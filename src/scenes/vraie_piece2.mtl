@@ -1,0 +1,31 @@
+#Produced by Art of Illusion 1.8, Wed Oct 20 21:10:59 CEST 2004
+newmtl vert
+Kd 0.43 0.71 0.18
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl marron
+Kd 0.69 0.43 0
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl rouge
+Kd 0.79 0.17 0.3
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl marron2
+Kd 0.45 0.3 0.18
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl bleu
+Kd 0.17 0.08 0.86
+Ks 0 0 0
+Ka 0 0.01 0
+illum 1
+newmtl jaune
+Kd 1 0.93 0.45
+Ks 0 0 0
+Ka 0 0 0
+illum 1

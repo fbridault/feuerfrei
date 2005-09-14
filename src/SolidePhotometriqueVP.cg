@@ -1,0 +1,101 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+// Le parametre PT3D passe en sortie doit correspondre a la coordonnees 3D du point
+// dans le repere global. Deux cas sont possible :
+// 1 : on lit une scene dans un fichier et donc tous les points sont specifies dans
+//     le repere global, alors PT3D est juste un passage de la position du point.
+// 2 : on construit la scene avec des appels a glTranslate et glRotate ... etc,
+//     alors PT3D est la multiplication de la position du point et de la matrice
+//     MODELVIEW permettant le positionnement du point dans le repere global.
+//     Attention a ne pas prendre en compte les transformations utilisees pour la
+//     visualisation de la scene comme le panorama ou le eyeball.
+
+struct vertexInputsTEX
+{
+	float4 position     : POSITION;
+	float3 normale      : NORMAL;
+	float4 color	    : COLOR0;
+	float2 texcoords    : TEXCOORD0;
+};
+
+struct vertexOutputsTEX
+{
+	float4 HPos	    : POSITION;
+	float4 Col0	    : COLOR0;
+	float2 texcoords    : TEXCOORD0;
+	float4 PT3D         : TEXCOORD1;
+	float3 normale      : TEXCOORD2;
+};
+
+vertexOutputsTEX vpSPTEX(vertexInputsTEX IN,
+	uniform float4x4 ModelViewProj
+	//cas 2
+	//,uniform float4x4 ModelView
+	)
+{
+	vertexOutputsTEX OUT;		
+
+	// transformation des coordonnees 3D dans le repere de la camera
+	OUT.HPos = mul(ModelViewProj, IN.position);
+
+	// passage de la couleur en sortie
+	OUT.Col0.xyz = IN.color.xyz;
+
+	// passage des coordonnees de texture
+	OUT.texcoords = IN.texcoords;
+
+	// passage des coordonnées du point 3D pour interpolation
+	// cas 1 : simple recopie
+	OUT.PT3D = IN.position;
+	// cas 2 : transformation vers le repere global avant passage
+	//OUT.PT3D = mul(ModelView, IN.position);
+	
+	// passage de la normale pour interpolation
+	OUT.normale = IN.normale;
+
+	return OUT;
+}
+
+
+
+
+struct vertexInputsWTEX
+{
+	float4 position     : POSITION;
+	float3 normale      : NORMAL;
+	float4 color	    : COLOR0;
+};
+
+struct vertexOutputsWTEX
+{
+	float4 HPos	    : POSITION;
+	float4 Col0	    : COLOR0;
+	float4 PT3D         : TEXCOORD0;
+	float3 normale      : TEXCOORD1;
+};
+
+vertexOutputsWTEX vpSPWTEX(vertexInputsWTEX IN,
+	uniform float4x4 ModelViewProj
+	//cas 2
+	//,uniform float4x4 ModelView
+	)
+{
+	vertexOutputsWTEX OUT;		
+
+	// transformation des coordonnees 3D dans le repere de la camera
+	OUT.HPos = mul(ModelViewProj, IN.position);
+
+	// passage de la couleur en sortie
+	OUT.Col0.xyz = IN.color.xyz;
+
+	// passage des coordonnées du point 3D pour interpolation
+	// cas 1 : simple recopie
+	OUT.PT3D = IN.position;
+	// cas 2 : transformation vers le repere global avant passage
+	//OUT.PT3D = mul(ModelView, IN.position);
+	
+	// passage de la normale pour interpolation
+	OUT.normale = IN.normale;
+
+	return OUT;
+}

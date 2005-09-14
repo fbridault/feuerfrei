@@ -1,0 +1,11 @@
+#Produced by Art of Illusion 2.0, Fri Apr 22 14:03:48 CEST 2005
+newmtl Untitled_2
+Kd 0.74 0.5886 0.0518
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Default_Texture
+Kd 1 1 1
+Ks 0 0 0
+Ka 0 0 0
+illum 1

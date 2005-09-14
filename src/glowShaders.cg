@@ -1,0 +1,53 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+struct vertin
+{
+  float4 position     : POSITION;
+  float4 color	  : COLOR0;
+  float2 texcoords  : TEXCOORD0;
+};
+
+struct vertout
+{
+  float4 position     : POSITION;
+  float4 color        : COLOR0;
+  float tc0    : TEXCOORD0;
+  float tc1    : TEXCOORD1;
+  float tc2    : TEXCOORD2;
+  float tc3    : TEXCOORD3;
+  float tc4    : TEXCOORD4;
+  float tc5    : TEXCOORD5;
+  float tc6    : TEXCOORD6;
+  float tc7    : TEXCOORD7;
+};
+
+vertout vertGlow(vertin IN, uniform float[8] offset, uniform float4x4 ModelViewProj)
+{
+  vertout OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage de la couleur en sortie
+  OUT.color = IN.color;
+  // passage des coordonnees de texture
+  OUT.tc0 = IN.texcoords + offset[0];
+  OUT.tc1 = IN.texcoords + offset[1];
+  OUT.tc2 = IN.texcoords + offset[2];
+  OUT.tc3 = IN.texcoords + offset[3];
+  OUT.tc4 = IN.texcoords + offset[4];
+  OUT.tc5 = IN.texcoords + offset[5];
+  OUT.tc6 = IN.texcoords + offset[6];
+  OUT.tc7 = IN.texcoords + offset[7];
+  
+  return OUT;
+}
+
+float4 fragGlow(vertout IN, uniform float[8] weights, uniform sampler1D texture) : COLOR
+{
+  float4 color;
+
+  color = tex1D(texture,IN.tc0) * weights[0] + tex1D(texture,IN.tc1) * weights[1] + (texture,IN.tc2) * weights[2] + (texture,IN.tc3) * weights[3] + (texture,IN.tc4) * weights[4] + (texture,IN.tc5) * weights[5] + (texture,IN.tc6) * weights[6] + (texture,IN.tc7) * weights[7];
+
+  return color;
+}
+q

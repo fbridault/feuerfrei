@@ -1,0 +1,39 @@
+#Produced by Art of Illusion 2.1, Fri Jul 29 15:45:36 CEST 2005
+newmtl murs
+Kd 0 0.16 0.8574
+Ks 1 1 1
+Ka 0 0 0
+illum 2
+Ns 1
+newmtl Caisse
+Kd 1 1 1
+map_Kd scene42.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Untitled_2
+Kd 1 0.07 0.17
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl vert
+Kd 0.28 0.76 0.13
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Default_Texture
+Kd 1 1 1
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Sol
+Kd 1 1 1
+map_Kd scene41.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Jaune
+Kd 0.93 1 0
+Ks 0 0 0
+Ka 0 0 0
+illum 1

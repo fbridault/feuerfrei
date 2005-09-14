@@ -1,0 +1,54 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+struct vertin
+{
+  float4 position     : POSITION;
+  float3 normale      : NORMAL;
+  float4 color	      : COLOR0;
+  float2 texcoords    : TEXCOORD0;
+};
+
+struct vertout
+{
+  float4 position     : POSITION;
+  float4 color        : COLOR0;
+  float2 texcoords    : TEXCOORD0;
+  float3 normale      : TEXCOORD1;
+};
+
+vertout vertBougie(vertin IN, uniform float texTranslation, uniform float4x4 ModelViewProj)
+{
+  vertout OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage de la couleur en sortie
+  OUT.color = IN.color;
+  // passage des coordonnees de texture
+  OUT.texcoords = IN.texcoords;
+  OUT.texcoords.y += texTranslation;
+  
+  // passage de la normale
+  OUT.normale = IN.normale;
+  
+  //IN.normale.z = 0;
+  //OUT.normale = mul(ModelViewProj, IN.normale).xyz;
+  
+  return OUT;
+}
+
+float4 fragBougie(vertout IN, uniform float4x4 ModelViewInv, uniform sampler2D texture) : COLOR
+{  
+  // cos de l'angle entre la direction de visée et la normale au point
+  // sortir mul(ModelViewInv, float4(0,0,1,0)).xyz) -> Identique pour tous les pixels
+  float cosa = dot(normalize(mul(ModelViewInv, float4(0,0,1,0)).xyz), normalize(IN.normale));
+  
+  // couleur de la texture de l'objet
+  float4 color = tex2D(texture, IN.texcoords);
+  
+  color.rgb =log(color.rgb+1)*2;
+  color.a = sqrt(cosa);
+
+  // melange de la couleur de l'objet, de sa texture et de l'intensite
+  return color;
+}

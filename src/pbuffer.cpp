@@ -5,11 +5,10 @@
 
 //#include "extgl.h"
 // sous linux decommenter les 2 lignes ci-dessous (pb a regler car normalement inutiles)
-//#define GLX_FLOAT_COMPONENTS_NV         0x20B0
-#include <GL/glxext.h>
-#include <GL/glut.h>
+#define GLX_FLOAT_COMPONENTS_NV         0x20B0
 
 #include "pbuffer.h"
+
 #include <string>
 #include <vector>
 
@@ -509,11 +508,11 @@ bool PBuffer::Initialize(int iWidth, int iHeight, bool bShareContexts, bool bSha
   m_pDisplay = pDisplay;
 
 
-  GLint texFormat = WGL_NO_TEXTURE_ARB;
-  wglQueryPbufferARB(m_hPBuffer, WGL_TEXTURE_FORMAT_ARB, &texFormat);
+//   GLint texFormat = WGL_NO_TEXTURE_ARB;
+//   wglQueryPbufferARB(m_hPBuffer, WGL_TEXTURE_FORMAT_ARB, &texFormat);
 
-  if (texFormat != WGL_NO_TEXTURE_ARB)
-    m_bIsTexture = true;
+//   if (texFormat != WGL_NO_TEXTURE_ARB)
+  m_bIsTexture = true;
 
 
   unsigned int w, h;
@@ -565,7 +564,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
 	  pfAttribList->push_back(8);
 	  pfAttribList->push_back(GLX_BLUE_SIZE);
 	  pfAttribList->push_back(8);
-
+	  printf("rgb\n");
 	  continue;
         }
 
@@ -573,7 +572,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
         {
 	  pfAttribList->push_back(GLX_ALPHA_SIZE);
 	  pfAttribList->push_back(getIntegerValue(token));
-            
+	  printf("alpha\n");
 	  continue;
         }
 
@@ -657,51 +656,51 @@ void PBuffer::Deactivate()
   m_glxOldContext = 0;
 }
 
-int PBuffer::Bind(int iBuffer)
-{
-  if (!m_bIsTexture)
-    {
-      fprintf(stderr, "PBuffer::Bind() failed - pbuffer format does not support render to texture!\n");
-      return 0;
-    }
+// int PBuffer::Bind(int iBuffer)
+// {
+//   if (!m_bIsTexture)
+//     {
+//       fprintf(stderr, "PBuffer::Bind() failed - pbuffer format does not support render to texture!\n");
+//       return 0;
+//     }
 
-  if (m_bIsBound)
-    {
-      fprintf(stderr, "PBuffer::Bind() failed - pbuffer is already bound.\n");
-      return 0;
-    }
+//   if (m_bIsBound)
+//     {
+//       fprintf(stderr, "PBuffer::Bind() failed - pbuffer is already bound.\n");
+//       return 0;
+//     }
 
-  int ret = glXBindTexImageARB (m_pDisplay, m_glxPbuffer, iBuffer);
-  if (!ret)
-    fprintf(stderr, "PBuffer::Bind() failed.\n");
+//   int ret = glXBindTexImageARB (m_pDisplay, m_glxPbuffer, iBuffer);
+//   if (!ret)
+//     fprintf(stderr, "PBuffer::Bind() failed.\n");
     
-  m_bIsBound = true;
+//   m_bIsBound = true;
 
-  return ret;
-}
+//   return ret;
+// }
 
-int PBuffer::Release(int iBuffer)
-{
-  if (!m_bIsTexture)
-    {
-      fprintf(stderr, "PBuffer::Release() failed - pbuffer format does not support render to texture!\n");
-      return 0;
-    }
+// int PBuffer::Release(int iBuffer)
+// {
+//   if (!m_bIsTexture)
+//     {
+//       fprintf(stderr, "PBuffer::Release() failed - pbuffer format does not support render to texture!\n");
+//       return 0;
+//     }
 
-  if (!m_bIsBound)
-    {
-      fprintf(stderr, "PBuffer::Release() failed - pbuffer is not bound.\n");
-      return 0;
-    }
+//   if (!m_bIsBound)
+//     {
+//       fprintf(stderr, "PBuffer::Release() failed - pbuffer is not bound.\n");
+//       return 0;
+//     }
 
-  int ret = glXReleaseTexImageARB(m_pDisplay, m_glxPbuffer, iBuffer);
-  if (!ret)
-    fprintf(stderr, "PBuffer::Release() failed.\n");
+//   int ret = glXReleaseTexImageARB(m_pDisplay, m_glxPbuffer, iBuffer);
+//   if (!ret)
+//     fprintf(stderr, "PBuffer::Release() failed.\n");
     
-  m_bIsBound = false;
+//   m_bIsBound = false;
     
-  return ret;
-}
+//   return ret;
+// }
 
 #elif defined(MACOS)
 

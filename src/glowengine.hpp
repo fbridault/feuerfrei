@@ -14,23 +14,18 @@ class GlowEngine;
 class GlowEngine
 {
 private: 
-  int				_iWidth, _iHeight; // dimensions des textures
-  int				win; // handler sur le contexte d'afichage
-    
-  unsigned int	_iTexture[2]; // textures codants les origines [0] et les directions [1] des rayons
-
-  // prog Cgx
+  int				width, height; // dimensions des textures
   
-  void init_glutnCg();
-
-  PBuffer		pbuffer;
-  CGcontext		cgContext;
-  CGprofile		cgvpProfile,cgfpProfile;
-
-  float			imgdata[TAILLE_PBFX*TAILLE_PBFY*3];
-  float			imgdata2[TAILLE_PBFX*TAILLE_PBFY*3];
-  float			imgdataout[TAILLE_PBFX*TAILLE_PBFY*4];
-  //	float			depthdata[TAILLE_PBFX*TAILLE_PBFY];
+  /** Pbuffer */
+  PBuffer pbuffer;
+  /** Pointeur sur le contexte CG */
+  CGcontext *context;
+  /** Vertex Shader pour le blur */
+  CgBlurVertexShader blurVertexShaderX, blurVertexShaderY;
+  /** Fragment Shader pour le blur */
+  CgBlurFragmentShader blurFragmentShader;
+  /** Indice de la texture servant à réaliser le blur */
+  GLuint texblur;
     
 public:
   

@@ -420,13 +420,32 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
       glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
       glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
       
-      cgBougieVertexShader.setModelViewProjectionMatrix();
+      /*cgBougieVertexShader.setModelViewProjectionMatrix();
       cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
       cgBougieFragmentShader.setTexture(&tex);
       cgBougieFragmentShader.setInverseModelViewMatrix();
       cgBougieVertexShader.enableShader();
-      cgBougieFragmentShader.enableShader();
+      cgBougieFragmentShader.enableShader();*/
       
+      glEnable (GL_TEXTURE_2D);
+
+      glMaterialfv (GL_FRONT, GL_AMBIENT, mat_ambient2);
+      glMaterialfv (GL_FRONT, GL_DIFFUSE, mat_diffuse);
+
+      glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+      glMap2f (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2,
+	       &texpts[0][0][0]);
+      glEnable (GL_MAP2_TEXTURE_COORD_2);
+      glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
+      glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
+
+      glMatrixMode (GL_TEXTURE);
+      glPushMatrix ();
+      glLoadIdentity ();
+      glTranslatef (0.0, angle / (double) (PI), 0.0);
+
       gluBeginSurface (nurbs);
       gluNurbsSurface (nurbs, uknotsCount, uknots, vknotsCount,
 		       vknots, (max_particles + nb_pts_fixes) * 3,
@@ -434,8 +453,9 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
       
-      cgBougieVertexShader.disableProfile();
-      cgBougieFragmentShader.disableProfile();
+      glDisable (GL_TEXTURE_2D);
+      /*cgBougieVertexShader.disableProfile();
+      cgBougieFragmentShader.disableProfile();*/
     }
 }
 

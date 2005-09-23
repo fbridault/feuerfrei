@@ -37,7 +37,8 @@ void CMaterial::apply () const
       matSpecular[i] = Ks.getColor (i);
       matAmbient[i] = 0.3;  // Ka
     } 
-  matDiffuse[3] = 1.0;
+  /* Mis à 0 pour indiquer que l'on ne fait pas de glow */
+  matDiffuse[3] = 0.0;
   matSpecular[3] = 1.0;
   matAmbient[3] = 1.0;
   

@@ -14,7 +14,7 @@ class GlowEngine;
 class GlowEngine
 {
 private: 
-  int				width, height; // dimensions des textures
+  int width, height; // dimensions de la texture
   
   /** Pbuffer */
   PBuffer pbuffer;

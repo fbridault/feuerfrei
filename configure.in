@@ -310,7 +310,25 @@ Place it in the directory /usr/include/GL.
 *****************************************************************])
 fi
 
-CPPFLAGS="$saved_CPPFLAGS -DGL_GLEXT_PROTOTYPES"
+# Check glxext.h version
+AC_MSG_CHECKING(version of GL/glxext.h)
+AC_RUN_IFELSE([
+  AC_LANG_PROGRAM(
+  [
+    #include <GL/glx.h>
+    #include <GL/glxext.h>
+  ], 
+  [
+    #if GLX_GLXEXT_VERSION < 5
+      return 1;
+    #endif
+  ])],
+AC_MSG_RESULT(ok),
+AC_MSG_RESULT(failed)
+AC_MSG_RESULT(** WARNING **: I'd like to have a newer <GL/glxext.h>. Please download it from http://oss.sgi.com/projects/ogl-sample/ABI/),
+AC_MSG_RESULT(ok))
+
+CPPFLAGS="$saved_CPPFLAGS -DGL_GLEXT_PROTOTYPES -DGLX_GLXEXT_PROTOTYPES"
 VS_CPPFLAGS="${VS_CPPFLAGS} $GL_CPPFLAGS"
 
 dnl --------------------------------------------------------------------------

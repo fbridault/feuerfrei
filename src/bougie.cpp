@@ -420,17 +420,17 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
       glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
       glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
       
-      /*cgBougieVertexShader.setModelViewProjectionMatrix();
+      cgBougieVertexShader.setModelViewProjectionMatrix();
       cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
       cgBougieFragmentShader.setTexture(&tex);
       cgBougieFragmentShader.setInverseModelViewMatrix();
       cgBougieVertexShader.enableShader();
-      cgBougieFragmentShader.enableShader();*/
+      cgBougieFragmentShader.enableShader();
       
-      glEnable (GL_TEXTURE_2D);
+      // glEnable (GL_TEXTURE_2D);
 
-      glMaterialfv (GL_FRONT, GL_AMBIENT, mat_ambient2);
-      glMaterialfv (GL_FRONT, GL_DIFFUSE, mat_diffuse);
+//       glMaterialfv (GL_FRONT, GL_AMBIENT, mat_ambient2);
+//       glMaterialfv (GL_FRONT, GL_DIFFUSE, mat_diffuse);
 
       glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
       glMap2f (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2,
@@ -453,9 +453,9 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
       
-      glDisable (GL_TEXTURE_2D);
-      /*cgBougieVertexShader.disableProfile();
-      cgBougieFragmentShader.disableProfile();*/
+      // glDisable (GL_TEXTURE_2D);
+      cgBougieVertexShader.disableProfile();
+      cgBougieFragmentShader.disableProfile();
     }
 }
 

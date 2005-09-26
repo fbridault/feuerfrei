@@ -5,16 +5,28 @@ class GlowEngine;
 
 #include <header.h>
 
-#include "extgl.h"
-#include "pbuffer.h"
 #include <Cg/cgGL.h>
 #include <GL/glut.h>
-
+#include "pbuffer.hpp"
+#include "CgBlurShaders.hpp"
+#include "scene.hpp"
+#include "eyeball.hpp"
 
 class GlowEngine
 {
+public:
+  
+  GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h);
+  virtual ~GlowEngine();
+
+  void activate();
+  void render();
+  void deactivate();
+  void drawBlur();
+
 private: 
   int width, height; // dimensions de la texture
+  int scaleFactor;
   
   /** Pbuffer */
   PBuffer pbuffer;
@@ -26,14 +38,10 @@ private:
   CgBlurFragmentShader blurFragmentShader;
   /** Indice de la texture servant à réaliser le blur */
   GLuint texblur;
-    
-public:
   
-  GlowEngine();
-  virtual ~GlowEngine();
-
-  
-
+  CScene *scene;
+  Eyeball *eyeball;
+  Texture *textest;
 };
 
 #endif

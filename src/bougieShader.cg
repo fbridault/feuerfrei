@@ -46,8 +46,8 @@ float4 fragBougie(vertout IN, uniform float4x4 ModelViewInv, uniform sampler2D t
   // couleur de la texture de l'objet
   float4 color = tex2D(texture, IN.texcoords);
   
-  color.rgb =log(color.rgb+1)*2;
-  color.a = sqrt(cosa);
+  color.rgb =log(color.rgb+1)*1.2;
+  color.a = cosa;
 
   // melange de la couleur de l'objet, de sa texture et de l'intensite
   return color;

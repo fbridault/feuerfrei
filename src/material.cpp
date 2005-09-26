@@ -42,9 +42,9 @@ void CMaterial::apply () const
   matSpecular[3] = 1.0;
   matAmbient[3] = 1.0;
   
-    for (int i = 0; i < COMPOSANTES-1; i++)
-      cout << matDiffuse[i] << " ";
-    cout << endl;
+//     for (int i = 0; i < COMPOSANTES-1; i++)
+//       cout << matDiffuse[i] << " ";
+//     cout << endl;
 
   glMaterialfv (GL_FRONT, GL_DIFFUSE, matDiffuse);
   glMaterialfv (GL_FRONT, GL_AMBIENT, matAmbient);

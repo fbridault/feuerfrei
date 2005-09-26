@@ -16,11 +16,14 @@
 class Texture
 {
 public:
-  /** Construit une texture à partir d'un fichier PNG.
+  /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger
    */
   Texture(const char* const filename);
-    /** Construit une texture à partir d'un fichier PNG.
+
+  Texture(const char* const filename, GLenum gltexture);
+  
+    /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}

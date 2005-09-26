@@ -15,6 +15,7 @@
 #include "firmalampe.hpp"
 #include "solver.hpp"
 #include "benchsolver.hpp"
+#include "glowengine.hpp"
 
 /********* Variables relatives au contrôle de l'affichage **************/
 static bool animate, affiche_velocite, affiche_repere, affiche_grille,
@@ -51,6 +52,9 @@ static SolidePhotometrique *solidePhoto;
 static bool solidePhotoEnabled, rotation,modePano,pixelBFC;
 /* interpolationSP = 0 ou 1; couleurOBJ = 0 ou 2 */
 static unsigned char interpolationSP, couleurOBJ;
+
+/********* Variables relatives au glow *********************************/
+static GlowEngine *glowEngine;
 
 
 /**************************** FONCTIONS GENERALES DE L'INTERFACE GRAPHIQUE **************************/
@@ -125,25 +129,60 @@ draw_velocity (void)
 static void
 draw (void)
 {
-//   GLUquadricObj *q;
-
   /* raz de la fenetre avec la couleur de fond */
-  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-  GLfloat val_ambiant[]={0.4,0.4,0.4,1.0};
-  GLfloat null[]={1.0,1.0,1.0,1.0};
+//   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  
+//   GLfloat val_ambiant[]={0.4,0.4,0.4,1.0};
+//   GLfloat null[]={1.0,1.0,1.0,1.0};
+  
+   glowEngine->activate();
+  /* raz de la fenetre avec la couleur de fond */
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
   /* Déplacement du eyeball */
-  eyeball->recalcModelView ();
+  eyeball->recalcModelView();
   
-  /* A REVOIR ECLAIRAGE INUTILE POUR SOLIDES PHOTOS, SEUL DEPLACEMENT UTILE */
+//   /****************************************/
+//   /* Rendu de la scène */
+//   /* A REVOIR ECLAIRAGE INUTILE POUR SOLIDES PHOTOS, SEUL DEPLACEMENT UTILE */
+  glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+  
   glPushMatrix ();
   SDL_mutexP (lock);
   for (int f = 0; f < nb_flammes; f++)
     flammes[f]->eclaire (animate, affiche_particules);
   SDL_mutexV (lock);
   glPopMatrix ();
+
+  scene->draw_scene ();
   
+  /* Dessin de la flamme */
+  /* Voir pour créer une display list pour la 2e passe */
+  SDL_mutexP (lock);
+  for (int f = 0; f < nb_flammes; f++)
+    flammes[f]->dessine (animate, affiche_flamme, affiche_particules);
+  SDL_mutexV (lock);
+  
+  glowEngine->render();
+  
+  glowEngine->deactivate();
+  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  
+  //glPushAttrib ( GL_DEPTH_BUFFER_BIT );
+  
+  //   /* Déplacement du eyeball */
+  //   eyeball->recalcModelView ();
+  
+//   /* A REVOIR ECLAIRAGE INUTILE POUR SOLIDES PHOTOS, SEUL DEPLACEMENT UTILE */
+//   glPushMatrix ();
+//   SDL_mutexP (lock);
+//   for (int f = 0; f < nb_flammes; f++)
+//     flammes[f]->eclaire (animate, affiche_particules);
+//   SDL_mutexV (lock);
+//   glPopMatrix ();
+  
+  glBlendFunc (GL_ONE, GL_ZERO);
   /* Affichage de la scène */
   if(solidePhotoEnabled){
     solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
@@ -153,6 +192,9 @@ draw (void)
     /**** Affichage de la scène avec ombres ****/
     glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT |
 		  GL_STENCIL_BUFFER_BIT);
+    
+    glEnable (GL_LIGHTING);
+    
     for (int f = 0; f < nb_flammes; f++)
       {
 	if (shadowVolumesEnabled)
@@ -167,25 +209,26 @@ draw (void)
     glPopAttrib ();
   }
   
-  /* Affichage des outils d'aide à la visu (grille, etc...) */
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glDisable (GL_LIGHTING);
+//   /* Affichage des outils d'aide à la visu (grille, etc...) */
+//   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glDisable (GL_LIGHTING);
   
-  for (int f = 0; f < nb_flammes; f++)
-  {
-    CPoint position (*(flammes[f]->getPosition ()));
+//   for (int f = 0; f < nb_flammes; f++)
+//   {
+//     CPoint position (*(flammes[f]->getPosition ()));
     
-    glPushMatrix ();
-    glTranslatef (position.getX (), position.getY (), position.getZ ());
-    if (affiche_repere)
-      glCallList (REPERE);
-    if (affiche_grille)
-      glCallList (GRILLE);
-    if (affiche_velocite)
-      draw_velocity();
+//     glPushMatrix ();
+//     glTranslatef (position.getX (), position.getY (), position.getZ ());
+//     if (affiche_repere)
+//       glCallList (REPERE);
+//     if (affiche_grille)
+//       glCallList (GRILLE);
+//     if (affiche_velocite)
+//       draw_velocity();
     
-    glPopMatrix ();
-  }
+//     glPopMatrix ();
+//   }
+   glBlendFunc  (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   /* Dessin de la flamme */
   SDL_mutexP (lock);
@@ -195,9 +238,13 @@ draw (void)
   
   if (affiche_fps)
     write_fps ();
-  
-  glEnable (GL_LIGHTING);
-  
+
+  glDisable (GL_DEPTH_TEST);
+
+  glBlendFunc (GL_ONE, GL_ONE);
+  glowEngine->drawBlur();
+  glEnable (GL_DEPTH_TEST);
+
   SDL_GL_SwapBuffers ();
   
   Frames++;
@@ -408,7 +455,7 @@ init_ui ()
 
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_BLEND);
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   glShadeModel (GL_SMOOTH);
   glEnable (GL_LINE_SMOOTH);
@@ -488,6 +535,8 @@ init_ui ()
   
   eyeball = new Eyeball (largeur, hauteur, clipping);
   
+  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur);
+
   /* Pour l'affichage */
   animate = true; 
   brintage = false;
@@ -833,7 +882,7 @@ main (int argc, char *argv[])
   delete solidePhoto;
 	
   if (context)
-	cgDestroyContext (context);	
+    cgDestroyContext (context);	
   
   return 0;
 }

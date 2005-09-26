@@ -83,7 +83,7 @@ float4 fragGlow(vertout IN, uniform float weights[8], uniform samplerRECT textur
   float4 color;
 
   color = texRECT(texture,IN.tc0) * weights[0] + texRECT(texture,IN.tc1) * weights[1] + texRECT(texture,IN.tc2) * weights[2] + texRECT(texture,IN.tc3) * weights[3] + texRECT(texture,IN.tc4) * weights[4] + texRECT(texture,IN.tc5) * weights[5] + texRECT(texture,IN.tc6) * weights[6] + texRECT(texture,IN.tc7) * weights[7];
-  color = color/54.0;
+  color = color/80.0;
   
 
   return color;

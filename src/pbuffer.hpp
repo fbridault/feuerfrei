@@ -1,6 +1,8 @@
 #ifndef __PBUFFERS_H__
 #define __PBUFFERS_H__
 
+#define UNIX
+
 #if defined(WIN32)
 #  include <windows.h>
 #  include <GL/gl.h>
@@ -51,7 +53,7 @@ class PBuffer
   void HandleModeSwitch();
 #endif
 
-#if defined(UNIX) || defined(WIN32)
+#if defined(WIN32)
   int Bind(int iBuffer);
   int Release(int iBuffer);
 #endif

@@ -7,7 +7,7 @@
 // sous linux decommenter les 2 lignes ci-dessous (pb a regler car normalement inutiles)
 #define GLX_FLOAT_COMPONENTS_NV         0x20B0
 
-#include "pbuffer.h"
+#include "pbuffer.hpp"
 
 #include <string>
 #include <vector>
@@ -339,52 +339,6 @@ void PBuffer::HandleModeSwitch()
     }
 }
 
-int PBuffer::Bind(int iBuffer)
-{
-  if (!m_bIsTexture)
-    {
-      fprintf(stderr, "PBuffer::Bind() failed - pbuffer format does not support render to texture!\n");
-      return 0;
-    }
-
-  if (m_bIsBound)
-    {
-      fprintf(stderr, "PBuffer::Bind() failed - pbuffer is already bound.\n");
-      return 0;
-    }
-
-  int ret = wglBindTexImageARB(m_hPBuffer, iBuffer);
-  if (!ret)
-    fprintf(stderr, "PBuffer::Bind() failed.\n");
-    
-  m_bIsBound = true;
-
-  return ret;
-}
-
-int PBuffer::Release(int iBuffer)
-{
-  if (!m_bIsTexture)
-    {
-      fprintf(stderr, "PBuffer::Release() failed - pbuffer format does not support render to texture!\n");
-      return 0;
-    }
-
-  if (!m_bIsBound)
-    {
-      fprintf(stderr, "PBuffer::Release() failed - pbuffer is not bound.\n");
-      return 0;
-    }
-
-  int ret = wglReleaseTexImageARB(m_hPBuffer, iBuffer);
-  if (!ret)
-    fprintf(stderr, "PBuffer::Release() failed.\n");
-    
-  m_bIsBound = false;
-    
-  return ret;
-}
-
 void PBuffer::Activate()
 {
   if (m_bIsActive)
@@ -564,7 +518,6 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
 	  pfAttribList->push_back(8);
 	  pfAttribList->push_back(GLX_BLUE_SIZE);
 	  pfAttribList->push_back(8);
-	  printf("rgb\n");
 	  continue;
         }
 
@@ -572,7 +525,6 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
         {
 	  pfAttribList->push_back(GLX_ALPHA_SIZE);
 	  pfAttribList->push_back(getIntegerValue(token));
-	  printf("alpha\n");
 	  continue;
         }
 

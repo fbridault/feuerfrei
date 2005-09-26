@@ -1,5 +1,5 @@
-#ifndef CGBOUGIESHADERS_H
-#define CGBOUGIESHADERS_H
+#ifndef CGBLURSHADERS_H
+#define CGBLURSHADERS_H
 
 class CgBlurVertexShader;
 class CgBlurFragmentShader;
@@ -29,7 +29,7 @@ private:
 class CgBlurFragmentShader : public CgShader
 {
 public:
-  CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context, Texture *tex);
+  CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context);
   virtual ~CgBlurFragmentShader();
   
   void setWeightsArray(){

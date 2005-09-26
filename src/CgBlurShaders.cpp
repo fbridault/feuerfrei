@@ -22,19 +22,19 @@ CgBlurVertexShader::~CgBlurVertexShader()
 
 /***********************************************************************************************************/
 
-CgBlurFragmentShader::CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context, Texture *tex) : 
+CgBlurFragmentShader::CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
   // Récupération des paramètres
   paramWeights = cgGetNamedParameter(program, "weights");
   paramTexture = cgGetNamedParameter(program, "texture");
-  weights[0] = 2;
-  weights[1] = 5;
-  weights[2] = 10;
+  weights[0] = 5;
+  weights[1] = 10;
+  weights[2] = 15;
   weights[3] = 20;
-  weights[4] = 10;
-  weights[5] = 5;
-  weights[6] = 2;
+  weights[4] = 15;
+  weights[5] = 10;
+  weights[6] = 5;
   weights[7] = 0;
 }
 

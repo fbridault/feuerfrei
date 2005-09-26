@@ -61,7 +61,8 @@ am_flames_OBJECTS = benchsolver.$(OBJEXT) bougie.$(OBJEXT) \
 	interface.$(OBJEXT) trackball.$(OBJEXT) CgShader.$(OBJEXT) \
 	CgSVShader.$(OBJEXT) CgSPFragmentShader.$(OBJEXT) \
 	CgSPVertexShader.$(OBJEXT) CgBougieShaders.$(OBJEXT) \
-	solidePhoto.$(OBJEXT) ies.$(OBJEXT)
+	solidePhoto.$(OBJEXT) ies.$(OBJEXT) pbuffer.$(OBJEXT) \
+	CgBlurShaders.$(OBJEXT) glowengine.$(OBJEXT)
 flames_OBJECTS = $(am_flames_OBJECTS)
 flames_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -254,6 +255,12 @@ flames_SOURCES = \
 	solidePhoto.hpp  \
 	ies.cpp  \
 	ies.hpp \
+	pbuffer.cpp  \
+	pbuffer.hpp  \
+	CgBlurShaders.cpp  \
+	CgBlurShaders.hpp  \
+	glowengine.cpp  \
+	glowengine.hpp  \
 	trackball.h  
 
 flames_LDFLAGS = 
@@ -324,6 +331,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CgBlurShaders.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CgBougieShaders.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CgSPFragmentShader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CgSPVertexShader.Po@am__quote@
@@ -335,12 +343,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eyeball.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/firmalampe.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flame.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glowengine.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graphicsFn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ies.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/leadSkeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/material.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pbuffer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/periSkeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scene.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/skeleton.Po@am__quote@

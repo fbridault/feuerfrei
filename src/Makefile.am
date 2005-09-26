@@ -72,6 +72,12 @@ flames_SOURCES = \
 	solidePhoto.hpp  \
 	ies.cpp  \
 	ies.hpp \
+	pbuffer.cpp  \
+	pbuffer.hpp  \
+	CgBlurShaders.cpp  \
+	CgBlurShaders.hpp  \
+	glowengine.cpp  \
+	glowengine.hpp  \
 	trackball.h  
 flames_LDFLAGS = 
 

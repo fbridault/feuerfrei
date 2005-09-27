@@ -179,49 +179,47 @@ Firmalampe::perturbate_forces ()
 }
 
 void
-Firmalampe::eclaire (bool animate, bool displayParticle)
+Firmalampe::eclaire ()
 {
   Particle *tmp;
-//  int 
+  
   nb_lights = 0;
 
   switch_off_lights ();
   /* Déplacement des guides + éclairage */
-  if (animate)
-    for (int i = 0; i < nbLeadSkeletons  ; i++){
-      guides[i]->move (displayParticle);
-			
-      tmp = guides[i]->getLastElt ();
-
-      nb_lights++;
-      if( (i < 8 ) ){
-	lightPositions[i][0] = tmp->getX ();
-	lightPositions[i][1] = tmp->getY ();
-	lightPositions[i][2] = tmp->getZ ();
-	lightPositions[i][3] = 1.0;
-      }
+  
+  for (int i = 0; i < nbLeadSkeletons  ; i++){
+    guides[i]->move ();
+    
+    tmp = guides[i]->getLastElt ();
+    
+    nb_lights++;
+    if( (i < 8 ) ){
+      lightPositions[i][0] = tmp->getX ();
+      lightPositions[i][1] = tmp->getY ();
+      lightPositions[i][2] = tmp->getZ ();
+      lightPositions[i][3] = 1.0;
     }
+  }
 }
 
 void
-Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
+Firmalampe::build ()
 {
   int i, j, l;
   int count;
-  int uknotsCount, vknotsCount;
-  int max_particles = INT_MIN;
+  max_particles = INT_MIN;
+  
+  eclaire();
 
   /* Déplacement et détermination du maximum */
   for (i = 0; i < nb_squelettes; i++)
     {
-      if (animate)
-	squelettes[i]->move (displayParticle);
+      squelettes[i]->move ();
       if (squelettes[i]->getSize () > max_particles)
 	max_particles = squelettes[i]->getSize ();
     }
-
-  if (!affiche_flamme)
-    return;
+  
   //  cout << max_particles << endl;
   // ctrlpoints = new Matrix_HPoint3Df(nb_squelettes+uorder-1,max_particles+nb_pts_fixes);
   //   uknots = new Vector_FLOAT(uorder+nb_squelettes+uorder-1);
@@ -247,12 +245,15 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	  /* On prend également en compte l'origine du squelette ET les extrémités du guide */
 	  /* On laisse les distances au carré pour des raisons évidentes de cot de calcul */
 
-	  distances[0] = squelettes[k]->getLeadSkeleton ()->getElt (0)->squaredDistanceFrom (squelettes[k]->getElt (0));
+	  distances[0] = 
+	    squelettes[k]->getLeadSkeleton ()->getElt (0)->squaredDistanceFrom (squelettes[k]->getElt (0));
 
 	  for (j = 0; j < squelettes[k]->getSize () - 1; j++)
-	    distances[j + 1] = squelettes[k]->getElt (j)->squaredDistanceFrom(squelettes[k]->getElt (j + 1));
-
-	  distances[squelettes[k]->getSize ()] = squelettes[k]->getLastElt ()->squaredDistanceFrom (squelettes[k]->getOrigine ());
+	    distances[j + 1] = 
+	      squelettes[k]->getElt (j)->squaredDistanceFrom(squelettes[k]->getElt (j + 1));
+	  
+	  distances[squelettes[k]->getSize ()] = 
+	    squelettes[k]->getLastElt ()->squaredDistanceFrom (squelettes[k]->getOrigine ());
 
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaÃ¯Â¿Å“re les premiers */
@@ -278,9 +279,7 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		indices_distances_max[l] = -1;
 	      else
 		/* On met Ã¯Â¿Å“0 la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
-		distances
-		  [indices_distances_max
-		   [l]] = 0;
+		distances[indices_distances_max[l]] = 0;
 
 	      //cout << FLT_MIN << endl << "dist max :" << dist_max << endl << indices_distances_max[l] << endl;
 	    }
@@ -289,19 +288,12 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	  count = 0;
 
 	  /* Remplissage des points de contrle */
-	  setCtrlPoint (i, count++,
-			squelettes[k]->
-			getLeadSkeleton ()->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getElt (0), 1.0);
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == 0)
 	      {
-		pt = CPoint::
-		  pointBetween
-		  (squelettes[k]->
-		   getLeadSkeleton ()->
-		   getElt (0),
-		   squelettes[k]->getElt (0));
+		pt = CPoint::pointBetween(squelettes[k]->getLeadSkeleton ()->getElt (0), squelettes[k]->getElt (0));
 		setCtrlPoint (i, count++, &pt);
 	      }
 
@@ -313,54 +305,31 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		  if (indices_distances_max[l] == j + 1)
 		    {
 		      /* On peut référencer j+1 puisque normalement, indices_distances_max[l] != j si j == squelettes[k]->getSize()-1 */
-		      pt = CPoint::
-			pointBetween
-			(squelettes
-			 [k]->
-			 getElt (j),
-			 squelettes
-			 [k]->getElt (j + 1));
-		      setCtrlPoint (i,
-				    count++, &pt);
+		      pt = CPoint::pointBetween(squelettes[k]->getElt (j), squelettes[k]->getElt (j + 1));
+		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
-	      setCtrlPoint (i, count++,
-			    squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
 	    }
-
-
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getLastElt ());
+	  
+	  setCtrlPoint (i, count++, squelettes[k]->getLastElt ());
 
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (indices_distances_max[l] ==
-		squelettes[k]->getSize ())
+	    if (indices_distances_max[l] == squelettes[k]->getSize ())
 	      {
-		pt = CPoint::
-		  pointBetween
-		  (squelettes[k]->
-		   getOrigine (),
-		   squelettes[k]->
-		   getLastElt ());
+		pt = CPoint::pointBetween(squelettes[k]->getOrigine (), squelettes[k]-> getLastElt ());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
 
 	  bool prec = false;
 
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (indices_distances_max[l] ==
-		squelettes[k]->getSize () + 1)
+	    if (indices_distances_max[l] == squelettes[k]->getSize () + 1)
 	      {
-		pt = CPoint::
-		  pointBetween
-		  (squelettes[k]->
-		   getOrigine (),
-		   squelettes[k]->
-		   getLeadSkeleton ()->
-		   getOrigine ());
+		pt = CPoint::pointBetween(squelettes[k]->getOrigine (),
+					  squelettes[k]->getLeadSkeleton()->getOrigine ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -374,39 +343,24 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		    pt = *squelettes[k]->
 		      getOrigine ();
 		  }
-		pt = CPoint::
-		  pointBetween (&pt,
-				squelettes
-				[k]->
-				getLeadSkeleton
-				()->
-				getOrigine ());
+		pt = CPoint::pointBetween (&pt, squelettes[k]->getLeadSkeleton()->getOrigine ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
-	  setCtrlPoint (i, count++,
-			squelettes[k]->
-			getLeadSkeleton ()->getOrigine ());
-
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getOrigine ());
 	}
       else
 	{
 	  /* Cas sans problÃ¨me */
 	  count = 0;
 	  /* Remplissage des points de contrÃ´le */
-	  setCtrlPoint (i, count++,
-			squelettes[k]->
-			getLeadSkeleton ()->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getElt (0), 1.0);
 	  for (j = 0; j < squelettes[k]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++,
-			    squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
 	    }
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getOrigine ());
-	  setCtrlPoint (i, count++,
-			squelettes[k]->
-			getLeadSkeleton ()->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getOrigine ());
 	}
     }
 
@@ -428,14 +382,31 @@ Firmalampe::dessine (bool animate, bool affiche_flamme, bool displayParticle)
   if (vknots[vorder] > vknots[vorder + 1])
     for (j = vorder + 1; j < vknotsCount; j++)
       vknots[j] += 1;
+}
 
+void 
+Firmalampe::drawWick()
+{
+   glCallList (MECHE);
+}
+
+void
+Firmalampe::drawFlame (bool displayParticle)
+{
+  int i;
+  
+  /* Affichage des particules */
+  if(displayParticle){
+    /* Déplacement et détermination du maximum */
+    for (i = 0; i < nb_squelettes; i++)
+      squelettes[i]->draw();
+    for (i = 0; i < nbLeadSkeletons; i++)
+      guides[i]->draw();
+  }
   glTranslatef (position.getX (), position.getY (), position.getZ ());
 
   GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 0.9 };
   GLfloat mat_ambient2[] = { 1.0, 1.0, 1.0, 1.0 };
-
-  /* Affichage de la mèche */
-  glCallList (MECHE);
 
   if (toggle)
     {

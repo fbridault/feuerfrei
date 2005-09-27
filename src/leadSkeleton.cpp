@@ -24,25 +24,13 @@ LeadSkeleton::~LeadSkeleton ()
 }
 
 int
-LeadSkeleton::move_origine (bool displayParticle)
+LeadSkeleton::move_origine ()
 {
   int i, j, k;
   CPoint tmp;
   float distx = 10 * dim_x / (float) solveur->getX ();
   float distz = dim_z / (float) solveur->getZ ();
-
-  CPoint position (flamePos + origine);
-
-  if (displayParticle)
-    {
-      glColor4f (0.1, 0.9, 0.0, 0.8);
-      glPushMatrix ();
-      glTranslatef (position.getX (), position.getY (),
-		    position.getZ ());
-      GraphicsFn::SolidSphere (0.01, 10, 10);
-      glPopMatrix ();
-    }
-
+  
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   i = (int) (origine.getX () * dim_x * solveur->getX ()) + 1 +
     solveur->getX () / 2;
@@ -80,7 +68,7 @@ LeadSkeleton::move_origine (bool displayParticle)
 }
 
 int
-LeadSkeleton::move_particle (Particle * const pos, bool displayParticle)
+LeadSkeleton::move_particle (Particle * const pos)
 {
   int i, j, k;
   //  int light;
@@ -112,26 +100,15 @@ LeadSkeleton::move_particle (Particle * const pos, bool displayParticle)
       || pos->getY () < 0 || pos->getY () > dim_y
       || pos->getZ () < -dim_z / 2.0 || pos->getZ () > dim_z / 2.0)
     return 0;
-
-  CPoint position (flamePos + *pos);
-
-  if (displayParticle)
-    {
-      glColor4f (0.1, 0.1, 1.0, 0.8);
-      glPushMatrix ();
-      glTranslatef (position.getX (), position.getY (), position.getZ ());
-      GraphicsFn::SolidSphere (0.01, 10, 10);
-      glPopMatrix ();
-    }
-
+  
   return 1;
 }
 
 /* Gère la création et la destruction des particules */
 void
-LeadSkeleton::move (bool displayParticle)
+LeadSkeleton::move ()
 {
-  Particle *tmp, *tmp2;
+  Particle *tmp;/* *tmp2;*/
   double dist;
   int i;
 
@@ -153,7 +130,7 @@ LeadSkeleton::move (bool displayParticle)
       tmp = getElt (i);
 
       if (move_particle
-	  (tmp, displayParticle))
+	  (tmp))
 	{
 	  setEltFile (i, tmp);
 
@@ -190,4 +167,16 @@ LeadSkeleton::move (bool displayParticle)
 	}
     }			/* for */
 
+}
+
+void LeadSkeleton::draw_particle (Particle * const particle)
+{
+  CPoint position (flamePos + *particle);
+
+  glColor4f (0.1, 0.1, 0.1, 0.8);
+  glPushMatrix ();
+  glTranslatef (position.getX (), position.getY (),
+		position.getZ ());
+  GraphicsFn::SolidSphere (0.01, 10, 10);
+  glPopMatrix ();
 }

@@ -41,14 +41,26 @@ public:
   Flame (Solver * s, CPoint * centre, CPoint * pos, const char *filename, CScene *scene);
   virtual ~Flame ();
   
-  /** Fonction appelÈe par la fonction de dessin OpenGL. Il s'agit de la fonction qui dessine la 
-   * flamme. Elle commence par dÈplacer les particules des squelettes pÈriphÈriques. Ensuite, elle 
-   * dÈfinit la matrice de points de contrÙle de la NURBS, des vecteurs de noeuds, et enfin du dessin
-   * proprement dit de la NURBS avec le placage de texture.
+    /** Fonction appel√©e par la fonction de dessin OpenGL. Elle commence par d√©placer les particules 
+   * des squelettes p√©riph√©riques. Ensuite, elle d√©finit la matrice de points de contr√¥le de la NURBS,
+   * des vecteurs de noeuds.
    */
-  virtual void dessine (bool animate, bool affiche_flamme,
-			bool displayParticle) = 0;
-  
+  virtual void build() = 0;
+    
+  /** Fonction appel√©e par la fonction de dessin OpenGL. Elle dessine la NURBS dÈfinie par la fonction
+   * build() avec le placage de texture
+   */
+  virtual void drawFlame(bool displayParticle) = 0;
+
+  /** Dessine la mËche de la flamme */
+  virtual void drawWick() = 0;
+
+  /** Dessine la flamme et sa mËche */
+  void draw(bool displayParticle){
+    drawFlame(displayParticle);
+    drawWick();
+  };
+
   /** Fonction appelÈe par le solveur de fluides pour ajouter l'ÈlÈvation thermique de la flamme.
    */
   virtual void add_forces (bool perturbate) = 0;
@@ -57,7 +69,7 @@ public:
    * au reste de la scËne via les particules du squelette guide. Elle s'occupe Ègalement de dÈplacer
    * les particules du squelette guide.
    */
-  virtual void eclaire (bool animate, bool displayParticle) = 0;
+  virtual void eclaire () = 0;
   
   CPoint *getPosition ()
   {
@@ -148,6 +160,9 @@ protected:
    * squelette. Allou√© une seule fois en d√©but de programme √† la taille maximale pour des raisons
    * √©videntes d'optimisation du temps d'ex√©cution.
    */
+  int uknotsCount, vknotsCount;
+  int max_particles;
+  
   float *distances;
   /** Tableau temporaire utilis√© pour classer les indices des distances entre points de contr√¥le
    * lors de l'ajout de points de contr√¥le suppl√©mentaires dans la NURBS.  Allou√© une seule fois 

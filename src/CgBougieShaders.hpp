@@ -20,7 +20,6 @@ public:
     cgGLSetParameter1f(paramTexTranslation, value);
   };
   
-
 private:
   CGparameter paramTexTranslation;
 };

@@ -41,13 +41,13 @@ float4 fragBougie(vertout IN, uniform float4x4 ModelViewInv, uniform sampler2D t
 {  
   // cos de l'angle entre la direction de visée et la normale au point
   // sortir mul(ModelViewInv, float4(0,0,1,0)).xyz) -> Identique pour tous les pixels
-  float cosa = dot(normalize(mul(ModelViewInv, float4(0,0,1,0)).xyz), normalize(IN.normale));
+  float cosa = dot(normalize(mul(ModelViewInv, float4(0,0,1,0))).xyz, normalize(IN.normale));
   
   // couleur de la texture de l'objet
   float4 color = tex2D(texture, IN.texcoords);
   
-  color.rgb =log(color.rgb+1)*1.2;
-  color.a = cosa;
+  color.rgb =log(color.rgb+1)*1.3;
+  color.a = cosa+.1;
 
   // melange de la couleur de l'objet, de sa texture et de l'intensite
   return color;

@@ -37,7 +37,7 @@ public:
   virtual ~PeriSkeleton();
   
   
-  void move(bool displayParticle);
+  void move();
 
   LeadSkeleton* getLeadSkeleton(){return guide;};
 
@@ -47,12 +47,12 @@ private:
    * @param n indice de la particule dans le squelette
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_particle(Particle* const pos, int n, bool displayParticle);
+  int move_particle(Particle* const pos, int n);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_origine(bool displayParticle);
+  int move_origine();
   
   /** Pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)

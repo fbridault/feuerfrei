@@ -26,27 +26,13 @@ PeriSkeleton::~PeriSkeleton ()
 }
 
 int
-PeriSkeleton::move_origine (bool displayParticle)
+PeriSkeleton::move_origine ()
 {
   int i, j, k;
   CPoint tmp;
   float distx = 10 * dim_x / (float) solveur->getX ();
   float distz = dim_y / (float) solveur->getZ ();
-
-  CPoint position (flamePos + origine);
-
-  if (displayParticle)
-    {
-      glDisable (GL_LIGHTING);
-      glColor4f (1.0, 0.0, 0.25, 0.8);
-      glPushMatrix ();
-      glTranslatef (position.getX (), position.getY (),
-		    position.getZ ());
-      GraphicsFn::SolidSphere (0.01, 10, 10);
-      glPopMatrix ();
-      glEnable (GL_LIGHTING);
-    }
-
+  
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   i = (int) (origine.getX () * dim_x * solveur->getX ()) + 1 +
     solveur->getX () / 2;
@@ -85,8 +71,7 @@ PeriSkeleton::move_origine (bool displayParticle)
 }
 
 int
-PeriSkeleton::move_particle (Particle * const pos, int n,
-			     bool displayParticle)
+PeriSkeleton::move_particle (Particle * const pos, int n)
 {
   int i, j, k;
   //  int light;
@@ -118,33 +103,19 @@ PeriSkeleton::move_particle (Particle * const pos, int n,
       || pos->getY () < 0 || pos->getY () > dim_y
       || pos->getZ () < -dim_z / 2.0 || pos->getZ () > dim_z / 2.0)
     return 0;
-
-  CPoint position (flamePos + *pos);
-
-  if (displayParticle)
-    {
-      glDisable (GL_LIGHTING);
-      glColor4f (1.0, 1.0, 0.25, 0.8);
-      glPushMatrix ();
-      glTranslatef (position.getX (), position.getY (),
-		    position.getZ ());
-      GraphicsFn::SolidSphere (0.01, 10, 10);
-      glPopMatrix ();
-      glEnable (GL_LIGHTING);
-    }
-
+  
   return 1;
 }
 
 /* Gère la création et la destruction des particules */
 void
-PeriSkeleton::move (bool displayParticle)
+PeriSkeleton::move ()
 {
   Particle *tmp, *tmp2;
   double dist;
   int i;
 
-  move_origine (displayParticle);
+  move_origine ();
 
   if (getSize () < NB_PARTICULES - 1)
     {
@@ -163,7 +134,7 @@ PeriSkeleton::move (bool displayParticle)
     {
       tmp = getElt (i);
 
-      if (move_particle (tmp, i, displayParticle))
+      if (move_particle (tmp, i))
 	{
 	  setEltFile (i, tmp);
 

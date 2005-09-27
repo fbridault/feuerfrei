@@ -34,6 +34,7 @@ public:
   
   void setWeightsArray(){
     cgGLSetParameterArray1f(paramWeights, 0, 8, weights);
+    cgGLSetParameter1f(paramDivide, divide);
   };
 
   void setTexture(Texture* tex){
@@ -43,8 +44,10 @@ public:
   
 private:
   CGparameter paramWeights;
+  CGparameter paramDivide;
   CGparameter paramTexture;
   float weights[8];
+  float divide;
 };
 
 #endif

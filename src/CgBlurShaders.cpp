@@ -25,17 +25,35 @@ CgBlurVertexShader::~CgBlurVertexShader()
 CgBlurFragmentShader::CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
+  float sigma = 4.0;
+  float coef=1.0;
+  divide = 0.0;
+
+  coef = 1/sqrt(2*PI*sigma);
   // Récupération des paramètres
   paramWeights = cgGetNamedParameter(program, "weights");
   paramTexture = cgGetNamedParameter(program, "texture");
-  weights[0] = 5;
-  weights[1] = 10;
-  weights[2] = 15;
-  weights[3] = 20;
-  weights[4] = 15;
-  weights[5] = 10;
-  weights[6] = 5;
+  paramDivide = cgGetNamedParameter(program, "divide");
+  
+  /* Calcul des poids */
+  for(int x=-3 ; x<=3 ; x++){
+    weights[x+3] = coef * expf(-(x*x)/(sigma*sigma));
+    divide += weights[x+3];
+  }
+
   weights[7] = 0;
+
+//   weights[0] = 5;
+//   weights[1] = 10;
+//   weights[2] = 20;
+//   weights[3] = 30;
+//   weights[4] = 20;
+//   weights[5] = 10;
+//   weights[6] = 5;
+//   weights[7] = 0;
+
+//   divide = 100;
+
 }
 
 CgBlurFragmentShader::~CgBlurFragmentShader()

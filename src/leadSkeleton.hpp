@@ -35,19 +35,21 @@ public:
   /** Déplacement d'une particule
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
   */
-  void move(bool displayParticle);
+  void move();
 
 private:
   /** Déplace une particule dans le champ de vélocité.
    * @param pos position de la particule
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_particle(Particle* const pos, bool displayParticle);
+  int move_particle(Particle* const pos);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_origine(bool displayParticle);
+  int move_origine();
+
+  void draw_particle (Particle * const particle);
 };
 
 #endif

@@ -106,6 +106,8 @@ public:
     return queue+1;
   };
 
+  void draw ();
+
 protected:
   /** Echange deux particules dans la file .
    * @param i indice de la première particule
@@ -128,13 +130,17 @@ protected:
    * @param v vecteur de vélocité en v
    * @param w vecteur de vélocité en w
    */
-  virtual int move_origine(bool displayParticle)=0;
+  virtual int move_origine()=0;
 
   /** Affectation de la position d'une particule dans l'espace 
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
   void setEltFile(int i, const CPoint* const pt);
+
+  virtual void draw_origine ();
+
+  virtual void draw_particle (Particle * const particle);
 
   /** Origine actuelle du squelette. */
   CPoint origine;

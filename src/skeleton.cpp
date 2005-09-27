@@ -76,3 +76,38 @@ void Skeleton::swap(int i, int j)
   
   file[j] = tmp;
 }
+
+void Skeleton::draw ()
+{
+  glDisable (GL_LIGHTING);
+
+  draw_origine();
+  for (int i = 0; i < getSize (); i++)
+    draw_particle( getElt (i) ) ;
+
+  glEnable (GL_LIGHTING);
+}
+
+void Skeleton::draw_origine ()
+{
+  CPoint position (flamePos + origine);
+    
+  glColor4f (1.0, 0.0, 0.25, 0.8);
+  glPushMatrix ();
+  glTranslatef (position.getX (), position.getY (),
+		position.getZ ());
+  GraphicsFn::SolidSphere (0.01, 10, 10);
+  glPopMatrix ();
+}
+
+void Skeleton::draw_particle (Particle * const particle)
+{
+  CPoint position (flamePos + *particle);
+
+  glColor4f (1.0, 1.0, 0.25, 0.8);
+  glPushMatrix ();
+  glTranslatef (position.getX (), position.getY (),
+		position.getZ ());
+  GraphicsFn::SolidSphere (0.01, 10, 10);
+  glPopMatrix ();
+}

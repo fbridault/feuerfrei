@@ -6,7 +6,7 @@ GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h
   blurVertexShaderY("glowShaders.cg","vertGlowY",  cgcontext),
   blurFragmentShader("glowShaders.cg","fragGlow",  cgcontext)
 {
-  scaleFactor = 6;
+  scaleFactor = 4;
   scene = s;
   context = cgcontext;
   eyeball = e;
@@ -162,16 +162,16 @@ void GlowEngine::drawBlur()
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,height);
-  glVertex3f(-1.0,1.0,0.0);
+  glVertex3f(-1.1,1.1,0.0);
   
   glTexCoord2f(0,0);
-  glVertex3f(-1.0,-1.0,0.0);
+  glVertex3f(-1.1,-1.1,0.0);
 
   glTexCoord2f(width,0);
-  glVertex3f(1.0,-1.0,0.0);
+  glVertex3f(1.1,-1.1,0.0);
 
   glTexCoord2f(width,height);
-  glVertex3f(1.0,1.0,0.0);
+  glVertex3f(1.1,1.1,0.0);
   
   glEnd();
 

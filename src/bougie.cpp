@@ -101,15 +101,14 @@ Bougie::perturbate_forces ()
 }
 
 void
-Bougie::eclaire (bool animate, bool displayParticle)
+Bougie::eclaire ()
 {
   nb_lights = 0;
   Particle *tmp;
 		
   switch_off_lights ();
-  /* Déplacement du guide */
-  if (animate)
-    guide->move (displayParticle);
+  /* D�placement du guide */
+  guide->move ();
 	
   for (int i = 0; i < guide->getSize (); i++)
     {
@@ -124,24 +123,23 @@ Bougie::eclaire (bool animate, bool displayParticle)
 }
 
 void
-Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
+Bougie::build ()
 {
   int i, j, l;
   int count;
-  int uknotsCount, vknotsCount;
-  int max_particles = INT_MIN;
+  max_particles = INT_MIN;
+  
+  eclaire();
 
-  /* Déplacement et détermination du maximum */
+  /* D�placement et d�termination du maximum */
   for (i = 0; i < nb_squelettes; i++)
     {
-      if (animate)
-	squelettes[i]->move (displayParticle);
+      squelettes[i]->move ();
+      
       if (squelettes[i]->getSize () > max_particles)
 	max_particles = squelettes[i]->getSize ();
     }
-
-  if (!affiche_flamme)
-    return;
+  
   //  cout << max_particles << endl;
   // ctrlpoints = new Matrix_HPoint3Df(nb_squelettes+uorder-1,max_particles+nb_pts_fixes);
   //   uknots = new Vector_FLOAT(uorder+nb_squelettes+uorder-1);
@@ -168,23 +166,16 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */
 
 	  distances[0] =
-	    guide->getElt (0)->
-	    squaredDistanceFrom (squelettes[k]->
-				 getElt (0));
+	    guide->getElt(0)->squaredDistanceFrom(squelettes[k]->getElt(0));
 
 	  for (j = 0; j < squelettes[k]->getSize () - 1; j++)
 	    distances[j + 1] =
-	      squelettes[k]->getElt (j)->
-	      squaredDistanceFrom (squelettes[k]->
-				   getElt (j + 1));
-
-	  distances[squelettes[k]->getSize ()] =
-	    squelettes[k]->getLastElt ()->
-	    squaredDistanceFrom (squelettes[k]->
-				 getOrigine ());
+	      squelettes[k]->getElt(j)->squaredDistanceFrom(squelettes[k]->getElt(j + 1));
+	  
+	  distances[squelettes[k]->getSize ()] = 
+	    squelettes[k]->getLastElt()->squaredDistanceFrom(squelettes[k]->getOrigine ());
 	  distances[squelettes[k]->getSize () + 1] =
-	    squelettes[k]->getOrigine ()->
-	    squaredDistanceFrom (guide->getOrigine ());
+	    squelettes[k]->getOrigine()->squaredDistanceFrom(guide->getOrigine ());
 
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
@@ -195,45 +186,37 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	    {
 	      float dist_max = FLT_MIN;
 
-	      for (j = 0; j < squelettes[k]->getSize () + 2;
-		   j++)
-		{
-		  if (distances[j] > dist_max)
-		    {
-		      indices_distances_max[l] = j;
-		      dist_max = distances[j];
-		    }
-		  //cout << distances[j] << " ";
-		}
+	      for (j = 0; j < squelettes[k]->getSize () + 2; j++){
+		if (distances[j] > dist_max)
+		  {
+		  indices_distances_max[l] = j;
+		  dist_max = distances[j];
+		  }
+		//cout << distances[j] << " ";
+	      }
 	      /* Il n'y a plus de place */
 	      if (dist_max == FLT_MIN)
 		indices_distances_max[l] = -1;
 	      else
 		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
-		distances[indices_distances_max[l]] =
-		  0;
+		distances[indices_distances_max[l]] = 0;
 
 	      //cout << FLT_MIN << endl << "dist max :" << dist_max << endl << indices_distances_max[l] << endl;
 	    }
 	  //cout << "prout" << endl;
 	  /* Les particules les plus ï¿=artï¿=s sont maintenant connues, on peut passer ï¿=l'affichage */
 	  count = 0;
-
+	  
 	  /* Remplissage des points de contrle */
 	  setCtrlPoint (i, count++, guide->getElt (0), 1.0);
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == 0)
 	      {
-		pt = CPoint::pointBetween (guide->
-					   getElt (0),
-					   squelettes
-					   [k]->
-					   getElt
-					   (0));
+		pt = CPoint::pointBetween (guide->getElt (0), squelettes[k]->getElt(0));
 		setCtrlPoint (i, count++, &pt);
 	      }
-
+	  
 	  for (j = 0; j < squelettes[k]->getSize () - 1; j++)
 	    {
 	      /* On regarde s'il ne faut pas ajouter un point */
@@ -242,49 +225,30 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		  if (indices_distances_max[l] == j + 1)
 		    {
 		      /* On peut référencer j+1 puisque normalement, indices_distances_max[l] != j si j == squelettes[k]->getSize()-1 */
-		      pt = CPoint::
-			pointBetween
-			(squelettes[k]->
-			 getElt (j),
-			 squelettes[k]->
-			 getElt (j + 1));
-		      setCtrlPoint (i, count++,
-				    &pt);
+		      pt = CPoint::pointBetween(squelettes[k]->getElt(j), squelettes[k]->getElt(j + 1));
+		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
-	      setCtrlPoint (i, count++,
-			    squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
 	    }
 
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getLastElt ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLastElt ());
 
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (indices_distances_max[l] ==
-		squelettes[k]->getSize ())
+	    if (indices_distances_max[l] == squelettes[k]->getSize ())
 	      {
-		pt = CPoint::
-		  pointBetween (squelettes[k]->
-				getOrigine (),
-				squelettes[k]->
-				getLastElt ());
+		pt = CPoint::pointBetween (squelettes[k]->getOrigine (), squelettes[k]->getLastElt());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
 
 	  bool prec = false;
 
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (indices_distances_max[l] ==
-		squelettes[k]->getSize () + 1)
+	    if (indices_distances_max[l] == squelettes[k]->getSize () + 1)
 	      {
-		pt = CPoint::
-		  pointBetween (squelettes[k]->
-				getOrigine (),
-				guide->
-				getOrigine ());
+		pt = CPoint::pointBetween (squelettes[k]->getOrigine (), guide->getOrigine ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -294,14 +258,9 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	    if (indices_distances_max[l] == -1)
 	      {
 		if (!prec)
-		  {
-		    pt = *squelettes[k]->
-		      getOrigine ();
-		  }
-		pt = CPoint::pointBetween (&pt,
-					   guide->
-					   getOrigine
-					   ());
+		  pt = *squelettes[k]-> getOrigine ();
+		
+		pt = CPoint::pointBetween (&pt, guide->getOrigine());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -315,11 +274,9 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 	  setCtrlPoint (i, count++, guide->getElt (0), 1.0);
 	  for (j = 0; j < squelettes[k]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++,
-			    squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
 	    }
-	  setCtrlPoint (i, count++,
-			squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
 	  setCtrlPoint (i, count++, guide->getOrigine ());
 	}
     }
@@ -342,15 +299,33 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
   if (vknots[vorder] > vknots[vorder + 1])
     for (j = vorder + 1; j < vknotsCount; j++)
       vknots[j] += 1;
+}
 
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
-
-  /* Affichage de la mèche */
+void
+Bougie::drawWick ()
+{
+  /* Affichage de la m�che */
   glPushMatrix ();
   glRotatef (-90.0, 1.0, 0.0, 0.0);
   glColor3f (0.0, 0.0, 0.0);
   GraphicsFn::SolidCylinder (dim_x / 120.0, dim_y / 12.0, 10, 10);
   glPopMatrix ();
+}
+
+void
+Bougie::drawFlame (bool displayParticle)
+{
+  int i;
+
+  /* Affichage des particules */
+  if(displayParticle){
+    /* D�placement et d�termination du maximum */
+    for (i = 0; i < nb_squelettes; i++)
+      squelettes[i]->draw();
+    guide->draw();
+  }  
+
+  glTranslatef (position.getX (), position.getY (), position.getZ ());
 
   if (toggle)
     {
@@ -366,7 +341,7 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
     }
   else
     {
-      /* Correction "à la grosse" pour les UVs -> à voir par la suite */
+      /* Correction "� la grosse" pour les UVs -> à voir par la suite */
       float vtex = 1 / (float) (max_particles);
 
       GLfloat texpts[2][2][2] =	{ {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };
@@ -409,17 +384,11 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
       if (angle2 < PI / 2.0) angle = PI - angle;
       
       /****************************************************************************************/
-      
-      GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 1.0 };
-      GLfloat mat_ambient2[] = { 1.0, 1.0, 1.0, 0.9 };
-      glMaterialfv (GL_FRONT, GL_AMBIENT, mat_ambient2);
-      glMaterialfv (GL_FRONT, GL_DIFFUSE, mat_diffuse);
-      
       glMap2f (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, **texpts);
       glEnable (GL_MAP2_TEXTURE_COORD_2);
       glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
       glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
-      
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       cgBougieVertexShader.setModelViewProjectionMatrix();
       cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
       cgBougieFragmentShader.setTexture(&tex);
@@ -427,24 +396,15 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
       cgBougieVertexShader.enableShader();
       cgBougieFragmentShader.enableShader();
       
-      // glEnable (GL_TEXTURE_2D);
+     // glEnable (GL_TEXTURE_2D);
 
-//       glMaterialfv (GL_FRONT, GL_AMBIENT, mat_ambient2);
-//       glMaterialfv (GL_FRONT, GL_DIFFUSE, mat_diffuse);
+//      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+//       glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
 
-      glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-      glMap2f (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2,
-	       &texpts[0][0][0]);
-      glEnable (GL_MAP2_TEXTURE_COORD_2);
-      glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
-      glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
-
-      glMatrixMode (GL_TEXTURE);
-      glPushMatrix ();
-      glLoadIdentity ();
-      glTranslatef (0.0, angle / (double) (PI), 0.0);
+//       glMatrixMode (GL_TEXTURE);
+//       glPushMatrix ();
+//       glLoadIdentity ();
+//       glTranslatef (0.0, angle / (double) (PI), 0.0);
 
       gluBeginSurface (nurbs);
       gluNurbsSurface (nurbs, uknotsCount, uknots, vknotsCount,
@@ -453,9 +413,10 @@ Bougie::dessine (bool animate, bool affiche_flamme, bool displayParticle)
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
       
-      // glDisable (GL_TEXTURE_2D);
-      cgBougieVertexShader.disableProfile();
-      cgBougieFragmentShader.disableProfile();
+ //     glPopMatrix();
+ //     glDisable (GL_TEXTURE_2D);
+       cgBougieVertexShader.disableProfile();
+       cgBougieFragmentShader.disableProfile();
     }
 }
 

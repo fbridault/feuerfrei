@@ -31,13 +31,20 @@ public:
   Firmalampe(Solver *s, int nb, CPoint *centre, CPoint *pos, CgSVShader *shader, char *meche_name, const char *filename, CScene *scene);
   ~Firmalampe();
   
-  /** Fonction appelée par la fonction de dessin OpenGL. Il s'agit de la fonction qui dessine la 
-   * flamme. Elle commence par déplacer les particules des squelettes périphériques. Ensuite, elle 
-   * définit la matrice de points de contrôle de la NURBS, des vecteurs de noeuds, et enfin du dessin
-   * proprement dit de la NURBS avec le placage de texture.
+  /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle commence par dÃ©placer les particules 
+   * des squelettes pÃ©riphÃ©riques. Ensuite, elle dÃ©finit la matrice de points de contrÃ´le de la NURBS,
+   * des vecteurs de noeuds.
    */
-  void dessine(bool animate, bool affiche_flamme, bool displayParticle);
-  
+  void build();
+    
+  /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+   * build() avec le placage de texture
+   */
+  void drawFlame(bool displayParticle);
+
+  /** Dessine la mèche de la flamme */
+  void drawWick();
+
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
   void add_forces(bool perturbate);
@@ -46,7 +53,7 @@ public:
    * au reste de la scène via les particules du squelette guide. Elle s'occupe également de déplacer
    * les particules du squelette guide.
    */
-  void eclaire(bool animate, bool displayParticle);
+  void eclaire();
 
   void cast_shadows_double_multiple(GLint objects_list_wsv);
   void cast_shadows_double(GLint objects_list_wsv);

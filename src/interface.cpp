@@ -20,7 +20,7 @@
 /********* Variables relatives au contrôle de l'affichage **************/
 static bool animate, affiche_velocite, affiche_repere, affiche_grille,
   affiche_flamme, affiche_fps, brintage, shadowsEnabled,
-  shadowVolumesEnabled, affiche_particules;
+  shadowVolumesEnabled, affiche_particules, glowEnabled, glowOnly;
 int done=0;
 
 /********* Variables relatives au solveur ******************************/
@@ -129,122 +129,125 @@ draw_velocity (void)
 static void
 draw (void)
 {
-  /* raz de la fenetre avec la couleur de fond */
-//   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
+  if(glowEnabled){
+    glowEngine->activate();
+    /* raz de la fenetre avec la couleur de fond */
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-//   GLfloat val_ambiant[]={0.4,0.4,0.4,1.0};
-//   GLfloat null[]={1.0,1.0,1.0,1.0};
+    /* Déplacement du eyeball */
+    eyeball->recalcModelView();
+    
+    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+    
+    scene->draw_scene ();
+    
+    /* Dessin de la flamme */
+    if(affiche_flamme)
+      {
+	/* Voir pour créer une display list pour la 2e passe */
+	SDL_mutexP (lock);
+	for (int f = 0; f < nb_flammes; f++){
+	  if(animate)
+	    flammes[f]->build();
+	  flammes[f]->drawFlame (affiche_particules);
+	}
+	SDL_mutexV (lock);
+      }
   
-   glowEngine->activate();
-  /* raz de la fenetre avec la couleur de fond */
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glowEngine->render();
   
-  /* Déplacement du eyeball */
-  eyeball->recalcModelView();
-  
-//   /****************************************/
-//   /* Rendu de la scène */
-//   /* A REVOIR ECLAIRAGE INUTILE POUR SOLIDES PHOTOS, SEUL DEPLACEMENT UTILE */
-  glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-  
-  glPushMatrix ();
-  SDL_mutexP (lock);
-  for (int f = 0; f < nb_flammes; f++)
-    flammes[f]->eclaire (animate, affiche_particules);
-  SDL_mutexV (lock);
-  glPopMatrix ();
-
-  scene->draw_scene ();
-  
-  /* Dessin de la flamme */
-  /* Voir pour créer une display list pour la 2e passe */
-  SDL_mutexP (lock);
-  for (int f = 0; f < nb_flammes; f++)
-    flammes[f]->dessine (animate, affiche_flamme, affiche_particules);
-  SDL_mutexV (lock);
-  
-  glowEngine->render();
-  
-  glowEngine->deactivate();
-  
+    glowEngine->deactivate();
+  }
+  /****************************************************************************/
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   
-  //glPushAttrib ( GL_DEPTH_BUFFER_BIT );
   
-  //   /* Déplacement du eyeball */
-  //   eyeball->recalcModelView ();
-  
-//   /* A REVOIR ECLAIRAGE INUTILE POUR SOLIDES PHOTOS, SEUL DEPLACEMENT UTILE */
-//   glPushMatrix ();
-//   SDL_mutexP (lock);
-//   for (int f = 0; f < nb_flammes; f++)
-//     flammes[f]->eclaire (animate, affiche_particules);
-//   SDL_mutexV (lock);
-//   glPopMatrix ();
-  
-  glBlendFunc (GL_ONE, GL_ZERO);
-  /* Affichage de la scène */
-  if(solidePhotoEnabled){
-    solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
-								 flammes[0]->getPosition());
-    solidePhoto->draw(couleurOBJ,interpolationSP);
-  }else{
-    /**** Affichage de la scène avec ombres ****/
-    glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT |
-		  GL_STENCIL_BUFFER_BIT);
+  /************ CONSTRUCTION DE LA FLAMME SANS GLOW ***************************/
+  if(!glowEnabled){
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    glEnable (GL_LIGHTING);
+    /* Déplacement du eyeball */
+    eyeball->recalcModelView ();
+    SDL_mutexP (lock);
+    for (int f = 0; f < nb_flammes; f++){
+      if(animate)
+	flammes[f]->build();
+    }
+    SDL_mutexV (lock);
+  }
     
+  if(!glowOnly){
+    
+    glBlendFunc (GL_ONE, GL_ZERO);
+  
+    /******************* Affichage de la scène ***********************************/
+    if(solidePhotoEnabled){
+      solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
+								   flammes[0]->getPosition());
+      solidePhoto->draw(couleurOBJ,interpolationSP);
+    }else{
+      /**** Affichage de la scène avec ombres ****/
+      glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT |
+		    GL_STENCIL_BUFFER_BIT);
+    
+      glEnable (GL_LIGHTING);
+    
+      for (int f = 0; f < nb_flammes; f++)
+	{
+	  if (shadowVolumesEnabled)
+	    flammes[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
+	  if (shadowsEnabled)
+	    flammes[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
+	  else{
+	    flammes[f]->switch_on_lights ();
+	    scene->draw_scene ();
+	  }
+	}
+      glPopAttrib ();
+
+      glDisable (GL_LIGHTING);
+    }
+  
+  
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+    /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
     for (int f = 0; f < nb_flammes; f++)
       {
-	if (shadowVolumesEnabled)
-	  flammes[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
-	if (shadowsEnabled)
-	  flammes[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
-	else{
-	  flammes[f]->switch_on_lights ();
-	  scene->draw_scene ();
-	}
+	CPoint position (*(flammes[f]->getPosition ()));
+    
+	glPushMatrix ();
+	glTranslatef (position.getX (), position.getY (), position.getZ ());
+	if (affiche_repere)
+	  glCallList (REPERE);
+	if (affiche_grille)
+	  glCallList (GRILLE);
+	if (affiche_velocite)
+	  draw_velocity();
+    
+	glPopMatrix ();
       }
-    glPopAttrib ();
+  
+    /********************* Dessin de la flamme ************************************/
+    SDL_mutexP (lock);
+    for (int f = 0; f < nb_flammes; f++)
+      if(affiche_flamme)
+	flammes[f]->draw (affiche_particules);
+    SDL_mutexV (lock);
+    
+    if (affiche_fps)
+      write_fps ();
+  }
+  /********************* PLACAGE DU GLOW ****************************************/
+  if(glowEnabled){
+    glDisable (GL_DEPTH_TEST);
+    
+    glBlendFunc (GL_ONE, GL_ONE);
+    glowEngine->drawBlur();
+    glEnable (GL_DEPTH_TEST);
   }
   
-//   /* Affichage des outils d'aide à la visu (grille, etc...) */
-//   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glDisable (GL_LIGHTING);
-  
-//   for (int f = 0; f < nb_flammes; f++)
-//   {
-//     CPoint position (*(flammes[f]->getPosition ()));
-    
-//     glPushMatrix ();
-//     glTranslatef (position.getX (), position.getY (), position.getZ ());
-//     if (affiche_repere)
-//       glCallList (REPERE);
-//     if (affiche_grille)
-//       glCallList (GRILLE);
-//     if (affiche_velocite)
-//       draw_velocity();
-    
-//     glPopMatrix ();
-//   }
-   glBlendFunc  (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
-  /* Dessin de la flamme */
-  SDL_mutexP (lock);
-  for (int f = 0; f < nb_flammes; f++)
-    flammes[f]->dessine (animate, affiche_flamme, affiche_particules);
-  SDL_mutexV (lock);
-  
-  if (affiche_fps)
-    write_fps ();
-
-  glDisable (GL_DEPTH_TEST);
-
-  glBlendFunc (GL_ONE, GL_ONE);
-  glowEngine->drawBlur();
-  glEnable (GL_DEPTH_TEST);
-
   SDL_GL_SwapBuffers ();
   
   Frames++;
@@ -285,6 +288,12 @@ keypressed (SDLKey touche)
   switch (touche){
   case SDLK_ESCAPE:
     done = 1;
+    break;
+  case SDLK_e:
+    glowEnabled = !glowEnabled;
+    break;
+case SDLK_z:
+    glowOnly = !glowOnly;
     break;
   case SDLK_d :
     solidePhotoEnabled = !solidePhotoEnabled;
@@ -539,11 +548,13 @@ init_ui ()
 
   /* Pour l'affichage */
   animate = true; 
-  brintage = false;
+  brintage = glowOnly = false;
   affiche_repere = affiche_velocite = affiche_particules = affiche_grille = false;
   affiche_fps = affiche_flamme = true;
   shadowsEnabled = shadowVolumesEnabled = false;
-  interpolationSP = couleurOBJ = 0;
+  solidePhotoEnabled = glowEnabled = true;
+  interpolationSP = 1;
+  couleurOBJ = 2;
   
   GraphicsFn::makeRasterFont ();
   sprintf (strfps, "%d", 0);

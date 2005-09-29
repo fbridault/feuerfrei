@@ -2,7 +2,9 @@
 
 #define PI 3.14159265358979323846
 #define DEUX_PI 6.283185307179586
-
+#define R 1.0
+#define G 0.5
+#define B 0
 struct vertexOutputsTEX
 {
   float4 HPos	    : POSITION;
@@ -29,7 +31,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
 	       uniform float4x4 TextureSPMatrix) : COLOR
 {
   // Couleur de la flamme (en dur pour l'instant)
-  float4 CouleurFlamme = float4(1.0,0.5,0.05,1.0);
+  float4 CouleurFlamme = float4(R,G,B,1.0);
 
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
@@ -78,7 +80,7 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
 		uniform float4x4 TextureSPMatrix) : COLOR
 {
   // Couleur de la flamme (en dur pour l'instant)
-  float4 CouleurFlamme = float4(1.0,0.5,0.05,1.0);
+  float4 CouleurFlamme = float4(R,G,B,1.0);
 
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
@@ -279,7 +281,7 @@ float4 fpSPTestTEX(in vertexOutputsTEX IN,
 		   uniform float4x4 TextureSPMatrix) : COLOR
 {
   // Couleur de la flamme (en dur pour l'instant)
-  float4 CouleurFlamme = float4(1.0,0.5,0.05,1.0);
+  float4 CouleurFlamme = float4(R,G,B,1.0);
 
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
@@ -366,8 +368,8 @@ float4 fpSPTestWTEX(in vertexOutputsWTEX IN,
 		    uniform float4x4 TextureSPMatrix) : COLOR
 {
   // Couleur de la flamme (en dur pour l'instant)
-  float4 CouleurFlamme = float4(1.0,0.5,0.05,1.0);
-
+  float4 CouleurFlamme = float4(R,G,B,1.0);
+  
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
   

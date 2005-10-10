@@ -34,7 +34,6 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
   glPushMatrix();
   glLoadIdentity();
   glRotatef(orientationSPtheta,axeRotation.getX(),axeRotation.getY(),axeRotation.getZ());
-  glMatrixMode(GL_MODELVIEW);
   
   /* Affichage des objets sans couleur */
   if(fragmentShaderIndex < 2){
@@ -66,6 +65,8 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex+2]->disableProfile();
   }
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
 }
 
 void

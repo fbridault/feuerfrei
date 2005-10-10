@@ -59,6 +59,7 @@ public:
   void draw(bool displayParticle){
     drawFlame(displayParticle);
     drawWick();
+    glPopMatrix();
   };
 
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.

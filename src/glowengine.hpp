@@ -12,6 +12,7 @@ class GlowEngine;
 #include "scene.hpp"
 #include "eyeball.hpp"
 
+
 class GlowEngine
 {
 public:
@@ -19,9 +20,15 @@ public:
   GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h);
   virtual ~GlowEngine();
 
+  /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
+   * fonction sera considérée comme étant une source de glow, donc rendue dans le pbuffer
+   */
   void activate();
-  void render();
+  /** Effectue le blur en trois passes */
+  void blur();
+  /** Désactive le glow, les appels suivants dessineront dans le color buffer */
   void deactivate();
+  /** Plaque le blur à l'écran */
   void drawBlur();
 
 private: 
@@ -41,7 +48,7 @@ private:
   
   CScene *scene;
   Eyeball *eyeball;
-  Texture *textest;
+  //Texture *textest;
 };
 
 #endif

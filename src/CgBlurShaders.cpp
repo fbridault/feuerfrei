@@ -25,7 +25,7 @@ CgBlurVertexShader::~CgBlurVertexShader()
 CgBlurFragmentShader::CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
-  float sigma = 1.398;
+  float sigma = 4.5;
   float coef=1.0;
   divide = 0.0;
 

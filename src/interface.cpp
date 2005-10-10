@@ -155,7 +155,7 @@ draw (void)
 	SDL_mutexV (lock);
       }
   
-    glowEngine->render();
+    glowEngine->blur();
   
     glowEngine->deactivate();
   }
@@ -187,7 +187,7 @@ draw (void)
 								   flammes[0]->getPosition());
       solidePhoto->draw(couleurOBJ,interpolationSP);
     }else{
-      /**** Affichage de la scène avec ombres ****/
+      /**** Affichage de la scène ****/
       glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT |
 		    GL_STENCIL_BUFFER_BIT);
     
@@ -527,13 +527,13 @@ init_ui ()
   SVShader->setshadowExtrudeDist (shadowExtrudeDistVec);
   /*********************************************************************/
 #ifdef BOUGIE
-  CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
+  CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);//pos (0.0, 0.0, 0.0);
   nb_squelettes_flammes = 4;
   flammes[0] = new Bougie (solveur, nb_squelettes_flammes, &pt, &pos,
 		dim_x / 7.0, SVShader,"bougie.obj",scene, &context);
 #else
-  //CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);
-  CPoint pt (0.0, 0.0, 0.0), pos (0.0, -1.0, 0.0);
+  CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);
+  //CPoint pt (0.0, 0.0, 0.0), pos (0.0, -0.5, 0.0);
   nb_squelettes_flammes = 5;
   flammes[0] = new Firmalampe(solveur,nb_squelettes_flammes,&pt,&pos,SVShader,meche_name,"firmalampe.obj",scene);
 #endif	

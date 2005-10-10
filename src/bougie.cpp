@@ -306,6 +306,7 @@ Bougie::drawWick ()
 {
   /* Affichage de la mèche */
   glPushMatrix ();
+  glTranslatef (position.getX (), position.getY (), position.getZ ());
   glRotatef (-90.0, 1.0, 0.0, 0.0);
   glColor3f (0.0, 0.0, 0.0);
   GraphicsFn::SolidCylinder (dim_x / 120.0, dim_y / 12.0, 10, 10);
@@ -317,6 +318,8 @@ Bougie::drawFlame (bool displayParticle)
 {
   int i;
 
+  glPushMatrix();
+  glTranslatef (position.getX (), position.getY (), position.getZ ());
   /* Affichage des particules */
   if(displayParticle){
     /* Déplacement et détermination du maximum */
@@ -324,9 +327,7 @@ Bougie::drawFlame (bool displayParticle)
       squelettes[i]->draw();
     guide->draw();
   }  
-
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
-
+  
   if (toggle)
     {
       glDisable (GL_LIGHTING);
@@ -418,6 +419,7 @@ Bougie::drawFlame (bool displayParticle)
        cgBougieVertexShader.disableProfile();
        cgBougieFragmentShader.disableProfile();
     }
+  glPopMatrix ();
 }
 
 void

@@ -34,8 +34,7 @@ GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h
 
   pbuffer.Deactivate();
   
-  textest = new Texture("texture.jpg",GL_TEXTURE_RECTANGLE_NV);
-
+  //textest = new Texture("texture.jpg",GL_TEXTURE_RECTANGLE_NV);
 }
 
 GlowEngine::~GlowEngine()
@@ -48,7 +47,7 @@ void GlowEngine::activate()
   glViewport (0, 0, width, height);
 }
 
-void GlowEngine::render()
+void GlowEngine::blur()
 {
   // Parametre de visualisation
   glMatrixMode(GL_PROJECTION);
@@ -116,10 +115,10 @@ void GlowEngine::render()
   
   glTexCoord2f(0,height);
   glVertex3f(-1.0,-1.0,0.0);
-
+  
   glTexCoord2f(width,height);
   glVertex3f(1.0,-1.0,0.0);
-
+  
   glTexCoord2f(width,0);
   glVertex3f(1.0,1.0,0.0);
   
@@ -146,7 +145,6 @@ void GlowEngine::deactivate()
 
 void GlowEngine::drawBlur()
 {
-  // Parametre de visualisation
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
@@ -162,16 +160,16 @@ void GlowEngine::drawBlur()
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,height);
-  glVertex3f(-1.1,1.1,0.0);
+  glVertex3f(-1.0,1.0,0.0);
   
   glTexCoord2f(0,0);
-  glVertex3f(-1.1,-1.1,0.0);
+  glVertex3f(-1.0,-1.0,0.0);
 
   glTexCoord2f(width,0);
-  glVertex3f(1.1,-1.1,0.0);
+  glVertex3f(1.0,-1.0,0.0);
 
   glTexCoord2f(width,height);
-  glVertex3f(1.1,1.1,0.0);
+  glVertex3f(1.0,1.0,0.0);
   
   glEnd();
 

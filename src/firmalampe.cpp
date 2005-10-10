@@ -135,7 +135,7 @@ Firmalampe::add_forces (bool perturbate)
 	//solveur->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->getY ())*exp((*pointsIterator)->getY ()) );
 	solveur->addVsrc (ptx, i, ptz, .005* exp(((double)pty+(*pointsIterator)->getY ()) ));
     }
-  //cout << "	AHAHHAHAHA " << endl;
+  
   /* Recherche d'un point maximum */
   /* ProblÃ¨me marche pas si il y a plus d'un pic dans la mÃ¨che */
 //   for (vector < CPoint * >::iterator pointsIterator = wickLeadPointsArray->begin ();
@@ -387,14 +387,19 @@ Firmalampe::build ()
 void 
 Firmalampe::drawWick()
 {
-   glCallList (MECHE);
+  glPushMatrix();
+  glTranslatef (position.getX (), position.getY (), position.getZ ());
+  glCallList (MECHE);
+  glPopMatrix();
 }
 
 void
 Firmalampe::drawFlame (bool displayParticle)
 {
   int i;
-  
+
+  glPushMatrix();
+  glTranslatef (position.getX (), position.getY (), position.getZ ());
   /* Affichage des particules */
   if(displayParticle){
     /* Déplacement et détermination du maximum */
@@ -403,8 +408,7 @@ Firmalampe::drawFlame (bool displayParticle)
     for (i = 0; i < nbLeadSkeletons; i++)
       guides[i]->draw();
   }
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
-
+  
   GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 0.9 };
   GLfloat mat_ambient2[] = { 1.0, 1.0, 1.0, 1.0 };
 
@@ -424,13 +428,11 @@ Firmalampe::drawFlame (bool displayParticle)
     }
   else
     {
-      /* Correction "à la grosse" pour les UVs -> Ã  voir par la suite */
+      /* Correction "à la grosse" pour les UVs -> à voir par la suite */
       float vtex = 1.0 / (float) (max_particles);
 
       GLfloat texpts[2][2][2] =
-	{ {{0.0, 0}, {0.0, 1.0}}, {{vtex, 0},
-				   {vtex, 1.0}}
-	};
+	{ {{0.0, 0}, {0.0, 1.0}}, {{vtex, 0}, {vtex, 1.0}} };
 
       glEnable (GL_TEXTURE_2D);
 
@@ -456,6 +458,7 @@ Firmalampe::drawFlame (bool displayParticle)
 
       glDisable (GL_TEXTURE_2D);
     }
+   glPopMatrix();
 }
 
 void

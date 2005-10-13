@@ -17,7 +17,7 @@ class GlowEngine
 {
 public:
   
-  GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h);
+  GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h, int sc);
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -30,6 +30,11 @@ public:
   void deactivate();
   /** Plaque le blur à l'écran */
   void drawBlur();
+
+  void setGaussSigma(float sigma)
+  {
+    blurFragmentShader.computeWeights(sigma);
+  }
 
 private: 
   int width, height; // dimensions de la texture

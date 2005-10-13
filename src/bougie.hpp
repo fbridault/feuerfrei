@@ -89,7 +89,8 @@ private:
   CgSVShader *cgShader;
   CgBougieVertexShader cgBougieVertexShader;
   CgBougieFragmentShader cgBougieFragmentShader;
-
+  
+  float gaussSigma;
 };
 
 #endif

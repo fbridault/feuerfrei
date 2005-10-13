@@ -1,24 +1,21 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h) : 
+GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h, int sc) : 
   pbuffer("rgb"), blurVertexShaderX("glowShaders.cg","vertGlowX",  cgcontext),
   blurVertexShaderY("glowShaders.cg","vertGlowY",  cgcontext),
   blurFragmentShader("glowShaders.cg","fragGlow",  cgcontext)
 {
-  scaleFactor = 4;
   scene = s;
   context = cgcontext;
   eyeball = e;
+  scaleFactor=sc;
   width=w/scaleFactor;
   height=h/scaleFactor;
-  // Initialiser le pbuffer maintenant que nous avons un contexte valide
 
-  // a utiliser pour la creation du pbuffer
+  // Initialiser le pbuffer
   pbuffer.Initialize(width, height, true, true);
-  // Initialisations pour le contexte de rendu du pbuffer
-  // Activer le pbuffer
-
+  
   // Couleur pour l'effacement
   glClearColor( 0.0, 0.0, 0.0, 0.0 );
 

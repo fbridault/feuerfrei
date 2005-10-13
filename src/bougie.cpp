@@ -392,22 +392,22 @@ Bougie::drawFlame (bool displayParticle)
       glMapGrid2f (20, 0.0, 1.0, 20, 0.0, 1.0);
       glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
       
-      cgBougieVertexShader.setModelViewProjectionMatrix();
-      cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
-      cgBougieVertexShader.setInverseModelViewMatrix();
-      cgBougieFragmentShader.setTexture(&tex);      
-      cgBougieVertexShader.enableShader();
-      cgBougieFragmentShader.enableShader();
+//       cgBougieVertexShader.setModelViewProjectionMatrix();
+//       cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
+//       cgBougieVertexShader.setInverseModelViewMatrix();
+//       cgBougieFragmentShader.setTexture(&tex);      
+//       cgBougieVertexShader.enableShader();
+//       cgBougieFragmentShader.enableShader();
       
-//       glEnable (GL_TEXTURE_2D);
+      glEnable (GL_TEXTURE_2D);
 
-//      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-//       glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
 
-//       glMatrixMode (GL_TEXTURE);
-//       glPushMatrix ();
-//       glLoadIdentity ();
-//       glTranslatef (0.0, angle / (double) (PI), 0.0);
+      glMatrixMode (GL_TEXTURE);
+      glPushMatrix ();
+      glLoadIdentity ();
+      glTranslatef (0.0, angle / (double) (PI), 0.0);
 
       gluBeginSurface (nurbs);
       gluNurbsSurface (nurbs, uknotsCount, uknots, vknotsCount,
@@ -416,10 +416,10 @@ Bougie::drawFlame (bool displayParticle)
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
       
- //      glPopMatrix();
-//       glDisable (GL_TEXTURE_2D);
-      cgBougieVertexShader.disableProfile();
-      cgBougieFragmentShader.disableProfile();
+      glPopMatrix();
+      glDisable (GL_TEXTURE_2D);
+ //      cgBougieVertexShader.disableProfile();
+//       cgBougieFragmentShader.disableProfile();
     }
   glPopMatrix ();
 }

@@ -55,7 +55,7 @@ static unsigned char interpolationSP, couleurOBJ;
 
 /********* Variables relatives au glow *********************************/
 static GlowEngine *glowEngine;
-
+static GlowEngine *glowEngine2;
 
 /**************************** FONCTIONS GENERALES DE L'INTERFACE GRAPHIQUE **************************/
 
@@ -141,7 +141,21 @@ draw (void)
   
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(glowEnabled){
+    GLfloat m[4][4];
+    CVector direction;
+    float dist, sigma;
+
+    glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
+
+    direction.setX (m[3][0]);
+    direction.setY (m[3][1]);
+    direction.setZ (m[3][2]);
+
+    dist = direction.length();
+    sigma = dist > 0.1 ? -log(10*dist)+6 : 6.0;
+    
     glowEngine->activate();
+    glowEngine->setGaussSigma(sigma);
     /* raz de la fenetre avec la couleur de fond */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -157,7 +171,28 @@ draw (void)
     glowEngine->blur();
   
     glowEngine->deactivate();
+    
+    glowEngine2->activate();
+    glowEngine2->setGaussSigma(sigma);
+    /* raz de la fenetre avec la couleur de fond */
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+    
+    scene->draw_scene ();
+    
+    /* Dessin de la flamme */
+    if(affiche_flamme)
+      for (int f = 0; f < nb_flammes; f++)
+	flammes[f]->drawFlame (affiche_particules);
+    
+    glowEngine2->blur();
+  
+    glowEngine2->deactivate();
   }
+
+  /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
+  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
   if(!glowOnly){    
@@ -214,12 +249,11 @@ draw (void)
 	glPopMatrix ();
       }
   
-    /********************* Dessin de la flamme ************************************/
-    SDL_mutexP (lock);
-    for (int f = 0; f < nb_flammes; f++)
+    /********************* Dessin de la flamme **********************************/
+    if(!glowEnabled)
       if(affiche_flamme)
-	flammes[f]->drawFlame (affiche_particules);
-    SDL_mutexV (lock);
+	for (int f = 0; f < nb_flammes; f++)
+	  flammes[f]->drawFlame (affiche_particules);
     
     if (affiche_fps)
       write_fps ();
@@ -229,6 +263,7 @@ draw (void)
     glDisable (GL_DEPTH_TEST);
     
     glBlendFunc (GL_ONE, GL_ONE);
+    glowEngine2->drawBlur();
     glowEngine->drawBlur();
     glEnable (GL_DEPTH_TEST);
   }
@@ -528,7 +563,8 @@ init_ui ()
   
   eyeball = new Eyeball (largeur, hauteur, clipping);
   
-  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur);
+  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 3);
+  glowEngine2 = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 1);
 
   /* Pour l'affichage */
   animate = true; 

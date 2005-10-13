@@ -32,6 +32,8 @@ public:
   CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context);
   virtual ~CgBlurFragmentShader();
   
+  void computeWeights(float sigma);
+
   void setWeightsArray(){
     cgGLSetParameterArray1f(paramWeights, 0, 8, weights);
     cgGLSetParameter1f(paramDivide, divide);

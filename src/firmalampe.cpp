@@ -25,7 +25,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   nb_squelettes = (nbLeadSkeletons * 2 + 2);
   squelettes = new PeriSkeleton *[nb_squelettes];
 
-  /* Génération d'un cÃ´té des squelettes périphériques */
+  /* Génération d'un côté des squelettes périphériques */
   for (int i = 1; i <= nbLeadSkeletons; i++)
     {
       pt = *meche.getLeadPoint (i - 1);
@@ -58,7 +58,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
 		      guides[nbLeadSkeletons - 1],
 		      LIFE_SPAN_AT_BIRTH - 2);
 
-  /* Allocation des tableaux Ã  la taille maximale pour les NURBS, */
+  /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
   ctrlpoints =
     new GLfloat[(NB_PARTICULES + nb_pts_fixes) *
@@ -114,7 +114,7 @@ Firmalampe::add_forces (bool perturbate)
   //~ solveur->addVsrc (x, 1, z, .11);
   //~ solveur->addVsrc (x-1, 1, z, .12);
   //~ solveur->addVsrc (x-2, 1, z, .10);
-
+  
   int ptx,pty,ptz,ind_max=0,i=0;
   double ymax=DBL_MIN;
   vector < CPoint * >*wickLeadPointsArray = meche.getLeadPointsArray();
@@ -414,7 +414,6 @@ Firmalampe::drawFlame (bool displayParticle)
 
   if (toggle)
     {
-      glDisable (GL_LIGHTING);
       glColor3f (1.0, 1.0, 1.0);
 
       gluBeginSurface (nurbs);
@@ -424,7 +423,6 @@ Firmalampe::drawFlame (bool displayParticle)
 		       3, ctrlpoints, uorder, vorder,
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
-      glEnable (GL_LIGHTING);
     }
   else
     {
@@ -458,7 +456,7 @@ Firmalampe::drawFlame (bool displayParticle)
 
       glDisable (GL_TEXTURE_2D);
     }
-   glPopMatrix();
+  glPopMatrix();
 }
 
 void
@@ -544,7 +542,7 @@ void
 Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
 {
   switch_off_lights ();
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
 
   glBlendFunc (GL_ONE, GL_ONE);
   for (int i = 0; i < 1 /*nb_lights *//**SHADOW_SAMPLE_PER_LIGHT*/ ;
@@ -588,7 +586,7 @@ Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
       glStencilFunc (GL_EQUAL, 0, ~0);
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
-      draw_scene_without_texture ();
+      sc->draw_sceneWTEX ();
 
       reset_diffuse_light (i);
     }
@@ -598,7 +596,7 @@ Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
     {
       enable_only_ambient_light (i);
     }
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   for (int i = 0; i < nb_lights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
        i++)
     {
@@ -613,7 +611,7 @@ void
 Firmalampe::cast_shadows_double (GLint objects_list_wsv)
 {
   switch_off_lights ();
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   switch_on_lights ();
 
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
@@ -651,7 +649,7 @@ Firmalampe::cast_shadows_double (GLint objects_list_wsv)
   glStencilFunc (GL_EQUAL, 0, ~0);
   glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFunc (GL_ONE, GL_ONE);
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
 
   glDisable (GL_STENCIL_TEST);
   //  glDepthFunc(GL_LESS);
@@ -663,7 +661,7 @@ Firmalampe::cast_shadows_double (GLint objects_list_wsv)
     {
       enable_only_ambient_light (i);
     }
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   for (int i = 0; i < nb_lights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
        i++)
     {

@@ -74,7 +74,7 @@ reshape (int width, int height)
   return;
 }
 
-/** Affiche le framerate Ã  l'écran */
+/** Affiche le framerate à l'écran */
 void
 write_fps ()
 {
@@ -129,14 +129,21 @@ draw_velocity (void)
 static void
 draw (void)
 {
+  /* Déplacement du eyeball */
+  eyeball->recalcModelView();
+  
+  /********** CONSTRUCTION DES FLAMMES *******************************/
+  SDL_mutexP (lock);
+  if(animate)
+    for (int f = 0; f < nb_flammes; f++)
+      flammes[f]->build();
+  SDL_mutexV (lock);
+  
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(glowEnabled){
     glowEngine->activate();
     /* raz de la fenetre avec la couleur de fond */
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
-    /* Déplacement du eyeball */
-    eyeball->recalcModelView();
     
     glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
     
@@ -144,55 +151,32 @@ draw (void)
     
     /* Dessin de la flamme */
     if(affiche_flamme)
-      {
-	/* Voir pour créer une display list pour la 2e passe */
-	SDL_mutexP (lock);
-	for (int f = 0; f < nb_flammes; f++){
-	  if(animate)
-	    flammes[f]->build();
-	  flammes[f]->drawFlame (affiche_particules);
-	}
-	SDL_mutexV (lock);
-      }
-  
+      for (int f = 0; f < nb_flammes; f++)
+	flammes[f]->drawFlame (affiche_particules);
+    
     glowEngine->blur();
   
     glowEngine->deactivate();
   }
-  /****************************************************************************/
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-  
-  
-  /************ CONSTRUCTION DE LA FLAMME SANS GLOW ***************************/
-  if(!glowEnabled){
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    /* Déplacement du eyeball */
-    eyeball->recalcModelView ();
-    SDL_mutexP (lock);
-    for (int f = 0; f < nb_flammes; f++){
-      if(animate)
-	flammes[f]->build();
-    }
-    SDL_mutexV (lock);
-  }
-    
-  if(!glowOnly){
-    
+
+  if(!glowOnly){    
     glBlendFunc (GL_ONE, GL_ZERO);
-  
-    /******************* Affichage de la scène ***********************************/
+    
+    /******************* AFFICHAGE DE LA SCENE *******************************/
+    /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
+    for (int f = 0; f < nb_flammes; f++) flammes[f]->drawWick ();
+    
     if(solidePhotoEnabled){
       solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
 								   flammes[0]->getPosition());
       solidePhoto->draw(couleurOBJ,interpolationSP);
     }else{
       /**** Affichage de la scène ****/
-      glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT |
-		    GL_STENCIL_BUFFER_BIT);
-    
+      glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+      
       glEnable (GL_LIGHTING);
-    
+      
       for (int f = 0; f < nb_flammes; f++)
 	{
 	  if (shadowVolumesEnabled)
@@ -201,22 +185,22 @@ draw (void)
 	    flammes[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
 	  else{
 	    flammes[f]->switch_on_lights ();
-	    scene->draw_scene ();
 	  }
 	}
+      scene->draw_scene ();
+      
       glPopAttrib ();
-
+      
       glDisable (GL_LIGHTING);
     }
-  
-  
+    
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
     for (int f = 0; f < nb_flammes; f++)
       {
 	CPoint position (*(flammes[f]->getPosition ()));
-    
+	
 	glPushMatrix ();
 	glTranslatef (position.getX (), position.getY (), position.getZ ());
 	if (affiche_repere)
@@ -225,7 +209,7 @@ draw (void)
 	  glCallList (GRILLE);
 	if (affiche_velocite)
 	  draw_velocity();
-    
+	
 	glPopMatrix ();
       }
   
@@ -233,7 +217,7 @@ draw (void)
     SDL_mutexP (lock);
     for (int f = 0; f < nb_flammes; f++)
       if(affiche_flamme)
-	flammes[f]->draw (affiche_particules);
+	flammes[f]->drawFlame (affiche_particules);
     SDL_mutexV (lock);
     
     if (affiche_fps)
@@ -250,6 +234,7 @@ draw (void)
   
   SDL_GL_SwapBuffers ();
   
+  /******************** CALCUL DU FRAMERATE *************************************/
   Frames++;
   
   GLint t = SDL_GetTicks ();
@@ -473,8 +458,6 @@ init_ui ()
   glEnable (GL_CULL_FACE);
   glCullFace (GL_BACK);
 
-  glEnable (GL_LIGHTING);
-
   glEnable (GL_AUTO_NORMAL);
   glEnable (GL_NORMALIZE);
 
@@ -527,7 +510,7 @@ init_ui ()
   SVShader->setshadowExtrudeDist (shadowExtrudeDistVec);
   /*********************************************************************/
 #ifdef BOUGIE
-  CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);//pos (0.0, 0.0, 0.0);
+  CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
   nb_squelettes_flammes = 4;
   flammes[0] = new Bougie (solveur, nb_squelettes_flammes, &pt, &pos,
 		dim_x / 7.0, SVShader,"bougie.obj",scene, &context);

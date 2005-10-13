@@ -19,7 +19,7 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     flammes[f]->getLuminaire()->draw(ALL,true);
   glEndList();
   
-  cout << "SCENE_OBJECTS_TEX" << endl;
+  
   glNewList(SCENE_OBJECTS_TEX,GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = objectsArray.begin();
        objectsArrayIterator != objectsArray.end();
@@ -27,7 +27,7 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     (*objectsArrayIterator)->draw(TEXTURED,true);
   glEndList();
   
-  cout << "SCENE_OBJECTS_WTEX" << endl;
+  
   glNewList(SCENE_OBJECTS_WTEX,GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = objectsArray.begin();
        objectsArrayIterator != objectsArray.end();
@@ -37,7 +37,7 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     flammes[f]->getLuminaire()->draw(FLAT,false);
   glEndList();
   
-  cout << "SCENE_OBJECTS_WSV_TEX" << endl;
+  
   glNewList(SCENE_OBJECTS_WSV_TEX,GL_COMPILE); 
   for (vector<CObject*>::iterator objectsArrayIteratorWSV = objectsArrayWSV.begin();
        objectsArrayIteratorWSV != objectsArrayWSV.end();
@@ -45,9 +45,9 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     (*objectsArrayIteratorWSV)->draw(TEXTURED,true);
   glEndList();
   
+  
   /* Création de la display list des objets qui projettent des ombres sans les textures */
   /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  cout << "SCENE_OBJECTS_WSV_WTEX" << endl;
   glNewList(SCENE_OBJECTS_WSV_WTEX,GL_COMPILE); 
   for (vector<CObject*>::iterator objectsArrayIteratorWSV = objectsArrayWSV.begin();
        objectsArrayIteratorWSV != objectsArrayWSV.end();
@@ -57,7 +57,7 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     flammes[f]->getLuminaire()->draw(FLAT,false);
   glEndList();	
 
-  cout << "SCENE_OBJECTS_WT" << endl;
+  
   glNewList (SCENE_OBJECTS_WT, GL_COMPILE);
   for (vector < CObject * >::iterator objectsArrayIterator = objectsArray.begin ();
        objectsArrayIterator != objectsArray.end ();
@@ -67,7 +67,7 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     flammes[f]->getLuminaire()->draw(ALL,false);
   glEndList ();
 
-  cout << "SCENE_OBJECTS_WSV" << endl;
+  
   /* Création de la display list des objets qui projettent des ombres */
   glNewList (SCENE_OBJECTS_WSV, GL_COMPILE);
   for (vector < CObject * >::iterator objectsArrayIteratorWSV = objectsArrayWSV.begin ();
@@ -80,7 +80,6 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
   
   /* Création de la display list des objets qui projettent des ombres sans les textures */
   /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  cout << "SCENE_OBJECTS_WSV_WT" << endl;
   glNewList (SCENE_OBJECTS_WSV_WT, GL_COMPILE);  
   for (vector < CObject * >::iterator objectsArrayIteratorWSV = objectsArrayWSV.begin ();
        objectsArrayIteratorWSV != objectsArrayWSV.end ();

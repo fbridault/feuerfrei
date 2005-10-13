@@ -5,6 +5,7 @@ CgBougieVertexShader::CgBougieVertexShader(char *sourceName, char *shaderName, C
 {
   // Récupération des paramètres
   paramTexTranslation = cgGetNamedParameter(program, "texTranslation");
+  paramModelViewInv = cgGetNamedParameter(program, "ModelViewInv");
 }
 
 CgBougieVertexShader::~CgBougieVertexShader()
@@ -18,7 +19,6 @@ CgBougieFragmentShader::CgBougieFragmentShader(char *sourceName, char *shaderNam
 {
   // Récupération des paramètres
   paramTexture = cgGetNamedParameter(program, "texture");
-  paramModelViewInv = cgGetNamedParameter(program, "ModelViewInv");
 }
 
 CgBougieFragmentShader::~CgBougieFragmentShader()

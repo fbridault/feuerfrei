@@ -42,6 +42,11 @@ public:
     cgGLEnableTextureParameter(paramTexture);
   };
   
+  void setTexture(GLuint tex){
+    cgGLSetTextureParameter(paramTexture, tex);
+    cgGLEnableTextureParameter(paramTexture);
+  };
+
 private:
   CGparameter paramWeights;
   CGparameter paramDivide;

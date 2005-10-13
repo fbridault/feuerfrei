@@ -19,8 +19,6 @@ GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h
   // Initialisations pour le contexte de rendu du pbuffer
   // Activer le pbuffer
 
-  pbuffer.Activate();
-
   // Couleur pour l'effacement
   glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
@@ -31,8 +29,6 @@ GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-  pbuffer.Deactivate();
   
   //textest = new Texture("texture.jpg",GL_TEXTURE_RECTANGLE_NV);
 }
@@ -68,7 +64,7 @@ void GlowEngine::blur()
   blurVertexShaderX.setOffsetsArray();
   blurVertexShaderX.setModelViewProjectionMatrix();
   blurFragmentShader.setWeightsArray();
-  //blurFragmentShader.setTexture(texblur);
+  blurFragmentShader.setTexture(texblur);
   blurVertexShaderX.enableShader();
   blurFragmentShader.enableShader();
   
@@ -102,7 +98,7 @@ void GlowEngine::blur()
   blurVertexShaderY.setOffsetsArray();
   blurVertexShaderY.setModelViewProjectionMatrix();
   blurFragmentShader.setWeightsArray();
-  //blurFragmentShader.setTexture(texblur);
+  blurFragmentShader.setTexture(texblur);
   blurVertexShaderY.enableShader();
   blurFragmentShader.enableShader();
     

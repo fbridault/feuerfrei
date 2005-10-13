@@ -23,9 +23,9 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   /* Création de la display list */
   /*******************************/
   glNewList (MECHE, GL_COMPILE);
-  glEnable (GL_LIGHTING);
+  //glEnable (GL_LIGHTING);
   draw (ALL,true);
-  glDisable (GL_LIGHTING);
+  //glDisable (GL_LIGHTING);
   glEndList ();
   cout << "Terminé" << endl;
 
@@ -37,8 +37,7 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   /* La bouding box est délimitée par les points ptMax[nb_lead_squelettes] et ptMin[0] */
   getBoundingBox (ptMax[nb_lead_squelettes], ptMin[0]);
 
-  for (vector < CPoint * >::iterator vertexIterator =
-	 vertexArray.begin ();
+  for (vector < CPoint * >::iterator vertexIterator = vertexArray.begin ();
        vertexIterator != vertexArray.end (); vertexIterator++)
     {
       /* Calcul du max */

@@ -14,9 +14,10 @@ struct vertout
   float4 color        : COLOR0;
   float2 texcoords    : TEXCOORD0;
   float3 normale      : TEXCOORD1;
+  float3 direction    : TEXCOORD2;
 };
 
-vertout vertBougie(vertin IN, uniform float texTranslation, uniform float4x4 ModelViewProj)
+vertout vertBougie(vertin IN, uniform float texTranslation, uniform float4x4 ModelViewInv, uniform float4x4 ModelViewProj)
 {
   vertout OUT;
   
@@ -28,27 +29,25 @@ vertout vertBougie(vertin IN, uniform float texTranslation, uniform float4x4 Mod
   OUT.texcoords = IN.texcoords;
   OUT.texcoords.y += texTranslation;
   
-  // passage de la normale
-  OUT.normale = IN.normale;
-  
   //IN.normale.z = 0;
-  //OUT.normale = mul(ModelViewProj, IN.normale).xyz;
+  OUT.normale = IN.normale;
+
+  OUT.direction = normalize(mul(ModelViewInv, float4(0,0,1,0))).xyz;
   
   return OUT;
 }
 
-float4 fragBougie(vertout IN, uniform float4x4 ModelViewInv, uniform sampler2D texture) : COLOR
+float4 fragBougie(vertout IN, uniform sampler2D texture) : COLOR
 {  
-  // cos de l'angle entre la direction de visée et la normale au point
-  // sortir mul(ModelViewInv, float4(0,0,1,0)).xyz) -> Identique pour tous les pixels
-  float cosa = dot(normalize(mul(ModelViewInv, float4(0,0,1,0))).xyz, normalize(IN.normale));
-  
+  // cos de l'angle entre la direction de visée et la normale au poi
+  float cosa = dot(IN.direction, normalize(IN.normale));
+	     
   // couleur de la texture de l'objet
   float4 color = tex2D(texture, IN.texcoords);
   
-  color.rgb =log(color.rgb+1)*1.3;
-  color.a = cosa+.1;
-
+  //color.rgb = IN.color.rgb;
+  color.a = cosa*color.a;
+  
   // melange de la couleur de l'objet, de sa texture et de l'intensite
   return color;
 }

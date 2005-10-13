@@ -304,12 +304,16 @@ Bougie::build ()
 void
 Bougie::drawWick ()
 {
+  float hauteur = dim_y / 6.0;
+  float largeur = dim_x / 60.0;
   /* Affichage de la mèche */
   glPushMatrix ();
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
+  glTranslatef (position.getX (), position.getY()-hauteur/2.0, position.getZ ());
   glRotatef (-90.0, 1.0, 0.0, 0.0);
   glColor3f (0.0, 0.0, 0.0);
-  GraphicsFn::SolidCylinder (dim_x / 120.0, dim_y / 12.0, 10, 10);
+  GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
+  glTranslatef (0.0, 0.0, hauteur);
+  GraphicsFn::SolidDisk (largeur, 10, 10);
   glPopMatrix ();
 }
 
@@ -330,7 +334,6 @@ Bougie::drawFlame (bool displayParticle)
   
   if (toggle)
     {
-      glDisable (GL_LIGHTING);
       glColor3f (1.0, 1.0, 1.0);
       gluBeginSurface (nurbs);
       gluNurbsSurface (nurbs, uknotsCount, uknots, vknotsCount,
@@ -338,12 +341,11 @@ Bougie::drawFlame (bool displayParticle)
 		       3, ctrlpoints, uorder, vorder,
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
-      glEnable (GL_LIGHTING);
     }
   else
     {
       /* Correction "Ã la grosse" pour les UVs -> Ã  voir par la suite */
-      float vtex = 1 / (float) (max_particles);
+      float vtex = 1.0 / (float) (max_particles);
 
       GLfloat texpts[2][2][2] =	{ {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };
       CPoint bougiepos;
@@ -392,20 +394,20 @@ Bougie::drawFlame (bool displayParticle)
       
       cgBougieVertexShader.setModelViewProjectionMatrix();
       cgBougieVertexShader.setTexTranslation(angle / (double) (PI));
-      cgBougieFragmentShader.setTexture(&tex);
-      cgBougieFragmentShader.setInverseModelViewMatrix();
+      cgBougieVertexShader.setInverseModelViewMatrix();
+      cgBougieFragmentShader.setTexture(&tex);      
       cgBougieVertexShader.enableShader();
       cgBougieFragmentShader.enableShader();
       
-     // glEnable (GL_TEXTURE_2D);
+//       glEnable (GL_TEXTURE_2D);
 
-      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-      glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
+//      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+//       glBindTexture (GL_TEXTURE_2D, tex.getTexture ());
 
-      glMatrixMode (GL_TEXTURE);
-      glPushMatrix ();
-      glLoadIdentity ();
-      glTranslatef (0.0, angle / (double) (PI), 0.0);
+//       glMatrixMode (GL_TEXTURE);
+//       glPushMatrix ();
+//       glLoadIdentity ();
+//       glTranslatef (0.0, angle / (double) (PI), 0.0);
 
       gluBeginSurface (nurbs);
       gluNurbsSurface (nurbs, uknotsCount, uknots, vknotsCount,
@@ -414,10 +416,10 @@ Bougie::drawFlame (bool displayParticle)
 		       GL_MAP2_VERTEX_3);
       gluEndSurface (nurbs);
       
- //     glPopMatrix();
- //     glDisable (GL_TEXTURE_2D);
-       cgBougieVertexShader.disableProfile();
-       cgBougieFragmentShader.disableProfile();
+ //      glPopMatrix();
+//       glDisable (GL_TEXTURE_2D);
+      cgBougieVertexShader.disableProfile();
+      cgBougieFragmentShader.disableProfile();
     }
   glPopMatrix ();
 }
@@ -500,7 +502,7 @@ void
 Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
 {
   switch_off_lights ();
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
 
   glBlendFunc (GL_ONE, GL_ONE);
   for (int i = 0; i < 1 /*nb_lights *//**SHADOW_SAMPLE_PER_LIGHT*/ ;
@@ -543,8 +545,8 @@ Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
       glStencilFunc (GL_EQUAL, 0, ~0);
       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
-      draw_scene_without_texture ();
-
+      sc->draw_sceneWTEX ();
+      
       reset_diffuse_light (i);
     }
   glDisable (GL_STENCIL_TEST);
@@ -552,7 +554,7 @@ Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
     {
       enable_only_ambient_light (i);
     }
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   for (int i = 0; i < nb_lights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
     {
       reset_diffuse_light (i);
@@ -566,7 +568,7 @@ void
 Bougie::cast_shadows_double (GLint objects_list_wsv)
 {
   switch_off_lights ();
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   switch_on_lights ();
 
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
@@ -604,7 +606,7 @@ Bougie::cast_shadows_double (GLint objects_list_wsv)
   glStencilFunc (GL_EQUAL, 0, ~0);
   glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFunc (GL_ONE, GL_ONE);
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
 
   switch_off_lights ();
   glDisable (GL_STENCIL_TEST);
@@ -612,7 +614,7 @@ Bougie::cast_shadows_double (GLint objects_list_wsv)
     {
       enable_only_ambient_light (i);
     }
-  draw_scene_without_texture ();
+  sc->draw_sceneWTEX ();
   for (int i = 0; i < nb_lights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
     {
       reset_diffuse_light (i);

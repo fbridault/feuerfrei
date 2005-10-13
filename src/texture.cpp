@@ -80,7 +80,7 @@ Texture::Texture(const char* const filename, GLint wrap_s, GLint wrap_t)
     cout << "Error : " << IMG_GetError();
   }else{
     cout << "OK" << endl;
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, sdltex->w, sdltex->h, 0, 
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, sdltex->w, sdltex->h, 0, 
 		  GL_RGBA, GL_UNSIGNED_BYTE, sdltex->pixels);
   }
   //  if(hasAlpha)

@@ -36,7 +36,7 @@ public:
   virtual void enableShader(){
     cgGLEnableProfile(profile);
     cgGLBindProgram(program);
-  };
+  }
 
   /** Désactivation du profil */
   void disableProfile(){

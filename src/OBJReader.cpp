@@ -50,7 +50,7 @@ COBJReader::COBJReader (const char *filename, CObject* currentObject)
   AS_ERROR(chdir("./scenes"),"chdir scenes dans COBJReader");
   FILE *pfichier_obj = fopen (filename, "r");
   if (!pfichier_obj){
-    cerr << "fichier de scÃ¨ne " << filename << " n'existe pas" << endl;
+    cerr << "fichier de scène " << filename << " n'existe pas" << endl;
     return;
   }
   

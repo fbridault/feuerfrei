@@ -10,6 +10,7 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   nb_squelettes = nb;
   
   position = *pos;
+  pos->setY(pos->getY() - dim_y/24.0);
   
   squelettes = new PeriSkeleton* [nb_squelettes];
   
@@ -17,7 +18,7 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   vorder = 4;
   
   nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(nurbs, GLU_SAMPLING_TOLERANCE, 10.0);
+  gluNurbsProperty(nurbs, GLU_SAMPLING_TOLERANCE, 20.0);
   gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
   gluNurbsCallback(nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
@@ -38,7 +39,7 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
   sc = scene;
 
   position = *pos;
-  
+
   uorder = 4;
   vorder = 4;
   
@@ -189,11 +190,4 @@ void Flame::reset_diffuse_light(int i)
   //    glLightfv(light,GL_SPECULAR,null);
   glLightfv(light,GL_AMBIENT,null);
   glDisable(light);
-}
-
-void Flame::draw_scene_without_texture(void)
-{
-  /* Scène */
-  glCallList(SCENE_OBJECTS_WT);
-  glCallList(SCENE_OBJECTS_WSV_WT);
 }

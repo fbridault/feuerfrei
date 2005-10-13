@@ -57,9 +57,8 @@ public:
 
   /** Dessine la flamme et sa mèche */
   void draw(bool displayParticle){
-    drawFlame(displayParticle);
     drawWick();
-    glPopMatrix();
+    drawFlame(displayParticle);
   };
 
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -133,8 +132,6 @@ protected:
   
   virtual void draw_shadowVolume (GLint objects_list_wsv, int i) = 0;
   virtual void draw_shadowVolume2 (GLint objects_list_wsv, int i) = 0;
-  
-  void draw_scene_without_texture (void);
   
   static void CALLBACK nurbsError (GLenum errorCode);
   

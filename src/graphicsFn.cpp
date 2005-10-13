@@ -88,6 +88,18 @@ GraphicsFn::SolidCylinder (GLdouble base, GLdouble height, GLint slices,
 }
 
 void
+GraphicsFn::SolidDisk (GLdouble rayon, GLint slices, GLint loops)
+{
+  QUAD_OBJ_INIT ();
+  gluQuadricDrawStyle (quadObj, GLU_FILL);
+  gluQuadricNormals (quadObj, GLU_SMOOTH);
+  /* If we ever changed/used the texture or orientation state
+     of quadObj, we'd need to change it to the defaults here
+     with gluQuadricTexture and/or gluQuadricOrientation. */
+  gluDisk (quadObj, 0, rayon, slices, loops);
+}
+
+void
 GraphicsFn::grille (int x, int y, int z)
 {
   double interx = dim_x / (double) x;
@@ -279,7 +291,6 @@ GraphicsFn::printString (char *s, int x, int y)
 {
   int i;
 
-  glDisable (GL_LIGHTING);
   glColor3f (1.0, 1.0, 1.0);
   glRasterPos2i (x, y);
 
@@ -290,5 +301,4 @@ GraphicsFn::printString (char *s, int x, int y)
   glListBase (fontOffset);
   glCallLists (strlen (s), GL_UNSIGNED_BYTE, (GLubyte *) s);
   glPopAttrib ();
-  glEnable (GL_LIGHTING);
 }

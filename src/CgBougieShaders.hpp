@@ -20,8 +20,13 @@ public:
     cgGLSetParameter1f(paramTexTranslation, value);
   };
   
+  void setInverseModelViewMatrix(){
+    cgGLSetStateMatrixParameter(paramModelViewInv, CG_GL_MODELVIEW_MATRIX,CG_GL_MATRIX_INVERSE);
+  };
+
 private:
   CGparameter paramTexTranslation;
+  CGparameter paramModelViewInv;
 };
 
 class CgBougieFragmentShader : public CgShader
@@ -34,14 +39,9 @@ public:
     cgGLSetTextureParameter(paramTexture, tex->getTexture());
     cgGLEnableTextureParameter(paramTexture);
   };
-  
-  void setInverseModelViewMatrix(){
-    cgGLSetStateMatrixParameter(paramModelViewInv, CG_GL_MODELVIEW_MATRIX,CG_GL_MATRIX_INVERSE);
-  };
-  
+    
 private:
   CGparameter paramTexture;
-  CGparameter paramModelViewInv;
 };
 
 #endif

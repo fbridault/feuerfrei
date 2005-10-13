@@ -161,12 +161,12 @@ draw (void)
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
   if(!glowOnly){    
-    /******************* AFFICHAGE DE LA SCENE *******************************/
-
     glBlendFunc (GL_ONE, GL_ZERO);
     
+    /******************* AFFICHAGE DE LA SCENE *******************************/
     /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
-    for (int f = 0; f < nb_flammes; f++) flammes[f]->drawWick ();
+    for (int f = 0; f < nb_flammes; f++) 
+      flammes[f]->drawWick ();
     
     if(solidePhotoEnabled){
       solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),

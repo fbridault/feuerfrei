@@ -152,7 +152,7 @@ draw (void)
     direction.setZ (m[3][2]);
 
     dist = direction.length();
-    sigma = dist > 0.1 ? -log(10*dist)+6 : 6.0;
+    sigma = dist > 0.1 ? -log(5*dist)+6 : 6.0;
     
     glowEngine->activate();
     glowEngine->setGaussSigma(sigma);
@@ -190,11 +190,9 @@ draw (void)
   
     glowEngine2->deactivate();
   }
-
-  /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+   
   if(!glowOnly){    
     glBlendFunc (GL_ONE, GL_ZERO);
     
@@ -258,16 +256,18 @@ draw (void)
     if (affiche_fps)
       write_fps ();
   }
+
   /********************* PLACAGE DU GLOW ****************************************/
   if(glowEnabled){
     glDisable (GL_DEPTH_TEST);
     
     glBlendFunc (GL_ONE, GL_ONE);
-    glowEngine2->drawBlur();
+    glowEngine2->drawBlur();    
+    
     glowEngine->drawBlur();
     glEnable (GL_DEPTH_TEST);
   }
-  
+
   SDL_GL_SwapBuffers ();
   
   /******************** CALCUL DU FRAMERATE *************************************/
@@ -563,7 +563,7 @@ init_ui ()
   
   eyeball = new Eyeball (largeur, hauteur, clipping);
   
-  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 3);
+  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 4);
   glowEngine2 = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 1);
 
   /* Pour l'affichage */

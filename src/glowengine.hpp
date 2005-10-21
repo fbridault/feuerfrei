@@ -29,7 +29,7 @@ public:
   /** Désactive le glow, les appels suivants dessineront dans le color buffer */
   void deactivate();
   /** Plaque le blur à l'écran */
-  void drawBlur();
+  void drawBlur(float alpha);
 
   void setGaussSigma(float sigma)
   {

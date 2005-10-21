@@ -100,7 +100,7 @@ Eyeball::mouseMotion (SDL_MouseMotionEvent * event)
 {
   if (!depl)
     return;
-  if (bouton_active == SDL_BUTTON_LEFT)
+  if (bouton_active == SDL_BUTTON_RIGHT)
     {
       trackball (lastquat,
 		 (2.0 * beginx - W) / W,

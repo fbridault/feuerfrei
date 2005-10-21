@@ -205,7 +205,7 @@ if test "x$have_GLU" = "xno" -a "x$GLU_LDOPTS" = "x" ; then
     echo "*** Hmm, you don't seem to have OpenGLU libraries installed in the standard"
     echo "*** location (/usr/lib).  I'll check in /usr/X11R6/lib, since"
     echo "*** many distributions (incorrectly) put OpenGLU libs there."
-    GLU_LDOPTS="-L/usr/X11R6/lib"
+    GLU_LDOPTS="-L/usr/X11R6/lib -L/usr/X11R6/lib64"
     FIND_GLU_LIB
 fi
 

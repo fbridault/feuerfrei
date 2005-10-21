@@ -144,15 +144,17 @@ draw (void)
     GLfloat m[4][4];
     CVector direction;
     float dist, sigma;
-
+    
+    /* Adaptation du flou en fonction de la distance */
+    /* On module la largeur de la gaussienne */
     glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
-
+    
     direction.setX (m[3][0]);
     direction.setY (m[3][1]);
     direction.setZ (m[3][2]);
-
+    
     dist = direction.length();
-    sigma = dist > 0.1 ? -log(5*dist)+6 : 6.0;
+    sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
     
     glowEngine->activate();
     glowEngine->setGaussSigma(sigma);
@@ -169,7 +171,7 @@ draw (void)
 	flammes[f]->drawFlame (affiche_particules);
     
     glowEngine->blur();
-  
+    
     glowEngine->deactivate();
     
     glowEngine2->activate();
@@ -187,12 +189,12 @@ draw (void)
 	flammes[f]->drawFlame (affiche_particules);
     
     glowEngine2->blur();
-  
+    
     glowEngine2->deactivate();
   }
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-   
+  
   if(!glowOnly){    
     glBlendFunc (GL_ONE, GL_ZERO);
     
@@ -246,7 +248,7 @@ draw (void)
 	
 	glPopMatrix ();
       }
-  
+    
     /********************* Dessin de la flamme **********************************/
     if(!glowEnabled)
       if(affiche_flamme)
@@ -256,18 +258,25 @@ draw (void)
     if (affiche_fps)
       write_fps ();
   }
-
+  
   /********************* PLACAGE DU GLOW ****************************************/
   if(glowEnabled){
     glDisable (GL_DEPTH_TEST);
+    glBlendColor(0.0,0.0,0.0,1.0);
+    //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
+    glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
+    //glowEngine2->drawBlur(0.5);
     
+    glowEngine->drawBlur(1.0);
+    
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+    glowEngine2->drawBlur(0.5);
     glBlendFunc (GL_ONE, GL_ONE);
-    glowEngine2->drawBlur();    
-    
-    glowEngine->drawBlur();
+    glowEngine->drawBlur(1.0);
+
     glEnable (GL_DEPTH_TEST);
   }
-
+  
   SDL_GL_SwapBuffers ();
   
   /******************** CALCUL DU FRAMERATE *************************************/

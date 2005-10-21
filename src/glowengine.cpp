@@ -136,7 +136,7 @@ void GlowEngine::deactivate()
   glViewport (0, 0, width*scaleFactor, height*scaleFactor);
 }
 
-void GlowEngine::drawBlur()
+void GlowEngine::drawBlur(float alpha)
 {
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -149,7 +149,7 @@ void GlowEngine::drawBlur()
   glEnable(GL_TEXTURE_RECTANGLE_NV);
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
   
-  glColor3f(1.0,1.0,1.0);
+  glColor4f(1.0,1.0,1.0, alpha);
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,height);

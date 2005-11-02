@@ -12,6 +12,12 @@
 #include <Cg/cg.h>
 #include <Cg/cgGL.h>
 
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
+
 #include "mathFn.hpp"
 
 using namespace std;
@@ -73,8 +79,7 @@ using namespace std;
 
 
 #define SHADOW_SAMPLE_PER_LIGHT 3
-#include "vector.hpp"
 
-extern double dim_x,dim_y,dim_z;
+#include "vector.hpp"
 
 #endif

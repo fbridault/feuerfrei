@@ -17,11 +17,7 @@
 #include "benchsolver.hpp"
 #include "glowengine.hpp"
 
-/********* Variables relatives au contrôle de l'affichage **************/
-static bool animate, affiche_velocite, affiche_repere, affiche_grille,
-  affiche_flamme, affiche_fps, brintage, shadowsEnabled,
-  shadowVolumesEnabled, affiche_particules, glowEnabled, glowOnly;
-int done=0;
+
 
 /********* Variables relatives au solveur ******************************/
 static Solver *solveur;
@@ -30,15 +26,7 @@ int solvx, solvy, solvz;
 double dim_x, dim_y, dim_z;
 SDL_mutex *lock;
 
-/********* Variables relatives à la fenêtre d'affichage ****************/
-static int largeur, hauteur;
-static double clipping;
-CGcontext context;
-static Eyeball *eyeball;
-/* Pour le compte des frames */
-static GLint Frames;
-static GLint T0 = 0;
-static char strfps[4];
+
 
 /********* Variables relatives à la simulation *************************/
 static char scene_name[255], meche_name[255];
@@ -47,15 +35,9 @@ static int nb_flammes = 1;
 static CScene *scene;
 static CgSVShader *SVShader;
 
-/********* Variables relatives aux solides photométriques **************/
-static SolidePhotometrique *solidePhoto;
-static bool solidePhotoEnabled, rotation,modePano,pixelBFC;
-/* interpolationSP = 0 ou 1; couleurOBJ = 0 ou 2 */
-static unsigned char interpolationSP, couleurOBJ;
 
-/********* Variables relatives au glow *********************************/
-static GlowEngine *glowEngine;
-static GlowEngine *glowEngine2;
+
+
 
 /**************************** FONCTIONS GENERALES DE L'INTERFACE GRAPHIQUE **************************/
 

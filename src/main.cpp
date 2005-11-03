@@ -1,25 +1,32 @@
-// Fichier hworld.cpp
-
 #include "main.hpp"
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-  EVT_BUTTON(ID_Bt_Click, MainFrame::OnClickButton1)
+  EVT_BUTTON(ID_ButtonRun, MainFrame::OnClickButtonRun)
+  EVT_BUTTON(ID_ButtonFlickering, MainFrame::OnClickButtonFlickering)
   EVT_MENU(ID_Quit, MainFrame::OnQuit)
   EVT_MENU(ID_About, MainFrame::OnAbout)
 END_EVENT_TABLE();
+
+class MyApp: public wxApp
+{
+    virtual bool OnInit();
+};
+
+IMPLEMENT_APP(MyApp)
 
 
 // Code de l'initialisation de l'application
 bool MyApp::OnInit()
 {
-  ::wxInitAllImageHandlers();
+  wxImage::AddHandler(new wxPNGHandler);
+  wxImage::AddHandler(new wxJPEGHandler);
   
-  MainFrame *frame = new MainFrame( _("Hello World"), wxPoint(0,0), wxSize(800,800) );
-  cout << "pouet" << endl;
+  MainFrame *frame = new MainFrame( _("Hello World"), wxPoint(0,0), wxSize(800,900) );
+  
   frame->Show(TRUE);
-  cout << "pouet2" << endl;
+  
 #ifdef BOUGIE
   if (frame->GetSettingsFromFile ("param.ini"))
     exit (2);
@@ -44,18 +51,24 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			     1                 ,
 			     0                  };
   
-  glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(400,400),attributelist, wxSUNKEN_BORDER );
+  glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   
   // Création d'un bouton. Ce bouton est associé à l'identifiant 
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  button1 = new wxButton(this,ID_Bt_Click,_("Start/Pause"));
+  buttonRun = new wxButton(this,ID_ButtonRun,_("Start/Pause"));
+  buttonFlickering = new wxButton(this,ID_ButtonFlickering,_("Flickering"));
+
+  sizerH = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Controls"));
+  sizerH->Add(buttonRun, 0, 0, 0);
+  sizerH->Add(buttonFlickering, 0, 0, 0);
   
-  sizer = new wxBoxSizer(wxVERTICAL);
-  sizer->Add(glBuffer, 0, 0, 0);
-  sizer->Add(button1, 0, 0, 0);
-  SetSizer(sizer);
+  sizerV = new wxBoxSizer(wxVERTICAL);
+  sizerV->Add(glBuffer, 0, 0, 0);
+  sizerV->Add(sizerH, 0, 0, 0);
+   
+  SetSizer(sizerV);
 
   menuFile = new wxMenu;
 
@@ -73,10 +86,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.
-void MainFrame::OnClickButton1(wxCommandEvent& event)
+void MainFrame::OnClickButtonRun(wxCommandEvent& event)
 {
   glBuffer->ToggleRun();
 }
+
+void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
+{
+  glBuffer->ToggleFlickering();
+}
+
 
 void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 {
@@ -85,7 +104,7 @@ void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 
 void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
 {
-  wxMessageBox(_("Real-time simulation of small flames"),
+  wxMessageBox(_("Real-time simulation of small flames\nOasis Team"),
 	       _("About flames"), wxOK | wxICON_INFORMATION, this);
 }
 
@@ -141,4 +160,12 @@ int MainFrame::GetSettingsFromFile (char *name)
   glBuffer->Init(largeur, hauteur, solvx, solvy, solvz, timeStep, scene_name, meche_name, clipping);
   
   return 0;
+}
+
+void MainFrame::SetFPS(int fps)
+{
+  wxString s;
+  s += wxString::Format(_("%d FPS"), fps);
+  
+  SetStatusText(s);
 }

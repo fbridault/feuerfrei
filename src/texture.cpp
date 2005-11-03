@@ -4,13 +4,6 @@
 
 Texture::Texture(const wxString& filename)
 {
-  /*unsigned char *texture;
-  unsigned int width,height;
-
-  read_png(filename,&texture,&width,&height);*/
-  
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
   glGenTextures(1, &texName);
   glBindTexture(GL_TEXTURE_2D, texName);
  
@@ -20,7 +13,7 @@ Texture::Texture(const wxString& filename)
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
  
   cout << "Chargement texture : " << filename.fn_str() << "......";
-  wxtex = new wxImage (filename, GuessImageType(filename));
+  wxtex = new wxImage (filename);
 
   if(!wxtex) {
     cout << "Error ";
@@ -33,8 +26,6 @@ Texture::Texture(const wxString& filename)
 
 Texture::Texture(const wxString& filename, GLenum gltexture)
 {  
- // glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
   glGenTextures(1, &texName);
   glBindTexture(gltexture, texName);
  
@@ -44,27 +35,21 @@ Texture::Texture(const wxString& filename, GLenum gltexture)
   glTexParameteri(gltexture,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 //  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
   cout << "Chargement texture : " << filename.fn_str() << "......";
-  wxtex = new wxImage (filename, GuessImageType(filename));
+  wxtex = new wxImage (filename);
 
   if(!wxtex) {
     cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (gltexture, 0, GL_RGB, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
-		GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
+    glTexImage2D (gltexture, 0, GL_RGB8, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		  GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
   
 }
 
 Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 {
-  /*unsigned char *texture;
-  unsigned int width,height;
-  
-  read_png(filename,&texture,&width,&height);*/
-  
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
+
   glGenTextures(1, &texName);
   glBindTexture(GL_TEXTURE_2D, texName);
  
@@ -74,7 +59,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
  
   cout << "Chargement texture : " << filename.fn_str() << "......";
-  wxtex = new wxImage (filename, GuessImageType(filename));
+  wxtex = new wxImage (filename);
   if(!wxtex) {
     cout << "Error";
   }else{
@@ -89,9 +74,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 }
 
 Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
-{
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
+{  
   glGenTextures(1, &texName);
   
 //    glBindTexture(GL_TEXTURE_2D, texName);

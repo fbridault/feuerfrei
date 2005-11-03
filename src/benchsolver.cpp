@@ -633,12 +633,12 @@ BenchSolver::vel_step_compare_diffuse_hybride ()
 }
 
 void
-BenchSolver::iterate (bool brintage, int nb_step_GS)
+BenchSolver::iterate (bool flickering, int nb_step_GS)
 {
   nb_step_gauss_seidel = nb_step_GS;
 
   for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (brintage);
+    flammes[i]->add_forces (flickering);
 
   //vel_step();
   //vel_step_compare_diffuse_normal();
@@ -717,10 +717,10 @@ BenchSolver::vel_step_save ()
 }
 
 void
-BenchSolver::iterate_save (bool brintage)
+BenchSolver::iterate_save (bool flickering)
 {  
   for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (brintage);
+    flammes[i]->add_forces (flickering);
 	
   vel_step_save();
   
@@ -732,12 +732,12 @@ BenchSolver::iterate_save (bool brintage)
 }
 
 void
-BenchSolver::iterate_hybride (bool brintage, int nb_step_GS)
+BenchSolver::iterate_hybride (bool flickering, int nb_step_GS)
 {
   nb_step_gauss_seidel = nb_step_GS;
 
   for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (brintage);
+    flammes[i]->add_forces (flickering);
 
   vel_step_compare_project_hybride ();
   //  dens_step();
@@ -748,19 +748,19 @@ BenchSolver::iterate_hybride (bool brintage, int nb_step_GS)
 }
 
 void
-BenchSolver::iterate (bool brintage)
+BenchSolver::iterate (bool flickering)
 {
   /* Temporaire : ajout de forces périodiques */
-  if ((nb_iter % nb_iter_brintage) == 5)
+  if ((nb_iter % nb_iter_flickering) == 5)
     {
       cleanSources ();
-      brintage = false;
+      flickering = false;
     }
   else 
-    if ((nb_iter % nb_iter_brintage) < 5)
-      brintage = true;
+    if ((nb_iter % nb_iter_flickering) < 5)
+      flickering = true;
     else
-      brintage = false;
+      flickering = false;
 
   printf ("Itération %d\r", nb_iter);
   fflush (stdout);
@@ -772,21 +772,21 @@ BenchSolver::iterate (bool brintage)
       return;
     }*/
 
-  iterate_save(brintage);
+  iterate_save(flickering);
   /* Pour comparaison dans diffuse strictement */
-  //iterate (brintage, ref_val);
-  //iterate_hybride( brintage, ref_val);
+  //iterate (flickering, ref_val);
+  //iterate_hybride( flickering, ref_val);
 
   /* Comparaison simple */
   //   save_state();
 
-  //   iterate( brintage, ref_val);
+  //   iterate( flickering, ref_val);
   //   save_ref();
 
   //   for(int i=1; i < ref_val; i++){
   //     set_previous_state();
 
-  //     iterate(brintage, i);
+  //     iterate(flickering, i);
   //     compare();
   //   }
 
@@ -794,18 +794,18 @@ BenchSolver::iterate (bool brintage)
   //   save_state();
 
   //   for(int i=1; i < ref_val; i++){
-  //     iterate( brintage, i);
+  //     iterate( flickering, i);
   //     save_ref();
 
   //     set_previous_state();
 
-  //     iterate_hybride(brintage, i);
+  //     iterate_hybride(flickering, i);
   //     compare();
 
   //     set_previous_state();
   //   }
 
-  //   iterate( brintage, ref_val);
+  //   iterate( flickering, ref_val);
 
   //file << endl;
   nb_iter++;

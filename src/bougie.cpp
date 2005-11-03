@@ -418,6 +418,9 @@ Bougie::drawFlame (bool displayParticle)
       
       glPopMatrix();
       glDisable (GL_TEXTURE_2D);
+
+      glMatrixMode (GL_MODELVIEW);
+      
  //      cgBougieVertexShader.disableProfile();
 //       cgBougieFragmentShader.disableProfile();
     }

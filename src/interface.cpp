@@ -378,7 +378,7 @@ case SDLK_z:
     affiche_fps = !affiche_fps;
     break;
   case SDLK_b:
-    brintage = !brintage;
+    flickering = !brintage;
     break;
   case SDLK_KP0:
     animate = !animate;
@@ -559,7 +559,7 @@ init_ui ()
 
   /* Pour l'affichage */
   animate = true; 
-  brintage = glowOnly = false;
+  flickering = glowOnly = false;
   affiche_repere = affiche_velocite = affiche_particules = affiche_grille = false;
   affiche_fps = affiche_flamme = true;
   shadowsEnabled = shadowVolumesEnabled = false;
@@ -614,7 +614,7 @@ solveur_loop (void *)
       if (animate)
 	{
 	  SDL_mutexP (lock);
-	  solveur->iterate (brintage);
+	  solveur->iterate (flickering);
 	  SDL_mutexV (lock);
 
 	  //ecart++;
@@ -656,7 +656,7 @@ sdl_loop_with_capture (void *arg)
     {
       SDL_Event event;
 
-      solveur->iterate (brintage);
+      solveur->iterate (flickering);
       while (SDL_PollEvent (&event))
 	{
 	  switch (event.type)
@@ -720,7 +720,7 @@ sdl_loop_single_thread (void *arg)
 		
       //~ start=clock();
    
-      solveur->iterate (brintage);
+      solveur->iterate (flickering);
       //~ t = (clock() - start)/((double)CLOCKS_PER_SEC);
       //~ printf("temps d'une itération : %g sec  \r", t);
       //~ fflush(stdout);

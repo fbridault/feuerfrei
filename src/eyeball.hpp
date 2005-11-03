@@ -42,11 +42,9 @@ public:
   /** Récupération de la coordonnée z du centre du eyeball. */
   GLdouble getCenterz(){return centerz;};
 
-//   /** Défini l'action à effectuer lorsque la souris se déplace */
-//   void mouseMotion(SDL_MouseMotionEvent *event);
+  void OnMouseClick (wxMouseEvent& event);
+  void OnMouseMotion (wxMouseEvent& event);
   
-//   /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
-//   void mouseButton(SDL_MouseButtonEvent *event);
 private:
   
   void recalculer_matrice_initiale(void);

@@ -30,6 +30,11 @@ public:
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
   
+  /** Défini l'action à effectuer lorsque la souris se déplace */
+  void OnMouseMotion(wxMouseEvent& event);
+  /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
+  void OnMouseClick(wxMouseEvent& event);
+    
   /** Initialisation globale du contrôle */
   void Init(int l, int h, int solvx, int solvy, int solvz, double timeStep, 
 	    char *scene_name, char *meche_name, double clipping);
@@ -41,16 +46,22 @@ public:
   {
     animate=!animate;
   };
-  
+    /** Lance/arrête l'animation */
+  void ToggleFlickering(void)
+  {
+    flickering=!flickering;
+  };
+
+
   DECLARE_EVENT_TABLE()
 
 private:
   void WriteFPS ();
   void DrawVelocity (void);
-
+  
   /********* Variables relatives au contrôle de l'affichage **************/
   bool animate, affiche_velocite, affiche_repere, affiche_grille,
-    affiche_flamme, affiche_fps, brintage, shadowsEnabled,
+    affiche_flamme, affiche_fps, flickering, shadowsEnabled,
     shadowVolumesEnabled, affiche_particules, glowEnabled, glowOnly;
   bool init, done;
 
@@ -60,10 +71,9 @@ private:
   CGcontext context;
   Eyeball *eyeball;
   /* Pour le compte des frames */
-  GLint Frames;
-  GLint T0;
-  char strfps[4];
-
+  int Frames;
+  int t;
+  
   /********* Variables relatives aux solides photométriques **************/
   SolidePhotometrique *solidePhoto;
   bool solidePhotoEnabled, rotation,modePano,pixelBFC;

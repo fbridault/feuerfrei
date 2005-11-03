@@ -1,10 +1,16 @@
 #include "wxGLBuffer.hpp"
+#include "main.hpp"
 
 #include <iostream>
 
 BEGIN_EVENT_TABLE(wxGLBuffer, wxGLCanvas)
   EVT_PAINT(wxGLBuffer::OnPaint)
   EVT_IDLE(wxGLBuffer::OnIdle)
+  EVT_MOTION(wxGLBuffer::OnMouseMotion)
+  EVT_MIDDLE_DOWN(wxGLBuffer::OnMouseClick)
+  EVT_MIDDLE_UP(wxGLBuffer::OnMouseClick)
+  EVT_RIGHT_DOWN(wxGLBuffer::OnMouseClick)
+  EVT_RIGHT_UP(wxGLBuffer::OnMouseClick)
 END_EVENT_TABLE();
 
 
@@ -34,7 +40,6 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 //   SetCurrent();
   
   done = init = false;
-  T0 = 0;
   nb_flammes = 1;
 }
 
@@ -53,29 +58,22 @@ wxGLBuffer::~wxGLBuffer()
 void wxGLBuffer::OnIdle(wxIdleEvent& event)
 {
   if(animate)
-    solveur->iterate (brintage);
+    solveur->iterate (flickering);
 
   this->Refresh();
   
   /*  draw();*/
   event.RequestMore();
 }
-
-/** Affiche le framerate à l'écran */
-void wxGLBuffer::WriteFPS ()
+  
+void wxGLBuffer::OnMouseMotion(wxMouseEvent& event)
 {
-  glMatrixMode (GL_PROJECTION);
-  glPushMatrix ();
-  glLoadIdentity ();
-  gluOrtho2D (0.0, (GLfloat) largeur, 0.0, (GLfloat) hauteur);
-  glMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
-  glLoadIdentity ();
-  GraphicsFn::printString (strfps, largeur - 80, hauteur - 20);
-  glPopMatrix ();
-  glMatrixMode (GL_PROJECTION);
-  glPopMatrix ();
-  glMatrixMode (GL_MODELVIEW);
+  eyeball->OnMouseMotion(event);
+}
+  
+void wxGLBuffer::OnMouseClick(wxMouseEvent& event)
+{
+  eyeball->OnMouseClick(event);
 }
 
 /** Fonction de dessin global */
@@ -93,7 +91,9 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   
   /* Déplacement du eyeball */
   eyeball->recalcModelView();
-  
+
+  glColor3f(1.0,1.0,0.0);
+  GraphicsFn::SolidSphere(3,20,20);
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
   if(animate)
@@ -211,17 +211,14 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
 	
 	glPopMatrix ();
       }
-    cout << "bi8" << endl;
+    //cout << "bi8" << endl;
     /********************* Dessin de la flamme **********************************/
     if(!glowEnabled)
       if(affiche_flamme)
 	for (int f = 0; f < nb_flammes; f++)
-	  flammes[f]->drawFlame (affiche_particules);
-    
-    // if (affiche_fps)
-    //   write_fps ();
+	  flammes[f]->drawFlame (affiche_particules);    
   }
-  cout << "b8" << endl;
+  //cout << "b8" << endl;
   /********************* PLACAGE DU GLOW ****************************************/
   if(glowEnabled){
     glDisable (GL_DEPTH_TEST);
@@ -241,38 +238,32 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   }
   
   /******** A VERIFIER *******/
-  glFlush();
+  //glFlush();
   /***************************/
   SwapBuffers ();
   //event.Skip();
 
 
   /******************** CALCUL DU FRAMERATE *************************************/
-  // Frames++;
+  Frames++;
   
-//   GLint t = SDL_GetTicks ();
-//   if (t - T0 >= 2000){
-//     GLfloat seconds = (t - T0) / 1000.0;
-//     GLfloat fps = Frames / seconds;
-    
-//     sprintf (strfps, "%d", (int) fps);
-    
-//     //printf("%d frames in %g seconds = %g FPS %s\n", Frames, seconds, fps, strfps);
-//     T0 = t;
-//     Frames = 0;
-//   } 
+  t = ::wxGetElapsedTime (false);
+  if (t >= 2000){    
+    ((MainFrame *)GetParent())->SetFPS( Frames / (t/1000) );
+    ::wxStartTimer();
+    Frames = 0;
+  } 
 }
 
 void wxGLBuffer::InitUISettings()
 {
   /* Pour l'affichage */
   animate = true; 
-  brintage = true; glowOnly = false;
+  flickering = true; glowOnly = false;
   affiche_repere = affiche_velocite = affiche_particules = affiche_grille = false;
-  affiche_fps = true;
-  affiche_flamme = false;
+  affiche_fps = affiche_flamme = true;
   shadowsEnabled = shadowVolumesEnabled = false;
-  solidePhotoEnabled = glowEnabled = false;
+  solidePhotoEnabled = glowEnabled = true;
   interpolationSP = 1;
   couleurOBJ = 2;
 }
@@ -347,10 +338,12 @@ void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double tim
   scene = new CScene (scene_name,flammes, nb_flammes);
   eyeball = new Eyeball (largeur, hauteur, clipping);
   
-  glowEngine = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 4);
+  glowEngine  = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 4);
   glowEngine2 = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 1);
   cout << "Initialisation terminée" << endl;
   /*GraphicsFn::makeRasterFont ();
     sprintf (strfps, "%d", 0);*/
   init = true;
+
+  ::wxStartTimer();
 }

@@ -27,7 +27,7 @@ public:
   /** Lance plusieurs itérations du solveur avec différents pas de résolutions pour les méthodes
    * de Gauss-Seidel, en vue du profiling
    */
-  void iterate (bool brintage);
+  void iterate (bool flickering);
 
 private:
   int IX2 (int i, int j, int k)
@@ -49,8 +49,8 @@ private:
 			    double *const residu0);
   void project_save (double *const p, double *const div, int num);
 
-  void iterate (bool brintage, int nb_step_GS);
-  void iterate_hybride (bool brintage, int nb_step_GS);
+  void iterate (bool flickering, int nb_step_GS);
+  void iterate_hybride (bool flickering, int nb_step_GS);
 
   /** Sauvegarde les différentes composantes du solveur comme valeur de référence */
 //  void save_ref ();
@@ -79,7 +79,7 @@ private:
   void writeLog ();
 
   const void save (const double *const x);
-  void iterate_save (bool brintage);
+  void iterate_save (bool flickering);
   
   ofstream file;
 

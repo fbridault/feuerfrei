@@ -26,7 +26,7 @@ public:
   virtual ~ Solver ();
 
   /** Lance une itération du solveur. */
-  virtual void iterate (bool brintage);
+  virtual void iterate (bool flickering);
 
   /** Informe au solveur la présence de flammes, en vue de leur contribution Ã  l'élévation thermique 
    * (même si celle-ci n'est que fictive, puisque "simulée" par la vélocité)
@@ -272,7 +272,7 @@ protected:
 
   /** Nombre d'itérations pour Gauss-Seidel */
   int nb_iter;
-  const static int nb_iter_brintage = 50;
+  const static int nb_iter_flickering = 50;
   /** Viscosité cinématique de l'air 15*10E-6. */
   double visc;
   /** Diffusion. */

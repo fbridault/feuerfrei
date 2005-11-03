@@ -767,23 +767,23 @@ Solver::vel_step_hybride ()
 }
 
 void
-Solver::iterate (bool brintage)
+Solver::iterate (bool flickering)
 {
   /* Temporaire : ajout de forces pÃ©riodiques */
-  //~ if ((nb_iter % nb_iter_brintage) == 5)
+  //~ if ((nb_iter % nb_iter_flickering) == 5)
   //~ {
   //~ cleanSources ();
-  //~ brintage = false;
+  //~ flickering = false;
   //~ }
-  //~ else if ((nb_iter % nb_iter_brintage) < 5)
-  //~ brintage = true;
+  //~ else if ((nb_iter % nb_iter_flickering) < 5)
+  //~ flickering = true;
   //~ else
-  //~ brintage = false;
+  //~ flickering = false;
 
   //cout << IX2(3374) << "  " << IX2(3375) << " " << IX2(1) << " " << IX2(225) << endl;
 
   for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (brintage);
+    flammes[i]->add_forces (flickering);
 
   vel_step ();
   //  dens_step();

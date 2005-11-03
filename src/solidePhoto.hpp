@@ -35,7 +35,7 @@ public:
    * @param o Orientation du solide
    * @param p Centre du solide
    */
-  void calculerFluctuationIntensiteCentreEtOrientation(CVector o,CPoint* p);
+  void calculerFluctuationIntensiteCentreEtOrientation(CVector o,CPoint* p, double dim_y);
 
   /** Passe au fichier suivant dans la liste des fichiers IES */
   void swap()

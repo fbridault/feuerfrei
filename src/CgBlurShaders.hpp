@@ -14,7 +14,7 @@ class CgSPVertexShader;
 class CgBlurVertexShader : public CgSPVertexShader
 {
 public:
-  CgBlurVertexShader(char *sourceName, char *shaderName, CGcontext *context);
+  CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgBlurVertexShader();
   
   void setOffsetsArray(){
@@ -29,7 +29,7 @@ private:
 class CgBlurFragmentShader : public CgShader
 {
 public:
-  CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context);
+  CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgBlurFragmentShader();
   
   void computeWeights(float sigma);

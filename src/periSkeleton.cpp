@@ -30,14 +30,14 @@ PeriSkeleton::move_origine ()
 {
   int i, j, k;
   CPoint tmp;
-  float distx = 10 * dim_x / (float) solveur->getX ();
-  float distz = dim_y / (float) solveur->getZ ();
+  float distx = 10 * solveur->getDimX() / (float) solveur->getX ();
+  float distz = solveur->getDimZ() / (float) solveur->getZ ();
   
   /* Retrouver les quatres cellules adjacentes autour de la particule */
-  i = (int) (origine.getX () * dim_x * solveur->getX ()) + 1 +
+  i = (int) (origine.getX () * solveur->getDimX() * solveur->getX ()) + 1 +
     solveur->getX () / 2;
-  j = (int) (origine.getY () * dim_y * solveur->getY ()) + 1;
-  k = (int) (origine.getZ () * dim_z * solveur->getZ ()) + 1 +
+  j = (int) (origine.getY () * solveur->getDimY() * solveur->getY ()) + 1;
+  k = (int) (origine.getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 +
     solveur->getZ () / 2;
 
   /* Calculer la nouvelle position */
@@ -80,10 +80,10 @@ PeriSkeleton::move_particle (Particle * const pos, int n)
     return 0;
 
   /* Retrouver les quatres cellules adjacentes autour de la particule */
-  i = (int) (pos->getX () * dim_x * solveur->getX ()) + 1 +
+  i = (int) (pos->getX () * solveur->getDimX() * solveur->getX ()) + 1 +
     solveur->getX () / 2;
-  j = (int) (pos->getY () * dim_y * solveur->getY ()) + 1;
-  k = (int) (pos->getZ () * dim_z * solveur->getZ ()) + 1 +
+  j = (int) (pos->getY () * solveur->getDimY() * solveur->getY ()) + 1;
+  k = (int) (pos->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 +
     solveur->getZ () / 2;
 
   /* Calculer la nouvelle position */
@@ -99,9 +99,9 @@ PeriSkeleton::move_particle (Particle * const pos, int n)
   pos->addY (solveur->getV (i, j, k));
   pos->addZ (solveur->getW (i, j, k));
 
-  if (pos->getX () < -dim_x / 2.0 || pos->getX () > dim_x / 2.0
-      || pos->getY () < 0 || pos->getY () > dim_y
-      || pos->getZ () < -dim_z / 2.0 || pos->getZ () > dim_z / 2.0)
+  if (pos->getX () < -solveur->getDimX() / 2.0 || pos->getX () > solveur->getDimX() / 2.0
+      || pos->getY () < 0 || pos->getY () > solveur->getDimY()
+      || pos->getZ () < -solveur->getDimZ() / 2.0 || pos->getZ () > solveur->getDimZ() / 2.0)
     return 0;
   
   return 1;

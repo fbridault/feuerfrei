@@ -1,6 +1,6 @@
 #include "CgSVShader.hpp"
 
-CgSVShader::CgSVShader (char *sourceName, char *shaderName, CGcontext *context):
+CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context):
   CgShader (sourceName, shaderName, context, CG_GL_VERTEX)
 {
   // Récupération des paramètres

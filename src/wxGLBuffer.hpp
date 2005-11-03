@@ -1,6 +1,23 @@
-#include "header.hpp"
+#ifndef WXGLBUFFER_H
+#define WXGLBUFFER_H
+
+class wxGLBuffer;
+
+#include "header.h"
+
 #include <wx/glcanvas.h>
 
+#include "CgSVShader.hpp"
+#include "eyeball.hpp"
+
+#include "scene.hpp"
+#include "solidePhoto.hpp"
+#include "graphicsFn.hpp"
+#include "bougie.hpp"
+#include "firmalampe.hpp"
+#include "solver.hpp"
+#include "benchsolver.hpp"
+#include "glowengine.hpp"
 
 
 class wxGLBuffer : public wxGLCanvas
@@ -13,8 +30,13 @@ public:
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
   
-  void InitUI();
-  
+  /** Initialisation globale du contrôle */
+  void Init(int l, int h, int solvx, int solvy, int solvz, double timeStep, 
+	    char *scene_name, char *meche_name, double clipping);
+  /** Initialisation des variables d'affichage de l'interface */
+  void InitUISettings();
+
+  /** Lance/arrête l'animation */
   void ToggleRun(void)
   {
     animate=!animate;
@@ -27,20 +49,19 @@ private:
   void DrawVelocity (void);
 
   /********* Variables relatives au contrôle de l'affichage **************/
-  bool init;
   bool animate, affiche_velocite, affiche_repere, affiche_grille,
     affiche_flamme, affiche_fps, brintage, shadowsEnabled,
     shadowVolumesEnabled, affiche_particules, glowEnabled, glowOnly;
-  int done=0;
+  bool init, done;
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
   int largeur, hauteur;
-  double clipping;
+  
   CGcontext context;
   Eyeball *eyeball;
   /* Pour le compte des frames */
   GLint Frames;
-  GLint T0 = 0;
+  GLint T0;
   char strfps[4];
 
   /********* Variables relatives aux solides photométriques **************/
@@ -55,14 +76,12 @@ private:
 
   /********* Variables relatives au solveur ******************************/
   Solver *solveur;
-  float pas_de_temps;
-  int solvx, solvy, solvz;
-  double dim_x, dim_y, dim_z;
-  
+    
   /********* Variables relatives à la simulation *************************/
-  char scene_name[255], meche_name[255];
   Flame **flammes;
-  int nb_flammes = 1;
+  int nb_flammes;
   CScene *scene;
   CgSVShader *SVShader;
 };
+
+#endif

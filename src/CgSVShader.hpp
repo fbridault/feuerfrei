@@ -22,7 +22,7 @@ public:
    * @param shaderName Nom du programme Cg
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    */
-  CgSVShader(char *sourceName, char *shaderName, CGcontext *context);
+  CgSVShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgSVShader();
   
   /** Réglage de l'épaisseur des shadow volumes */

@@ -8,10 +8,10 @@ class Solver;
 
 class Flame;
 
-/** La classe Solver propose une implÃ©mentation 3D de la mÃ©thode stable implicite semi-lagrangienne de Stam.
- * A noter que dans le cadre de notre modÃ¨le de flamme, le champ de densitÃ© n'est pas utilisÃ©, ce qui,
- * physiquement semble assez curieux (d'aprÃ¨s Alexei). NÃ©anmoins Stam prÃ©sente bien les choses ainsi dans
- * son code initial, la densitÃ© dÃ©pend de la vÃ©locitÃ©, la vÃ©locitÃ© Ã©volue indÃ©pendament.
+/** La classe Solver propose une implémentation 3D de la méthode stable implicite semi-lagrangienne de Stam.
+ * A noter que dans le cadre de notre modèle de flamme, le champ de densité n'est pas utilisé, ce qui,
+ * physiquement semble assez curieux (d'après Alexei). Néanmoins Stam présente bien les choses ainsi dans
+ * son code initial, la densité dépend de la vélocité, la vélocité évolue indépendament.
  * 
  * @author	Flavien Bridault
  */
@@ -20,17 +20,16 @@ class Solver
 public:
   /** Constructeur du solveur.
    * @param n : taille de la grille
-   * @param pas_de_temps : pas de temps utilisÃ© pour la simulation
+   * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  Solver (int n_x, int n_y, int n_z, double pas_de_temps);
-
+  Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
   virtual ~ Solver ();
 
-  /** Lance une itÃ©ration du solveur. */
+  /** Lance une itération du solveur. */
   virtual void iterate (bool brintage);
 
-  /** Informe au solveur la prÃ©sence de flammes, en vue de leur contribution Ã  l'Ã©lÃ©vation thermique 
-   * (mÃªme si celle-ci n'est que fictive, puisque "simulÃ©e" par la vÃ©locitÃ©)
+  /** Informe au solveur la présence de flammes, en vue de leur contribution Ã  l'élévation thermique 
+   * (même si celle-ci n'est que fictive, puisque "simulée" par la vélocité)
    * @param f tableau contenant les pointeurs vers les flammes
    * @param nb_f nombre de flammes (taille du tableau)
    */
@@ -80,11 +79,11 @@ public:
     v_src[IX (i, j, k)] = value;
   };
   /** Ajout des forces externes.
-   * @param x composante Ã  traiter
-   * @param src composante contenant les forces engendrÃ©es par les sources externes
+   * @param x composante à traiter
+   * @param src composante contenant les forces engendrées par les sources externes
    */
   void add_source (double *const x, double *const src);
-  /** Remet Ã  zÃ©ro toutes les forces externes */
+  /** Remet à zéro toutes les forces externes */
   void cleanSources ();
 
   /** Retourne le nombre de voxels en X */
@@ -102,6 +101,47 @@ public:
   {
     return N_z;
   };
+
+  /** Retourne la dimension en X */
+  double getDimX ()
+  {
+    return dim_x;
+  };
+  /** Retourne la dimension en Y */
+  double getDimY ()
+  {
+    return dim_y;
+  };
+  /** Retourne la dimension en Z */
+  double getDimZ ()
+  {
+    return dim_z;
+  };
+
+  /** Retourne le pas de temps */
+  double getTimeStep()
+  {
+    return dt;
+  };
+
+  /** NOTE : Les 6 méthodes ci-dessus pourraient faire partie d'un objet hérité Grid3D par exemple */
+  /** Fonction de construction de la display list de la grille du solveur */
+  void buildDLGrid ();
+  /** Fonction de construction de la display list du repère du solveur */
+  void buildDLBase ();
+  /** Fonction de dessin de la grille */
+  void displayGrid (){
+    glCallList (GRILLE);
+  };
+  /** Fonction de dessin du repère de base */
+  void displayBase (){
+    glCallList (REPERE);
+  };
+  /** Fonction de dessin du champ de vélocité */
+  void displayVelocityField (void);
+  /** Fonction de dessin de la vélocité d'une cellule */
+  void displayArrow (CVector * const direction);
+
 protected:
   int IX (int i, int j, int k)
   {
@@ -124,90 +164,94 @@ protected:
 
   /** Traitement de valeurs aux bords du solveur.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param x composante Ã  traiter
+   * @param x composante à traiter
    */
   void set_bnd (int b, double *const x);
 
-  /** Effectue une rÃ©solution des systÃ¨mes linÃ©aires de la diffusion
-  * et de la projection Ã  l'aide de la mÃ©thode itÃ©rative de Gauss-Seidel
+  /** Effectue une résolution des systèmes linéaires de la diffusion
+  * et de la projection à l'aide de la méthode itérative de Gauss-Seidel
   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-  * @param x composante Ã  traiter
-  * @param x0 composante x au pas de temps prÃ©cÃ©dent
+  * @param x composante à traiter
+  * @param x0 composante x au pas de temps précédent
   * @param a valeur des coefficients dans la matrice A
   * @param div fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
   * et 1/6 pour la projection
-  * @param nb_steps nombre d'itÃ©rations Ã  effectuer
+  * @param nb_steps nombre d'itérations à effectuer
   */
   inline void GS_solve(int b, double *const x, const double *const x0,
 				double a, double div, double nb_steps);
   
-  /** Effectue une rÃ©solution des systÃ¨mes linÃ©aires de la diffusion
-  * et de la projection Ã  l'aide de la mÃ©thode du Gradient ConjuguÃ©
+  /** Effectue une résolution des systèmes linéaires de la diffusion
+  * et de la projection à l'aide de la méthode du Gradient Conjugué
   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-  * @param x composante Ã  traiter
-  * @param x0 composante x au pas de temps prÃ©cÃ©dent
+  * @param x composante à traiter
+  * @param x0 composante x au pas de temps précédent
   * @param a valeur des coefficients dans la matrice A
   * @param div fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
   * et 1/6 pour la projection
-  * @param nb_steps nombre d'itÃ©rations Ã  effectuer
+  * @param nb_steps nombre d'itérations à effectuer
   */
   inline void GCSSOR(double *const x0, const double *const b, double a, double diagonal, 
 		     double nb_steps, double omega );
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param x composante Ã  traiter
-   * @param x0 composante x au pas de temps prÃ©cÃ©dent
-   * @param diff_visc paramÃ¨tre correspondant soit Ã  la diffusion si la fonction est utilisÃ©e pour
-   * la rÃ©solution du pas de densitÃ©, soit Ã  la viscositÃ© si elle est employÃ©e pour la rÃ©solution
-   * du pas de vÃ©locitÃ©
+   * @param x composante à traiter
+   * @param x0 composante x au pas de temps précédent
+   * @param diff_visc paramètre correspondant soit à la diffusion si la fonction est utilisée pour
+   * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
+   * du pas de vélocité
    */
   void diffuse (int b, double *const x, const double *const x0,
 				double a, double diff_visc);
 
-  /** Pas de diffusion avec hybridation avec relance de la mÃ©thode de Gauss-Seidel
+  /** Pas de diffusion avec hybridation avec relance de la méthode de Gauss-Seidel
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param x composante Ã  traiter
-   * @param x0 composante x au pas de temps prÃ©cÃ©dent
-   * @param residu residu de la composante Ã  traiter
-   * @param residu0 residu au pas de temps prÃ©cÃ©dent
-   * @param diff_visc paramÃ¨tre correspondant soit Ã  la diffusion si la fonction est utilisÃ©e pour
-   * la rÃ©solution du pas de densitÃ©, soit Ã  la viscositÃ© si elle est employÃ©e pour la rÃ©solution
-   * du pas de vÃ©locitÃ©
+   * @param x composante à traiter
+   * @param x0 composante x au pas de temps précédent
+   * @param residu residu de la composante à traiter
+   * @param residu0 residu au pas de temps précédent
+   * @param diff_visc paramètre correspondant soit à la diffusion si la fonction est utilisée pour
+   * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
+   * du pas de vélocité
    */
   void diffuse_hybride (int b, double *const x, const double *const x0,
 			double *const residu, double *const residu0,
 			double diff_visc);
 
-  /** Pas d'advection => dÃ©placement du fluide sur lui-mÃªme.
+  /** Pas d'advection => déplacement du fluide sur lui-mÃªme.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param d composante Ã  traiter
-   * @param d0 composante d au pas de temps prÃ©cÃ©dent
-   * @param u vecteur de vÃ©locitÃ© en u
-   * @param v vecteur de vÃ©locitÃ© en v
-   * @param w vecteur de vÃ©locitÃ© en w
+   * @param d composante à traiter
+   * @param d0 composante d au pas de temps précédent
+   * @param u vecteur de vélocité en u
+   * @param v vecteur de vélocité en v
+   * @param w vecteur de vélocité en w
    */
   void advect (int b, double *const d, const double *const d0,
 	       const double *const u, const double *const v,
 	       const double *const w);
 
   /** Pas de projection pour garantir la conservation de la masse.
-   * Les tableaux passÃ©s en paramÃ¨tre sont modifiÃ©s ici et ne doivent donc plus servir aprÃ¨s l'appel de la projection
+   * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
    */
   void project (double *const p, double *const div);
 
-  /** Pas de rÃ©solution de la densitÃ©. */
+  /** Pas de résolution de la densité. */
   void dens_step ();
 
-  /** Pas de rÃ©solution de la vÃ©locitÃ©. */
+  /** Pas de résolution de la vélocité. */
   virtual void vel_step ();
 
-  /** Pas de rÃ©solution de la vÃ©locitÃ©, en utilisant l'hybridation */
+  /** Pas de résolution de la vélocité, en utilisant l'hybridation */
   void vel_step_hybride ();
 
-  /** Nombre de voxels sur un cÃ´tÃ© du cube de rÃ©solution. */
+  /** Nombre de voxels sur un côté du cube de résolution. */
   int N_x, N_y, N_z;
-  /** Taille totale du cube en nombre de voxels, Ã©gal Ã  (N+2)^3. */
+  
+  /** Dimensions du solveur */
+  double dim_x, dim_y, dim_z;
+
+  /** Taille totale du cube en nombre de voxels, égal à (N+2)^3. */
   int size;
   double *u, *v, *w, *u_prev, *v_prev, *w_prev, *u_src, *v_src, *w_src;
   double *dens, *dens_prev, *dens_src;
@@ -215,7 +259,7 @@ protected:
     *residu_w_prev;
   double *r, *z, *q, *p;
 	
-  /** Nombre de pas de rÃ©solutions de Gauss-seidel dans les mÃ©thodes de diffusion et de projection */
+  /** Nombre de pas de résolutions de Gauss-seidel dans les méthodes de diffusion et de projection */
   int nb_step_gauss_seidel;
 
   /** Tableau de pointeurs vers les flammes.
@@ -226,10 +270,10 @@ protected:
   /** Nombre de flammes. */
   int nb_flammes;
 
-  /** Nombre d'itÃ©rations pour Gauss-Seidel */
+  /** Nombre d'itérations pour Gauss-Seidel */
   int nb_iter;
   const static int nb_iter_brintage = 50;
-  /** ViscositÃ© cinÃ©matique de l'air 15*10E-6. */
+  /** Viscosité cinématique de l'air 15*10E-6. */
   double visc;
   /** Diffusion. */
   double diff;

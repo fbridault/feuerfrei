@@ -2,9 +2,9 @@
 
 
 GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h, int sc) : 
-  pbuffer("rgb"), blurVertexShaderX("glowShaders.cg","vertGlowX",  cgcontext),
-  blurVertexShaderY("glowShaders.cg","vertGlowY",  cgcontext),
-  blurFragmentShader("glowShaders.cg","fragGlow",  cgcontext)
+  pbuffer("rgb"), blurVertexShaderX(_("glowShaders.cg"),_("vertGlowX"),  cgcontext),
+  blurVertexShaderY(_("glowShaders.cg"),_("vertGlowY"),  cgcontext),
+  blurFragmentShader(_("glowShaders.cg"),_("fragGlow"),  cgcontext)
 {
   scene = s;
   context = cgcontext;

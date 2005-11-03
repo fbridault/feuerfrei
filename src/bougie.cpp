@@ -13,9 +13,9 @@ extern void draw_scene ();
 Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 		double rayon, CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
   Flame (s, nb, centre, pos, filename, scene),
-  tex ("textures/bougie2.png", GL_CLAMP, GL_REPEAT),
-  cgBougieVertexShader ("bougieShader.cg","vertBougie",context),
-  cgBougieFragmentShader ("bougieShader.cg","fragBougie",context)
+  tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT),
+  cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
+  cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {
   int i;
   double angle;
@@ -46,9 +46,9 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
   indices_distances_max =
     new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
 
-  x = (int) (centre->getX () * dim_x * solveur->getX ()) + 1 + solveur->getX () / 2;
-  y = (int) (centre->getY () * dim_y * solveur->getY ()) + 1;
-  z = (int) (centre->getZ () * dim_z * solveur->getZ ()) + 1 + solveur->getZ () / 2;
+  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 + solveur->getX () / 2;
+  y = (int) (centre->getY () * solveur->getDimY() * solveur->getY ()) + 1;
+  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 + solveur->getZ () / 2;
 
   cgShader = shader;
 }
@@ -304,8 +304,8 @@ Bougie::build ()
 void
 Bougie::drawWick ()
 {
-  float hauteur = dim_y / 6.0;
-  float largeur = dim_x / 60.0;
+  float hauteur = solveur->getDimY() / 6.0;
+  float largeur = solveur->getDimX() / 60.0;
   /* Affichage de la mèche */
   glPushMatrix ();
   glTranslatef (position.getX (), position.getY()-hauteur/2.0, position.getZ ());

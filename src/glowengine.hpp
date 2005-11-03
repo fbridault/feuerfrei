@@ -6,7 +6,7 @@ class GlowEngine;
 #include <header.h>
 
 #include <Cg/cgGL.h>
-#include <GL/glut.h>
+
 #include "pbuffer.hpp"
 #include "CgBlurShaders.hpp"
 #include "scene.hpp"

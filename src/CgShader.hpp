@@ -19,7 +19,7 @@ public:
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    * @param type Type du shader : CG_GL_VERTEX ou CG_GL_FRAGMENT
    */
-  CgShader(char *sourceName, char *shaderName, CGcontext *context, CGGLenum type);
+  CgShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type);
   virtual ~CgShader();
   
   /** Activation du profil */

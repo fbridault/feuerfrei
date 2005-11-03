@@ -81,45 +81,45 @@ Eyeball::recalcModelView (void)
   /*glTranslatef(-eyex, -eyey, -eyez); */
 }
 
-void
-Eyeball::mouseButton (SDL_MouseButtonEvent * event)
-{
-  bouton_active = event->button;
-  beginx = event->x;
-  beginy = event->y;
+// void
+// Eyeball::mouseButton (SDL_MouseButtonEvent * event)
+// {
+//   bouton_active = event->button;
+//   beginx = event->x;
+//   beginy = event->y;
 
-  if (depl_rapide)
-    if (event->type == SDL_MOUSEBUTTONDOWN)
-      depl = TRUE;
-    else
-      depl = FALSE;
-}
+//   if (depl_rapide)
+//     if (event->type == SDL_MOUSEBUTTONDOWN)
+//       depl = TRUE;
+//     else
+//       depl = FALSE;
+// }
 
-void
-Eyeball::mouseMotion (SDL_MouseMotionEvent * event)
-{
-  if (!depl)
-    return;
-  if (bouton_active == SDL_BUTTON_RIGHT)
-    {
-      trackball (lastquat,
-		 (2.0 * beginx - W) / W,
-		 (H - 2.0 * beginy) / H,
-		 (COEFFICIENT_ROTATION_QUATERNION * 2.0 * event->x - W) / W,
-		 (H - COEFFICIENT_ROTATION_QUATERNION * 2.0 * event->y) / H);
-      add_quats (lastquat, curquat, curquat);
-    }
-  else if (bouton_active == SDL_BUTTON_MIDDLE)
-    {
-      eyez += (event->y - beginy) * zoomstep;
-      if (eyez < centerz)
-	eyez = centerz + (float) 1.0;
-      //if(eyez > 5.0 * taillex) eyez = 5.0 * taillex;
-      recalculer_matrice_initiale ();
-    }
-  beginx = event->x;
-  beginy = event->y;
-}
+// void
+// Eyeball::mouseMotion (SDL_MouseMotionEvent * event)
+// {
+//   if (!depl)
+//     return;
+//   if (bouton_active == SDL_BUTTON_RIGHT)
+//     {
+//       trackball (lastquat,
+// 		 (2.0 * beginx - W) / W,
+// 		 (H - 2.0 * beginy) / H,
+// 		 (COEFFICIENT_ROTATION_QUATERNION * 2.0 * event->x - W) / W,
+// 		 (H - COEFFICIENT_ROTATION_QUATERNION * 2.0 * event->y) / H);
+//       add_quats (lastquat, curquat, curquat);
+//     }
+//   else if (bouton_active == SDL_BUTTON_MIDDLE)
+//     {
+//       eyez += (event->y - beginy) * zoomstep;
+//       if (eyez < centerz)
+// 	eyez = centerz + (float) 1.0;
+//       //if(eyez > 5.0 * taillex) eyez = 5.0 * taillex;
+//       recalculer_matrice_initiale ();
+//     }
+//   beginx = event->x;
+//   beginy = event->y;
+// }
 
 void
 Eyeball::recalculer_matrice_initiale (void)

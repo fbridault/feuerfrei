@@ -1,25 +1,19 @@
 #include "CgShader.hpp"
 
-CgShader::CgShader (char *sourceName, char *shaderName, CGcontext *context, CGGLenum type)
+CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type)
 {
   // Initialiser les profils et les options du compilateur CG
   profile = cgGLGetLatestProfile(type);
-  //printf("profile : %s\n",cgGetProfileString(shadowProfile));
+  if(profile==CG_PROFILE_UNKNOWN)
+    cerr << "Cg Error : Unknown Profile for shader " << shaderName.fn_str() << endl;
+  else
+    cerr << "profile for shader " <<  shaderName.fn_str() << " : " << cgGetProfileString(profile) << endl;
+
   cgGLSetOptimalOptions(profile);
   
   // Création et chargement du vertex program
-  program =
-    cgCreateProgramFromFile (*context, CG_SOURCE, sourceName, profile, shaderName, 0);
-//   if (vertexProgram == 0) /* test la compilation du programme cg */
-//   {
-//       /* recuperer le code d'erreur */
-//       CGerror Error = cgGetError();
-//       /* afficher le message d'erreur correspondant a ce code */
-//       printf("*** Erreur de compilation du vertex program vpSPTEX ***\n");
-//       printf("%s \n",cgGetErrorString(Error));
-//       printf("%s \n",cgGetLastListing(*context));
-//       exit(-1);
-//     }
+  program = cgCreateProgramFromFile (*context, CG_SOURCE, sourceName.fn_str(), profile, shaderName.fn_str(), 0);
+  
   cgGLLoadProgram (program);
 }
 

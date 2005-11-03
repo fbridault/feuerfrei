@@ -2,8 +2,8 @@
 #define TEXTURE_H
 
 #include "header.h"
-#include "SDL.h"
-#include "SDL_image.h"
+#include <wx/image.h>
+
 /** La classe texture peut être utilisée pour définir une texture à partir d'un fichier image. 
  * Il suffit simplement de définir un objet Texture en lui donnant en paramètre le nom de la texture. 
  * Ensuite, lors du texturage, il suffit d'appeler la fonction glBindTexture() avec comme paramètre 
@@ -19,16 +19,16 @@ public:
   /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger
    */
-  Texture(const char* const filename);
+  Texture(const wxString& filename);
 
-  Texture(const char* const filename, GLenum gltexture);
+  Texture(const wxString& filename, GLenum gltexture);
   
     /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  Texture(const char* const filename, GLint wrap_s, GLint wrap_t);
+  Texture(const wxString& filename, GLint wrap_s, GLint wrap_t);
 
   /** Construit une texture GL_LUMINANCE a partir d'un tableau de reels, de la largeur
     et de la hauteur de la texture.
@@ -41,13 +41,15 @@ public:
   /** Donne l'identifiant de la texture à utiliser avec glBindTexture(). */
   const GLuint getTexture() const {return texName;};
 
+  const long GuessImageType(const wxString& filename);
+
 private:
   /** Indique si la texture possède un canal alpha */
   bool hasAlpha;
 
   /** Identifiant OpenGL de la texture */
   GLuint texName;
-  SDL_Surface *sdltex;
+  wxImage *wxtex;
 };
 
 #endif

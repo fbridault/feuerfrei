@@ -7,13 +7,9 @@ INCLUDES = \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
 	-DPACKAGE_DATA_DIR=\""$(datadir)"\" 
 
-AM_CFLAGS =\
-	 -O3\
-	 -Wall
+AM_CFLAGS = 
 
-AM_CXXFLAGS =\
-	 -O3\
-	 -Wall
+AM_CXXFLAGS = 
 
 bin_PROGRAMS = flames
 
@@ -56,7 +52,6 @@ flames_SOURCES = \
 	texture.hpp  \
 	vector.hpp  \
 	wick.hpp  \
-	interface.cpp  \
 	trackball.cpp  \  \
 	CgShader.cpp  \
 	CgShader.hpp  \
@@ -78,6 +73,10 @@ flames_SOURCES = \
 	CgBlurShaders.hpp  \
 	glowengine.cpp  \
 	glowengine.hpp  \
+	wxGLBuffer.cpp  \
+	wxGLBuffer.hpp  \
+	main.cpp  \
+	main.hpp  \
 	trackball.h  
 flames_LDFLAGS = 
 

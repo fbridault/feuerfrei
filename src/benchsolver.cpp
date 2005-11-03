@@ -4,7 +4,8 @@
 
 extern int done;
 
-BenchSolver::BenchSolver (int n_x, int n_y, int n_z, double pas_de_temps): Solver (n_x, n_y, n_z, pas_de_temps)
+BenchSolver::BenchSolver (int n_x, int n_y, int n_z, double dim, double pas_de_temps): 
+  Solver (n_x, n_y, n_z, dim, pas_de_temps)
 {
   u_save = new double[size];
   v_save = new double[size];
@@ -809,8 +810,8 @@ BenchSolver::iterate (bool brintage)
   //file << endl;
   nb_iter++;
       
-  if (nb_iter == 150)
-    done = 1;
+  // if (nb_iter == 150)
+//     done = 1;
 
   return;
 }

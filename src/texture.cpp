@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-Texture::Texture(const char* const filename)
+Texture::Texture(const wxString& filename)
 {
   /*unsigned char *texture;
   unsigned int width,height;
@@ -19,19 +19,19 @@ Texture::Texture(const char* const filename)
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
  
-  cout << "Chargement texture : " << filename << "......";
-  sdltex = IMG_Load (filename);
+  cout << "Chargement texture : " << filename.fn_str() << "......";
+  wxtex = new wxImage (filename, GuessImageType(filename));
 
-  if(!sdltex) {
-    cout << "Error : " << IMG_GetError();
+  if(!wxtex) {
+    cout << "Error ";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, sdltex->w, sdltex->h, 0, 
-		  GL_RGB, GL_UNSIGNED_BYTE, sdltex->pixels);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		  GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
 }
 
-Texture::Texture(const char* const filename, GLenum gltexture)
+Texture::Texture(const wxString& filename, GLenum gltexture)
 {  
  // glPixelStorei(GL_UNPACK_ALIGNMENT,1);
   
@@ -43,20 +43,20 @@ Texture::Texture(const char* const filename, GLenum gltexture)
   glTexParameteri(gltexture,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(gltexture,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 //  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
-  cout << "Chargement texture : " << filename << "......";
-  sdltex = IMG_Load (filename);
+  cout << "Chargement texture : " << filename.fn_str() << "......";
+  wxtex = new wxImage (filename, GuessImageType(filename));
 
-  if(!sdltex) {
-    cout << "Error : " << IMG_GetError();
+  if(!wxtex) {
+    cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (gltexture, 0, GL_RGB, sdltex->w, sdltex->h, 0, 
-		GL_RGB, GL_UNSIGNED_BYTE, sdltex->pixels);
+    glTexImage2D (gltexture, 0, GL_RGB, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
   
 }
 
-Texture::Texture(const char* const filename, GLint wrap_s, GLint wrap_t)
+Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 {
   /*unsigned char *texture;
   unsigned int width,height;
@@ -73,15 +73,14 @@ Texture::Texture(const char* const filename, GLint wrap_s, GLint wrap_t)
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
  
-  cout << "Chargement texture : " << filename << "......";
-  sdltex = IMG_Load (filename);
-
-  if(!sdltex) {
-    cout << "Error : " << IMG_GetError();
+  cout << "Chargement texture : " << filename.fn_str() << "......";
+  wxtex = new wxImage (filename, GuessImageType(filename));
+  if(!wxtex) {
+    cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, sdltex->w, sdltex->h, 0, 
-		  GL_RGBA, GL_UNSIGNED_BYTE, sdltex->pixels);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		  GL_RGBA, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
   //  if(hasAlpha)
   //     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,texture);
@@ -112,4 +111,20 @@ Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
    glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_FLOAT_R32_NV, w, h, 0, GL_LUMINANCE, GL_FLOAT, texels);
 
 //   glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_FLOAT_RGB32_NV, w, h, 0, GL_RGB, GL_FLOAT, texels);
+}
+
+const long Texture::GuessImageType(const wxString& filename)
+{
+  wxString pngSuffix = _(".png");
+  wxString jpgSuffix = _(".jpg");
+
+  if(filename.Right(4) == pngSuffix){
+    cout << "image " << filename << "est de type PNG" << endl;
+    return wxBITMAP_TYPE_PNG;
+  }
+  if(filename.Right(4) == jpgSuffix){
+    cout << "image " << filename << "est de type JPG" << endl;
+    return wxBITMAP_TYPE_JPEG;
+  }
+  return wxBITMAP_TYPE_ANY;
 }

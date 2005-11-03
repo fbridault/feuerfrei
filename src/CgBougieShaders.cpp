@@ -1,6 +1,6 @@
 #include "CgBougieShaders.hpp"
 
-CgBougieVertexShader::CgBougieVertexShader(char *sourceName, char *shaderName, CGcontext *context) : 
+CgBougieVertexShader::CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
   CgSPVertexShader (sourceName, shaderName, context)
 {
   // Récupération des paramètres
@@ -14,7 +14,7 @@ CgBougieVertexShader::~CgBougieVertexShader()
 
 /***********************************************************************************************************/
 
-CgBougieFragmentShader::CgBougieFragmentShader(char *sourceName, char *shaderName, CGcontext *context) : 
+CgBougieFragmentShader::CgBougieFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
   // Récupération des paramètres

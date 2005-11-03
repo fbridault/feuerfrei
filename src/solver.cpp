@@ -1,17 +1,43 @@
 #include "solver.hpp"
 
 #include <math.h>
+#include "graphicsFn.hpp"
 
 #define MAXITER 100
 #define EPSILON2 1e-10
 
-Solver::Solver (int n_x, int n_y, int n_z, double pas_de_temps)
+Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
 {
   int n3=n_x * n_y * n_z;
   
   N_x = n_x;
   N_y = n_y;
   N_z = n_z;
+  
+  /* DÈtermination de la taille du solveur de maniËre ‡ ce que */
+  /*  le plus grand cÙtÈ soit de dimension dim */
+  if (N_x > N_y){
+    if (N_x > N_z){
+      dim_x = dim;
+      dim_y = dim_x * N_y / N_x;
+      dim_z = dim_x * N_z / N_x;
+    }else{
+      dim_z = dim;
+      dim_x = dim_z * N_x / N_z;
+      dim_y = dim_z * N_y / N_z;
+    }
+  }else{
+    if (N_y > N_z){
+      dim_y = dim;
+      dim_x = dim_y * N_x / N_y;
+      dim_z = dim_y * N_z / N_y;
+    }else{
+      dim_z = dim;
+      dim_x = dim_z * N_x / N_z;
+      dim_y = dim_z * N_y / N_z;
+    }
+  }
+  
   size = (N_x + 2) * (N_y + 2) * (N_z + 2);
   dt = pas_de_temps;
 
@@ -69,6 +95,10 @@ Solver::Solver (int n_x, int n_y, int n_z, double pas_de_temps)
   z=new double[n3];
   p=new double[n3];
   q=new double[n3];
+
+  /* Construction des display lists */
+  buildDLBase ();
+  buildDLGrid ();
 }
 
 Solver::~Solver ()
@@ -771,4 +801,131 @@ Solver::cleanSources ()
   u_src = (double *) memset (u_src, 0, size * sizeof (double));
   v_src = (double *) memset (v_src, 0, size * sizeof (double));
   w_src = (double *) memset (w_src, 0, size * sizeof (double));
+}
+
+void
+Solver::buildDLGrid ()
+{
+  double interx = dim_x / (double) N_x;
+  double intery = dim_y / (double) N_y;
+  double interz = dim_z / (double) N_z;
+  double i, j;
+
+  glNewList (GRILLE, GL_COMPILE);
+  glPushMatrix ();
+  glTranslatef (-dim_x / 2.0, 0, dim_z / 2.0);
+  glBegin (GL_LINES);
+
+  glColor4f (0.5, 0.5, 0.5, 0.5);
+
+  for (j = 0.0; j <= dim_z; j += interz)
+    {
+      for (i = 0.0; i <= dim_x + interx / 2; i += interx)
+	{
+	  glVertex3f (i, 0.0, -j);
+	  glVertex3f (i, dim_y, -j);
+	}
+      for (i = 0.0; i <= dim_y + intery / 2; i += intery)
+	{
+	  glVertex3f (0.0, i, -j);
+	  glVertex3f (dim_x, i, -j);
+	}
+    }
+  glEnd ();
+  glPopMatrix ();
+  glEndList ();
+}
+
+void
+Solver::buildDLBase ()
+{
+  double interx = dim_x / (double) N_x;
+  double interz = dim_z / (double) N_z;
+  double i;
+
+  glNewList (REPERE, GL_COMPILE);
+  glPushMatrix ();
+  glTranslatef (-dim_x / 2.0, 0.0, dim_z / 2.0);
+  glBegin (GL_LINES);
+
+  glLineWidth (1.0);
+  glColor4f (0.5, 0.5, 0.5, 0.5);
+  for (i = 0.0; i <= dim_x + interx / 2; i += interx)
+    {
+      glVertex3f (i, 0.0, -dim_z);
+      glVertex3f (i, 0.0, 0.0);
+    }
+  for (i = 0.0; i <= dim_z + interz / 2; i += interz)
+    {
+      glVertex3f (0.0, 0.0, i - dim_z);
+      glVertex3f (dim_x, 0.0, i - dim_z);
+    }
+  glEnd ();
+  glPopMatrix ();
+  glEndList ();
+}
+
+void 
+Solver::displayVelocityField (void)
+{
+  double inc_x = dim_x / (double) N_x;
+  double inc_y = dim_y / (double) N_y;
+  double inc_z = dim_z / (double) N_z;
+  
+  for (int i = 1; i <= N_x; i++)
+    {
+      for (int j = 1; j <= N_y; j++)
+	{
+	  for (int k = 1; k <= N_z; k++)
+	    {
+	      CVector vect;
+	      /* Affichage du champ de vÈlocitÈ */
+	      glPushMatrix ();
+	      glTranslatef (inc_x * i - inc_x / 2.0 - N_x / 2.0,
+			    inc_y * j - inc_y / 2.0, 
+			    inc_z * k - inc_z / 2.0 -  N_z / 2.0);
+	      //    printf("vÈlocitÈ %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
+	      //SDL_mutexP (lock);
+	      vect.setX (getU (i, j, k));
+	      vect.setY (getV (i, j, k));
+	      vect.setZ (getW (i, j, k));
+	      //SDL_mutexV (lock);
+	      displayArrow (&vect);
+	      glPopMatrix ();
+	    }
+	}
+    }
+}
+
+void
+Solver::displayArrow (CVector * const direction)
+{
+  double norme_vel =
+    sqrt (direction->getX () * direction->getX () +
+	  direction->getY () * direction->getY () +
+	  direction->getZ () * direction->getZ ());
+  double taille = dim_x * dim_y * dim_z * norme_vel / 2.5;
+  double angle;
+  CVector axeRot, axeCone (0.0, 0.0, 1.0);
+
+  direction->normalize ();
+
+  /* On obtient un vecteur perpendiculaire au plan d√©fini par l'axe du c√¥ne et la direction souhait√©e */
+  axeRot = axeCone ^ *direction;
+
+  /* On r√©cup√®re l'angle de rotation entre les deux vecteurs */
+  angle = acos (axeCone * *direction);
+
+  glRotatef (angle * RAD_TO_DEG, axeRot.getX (), axeRot.getY (), axeRot.getZ ());
+  /***********************************************************************************/
+
+  /* D√©grad√© de couleur bleu vers rouge */
+  /* Probl√®me : on ne conna√Æt pas l'√©chelle des valeurs */
+  /* On va donc tenter de prendre une valeur max suffisamment grande */
+  /* pour pouvoir discerner au mieux les variations de la v√©locit√© */
+
+//  printf("%f\n",norme_vel);
+  glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
+
+  GraphicsFn::SolidCone (taille / 4, taille, 3, 3);
 }

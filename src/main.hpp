@@ -8,7 +8,7 @@
 #include <wx/wx.h>
 #endif
 
-#include "wxGLBuffer.h"
+#include "wxGLBuffer.hpp"
 
 
 #define LARGEUR  512
@@ -44,8 +44,9 @@ public:
   void OnQuit(wxCommandEvent& event);
   void OnAbout(wxCommandEvent& event);
 
-  int ParseInitFile (char *name);
+  int GetSettingsFromFile (char *name);
   
+private:
   // Boutton 1
   wxButton *button1;
   wxGLBuffer *glBuffer;

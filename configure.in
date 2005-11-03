@@ -23,9 +23,10 @@ AC_MSG_CHECKING(for debug mode)
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [enable debugging mode]),, enable_debug="no")
 if test "x${enable_debug}" != "xno"; then
-    CXXFLAGS="$CXXFLAGS -Wall -W -DDEBUG -O0 -g3"
+    CXXFLAGS="$CXXFLAGS -Wall -W -ggdb -DDEBUG -O0"
     AC_MSG_RESULT([enabled])
 else
+    CXXFLAGS="$CXXFLAGS -O3 -Wall"
     AC_MSG_RESULT([disabled])
 fi
 
@@ -65,6 +66,7 @@ fi
 WX_CPPFLAGS="`$WXCONFIG --cppflags`"
 WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
 WX_LIBS="`$WXCONFIG --libs`"
+WX_GL_LIBS="`$WXCONFIG --gl-libs`"
 
 CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
 CXXFLAGS="$CXXFLAGS $WX_CPPFLAGS"
@@ -372,7 +374,7 @@ AC_SUBST(CG_LIBS)
 CPPFLAGS="${CPPFLAGS} ${VS_CPPFLAGS} ${PYTHON_CPPFLAGS} ${BOOST_CPPFLAGS} ${CG_CPPFLAGS}"' -I$(top_srcdir)/src '
 CXXFLAGS="${CXXFLAGS} ${VS_CXXFLAGS} ${PTHREAD_CXXFLAGS} -pipe"
 
-LIBS="${LIBS} ${VS_LIBS} ${PYTHON_LIBS} ${PTHREAD_LIBS} ${CG_LIBS}"
+LIBS="${LIBS} ${VS_LIBS} ${PYTHON_LIBS} ${PTHREAD_LIBS} ${CG_LIBS} ${WX_LIBS} ${WX_GL_LIBS}"
 
 AC_OUTPUT([
 Makefile

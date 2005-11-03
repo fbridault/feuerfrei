@@ -10,7 +10,7 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   nb_squelettes = nb;
   
   position = *pos;
-  pos->setY(pos->getY() - dim_y/24.0);
+  pos->setY(pos->getY() - solveur->getDimY()/24.0);
   
   squelettes = new PeriSkeleton* [nb_squelettes];
   

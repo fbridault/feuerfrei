@@ -460,6 +460,8 @@ COBJReader::importMaterial (const char *filename)
   CMaterial *nouvelle_matiere;
   Texture *nouvelle_texture = NULL;
   string name_nouvelle_matiere;
+  wxString name_nouvelle_texture;
+  
   if (!pfichier_mtl)
     return;
 
@@ -543,7 +545,9 @@ COBJReader::importMaterial (const char *filename)
 	  break;
 	case 'm':		//map_K?
 	  fscanf (pfichier_mtl, " %s %s ", buffer, buffer);
-	  nouvelle_texture = new Texture (buffer);
+	  //name_nouvelle_texture = buffer;
+	  
+	  nouvelle_texture = new Texture (wxString(buffer, wxConvUTF8));
 	  break;
 	default:
 	  fgets (buffer, sizeof (buffer), pfichier_mtl);

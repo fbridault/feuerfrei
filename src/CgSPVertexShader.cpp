@@ -1,6 +1,6 @@
 #include "CgSPVertexShader.hpp"
 
-CgSPVertexShader::CgSPVertexShader(char *sourceName, char *shaderName, CGcontext *context) : 
+CgSPVertexShader::CgSPVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_VERTEX)
 {
   // Récupération des paramètres

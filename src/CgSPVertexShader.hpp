@@ -21,7 +21,7 @@ public:
    * @param shaderName Nom du programme Cg
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    */
-  CgSPVertexShader(char *sourceName, char *shaderName, CGcontext *context);
+  CgSPVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgSPVertexShader();
   
   void setModelViewProjectionMatrix(){

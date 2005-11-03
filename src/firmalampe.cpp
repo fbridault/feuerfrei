@@ -12,7 +12,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
 			CgSVShader * shader, char *meche_name, const char *filename, CScene *scene):
   Flame (s, centre, pos, filename,scene),
   meche (meche_name, nb),
-  tex ("textures/firmalampe.png", GL_CLAMP, GL_CLAMP)
+  tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
   CPoint pt;
   float largeur = 0.03;
@@ -69,10 +69,10 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   indices_distances_max =
     new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
 
-  x = (int) (centre->getX () * dim_x * solveur->getX ()) + 1 +
+  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 +
     solveur->getX () / 2;
-  y = (int) (centre->getY () * dim_y * solveur->getY ()) + 1;
-  z = (int) (centre->getZ () * dim_z * solveur->getZ ()) + 1 +
+  y = (int) (centre->getY () * solveur->getDimY() * solveur->getY ()) + 1;
+  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 +
     solveur->getZ () / 2;
 
   cgShader = shader;
@@ -123,11 +123,11 @@ Firmalampe::add_forces (bool perturbate)
 	 wickLeadPointsArray->begin ();
        pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
     {
-      ptx = (int) ((*pointsIterator)->getX () * dim_x *
+      ptx = (int) ((*pointsIterator)->getX () * solveur->getDimX() *
 		   solveur->getX ()) + 1 + solveur->getX () / 2;
-      pty = (int) ((*pointsIterator)->getY () * dim_y *
+      pty = (int) ((*pointsIterator)->getY () * solveur->getDimY() *
 		   solveur->getY ()) + 1 ;
-      ptz = (int) ((*pointsIterator)->getZ () * dim_z *
+      ptz = (int) ((*pointsIterator)->getZ () * solveur->getDimZ() *
 		   solveur->getZ ()) + 1 + solveur->getZ () / 2;
       //cout << ptx << " " << pty << " " << ptz << endl;
       //cout << (*pointsIterator)->getY() << endl;
@@ -149,11 +149,11 @@ Firmalampe::add_forces (bool perturbate)
 //       i++;
 //     }
   
-//   ptx = (int) ( ((*wickLeadPointsArray)[ind_max])->getX () * dim_x *
+//   ptx = (int) ( ((*wickLeadPointsArray)[ind_max])->getX () * solveur->getDimX() *
 // 		solveur->getX ()) + 2 + solveur->getX () / 2;
-//   pty = (int) ( ((*wickLeadPointsArray)[ind_max])->getY () * dim_y *
+//   pty = (int) ( ((*wickLeadPointsArray)[ind_max])->getY () * solveur->getDimY() *
 // 		solveur->getY ()) + 1 ;
-//   ptz = (int) ( ((*wickLeadPointsArray)[ind_max])->getZ () * dim_z *
+//   ptz = (int) ( ((*wickLeadPointsArray)[ind_max])->getZ () * solveur->getDimZ() *
 // 		solveur->getZ ()) + 1 + solveur->getZ () / 2;
 	
 //   solveur->addVsrc (ptx-1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->getY () );

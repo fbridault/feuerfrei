@@ -1,6 +1,6 @@
 #include "CgSPFragmentShader.hpp"
 
-CgSPFragmentShader::CgSPFragmentShader(char *sourceName, char *shaderName, CGcontext *context, IESList *ieslist, bool type) :
+CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, IESList *ieslist, bool type) :
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
   interp = type;

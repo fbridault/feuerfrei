@@ -1,6 +1,6 @@
 #include "CgBlurShaders.hpp"
 
-CgBlurVertexShader::CgBlurVertexShader(char *sourceName, char *shaderName, CGcontext *context) : 
+CgBlurVertexShader::CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
   CgSPVertexShader (sourceName, shaderName, context)
 {
   // Récupération des paramètres
@@ -22,7 +22,7 @@ CgBlurVertexShader::~CgBlurVertexShader()
 
 /***********************************************************************************************************/
 
-CgBlurFragmentShader::CgBlurFragmentShader(char *sourceName, char *shaderName, CGcontext *context) : 
+CgBlurFragmentShader::CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT)
 {
   // Récupération des paramètres

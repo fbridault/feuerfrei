@@ -2,7 +2,6 @@
 #define EYEBALL_H
 
 #include "header.h"
-#include "SDL.h"
 
 /** Classe définissant un "eyeball" qui permet de tourner et de zoomer un point fixe dans
  * l'espace. Cette classe nécessite la librairie SDL ainsi que le module trackball.c
@@ -43,11 +42,11 @@ public:
   /** Récupération de la coordonnée z du centre du eyeball. */
   GLdouble getCenterz(){return centerz;};
 
-  /** Défini l'action à effectuer lorsque la souris se déplace */
-  void mouseMotion(SDL_MouseMotionEvent *event);
+//   /** Défini l'action à effectuer lorsque la souris se déplace */
+//   void mouseMotion(SDL_MouseMotionEvent *event);
   
-  /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
-  void mouseButton(SDL_MouseButtonEvent *event);
+//   /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
+//   void mouseButton(SDL_MouseButtonEvent *event);
 private:
   
   void recalculer_matrice_initiale(void);
@@ -59,10 +58,10 @@ private:
   GLdouble centerx, centery, centerz;
   GLdouble upx, upy, upz;
   GLdouble vectviseex,vectviseey,vectviseez;
-  Uint8 bouton_active;
+  int bouton_active;
   GLdouble ouverture;
   float minx,miny,minz,maxx,maxy,maxz,taillex,zoomstep;
-  Uint16 beginx, beginy;
+  long beginx, beginy;
   int depl,depl_rapide;
   int W,H;
   float curquat[4];

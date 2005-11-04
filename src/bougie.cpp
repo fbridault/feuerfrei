@@ -13,7 +13,7 @@ extern void draw_scene ();
 Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 		double rayon, CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
   Flame (s, nb, centre, pos, filename, scene),
-  tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT),
+  tex (_("textures/texture.jpg"), GL_CLAMP, GL_REPEAT),
   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {

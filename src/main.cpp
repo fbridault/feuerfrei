@@ -5,8 +5,10 @@
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_BUTTON(ID_ButtonRun, MainFrame::OnClickButtonRun)
   EVT_BUTTON(ID_ButtonFlickering, MainFrame::OnClickButtonFlickering)
-  EVT_MENU(ID_Quit, MainFrame::OnQuit)
-  EVT_MENU(ID_About, MainFrame::OnAbout)
+  EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
+  EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
+  EVT_MENU(IDM_Glow, MainFrame::OnGlowMenu)
+  EVT_MENU(IDM_SP, MainFrame::OnSPMenu)
 END_EVENT_TABLE();
 
 class FlamesApp : public wxApp
@@ -72,13 +74,18 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   SetSizer(sizerV);
 
   menuFile = new wxMenu;
-
-  menuFile->Append( ID_About, _("&About...") );
+  
+  menuFile->Append( IDM_About, _("&About...") );
   menuFile->AppendSeparator();
-  menuFile->Append( ID_Quit, _("E&xit") );
+  menuFile->Append( IDM_Quit, _("E&xit") );
+  
+  menuDisplay = new wxMenu;
+  menuDisplay->AppendCheckItem( IDM_Glow, _("&Glow") );
+  menuDisplay->AppendCheckItem( IDM_SP, _("&Photometric solid") );
   
   menuBar = new wxMenuBar;
   menuBar->Append( menuFile, _("&File") );
+  menuBar->Append( menuDisplay, _("&Display") );
   
   SetMenuBar( menuBar );
   
@@ -97,13 +104,22 @@ void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
   glBuffer->ToggleFlickering();
 }
 
+void MainFrame::OnGlowMenu(wxCommandEvent& event)
+{
+  glBuffer->ToggleGlow();
+}
 
-void MainFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
+void MainFrame::OnSPMenu(wxCommandEvent& event)
+{
+  glBuffer->ToggleSP();
+}
+
+void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
 {
   Close(TRUE);
 }
 
-void MainFrame::OnAbout(wxCommandEvent& WXUNUSED(event))
+void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 {
   wxMessageBox(_("Real-time simulation of small flames\nOasis Team"),
 	       _("About flames"), wxOK | wxICON_INFORMATION, this);

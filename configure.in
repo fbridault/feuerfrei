@@ -356,8 +356,6 @@ AC_MSG_RESULT(ok))
 CPPFLAGS="$saved_CPPFLAGS -DGL_GLEXT_PROTOTYPES -DGLX_GLXEXT_PROTOTYPES"
 VS_CPPFLAGS="${VS_CPPFLAGS} $GL_CPPFLAGS"
 
-
-
 dnl --------------------------------------------------------------------------
 dnl Check for Cg headers
 dnl --------------------------------------------------------------------------

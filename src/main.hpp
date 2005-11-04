@@ -17,13 +17,15 @@
 enum
 {
 ID_ButtonRun = 1,
-ID_ButtonFlickering =2,
+ID_ButtonFlickering,
 };
 
 enum
 {
-ID_Quit = 1,
-ID_About,
+IDM_Quit = 1,
+IDM_About,
+IDM_Glow,
+IDM_SP
 };
 
 class MainFrame: public wxFrame
@@ -36,8 +38,10 @@ public:
   void OnClickButtonFlickering(wxCommandEvent& event);
   
   /** Actions des menus */
-  void OnQuit(wxCommandEvent& event);
-  void OnAbout(wxCommandEvent& event);
+  void OnQuitMenu(wxCommandEvent& event);
+  void OnAboutMenu(wxCommandEvent& event);
+  void OnGlowMenu(wxCommandEvent& event);
+  void OnSPMenu(wxCommandEvent& event);
 
   void SetFPS(int fps);
   int GetSettingsFromFile (char *name);
@@ -47,7 +51,7 @@ private:
   // Boutton 1
   wxButton *buttonRun, *buttonFlickering;
   wxGLBuffer *glBuffer;
-  wxMenu *menuFile;
+  wxMenu *menuFile, *menuDisplay;
   wxMenuBar *menuBar;
   wxStaticBoxSizer *sizerH;
   wxBoxSizer *sizerV;

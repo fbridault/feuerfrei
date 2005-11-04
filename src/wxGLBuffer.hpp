@@ -23,6 +23,7 @@ class wxGLBuffer;
 class wxGLBuffer : public wxGLCanvas
 {
 public:
+  wxGLBuffer() {}
   wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
 	     long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
   virtual ~wxGLBuffer();
@@ -42,18 +43,13 @@ public:
   void InitUISettings();
 
   /** Lance/arrête l'animation */
-  void ToggleRun(void)
-  {
-    animate=!animate;
-  };
-    /** Lance/arrête l'animation */
-  void ToggleFlickering(void)
-  {
-    flickering=!flickering;
-  };
-
-
-  DECLARE_EVENT_TABLE()
+  void ToggleRun(void) { animate=!animate; };
+  /** Lance/arrête l'animation */
+  void ToggleFlickering(void) { flickering=!flickering; };
+  /** Active/Désactive le solide photométrique */
+  void ToggleSP(void) { solidePhotoEnabled=!solidePhotoEnabled; };
+  /** Active/Désactive le glow */
+  void ToggleGlow(void) { glowEnabled=!glowEnabled; };
 
 private:
   void WriteFPS ();
@@ -92,6 +88,8 @@ private:
   int nb_flammes;
   CScene *scene;
   CgSVShader *SVShader;
+
+  DECLARE_EVENT_TABLE()
 };
 
 #endif

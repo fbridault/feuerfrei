@@ -5,7 +5,7 @@ struct appdata
   float4 Position 	: POSITION;
   float3 Normal		: NORMAL;
   float4 DiffuseColor   : COLOR0;
-  float2 TexCoord0      : TEXCOORD0;
+//  float2 TexCoord0      : TEXCOORD0;
 };
 
 struct vpconn

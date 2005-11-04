@@ -57,7 +57,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float4 ColorSP = texRECT(textureSP, texcoordsSP);
+  float ColorSP = texRECT(textureSP, texcoordsSP);
     
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
@@ -103,7 +103,7 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float4 ColorSP = texRECT(textureSP, texcoordsSP);
+  float ColorSP = texRECT(textureSP, texcoordsSP);
 
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
@@ -142,7 +142,7 @@ float4 fpSPSeul(in vertexOutputsWTEX IN,
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
     
   // recuperation de l'intensite du fragment
-  float4 ColorSP = texRECT(textureSP, texcoordsSP).x;
+  float ColorSP = texRECT(textureSP, texcoordsSP).x;
     
   // attenuation de l'intensite en fonction de la flamme
 /*   ColorSP *= fluctuationIntensite; */
@@ -175,7 +175,7 @@ float4 fpSPSeulBFCTEX(in vertexOutputsTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float4 ColorSP = texRECT(textureSP, texcoordsSP).x;
+  float ColorSP = texRECT(textureSP, texcoordsSP).x;
         
   // attenuation de l'intensite en fonction de la flamme
   ColorSP *= fluctuationIntensite;
@@ -209,7 +209,7 @@ float4 fpSPSeulBFCWTEX(in vertexOutputsWTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float4 ColorSP = texRECT(textureSP, texcoordsSP).x;
+  float ColorSP = texRECT(textureSP, texcoordsSP).x;
         
   // attenuation de l'intensite en fonction de la flamme
   ColorSP *= fluctuationIntensite;

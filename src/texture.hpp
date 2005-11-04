@@ -2,14 +2,12 @@
 #define TEXTURE_H
 
 #include "header.h"
-#include <wx/image.h>
 
 /** La classe texture peut être utilisée pour définir une texture à partir d'un fichier image. 
  * Il suffit simplement de définir un objet Texture en lui donnant en paramètre le nom de la texture. 
  * Ensuite, lors du texturage, il suffit d'appeler la fonction glBindTexture() avec comme paramètre 
- * Texture::getTexture(). Pour l'instant, la classe est limitée aux textures 2D ainsi qu'aux images 
- * sous format PNG (avec ou sans transparence).
- * A noter que cette classe peut facilement Ãªtre réutilisée pour une autre application.
+ * Texture::getTexture(). Pour l'instant, la classe est limitée aux textures 2D.
+ * A noter que cette classe peut facilement être réutilisée pour une autre application.
  *
  * @author	Flavien Bridault
  */
@@ -22,6 +20,7 @@ public:
   Texture(const wxString& filename);
 
   Texture(const wxString& filename, GLenum gltexture);
+  virtual ~Texture();
   
     /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger

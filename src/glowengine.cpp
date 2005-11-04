@@ -16,9 +16,6 @@ GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h
   // Initialiser le pbuffer
   pbuffer.Initialize(width, height, true, true);
   
-  // Couleur pour l'effacement
-  glClearColor( 0.0, 0.0, 0.0, 0.0 );
-
   glGenTextures(1, &texblur);
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

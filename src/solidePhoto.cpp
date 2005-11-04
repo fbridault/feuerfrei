@@ -11,7 +11,7 @@ SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context) :
   ieslist.addIESFile("IES/out111621PN.IES");
   ieslist.addIESFile("IES/out2518T1EF.IES");
   ieslist.addIESFile("IES/out8013H1EN.IES");
-
+  
   SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"),context,&ieslist,0);
   SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeulInterpole"),context,&ieslist,1);
   SPFragmentShader[2] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"),context,&ieslist,0);

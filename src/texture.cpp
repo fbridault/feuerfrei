@@ -4,6 +4,8 @@
 
 Texture::Texture(const wxString& filename)
 {
+  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+  
   glGenTextures(1, &texName);
   glBindTexture(GL_TEXTURE_2D, texName);
  
@@ -41,7 +43,7 @@ Texture::Texture(const wxString& filename, GLenum gltexture)
     cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (gltexture, 0, GL_RGB8, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+    glTexImage2D (gltexture, 0, GL_RGB, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
 		  GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
   
@@ -94,6 +96,11 @@ Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
    glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_FLOAT_R32_NV, w, h, 0, GL_LUMINANCE, GL_FLOAT, texels);
 
 //   glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_FLOAT_RGB32_NV, w, h, 0, GL_RGB, GL_FLOAT, texels);
+}
+
+Texture::~Texture()
+{
+  delete wxtex;
 }
 
 const long Texture::GuessImageType(const wxString& filename)

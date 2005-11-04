@@ -9,16 +9,16 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(ID_About, MainFrame::OnAbout)
 END_EVENT_TABLE();
 
-class MyApp: public wxApp
+class FlamesApp : public wxApp
 {
     virtual bool OnInit();
 };
 
-IMPLEMENT_APP(MyApp)
+IMPLEMENT_APP(FlamesApp)
 
 
 // Code de l'initialisation de l'application
-bool MyApp::OnInit()
+bool FlamesApp::OnInit()
 {
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
@@ -26,7 +26,9 @@ bool MyApp::OnInit()
   MainFrame *frame = new MainFrame( _("Hello World"), wxPoint(0,0), wxSize(800,900) );
   
   frame->Show(TRUE);
+  SetTopWindow(frame);
   
+  //  wxSafeYield();
 #ifdef BOUGIE
   if (frame->GetSettingsFromFile ("param.ini"))
     exit (2);
@@ -34,8 +36,7 @@ bool MyApp::OnInit()
   if (frame->GetSettingsFromFile ("param2.ini"))
     exit (2);
 #endif
-  SetTopWindow(frame);
-
+  
   return TRUE;
 } 
 

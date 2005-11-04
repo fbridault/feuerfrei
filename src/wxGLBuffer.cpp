@@ -37,7 +37,7 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
 //   parent->Show(true);
-//   SetCurrent();
+  SetCurrent();
   
   done = init = false;
   nb_flammes = 1;
@@ -81,7 +81,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
 {
   if(!init)
     return;
-
+  
   wxPaintDC dc(this);
   
   if(!GetContext())
@@ -91,159 +91,168 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   
   /* Déplacement du eyeball */
   eyeball->recalcModelView();
-
-  glColor3f(1.0,1.0,0.0);
-  GraphicsFn::SolidSphere(3,20,20);
-  /********** CONSTRUCTION DES FLAMMES *******************************/
-  // SDL_mutexP (lock);
-  if(animate)
-    for (int f = 0; f < nb_flammes; f++)
-      flammes[f]->build();
-  // SDL_mutexV (lock);
   
-  /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
-  if(glowEnabled){
-    GLfloat m[4][4];
-    CVector direction;
-    float dist, sigma;
-    
-    /* Adaptation du flou en fonction de la distance */
-    /* On module la largeur de la gaussienne */
-    glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
-    
-    direction.setX (m[3][0]);
-    direction.setY (m[3][1]);
-    direction.setZ (m[3][2]);
-    
-    dist = direction.length();
-    sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
-    
-    glowEngine->activate();
-    glowEngine->setGaussSigma(sigma);
-    /* raz de la fenetre avec la couleur de fond */
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-    
-    scene->draw_scene ();
-    
-    /* Dessin de la flamme */
-    if(affiche_flamme)
-      for (int f = 0; f < nb_flammes; f++)
-	flammes[f]->drawFlame (affiche_particules);
-    
-    glowEngine->blur();
-    
-    glowEngine->deactivate();
-    
-    glowEngine2->activate();
-    glowEngine2->setGaussSigma(sigma);
-    /* raz de la fenetre avec la couleur de fond */
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-    
-    scene->draw_scene ();
-    
-    /* Dessin de la flamme */
-    if(affiche_flamme)
-      for (int f = 0; f < nb_flammes; f++)
-	flammes[f]->drawFlame (affiche_particules);
-    
-    glowEngine2->blur();
-    
-    glowEngine2->deactivate();
-  }
+//   glColor3f(1.0,1.0,0.0);
+//   GraphicsFn::SolidCone(4,4,20,20);
+//   /********** CONSTRUCTION DES FLAMMES *******************************/
+//   // SDL_mutexP (lock);
+//   if(animate)
+//     for (int f = 0; f < nb_flammes; f++)
+//       flammes[f]->build();
+//   // SDL_mutexV (lock);
   
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
+//   if(glowEnabled){
+//     GLfloat m[4][4];
+//     CVector direction;
+//     float dist, sigma;
+    
+//     /* Adaptation du flou en fonction de la distance */
+//     /* On module la largeur de la gaussienne */
+//     glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
+    
+//     direction.setX (m[3][0]);
+//     direction.setY (m[3][1]);
+//     direction.setZ (m[3][2]);
+    
+//     dist = direction.length();
+//     sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
+    
+//     glowEngine->activate();
+//     glowEngine->setGaussSigma(sigma);
+    
+//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+//     glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+    
+//     scene->draw_scene ();
+    
+//     /* Dessin de la flamme */
+//     if(affiche_flamme)
+//       for (int f = 0; f < nb_flammes; f++)
+// 	flammes[f]->drawFlame (affiche_particules);
+    
+//     glowEngine->blur();
+    
+//     glowEngine->deactivate();
+    
+//     glowEngine2->activate();
+//     glowEngine2->setGaussSigma(sigma);
+    
+//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+//     glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
+    
+//     scene->draw_scene ();
+    
+//     /* Dessin de la flamme */
+//     if(affiche_flamme)
+//       for (int f = 0; f < nb_flammes; f++)
+// 	flammes[f]->drawFlame (affiche_particules);
+    
+//     glowEngine2->blur();
+    
+//     glowEngine2->deactivate();
+//   }
   
-  if(!glowOnly){    
-    glBlendFunc (GL_ONE, GL_ZERO);
+//   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  
+//   if(!glowOnly){    
+//     glBlendFunc (GL_ONE, GL_ZERO);
     
-    /******************* AFFICHAGE DE LA SCENE *******************************/
-    /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
-    for (int f = 0; f < nb_flammes; f++) 
-      flammes[f]->drawWick ();
+//     /******************* AFFICHAGE DE LA SCENE *******************************/
+//     /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
+//     for (int f = 0; f < nb_flammes; f++) 
+//       flammes[f]->drawWick ();
     
-    if(solidePhotoEnabled){
-      solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
-								   flammes[0]->getPosition(),
-								   solveur->getDimY());
-      solidePhoto->draw(couleurOBJ,interpolationSP);
-    }else{
-      /**** Affichage de la scène ****/
-      glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+//     if(solidePhotoEnabled){
+//       solidePhoto->calculerFluctuationIntensiteCentreEtOrientation(flammes[0]->get_main_direction(),
+// 								   flammes[0]->getPosition(),
+// 								   solveur->getDimY());
+//       solidePhoto->draw(couleurOBJ,interpolationSP);
+//     }else{
+//       /**** Affichage de la scène ****/
+//       glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
       
+//       glEnable (GL_LIGHTING);
+      
+//       for (int f = 0; f < nb_flammes; f++)
+// 	{
+// 	  if (shadowVolumesEnabled)
+// 	    flammes[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
+// 	  if (shadowsEnabled)
+// 	    flammes[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
+// 	  else{
+// 	    flammes[f]->switch_on_lights ();
+// 	  }
+// 	}
+//       scene->draw_scene ();
+      
+//       glPopAttrib ();
+      
+//       glDisable (GL_LIGHTING);
+//     }
+    
+//     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+//     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
+//     for (int f = 0; f < nb_flammes; f++)
+//       {
+// 	CPoint position (*(flammes[f]->getPosition ()));
+	
+// 	glPushMatrix ();
+// 	glTranslatef (position.getX (), position.getY (), position.getZ ());
+// 	if (affiche_repere)
+// 	  solveur->displayBase();
+// 	if (affiche_grille)
+// 	  solveur->displayGrid();
+// 	if (affiche_velocite)
+// 	  solveur->displayVelocityField();
+	
+// 	glPopMatrix ();
+//       }
+//     //cout << "bi8" << endl;
+//     /********************* Dessin de la flamme **********************************/
+//     if(!glowEnabled)
+//       if(affiche_flamme)
+// 	for (int f = 0; f < nb_flammes; f++)
+// 	  flammes[f]->drawFlame (affiche_particules);
+//   }
+//   //cout << "b8" << endl;
+
+
+//   /********************* PLACAGE DU GLOW ****************************************/
+//   if(glowEnabled){
+//     glDisable (GL_DEPTH_TEST);
+//     glBlendColor(0.0,0.0,0.0,1.0);
+//     //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
+//     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
+//     //glowEngine2->drawBlur(0.5);
+    
+//     glowEngine->drawBlur(1.0);
+    
+//     glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+//     glowEngine2->drawBlur(0.5);
+//     glBlendFunc (GL_ONE, GL_ONE);
+//     glowEngine->drawBlur(1.0);
+    
+//     glEnable (GL_DEPTH_TEST);
+//   }
+  
       glEnable (GL_LIGHTING);
       
-      for (int f = 0; f < nb_flammes; f++)
-	{
-	  if (shadowVolumesEnabled)
-	    flammes[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
-	  if (shadowsEnabled)
-	    flammes[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
-	  else{
-	    flammes[f]->switch_on_lights ();
-	  }
-	}
+      flammes[0]->switch_on_lights ();
       scene->draw_scene ();
-      
-      glPopAttrib ();
-      
+            
       glDisable (GL_LIGHTING);
-    }
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-    for (int f = 0; f < nb_flammes; f++)
-      {
-	CPoint position (*(flammes[f]->getPosition ()));
-	
-	glPushMatrix ();
-	glTranslatef (position.getX (), position.getY (), position.getZ ());
-	if (affiche_repere)
-	  solveur->displayBase();
-	if (affiche_grille)
-	  solveur->displayGrid();
-	if (affiche_velocite)
-	  solveur->displayVelocityField();
-	
-	glPopMatrix ();
-      }
-    //cout << "bi8" << endl;
-    /********************* Dessin de la flamme **********************************/
-    if(!glowEnabled)
-      if(affiche_flamme)
-	for (int f = 0; f < nb_flammes; f++)
-	  flammes[f]->drawFlame (affiche_particules);    
-  }
-  //cout << "b8" << endl;
-  /********************* PLACAGE DU GLOW ****************************************/
-  if(glowEnabled){
-    glDisable (GL_DEPTH_TEST);
-    glBlendColor(0.0,0.0,0.0,1.0);
-    //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
-    glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
-    //glowEngine2->drawBlur(0.5);
-    
-    glowEngine->drawBlur(1.0);
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-    glowEngine2->drawBlur(0.5);
-    glBlendFunc (GL_ONE, GL_ONE);
-    glowEngine->drawBlur(1.0);
 
-    glEnable (GL_DEPTH_TEST);
-  }
-  
   /******** A VERIFIER *******/
-  //glFlush();
+  glFlush();
+  //  glFinish();
   /***************************/
   SwapBuffers ();
   //event.Skip();
-
-
+  
   /******************** CALCUL DU FRAMERATE *************************************/
   Frames++;
   
@@ -263,7 +272,7 @@ void wxGLBuffer::InitUISettings()
   affiche_repere = affiche_velocite = affiche_particules = affiche_grille = false;
   affiche_fps = affiche_flamme = true;
   shadowsEnabled = shadowVolumesEnabled = false;
-  solidePhotoEnabled = glowEnabled = true;
+  solidePhotoEnabled = false; glowEnabled = false;
   interpolationSP = 1;
   couleurOBJ = 2;
 }
@@ -309,7 +318,6 @@ void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double tim
   context = cgCreateContext();
 
   contextCopy = &context;
-  // Fonction a executer si erreur CG
   cgSetErrorCallback(cgErrorCallback);
 
   solidePhoto = new SolidePhotometrique(scene, &context);

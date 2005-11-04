@@ -33,7 +33,7 @@ using namespace std;
 
 #define NB_PARTICULES 8
 
-//#define BOUGIE
+#define BOUGIE
 
 #ifdef BOUGIE
 #define LIFE_SPAN_AT_BIRTH 6

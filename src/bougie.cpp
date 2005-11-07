@@ -55,6 +55,9 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 
 Bougie::~Bougie ()
 {
+  for (int i = 0; i < nb_squelettes; i++)
+    delete squelettes[i];
+  delete[]squelettes;
   delete[]ctrlpoints;
   delete[]uknots;
   delete[]vknots;

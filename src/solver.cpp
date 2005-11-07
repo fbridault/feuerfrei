@@ -41,7 +41,9 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   size = (N_x + 2) * (N_y + 2) * (N_z + 2);
   dt = pas_de_temps;
 
+  cout << "pouetnew " << size << endl;
   u = new double[size];
+  cout << "pouetpasnew" << endl;
   v = new double[size];
   w = new double[size];
   u_prev = new double[size];
@@ -53,36 +55,35 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   u_src = new double[size];
   v_src = new double[size];
   w_src = new double[size];
+  
+  memset (u, 0, size * sizeof (double));
+  memset (v, 0, size * sizeof (double));
+  memset (w, 0, size * sizeof (double));
+  memset (u_prev, 0, size * sizeof (double));
+  memset (v_prev, 0, size * sizeof (double));
+  memset (w_prev, 0, size * sizeof (double));
+  memset (dens, 0, size * sizeof (double));
+  memset (dens_prev, 0, size * sizeof (double));
+  memset (dens_src, 0, size * sizeof (double));
+  memset (u_src, 0, size * sizeof (double));
+  memset (v_src, 0, size * sizeof (double));
+  memset (w_src, 0, size * sizeof (double));
 
-  u = (double *) memset (u, 0, size * sizeof (double));
-  v = (double *) memset (v, 0, size * sizeof (double));
-  w = (double *) memset (w, 0, size * sizeof (double));
-  u_prev = (double *) memset (u_prev, 0, size * sizeof (double));
-  v_prev = (double *) memset (v_prev, 0, size * sizeof (double));
-  w_prev = (double *) memset (w_prev, 0, size * sizeof (double));
-  dens = (double *) memset (dens, 0, size * sizeof (double));
-  dens_prev = (double *) memset (dens_prev, 0, size * sizeof (double));
-  dens_src = (double *) memset (dens_src, 0, size * sizeof (double));
-  u_src = (double *) memset (u_src, 0, size * sizeof (double));
-  v_src = (double *) memset (v_src, 0, size * sizeof (double));
-  w_src = (double *) memset (w_src, 0, size * sizeof (double));
-
+  cout << "pouet" << endl;
   residu_u = new double[size];
-  residu_u = (double *) memset (residu_u, 0, size * sizeof (double));
+  memset (residu_u, 0, size * sizeof (double));
   residu_u_prev = new double[size];
-  residu_u_prev =
-    (double *) memset (residu_u_prev, 0, size * sizeof (double));
+  memset (residu_u_prev, 0, size * sizeof (double));
   residu_v = new double[size];
-  residu_v = (double *) memset (residu_v, 0, size * sizeof (double));
+  memset (residu_v, 0, size * sizeof (double));
   residu_v_prev = new double[size];
-  residu_v_prev =
-    (double *) memset (residu_v_prev, 0, size * sizeof (double));
+  memset (residu_v_prev, 0, size * sizeof (double));
   residu_w = new double[size];
-  residu_w = (double *) memset (residu_w, 0, size * sizeof (double));
+  memset (residu_w, 0, size * sizeof (double));
   residu_w_prev = new double[size];
-  residu_w_prev =
-    (double *) memset (residu_w_prev, 0, size * sizeof (double));
+  memset (residu_w_prev, 0, size * sizeof (double));
 
+  cout << "pouet" << endl;
   visc = 0.00000015;
   diff = 0.001;
   nb_step_gauss_seidel = 15;
@@ -95,7 +96,7 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   z=new double[n3];
   p=new double[n3];
   q=new double[n3];
-
+  
   /* Construction des display lists */
   buildDLBase ();
   buildDLGrid ();
@@ -111,10 +112,10 @@ Solver::~Solver ()
   delete[]w_prev;
   delete[]dens;
   delete[]dens_prev;
+  delete[]dens_src;
   delete[]u_src;
   delete[]v_src;
   delete[]w_src;
-  delete[]dens_src;
 
   delete[]residu_u;
   delete[]residu_v;
@@ -127,6 +128,9 @@ Solver::~Solver ()
   delete[]z;
   delete[]p;
   delete[]q;
+
+  glDeleteLists(REPERE,1);
+  glDeleteLists(GRILLE,1);
 }
 
 void

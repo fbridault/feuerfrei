@@ -32,9 +32,10 @@ enum
 
 enum
   {
-    ID_ButtonRun = 1,
-    ID_ButtonFlickering,
-    ID_ButtonSwap,
+    IDB_Run = 1,
+    IDB_Restart,
+    IDB_Flickering,
+    IDB_Swap,
   };
 
 enum
@@ -61,6 +62,7 @@ public:
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
   void OnClickButtonRun(wxCommandEvent& event);
+  void OnClickButtonRestart(wxCommandEvent& event);
   void OnClickButtonFlickering(wxCommandEvent& event);
   void OnClickButtonSwap(wxCommandEvent& event);
   
@@ -89,7 +91,7 @@ private:
   /** Zone d'affichage OpenGL */
   wxGLBuffer *m_glBuffer;
   /** Boutons */
-  wxButton *m_buttonRun, *m_buttonFlickering, *m_buttonSwap;
+  wxButton *m_buttonRun, *m_buttonRestart, *m_buttonFlickering, *m_buttonSwap;
   /** Menus */
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames;
   /** Barre de menu */

@@ -91,6 +91,9 @@ public:
   int width, height;
   double clipping;
   wxString sceneName,mecheName;
+  bool PSEnabled,glowEnabled;
+  /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
+  int IPSEnabled, BPSEnabled;
 };
 
 #include "vector.hpp"

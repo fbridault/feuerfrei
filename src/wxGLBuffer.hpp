@@ -35,69 +35,77 @@ public:
   /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
   void OnMouseClick(wxMouseEvent& event);
     
+  void InitGL(void);
+  void InitScene(void);
+  void InitUISettings(void);
+  void Restart (void);
+  void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(flameAppConfig *config);
   /** Initialisation des variables d'affichage de l'interface */
-  void InitUISettings();
+  
 
+  bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
-  void ToggleRun(void) { animate=!animate; };
+  void ToggleRun(void) { m_run=!m_run; };
   /** Lance/arrête l'animation */
-  void ToggleFlickering(void) { flickering=!flickering; };
+  void ToggleFlickering(void) { m_flickering=!m_flickering; };
   /** Active/Désactive le solide photométrique */
-  void ToggleSP(void) { solidePhotoEnabled=!solidePhotoEnabled; };
+  void ToggleSP(void) { m_currentConfig->PSEnabled=!m_currentConfig->PSEnabled; };
   /** Active/Désactive le glow */
-  void ToggleGlow(void) { glowEnabled=!glowEnabled; };
-  void ToggleGridDisplay(void) { affiche_grille=!affiche_grille; };
-  void ToggleBaseDisplay(void) { affiche_repere=!affiche_repere; };
-  void ToggleVelocityDisplay(void) { affiche_velocite=!affiche_velocite; };
-  void ToggleParticlesDisplay(void) { affiche_particules=!affiche_particules; };
-  void ToggleFlamesDisplay(void) { affiche_flamme=!affiche_flamme; };
+  void ToggleGlow(void) { m_currentConfig->glowEnabled=!m_currentConfig->glowEnabled; };
+  void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
+  void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };
+  void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
+  void ToggleParticlesDisplay(void) { m_displayParticles=!m_displayParticles; };
+  void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleSmoothShading(void) { 
-    for (int f = 0; f < nb_flammes; f++)
-    flammes[f]->toggleSmoothShading (); };
-  void ToggleBlendedSP(void) { couleurOBJ = 2-couleurOBJ; };
-  void ToggleInterpolationSP(void) { interpolationSP = 1-interpolationSP; };
+    for (int f = 0; f < m_nbFlames; f++)
+    m_flames[f]->toggleSmoothShading (); };
+  void ToggleBlendedSP(void) { m_currentConfig->BPSEnabled = 2-m_currentConfig->BPSEnabled; };
+  void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
 
-  void Swap(void) { solidePhoto->swap(); };
+  void Swap(void) { m_photoSolid->swap(); };
 
 private:
   void WriteFPS ();
   void DrawVelocity (void);
   
+  /** Configuration de l'application */
+  flameAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
-  bool animate, affiche_velocite, affiche_repere, affiche_grille,
-    affiche_flamme, affiche_fps, flickering, shadowsEnabled,
-    shadowVolumesEnabled, affiche_particules, glowEnabled, glowOnly;
-  bool init, done;
+  /* true si la simulation est en cours, 0 sinon */
+  bool m_run;
+  bool m_displayVelocity, m_displayBase, m_displayGrid,
+    m_displayFlame, m_displayParticles;
+  bool m_flickering, m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
+  /** true si l'application est correctement initialisée, 0 sinon */
+  bool m_init;
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
-  int largeur, hauteur;
+  int m_width, m_height;
   
-  CGcontext context;
-  Eyeball *eyeball;
+  CGcontext m_context;
+  Eyeball *m_eyeball;
   /* Pour le compte des frames */
-  int Frames;
-  int t;
+  int m_framesCount;
+  int m_t;
   
   /********* Variables relatives aux solides photométriques **************/
-  SolidePhotometrique *solidePhoto;
-  bool solidePhotoEnabled, rotation,modePano,pixelBFC;
-  /* interpolationSP = 0 ou 1; couleurOBJ = 0 ou 2 */
-  unsigned char interpolationSP, couleurOBJ;
+  SolidePhotometrique *m_photoSolid;
 
   /********* Variables relatives au glow *********************************/
-  GlowEngine *glowEngine;
-  GlowEngine *glowEngine2;
+  GlowEngine *m_glowEngine;
+  GlowEngine *m_glowEngine2;
 
   /********* Variables relatives au solveur ******************************/
-  Solver *solveur;
+  Solver *m_solver;
     
   /********* Variables relatives à la simulation *************************/
-  Flame **flammes;
-  int nb_flammes;
-  CScene *scene;
-  CgSVShader *SVShader;
+  Flame **m_flames;
+  int m_nbFlames;
+  CScene *m_scene;
+  CgSVShader *m_SVShader;
 
   DECLARE_EVENT_TABLE()
 };

@@ -3,9 +3,10 @@
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-  EVT_BUTTON(ID_ButtonRun, MainFrame::OnClickButtonRun)
-  EVT_BUTTON(ID_ButtonFlickering, MainFrame::OnClickButtonFlickering)
-  EVT_BUTTON(ID_ButtonSwap, MainFrame::OnClickButtonSwap)
+  EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
+  EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
+  EVT_BUTTON(IDB_Flickering, MainFrame::OnClickButtonFlickering)
+  EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
   EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
   EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
   EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
@@ -65,9 +66,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  m_buttonRun = new wxButton(this,ID_ButtonRun,_("Start/Pause"));
-  m_buttonFlickering = new wxButton(this,ID_ButtonFlickering,_("Flickering"));
-  m_buttonSwap = new wxButton(this,ID_ButtonSwap,_("Next IES file"));
+  m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
+  m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
+  m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));
+  m_buttonSwap = new wxButton(this,IDB_Swap,_("Next IES file"));
   
   m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
@@ -76,8 +78,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 0, 0, 0);
-  m_globalSizer->Add(m_buttonFlickering, 0, 0, 0);
-  
+  m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
+  m_globalSizer->Add(m_buttonFlickering, 0, 0, 0);  
 
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
   m_solidSizer->Add(m_enableSolidCheckBox, 0, 0, 0);
@@ -139,7 +141,17 @@ void MainFrame::OnClose(wxCloseEvent& event)
 // Fonction qui est exécutée lors du click sur le bouton.
 void MainFrame::OnClickButtonRun(wxCommandEvent& event)
 {
+  if(m_glBuffer->IsRunning())
+    m_buttonRun->SetLabel(_("Continue"));
+  else
+    m_buttonRun->SetLabel(_("Pause"));
   m_glBuffer->ToggleRun();
+}
+
+// Fonction qui est exécutée lors du click sur le bouton.
+void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
+{
+  m_glBuffer->Restart();
 }
 
 void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
@@ -212,8 +224,14 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 
 void MainFrame::OnCheckES(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleSP();
-  
+  if(m_enableSolidCheckBox->IsChecked()){
+    m_interpolatedSolidCheckBox->Enable();
+    m_blendedSolidCheckBox->Enable();
+  }else{
+    m_interpolatedSolidCheckBox->Disable();
+    m_blendedSolidCheckBox->Disable();
+  }
+  m_glBuffer->ToggleSP(); 
 }
 
 void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
@@ -227,10 +245,10 @@ void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 	       _("About flames"), wxOK | wxICON_INFORMATION, this);
 }
 
-/* A convertir en wx */
 void MainFrame::GetSettingsFromConfigFile ()
 {
-  m_config = new wxFileConfig( _("param.ini" ));
+  wxFileInputStream* file = new wxFileInputStream( _("param.ini" ));
+  m_config = new wxFileConfig( *file );
   
   m_currentConfig.solvx = m_config->Read(_("/Solver/X_res"), 15);
   m_currentConfig.solvy = m_config->Read(_("/Solver/Y_res"), 15);
@@ -239,17 +257,33 @@ void MainFrame::GetSettingsFromConfigFile ()
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
+  m_config->Read(_("/Display/PhotometricSolid"), &m_currentConfig.PSEnabled, false);
+  m_config->Read(_("/Display/IPSEnabled"), &m_currentConfig.IPSEnabled, 0);
+  m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
+  m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
   /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
   //  flameType = m_config->Read(_("/Flame/Type"), 1);
   m_currentConfig.mecheName = m_config->Read(_("/Flame/WickFileName"), _("meche2.obj"));
   
-  /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
-  //  flameType = config->Read(_("/Flame/Type"), 1);
+  m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
+  m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
+  m_enableSolidCheckBox->SetValue(m_currentConfig.PSEnabled);
+  m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   
+  if(m_enableSolidCheckBox->IsChecked()){
+    m_interpolatedSolidCheckBox->Enable();
+    m_blendedSolidCheckBox->Enable();
+  }else{
+    m_interpolatedSolidCheckBox->Disable();
+    m_blendedSolidCheckBox->Disable();
+  }
+
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig);
   
+  delete file;
+
   return;
 }
 
@@ -262,6 +296,10 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Width"), m_currentConfig.width);
   m_config->Write(_("/Display/Height"), m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
+  m_config->Write(_("/Display/PhotometricSolid"), m_currentConfig.PSEnabled);
+  m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
+  m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
+  m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   m_config->Write(_("/Flame/WickFileName"), m_currentConfig.mecheName);
   

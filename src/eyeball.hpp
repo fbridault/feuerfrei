@@ -24,7 +24,7 @@ public:
   * param clipping_value Distance de clipping
   */
   Eyeball(int w, int h, double clipping_value);
-  
+  virtual ~Eyeball() {};
   /** Calcul de la matrice de transformation. A appeler avant de tracer l'objet à visualiser dans la scène.*/
   void recalcModelView(void);
 

@@ -62,7 +62,6 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
 Flame::~Flame()
 {
   gluDeleteNurbsRenderer(nurbs);
-  delete [] squelettes;
   delete luminaire;
 }
 

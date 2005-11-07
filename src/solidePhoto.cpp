@@ -22,7 +22,9 @@ SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context) :
 
 SolidePhotometrique::~SolidePhotometrique()
 {
-  delete [] SPFragmentShader;
+  for(int i=0; i < NBSHADER; i++)
+    delete SPFragmentShader[i];
+  delete[]SPFragmentShader;
 }
 
 void 

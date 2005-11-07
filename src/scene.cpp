@@ -19,14 +19,12 @@ CScene::CScene (const char* const filename, Flame **flammes, int nb_flammes)
     flammes[f]->getLuminaire()->draw(ALL,true);
   glEndList();
   
-  
   glNewList(SCENE_OBJECTS_TEX,GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = objectsArray.begin();
        objectsArrayIterator != objectsArray.end();
        objectsArrayIterator++)
     (*objectsArrayIterator)->draw(TEXTURED,true);
   glEndList();
-  
   
   glNewList(SCENE_OBJECTS_WTEX,GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = objectsArray.begin();

@@ -84,6 +84,15 @@ using namespace std;
 
 #define SHADOW_SAMPLE_PER_LIGHT 3
 
+class flameAppConfig{
+public:
+  int solvx, solvy, solvz;
+  double timeStep;
+  int width, height;
+  double clipping;
+  wxString sceneName,mecheName;
+};
+
 #include "vector.hpp"
 
 #endif

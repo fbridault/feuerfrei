@@ -66,8 +66,27 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
     cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
-		  GL_RGBA, GL_UNSIGNED_BYTE, wxtex->GetData());
+    
+    if( wxtex->HasAlpha() ){
+      unsigned char *imgcpy,*tmp;
+      tmp = imgcpy = new unsigned char[wxtex->GetWidth()*wxtex->GetHeight()*4];
+            
+      for(int j=0; j < wxtex->GetHeight(); j++)
+	for(int i=0; i < wxtex->GetWidth(); i++){
+	  *(tmp++) = wxtex->GetRed(i,j);
+	  *(tmp++) = wxtex->GetGreen(i,j);
+	  *(tmp++) = wxtex->GetBlue(i,j);
+	  *(tmp++) = wxtex->GetAlpha(i,j);
+      }
+      
+      cout << "Canal alpha présent" << endl;
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		  GL_RGBA, GL_UNSIGNED_BYTE, imgcpy);
+      delete [] imgcpy;
+    }
+    else
+      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
+		    GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
   //  if(hasAlpha)
   //     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,texture);

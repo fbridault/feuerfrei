@@ -5,10 +5,22 @@
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_BUTTON(ID_ButtonRun, MainFrame::OnClickButtonRun)
   EVT_BUTTON(ID_ButtonFlickering, MainFrame::OnClickButtonFlickering)
+  EVT_BUTTON(ID_ButtonSwap, MainFrame::OnClickButtonSwap)
+  EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
   EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
   EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
-  EVT_MENU(IDM_Glow, MainFrame::OnGlowMenu)
-  EVT_MENU(IDM_SP, MainFrame::OnSPMenu)
+  EVT_MENU(IDM_Grid, MainFrame::OnGridMenu)
+  EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
+  EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
+  EVT_MENU(IDM_Particles, MainFrame::OnParticlesMenu)
+  EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
+  EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
+  EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
+  EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
+  EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
+  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
+  EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
+  EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
 class FlamesApp : public wxApp
@@ -25,20 +37,13 @@ bool FlamesApp::OnInit()
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
-  MainFrame *frame = new MainFrame( _("Hello World"), wxPoint(0,0), wxSize(800,900) );
+  MainFrame *frame = new MainFrame( _("Hello World"), wxDefaultPosition, wxSize(950,860) );
   
-  frame->Show(TRUE);
+  frame->Show(TRUE);  
+  
+  frame->GetSettingsFromConfigFile ();
+  
   SetTopWindow(frame);
-  
-  //  wxSafeYield();
-#ifdef BOUGIE
-  if (frame->GetSettingsFromFile ("param.ini"))
-    exit (2);
-#else
-  if (frame->GetSettingsFromFile ("param2.ini"))
-    exit (2);
-#endif
-  
   return TRUE;
 } 
 
@@ -48,70 +53,167 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
 
-  int attributelist[ 5 ] = { WX_GL_RGBA        ,
-			     WX_GL_DOUBLEBUFFER,
-			     WX_GL_STENCIL_SIZE,
-			     1                 ,
-			     0                  };
+  int attributelist[ 10 ] = { WX_GL_RGBA        ,
+			      WX_GL_DOUBLEBUFFER,
+			      WX_GL_STENCIL_SIZE,
+			      1                 ,
+			      0                  };
   
-  glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
+  m_glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   
   // Création d'un bouton. Ce bouton est associé à l'identifiant 
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  buttonRun = new wxButton(this,ID_ButtonRun,_("Start/Pause"));
-  buttonFlickering = new wxButton(this,ID_ButtonFlickering,_("Flickering"));
-
-  sizerH = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Controls"));
-  sizerH->Add(buttonRun, 0, 0, 0);
-  sizerH->Add(buttonFlickering, 0, 0, 0);
+  m_buttonRun = new wxButton(this,ID_ButtonRun,_("Start/Pause"));
+  m_buttonFlickering = new wxButton(this,ID_ButtonFlickering,_("Flickering"));
+  m_buttonSwap = new wxButton(this,ID_ButtonSwap,_("Next IES file"));
   
-  sizerV = new wxBoxSizer(wxVERTICAL);
-  sizerV->Add(glBuffer, 0, 0, 0);
-  sizerV->Add(sizerH, 0, 0, 0);
+  m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
+  m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
+  m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
+  m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
+  
+  m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
+  m_globalSizer->Add(m_buttonRun, 0, 0, 0);
+  m_globalSizer->Add(m_buttonFlickering, 0, 0, 0);
+  
+
+  m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
+  m_solidSizer->Add(m_enableSolidCheckBox, 0, 0, 0);
+  m_solidSizer->Add(m_interpolatedSolidCheckBox, 0, 0, 0);
+  m_solidSizer->Add(m_blendedSolidCheckBox, 0, 0, 0);
+  m_solidSizer->Add(m_buttonSwap, 0, 0, 0);
+  
+  m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Glow"));
+  m_glowSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
+  
+  m_rightSizer = new wxBoxSizer(wxVERTICAL);
+  m_rightSizer->Add(m_globalSizer, 0, 0, 0);
+  m_rightSizer->Add(m_solidSizer, 0, 0, 0);
+  m_rightSizer->Add(m_glowSizer, 0, 0, 0);
+
+  m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_mainSizer->Add(m_glBuffer, 0, 0, 0);
+  m_mainSizer->Add(m_rightSizer, 0, 0, 0);
    
-  SetSizer(sizerV);
+  SetSizer(m_mainSizer);
 
-  menuFile = new wxMenu;
+  m_menuFile = new wxMenu;
   
-  menuFile->Append( IDM_About, _("&About...") );
-  menuFile->AppendSeparator();
-  menuFile->Append( IDM_Quit, _("E&xit") );
+  m_menuFile->Append( IDM_SaveSettings, _("&Save settings") );
+  m_menuFile->Append( IDM_About, _("&About...") );
+  m_menuFile->AppendSeparator();
+  m_menuFile->Append( IDM_Quit, _("E&xit") );
   
-  menuDisplay = new wxMenu;
-  menuDisplay->AppendCheckItem( IDM_Glow, _("&Glow") );
-  menuDisplay->AppendCheckItem( IDM_SP, _("&Photometric solid") );
+  m_menuDisplayFlames = new wxMenu;
+  m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("Hide"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("Wired"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("Shaded"));
+  m_menuDisplayFlames->Check(IDM_Shaded,true);
   
-  menuBar = new wxMenuBar;
-  menuBar->Append( menuFile, _("&File") );
-  menuBar->Append( menuDisplay, _("&Display") );
+  m_menuDisplay = new wxMenu;
+  m_menuDisplay->AppendCheckItem( IDM_Grid, _("Grid"));
+  m_menuDisplay->AppendCheckItem( IDM_Base, _("Base"));
+  m_menuDisplay->AppendCheckItem( IDM_Velocity, _("Velocity"));
+  m_menuDisplay->AppendCheckItem( IDM_Particles, _("Particles"));
+  m_menuDisplay->Append( IDM_Flames, _("Flames"), m_menuDisplayFlames);
   
-  SetMenuBar( menuBar );
+  m_menuBar = new wxMenuBar;
+  m_menuBar->Append( m_menuFile, _("&File") );
+  m_menuBar->Append( m_menuDisplay, _("&Display") );
+  
+  SetMenuBar( m_menuBar );
   
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
 }
 
+void MainFrame::OnClose(wxCloseEvent& event)
+{
+  delete m_config;
+  
+  Destroy();
+}
+
 // Fonction qui est exécutée lors du click sur le bouton.
 void MainFrame::OnClickButtonRun(wxCommandEvent& event)
 {
-  glBuffer->ToggleRun();
+  m_glBuffer->ToggleRun();
 }
 
 void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
 {
-  glBuffer->ToggleFlickering();
+  m_glBuffer->ToggleFlickering();
 }
 
-void MainFrame::OnGlowMenu(wxCommandEvent& event)
+void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
 {
-  glBuffer->ToggleGlow();
+  m_glBuffer->Swap();
 }
 
-void MainFrame::OnSPMenu(wxCommandEvent& event)
+void MainFrame::OnGridMenu(wxCommandEvent& event)
 {
-  glBuffer->ToggleSP();
+  m_glBuffer->ToggleGridDisplay();
+}
+
+void MainFrame::OnBaseMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleBaseDisplay();
+}
+
+void MainFrame::OnVelocityMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleVelocityDisplay();
+}
+
+void MainFrame::OnParticlesMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleParticlesDisplay();
+}
+
+void MainFrame::OnHideMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleFlamesDisplay();
+}
+
+void MainFrame::OnWiredMenu(wxCommandEvent& event)
+{
+  if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
+    m_glBuffer->ToggleSmoothShading();
+    m_menuDisplayFlames->Check(IDM_Shaded,false);
+  }else
+    m_menuDisplayFlames->Check(IDM_Wired,true);
+}
+
+void MainFrame::OnShadedMenu(wxCommandEvent& event)
+{
+  if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
+    m_glBuffer->ToggleSmoothShading();
+    m_menuDisplayFlames->Check(IDM_Wired,false);
+  }else
+    m_menuDisplayFlames->Check(IDM_Shaded,true);
+}
+
+void MainFrame::OnCheckBS(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleBlendedSP();
+}
+
+void MainFrame::OnCheckIS(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleInterpolationSP();
+}
+
+void MainFrame::OnCheckGlow(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleGlow();
+}
+
+void MainFrame::OnCheckES(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleSP();
+  
 }
 
 void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
@@ -126,57 +228,50 @@ void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 }
 
 /* A convertir en wx */
-int MainFrame::GetSettingsFromFile (char *name)
+void MainFrame::GetSettingsFromConfigFile ()
 {
-  FILE *f;
-  char buffer[255];
-  float timeStep;
-  int solvx, solvy, solvz;
-  double clipping;
-  char meche_name[255];
-  char scene_name[255];
-  int largeur, hauteur;
+  m_config = new wxFileConfig( _("param.ini" ));
   
-  if ((f = fopen (name, "r")) == NULL)
-    {
-      cout << "Problème d'ouverture du fichier de paramétrage" <<
-	endl;
-      return 2;
-    }
-
-  do
-    {
-      fscanf (f, "%s", buffer);
-
-      if (!strcmp (buffer, "GRID_SIZE"))
-	fscanf (f, "%d %d %d", &solvx, &solvy, &solvz);
-      else if (!strcmp (buffer, "TIME_STEP"))
-	fscanf (f, "%f", &timeStep);
-      else if (!strcmp (buffer, "SCENE"))
-	fscanf (f, "%s", scene_name);
-      else if (!strcmp (buffer, "WINDOW_SIZE"))
-	fscanf (f, "%d %d", &largeur, &hauteur);
-      else if (!strcmp (buffer, "CLIPPING"))
-	fscanf (f, "%lf", &clipping);
-      else if (!strcmp (buffer, "WICK"))
-	fscanf (f, "%s", meche_name);
-
-    }
-  while (!feof (f));
-  timeStep=0.4;
-  cout << "Grille de " << solvx << "x" << solvy << "x" << solvz << endl;
-  cout << "Pas de temps :" << timeStep << endl;
-  cout << "Pas de temps :" << meche_name << endl;
-  cout << "Pas de temps :" << largeur << hauteur << endl;
-  cout << "Pas de temps :" << clipping << endl;
-  cout << "Nom de la scène :" << scene_name << endl;
-
-  fclose (f);
-
-  glBuffer->SetSize(wxSize(largeur,hauteur));
-  glBuffer->Init(largeur, hauteur, solvx, solvy, solvz, timeStep, scene_name, meche_name, clipping);
+  m_currentConfig.solvx = m_config->Read(_("/Solver/X_res"), 15);
+  m_currentConfig.solvy = m_config->Read(_("/Solver/Y_res"), 15);
+  m_currentConfig.solvz = m_config->Read(_("/Solver/Z_res"), 15);
+  m_config->Read(_("/Solver/TimeStep"),&m_currentConfig.timeStep,0.4);
+  m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
+  m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
+  m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
+  m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
+  /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
+  //  flameType = m_config->Read(_("/Flame/Type"), 1);
+  m_currentConfig.mecheName = m_config->Read(_("/Flame/WickFileName"), _("meche2.obj"));
   
-  return 0;
+  /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
+  //  flameType = config->Read(_("/Flame/Type"), 1);
+  
+  m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
+  m_glBuffer->Init(&m_currentConfig);
+  
+  return;
+}
+
+void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
+{
+  m_config->Write(_("/Solver/X_res"),m_currentConfig.solvx);
+  m_config->Write(_("/Solver/Y_res"),m_currentConfig.solvy);
+  m_config->Write(_("/Solver/Z_res"),m_currentConfig.solvz);
+  m_config->Write(_("/Solver/TimeStep"),m_currentConfig.timeStep);
+  m_config->Write(_("/Display/Width"), m_currentConfig.width);
+  m_config->Write(_("/Display/Height"), m_currentConfig.height);
+  m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
+  m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
+  m_config->Write(_("/Flame/WickFileName"), m_currentConfig.mecheName);
+  
+  wxFileOutputStream* file = new wxFileOutputStream( _("param.ini" ));
+  
+  if (m_config->Save(*file) )  
+    wxMessageBox(_("Configuration for the current simulation have been saved"),
+		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
+
+  delete file;
 }
 
 void MainFrame::SetFPS(int fps)

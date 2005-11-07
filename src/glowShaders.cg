@@ -78,11 +78,11 @@ vertout vertGlowY(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   return OUT;
 }
 
-float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, uniform samplerRECT texture) : COLOR
+float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, uniform samplerRECT text ) : COLOR
 {
   float4 color;
 
-  color = (texRECT(texture,IN.tc0) * weights[0] + texRECT(texture,IN.tc1) * weights[1] + texRECT(texture,IN.tc2) * weights[2] + texRECT(texture,IN.tc3) * weights[3] + texRECT(texture,IN.tc4) * weights[4] + texRECT(texture,IN.tc5) * weights[5] + texRECT(texture,IN.tc6) * weights[6] + texRECT(texture,IN.tc7) * weights[7])/divide;
+  color = (texRECT(text,IN.tc0) * weights[0] + texRECT(text,IN.tc1) * weights[1] + texRECT(text,IN.tc2) * weights[2] + texRECT(text,IN.tc3) * weights[3] + texRECT(text,IN.tc4) * weights[4] + texRECT(text,IN.tc5) * weights[5] + texRECT(text,IN.tc6) * weights[6] + texRECT(text,IN.tc7) * weights[7])/divide;
   
   return color;
 }

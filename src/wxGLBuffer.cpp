@@ -1,4 +1,5 @@
 #include "wxGLBuffer.hpp"
+
 #include "main.hpp"
 
 #include <iostream>
@@ -34,9 +35,6 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 		       long style, const wxString& name, const wxPalette& palette)
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
-//   parent->Show(true);
-  SetCurrent();
-  
   done = init = false;
   nb_flammes = 1;
 }
@@ -48,9 +46,10 @@ wxGLBuffer::~wxGLBuffer()
   delete eyeball;
   delete SVShader;
   delete solidePhoto;
-	
+  
   if (context)
-    cgDestroyContext (context);	
+    cgDestroyContext (context);
+  cout << "Free ..." << endl;
 }
 
 void wxGLBuffer::OnIdle(wxIdleEvent& event)
@@ -150,7 +149,6 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     glowEngine2->deactivate();
   }
-  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   
   if(!glowOnly){    
@@ -207,37 +205,37 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
 	
 	glPopMatrix ();
       }
-    //cout << "bi8" << endl;
     /********************* Dessin de la flamme **********************************/
     if(!glowEnabled)
       if(affiche_flamme)
 	for (int f = 0; f < nb_flammes; f++)
 	  flammes[f]->drawFlame (affiche_particules);
   }
-  //cout << "b8" << endl;
-
-
   /********************* PLACAGE DU GLOW ****************************************/
   if(glowEnabled){
     glDisable (GL_DEPTH_TEST);
-    glBlendColor(0.0,0.0,0.0,1.0);
+ //    glBlendColor(0.0,0.0,0.0,1.0);
     //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
-    glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
-    //glowEngine2->drawBlur(0.5);
+//     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
+//     //glowEngine2->drawBlur(0.5);
     
-    glowEngine->drawBlur(1.0);
+//     glowEngine->drawBlur(1.0);
     
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-    glowEngine2->drawBlur(0.5);
+//     glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+//     glowEngine2->drawBlur(0.5);
+//     glBlendFunc (GL_ONE, GL_ONE);
+//     glowEngine->drawBlur(1.0);
+    
     glBlendFunc (GL_ONE, GL_ONE);
+    glowEngine2->drawBlur(1.0);
     glowEngine->drawBlur(1.0);
-    
+
     glEnable (GL_DEPTH_TEST);
   }
-
+  
   /******** A VERIFIER *******/
   glFlush();
-  //  glFinish();
+  //glFinish();
   /***************************/
   SwapBuffers ();
   
@@ -261,25 +259,23 @@ void wxGLBuffer::InitUISettings()
   flickering = glowOnly = false;
   affiche_repere = affiche_velocite = affiche_particules = affiche_grille = false;
   affiche_fps = affiche_flamme = true;
-  shadowsEnabled = shadowVolumesEnabled = false;
+  shadowsEnabled = false; shadowVolumesEnabled = false;
   solidePhotoEnabled = false; glowEnabled = false;
-  interpolationSP = 1;
-  couleurOBJ = 2;
+  interpolationSP = couleurOBJ = 0;
 }
 
 /** Initialisation de l'interface */
-void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double timeStep, 
-		       char *scene_name, char *meche_name, double clipping)
+void wxGLBuffer::Init (flameAppConfig *config)
 {
   int nb_squelettes_flammes;
   
   InitUISettings();
   
-  largeur = l; hauteur = h;
-
+  largeur = config->width; hauteur = config->height;
+  
   SetCurrent();
 
-  glClearColor (0.5, 1.0, 1.0, 1.0);
+  glClearColor (0.0, 0.0, 0.0, 1.0);
   /* Restriction de la zone d'affichage */
   glViewport (0, 0, largeur, hauteur);
 
@@ -296,8 +292,10 @@ void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double tim
 
   glEnable (GL_AUTO_NORMAL);
   glEnable (GL_NORMALIZE);
-  
-  solveur = new Solver(solvx, solvy, solvz, 1.0, timeStep);
+
+  //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+  solveur = new Solver(config->solvx, config->solvy, config->solvz, 1.0, config->timeStep);
   //solveur = new BenchSolver (solvx, solvy, solvz, 1.0, timeStep);
 
   /* Changement de répertoire pour les textures */
@@ -311,13 +309,9 @@ void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double tim
   cgSetErrorCallback(cgErrorCallback);
   
   solidePhoto = new SolidePhotometrique(scene, &context);
-  /***************************** CG Init *******************************/
-  GLfloat fatnessVec[] = { -0.001, -0.001, -0.001, 0.0 };
-  GLfloat shadowExtrudeDistVec[] = { 5.0, 5.0, 5.0, 0.0 };
-  SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("main"), &context);
-  SVShader->setFatness (fatnessVec);
-  SVShader->setshadowExtrudeDist (shadowExtrudeDistVec);
-  /*********************************************************************/
+  
+  SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &context);
+  
 
 #ifdef BOUGIE
   CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
@@ -328,19 +322,17 @@ void wxGLBuffer::Init (int l, int h, int solvx, int solvy, int solvz, double tim
   CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);
   //CPoint pt (0.0, 0.0, 0.0), pos (0.0, -0.5, 0.0);
   nb_squelettes_flammes = 5;
-  flammes[0] = new Firmalampe(solveur,nb_squelettes_flammes,&pt,&pos,SVShader,meche_name,"firmalampe.obj",scene);
+  flammes[0] = new Firmalampe(solveur,nb_squelettes_flammes,&pt,&pos,SVShader,config->mecheName.fn_str(),"firmalampe.obj",scene);
 #endif	
   //AS_ERROR(chdir(".."),"chdir ..");
   solveur->setFlames ((Flame **) flammes, nb_flammes);
   
-  scene = new CScene (scene_name,flammes, nb_flammes);
-  eyeball = new Eyeball (largeur, hauteur, clipping);
+  scene = new CScene (config->sceneName.fn_str(),flammes, nb_flammes);
+  eyeball = new Eyeball (largeur, hauteur, config->clipping);
   
   glowEngine  = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 4);
   glowEngine2 = new GlowEngine (scene, eyeball, &context, largeur, hauteur, 1);
   cout << "Initialisation terminée" << endl;
-  /*GraphicsFn::makeRasterFont ();
-    sprintf (strfps, "%d", 0);*/
 
   ::wxStartTimer();
 

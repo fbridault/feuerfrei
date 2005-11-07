@@ -48,20 +48,15 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
     SPVertexShaderTex.setModelViewProjectionMatrix();
     SPVertexShaderTex.enableShader();
     SPFragmentShader[fragmentShaderIndex]->enableShader(&centreSP,fluctuationIntensite);
-    
-    scene->draw_sceneTEX();
-    
+    scene->draw_sceneTEX();    
     SPVertexShaderTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex]->disableProfile();
     
     /* Affichage des objets sans texture */
     SPVertexShaderWTex.setModelViewProjectionMatrix();
-    SPVertexShaderWTex.enableShader();
-    
-    SPFragmentShader[fragmentShaderIndex+2]->enableShader(&centreSP,fluctuationIntensite);
-    
-    scene->draw_sceneWTEX();
-    
+    SPVertexShaderWTex.enableShader();    
+    SPFragmentShader[fragmentShaderIndex+2]->enableShader(&centreSP,fluctuationIntensite);    
+    scene->draw_sceneWTEX();    
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex+2]->disableProfile();
   }
@@ -85,7 +80,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,C
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan
   axeRotation.set(-o.getZ(),0.0,o.getX());
-
+  
   // l'angle de rotation theta est la coordonnée sphérique correspondante
   y=o.getY();
   r = (float)o.length();

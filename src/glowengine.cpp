@@ -54,7 +54,6 @@ void GlowEngine::blur()
 
   /* Premier blur */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
   blurVertexShaderX.setOffsetsArray();
   blurVertexShaderX.setModelViewProjectionMatrix();
   blurFragmentShader.setWeightsArray();
@@ -95,7 +94,7 @@ void GlowEngine::blur()
   blurFragmentShader.setTexture(texblur);
   blurVertexShaderY.enableShader();
   blurFragmentShader.enableShader();
-    
+  
   glColor3f(1.0,1.0,1.0);
   
   glBegin(GL_QUADS);

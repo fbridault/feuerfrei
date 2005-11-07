@@ -16,6 +16,7 @@ extern void importOBJFile2Scene (const char *filename, CScene* sceneToImportInto
 
 #include <list>
 #include <string>
+#include <iostream>
 using namespace std;
 
 /** 

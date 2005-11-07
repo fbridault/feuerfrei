@@ -19,7 +19,6 @@ class wxGLBuffer;
 #include "benchsolver.hpp"
 #include "glowengine.hpp"
 
-
 class wxGLBuffer : public wxGLCanvas
 {
 public:
@@ -37,8 +36,7 @@ public:
   void OnMouseClick(wxMouseEvent& event);
     
   /** Initialisation globale du contrôle */
-  void Init(int l, int h, int solvx, int solvy, int solvz, double timeStep, 
-	    char *scene_name, char *meche_name, double clipping);
+  void Init(flameAppConfig *config);
   /** Initialisation des variables d'affichage de l'interface */
   void InitUISettings();
 
@@ -50,6 +48,18 @@ public:
   void ToggleSP(void) { solidePhotoEnabled=!solidePhotoEnabled; };
   /** Active/Désactive le glow */
   void ToggleGlow(void) { glowEnabled=!glowEnabled; };
+  void ToggleGridDisplay(void) { affiche_grille=!affiche_grille; };
+  void ToggleBaseDisplay(void) { affiche_repere=!affiche_repere; };
+  void ToggleVelocityDisplay(void) { affiche_velocite=!affiche_velocite; };
+  void ToggleParticlesDisplay(void) { affiche_particules=!affiche_particules; };
+  void ToggleFlamesDisplay(void) { affiche_flamme=!affiche_flamme; };
+  void ToggleSmoothShading(void) { 
+    for (int f = 0; f < nb_flammes; f++)
+    flammes[f]->toggleSmoothShading (); };
+  void ToggleBlendedSP(void) { couleurOBJ = 2-couleurOBJ; };
+  void ToggleInterpolationSP(void) { interpolationSP = 1-interpolationSP; };
+
+  void Swap(void) { solidePhoto->swap(); };
 
 private:
   void WriteFPS ();

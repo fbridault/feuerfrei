@@ -7,6 +7,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
   EVT_BUTTON(IDB_Flickering, MainFrame::OnClickButtonFlickering)
   EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
+  EVT_MENU(IDM_OpenScene, MainFrame::OnOpenSceneMenu)
   EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
   EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
   EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
@@ -32,9 +33,9 @@ class FlamesApp : public wxApp
 IMPLEMENT_APP(FlamesApp)
 
 
-// Code de l'initialisation de l'application
 bool FlamesApp::OnInit()
 {
+  /* Déclaration des handlers pour la gestion des formats d'image */
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
@@ -48,8 +49,6 @@ bool FlamesApp::OnInit()
   return TRUE;
 } 
 
-
-// Construction de la fenêtre. Elle ne contient qu'un bouton.
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
@@ -103,6 +102,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
   m_menuFile = new wxMenu;
   
+  m_menuFile->Append( IDM_OpenScene, _("&Open scene...") );
   m_menuFile->Append( IDM_SaveSettings, _("&Save settings") );
   m_menuFile->Append( IDM_About, _("&About...") );
   m_menuFile->AppendSeparator();
@@ -131,122 +131,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   SetStatusText( _("FPS will be here...") );
 }
 
-void MainFrame::OnClose(wxCloseEvent& event)
-{
-
-  cout << "AAAAAAAAAAAAAAAAAAAAAH" << endl;
-  delete m_config;
-  
-  Destroy();
-  cout << "AAAAAAAAAAAAAAAAAAAAAH" << endl;
-}
-
-// Fonction qui est exécutée lors du click sur le bouton.
-void MainFrame::OnClickButtonRun(wxCommandEvent& event)
-{
-  if(m_glBuffer->IsRunning())
-    m_buttonRun->SetLabel(_("Continue"));
-  else
-    m_buttonRun->SetLabel(_("Pause"));
-  m_glBuffer->ToggleRun();
-}
-
-// Fonction qui est exécutée lors du click sur le bouton.
-void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
-{
-  m_glBuffer->Restart();
-}
-
-void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleFlickering();
-}
-
-void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
-{
-  m_glBuffer->Swap();
-}
-
-void MainFrame::OnGridMenu(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleGridDisplay();
-}
-
-void MainFrame::OnBaseMenu(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleBaseDisplay();
-}
-
-void MainFrame::OnVelocityMenu(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleVelocityDisplay();
-}
-
-void MainFrame::OnParticlesMenu(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleParticlesDisplay();
-}
-
-void MainFrame::OnHideMenu(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleFlamesDisplay();
-}
-
-void MainFrame::OnWiredMenu(wxCommandEvent& event)
-{
-  if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
-    m_glBuffer->ToggleSmoothShading();
-    m_menuDisplayFlames->Check(IDM_Shaded,false);
-  }else
-    m_menuDisplayFlames->Check(IDM_Wired,true);
-}
-
-void MainFrame::OnShadedMenu(wxCommandEvent& event)
-{
-  if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
-    m_glBuffer->ToggleSmoothShading();
-    m_menuDisplayFlames->Check(IDM_Wired,false);
-  }else
-    m_menuDisplayFlames->Check(IDM_Shaded,true);
-}
-
-void MainFrame::OnCheckBS(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleBlendedSP();
-}
-
-void MainFrame::OnCheckIS(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleInterpolationSP();
-}
-
-void MainFrame::OnCheckGlow(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleGlow();
-}
-
-void MainFrame::OnCheckES(wxCommandEvent& event)
-{
-  if(m_enableSolidCheckBox->IsChecked()){
-    m_interpolatedSolidCheckBox->Enable();
-    m_blendedSolidCheckBox->Enable();
-  }else{
-    m_interpolatedSolidCheckBox->Disable();
-    m_blendedSolidCheckBox->Disable();
-  }
-  m_glBuffer->ToggleSP(); 
-}
-
-void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
-{
-  Close(TRUE);
-}
-
-void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
-{
-  wxMessageBox(_("Real-time simulation of small flames\nOasis Team"),
-	       _("About flames"), wxOK | wxICON_INFORMATION, this);
-}
 
 void MainFrame::GetSettingsFromConfigFile ()
 {
@@ -290,6 +174,82 @@ void MainFrame::GetSettingsFromConfigFile ()
   return;
 }
 
+void MainFrame::OnClose(wxCloseEvent& event)
+{
+  delete m_config;
+  
+  Destroy();
+}
+
+// Fonction qui est exécutée lors du click sur le bouton.
+void MainFrame::OnClickButtonRun(wxCommandEvent& event)
+{
+  if(m_glBuffer->IsRunning())
+    m_buttonRun->SetLabel(_("Continue"));
+  else
+    m_buttonRun->SetLabel(_("Pause"));
+  m_glBuffer->ToggleRun();
+}
+
+// Fonction qui est exécutée lors du click sur le bouton.
+void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
+{
+  m_glBuffer->Restart();
+}
+
+void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleFlickering();
+}
+
+void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
+{
+  m_glBuffer->Swap();
+}
+
+void MainFrame::OnCheckBS(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleBlendedSP();
+}
+
+void MainFrame::OnCheckIS(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleInterpolationSP();
+}
+
+void MainFrame::OnCheckGlow(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleGlow();
+}
+
+void MainFrame::OnCheckES(wxCommandEvent& event)
+{
+  if(m_enableSolidCheckBox->IsChecked()){
+    m_interpolatedSolidCheckBox->Enable();
+    m_blendedSolidCheckBox->Enable();
+  }else{
+    m_interpolatedSolidCheckBox->Disable();
+    m_blendedSolidCheckBox->Disable();
+  }
+  m_glBuffer->ToggleSP(); 
+}
+
+void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
+{
+  wxString filename;
+  
+  wxFileDialog fileDialog(this, _("Choose a scene file"), _("scenes"), _(""), "*.obj", wxOPEN|wxFILE_MUST_EXIST);
+  if(fileDialog.ShowModal() == wxID_OK){
+    filename = fileDialog.GetFilename();
+  
+    cout << filename.fn_str() << endl;
+    if(!filename.IsEmpty()){
+      m_currentConfig.sceneName = filename;
+      m_glBuffer->Restart();
+    }
+  }
+}
+
 void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
   m_config->Write(_("/Solver/X_res"),m_currentConfig.solvx);
@@ -313,6 +273,60 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
 
   delete file;
+}
+
+void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
+{
+  Close(TRUE);
+}
+
+void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
+{
+  wxMessageBox(_("Real-time simulation of small flames\nOasis Team"),
+	       _("About flames"), wxOK | wxICON_INFORMATION, this);
+}
+
+void MainFrame::OnGridMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleGridDisplay();
+}
+
+void MainFrame::OnBaseMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleBaseDisplay();
+}
+
+void MainFrame::OnVelocityMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleVelocityDisplay();
+}
+
+void MainFrame::OnParticlesMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleParticlesDisplay();
+}
+
+void MainFrame::OnHideMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleFlamesDisplay();
+}
+
+void MainFrame::OnWiredMenu(wxCommandEvent& event)
+{
+  if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
+    m_glBuffer->ToggleSmoothShading();
+    m_menuDisplayFlames->Check(IDM_Shaded,false);
+  }else
+    m_menuDisplayFlames->Check(IDM_Wired,true);
+}
+
+void MainFrame::OnShadedMenu(wxCommandEvent& event)
+{
+  if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
+    m_glBuffer->ToggleSmoothShading();
+    m_menuDisplayFlames->Check(IDM_Wired,false);
+  }else
+    m_menuDisplayFlames->Check(IDM_Shaded,true);
 }
 
 void MainFrame::SetFPS(int fps)

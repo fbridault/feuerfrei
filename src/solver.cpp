@@ -41,9 +41,7 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   size = (N_x + 2) * (N_y + 2) * (N_z + 2);
   dt = pas_de_temps;
 
-  cerr << "pouetnew " << size << endl;
   u = new double[size];
-  cerr << "pouetpasnew" << endl;
   v = new double[size];
   w = new double[size];
   u_prev = new double[size];
@@ -102,11 +100,8 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
 
 Solver::~Solver ()
 {
-  cerr << "solv1" << endl;
   delete[]u;
-  cerr << "solv2" << endl;
   delete[]v;
-  cerr << "solv21" << endl;
   delete[]w;
 
   delete[]u_prev;
@@ -135,7 +130,6 @@ Solver::~Solver ()
 
   glDeleteLists(REPERE,1);
   glDeleteLists(GRILLE,1);
-  cerr << "solver deleted" << endl;
 }
 
 void

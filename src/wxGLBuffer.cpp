@@ -42,14 +42,10 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 
 wxGLBuffer::~wxGLBuffer()
 {
-  cerr << "pouetdel" << endl;
   DestroyScene();
-  cerr << "pouetdel12" << endl;
   delete m_SVShader;
-  cerr << "pouetdel14" << endl;
   if (m_context)
     cgDestroyContext (m_context);
-  cerr << "pouetdel2" << endl;
 }
 
 void wxGLBuffer::InitUISettings(void)
@@ -98,16 +94,15 @@ void wxGLBuffer::InitGL(void)
 void wxGLBuffer::InitScene(void)
 {
   int nb_squelettes_flammes;
-  cout << "pouet1" << endl;
+  
   m_solver = new Solver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz, 1.0, m_currentConfig->timeStep);
   //m_solver = new BenchSolver (solvx, solvy, solvz, 1.0, timeStep);
-  cout << "pouet2" << endl;
+  
+  m_scene = new CScene (m_currentConfig->sceneName.fn_str());
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
   m_flames = new Flame *[m_nbFlames];
-    cout << "pouet3" << endl;
   m_photoSolid = new SolidePhotometrique(m_scene, &m_context);
-  cout << "pouet4" << endl;
 #ifdef BOUGIE
   CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
   nb_squelettes_flammes = 4;
@@ -119,12 +114,9 @@ void wxGLBuffer::InitScene(void)
   nb_squelettes_flammes = 5;
   m_flames[0] = new Firmalampe(m_solver,nb_squelettes_flammes,&pt,&pos,m_SVShader,m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
 #endif 
-cout << "pouet5" << endl;
   //AS_ERROR(chdir(".."),"chdir ..");
   m_solver->setFlames ((Flame **) m_flames, m_nbFlames);
-  cout << "pouet6" << endl;
-  m_scene = new CScene (m_currentConfig->sceneName.fn_str(),m_flames, m_nbFlames);
-cout << "pouet7" << endl;
+  m_scene->createDisplayLists();
   m_eyeball = new Eyeball (m_width, m_height, m_currentConfig->clipping);
   
   m_glowEngine  = new GlowEngine (m_scene, m_eyeball, &m_context, m_width, m_height, 4);
@@ -146,7 +138,7 @@ void wxGLBuffer::Init (flameAppConfig *config)
 
   m_init = true;
   
-  cout << "Initialisation terminée" << endl;
+  cerr << "Initialisation terminée" << endl;
 }
 
 void wxGLBuffer::Restart (void)
@@ -164,23 +156,15 @@ void wxGLBuffer::Restart (void)
 
 void wxGLBuffer::DestroyScene(void)
 { 
-  cerr << "pouetdel00" << endl;
   delete m_glowEngine;
   delete m_glowEngine2;
-  cerr << "pouetdel01" << endl;
   delete m_eyeball;
-  cerr << "pouetdel02" << endl;
   delete m_scene;
-  cerr << "pouetdel03" << endl;
   delete m_photoSolid;
-  cerr << "pouetdel03.5" << endl;
   for (int f = 0; f < m_nbFlames; f++)
     delete m_flames[f];
-  cerr << "pouetdel04" << endl;
   delete[]m_flames;
-  cerr << "pouetdel05" << endl;
   delete m_solver;
-  cerr << "pouetdel06" << endl;
 }
 
 void wxGLBuffer::OnIdle(wxIdleEvent& event)

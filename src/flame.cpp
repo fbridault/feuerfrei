@@ -28,9 +28,7 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   
   perturbate_count=0;
 
-  luminaire = new CObject(pos);
-
-  importOBJFile2Scene (filename, luminaire);
+  scene->loadObject(filename, new CObject(scene,pos));
 }
 
 Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScene *scene)
@@ -53,10 +51,8 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
   nb_lights=0;
   
   perturbate_count=0;
-  
-  luminaire = new CObject(pos);
-
-  importOBJFile2Scene (filename, luminaire);
+    
+  scene->loadObject(filename, new CObject(scene,pos));
 }
 
 Flame::~Flame()

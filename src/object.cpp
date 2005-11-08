@@ -9,35 +9,29 @@
 
 CObject::~CObject ()
 {
-  for (vector < CPoint * >::iterator vertexArrayIterator = vertexArray.begin (); 
-       vertexArrayIterator != vertexArray.end ();
+  for (vector < CPoint * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
+       vertexArrayIterator != m_vertexArray.end ();
        vertexArrayIterator++)
     delete (*vertexArrayIterator);
-  vertexArray.clear ();
+  m_vertexArray.clear ();
   
-  for (vector < CVector * >::iterator normalsArrayIterator = normalsArray.begin (); 
-       normalsArrayIterator != normalsArray.end ();
+  for (vector < CVector * >::iterator normalsArrayIterator = m_normalsArray.begin (); 
+       normalsArrayIterator != m_normalsArray.end ();
        normalsArrayIterator++)
     delete (*normalsArrayIterator);
-  normalsArray.clear ();
+  m_normalsArray.clear ();
 
-  for (vector < CPoint * >::iterator texCoordsArrayIterator = texCoordsArray.begin (); 
-       texCoordsArrayIterator != texCoordsArray.end ();
+  for (vector < CPoint * >::iterator texCoordsArrayIterator = m_texCoordsArray.begin (); 
+       texCoordsArrayIterator != m_texCoordsArray.end ();
        texCoordsArrayIterator++)
     delete (*texCoordsArrayIterator);
-  texCoordsArray.clear ();
+  m_texCoordsArray.clear ();
 
-  for (vector < CIndex * >::iterator vertexIndexArrayIterator = vertexIndexArray.begin ();
-       vertexIndexArrayIterator != vertexIndexArray.end (); 
+  for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+       vertexIndexArrayIterator != m_vertexIndexArray.end (); 
        vertexIndexArrayIterator++)
     delete (*vertexIndexArrayIterator);
-  vertexIndexArray.clear ();
-  
-  for (vector < CMaterial * >::iterator materialArrayIterator = materialArray.begin (); 
-       materialArrayIterator != materialArray.end ();
-       materialArrayIterator++)
-    delete (*materialArrayIterator);
-  materialArray.clear ();
+  m_vertexIndexArray.clear ();
 }
 
 void
@@ -45,8 +39,8 @@ CObject::getBoundingBox (CPoint & max, CPoint & min)
 {
   CPoint ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   /* Création de la bounding box */
-  for (vector < CPoint * >::iterator vertexArrayIterator = vertexArray.begin (); 
-       vertexArrayIterator != vertexArray.end ();
+  for (vector < CPoint * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
+       vertexArrayIterator != m_vertexArray.end ();
        vertexArrayIterator++){
     /* Calcul du max */
     if ((*vertexArrayIterator)->getX () > ptMax.getX ())
@@ -70,17 +64,16 @@ CObject::getBoundingBox (CPoint & max, CPoint & min)
 void
 CObject::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 {
-  if(currentMaterialIndex != lastMaterialIndex){
-    if(materialArray[currentMaterialIndex]->hasDiffuseTexture() && tex){
+  if(currentMaterialIndex != m_lastMaterialIndex){
+    if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
       glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, materialArray[currentMaterialIndex]->getDiffuseTexture());
+      glBindTexture(GL_TEXTURE_2D, m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture());
       glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }else
       glDisable(GL_TEXTURE_2D);
-    materialArray[currentMaterialIndex]->apply();
-    lastMaterialIndex = currentMaterialIndex;
+    m_scene->getMaterial(currentMaterialIndex)->apply();
+    m_lastMaterialIndex = currentMaterialIndex;
   }
-
 }
 
 void
@@ -88,26 +81,26 @@ CObject::draw (char drawCode, bool tex)
 {  
   CIndex *index;
   int vertexCount=0;
-  lastMaterialIndex=-1;
+  m_lastMaterialIndex=-1;
   
-  switch(attributes){
+  switch(m_attributes){
   case 0:
     cerr << "Cas non pris en compte pour l'instant" << endl;
     break;
   case 1:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = vertexIndexArray.begin ();
-	 vertexIndexArrayIterator != vertexIndexArray.end ();
+    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
       
       if(drawCode > 0){
 	/* Ne dessiner que si il y a une texture */
-	if(!materialArray[index->vm]->hasDiffuseTexture())
+	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
 	if(drawCode < 0)
 	  /* Ne dessiner que si il n'y a pas de texture */
-	  if(materialArray[index->vm]->hasDiffuseTexture())
+	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
       
       if(!vertexCount){
@@ -115,10 +108,10 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glNormal3f (normalsArray[index->vn]->getX (), normalsArray[index->vn]->getY (), 
-		  normalsArray[index->vn]->getZ ());
-      glVertex3f (vertexArray[index->v]->getX (), vertexArray[index->v]->getY (), 
-		  vertexArray[index->v]->getZ ());
+      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
+		  m_normalsArray[index->vn]->getZ ());
+      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
+		  m_vertexArray[index->v]->getZ ());
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();
@@ -128,19 +121,19 @@ CObject::draw (char drawCode, bool tex)
     
     break;
   case 2:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = vertexIndexArray.begin ();
-	 vertexIndexArrayIterator != vertexIndexArray.end ();
+    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
 
      if(drawCode > 0){
 	/* Ne dessiner que si il y a une texture */
-	if(!materialArray[index->vm]->hasDiffuseTexture())
+	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
 	if(drawCode < 0)
 	  /* Ne dessiner que si il n'y a pas de texture */
-	  if(materialArray[index->vm]->hasDiffuseTexture())
+	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
 
       if(!vertexCount){
@@ -148,10 +141,10 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glNormal3f (normalsArray[index->vn]->getX (), normalsArray[index->vn]->getY (), 
-		  normalsArray[index->vn]->getZ ());
-      glVertex3f (vertexArray[index->v]->getX (), vertexArray[index->v]->getY (), 
-		  vertexArray[index->v]->getZ ());
+      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
+		  m_normalsArray[index->vn]->getZ ());
+      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
+		  m_vertexArray[index->v]->getZ ());
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();
@@ -160,19 +153,19 @@ CObject::draw (char drawCode, bool tex)
     }
     break;
   case 3:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = vertexIndexArray.begin ();
-	 vertexIndexArrayIterator != vertexIndexArray.end ();
+    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
 
      if(drawCode > 0){
 	/* Ne dessiner que si il y a une texture */
-	if(!materialArray[index->vm]->hasDiffuseTexture())
+	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
 	if(drawCode < 0)
 	  /* Ne dessiner que si il n'y a pas de texture */
-	  if(materialArray[index->vm]->hasDiffuseTexture())
+	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
 
       if(!vertexCount){
@@ -180,11 +173,11 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glTexCoord2f ( texCoordsArray[index->vt]->getX(), texCoordsArray[index->vt]->getY() );
-      glNormal3f (normalsArray[index->vn]->getX (), normalsArray[index->vn]->getY (), 
-		  normalsArray[index->vn]->getZ ());
-      glVertex3f (vertexArray[index->v]->getX (), vertexArray[index->v]->getY (), 
-		  vertexArray[index->v]->getZ ());
+      glTexCoord2f ( m_texCoordsArray[index->vt]->getX(), m_texCoordsArray[index->vt]->getY() );
+      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
+		  m_normalsArray[index->vn]->getZ ());
+      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
+		  m_vertexArray[index->v]->getZ ());
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();

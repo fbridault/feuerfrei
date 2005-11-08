@@ -24,7 +24,6 @@ SolidePhotometrique::~SolidePhotometrique()
 {
   for(int i=0; i < NBSHADER; i++)
     delete SPFragmentShader[i];
-  delete[]SPFragmentShader;
 }
 
 void 

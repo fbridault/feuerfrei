@@ -21,12 +21,13 @@ class Wick : public CObject
 {
 private:
   /**<Liste des points qui vont servir à  créer les squelettes guides */
-  vector < CPoint * >leadPointsArray;
+  vector < CPoint * >m_leadPointsArray;
+  
 public:
   /** Constructeur de mèche	
    * @param filename nom du fichier de scène où est stockée la mèche
    */
-  Wick(char *filename, int nb_lead_squelettes);
+  Wick(char *filename, int nb_lead_squelettes, CScene *scene);
   virtual ~Wick();
   	
   /**
@@ -34,7 +35,7 @@ public:
    */
   virtual int getLeadPointsArraySize () const
   {
-    return leadPointsArray.size ();
+    return m_leadPointsArray.size ();
   };
   /**
    * Lecture d'un point sp&eacute;cifique des squelettes guides.
@@ -43,11 +44,11 @@ public:
    */
   virtual const CPoint *getLeadPoint(int index) const
   {
-    return (leadPointsArray[index]);
+    return (m_leadPointsArray[index]);
   };
   virtual vector < CPoint * > *getLeadPointsArray ()
   {
-    return ( &leadPointsArray );
+    return ( &m_leadPointsArray );
   };
 };
 

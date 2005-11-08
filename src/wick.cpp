@@ -9,7 +9,7 @@
 #include "graphicsFn.hpp"
 #include "OBJReader.hpp"
 
-Wick::Wick (char *filename, int nb_lead_squelettes)
+Wick::Wick (char *filename, int nb_lead_squelettes, CScene *scene) : CObject(scene)
 {
   CPoint ptMax[nb_lead_squelettes + 1], ptMin[nb_lead_squelettes + 1];
   CPoint ExtrGauche (DBL_MAX, 0, 0), ExtrDroite (DBL_MIN, 0, 0);
@@ -17,8 +17,8 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
 
   /* Chargement de la mèche */
   cout << "Chargement de la mèche du fichier " << filename << "...";
-  importOBJFile2Scene (filename, this);
-
+  scene->loadObject(filename, this, true);
+  
   /*******************************/
   /* Création de la display list */
   /*******************************/
@@ -37,8 +37,8 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   /* La bouding box est délimitée par les points ptMax[nb_lead_squelettes] et ptMin[0] */
   getBoundingBox (ptMax[nb_lead_squelettes], ptMin[0]);
 
-  for (vector < CPoint * >::iterator vertexIterator = vertexArray.begin ();
-       vertexIterator != vertexArray.end (); vertexIterator++)
+  for (vector < CPoint * >::iterator vertexIterator = m_vertexArray.begin ();
+       vertexIterator != m_vertexArray.end (); vertexIterator++)
     {
       /* Calcul du max */
       if ((*vertexIterator)->getX () > ExtrDroite.getX ())
@@ -69,8 +69,8 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   /* Tri des points dans les partitions */
   /* Il serait possible de faire un tri par dichotomie */
   /* pour aller un peu plus vite */
-  for (vector < CPoint * >::iterator vertexIterator = vertexArray.begin ();
-       vertexIterator != vertexArray.end (); vertexIterator++)
+  for (vector < CPoint * >::iterator vertexIterator = m_vertexArray.begin ();
+       vertexIterator != m_vertexArray.end (); vertexIterator++)
     for (int i = 1; i <= nb_lead_squelettes; i++)
       if ((*vertexIterator)->getX () > ptMin[i-1].getX () &&
 	  (*vertexIterator)->getY () > ptMin[i-1].getY () &&
@@ -82,7 +82,7 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   
   /* Création des leadPoints */
   /* On prend simplement le barycentre de chaque partition */
-  leadPointsArray.push_back (new CPoint(ExtrGauche));
+  m_leadPointsArray.push_back (new CPoint(ExtrGauche));
   
   for (int i = 0; i < nb_lead_squelettes; i++)
     {
@@ -106,18 +106,18 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
 	    }
 	  barycentre = barycentre / (float)n;
 
-	  leadPointsArray.push_back (new CPoint (barycentre));
+	  m_leadPointsArray.push_back (new CPoint (barycentre));
 	}
     }
-  leadPointsArray.push_back (new CPoint(ExtrDroite));  
+  m_leadPointsArray.push_back (new CPoint(ExtrDroite));  
 }
 
 Wick::~Wick ()
 {
   for (vector < CPoint * >::iterator pointsIterator =
-	 leadPointsArray.begin ();
-       pointsIterator != leadPointsArray.end (); pointsIterator++)
+	 m_leadPointsArray.begin ();
+       pointsIterator != m_leadPointsArray.end (); pointsIterator++)
     delete (*pointsIterator);
-  leadPointsArray.clear ();
+  m_leadPointsArray.clear ();
 }
 

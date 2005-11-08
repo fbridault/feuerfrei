@@ -38,17 +38,13 @@ public:
   Texture(GLsizei w, GLsizei h, const GLfloat *texels);
   
   /** Donne l'identifiant de la texture à utiliser avec glBindTexture(). */
-  const GLuint getTexture() const {return texName;};
-
-  const long GuessImageType(const wxString& filename);
+  const GLuint getTexture() const {return m_texName;};
 
 private:
-  /** Indique si la texture possède un canal alpha */
-  bool hasAlpha;
-
   /** Identifiant OpenGL de la texture */
-  GLuint texName;
-  wxImage *wxtex;
+  GLuint m_texName;
+  /** Image */
+  wxImage *m_wxtex;
 };
 
 #endif

@@ -13,6 +13,7 @@ class CObject;
 #include "material.hpp"
 #include "source.hpp"
 #include "OBJReader.hpp"
+#include "scene.hpp"
 
 #include <vector>
 
@@ -43,36 +44,37 @@ class CObject
 {
 protected:
   /**<Liste des points de l'objet */
-  vector < CPoint *>vertexArray;
+  vector < CPoint *>m_vertexArray;
   /**<Liste des coordonnées de textures de l'objet */
-  vector < CPoint *>texCoordsArray;
+  vector < CPoint *>m_texCoordsArray;
   /**<Liste des normales de l'objet */
-  vector < CVector *>normalsArray;
+  vector < CVector *>m_normalsArray;
   /**<Liste des indices des points des facettes */
-  vector < CIndex *>vertexIndexArray;
-  /**<Liste des materiaux*/
-  vector < CMaterial *>materialArray;
+  vector < CIndex *>m_vertexIndexArray;
   
-  int attributes;
-  int lastMaterialIndex;
-  CPoint offset;
+  int m_attributes;
+  int m_lastMaterialIndex;
+  CPoint m_offset;
+  CScene *m_scene;
   
 public:
   /**
    * Constructeur par d&eacute;faut.
    */
-  CObject ()
+  CObject (CScene *scene)
   {
-    attributes = 0;
+    m_scene = scene;
+    m_attributes = 0;
   };
   /**
    * Constructeur permettant de donner une position absolue à l'objet
    * @param pos Position à donner à l'objet
    */
-  CObject (CPoint* pos)
+  CObject (CScene *scene, CPoint* pos)
   {
-    attributes = 0;
-    offset = *pos;
+    m_scene = scene;
+    m_attributes = 0;
+    m_offset = *pos;
   };
   /**
    * Destructeur par d&eacute;faut.
@@ -84,10 +86,10 @@ public:
    */
   virtual void addVertex ( CPoint* const newVertex)
   {
-    newVertex->setX(newVertex->getX() + offset.getX() );
-    newVertex->setY(newVertex->getY() + offset.getY() );
-    newVertex->setZ(newVertex->getZ() + offset.getZ() );
-    vertexArray.push_back(newVertex);
+    newVertex->setX(newVertex->getX() + m_offset.getX() );
+    newVertex->setY(newVertex->getY() + m_offset.getY() );
+    newVertex->setZ(newVertex->getZ() + m_offset.getZ() );
+    m_vertexArray.push_back(newVertex);
   };
   
   /** Ajoute une normale dans l'objet
@@ -95,7 +97,7 @@ public:
    */
   virtual void addNormal (CVector* const newNormal)
   {
-    normalsArray.push_back(newNormal);
+    m_normalsArray.push_back(newNormal);
   };
   
   /** Ajoute une coordonnée de texture dans l'objet
@@ -103,7 +105,7 @@ public:
    */
   virtual void addTexCoord (CPoint* const newTexCoord)
   {
-    texCoordsArray.push_back(newTexCoord);
+    m_texCoordsArray.push_back(newTexCoord);
   };
   
   /** Ajoute une facette dans l'objet
@@ -111,35 +113,29 @@ public:
    */
   virtual void addFacet (CIndex* const vertexIndex1, CIndex* const vertexIndex2, CIndex* const vertexIndex3)
   {
-    vertexIndexArray.push_back(vertexIndex1);
-    vertexIndexArray.push_back(vertexIndex2);
-    vertexIndexArray.push_back(vertexIndex3);
+    m_vertexIndexArray.push_back(vertexIndex1);
+    m_vertexIndexArray.push_back(vertexIndex2);
+    m_vertexIndexArray.push_back(vertexIndex3);
   };
 
   void checkAndApplyMaterial(int currentMaterialIndex, bool tex);
-
-  virtual int addMaterial(CMaterial *newMaterial)
-  {
-    materialArray.push_back(newMaterial);
-    return (materialArray.size() - 1);
-  };
   
   /**
    * Lecture du nombre de points contenus dans la sc&egrave;ne.
    */
   virtual int getVertexArraySize () const
   {
-    return vertexArray.size ();
+    return m_vertexArray.size ();
   };
   
   virtual int getNormalsArraySize () const
   {
-    return normalsArray.size ();
+    return m_normalsArray.size ();
   };
 
   virtual int getPolygonsCount () const
   {
-    return (vertexIndexArray.size () / 3);
+    return (m_vertexIndexArray.size () / 3);
   };
   /**
    * Lecture d'un point sp&eacute;cifique contenu dans la sc&egrave;ne.
@@ -148,18 +144,15 @@ public:
    */
   virtual CPoint *getPoint(int index) const
   {
-    return (vertexArray[index]);
+    return (m_vertexArray[index]);
   };
   
   void getBoundingBox (CPoint & max, CPoint & min);
 
   void setAttributes (int attr)
   {
-    attributes = attr;
+    m_attributes = attr;
   };
-
-  virtual CMaterial* getMaterial() const
-  { return materialArray[0]; };
   
   /** Fonction de dessin de l'objet */
   virtual void draw(char drawCode, bool tex);

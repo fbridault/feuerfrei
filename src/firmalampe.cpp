@@ -11,7 +11,7 @@
 Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
 			CgSVShader * shader, char *meche_name, const char *filename, CScene *scene):
   Flame (s, centre, pos, filename,scene),
-  meche (meche_name, nb),
+  meche (meche_name, nb, scene),
   tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
   CPoint pt;

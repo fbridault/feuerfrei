@@ -3,6 +3,7 @@
 
 class CMaterial;
 
+#include <string>
 #include "intensity.hpp"
 #include "texture.hpp"
 
@@ -19,12 +20,13 @@ class CMaterial;
 class CMaterial 
 {
 private:
-  CIntensity Kd;        /**<composante de r&eacute;flexion diffuse.*/
-  CIntensity Ks;        /**<composante de r&eacute;flexion sp&eacute;culaire.*/
-  double Kss;       /**<indice de tache sp&eacute;culaire*/
-  CIntensity Ka;        /**<composante de r&eacute;flexion ambiante.*/
+  string m_name;
+  CIntensity m_Kd;        /**<composante de r&eacute;flexion diffuse.*/
+  CIntensity m_Ks;        /**<composante de r&eacute;flexion sp&eacute;culaire.*/
+  double m_Kss;       /**<indice de tache sp&eacute;culaire*/
+  CIntensity m_Ka;        /**<composante de r&eacute;flexion ambiante.*/
 
-  Texture *diffuseTexture;
+  Texture *m_diffuseTexture;
 public:
   /**
    * Constructeur par d&eacute;faut. Cr&eacute;e un mat&eacute;riau noir opaque.
@@ -39,38 +41,40 @@ public:
    * @param specularExponent	indice de tache sp&eacute;culaire.
    * @param refractionIndex	indice de r&eacute;fraction.
    */
-  CMaterial( double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
+  CMaterial( const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~CMaterial(){delete diffuseTexture;};
+  ~CMaterial(){if(m_diffuseTexture!=NULL) delete m_diffuseTexture;};
 
+  const string *getName() const
+  { return &m_name;};
   /*
    * Lecture de la composante sp&eacute;culaire. 
    * @return Une variable de type CIntensity.
    */
   CIntensity getSpecularCoefficients() const
-  { return (Ks);};
+  { return (m_Ks);};
   /**
    * Lecture de la composante diffuse. 
    * @return Une variable de type CIntensity.
    */ 
   CIntensity getDiffuseCoefficients() const
-  { return (Kd);};
+  { return (m_Kd);};
   /**
    * Lecture de la composante ambiante. 
    * @return Une variable de type CIntensity.
    */ 
   const CIntensity& getAmbientCoefficients() const
-  { return (Ka); };
+  { return (m_Ka); };
   
   void apply () const;
   
   const bool hasDiffuseTexture() const
-  { return (diffuseTexture!=NULL);};
+  { return (m_diffuseTexture!=NULL);};
 
   const GLuint getDiffuseTexture() const
-  { return (diffuseTexture->getTexture());};
+  { return (m_diffuseTexture->getTexture());};
 };//CMaterial
 
 #endif 

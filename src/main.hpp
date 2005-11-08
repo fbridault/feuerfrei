@@ -40,7 +40,8 @@ enum
 
 enum
   {
-    IDM_SaveSettings = 1,
+    IDM_OpenScene = 1,
+    IDM_SaveSettings,
     IDM_Quit,
     IDM_About,
     IDM_Grid,
@@ -59,6 +60,8 @@ class MainFrame: public wxFrame
 public:
   MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size); 
   
+  void GetSettingsFromConfigFile ();
+  
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
   void OnClickButtonRun(wxCommandEvent& event);
@@ -67,6 +70,7 @@ public:
   void OnClickButtonSwap(wxCommandEvent& event);
   
   /** Actions des menus */
+  void OnOpenSceneMenu(wxCommandEvent& event);
   void OnSaveSettingsMenu(wxCommandEvent& event);
   void OnQuitMenu(wxCommandEvent& event);
   void OnAboutMenu(wxCommandEvent& event);
@@ -83,7 +87,6 @@ public:
   void OnCheckES(wxCommandEvent& event);
   
   void SetFPS(int fps);
-  void GetSettingsFromConfigFile ();
   
 private:
   /** Pointeur sur le fichier de configuration */

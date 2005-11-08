@@ -41,9 +41,9 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   size = (N_x + 2) * (N_y + 2) * (N_z + 2);
   dt = pas_de_temps;
 
-  cout << "pouetnew " << size << endl;
+  cerr << "pouetnew " << size << endl;
   u = new double[size];
-  cout << "pouetpasnew" << endl;
+  cerr << "pouetpasnew" << endl;
   v = new double[size];
   w = new double[size];
   u_prev = new double[size];
@@ -69,7 +69,6 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   memset (v_src, 0, size * sizeof (double));
   memset (w_src, 0, size * sizeof (double));
 
-  cout << "pouet" << endl;
   residu_u = new double[size];
   memset (residu_u, 0, size * sizeof (double));
   residu_u_prev = new double[size];
@@ -83,7 +82,6 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
   residu_w_prev = new double[size];
   memset (residu_w_prev, 0, size * sizeof (double));
 
-  cout << "pouet" << endl;
   visc = 0.00000015;
   diff = 0.001;
   nb_step_gauss_seidel = 15;
@@ -104,15 +102,21 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
 
 Solver::~Solver ()
 {
+  cerr << "solv1" << endl;
   delete[]u;
+  cerr << "solv2" << endl;
   delete[]v;
+  cerr << "solv21" << endl;
   delete[]w;
+
   delete[]u_prev;
   delete[]v_prev;
   delete[]w_prev;
   delete[]dens;
+
   delete[]dens_prev;
   delete[]dens_src;
+
   delete[]u_src;
   delete[]v_src;
   delete[]w_src;
@@ -131,6 +135,7 @@ Solver::~Solver ()
 
   glDeleteLists(REPERE,1);
   glDeleteLists(GRILLE,1);
+  cerr << "solver deleted" << endl;
 }
 
 void

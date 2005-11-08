@@ -83,7 +83,7 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
   /* Création des leadPoints */
   /* On prend simplement le barycentre de chaque partition */
   leadPointsArray.push_back (new CPoint(ExtrGauche));
-			
+  
   for (int i = 0; i < nb_lead_squelettes; i++)
     {
       CPoint barycentre;
@@ -109,7 +109,7 @@ Wick::Wick (char *filename, int nb_lead_squelettes)
 	  leadPointsArray.push_back (new CPoint (barycentre));
 	}
     }
-  leadPointsArray.push_back (new CPoint(ExtrDroite));
+  leadPointsArray.push_back (new CPoint(ExtrDroite));  
 }
 
 Wick::~Wick ()

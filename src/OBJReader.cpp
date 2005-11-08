@@ -579,3 +579,12 @@ COBJReader::importMaterial (const char *filename)
     }
   matFile.close();
 }
+
+COBJReader::~COBJReader(){
+  mlist.clear();
+  for (list < CMaterial * >::iterator materialArrayIterator = matlist.begin (); 
+       materialArrayIterator != matlist.end ();
+       materialArrayIterator++)
+    delete (*materialArrayIterator);
+  matlist.clear();
+}

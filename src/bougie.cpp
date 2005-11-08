@@ -13,9 +13,9 @@ extern void draw_scene ();
 Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 		double rayon, CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
   Flame (s, nb, centre, pos, filename, scene),
-  tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT),
-  cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
-  cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
+  tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
+//   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
+//   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {
   int i;
   double angle;
@@ -55,8 +55,10 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 
 Bougie::~Bougie ()
 {
+  cerr << "pouetdel03.6" << endl;
   for (int i = 0; i < nb_squelettes; i++)
     delete squelettes[i];
+    cerr << "pouetdel03.7" << endl;
   delete[]squelettes;
   delete[]ctrlpoints;
   delete[]uknots;
@@ -66,6 +68,7 @@ Bougie::~Bougie ()
   delete[]indices_distances_max;
 
   delete guide;
+    cerr << "pouetdel03.75" << endl;
 }
 
 void

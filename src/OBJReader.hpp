@@ -62,7 +62,7 @@ public:
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~COBJReader(){mlist.clear();matlist.clear();};
+  ~COBJReader();
 };
 
 #endif

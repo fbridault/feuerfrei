@@ -133,9 +133,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 void MainFrame::OnClose(wxCloseEvent& event)
 {
+
+  cout << "AAAAAAAAAAAAAAAAAAAAAH" << endl;
   delete m_config;
   
   Destroy();
+  cout << "AAAAAAAAAAAAAAAAAAAAAH" << endl;
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.

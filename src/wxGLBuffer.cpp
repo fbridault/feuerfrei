@@ -42,14 +42,15 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
 
 wxGLBuffer::~wxGLBuffer()
 {
+  cerr << "pouetdel" << endl;
   DestroyScene();
-  
+  cerr << "pouetdel12" << endl;
   delete m_SVShader;
-  
+  cerr << "pouetdel14" << endl;
   if (m_context)
     cgDestroyContext (m_context);
+  cerr << "pouetdel2" << endl;
 }
-
 
 void wxGLBuffer::InitUISettings(void)
 {
@@ -150,7 +151,6 @@ void wxGLBuffer::Init (flameAppConfig *config)
 
 void wxGLBuffer::Restart (void)
 {
-  int *tab;
   Disable();
   m_init = false;
   DestroyScene();
@@ -163,19 +163,24 @@ void wxGLBuffer::Restart (void)
 
 
 void wxGLBuffer::DestroyScene(void)
-{
-  delete m_solver;
-  cout << "pouet3514" << endl;
-  for (int f = 0; f < m_nbFlames; f++)
-    delete m_flames[f];
-  cout << "pouet354" << endl;
-  delete[]m_flames;
-  cout << "pouet132" << endl;
-  delete m_eyeball;
-  delete m_photoSolid;
+{ 
+  cerr << "pouetdel00" << endl;
   delete m_glowEngine;
   delete m_glowEngine2;
+  cerr << "pouetdel01" << endl;
+  delete m_eyeball;
+  cerr << "pouetdel02" << endl;
   delete m_scene;
+  cerr << "pouetdel03" << endl;
+  delete m_photoSolid;
+  cerr << "pouetdel03.5" << endl;
+  for (int f = 0; f < m_nbFlames; f++)
+    delete m_flames[f];
+  cerr << "pouetdel04" << endl;
+  delete[]m_flames;
+  cerr << "pouetdel05" << endl;
+  delete m_solver;
+  cerr << "pouetdel06" << endl;
 }
 
 void wxGLBuffer::OnIdle(wxIdleEvent& event)

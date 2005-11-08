@@ -29,7 +29,7 @@ public:
    * @param shader pointeur sur le shader qui g�n�re les shadow volumes
    */
   Firmalampe(Solver *s, int nb, CPoint *centre, CPoint *pos, CgSVShader *shader, char *meche_name, const char *filename, CScene *scene);
-  ~Firmalampe();
+  virtual ~Firmalampe();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,

@@ -88,6 +88,10 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, wxtex->GetWidth(), wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, wxtex->GetData());
   }
+  /* Semble nécessaire pour éviter un plantage lors de la libération de la wxImage  */
+  /* Toutefois cette fonction plante si on la met dans le destructeur, je la laisse */
+  /* donc ici pour le moment */
+  wxtex->Destroy();
   //  if(hasAlpha)
   //     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,texture);
   //   else

@@ -26,4 +26,5 @@ CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxStrin
 
 CgSPFragmentShader::~CgSPFragmentShader()
 {
+  delete texture_solide_photometrique;
 }

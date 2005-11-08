@@ -77,7 +77,7 @@ public:
   /**
    * Destructeur par d&eacute;faut.
    */
-  virtual ~ CObject ();
+  virtual ~CObject ();
   
   /** Ajoute un point dans l'objet
    * @param newVertex point à ajouter 

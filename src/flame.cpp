@@ -60,8 +60,11 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
 }
 
 Flame::~Flame()
-{
+{  
+  cerr << "pouetdel03.8" << endl;
   gluDeleteNurbsRenderer(nurbs);
+  
+  cerr << "pouetdel03.9" << endl;
   delete luminaire;
 }
 

@@ -23,7 +23,7 @@ public:
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
   Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
-  virtual ~ Solver ();
+  virtual ~Solver ();
 
   /** Lance une itération du solveur. */
   virtual void iterate (bool flickering);
@@ -178,7 +178,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  inline void GS_solve(int b, double *const x, const double *const x0,
+  void GS_solve(int b, double *const x, const double *const x0,
 				double a, double div, double nb_steps);
   
   /** Effectue une résolution des systèmes linéaires de la diffusion
@@ -191,7 +191,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  inline void GCSSOR(double *const x0, const double *const b, double a, double diagonal, 
+  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, 
 		     double nb_steps, double omega );
   
   /** Pas de diffusion.

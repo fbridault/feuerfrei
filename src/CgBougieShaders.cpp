@@ -10,6 +10,7 @@ CgBougieVertexShader::CgBougieVertexShader(const wxString& sourceName, const wxS
 
 CgBougieVertexShader::~CgBougieVertexShader()
 {
+  cerr << "delete bogie shader" << endl;
 }
 
 /***********************************************************************************************************/

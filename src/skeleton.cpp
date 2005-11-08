@@ -32,7 +32,7 @@ Skeleton::Skeleton(Solver* const s, const CPoint position, const CPoint pt, int 
 
 Skeleton::~Skeleton()
 {
-  free(file);
+  delete [] file;
 }
 
 void Skeleton::entree(const CPoint* const pt)

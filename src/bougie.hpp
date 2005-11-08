@@ -33,7 +33,7 @@ public:
    */
   Bougie(Solver *s, int nb, CPoint *centre, CPoint *pos, double rayon, 
 	 CgSVShader *shader, const char *filename, CScene *scene, CGcontext *context);
-  ~Bougie();
+  virtual ~Bougie();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
@@ -80,16 +80,16 @@ private:
   /** Pointeur vers le squelette guide. */
   LeadSkeleton *guide;
 
-  /** Identifiant de la texture. */
-  Texture tex;
-
   /** Nombre de points fixes pour chaque direction v = origine du guide + origine du squelette pÃ©riphÃ©rique + sommet du guide */
   const static int nb_pts_fixes = 3;
+    
+  /** Identifiant de la texture. */
+  Texture tex;
   
   CgSVShader *cgShader;
-  CgBougieVertexShader cgBougieVertexShader;
-  CgBougieFragmentShader cgBougieFragmentShader;
-  
+//   CgBougieVertexShader cgBougieVertexShader;
+//   CgBougieFragmentShader cgBougieFragmentShader;
+
   float gaussSigma;
 };
 

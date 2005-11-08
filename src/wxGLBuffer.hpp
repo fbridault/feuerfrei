@@ -22,10 +22,11 @@ class wxGLBuffer;
 class wxGLBuffer : public wxGLCanvas
 {
 public:
-  wxGLBuffer() {}
   wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
 	     long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
-  virtual ~wxGLBuffer();
+  
+  ~wxGLBuffer();
+  //virtual bool Destroy();
   
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);

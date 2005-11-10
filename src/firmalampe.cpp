@@ -33,7 +33,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
     {
       pt = *meche.getLeadPoint (i - 1);
       guides[i - 1] = new LeadSkeleton (solveur, position, pt, rootMoveFactorL,m_lifeSpanAtBirth);
-      pt.addZ (-largeur / 2.0);
+      pt.z += (-largeur / 2.0);
       squelettes[i] = new PeriSkeleton (solveur, position, pt, rootMoveFactorP,
 					guides[i - 1], m_lifeSpanAtBirth - 2);
     }
@@ -42,18 +42,18 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   for (int j = nbLeadSkeletons, i = nbLeadSkeletons + 2; j > 0; j--, i++)
   {
 	pt = *meche.getLeadPoint (j - 1);
-	pt.addZ (largeur / 2.0);
+	pt.z += (largeur / 2.0);
 	squelettes[i] = new PeriSkeleton (solveur, position, pt, rootMoveFactorP,
 					  guides[j - 1], m_lifeSpanAtBirth - 2);
   }
   
   /* Ajout des extrémités */
   pt = *meche.getLeadPoint (0);
-  pt.addX (-largeur / 2.0);
+  pt.x += (-largeur / 2.0);
   squelettes[0] = new PeriSkeleton (solveur, position,  pt, rootMoveFactorP, 
 				    guides[0], m_lifeSpanAtBirth - 2);
   pt = *meche.getLeadPoint (nbLeadSkeletons - 1);
-  pt.addX (largeur / 2.0);
+  pt.x += (largeur / 2.0);
   squelettes[nbLeadSkeletons + 1] = new PeriSkeleton (solveur, position, pt,rootMoveFactorP,
 						      guides[nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
 
@@ -65,13 +65,11 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   distances = new float[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
   indices_distances_max = new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
 
-  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 + solveur->getX () / 2;
-  y = (int) (centre->getY () * solveur->getDimY() * solveur->getY ()) + 1;
-  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 + solveur->getZ () / 2;
+  x = (int) (centre->x * solveur->getDimX() * solveur->getXRes ()) + 1 + solveur->getXRes () / 2;
+  y = (int) (centre->y * solveur->getDimY() * solveur->getYRes ()) + 1;
+  z = (int) (centre->z * solveur->getDimZ() * solveur->getZRes ()) + 1 + solveur->getZRes () / 2;
 
   cgShader = shader;
-	
-  cout << x << " " << y << " " << z << endl;
 }
 
 Firmalampe::~Firmalampe ()
@@ -90,9 +88,9 @@ void
 Firmalampe::add_forces (bool perturbate)
 {
   /* Cellule(s) génératrice(s) */
-  for (int i = 1; i < solveur->getX () + 1; i++)
-    for (int j = 1; j < solveur->getY () + 1; j++)
-      for (int k = 1; k < solveur->getZ () + 1; k++)
+  for (int i = 1; i < solveur->getXRes() + 1; i++)
+    for (int j = 1; j < solveur->getYRes() + 1; j++)
+      for (int k = 1; k < solveur->getZRes() + 1; k++)
 	solveur->setVsrc (i, j, k, .02 / (float) (j));
 
   // cout << x << " " << z << endl;
@@ -117,17 +115,14 @@ Firmalampe::add_forces (bool perturbate)
 	 wickLeadPointsArray->begin ();
        pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
     {
-      ptx = (int) ((*pointsIterator)->getX () * solveur->getDimX() *
-		   solveur->getX ()) + 1 + solveur->getX () / 2;
-      pty = (int) ((*pointsIterator)->getY () * solveur->getDimY() *
-		   solveur->getY ()) + 1 ;
-      ptz = (int) ((*pointsIterator)->getZ () * solveur->getDimZ() *
-		   solveur->getZ ()) + 1 + solveur->getZ () / 2;
+      ptx = (int) ((*pointsIterator)->x * solveur->getDimX() * solveur->getXRes()) + 1 + solveur->getXRes() / 2;
+      pty = (int) ((*pointsIterator)->y * solveur->getDimY() * solveur->getYRes()) + 1 ;
+      ptz = (int) ((*pointsIterator)->z * solveur->getDimZ() * solveur->getZRes()) + 1 + solveur->getZRes() / 2;
       //cout << ptx << " " << pty << " " << ptz << endl;
-      //cout << (*pointsIterator)->getY() << endl;
+      //cout << (*pointsIterator)->y << endl;
       for (int i = pty ; i > 0 ; i--) 
-	//solveur->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->getY ())*exp((*pointsIterator)->getY ()) );
-	solveur->addVsrc (ptx, i, ptz, .005* exp(((double)pty+(*pointsIterator)->getY ()) ));
+	//solveur->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
+	solveur->addVsrc (ptx, i, ptz, .005* exp(((double)pty+(*pointsIterator)->y) ));
     }
   
   /* Recherche d'un point maximum */
@@ -136,23 +131,23 @@ Firmalampe::add_forces (bool perturbate)
 //        pointsIterator != wickLeadPointsArray->end (); 
 //        pointsIterator++)
 //     {
-//       if( ymax < (*pointsIterator)->getY () ){
-// 	ymax = (*pointsIterator)->getY ();
+//       if( ymax < (*pointsIterator)->y ){
+// 	ymax = (*pointsIterator)->y;
 // 	ind_max = i;
 //       }
 //       i++;
 //     }
   
-//   ptx = (int) ( ((*wickLeadPointsArray)[ind_max])->getX () * solveur->getDimX() *
-// 		solveur->getX ()) + 2 + solveur->getX () / 2;
-//   pty = (int) ( ((*wickLeadPointsArray)[ind_max])->getY () * solveur->getDimY() *
-// 		solveur->getY ()) + 1 ;
-//   ptz = (int) ( ((*wickLeadPointsArray)[ind_max])->getZ () * solveur->getDimZ() *
-// 		solveur->getZ ()) + 1 + solveur->getZ () / 2;
+//   ptx = (int) ( ((*wickLeadPointsArray)[ind_max])->x * solveur->getDimX() *
+// 		solveur->x) + 2 + solveur->getX () / 2;
+//   pty = (int) ( ((*wickLeadPointsArray)[ind_max])->y * solveur->getDimY() *
+// 		solveur->y) + 1 ;
+//   ptz = (int) ( ((*wickLeadPointsArray)[ind_max])->z * solveur->getDimZ() *
+// 		solveur->z) + 1 + solveur->getZ () / 2;
 	
-//   solveur->addVsrc (ptx-1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->getY () );
-//   solveur->addVsrc (ptx, pty, ptz, 4 * ((*wickLeadPointsArray)[ind_max])->getY () );
-//   solveur->addVsrc (ptx+1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->getY () );
+//   solveur->addVsrc (ptx-1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->y );
+//   solveur->addVsrc (ptx, pty, ptz, 4 * ((*wickLeadPointsArray)[ind_max])->y );
+//   solveur->addVsrc (ptx+1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->y );
   
   if (perturbate)
     perturbate_forces ();
@@ -189,9 +184,9 @@ Firmalampe::eclaire ()
     
     nb_lights++;
     if( (i < 8 ) ){
-      lightPositions[i][0] = tmp->getX ();
-      lightPositions[i][1] = tmp->getY ();
-      lightPositions[i][2] = tmp->getZ ();
+      lightPositions[i][0] = tmp->x;
+      lightPositions[i][1] = tmp->y;
+      lightPositions[i][2] = tmp->z;
       lightPositions[i][3] = 1.0;
     }
   }
@@ -382,7 +377,7 @@ void
 Firmalampe::drawWick()
 {
   glPushMatrix();
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
+  glTranslatef (position.x, position.y, position.z);
   glCallList (MECHE);
   glPopMatrix();
 }
@@ -393,7 +388,7 @@ Firmalampe::drawFlame (bool displayParticle)
   int i;
 
   glPushMatrix();
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
+  glTranslatef (position.x, position.y, position.z);
   /* Affichage des particules */
   if(displayParticle){
     /* Déplacement et détermination du maximum */

@@ -105,9 +105,9 @@ protected:
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt)
   {
-    ctrlpoints[(u * size + v) * 3] = pt->getX ();
-    ctrlpoints[(u * size + v) * 3 + 1] = pt->getY ();
-    ctrlpoints[(u * size + v) * 3 + 2] = pt->getZ ();
+    ctrlpoints[(u * size + v) * 3] = pt->x;
+    ctrlpoints[(u * size + v) * 3 + 1] = pt->y;
+    ctrlpoints[(u * size + v) * 3 + 2] = pt->z;
     //    ctrlpoints[(u*size+v)*4+3] = 1.0;
   }
 
@@ -119,9 +119,9 @@ protected:
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt, double w)
   {
-    ctrlpoints[(u * size + v) * 3] = pt->getX ();
-    ctrlpoints[(u * size + v) * 3 + 1] = pt->getY ();
-    ctrlpoints[(u * size + v) * 3 + 2] = pt->getZ ();
+    ctrlpoints[(u * size + v) * 3] = pt->x;
+    ctrlpoints[(u * size + v) * 3 + 1] = pt->y;
+    ctrlpoints[(u * size + v) * 3 + 2] = pt->z;
     //    ctrlpoints[(u*size+v)*3+3] = w;
   }
   

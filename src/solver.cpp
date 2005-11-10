@@ -889,9 +889,9 @@ Solver::displayVelocityField (void)
 			    inc_z * k - inc_z / 2.0 -  m_nbVoxelsZ / 2.0);
 	      //    printf("v�locit� %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
 	      //SDL_mutexP (lock);
-	      vect.setX (getU (i, j, k));
-	      vect.setY (getV (i, j, k));
-	      vect.setZ (getW (i, j, k));
+	      vect.x = getU (i, j, k);
+	      vect.y = getV (i, j, k);
+	      vect.z = getW (i, j, k);
 	      //SDL_mutexV (lock);
 	      displayArrow (&vect);
 	      glPopMatrix ();
@@ -903,10 +903,9 @@ Solver::displayVelocityField (void)
 void
 Solver::displayArrow (CVector * const direction)
 {
-  double norme_vel =
-    sqrt (direction->getX () * direction->getX () +
-	  direction->getY () * direction->getY () +
-	  direction->getZ () * direction->getZ ());
+  double norme_vel = sqrt (direction->x * direction->x +
+			   direction->y * direction->z +
+			   direction->z * direction->z);
   double taille = m_dimX * m_dimY * m_dimZ * norme_vel / 2.5;
   double angle;
   CVector axeRot, axeCone (0.0, 0.0, 1.0);
@@ -919,7 +918,7 @@ Solver::displayArrow (CVector * const direction)
   /* On récupère l'angle de rotation entre les deux vecteurs */
   angle = acos (axeCone * *direction);
 
-  glRotatef (angle * RAD_TO_DEG, axeRot.getX (), axeRot.getY (), axeRot.getZ ());
+  glRotatef (angle * RAD_TO_DEG, axeRot.x, axeRot.y, axeRot.z);
   /***********************************************************************************/
 
   /* Dégradé de couleur bleu vers rouge */

@@ -149,18 +149,20 @@ void MainFrame::GetSettingsFromConfigFile ()
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
-  /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
-  //  flameType = m_config->Read(_("/Flame/Type"), 1);
-  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
 
+  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
-  wxString groupName;
-  
+  m_nbFlamesMax = m_currentConfig.nbFlames;
+
+  wxString groupName;  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
-      groupName.Printf(_("/Flame#%d/"),i);
+      groupName.Printf(_("/Flame%d/"),i);
       
-      m_currentConfig.flames[i].type = m_config->Read(groupName + _("Type"), 1);
+      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
+      m_config->Read(groupName + _("Pos.x"),(double *) &m_currentConfig.flames[i].position.x, 0.0);
+      m_config->Read(groupName + _("Pos.y"),(double *) &m_currentConfig.flames[i].position.y, 0.5);
+      m_config->Read(groupName + _("Pos.z"),(double *) &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
     }
@@ -276,8 +278,31 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
-  m_config->Write(_("/Flame/WickFileName"), m_currentConfig.mecheName);
   
+  m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);
+
+  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
+  wxString groupName;
+  
+  for(int i=0; i < m_nbFlamesMax; i++)
+    {
+      groupName.Printf(_("/Flame%d/"),i);
+
+      m_config->DeleteGroup(groupName);
+    }
+  
+  for(int i=0; i < m_currentConfig.nbFlames; i++)
+    {
+      groupName.Printf(_("/Flame%d/"),i);
+      
+      m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
+      m_config->Write(groupName + _("Pos.x"),(double )m_currentConfig.flames[i].position.x);
+      m_config->Write(groupName + _("Pos.y"),(double )m_currentConfig.flames[i].position.y);
+      m_config->Write(groupName + _("Pos.z"),(double )m_currentConfig.flames[i].position.z);
+      if(m_currentConfig.flames[i].type == FIRMALAMPE)
+	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
+    }
+
   wxFileOutputStream* file = new wxFileOutputStream( _("param.ini" ));
   
   if (m_config->Save(*file) )  

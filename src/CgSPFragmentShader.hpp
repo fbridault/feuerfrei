@@ -55,7 +55,7 @@ public:
   };
   
   void setparamCentreSP(CPoint *centreSP){
-    cgGLSetParameter3f(paramCentreSP,centreSP->getX(),centreSP->getY(),centreSP->getZ());
+    cgGLSetParameter3f(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
   };
   
   void setparamFluctuationIntensite(GLfloat fluctuationIntensite){

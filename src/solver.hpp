@@ -87,17 +87,17 @@ public:
   void cleanSources ();
 
   /** Retourne le nombre de voxels en X */
-  int getX ()
+  int getXRes()
   {
     return m_nbVoxelsX;
   };
   /** Retourne le nombre de voxels en Y */
-  int getY ()
+  int getYRes()
   {
     return m_nbVoxelsY;
   };
   /** Retourne le nombre de voxels en Z */
-  int getZ ()
+  int getZRes()
   {
     return m_nbVoxelsZ;
   };
@@ -141,6 +141,15 @@ public:
   void displayVelocityField (void);
   /** Fonction de dessin de la vélocité d'une cellule */
   void displayArrow (CVector * const direction);
+
+  /* Retrouver la cellule où est située la particule */
+  void findParticlePosition(CPoint *p, int *i, int *j, int *k)
+  {
+    *i = (int) (p->x * m_dimX * m_nbVoxelsX) + 1 + m_nbVoxelsX / 2;
+    *j = (int) (p->y * m_dimY * m_nbVoxelsY) + 1;
+    *k = (int) (p->z * m_dimZ * m_nbVoxelsZ) + 1 + m_nbVoxelsZ / 2;
+  };
+
 
 protected:
   int IX (int i, int j, int k)

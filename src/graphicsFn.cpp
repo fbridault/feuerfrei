@@ -83,36 +83,36 @@ void GraphicsFn::cylindre(float hauteur, float rayon, float slices )
 	glVertex3f(0,-2,0);
 	glEnd();
 	
-	pts[0].setX(rayon*cos(k));
-	pts[0].setY(-2);
-	pts[0].setZ(rayon*sin(k));
-	pts[1].setX(rayon*cos(k+angle));
-	pts[1].setY(-2);
-	pts[1].setZ(rayon*sin(k+angle));
-	pts[2].setX(rayon*cos(k+angle));
-	pts[2].setY(hauteur-2);
-	pts[2].setZ(rayon*sin(k+angle));
-	pts[3].setX(rayon*cos(k));
-	pts[3].setY(hauteur-2);
-	pts[3].setZ(rayon*sin(k));
+	pts[0].x = rayon*cos(k);
+	pts[0].y = -2;
+	pts[0].z = rayon*sin(k);
+	pts[1].x = rayon*cos(k+angle);
+	pts[1].y = -2;
+	pts[1].z = rayon*sin(k+angle);
+	pts[2].x = rayon*cos(k+angle);
+	pts[2].y = hauteur-2;
+	pts[2].z = rayon*sin(k+angle);
+	pts[3].x = rayon*cos(k);
+	pts[3].y = hauteur-2;
+	pts[3].z = rayon*sin(k);
 	/* calcul de la normale */
-	v1.setX(pts[1].getX() - pts[0].getX());
-	v1.setY(pts[1].getY() - pts[0].getY());
-	v1.setZ(pts[1].getZ() - pts[0].getZ());
-	v2.setX(pts[2].getX() - pts[1].getX());
-	v2.setY(pts[2].getY() - pts[1].getY());
-	v2.setZ(pts[2].getZ() - pts[1].getZ());
+	v1.x = pts[1].x - pts[0].x;
+	v1.y = pts[1].y - pts[0].y;
+	v1.z = pts[1].z - pts[0].z;
+	v2.x = pts[2].x - pts[1].x;
+	v2.y = pts[2].y - pts[1].y;
+	v2.z = pts[2].z - pts[1].z;
 	v3 = v2 ^ v1;
 	//MathFn::normalisation(&v3); // Fait automatiquement
 	
 	glBegin(GL_QUADS);
-	glNormal3f(v3.getX(), v3.getY(), v3.getZ());
+	glNormal3f(v3.x, v3.y, v3.z);
 	glVertex3f(rayon*cos(k),-2,rayon*sin(k));
-	glNormal3f(v3.getX(), v3.getY(), v3.getZ());
+	glNormal3f(v3.x, v3.y, v3.z);
 	glVertex3f(rayon*cos(k),hauteur-2,rayon*sin(k));
-	glNormal3f(v3.getX(), v3.getY(), v3.getZ());
+	glNormal3f(v3.x, v3.y, v3.z);
 	glVertex3f(rayon*cos(k+angle),hauteur-2,rayon*sin(k+angle));
-	glNormal3f(v3.getX(), v3.getY(), v3.getZ());
+	glNormal3f(v3.x, v3.y, v3.z);
 	glVertex3f(rayon*cos(k+angle),-2,rayon*sin(k+angle));
 	glEnd();
 	glBegin(GL_TRIANGLES);

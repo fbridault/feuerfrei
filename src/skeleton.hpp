@@ -37,8 +37,8 @@ public:
    */
   void birth(int l){lifespan=l;};
   
-  virtual Particle& operator= (const Particle& P){X=P.X; Y=P.Y; Z=P.Z; lifespan=P.lifespan; return *this;};
-  virtual Particle& operator= (const CPoint& P){X=P.getX(); Y=P.getY(); Z=P.getZ(); return *this;};
+  virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; lifespan=P.lifespan; return *this;};
+  virtual Particle& operator= (const CPoint& P){x=P.x; y=P.y; z=P.z; return *this;};
 	
 private:
 };

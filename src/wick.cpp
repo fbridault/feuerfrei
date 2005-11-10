@@ -41,29 +41,25 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
        vertexIterator != m_vertexArray.end (); vertexIterator++)
     {
       /* Calcul du max */
-      if ((*vertexIterator)->getX () > ExtrDroite.getX ())
+      if ((*vertexIterator)->x > ExtrDroite.x)
 	ExtrDroite = *(*vertexIterator);
       /* Calcul du min */
-      if ((*vertexIterator)->getX () < ExtrGauche.getX ())
+      if ((*vertexIterator)->x < ExtrGauche.x)
 	ExtrGauche = *(*vertexIterator);
     }
   
   /* Découpage de la bounding box en nb_lead_squelettes partitions selon l'axe X */
   for (int i = 1; i <= nb_lead_squelettes; i++)
     {
-      ptMin[i].setX (ptMin[0].getX () +
-		     i * (ptMax[nb_lead_squelettes].getX () -
-			  ptMin[0].getX ()) / nb_lead_squelettes);
-      ptMin[i].setY (ptMin[0].getY ());
-      ptMin[i].setZ (ptMin[0].getZ ());
+      ptMin[i].x = ptMin[0].x + i * (ptMax[nb_lead_squelettes].x - ptMin[0].x) / nb_lead_squelettes;
+      ptMin[i].y = ptMin[0].y;
+      ptMin[i].z = ptMin[0].z;
     }
   for (int i = 0; i < nb_lead_squelettes; i++)
     {
-      ptMax[i].setX (ptMin[0].getX () +
-		     i * (ptMax[nb_lead_squelettes].getX () -
-			  ptMin[0].getX ()) / nb_lead_squelettes);
-      ptMax[i].setY (ptMax[nb_lead_squelettes].getY ());
-      ptMax[i].setZ (ptMax[nb_lead_squelettes].getZ ());
+      ptMax[i].x = ptMin[0].x + i * (ptMax[nb_lead_squelettes].x - ptMin[0].x) / nb_lead_squelettes;
+      ptMax[i].y = ptMax[nb_lead_squelettes].y;
+      ptMax[i].z = ptMax[nb_lead_squelettes].z;
     }
 
   /* Tri des points dans les partitions */
@@ -72,12 +68,12 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
   for (vector < CPoint * >::iterator vertexIterator = m_vertexArray.begin ();
        vertexIterator != m_vertexArray.end (); vertexIterator++)
     for (int i = 1; i <= nb_lead_squelettes; i++)
-      if ((*vertexIterator)->getX () > ptMin[i-1].getX () &&
-	  (*vertexIterator)->getY () > ptMin[i-1].getY () &&
-	  (*vertexIterator)->getZ () > ptMin[i-1].getZ () &&
-	  (*vertexIterator)->getX () < ptMax[i].getX () &&
-	  (*vertexIterator)->getY () < ptMax[i].getY () &&
-	  (*vertexIterator)->getZ () < ptMax[i].getZ ())
+      if ((*vertexIterator)->x > ptMin[i-1].x &&
+	  (*vertexIterator)->y > ptMin[i-1].y &&
+	  (*vertexIterator)->z > ptMin[i-1].z &&
+	  (*vertexIterator)->x < ptMax[i].x &&
+	  (*vertexIterator)->y < ptMax[i].y &&
+	  (*vertexIterator)->z < ptMax[i].z)
 	pointsPartitionsArray[i-1].push_back (*vertexIterator);
   
   /* Création des leadPoints */
@@ -99,9 +95,9 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
 		 pointsPartitionsArray[i].end ();
 	       pointsIterator++)
 	    {
-	      barycentre.addX ((*pointsIterator)->getX ());
-	      barycentre.addY ((*pointsIterator)->getY ());
-	      barycentre.addZ ((*pointsIterator)->getZ ());
+	      barycentre.x += (*pointsIterator)->x;
+	      barycentre.y += (*pointsIterator)->y;
+	      barycentre.z += (*pointsIterator)->z;
 	      n++;
 	    }
 	  barycentre = barycentre / (float)n;

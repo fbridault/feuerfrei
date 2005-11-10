@@ -43,7 +43,7 @@ public:
   void Restart (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
-  void Init(flameAppConfig *config);
+  void Init(FlameAppConfig *config);
   /** Initialisation des variables d'affichage de l'interface */
   
 
@@ -62,7 +62,7 @@ public:
   void ToggleParticlesDisplay(void) { m_displayParticles=!m_displayParticles; };
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleSmoothShading(void) { 
-    for (int f = 0; f < m_nbFlames; f++)
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->toggleSmoothShading (); };
   void ToggleBlendedSP(void) { m_currentConfig->BPSEnabled = 2-m_currentConfig->BPSEnabled; };
   void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
@@ -74,7 +74,7 @@ private:
   void DrawVelocity (void);
   
   /** Configuration de l'application */
-  flameAppConfig *m_currentConfig;
+  FlameAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
   bool m_run;
@@ -105,8 +105,6 @@ private:
     
   /********* Variables relatives à la simulation *************************/
   Flame **m_flames;
-  int m_nbFlames;
-  int m_FlameType;
   CScene *m_scene;
   CgSVShader *m_SVShader;
 

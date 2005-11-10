@@ -9,7 +9,6 @@
 
 class CObject;
 
-#include "vector.hpp"
 #include "material.hpp"
 #include "source.hpp"
 #include "OBJReader.hpp"
@@ -86,9 +85,9 @@ public:
    */
   virtual void addVertex ( CPoint* const newVertex)
   {
-    newVertex->setX(newVertex->getX() + m_offset.getX() );
-    newVertex->setY(newVertex->getY() + m_offset.getY() );
-    newVertex->setZ(newVertex->getZ() + m_offset.getZ() );
+    newVertex->x = newVertex->x + m_offset.x ;
+    newVertex->y = newVertex->y + m_offset.y ;
+    newVertex->z = newVertex->z + m_offset.z ;
     m_vertexArray.push_back(newVertex);
   };
   

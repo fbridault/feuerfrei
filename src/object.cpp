@@ -43,19 +43,19 @@ CObject::getBoundingBox (CPoint & max, CPoint & min)
        vertexArrayIterator != m_vertexArray.end ();
        vertexArrayIterator++){
     /* Calcul du max */
-    if ((*vertexArrayIterator)->getX () > ptMax.getX ())
-      ptMax.setX ((*vertexArrayIterator)->getX ());
-    if ((*vertexArrayIterator)->getY () > ptMax.getY ())
-      ptMax.setY ((*vertexArrayIterator)->getY ());
-    if ((*vertexArrayIterator)->getZ () > ptMax.getZ ())
-      ptMax.setZ ((*vertexArrayIterator)->getZ ());
+    if ((*vertexArrayIterator)->x > ptMax.x)
+      ptMax.x = (*vertexArrayIterator)->x;
+    if ((*vertexArrayIterator)->y > ptMax.y)
+      ptMax.y = (*vertexArrayIterator)->y;
+    if ((*vertexArrayIterator)->z > ptMax.z)
+      ptMax.z = (*vertexArrayIterator)->z;
     /* Calcul du min */
-    if ((*vertexArrayIterator)->getX () < ptMin.getX ())
-      ptMin.setX ((*vertexArrayIterator)->getX ());
-    if ((*vertexArrayIterator)->getY () < ptMin.getY ())
-      ptMin.setY ((*vertexArrayIterator)->getY ());
-    if ((*vertexArrayIterator)->getZ () < ptMin.getZ ())
-      ptMin.setZ ((*vertexArrayIterator)->getZ ());
+    if ((*vertexArrayIterator)->x < ptMin.x)
+      ptMin.x = (*vertexArrayIterator)->x;
+    if ((*vertexArrayIterator)->y < ptMin.y)
+      ptMin.y = (*vertexArrayIterator)->y;
+    if ((*vertexArrayIterator)->z < ptMin.z)
+      ptMin.z = (*vertexArrayIterator)->z;
   }
   
   max = ptMax; min = ptMin;
@@ -108,10 +108,10 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
-		  m_normalsArray[index->vn]->getZ ());
-      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
-		  m_vertexArray[index->v]->getZ ());
+      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
+		  m_normalsArray[index->vn]->z);
+      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();
@@ -141,10 +141,10 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
-		  m_normalsArray[index->vn]->getZ ());
-      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
-		  m_vertexArray[index->v]->getZ ());
+      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
+		  m_normalsArray[index->vn]->z);
+      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();
@@ -173,11 +173,11 @@ CObject::draw (char drawCode, bool tex)
 	glBegin (GL_POLYGON);
       }
       
-      glTexCoord2f ( m_texCoordsArray[index->vt]->getX(), m_texCoordsArray[index->vt]->getY() );
-      glNormal3f (m_normalsArray[index->vn]->getX (), m_normalsArray[index->vn]->getY (), 
-		  m_normalsArray[index->vn]->getZ ());
-      glVertex3f (m_vertexArray[index->v]->getX (), m_vertexArray[index->v]->getY (), 
-		  m_vertexArray[index->v]->getZ ());
+      glTexCoord2f ( m_texCoordsArray[index->vt]->x, m_texCoordsArray[index->vt]->y );
+      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
+		  m_normalsArray[index->vn]->z);
+      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){
 	glEnd ();

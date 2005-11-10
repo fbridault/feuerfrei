@@ -23,15 +23,10 @@ PeriSkeleton::moveRoot ()
 {
   int i, j, k;
   CPoint tmp;
-  float distx = 10 * m_solver->getDimX() / (float) m_solver->getX ();
-  float distz = m_solver->getDimZ() / (float) m_solver->getZ ();
+  float distx = 10 * m_solver->getDimX() / (float) m_solver->getXRes ();
+  float distz = m_solver->getDimZ() / (float) m_solver->getZRes ();
   
-  /* Retrouver les quatres cellules adjacentes autour de la particule */
-  i = (int) (m_root.getX () * m_solver->getDimX() * m_solver->getX ()) + 1 +
-    m_solver->getX () / 2;
-  j = (int) (m_root.getY () * m_solver->getDimY() * m_solver->getY ()) + 1;
-  k = (int) (m_root.getZ () * m_solver->getDimZ() * m_solver->getZ ()) + 1 +
-    m_solver->getZ () / 2;
+  m_solver->findParticlePosition(&m_root, &i, &j, &k);
 
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
@@ -39,18 +34,18 @@ PeriSkeleton::moveRoot ()
   // cout << pos->x << " " << pos->y << " " << pos->z << "     ";
   //   cout << i << " " << j << " " << k << endl;
 
-  //tmp.setX( m_rootSave.getX() + 4*(m_solver->getU(i,j,k) + m_solver->getU(i-1,j,k) + m_solver->getU(i+1,j,k) + m_solver->getU(i,j-1,k) + m_solver->getU(i,j+1,k)+ m_solver->getU(i,j,k-1) + m_solver->getU(i,j,k+1))/7.0 );
-  //tmp.setY( m_rootSave.getY() + 0.75*(m_solver->getV(i,j,k) + m_solver->getV(i-1,j,k) + m_solver->getV(i+1,j,k) + m_solver->getV(i,j-1,k) + m_solver->getV(i,j+1,k)+ m_solver->getV(i,j,k-1) + m_solver->getV(i,j,k+1))/7.0 );
-  //tmp.setZ( m_rootSave.getZ() + 4*(m_solver->getW(i,j,k) + m_solver->getW(i-1,j,k) + m_solver->getW(i+1,j,k) + m_solver->getW(i,j-1,k) + m_solver->getW(i,j+1,k)+ m_solver->getW(i,j,k-1) + m_solver->getW(i,j,k+1))/7.0 );
+  //tmp.setX( m_rootSave.x + 4*(m_solver->getU(i,j,k) + m_solver->getU(i-1,j,k) + m_solver->getU(i+1,j,k) + m_solver->getU(i,j-1,k) + m_solver->getU(i,j+1,k)+ m_solver->getU(i,j,k-1) + m_solver->getU(i,j,k+1))/7.0 );
+  //tmp.setY( m_rootSave.y + 0.75*(m_solver->getV(i,j,k) + m_solver->getV(i-1,j,k) + m_solver->getV(i+1,j,k) + m_solver->getV(i,j-1,k) + m_solver->getV(i,j+1,k)+ m_solver->getV(i,j,k-1) + m_solver->getV(i,j,k+1))/7.0 );
+  //tmp.setZ( m_rootSave.z + 4*(m_solver->getW(i,j,k) + m_solver->getW(i-1,j,k) + m_solver->getW(i+1,j,k) + m_solver->getW(i,j-1,k) + m_solver->getW(i,j+1,k)+ m_solver->getW(i,j,k-1) + m_solver->getW(i,j,k+1))/7.0 );
 
-  tmp.setX (m_rootSave.getX () + m_rootMoveFactor.getX() * m_solver->getU (i, j, k));
-  tmp.setY (m_rootSave.getY () + m_rootMoveFactor.getY() * m_solver->getV (i, j, k));
-  tmp.setZ (m_rootSave.getZ () + m_rootMoveFactor.getZ() * m_solver->getW (i, j, k));
+  tmp.x = m_rootSave.x + m_rootMoveFactor.x * m_solver->getU (i, j, k);
+  tmp.y = m_rootSave.y + m_rootMoveFactor.y * m_solver->getV (i, j, k);
+  tmp.z = m_rootSave.z + m_rootMoveFactor.z * m_solver->getW (i, j, k);
 
-  if (tmp.getX () < (m_rootSave.getX () - distx)
-      || tmp.getX () > (m_rootSave.getX () + distx)
-      || tmp.getZ () < (m_rootSave.getZ () - distz)
-      || tmp.getZ () > (m_rootSave.getZ () + distz))
+  if (tmp.x < (m_rootSave.x - distx)
+      || tmp.x > (m_rootSave.x + distx)
+      || tmp.z < (m_rootSave.z - distz)
+      || tmp.z > (m_rootSave.z + distz))
     return 0;
 
   m_root = tmp;
@@ -66,11 +61,8 @@ PeriSkeleton::moveParticle (Particle * const pos, int n)
 
   if (pos->isDead ())
     return 0;
-
-  /* Retrouver les quatres cellules adjacentes autour de la particule */
-  i = (int) (pos->getX () * m_solver->getDimX() * m_solver->getX ()) + 1 + m_solver->getX () / 2;
-  j = (int) (pos->getY () * m_solver->getDimY() * m_solver->getY ()) + 1;
-  k = (int) (pos->getZ () * m_solver->getDimZ() * m_solver->getZ ()) + 1 + m_solver->getZ () / 2;
+  
+  m_solver->findParticlePosition(pos, &i, &j, &k);
 
   /* Calculer la nouvelle position */
   /* IntÃ©gration d'Euler */
@@ -81,13 +73,13 @@ PeriSkeleton::moveParticle (Particle * const pos, int n)
   //pos->addY( (m_solver->getV(i,j,k) + m_solver->getV(i-1,j,k) + m_solver->getV(i+1,j,k) + m_solver->getV(i,j-1,k) + m_solver->getV(i,j+1,k) + m_solver->getV(i,j,k-1) + m_solver->getV(i,j,k+1))/7.0);
   //pos->addZ( (m_solver->getW(i,j,k) + m_solver->getW(i-1,j,k) + m_solver->getW(i+1,j,k) + m_solver->getW(i,j-1,k) + m_solver->getW(i,j+1,k) + m_solver->getW(i,j,k-1) + m_solver->getW(i,j,k+1))/7.0);
 
-  pos->addX (m_solver->getU (i, j, k));
-  pos->addY (m_solver->getV (i, j, k));
-  pos->addZ (m_solver->getW (i, j, k));
+  pos->x += m_solver->getU (i, j, k);
+  pos->y += m_solver->getV (i, j, k);
+  pos->z += m_solver->getW (i, j, k);
 
-  if (pos->getX () < -m_solver->getDimX() / 2.0 || pos->getX () > m_solver->getDimX() / 2.0 || 
-      pos->getY () < 0 || pos->getY () > m_solver->getDimY() ||
-      pos->getZ () < -m_solver->getDimZ() / 2.0 || pos->getZ () > m_solver->getDimZ() / 2.0)
+  if (pos->x < -m_solver->getDimX() / 2.0 || pos->x > m_solver->getDimX() / 2.0 || 
+      pos->y < 0 || pos->y > m_solver->getDimY() ||
+      pos->z < -m_solver->getDimZ() / 2.0 || pos->z > m_solver->getDimZ() / 2.0)
     return 0;
   
   return 1;

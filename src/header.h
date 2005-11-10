@@ -79,10 +79,21 @@ enum{
 #define GREEN                   1
 #define BLUE                    2
 
-
 #define SHADOW_SAMPLE_PER_LIGHT 3
 
-class flameAppConfig{
+#define BOUGIE 1
+#define FIRMALAMPE 2
+
+#include "vector.hpp"
+
+class FlameConfig{
+public:
+  char type;
+  CPoint position;
+  wxString wickName;
+};
+
+class FlameAppConfig{
 public:
   int solvx, solvy, solvz;
   double timeStep;
@@ -92,8 +103,8 @@ public:
   bool PSEnabled,glowEnabled;
   /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
+  int nbFlames;
+  FlameConfig *flames;
 };
-
-#include "vector.hpp"
 
 #endif

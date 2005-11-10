@@ -105,7 +105,11 @@ private:
   
   wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer;
   wxBoxSizer *m_mainSizer, *m_rightSizer;
-  flameAppConfig m_currentConfig;
+  FlameAppConfig m_currentConfig;
+  
+  /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
+  /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
+  int m_nbFlamesMax;
   
   DECLARE_EVENT_TABLE()
 };

@@ -83,8 +83,8 @@ void Skeleton::drawRoot ()
     
   glColor4f (1.0, 0.0, 0.25, 0.8);
   glPushMatrix ();
-  glTranslatef (position.getX (), position.getY (),
-		position.getZ ());
+  glTranslatef (position.x, position.y,
+		position.z);
   GraphicsFn::SolidSphere (0.01, 10, 10);
   glPopMatrix ();
 }
@@ -95,8 +95,8 @@ void Skeleton::drawParticle (Particle * const particle)
 
   glColor4f (1.0, 1.0, 0.25, 0.8);
   glPushMatrix ();
-  glTranslatef (position.getX (), position.getY (),
-		position.getZ ());
+  glTranslatef (position.x, position.y,
+		position.z);
   GraphicsFn::SolidSphere (0.01, 10, 10);
   glPopMatrix ();
 }

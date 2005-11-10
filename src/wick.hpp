@@ -8,8 +8,7 @@
  *  bridault@lil.univ-littoral.fr
  ****************************************************************************/
 class Wick;
-#include "wick.hpp"
-#include "vector.hpp"
+
 #include "material.hpp"
 #include "object.hpp"
 

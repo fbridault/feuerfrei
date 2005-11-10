@@ -34,7 +34,7 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();
   glLoadIdentity();
-  glRotatef(orientationSPtheta,axeRotation.getX(),axeRotation.getY(),axeRotation.getZ());
+  glRotatef(orientationSPtheta,axeRotation.x,axeRotation.y,axeRotation.z);
   
   /* Affichage des objets sans couleur */
   if(fragmentShaderIndex < 2){
@@ -80,10 +80,10 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,C
 
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan
-  axeRotation.set(-o.getZ(),0.0,o.getX());
+  axeRotation.set(-o.z,0.0,o.x);
   
   // l'angle de rotation theta est la coordonnée sphérique correspondante
-  y=o.getY();
+  y=o.y;
   r = (float)o.length();
   if(r - fabs(y) < EPSILON)
     orientationSPtheta = 0.0;

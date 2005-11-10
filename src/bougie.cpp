@@ -27,9 +27,9 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
   for (i = 0; i < nb_squelettes; i++)
     {
       squelettes[i] =
-	new PeriSkeleton (solveur, position, CPoint (cos (angle) * rayon + centre->getX (), 
-						     centre->getY (), 
-						     sin (angle) * rayon + centre->getZ ()),
+	new PeriSkeleton (solveur, position, CPoint (cos (angle) * rayon + centre->x, 
+						     centre->y, 
+						     sin (angle) * rayon + centre->z),
 			  CPoint(4,.75,4),
 			  guide, m_lifeSpanAtBirth);
 
@@ -46,9 +46,9 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
   indices_distances_max =
     new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
 
-  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 + solveur->getX () / 2;
-  y = (int) (centre->getY () * solveur->getDimY() * solveur->getY ()) + 1;
-  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 + solveur->getZ () / 2;
+  x = (int) (centre->x * solveur->getDimX() * solveur->getXRes ()) + 1 + solveur->getXRes () / 2;
+  y = (int) (centre->y * solveur->getDimY() * solveur->getYRes ()) + 1;
+  z = (int) (centre->z * solveur->getDimZ() * solveur->getZRes ()) + 1 + solveur->getZRes () / 2;
 
   cgShader = shader;
 }
@@ -71,10 +71,10 @@ Bougie::~Bougie ()
 void
 Bougie::add_forces (bool perturbate)
 {
-  /* Cellule(s) g√©n√©ratrice(s) */
-  for (int i = 1; i < solveur->getX () + 1; i++)
-    for (int j = 1; j < solveur->getY () + 1; j++)
-      for (int k = 1; k < solveur->getZ () + 1; k++)
+  /* Cellule(s) gÈnÈratrice(s) */
+  for (int i = 1; i < solveur->getXRes() + 1; i++)
+    for (int j = 1; j < solveur->getYRes() + 1; j++)
+      for (int k = 1; k < solveur->getZRes() + 1; k++)
 	solveur->setVsrc (i, j, k, .08 / (float) (j));
   solveur->addVsrc (x, 1, z, .04);
 
@@ -86,20 +86,20 @@ void
 Bougie::perturbate_forces ()
 {
   if(perturbate_count==4){
-    solveur->setVsrc(((int)(ceil(solveur->getX()/2.0))),1,((int)(ceil(solveur->getZ()/2.0))),0.25);
+    solveur->setVsrc(((int)(ceil(solveur->getXRes()/2.0))),1,((int)(ceil(solveur->getZRes()/2.0))),0.25);
     perturbate_count = 0;
   }else
     perturbate_count++;
 
-  //  for (int i = -solveur->getZ () / 4 - 1; i <= solveur->getZ () / 4 + 1; i++)
-  //     for (int j = -2 * solveur->getY () / 4;
-  // 	 j < -solveur->getY () / 4; j++)
-  //       solveur->setUsrc (solveur->getX (),
+  //  for (int i = -solveur->z / 4 - 1; i <= solveur->getZ () / 4 + 1; i++)
+  //     for (int j = -2 * solveur->y / 4;
+  // 	 j < -solveur->y / 4; j++)
+  //       solveur->setUsrc (solveur->x,
   // 			((int)
-  // 			 (ceil (solveur->getY () / 2.0))) +
+  // 			 (ceil (solveur->y / 2.0))) +
   // 			j,
   // 			((int)
-  // 			 (ceil (solveur->getZ () / 2.0))) +
+  // 			 (ceil (solveur->z / 2.0))) +
   // 			i, -1);
 }
 
@@ -118,9 +118,9 @@ Bougie::eclaire ()
       tmp = guide->getParticle (i);
 
       nb_lights++;
-      lightPositions[i][0] = tmp->getX ();
-      lightPositions[i][1] = tmp->getY ();
-      lightPositions[i][2] = tmp->getZ ();
+      lightPositions[i][0] = tmp->x;
+      lightPositions[i][1] = tmp->y;
+      lightPositions[i][2] = tmp->z;
       lightPositions[i][3] = 1.0;
     }
 }
@@ -311,7 +311,7 @@ Bougie::drawWick ()
   float largeur = solveur->getDimX() / 60.0;
   /* Affichage de la mËche */
   glPushMatrix ();
-  glTranslatef (position.getX (), position.getY()-hauteur/2.0, position.getZ ());
+  glTranslatef (position.x, position.y-hauteur/2.0, position.z);
   glRotatef (-90.0, 1.0, 0.0, 0.0);
   glColor3f (0.0, 0.0, 0.0);
   GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
@@ -326,7 +326,7 @@ Bougie::drawFlame (bool displayParticle)
   int i;
 
   glPushMatrix();
-  glTranslatef (position.getX (), position.getY (), position.getZ ());
+  glTranslatef (position.x, position.y, position.z);
   /* Affichage des particules */
   if(displayParticle){
     /* DÈplacement et dÈtermination du maximum */
@@ -350,9 +350,7 @@ Bougie::drawFlame (bool displayParticle)
       /* Correction "√ la grosse" pour les UVs -> √† voir par la suite */
       float vtex = 1.0 / (float) (max_particles);
 
-      GLfloat texpts[2][2][2] =	{ {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };
-      CPoint bougiepos;
-      CVector worldLookAt, worldLookX, direction;
+      GLfloat texpts[2][2][2] =	{ {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };      
       double angle, angle2;
 
       /************* D√©placement de la texture de mani√®re √† ce qu'elle reste "en face" de l'observateur ********************/
@@ -361,23 +359,13 @@ Bougie::drawFlame (bool displayParticle)
       glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
 
       /* Position de la bougie = translation dans la matrice courante */
-      bougiepos.setX (m[3][0]);
-      bougiepos.setY (m[3][1]);
-      bougiepos.setZ (m[3][2]);
+      CPoint bougiepos(m[3][0], m[3][1], m[3][2]);
 
       /* Position de l'axe de regard de bougie dans le rep√®re du monde = axe initial * Matrice de rotation */
       /* Attention, ne pas prendre la translation en plus !!!! */
-      worldLookAt.setX (m[2][0]);
-      worldLookAt.setY (m[2][1]);
-      worldLookAt.setZ (m[2][2]);
-
-      worldLookX.setX (m[0][0]);
-      worldLookX.setY (m[0][1]);
-      worldLookX.setZ (m[0][2]);
-      
-      direction.setX (-bougiepos.getX ());
-      direction.setY (0.0);
-      direction.setZ (-bougiepos.getZ ());
+      CVector worldLookAt(m[2][0], m[2][1], m[2][2]);
+      CVector worldLookX(m[0][0], m[0][1], m[0][2]);
+      CVector direction(-bougiepos.x, 0.0, -bougiepos.z);
       
       direction.normalize ();
       /* Apparemment, pas besoin de le normaliser, on laisse pour le moment */

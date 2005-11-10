@@ -36,7 +36,6 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
   m_init = false;
-  m_nbFlames = 1;
   m_run = 0;
 }
 
@@ -87,31 +86,28 @@ void wxGLBuffer::InitGL(void)
   
   contextCopy = &m_context;
   cgSetErrorCallback(cgErrorCallback);
-
+  
   m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context);
 }
 
 void wxGLBuffer::InitFlames(void)
 {
-  short nbSkeletons;
-  m_flames = new Flame *[m_nbFlames];
-  short type = BOUGIE;
+  int nbSkeletons;
+  CPoint pt(0,0,0);
   
-  CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
-
-  for(int i=0 ; i < m_nbFlames; i++)
-    //    switch(m_FlameType[i]){
-    switch(type){
-    case BOUGIE : 
+  m_flames = new Flame *[m_currentConfig->nbFlames];
+  
+  for(int i=0 ; i < m_currentConfig->nbFlames; i++)
+    switch(m_currentConfig->flames[i].type){
+    case BOUGIE :
       nbSkeletons = 4;
-      m_flames[i] = new Bougie (m_solver, nbSkeletons, &pt, &pos, m_solver->getDimX()/ 7.0, 
-				m_SVShader,"bougie.obj",m_scene, &m_context);
+      m_flames[i] = new Bougie (m_solver, nbSkeletons, &pt, &m_currentConfig->flames[i].position,
+				m_solver->getDimX()/ 7.0, m_SVShader,"bougie.obj",m_scene, &m_context);
       break;
     case FIRMALAMPE :
-      
       nbSkeletons = 5;
-      m_flames[0] = new Firmalampe(m_solver,nbSkeletons,&pt,&pos,m_SVShader,
-				   m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
+      m_flames[i] = new Firmalampe(m_solver,nbSkeletons,&pt,&m_currentConfig->flames[i].position,
+				   m_SVShader, m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
       break;
     }
 }
@@ -130,8 +126,9 @@ void wxGLBuffer::InitScene(void)
   
   InitFlames();
     //AS_ERROR(chdir(".."),"chdir ..");
-  m_solver->setFlames ((Flame **) m_flames, m_nbFlames);
+  m_solver->setFlames ((Flame **) m_flames, m_currentConfig->nbFlames);
   m_scene->createDisplayLists();
+  
   m_eyeball = new Eyeball (m_width, m_height, m_currentConfig->clipping);
   
   m_glowEngine  = new GlowEngine (m_scene, m_eyeball, &m_context, m_width, m_height, 4);
@@ -139,7 +136,7 @@ void wxGLBuffer::InitScene(void)
 }
 
 /** Initialisation de l'interface */
-void wxGLBuffer::Init (flameAppConfig *config)
+void wxGLBuffer::Init (FlameAppConfig *config)
 {  
   m_currentConfig = config;
 
@@ -176,7 +173,7 @@ void wxGLBuffer::DestroyScene(void)
   delete m_eyeball;
   delete m_scene;
   delete m_photoSolid;
-  for (int f = 0; f < m_nbFlames; f++)
+  for (int f = 0; f < m_currentConfig->nbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
   
@@ -223,23 +220,20 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
   if(m_run)
-    for (int f = 0; f < m_nbFlames; f++)
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();
   // SDL_mutexV (lock);
   
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(m_currentConfig->glowEnabled){
     GLfloat m[4][4];
-    CVector direction;
     float dist, sigma;
     
     /* Adaptation du flou en fonction de la distance */
     /* On module la largeur de la gaussienne */
     glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
     
-    direction.setX (m[3][0]);
-    direction.setY (m[3][1]);
-    direction.setZ (m[3][2]);
+    CVector direction(m[3][0], m[3][1], m[3][2]);
     
     dist = direction.length();
     sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
@@ -255,7 +249,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     /* Dessin de la flamme */
     if(m_displayFlame)
-      for (int f = 0; f < m_nbFlames; f++)
+      for (int f = 0; f < m_currentConfig->nbFlames; f++)
 	m_flames[f]->drawFlame (m_displayParticles);
     
     m_glowEngine->blur();
@@ -273,7 +267,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     /* Dessin de la flamme */
     if(m_displayFlame)
-      for (int f = 0; f < m_nbFlames; f++)
+      for (int f = 0; f < m_currentConfig->nbFlames; f++)
 	m_flames[f]->drawFlame (m_displayParticles);
     
     m_glowEngine2->blur();
@@ -287,7 +281,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     /******************* AFFICHAGE DE LA SCENE *******************************/
     /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
-    for (int f = 0; f < m_nbFlames; f++) 
+    for (int f = 0; f < m_currentConfig->nbFlames; f++) 
       m_flames[f]->drawWick ();
     
     if(m_currentConfig->PSEnabled){
@@ -301,7 +295,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
       
       glEnable (GL_LIGHTING);
       
-      for (int f = 0; f < m_nbFlames; f++)
+      for (int f = 0; f < m_currentConfig->nbFlames; f++)
 	{
 	  if (m_shadowVolumesEnabled)
 	    m_flames[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
@@ -321,12 +315,12 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-    for (int f = 0; f < m_nbFlames; f++)
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
       {
 	CPoint position (*(m_flames[f]->getPosition ()));
 	
 	glPushMatrix ();
-	glTranslatef (position.getX (), position.getY (), position.getZ ());
+	glTranslatef (position.x, position.y, position.z);
 	if (m_displayBase)
 	  m_solver->displayBase();
 	if (m_displayGrid)
@@ -339,7 +333,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     /********************* Dessin de la flamme **********************************/
     if(!m_currentConfig->glowEnabled)
       if(m_displayFlame)
-	for (int f = 0; f < m_nbFlames; f++)
+	for (int f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayParticles);
   }
   /********************* PLACAGE DU GLOW ****************************************/

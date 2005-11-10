@@ -3,7 +3,6 @@
 
 class CScene;
 
-#include "vector.hpp"
 #include "material.hpp"
 #include "source.hpp"
 #include "object.hpp"

@@ -19,16 +19,10 @@ public:
    * @param s pointeur sur le solveur de fluides
    * @param position position de la flamme dans l'espace
    * @param pt position de l'origine du squelette
-   */
-  LeadSkeleton(Solver* const s, const CPoint position, const CPoint pt);
-
-  /** Constructeur de squelette guide
-   * @param s pointeur sur le solveur de fluides
-   * @param position position de la flamme dans l'espace
-   * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  LeadSkeleton(Solver* const s, const CPoint position, const CPoint pt, int pls);
+  LeadSkeleton(Solver* const s, const CPoint& position, const CPoint& pt,
+	       const CPoint& rootMoveFactor, int pls);
 
   virtual ~LeadSkeleton();
   
@@ -42,14 +36,14 @@ private:
    * @param pos position de la particule
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_particle(Particle* const pos);
+  int moveParticle(Particle* const pos);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_origine();
+  int moveRoot();
 
-  void draw_particle (Particle * const particle);
+  void drawParticle (Particle * const particle);
 };
 
 #endif

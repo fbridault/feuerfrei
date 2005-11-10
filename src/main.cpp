@@ -39,7 +39,7 @@ bool FlamesApp::OnInit()
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
-  MainFrame *frame = new MainFrame( _("Hello World"), wxDefaultPosition, wxSize(950,860) );
+  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(950,860) );
   
   frame->Show(TRUE);  
   
@@ -151,8 +151,20 @@ void MainFrame::GetSettingsFromConfigFile ()
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
   /* A intégrer bientôt, mais il faut propager alors dans les squelettes */
   //  flameType = m_config->Read(_("/Flame/Type"), 1);
-  m_currentConfig.mecheName = m_config->Read(_("/Flame/WickFileName"), _("meche2.obj"));
+  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
+
+  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
+  wxString groupName;
   
+  for(int i=0; i < m_currentConfig.nbFlames; i++)
+    {
+      groupName.Printf(_("/Flame#%d/"),i);
+      
+      m_currentConfig.flames[i].type = m_config->Read(groupName + _("Type"), 1);
+      if(m_currentConfig.flames[i].type == FIRMALAMPE)
+	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
+    }
+
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
   m_enableSolidCheckBox->SetValue(m_currentConfig.PSEnabled);
@@ -238,7 +250,7 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
   
-  wxFileDialog fileDialog(this, _("Choose a scene file"), _("scenes"), _(""), "*.obj", wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a scene file"), _("scenes"), _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetFilename();
   

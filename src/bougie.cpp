@@ -18,20 +18,20 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 //   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {
   int i;
-  double angle;
-
-  guide = new LeadSkeleton (solveur, position, *centre);
+  double angle;  
+  m_lifeSpanAtBirth = 6;
+  
+  guide = new LeadSkeleton (solveur, position, *centre, CPoint(4,.75,4),m_lifeSpanAtBirth);
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < nb_squelettes; i++)
     {
       squelettes[i] =
-	new PeriSkeleton (solveur, position,
-			  CPoint (cos (angle) * rayon +
-				  centre->getX (),
-				  centre->getY (),
-				  sin (angle) * rayon +
-				  centre->getZ ()), guide);
+	new PeriSkeleton (solveur, position, CPoint (cos (angle) * rayon + centre->getX (), 
+						     centre->getY (), 
+						     sin (angle) * rayon + centre->getZ ()),
+			  CPoint(4,.75,4),
+			  guide, m_lifeSpanAtBirth);
 
       angle += 2 * PI / nb_squelettes;
     }
@@ -55,10 +55,8 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos,
 
 Bougie::~Bougie ()
 {
-  cerr << "pouetdel03.6" << endl;
   for (int i = 0; i < nb_squelettes; i++)
     delete squelettes[i];
-    cerr << "pouetdel03.7" << endl;
   delete[]squelettes;
   delete[]ctrlpoints;
   delete[]uknots;
@@ -68,7 +66,6 @@ Bougie::~Bougie ()
   delete[]indices_distances_max;
 
   delete guide;
-    cerr << "pouetdel03.75" << endl;
 }
 
 void
@@ -118,7 +115,7 @@ Bougie::eclaire ()
 	
   for (int i = 0; i < guide->getSize (); i++)
     {
-      tmp = guide->getElt (i);
+      tmp = guide->getParticle (i);
 
       nb_lights++;
       lightPositions[i][0] = tmp->getX ();
@@ -172,16 +169,16 @@ Bougie::build ()
 	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */
 
 	  distances[0] =
-	    guide->getElt(0)->squaredDistanceFrom(squelettes[k]->getElt(0));
+	    guide->getParticle(0)->squaredDistanceFrom(squelettes[k]->getParticle(0));
 
 	  for (j = 0; j < squelettes[k]->getSize () - 1; j++)
 	    distances[j + 1] =
-	      squelettes[k]->getElt(j)->squaredDistanceFrom(squelettes[k]->getElt(j + 1));
+	      squelettes[k]->getParticle(j)->squaredDistanceFrom(squelettes[k]->getParticle(j + 1));
 	  
 	  distances[squelettes[k]->getSize ()] = 
-	    squelettes[k]->getLastElt()->squaredDistanceFrom(squelettes[k]->getOrigine ());
+	    squelettes[k]->getLastParticle()->squaredDistanceFrom(squelettes[k]->getRoot ());
 	  distances[squelettes[k]->getSize () + 1] =
-	    squelettes[k]->getOrigine()->squaredDistanceFrom(guide->getOrigine ());
+	    squelettes[k]->getRoot()->squaredDistanceFrom(guide->getRoot ());
 
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
@@ -214,12 +211,12 @@ Bougie::build ()
 	  count = 0;
 	  
 	  /* Remplissage des points de contrle */
-	  setCtrlPoint (i, count++, guide->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, guide->getParticle (0), 1.0);
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == 0)
 	      {
-		pt = CPoint::pointBetween (guide->getElt (0), squelettes[k]->getElt(0));
+		pt = CPoint::pointBetween (guide->getParticle (0), squelettes[k]->getParticle(0));
 		setCtrlPoint (i, count++, &pt);
 	      }
 	  
@@ -231,30 +228,30 @@ Bougie::build ()
 		  if (indices_distances_max[l] == j + 1)
 		    {
 		      /* On peut référencer j+1 puisque normalement, indices_distances_max[l] != j si j == squelettes[k]->getSize()-1 */
-		      pt = CPoint::pointBetween(squelettes[k]->getElt(j), squelettes[k]->getElt(j + 1));
+		      pt = CPoint::pointBetween(squelettes[k]->getParticle(j), squelettes[k]->getParticle(j + 1));
 		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
-	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getParticle (j));
 	    }
 
-	  setCtrlPoint (i, count++, squelettes[k]->getLastElt ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLastParticle ());
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == squelettes[k]->getSize ())
 	      {
-		pt = CPoint::pointBetween (squelettes[k]->getOrigine (), squelettes[k]->getLastElt());
+		pt = CPoint::pointBetween (squelettes[k]->getRoot (), squelettes[k]->getLastParticle());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
-	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getRoot ());
 
 	  bool prec = false;
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == squelettes[k]->getSize () + 1)
 	      {
-		pt = CPoint::pointBetween (squelettes[k]->getOrigine (), guide->getOrigine ());
+		pt = CPoint::pointBetween (squelettes[k]->getRoot (), guide->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -264,26 +261,26 @@ Bougie::build ()
 	    if (indices_distances_max[l] == -1)
 	      {
 		if (!prec)
-		  pt = *squelettes[k]-> getOrigine ();
+		  pt = *squelettes[k]-> getRoot ();
 		
-		pt = CPoint::pointBetween (&pt, guide->getOrigine());
+		pt = CPoint::pointBetween (&pt, guide->getRoot());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
-	  setCtrlPoint (i, count++, guide->getOrigine ());
+	  setCtrlPoint (i, count++, guide->getRoot ());
 	}
       else
 	{
 	  /* Cas sans problème */
 	  count = 0;
 	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (i, count++, guide->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, guide->getParticle (0), 1.0);
 	  for (j = 0; j < squelettes[k]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getParticle (j));
 	    }
-	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
-	  setCtrlPoint (i, count++, guide->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getRoot ());
+	  setCtrlPoint (i, count++, guide->getRoot ());
 	}
     }
 

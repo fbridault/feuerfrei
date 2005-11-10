@@ -7,86 +7,78 @@ extern int done;
 BenchSolver::BenchSolver (int n_x, int n_y, int n_z, double dim, double pas_de_temps): 
   Solver (n_x, n_y, n_z, dim, pas_de_temps)
 {
-  u_save = new double[size];
-  v_save = new double[size];
-  w_save = new double[size];
-  u_prev_save = new double[size];
-  v_prev_save = new double[size];
-  w_prev_save = new double[size];
-  dens_save = new double[size];
-  dens_prev_save = new double[size];
-  dens_src_save = new double[size];
-  u_src_save = new double[size];
-  v_src_save = new double[size];
-  w_src_save = new double[size];
-  row_size = N_x * N_y * N_z;
-  row_save = new double[row_size];
+  m_uSave = new double[m_nbVoxels];
+  m_vSave = new double[m_nbVoxels];
+  m_wSave = new double[m_nbVoxels];
+  m_uPrevSave = new double[m_nbVoxels];
+  m_vPrevSave = new double[m_nbVoxels];
+  m_wPrevSave = new double[m_nbVoxels];
+  m_densSave = new double[m_nbVoxels];
+  m_densPrevSave = new double[m_nbVoxels];
+  m_densSrcSave = new double[m_nbVoxels];
+  m_uSrcSave = new double[m_nbVoxels];
+  m_vSrcSave = new double[m_nbVoxels];
+  m_wSrcSave = new double[m_nbVoxels];
+  m_rowSize = m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_rowSave = new double[m_rowSize];
 	
-  u_save = (double *) memset (u_save, 0, size * sizeof (double));
-  v_save = (double *) memset (v_save, 0, size * sizeof (double));
-  w_save = (double *) memset (w_save, 0, size * sizeof (double));
-  u_prev_save =
-    (double *) memset (u_prev_save, 0, size * sizeof (double));
-  v_prev_save =
-    (double *) memset (v_prev_save, 0, size * sizeof (double));
-  w_prev_save =
-    (double *) memset (w_prev_save, 0, size * sizeof (double));
-  dens_save = (double *) memset (dens_save, 0, size * sizeof (double));
-  dens_prev_save =
-    (double *) memset (dens_prev_save, 0, size * sizeof (double));
-  dens_src_save =
-    (double *) memset (dens_src_save, 0, size * sizeof (double));
-  u_src_save =
-    (double *) memset (u_src_save, 0, size * sizeof (double));
-  v_src_save =
-    (double *) memset (v_src_save, 0, size * sizeof (double));
-  w_src_save =
-    (double *) memset (w_src_save, 0, size * sizeof (double));
+  m_uSave = (double *) memset (m_uSave, 0, m_nbVoxels * sizeof (double));
+  m_vSave = (double *) memset (m_vSave, 0, m_nbVoxels * sizeof (double));
+  m_wSave = (double *) memset (m_wSave, 0, m_nbVoxels * sizeof (double));
+  m_uPrevSave = (double *) memset (m_uPrevSave, 0, m_nbVoxels * sizeof (double));
+  m_vPrevSave = (double *) memset (m_vPrevSave, 0, m_nbVoxels * sizeof (double));
+  m_wPrevSave = (double *) memset (m_wPrevSave, 0, m_nbVoxels * sizeof (double));
+  m_densSave = (double *) memset (m_densSave, 0, m_nbVoxels * sizeof (double));
+  m_densPrevSave = (double *) memset (m_densPrevSave, 0, m_nbVoxels * sizeof (double));
+  m_densSrcSave = (double *) memset (m_densSrcSave, 0, m_nbVoxels * sizeof (double));
+  m_uSrcSave = (double *) memset (m_uSrcSave, 0, m_nbVoxels * sizeof (double));
+  m_vSrcSave = (double *) memset (m_vSrcSave, 0, m_nbVoxels * sizeof (double));
+  m_wSrcSave = (double *) memset (m_wSrcSave, 0, m_nbVoxels * sizeof (double));
 
-  u_ref = new double[size];
-  v_ref = new double[size];
-  w_ref = new double[size];
-  p_ref = new double[size];
-  dens_ref = new double[size];
-  p_save = new double[size];
+  m_uRef = new double[m_nbVoxels];
+  m_vRef = new double[m_nbVoxels];
+  m_wRef = new double[m_nbVoxels];
+  m_pRef = new double[m_nbVoxels];
+  m_densRef = new double[m_nbVoxels];
+  m_pSave = new double[m_nbVoxels];
 
-  ulog = new double[2 * ref_val];
-  vlog = new double[2 * ref_val];
-  wlog = new double[2 * ref_val];
-  plog = new double[2 * ref_val];
+  m_uLog = new double[2 * m_refVal];
+  m_vLog = new double[2 * m_refVal];
+  m_wLog = new double[2 * m_refVal];
+  m_pLog = new double[2 * m_refVal];
 
-  //file.open ("solver.log", ios::out | ios::trunc);
+  //m_file.open ("solver.log", ios::out | ios::trunc);
 }
 
 BenchSolver::~BenchSolver ()
 {
-  //file.close ();
+  //m_file.close ();
 
-  delete[]u_save;
-  delete[]v_save;
-  delete[]w_save;
-  delete[]u_prev_save;
-  delete[]v_prev_save;
-  delete[]w_prev_save;
-  delete[]dens_save;
-  delete[]dens_prev_save;
-  delete[]u_src_save;
-  delete[]v_src_save;
-  delete[]w_src_save;
-  delete[]dens_src_save;
-  delete[]p_save;
-  delete[]row_save;
+  delete[]m_uSave;
+  delete[]m_vSave;
+  delete[]m_wSave;
+  delete[]m_uPrevSave;
+  delete[]m_vPrevSave;
+  delete[]m_wPrevSave;
+  delete[]m_densSave;
+  delete[]m_densPrevSave;
+  delete[]m_uSrcSave;
+  delete[]m_vSrcSave;
+  delete[]m_wSrcSave;
+  delete[]m_densSrcSave;
+  delete[]m_pSave;
+  delete[]m_rowSave;
   
-  delete[]u_ref;
-  delete[]v_ref;
-  delete[]w_ref;
-  delete[]dens_ref;
-  delete[]p_ref;
+  delete[]m_uRef;
+  delete[]m_vRef;
+  delete[]m_wRef;
+  delete[]m_densRef;
+  delete[]m_pRef;
 
-  delete[]ulog;
-  delete[]vlog;
-  delete[]wlog;
-  delete[]plog;
+  delete[]m_uLog;
+  delete[]m_vLog;
+  delete[]m_wLog;
+  delete[]m_pLog;
 }
 
 /* Pas de diffusion */
@@ -97,11 +89,11 @@ BenchSolver::diffuse_log (int b, double *const x, const double *const x0,
 {
   int i, j, k, l;
 
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      x[IX (i, j, k)] =
 		(x0[IX (i, j, k)] +
@@ -131,41 +123,29 @@ BenchSolver::diffuse_hybride_log (int b, double *const x, const double *const x0
   double diffe;
   int i, j, k, l;
 
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  for (l = 0; l < m_nbStepsGS; l++)
     {
 
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
-	      x[IX (i, j, k)] =
-		(x0[IX (i, j, k)] +
-		 a * (x[IX (i - 1, j, k)] +
-		      x[IX (i + 1, j, k)] +
-		      x[IX (i, j - 1, k)] +
-		      x[IX (i, j + 1, k)] +
-		      x[IX (i, j, k - 1)] +
-		      x[IX (i, j, k + 1)])) /
-		(1.0 + 6.0 * a);
-	      residu[IX (i, j, k)] =
-		x0[IX (i, j, k)] -
-		(x[IX (i, j, k)] -
-		 a * (x[IX (i - 1, j, k)] +
-		      x[IX (i + 1, j, k)] +
-		      x[IX (i, j - 1, k)] +
-		      x[IX (i, j + 1, k)] +
-		      x[IX (i, j, k - 1)] +
-		      x[IX (i, j, k + 1)] -
-		      6 * x[IX (i, j, k)]));
+	      x[IX (i, j, k)] = (x0[IX (i, j, k)] +
+		 a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
+		      x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
+		      x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)])) / (1.0 + 6.0 * a);
+	      residu[IX (i, j, k)] = x0[IX (i, j, k)] -
+		(x[IX (i, j, k)] - a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
+					x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
+					x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)] - 6 * x[IX (i, j, k)]));
 	    }
 
       /* calcul du terme alpha */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
-	      diffe = residu[IX (i, j, k)] -
-		residu0[IX (i, j, k)];
+	      diffe = residu[IX (i, j, k)] - residu0[IX (i, j, k)];
 	      //cout << residu[IX(i,j,k)] << " " << residu0[IX(i,j,k)] << " " << diff << endl;
 	      //      getchar();
 	      num += (residu0[IX (i, j, k)] * diffe);
@@ -183,9 +163,9 @@ BenchSolver::diffuse_hybride_log (int b, double *const x, const double *const x0
       //printf("alpha : %f\n", alpha);
 
       /* hybridation des radiosites et des residus */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      x[IX (i, j, k)] = alpha * x[IX (i, j, k)] + (1 - alpha) * x0[IX (i, j, k)];
 	      residu0[IX (i, j, k)] = alpha * residu[IX (i, j, k)] + (1 - alpha) * residu0[IX (i, j, k)];
@@ -204,33 +184,33 @@ void
 BenchSolver::project_log (double *const p, double *const div,
 			  double *const xref, double *const xlog)
 {
-  double h_x = 1.0 / N_x, h_y = 1.0 / N_y, h_z = 1.0 / N_z;
+  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k, l;
 
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  div[IX (i, j, k)] =
 	    -0.5 * (h_x *
-		    (u[IX (i + 1, j, k)] -
-		     u[IX (i - 1, j, k)]) +
-		    h_y * (v[IX (i, j + 1, k)] -
-			   v[IX (i, j - 1, k)]) +
-		    h_z * (w[IX (i, j, k + 1)] -
-			   w[IX (i, j, k - 1)]));
+		    (m_u[IX (i + 1, j, k)] -
+		     m_u[IX (i - 1, j, k)]) +
+		    h_y * (m_v[IX (i, j + 1, k)] -
+			   m_v[IX (i, j - 1, k)]) +
+		    h_z * (m_w[IX (i, j, k + 1)] -
+			   m_w[IX (i, j, k - 1)]));
 	  p[IX (i, j, k)] = 0;
 	}
 
   set_bnd (0, div);
   set_bnd (0, p);
 
-  save_state (p, p_save);
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  save_state (p, m_pSave);
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    p[IX (i, j, k)] =
 	      (div[IX (i, j, k)] +
 	       p[IX (i - 1, j, k)] +
@@ -242,12 +222,12 @@ BenchSolver::project_log (double *const p, double *const div,
       set_bnd (0, p);
     }
   save_ref (p, xref);
-  set_previous_state (p, p_save);
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  set_previous_state (p, m_pSave);
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    p[IX (i, j, k)] =
 	      (div[IX (i, j, k)] +
 	       p[IX (i - 1, j, k)] +
@@ -260,23 +240,23 @@ BenchSolver::project_log (double *const p, double *const div,
       compare (l, p, xlog, xref);
     }
 
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
-	  u[IX (i, j, k)] -=
+	  m_u[IX (i, j, k)] -=
 	    0.5 * (p[IX (i + 1, j, k)] -
 		   p[IX (i - 1, j, k)]) / h_x;
-	  v[IX (i, j, k)] -=
+	  m_v[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j + 1, k)] -
 		   p[IX (i, j - 1, k)]) / h_y;
-	  w[IX (i, j, k)] -=
+	  m_w[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j, k + 1)] -
 		   p[IX (i, j, k - 1)]) / h_z;
 	}
-  set_bnd (1, u);
-  set_bnd (2, v);
-  set_bnd (3, w);
+  set_bnd (1, m_u);
+  set_bnd (2, m_v);
+  set_bnd (3, m_w);
 }
 
 /* Pas de projection pour garantir la conservation de la masse */
@@ -287,39 +267,39 @@ BenchSolver::project_log_hybride (double *p, double *const div,
 				  double *const xref, double *const xlog,
 				  double *const residu, double *const residu0)
 {
-  double h_x = 1.0 / N_x, h_y = 1.0 / N_y, h_z = 1.0 / N_z;
+  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k, l;
   double diffe;
   double alpha;
   double num = 0.0;
   double den = 0.0;
 
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  div[IX (i, j, k)] =
 	    -0.5 * (h_x *
-		    (u[IX (i + 1, j, k)] -
-		     u[IX (i - 1, j, k)]) +
-		    h_y * (v[IX (i, j + 1, k)] -
-			   v[IX (i, j - 1, k)]) +
-		    h_z * (w[IX (i, j, k + 1)] -
-			   w[IX (i, j, k - 1)]));
+		    (m_u[IX (i + 1, j, k)] -
+		     m_u[IX (i - 1, j, k)]) +
+		    h_y * (m_v[IX (i, j + 1, k)] -
+			   m_v[IX (i, j - 1, k)]) +
+		    h_z * (m_w[IX (i, j, k + 1)] -
+			   m_w[IX (i, j, k - 1)]));
 	  p[IX (i, j, k)] = 0;
-	  p_save[IX (i, j, k)] = 0;
+	  m_pSave[IX (i, j, k)] = 0;
 	}
 
   set_bnd (0, div);
   set_bnd (0, p);
 
   /* Résolution initiale en guise de référence */
-  save_state (p, p_save);
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  save_state (p, m_pSave);
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    p[IX (i, j, k)] =
 	      (div[IX (i, j, k)] +
 	       p[IX (i - 1, j, k)] +
@@ -331,12 +311,12 @@ BenchSolver::project_log_hybride (double *p, double *const div,
       set_bnd (0, p);
     }
   save_ref (p, xref);
-  set_previous_state (p, p_save);
+  set_previous_state (p, m_pSave);
 
   /* Initialisation des résidus */
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  residu0[IX (i, j, k)] =
 	    div[IX (i, j, k)] +
@@ -350,12 +330,12 @@ BenchSolver::project_log_hybride (double *p, double *const div,
 	}
 			
   /* Hybridation */
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      SWAP (p_save, p);
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      SWAP (m_pSave, p);
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      p[IX (i, j, k)] =
 		(div[IX (i, j, k)] +
@@ -377,9 +357,9 @@ BenchSolver::project_log_hybride (double *p, double *const div,
 	    }
       set_bnd (0, p);
       /* calcul du terme alpha */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      diffe = residu[IX (i, j, k)] -
 		residu0[IX (i, j, k)];
@@ -400,13 +380,13 @@ BenchSolver::project_log_hybride (double *p, double *const div,
       //printf("alpha : %f\n", alpha);
 
       /* hybridation des radiosites et des residus */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      p[IX (i, j, k)] =
 		alpha * p[IX (i, j, k)] + 
-		(1 - alpha) * p_save[IX (i, j, k)];
+		(1 - alpha) * m_pSave[IX (i, j, k)];
 
 	      residu0[IX (i, j, k)] =
 		alpha * residu[IX (i, j, k)] +
@@ -419,55 +399,55 @@ BenchSolver::project_log_hybride (double *p, double *const div,
     }
   /* Fin hybridation */
 	
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
-	  u[IX (i, j, k)] -=
+	  m_u[IX (i, j, k)] -=
 	    0.5 * (p[IX (i + 1, j, k)] -
 		   p[IX (i - 1, j, k)]) / h_x;
-	  v[IX (i, j, k)] -=
+	  m_v[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j + 1, k)] -
 		   p[IX (i, j - 1, k)]) / h_y;
-	  w[IX (i, j, k)] -=
+	  m_w[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j, k + 1)] -
 		   p[IX (i, j, k - 1)]) / h_z;
 	}
-  set_bnd (1, u);
-  set_bnd (2, v);
-  set_bnd (3, w);
+  set_bnd (1, m_u);
+  set_bnd (2, m_v);
+  set_bnd (3, m_w);
 }
 
 
 void
 BenchSolver::project_save (double *const p, double *const div, int num)
 {
-  double h_x = 1.0 / N_x, h_y = 1.0 / N_y, h_z = 1.0 / N_z;
+  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k, l;
 
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  div[IX (i, j, k)] =
 	    -0.5 * (h_x *
-		    (u[IX (i + 1, j, k)] -
-		     u[IX (i - 1, j, k)]) +
-		    h_y * (v[IX (i, j + 1, k)] -
-			   v[IX (i, j - 1, k)]) +
-		    h_z * (w[IX (i, j, k + 1)] -
-			   w[IX (i, j, k - 1)]));
+		    (m_u[IX (i + 1, j, k)] -
+		     m_u[IX (i - 1, j, k)]) +
+		    h_y * (m_v[IX (i, j + 1, k)] -
+			   m_v[IX (i, j - 1, k)]) +
+		    h_z * (m_w[IX (i, j, k + 1)] -
+			   m_w[IX (i, j, k - 1)]));
 	  p[IX (i, j, k)] = 0;
 	}
 
   set_bnd (0, div);
   set_bnd (0, p);
 
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  for (l = 0; l < m_nbStepsGS; l++)
     {
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    p[IX (i, j, k)] =
 	      (div[IX (i, j, k)] +
 	       p[IX (i - 1, j, k)] +
@@ -479,166 +459,161 @@ BenchSolver::project_save (double *const p, double *const div, int num)
       set_bnd (0, p);
     }
   
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
-	  u[IX (i, j, k)] -=
+	  m_u[IX (i, j, k)] -=
 	    0.5 * (p[IX (i + 1, j, k)] -
 		   p[IX (i - 1, j, k)]) / h_x;
-	  v[IX (i, j, k)] -=
+	  m_v[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j + 1, k)] -
 		   p[IX (i, j - 1, k)]) / h_y;
-	  w[IX (i, j, k)] -=
+	  m_w[IX (i, j, k)] -=
 	    0.5 * (p[IX (i, j, k + 1)] -
 		   p[IX (i, j, k - 1)]) / h_z;
 	}
-  set_bnd (1, u);
-  set_bnd (2, v);
-  set_bnd (3, w);
+  set_bnd (1, m_u);
+  set_bnd (2, m_v);
+  set_bnd (3, m_w);
 }
 
 
 void
 BenchSolver::vel_step_compare_diffuse_normal ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
   /* On effectue une résolution complète pour servir de valeur de référence */
   /* Puis on relance une méthode de diffusion en comparant les valeurs      */
   /* calculées successivement avec la valeur de référence                   */
-  SWAP (u_prev, u);
-  save_state (u, u_save);
-  diffuse (1, u, u_prev, a_visc, visc);
-  save_ref (u, u_ref);
-  set_previous_state (u, u_save);
-  diffuse_log (1, u, u_prev, u_ref, ulog, a_visc, visc);
+  SWAP (m_uPrev, m_u);
+  save_state (m_u, m_uSave);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  save_ref (m_u, m_uRef);
+  set_previous_state (m_u, m_uSave);
+  diffuse_log (1, m_u, m_uPrev, m_uRef, m_uLog, m_aVisc, m_visc);
 	
-  SWAP (v_prev, v);
-  save_state (v, v_save);
-  diffuse (2, v, v_prev, a_visc, visc);
-  save_ref (v, v_ref);
-  set_previous_state (v, v_save);
-  diffuse_log (2, v, v_prev, v_ref, vlog, a_visc, visc);
+  SWAP (m_vPrev, m_v);
+  save_state (m_v, m_vSave);
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  save_ref (m_v, m_vRef);
+  set_previous_state (m_v, m_vSave);
+  diffuse_log (2, m_v, m_vPrev, m_vRef, m_vLog, m_aVisc, m_visc);
 	
-  SWAP (w_prev, w);
-  save_state (w, w_save);
-  diffuse (3, w, w_prev, a_visc, visc);
-  save_ref (w, w_ref);
-  set_previous_state (w, w_save);
-  diffuse_log (3, w, w_prev, w_ref, wlog, a_visc, visc);
+  SWAP (m_wPrev, m_w);
+  save_state (m_w, m_wSave);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  save_ref (m_w, m_wRef);
+  set_previous_state (m_w, m_wSave);
+  diffuse_log (3, m_w, m_wPrev, m_wRef, m_wLog, m_aVisc, m_visc);
   writeLog ();
   /**************************************************************************/
-  project (u_prev, v_prev);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
-  project (u_prev, v_prev);
+  project (m_uPrev, m_vPrev);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+  project (m_uPrev, m_vPrev);
 }
 
 void
 BenchSolver::vel_step_compare_project_normal ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
-  SWAP (u_prev, u);
-  diffuse (1, u, u_prev, a_visc, visc);
-  SWAP (v_prev, v);
-  diffuse (2, v, v_prev, a_visc, visc);
-  SWAP (w_prev, w);
-  diffuse (3, w, w_prev, a_visc, visc);
-  project_log (u_prev, v_prev, p_ref, ulog);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
-  project_log (u_prev, v_prev, p_ref, vlog);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
+  SWAP (m_uPrev, m_u);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  SWAP (m_vPrev, m_v);
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  SWAP (m_wPrev, m_w);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  project_log (m_uPrev, m_vPrev, m_pRef, m_uLog);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+  project_log (m_uPrev, m_vPrev, m_pRef, m_vLog);
   writeLog ();
 }
 
 void
 BenchSolver::vel_step_compare_project_hybride ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
-  SWAP (u_prev, u);
-  diffuse (1, u, u_prev, a_visc, visc);
-  SWAP (v_prev, v);
-  diffuse (2, v, v_prev, a_visc, visc);
-  SWAP (w_prev, w);
-  diffuse (3, w, w_prev, a_visc, visc);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
+  SWAP (m_uPrev, m_u);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  SWAP (m_vPrev, m_v);
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  SWAP (m_wPrev, m_w);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
 
-  project_log_hybride (u_prev, v_prev, p_ref, ulog, residu_u,
-		       residu_u_prev);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
+  project_log_hybride (m_uPrev, m_vPrev, m_pRef, m_uLog, m_uResidu, m_uPrevResidu);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
 
-  project_log_hybride (u_prev, v_prev, p_ref, vlog, residu_v,
-		       residu_v_prev);
+  project_log_hybride (m_uPrev, m_vPrev, m_pRef, m_vLog, m_vResidu, m_vPrevResidu);
   writeLog ();
 }
 
 void
 BenchSolver::vel_step_compare_diffuse_hybride ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
   /* On effectue une résolution complète pour servir de valeur de référence */
   /* Puis on relance une méthode de diffusion en comparant les valeurs      */
   /* calculées successivement avec la valeur de référence                   */
-  SWAP (u_prev, u);
-  save_state (u, u_save);
-  diffuse (1, u, u_prev, a_visc, visc);
-  save_ref (u, u_ref);
-  set_previous_state (u, u_save);
-  diffuse_hybride_log (1, u, u_prev, u_ref, residu_u, residu_u_prev,
-		       ulog, a_visc, visc);
-  SWAP (v_prev, v);
-  save_state (v, v_save);
-  diffuse (2, v, v_prev, a_visc, visc);
-  save_ref (v, v_ref);
-  set_previous_state (v, v_save);
-  diffuse_hybride_log (2, v, v_prev, v_ref, residu_v, residu_v_prev,
-		       vlog, a_visc, visc);
-  SWAP (w_prev, w);
-  save_state (w, w_save);
-  diffuse (3, w, w_prev, a_visc, visc);
-  save_ref (w, w_ref);
-  set_previous_state (w, w_save);
-  diffuse_hybride_log (3, w, w_prev, w_ref, residu_w, residu_w_prev,
-		       wlog, a_visc, visc);
+  SWAP (m_uPrev, m_u);
+  save_state (m_u, m_uSave);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  save_ref (m_u, m_uRef);
+  set_previous_state (m_u, m_uSave);
+  diffuse_hybride_log (1, m_u, m_uPrev, m_uRef, m_uResidu, m_uPrevResidu, m_uLog, m_aVisc, m_visc);
+  SWAP (m_vPrev, m_v);
+  save_state (m_v, m_vSave);
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  save_ref (m_v, m_vRef);
+  set_previous_state (m_v, m_vSave);
+  diffuse_hybride_log (2, m_v, m_vPrev, m_vRef, m_vResidu, m_vPrevResidu, m_vLog, m_aVisc, m_visc);
+  SWAP (m_wPrev, m_w);
+  save_state (m_w, m_wSave);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  save_ref (m_w, m_wRef);
+  set_previous_state (m_w, m_wSave);
+  diffuse_hybride_log (3, m_w, m_wPrev, m_wRef, m_wResidu, m_wPrevResidu, m_wLog, m_aVisc, m_visc);
   writeLog ();
   /**************************************************************************/
-  project (u_prev, v_prev);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
-  project (u_prev, v_prev);
+  project (m_uPrev, m_vPrev);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+  project (m_uPrev, m_vPrev);
 }
 
 void
 BenchSolver::iterate (bool flickering, int nb_step_GS)
 {
-  nb_step_gauss_seidel = nb_step_GS;
+  m_nbStepsGS = nb_step_GS;
 
-  for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (flickering);
+  for (int i = 0; i < m_nbFlames; i++)
+    m_flames[i]->add_forces (flickering);
 
   //vel_step();
   //vel_step_compare_diffuse_normal();
@@ -647,9 +622,9 @@ BenchSolver::iterate (bool flickering, int nb_step_GS)
   //vel_step_compare_project_hybride ();
   //  dens_step();
 
-  set_bnd (0, u);
-  set_bnd (0, v);
-  set_bnd (0, w);
+  set_bnd (0, m_u);
+  set_bnd (0, m_v);
+  set_bnd (0, m_w);
 }
 
 void
@@ -657,115 +632,115 @@ BenchSolver::vel_step_save ()
 {
   char buf[50];
   
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
 
-  SWAP (u_prev, u);
-  diffuse (1, u, u_prev, a_visc, visc);
-  SWAP (v_prev, v);
-  if(! (nb_iter % 10)){
-    sprintf(buf,"avt_diffusion_%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  SWAP (m_uPrev, m_u);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  SWAP (m_vPrev, m_v);
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"avt_diffusion_%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
-  diffuse (2, v, v_prev, a_visc, visc);
-  if(! (nb_iter % 10)){
-    sprintf(buf,"apr_diffusion_%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"apr_diffusion_%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
-  SWAP (w_prev, w);
-  diffuse (3, w, w_prev, a_visc, visc);
+  SWAP (m_wPrev, m_w);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
 
-  if(! (nb_iter % 10)){
-    sprintf(buf,"avt_project_avt_advect%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"avt_project_avt_advect%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
-  project (u_prev, v_prev);
-  if(! (nb_iter % 10)){
-    sprintf(buf,"apr_project_avt_advect%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  project (m_uPrev, m_vPrev);
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"apr_project_avt_advect%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
   
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
   
-  if(! (nb_iter % 10)){
-    sprintf(buf,"avt_project_apr_advect%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"avt_project_apr_advect%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
-  project (u_prev, v_prev);
-  if(! (nb_iter % 10)){
-    sprintf(buf,"apr_project_apr_advect%dx%dx%d_i%d",N_x,N_y,N_z,nb_iter);
-    file.open (buf, ios::out | ios::trunc);
-    save(v);
-    file.close();
+  project (m_uPrev, m_vPrev);
+  if(! (m_nbIter % 10)){
+    sprintf(buf,"apr_project_apr_advect%dx%dx%d_i%d",m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ,m_nbIter);
+    m_file.open (buf, ios::out | ios::trunc);
+    save(m_v);
+    m_file.close();
   }
 }
 
 void
 BenchSolver::iterate_save (bool flickering)
 {  
-  for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (flickering);
+  for (int i = 0; i < m_nbFlames; i++)
+    m_flames[i]->add_forces (flickering);
 	
   vel_step_save();
   
   //  dens_step();
 
-  set_bnd (0, u);
-  set_bnd (0, v);
-  set_bnd (0, w);
+  set_bnd (0, m_u);
+  set_bnd (0, m_v);
+  set_bnd (0, m_w);
 }
 
 void
 BenchSolver::iterate_hybride (bool flickering, int nb_step_GS)
 {
-  nb_step_gauss_seidel = nb_step_GS;
+  m_nbStepsGS = nb_step_GS;
 
-  for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (flickering);
+  for (int i = 0; i < m_nbFlames; i++)
+    m_flames[i]->add_forces (flickering);
 
   vel_step_compare_project_hybride ();
   //  dens_step();
 
-  set_bnd (0, u);
-  set_bnd (0, v);
-  set_bnd (0, w);
+  set_bnd (0, m_u);
+  set_bnd (0, m_v);
+  set_bnd (0, m_w);
 }
 
 void
 BenchSolver::iterate (bool flickering)
 {
   /* Temporaire : ajout de forces périodiques */
-  if ((nb_iter % nb_iter_flickering) == 5)
+  if ((m_nbIter % m_nbIterFlickering) == 5)
     {
       cleanSources ();
       flickering = false;
     }
   else 
-    if ((nb_iter % nb_iter_flickering) < 5)
+    if ((m_nbIter % m_nbIterFlickering) < 5)
       flickering = true;
     else
       flickering = false;
 
-  printf ("Itération %d\r", nb_iter);
+  printf ("Itération %d\r", m_nbIter);
   fflush (stdout);
 
-  /*if (file.bad ())
+  /*if (m_file.bad ())
     {
       cout << "Attention, erreur dans l'écriture du log du solveur"
 	   << endl;
@@ -774,16 +749,16 @@ BenchSolver::iterate (bool flickering)
 
   iterate_save(flickering);
   /* Pour comparaison dans diffuse strictement */
-  //iterate (flickering, ref_val);
-  //iterate_hybride( flickering, ref_val);
+  //iterate (flickering, m_refVal);
+  //iterate_hybride( flickering, m_refVal);
 
   /* Comparaison simple */
   //   save_state();
 
-  //   iterate( flickering, ref_val);
+  //   iterate( flickering, m_refVal);
   //   save_ref();
 
-  //   for(int i=1; i < ref_val; i++){
+  //   for(int i=1; i < m_refVal; i++){
   //     set_previous_state();
 
   //     iterate(flickering, i);
@@ -793,7 +768,7 @@ BenchSolver::iterate (bool flickering)
   /* Comparaison GS et GS+hybridation */
   //   save_state();
 
-  //   for(int i=1; i < ref_val; i++){
+  //   for(int i=1; i < m_refVal; i++){
   //     iterate( flickering, i);
   //     save_ref();
 
@@ -805,12 +780,12 @@ BenchSolver::iterate (bool flickering)
   //     set_previous_state();
   //   }
 
-  //   iterate( flickering, ref_val);
+  //   iterate( flickering, m_refVal);
 
-  //file << endl;
-  nb_iter++;
+  //m_file << endl;
+  m_nbIter++;
       
-  // if (nb_iter == 150)
+  // if (m_nbIter == 150)
 //     done = 1;
 
   return;
@@ -819,74 +794,57 @@ BenchSolver::iterate (bool flickering)
 void
 BenchSolver::save_state ()
 {
-  u_save = (double *) memcpy (u_save, u, size * sizeof (double));
-  v_save = (double *) memcpy (v_save, v, size * sizeof (double));
-  w_save = (double *) memcpy (w_save, w, size * sizeof (double));
-  u_prev_save =
-    (double *) memcpy (u_prev_save, u_prev,
-		       size * sizeof (double));
-  v_prev_save =
-    (double *) memcpy (v_prev_save, v_prev,
-		       size * sizeof (double));
-  w_prev_save =
-    (double *) memcpy (w_prev_save, w_prev,
-		       size * sizeof (double));
-  dens_save =
-    (double *) memcpy (dens_save, dens, size * sizeof (double));
-  dens_prev_save =
-    (double *) memcpy (dens_prev_save, dens_prev,
-		       size * sizeof (double));
-  dens_src_save =
-    (double *) memcpy (dens_src_save, dens_src,
-		       size * sizeof (double));
-  u_src_save =
-    (double *) memcpy (u_src_save, u_src, size * sizeof (double));
-  v_src_save =
-    (double *) memcpy (v_src_save, v_src, size * sizeof (double));
-  w_src_save =
-    (double *) memcpy (w_src_save, w_src, size * sizeof (double));
+  m_uSave = (double *) memcpy (m_uSave, m_u, m_nbVoxels * sizeof (double));
+  m_vSave = (double *) memcpy (m_vSave, m_v, m_nbVoxels * sizeof (double));
+  m_wSave = (double *) memcpy (m_wSave, m_w, m_nbVoxels * sizeof (double));
+  m_uPrevSave = (double *) memcpy (m_uPrevSave, m_uPrev, m_nbVoxels * sizeof (double));
+  m_vPrevSave = (double *) memcpy (m_vPrevSave, m_vPrev, m_nbVoxels * sizeof (double));
+  m_wPrevSave = (double *) memcpy (m_wPrevSave, m_wPrev, m_nbVoxels * sizeof (double));
+  m_densSave = (double *) memcpy (m_densSave, m_dens, m_nbVoxels * sizeof (double));
+  m_densPrevSave = (double *) memcpy (m_densPrevSave, m_densPrev, m_nbVoxels * sizeof (double));
+  m_densSrcSave = (double *) memcpy (m_densSrcSave, m_densSrc, m_nbVoxels * sizeof (double));
+  m_uSrcSave = (double *) memcpy (m_uSrcSave, m_uSrc, m_nbVoxels * sizeof (double));
+  m_vSrcSave = (double *) memcpy (m_vSrcSave, m_vSrc, m_nbVoxels * sizeof (double));
+  m_wSrcSave = (double *) memcpy (m_wSrcSave, m_wSrc, m_nbVoxels * sizeof (double));
 }
 
 void
 BenchSolver::save_state (const double *const x, double *x_save)
 {
-  x_save = (double *) memcpy (x_save, x, size * sizeof (double));
+  x_save = (double *) memcpy (x_save, x, m_nbVoxels * sizeof (double));
 }
 
 void
 BenchSolver::save_ref (const double *const x, double *x_ref)
 {
-  x_ref = (double *) memcpy (x_ref, x, size * sizeof (double));
+  x_ref = (double *) memcpy (x_ref, x, m_nbVoxels * sizeof (double));
 }
 
 void
 BenchSolver::set_previous_state (double *x, const double *const x_save)
 {
-  x = (double *) memcpy (x, x_save, size * sizeof (double));
+  x = (double *) memcpy (x, x_save, m_nbVoxels * sizeof (double));
 }
 
 void
 BenchSolver::set_previous_state ()
 {
-  u = (double *) memcpy (u, u_save, size * sizeof (double));
-  v = (double *) memcpy (v, v_save, size * sizeof (double));
-  w = (double *) memcpy (w, w_save, size * sizeof (double));
-  u_prev = (double *) memcpy (u_prev, u_prev_save,
-			      size * sizeof (double));
-  v_prev = (double *) memcpy (v_prev, v_prev_save,
-			      size * sizeof (double));
-  w_prev = (double *) memcpy (w_prev, w_prev_save,
-			      size * sizeof (double));
-  dens = (double *) memcpy (dens, dens_save, size * sizeof (double));
-  dens_prev =
-    (double *) memcpy (dens_prev, dens_prev_save,
-		       size * sizeof (double));
-  dens_src =
-    (double *) memcpy (dens_src, dens_src_save,
-		       size * sizeof (double));
-  u_src = (double *) memcpy (u_src, u_src_save, size * sizeof (double));
-  v_src = (double *) memcpy (v_src, v_src_save, size * sizeof (double));
-  w_src = (double *) memcpy (w_src, w_src_save, size * sizeof (double));
+  m_u = (double *) memcpy (m_u, m_uSave, m_nbVoxels * sizeof (double));
+  m_v = (double *) memcpy (m_v, m_vSave, m_nbVoxels * sizeof (double));
+  m_w = (double *) memcpy (m_w, m_wSave, m_nbVoxels * sizeof (double));
+  m_uPrev = (double *) memcpy (m_uPrev, m_uPrevSave, m_nbVoxels * sizeof (double));
+  m_vPrev = (double *) memcpy (m_vPrev, m_vPrevSave, m_nbVoxels * sizeof (double));
+  m_wPrev = (double *) memcpy (m_wPrev, m_wPrevSave, m_nbVoxels * sizeof (double));
+  m_dens = (double *) memcpy (m_dens, m_densSave, m_nbVoxels * sizeof (double));
+  m_densPrev =
+    (double *) memcpy (m_densPrev, m_densPrevSave,
+		       m_nbVoxels * sizeof (double));
+  m_densSrc =
+    (double *) memcpy (m_densSrc, m_densSrcSave,
+		       m_nbVoxels * sizeof (double));
+  m_uSrc = (double *) memcpy (m_uSrc, m_uSrcSave, m_nbVoxels * sizeof (double));
+  m_vSrc = (double *) memcpy (m_vSrc, m_vSrcSave, m_nbVoxels * sizeof (double));
+  m_wSrc = (double *) memcpy (m_wSrc, m_wSrcSave, m_nbVoxels * sizeof (double));
 }
 
 void
@@ -897,9 +855,9 @@ BenchSolver::compare (int n, const double *const x, double *const xlog,
   double xerrtmp;
   double xerrmax = 0;
 
-  for (int i = 1; i <= N_x; i++)
-    for (int j = 1; j <= N_y; j++)
-      for (int k = 1; k <= N_z; k++)
+  for (int i = 1; i <= m_nbVoxelsX; i++)
+    for (int j = 1; j <= m_nbVoxelsY; j++)
+      for (int k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  xerrtmp =
 	    x[IX (i, j, k)] - xref[IX (i, j, k)];
@@ -912,7 +870,7 @@ BenchSolver::compare (int n, const double *const x, double *const xlog,
 	    xerrmax = xerrtmp;
 	}
 
-  xlog[2 * n] = sqrt (xerr) / (N_x * N_y * N_z);
+  xlog[2 * n] = sqrt (xerr) / (m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ);
   xlog[2 * n + 1] = xerrmax;
 }
 
@@ -924,16 +882,13 @@ BenchSolver::compare ()
   double uerrmax = 0, verrmax = 0, werrmax = 0;
   uerr = verr = werr = 0;
 
-  for (int i = 1; i <= N_x; i++)
-    for (int j = 1; j <= N_y; j++)
-      for (int k = 1; k <= N_z; k++)
+  for (int i = 1; i <= m_nbVoxelsX; i++)
+    for (int j = 1; j <= m_nbVoxelsY; j++)
+      for (int k = 1; k <= m_nbVoxelsZ; k++)
 	{
-	  uerrtmp =
-	    u[IX (i, j, k)] - u_ref[IX (i, j, k)];
-	  verrtmp =
-	    v[IX (i, j, k)] - v_ref[IX (i, j, k)];
-	  werrtmp =
-	    w[IX (i, j, k)] - w_ref[IX (i, j, k)];
+	  uerrtmp = m_u[IX (i, j, k)] - m_uRef[IX (i, j, k)];
+	  verrtmp = m_v[IX (i, j, k)] - m_vRef[IX (i, j, k)];
+	  werrtmp = m_w[IX (i, j, k)] - m_wRef[IX (i, j, k)];
 
 	  uerrtmp *= uerrtmp;
 	  verrtmp *= verrtmp;
@@ -951,61 +906,59 @@ BenchSolver::compare ()
 	    werrmax = werrtmp;
 	}
 
-  file << nb_iter << " " << nb_step_gauss_seidel << " ";
-  file << sqrt (uerr) << " " << sqrt (verr) << " " << sqrt (werr) <<
+  m_file << m_nbIter << " " << m_nbStepsGS << " ";
+  m_file << sqrt (uerr) << " " << sqrt (verr) << " " << sqrt (werr) <<
     " ";
-  file << uerrmax << " " << verrmax << " " << werrmax << endl;
+  m_file << uerrmax << " " << verrmax << " " << werrmax << endl;
 }
 
 const void BenchSolver::save (const double *const x)
 {
-  double a = dt * visc * row_size;
-
-  for (int i = 1; i <= N_x; i++)
-    for (int j = 1; j <= N_y; j++){
-      for (int k = 1; k <= N_z; k++)
+  for (int i = 1; i <= m_nbVoxelsX; i++)
+    for (int j = 1; j <= m_nbVoxelsY; j++){
+      for (int k = 1; k <= m_nbVoxelsZ; k++)
 	{
-	  file << x[IX(i,j,k)] << " ";
+	  m_file << x[IX(i,j,k)] << " ";
 	  
 	}
-      file << endl;
+      m_file << endl;
     }
 }
 
 // const void BenchSolver::save (const double *const x)
 // {
-//   double a = dt * visc * row_size;
+//   double a = dt * m_visc * m_rowSize;
 
-//   for (int i = 1; i <= N_x; i++)
-//     for (int j = 1; j <= N_y; j++)
-//       for (int k = 1; k <= N_z; k++)
+//   for (int i = 1; i <= m_nbVoxelsX; i++)
+//     for (int j = 1; j <= m_nbVoxelsY; j++)
+//       for (int k = 1; k <= m_nbVoxelsZ; k++)
 // 	{
-// 	  row_save = (double *) memset (row_save, 0, row_size * sizeof (double));
-// 	  if(j>2) row_save[IX2 (i-1, j-2, k-1)] = a * x[IX (i, j-1, k)];
-// 	  if(i>2) row_save[IX2 (i-2, j-1, k-1)] = a * x[IX (i-1, j, k)];
-// 	  if(i<N_x) row_save[IX2 (i, j-1, k-1)] = a * x[IX (i+1, j, k)];
-// 	  if(j<N_y) row_save[IX2 (i-1, j, k-1)] = a * x[IX (i, j+1, k)];
-// 	  if(k>2) row_save[IX2 (i-1, j-1, k-2)] = a * x[IX (i, j, k-1)];
-// 	  if(k<N_z) row_save[IX2 (i-1, j-1, k)] = a * x[IX (i, j, k+1)];
-// 	  row_save[IX2 (i-1, j-1, k-1)] = ( 1+6.0 * a) * x[IX (i, j, k)];
+// 	  m_rowSave = (double *) memset (m_rowSave, 0, m_rowSize * sizeof (double));
+// 	  if(j>2) m_rowSave[IX2 (i-1, j-2, k-1)] = a * x[IX (i, j-1, k)];
+// 	  if(i>2) m_rowSave[IX2 (i-2, j-1, k-1)] = a * x[IX (i-1, j, k)];
+// 	  if(i<m_nbVoxelsX) m_rowSave[IX2 (i, j-1, k-1)] = a * x[IX (i+1, j, k)];
+// 	  if(j<m_nbVoxelsY) m_rowSave[IX2 (i-1, j, k-1)] = a * x[IX (i, j+1, k)];
+// 	  if(k>2) m_rowSave[IX2 (i-1, j-1, k-2)] = a * x[IX (i, j, k-1)];
+// 	  if(k<m_nbVoxelsZ) m_rowSave[IX2 (i-1, j-1, k)] = a * x[IX (i, j, k+1)];
+// 	  m_rowSave[IX2 (i-1, j-1, k-1)] = ( 1+6.0 * a) * x[IX (i, j, k)];
 	  
-// 	  for(int l = 0; l<= row_size; l++)
-// 	    file << row_save[l] << " ";
-// 	  file << endl;
+// 	  for(int l = 0; l<= m_rowSize; l++)
+// 	    m_file << m_rowSave[l] << " ";
+// 	  m_file << endl;
 // 	}  
 // }
 
 void
 BenchSolver::writeLog ()
 {
-  for (int i = 0; i < nb_step_gauss_seidel; i++)
+  for (int i = 0; i < m_nbStepsGS; i++)
     {
-      file << nb_iter << " " << i << " ";
-      file << ulog[2 * i] << " " << vlog[2 * i] << " " << wlog[2 *
+      m_file << m_nbIter << " " << i << " ";
+      m_file << m_uLog[2 * i] << " " << m_vLog[2 * i] << " " << m_wLog[2 *
 							       i] <<
 	" ";
-      file << ulog[2 * i + 1] << " " << vlog[2 * i +
-					     1] << " " << wlog[2 *
+      m_file << m_uLog[2 * i + 1] << " " << m_vLog[2 * i +
+					     1] << " " << m_wLog[2 *
 							       i +
 							       1] <<
 	endl;

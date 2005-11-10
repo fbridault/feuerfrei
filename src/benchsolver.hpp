@@ -32,7 +32,7 @@ public:
 private:
   int IX2 (int i, int j, int k)
   {
-    return ((i) + (N_x) * (j) + (N_x) * (N_y) * (k));
+    return ((i) + (m_nbVoxelsX) * (j) + (m_nbVoxelsX) * (m_nbVoxelsY) * (k));
   };
   
   void diffuse_log (int b, double *const x, const double *const x0,
@@ -81,19 +81,19 @@ private:
   const void save (const double *const x);
   void iterate_save (bool flickering);
   
-  ofstream file;
+  ofstream m_file;
 
-  double *u_save, *v_save, *w_save, *u_prev_save, *v_prev_save, *w_prev_save;
-  double *dens_save, *dens_prev_save, *dens_src_save;
-  double *u_src_save, *v_src_save, *w_src_save;
-  double *p_save;
-  double *row_save;
-  double *u_ref, *v_ref, *w_ref, *p_ref, *dens_ref;
+  double *m_uSave, *m_vSave, *m_wSave, *m_uPrevSave, *m_vPrevSave, *m_wPrevSave;
+  double *m_densSave, *m_densPrevSave, *m_densSrcSave;
+  double *m_uSrcSave, *m_vSrcSave, *m_wSrcSave;
+  double *m_pSave;
+  double *m_rowSave;
+  double *m_uRef, *m_vRef, *m_wRef, *m_pRef, *m_densRef;
   /** Tableaux temporaires pour loguer les valeurs calculées */
-  double *ulog, *vlog, *wlog, *plog;
+  double *m_uLog, *m_vLog, *m_wLog, *m_pLog;
 
-  int row_size;
-  static const int ref_val = 25;
+  int m_rowSize;
+  static const int m_refVal = 25;
 };
 
 #endif

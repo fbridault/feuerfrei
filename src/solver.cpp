@@ -6,92 +6,92 @@
 #define MAXITER 100
 #define EPSILON2 1e-10
 
-Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
+Solver::Solver (int n_x, int n_y, int n_z, double dim, double timeStep)
 {
   int n3=n_x * n_y * n_z;
   
-  N_x = n_x;
-  N_y = n_y;
-  N_z = n_z;
+  m_nbVoxelsX = n_x;
+  m_nbVoxelsY = n_y;
+  m_nbVoxelsZ = n_z;
   
   /* Détermination de la taille du solveur de manière à ce que */
   /*  le plus grand côté soit de dimension dim */
-  if (N_x > N_y){
-    if (N_x > N_z){
-      dim_x = dim;
-      dim_y = dim_x * N_y / N_x;
-      dim_z = dim_x * N_z / N_x;
+  if (m_nbVoxelsX > m_nbVoxelsY){
+    if (m_nbVoxelsX > m_nbVoxelsZ){
+      m_dimX = dim;
+      m_dimY = m_dimX * m_nbVoxelsY / m_nbVoxelsX;
+      m_dimZ = m_dimX * m_nbVoxelsZ / m_nbVoxelsX;
     }else{
-      dim_z = dim;
-      dim_x = dim_z * N_x / N_z;
-      dim_y = dim_z * N_y / N_z;
+      m_dimZ = dim;
+      m_dimX = m_dimZ * m_nbVoxelsX / m_nbVoxelsZ;
+      m_dimY = m_dimZ * m_nbVoxelsY / m_nbVoxelsZ;
     }
   }else{
-    if (N_y > N_z){
-      dim_y = dim;
-      dim_x = dim_y * N_x / N_y;
-      dim_z = dim_y * N_z / N_y;
+    if (m_nbVoxelsY > m_nbVoxelsZ){
+      m_dimY = dim;
+      m_dimX = m_dimY * m_nbVoxelsX / m_nbVoxelsY;
+      m_dimZ = m_dimY * m_nbVoxelsZ / m_nbVoxelsY;
     }else{
-      dim_z = dim;
-      dim_x = dim_z * N_x / N_z;
-      dim_y = dim_z * N_y / N_z;
+      m_dimZ = dim;
+      m_dimX = m_dimZ * m_nbVoxelsX / m_nbVoxelsZ;
+      m_dimY = m_dimZ * m_nbVoxelsY / m_nbVoxelsZ;
     }
   }
   
-  size = (N_x + 2) * (N_y + 2) * (N_z + 2);
-  dt = pas_de_temps;
-
-  u = new double[size];
-  v = new double[size];
-  w = new double[size];
-  u_prev = new double[size];
-  v_prev = new double[size];
-  w_prev = new double[size];
-  dens = new double[size];
-  dens_prev = new double[size];
-  dens_src = new double[size];
-  u_src = new double[size];
-  v_src = new double[size];
-  w_src = new double[size];
+  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
+  m_dt = timeStep;
   
-  memset (u, 0, size * sizeof (double));
-  memset (v, 0, size * sizeof (double));
-  memset (w, 0, size * sizeof (double));
-  memset (u_prev, 0, size * sizeof (double));
-  memset (v_prev, 0, size * sizeof (double));
-  memset (w_prev, 0, size * sizeof (double));
-  memset (dens, 0, size * sizeof (double));
-  memset (dens_prev, 0, size * sizeof (double));
-  memset (dens_src, 0, size * sizeof (double));
-  memset (u_src, 0, size * sizeof (double));
-  memset (v_src, 0, size * sizeof (double));
-  memset (w_src, 0, size * sizeof (double));
-
-  residu_u = new double[size];
-  memset (residu_u, 0, size * sizeof (double));
-  residu_u_prev = new double[size];
-  memset (residu_u_prev, 0, size * sizeof (double));
-  residu_v = new double[size];
-  memset (residu_v, 0, size * sizeof (double));
-  residu_v_prev = new double[size];
-  memset (residu_v_prev, 0, size * sizeof (double));
-  residu_w = new double[size];
-  memset (residu_w, 0, size * sizeof (double));
-  residu_w_prev = new double[size];
-  memset (residu_w_prev, 0, size * sizeof (double));
-
-  visc = 0.00000015;
-  diff = 0.001;
-  nb_step_gauss_seidel = 15;
-  nb_iter = 0;
+  m_u = new double[m_nbVoxels];
+  m_v = new double[m_nbVoxels];
+  m_w = new double[m_nbVoxels];
+  m_uPrev = new double[m_nbVoxels];
+  m_vPrev = new double[m_nbVoxels];
+  m_wPrev = new double[m_nbVoxels];
+  m_dens = new double[m_nbVoxels];
+  m_densPrev = new double[m_nbVoxels];
+  m_densSrc = new double[m_nbVoxels];
+  m_uSrc = new double[m_nbVoxels];
+  m_vSrc = new double[m_nbVoxels];
+  m_wSrc = new double[m_nbVoxels];
   
-  a_diff = dt * diff * N_x * N_y * N_z;
-  a_visc = dt * visc * N_x * N_y * N_z;
+  memset (m_u, 0, m_nbVoxels * sizeof (double));
+  memset (m_v, 0, m_nbVoxels * sizeof (double));
+  memset (m_w, 0, m_nbVoxels * sizeof (double));
+  memset (m_uPrev, 0, m_nbVoxels * sizeof (double));
+  memset (m_vPrev, 0, m_nbVoxels * sizeof (double));
+  memset (m_wPrev, 0, m_nbVoxels * sizeof (double));
+  memset (m_dens, 0, m_nbVoxels * sizeof (double));
+  memset (m_densPrev, 0, m_nbVoxels * sizeof (double));
+  memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
+
+  m_uResidu = new double[m_nbVoxels];
+  memset (m_uResidu, 0, m_nbVoxels * sizeof (double));
+  m_uPrevResidu = new double[m_nbVoxels];
+  memset (m_uPrevResidu, 0, m_nbVoxels * sizeof (double));
+  m_vResidu = new double[m_nbVoxels];
+  memset (m_vResidu, 0, m_nbVoxels * sizeof (double));
+  m_vPrevResidu = new double[m_nbVoxels];
+  memset (m_vPrevResidu, 0, m_nbVoxels * sizeof (double));
+  m_wResidu = new double[m_nbVoxels];
+  memset (m_wResidu, 0, m_nbVoxels * sizeof (double));
+  m_wPrevResidu = new double[m_nbVoxels];
+  memset (m_wPrevResidu, 0, m_nbVoxels * sizeof (double));
+
+  m_visc = 0.00000015;
+  m_diff = 0.001;
+  m_nbStepsGS = 15;
+  m_nbIter = 0;
   
-  r=new double[n3];
-  z=new double[n3];
-  p=new double[n3];
-  q=new double[n3];
+  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  
+  m_r=new double[n3];
+  m_z=new double[n3];
+  m_p=new double[n3];
+  m_q=new double[n3];
   
   /* Construction des display lists */
   buildDLBase ();
@@ -100,33 +100,33 @@ Solver::Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps)
 
 Solver::~Solver ()
 {
-  delete[]u;
-  delete[]v;
-  delete[]w;
+  delete[]m_u;
+  delete[]m_v;
+  delete[]m_w;
 
-  delete[]u_prev;
-  delete[]v_prev;
-  delete[]w_prev;
-  delete[]dens;
+  delete[]m_uPrev;
+  delete[]m_vPrev;
+  delete[]m_wPrev;
+  delete[]m_dens;
 
-  delete[]dens_prev;
-  delete[]dens_src;
+  delete[]m_densPrev;
+  delete[]m_densSrc;
 
-  delete[]u_src;
-  delete[]v_src;
-  delete[]w_src;
+  delete[]m_uSrc;
+  delete[]m_vSrc;
+  delete[]m_wSrc;
 
-  delete[]residu_u;
-  delete[]residu_v;
-  delete[]residu_w;
-  delete[]residu_u_prev;
-  delete[]residu_v_prev;
-  delete[]residu_w_prev;
+  delete[]m_uResidu;
+  delete[]m_vResidu;
+  delete[]m_wResidu;
+  delete[]m_uPrevResidu;
+  delete[]m_vPrevResidu;
+  delete[]m_wPrevResidu;
   
-  delete[]r;
-  delete[]z;
-  delete[]p;
-  delete[]q;
+  delete[]m_r;
+  delete[]m_z;
+  delete[]m_p;
+  delete[]m_q;
 
   glDeleteLists(REPERE,1);
   glDeleteLists(GRILLE,1);
@@ -137,31 +137,31 @@ Solver::set_bnd (int b, double *const x)
 {
   int i, j;
 
-  for (i = 1; i <= N_y; i++)
+  for (i = 1; i <= m_nbVoxelsY; i++)
     {
-      for (j = 1; j <= N_z; j++)
+      for (j = 1; j <= m_nbVoxelsZ; j++)
 	{
 	  x[IX (0, i, j)] = 0;	//x[IX(i,j,1)];
-	  x[IX (N_x + 1, i, j)] = 0;	//x[IX(i,j,N)];
+	  x[IX (m_nbVoxelsX + 1, i, j)] = 0;	//x[IX(i,j,N)];
 	}
     }
 
-  for (i = 1; i <= N_x; i++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
     {
-      for (j = 1; j <= N_z; j++)
+      for (j = 1; j <= m_nbVoxelsZ; j++)
 	{
 	  x[IX (i, 0, j)] = 0;	//x[IX(i, 1, j)];
 	  //x[IX(i, N+1, j)] = 0;//x[IX(i,N,j)];
-	  x[IX (i, N_y + 1, j)] = 0;//-- x[IX (i, N_y, j)];
+	  x[IX (i, m_nbVoxelsY + 1, j)] = 0;//-- x[IX (i, m_nbVoxelsY, j)];
 	}
     }
 
-  for (i = 1; i <= N_x; i++)
+  for (i = 1; i <= m_nbVoxelsX; i++)
     {
-      for (j = 1; j <= N_y; j++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
 	{
 	  x[IX (i, j, 0)] = 0;	//x[IX(i,j,1)];
-	  x[IX (i, j, N_z + 1)] = 0;	//x[IX(i,j,N)];
+	  x[IX (i, j, m_nbVoxelsZ + 1)] = 0;	//x[IX(i,j,N)];
 	}
     }
 }
@@ -172,8 +172,8 @@ Solver::add_source (double *const x, double *const src)
 {
   int i;
 
-  for (i = 0; i < size; i++)
-    x[i] += dt * src[i];
+  for (i = 0; i < m_nbVoxels; i++)
+    x[i] += m_dt * src[i];
 }
 
 void Solver::GS_solve(int b, double *const x, const double *const x0,
@@ -182,9 +182,9 @@ void Solver::GS_solve(int b, double *const x, const double *const x0,
   int i, j, k, l;
   
   for (l = 0; l < nb_steps; l++){
-    for (i = 1; i <= N_x; i++)
-      for (j = 1; j <= N_y; j++)
-	for (k = 1; k <= N_z; k++)
+    for (i = 1; i <= m_nbVoxelsX; i++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
+	for (k = 1; k <= m_nbVoxelsZ; k++)
 	  x[IX (i, j, k)] = (x0[IX (i, j, k)] +
 			     a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +
@@ -200,9 +200,9 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
   double d=f*a;
   double e=2.0-omega;
 
-  int taille=N_x;
-  int n2=N_x * N_y; // ProblÃ¨me lÃ  !!!!!!!!!!!!!!!!!!!!!
-  int n3=N_x * N_y * N_z;
+  int taille=m_nbVoxelsX;
+  int n2=m_nbVoxelsX * m_nbVoxelsY; // ProblÃ¨me lÃ  !!!!!!!!!!!!!!!!!!!!!
+  int n3=m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
 
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
@@ -215,107 +215,107 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
   eb2=EPSILON2*normb2;
   // calcul du premier rÃ©sidu r
   //calcul de r = b - A*x0
-  r[0]=b[IX2(0)]-diagonal*x0[IX2(0)]+a*(x0[IX2(1)]+x0[IX2(taille)]+x0[IX2(n2)]);
+  m_r[0]=b[IX2(0)]-diagonal*x0[IX2(0)]+a*(x0[IX2(1)]+x0[IX2(taille)]+x0[IX2(n2)]);
   for(int i= 1; i<taille ; i++){
-    r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
+    m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
   }
   for(int i= taille; i<n2 ; i++){
-    r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+
+    m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+
 					  x0[IX2(i+n2)]);
   }
   for(int i= n2; i<n3-n2 ; i++){
-    r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+
+    m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+
 					  x0[IX2(i+taille)]+x0[IX2(i+n2)]);
   }
   for(int i= n3-n2; i<n3-taille ; i++){
-    r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+
+    m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+
 					  x0[IX2(i+taille)]);
   }
   for(int i= n3-taille; i<n3-1 ; i++){
-    r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]);
+    m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]);
   }
   int i=n3-1;
-  r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]);
+  m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]);
 
 
   // calcul de z tel que Cz=r
 
   // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-  z[0]=e*r[0];
+  m_z[0]=e*m_r[0];
   for(int i=1;i<taille;i++){
-	z[i]=e*r[i]+d*z[i-1];
+	m_z[i]=e*m_r[i]+d*m_z[i-1];
   }
   for(int i=taille;i<n2;i++){
-	z[i]=e*r[i]+d*(z[i-1]+z[i-taille]);
+	m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]);
   }
   for(int i=n2;i<n3;i++){
-	z[i]=e*r[i]+d*(z[i-1]+z[i-taille]+z[i-n2]);
+	m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]+m_z[i-n2]);
   }
 
   // calcul de z tel que (D/w -TL)z=u
-  z[n3-1]=f*z[n3-1];
+  m_z[n3-1]=f*m_z[n3-1];
   for(int i=n3-2;i>=n3-taille;i--){
-	z[i]=f*z[i]+d*z[i+1];
+	m_z[i]=f*m_z[i]+d*m_z[i+1];
   }
   for(int i=n3-taille-1;i>=n3-n2;i--){
-	z[i]=f*z[i]+d*(z[i+1]+z[i+taille]);
+	m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]);
   }
   for(int i=n3-n2-1;i>=0;i--){
-	z[i]=f*z[i]+d*(z[i+1]+z[i+taille]+z[i+n2]);
+	m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]+m_z[i+n2]);
   }
 	
   // p=z
   for(int i=0; i< n3;i++){
-	p[i]=z[i];
+	m_p[i]=m_z[i];
   }
 
   // calcul de r.z
   rho0=0.0;
   for(int i = 0; i<n3;i++){
-	rho0+=r[i]*z[i];
+	rho0+=m_r[i]*m_z[i];
   }
   // dÃ©but des itÃ©rations
   for(int numiter=0;numiter<MAXITER;numiter++){
 	//calcul de q =  A.p
-	q[0]=diagonal*p[0]-a*(p[1]+p[taille]+p[n2]);
+	m_q[0]=diagonal*m_p[0]-a*(m_p[1]+m_p[taille]+m_p[n2]);
 	for(int i= 1; i<taille ; i++){
-	  q[i]=diagonal*p[i]-a*(p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+	  m_q[i]=diagonal*m_p[i]-a*(m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 	}
 	for(int i= taille; i<n2 ; i++){
-	  q[i]=diagonal*p[i]-a*(p[i-taille]+p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+	  m_q[i]=diagonal*m_p[i]-a*(m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 	}
 	for(int i= n2; i<n3-n2 ; i++){
-	  q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+	  m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 	}
 	for(int i= n3-n2; i<n3-taille ; i++){
-	  q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]+p[i+taille]);
+	  m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]);
 	}
 	for(int i= n3-taille; i<n3-1 ; i++){
-	  q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]);
+	  m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]);
 	}
 	int i=n3-1;
-	q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]);
+	m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]);
 
 
 	//calcul du produit scalaire p.q
 	alpha=0.0f;
 	for(int i=0;i<n3;i++){
-	  alpha+=p[i]*q[i];
+	  alpha+=m_p[i]*m_q[i];
 	}
 	//calcul de alpha
 	alpha=rho0/alpha;
 	// calcul de x = x + alpha.p
 	for(int i=0;i<n3;i++){
-	  x0[IX2(i)]+=alpha*p[i];
+	  x0[IX2(i)]+=alpha*m_p[i];
 	}
 	// calcul de r = r -alpha*q
 	for(int i=0;i<n3;i++){
-	  r[i]-=alpha*q[i];
+	  m_r[i]-=alpha*m_q[i];
 	}
 	// calcul du carrÃ© de la norme du rÃ©sidu
 	norm2=0.0f;
 	for(int i=0;i<n3;i++){
-	  norm2+=r[i]*r[i];
+	  norm2+=m_r[i]*m_r[i];
 	}
 	//test d'arrÃªt
 	if(norm2 < eb2){
@@ -325,40 +325,40 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
 	// calcul de z tel que Cz =r
 
 	// calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-	z[0]=e*r[0];
+	m_z[0]=e*m_r[0];
 	for(int i=1;i<taille;i++){
-	  z[i]=e*r[i]+d*z[i-1];
+	  m_z[i]=e*m_r[i]+d*m_z[i-1];
 	}
 	for(int i=taille;i<n2;i++){
-	  z[i]=e*r[i]+d*(z[i-1]+z[i-taille]);
+	  m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]);
 	}
 	for(int i=n2;i<n3;i++){
-	  z[i]=e*r[i]+d*(z[i-1]+z[i-taille]+z[i-n2]);
+	  m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]+m_z[i-n2]);
 	}
 
 	// calcul de z tel que (D/w -TL)z=u
-	z[n3-1]=f*z[n3-1];
+	m_z[n3-1]=f*m_z[n3-1];
 	for(int i=n3-2;i>=n3-taille;i--){
-	  z[i]=f*z[i]+d*z[i+1];
+	  m_z[i]=f*m_z[i]+d*m_z[i+1];
 	}
 	for(int i=n3-taille-1;i>=n3-n2;i--){
-	  z[i]=f*z[i]+d*(z[i+1]+z[i+taille]);
+	  m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]);
 	}
 	for(int i=n3-n2-1;i>=0;i--){
-	  z[i]=f*z[i]+d*(z[i+1]+z[i+taille]+z[i+n2]);
+	  m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]+m_z[i+n2]);
 	}
 
 	//calcul de rho1 = r.z
 	rho1=0.0;
 	for(int i=0; i <n3;i++){
-	  rho1+=r[i]*z[i];
+	  rho1+=m_r[i]*m_z[i];
 	}
 	//calcul de beta =rho1/rho0
 	beta=rho1/rho0;
 	rho0=rho1;
 	//calcul de p = z+ beta.p
 	for(int i=0; i <n3;i++){
-	  p[i]=z[i] + beta*p[i];
+	  m_p[i]=m_z[i] + beta*m_p[i];
 	}
 
   }//for numiter
@@ -367,7 +367,7 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
   }
   
   for(int i=0; i <n3;i++)
-    x0[IX2(i)]=q[i];
+    x0[IX2(i)]=m_q[i];
 	
   return;
 }//GCSSOR
@@ -384,9 +384,9 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
 //   double d=f*a;
 //   double e=2.0f-omega;
 
-//   int taille=N_x;
-//   int n2=N_x * N_y; // ProblÃ¨me lÃ  !!!!!!!!!!!!!!!!!!!!!
-//   int n3=N_x * N_y * N_z;
+//   int taille=m_nbVoxelsX;
+//   int n2=m_nbVoxelsX * m_nbVoxelsY; // ProblÃ¨me lÃ  !!!!!!!!!!!!!!!!!!!!!
+//   int n3=m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
 
 //   double rho0, rho1, alpha, beta;
 
@@ -397,137 +397,137 @@ void Solver::GCSSOR(double *const x0, const double *const b, double a, double di
 
 //   // calcul du premier rÃ©sidu r
 //   //calcul de r = b - A*x0
-//   r[0]=b[IX2(0)]-diagonal*x0[IX2(0)]+a*(x0[IX2(1)]+x0[IX2(taille)]+x0[IX2(n2)]);
+//   m_r[0]=b[IX2(0)]-diagonal*x0[IX2(0)]+a*(x0[IX2(1)]+x0[IX2(taille)]+x0[IX2(n2)]);
 //   for(int i= 1; i<taille ; i++){
-//     r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
+//     m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
 //   }
 //   for(int i= taille; i<n2 ; i++){
-//     r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
+//     m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
 //   }
 //   for(int i= n2; i<n3-n2 ; i++){
-//     r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
+//     m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]+x0[IX2(i+n2)]);
 //   }
 //   for(int i= n3-n2; i<n3-taille ; i++){
-//     r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]);
+//     m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]+x0[IX2(i+taille)]);
 //   }
 //   for(int i= n3-taille; i<n3-1 ; i++){
-//     r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]);
+//     m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]+x0[IX2(i+1)]);
 //   }
 //   int i=n3-1;
-//   r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]);
+//   m_r[i]=b[IX2(i)]-diagonal*x0[IX2(i)]+a*(x0[IX2(i-n2)]+x0[IX2(i-taille)]+x0[IX2(i-1)]);
 
 
 //   // calcul de z tel que Cz=r
 
 //   // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-//   z[0]=e*r[0];
+//   m_z[0]=e*m_r[0];
 //   for(int i=1;i<taille;i++){
-//     z[i]=e*r[i]+d*z[i-1];
+//     m_z[i]=e*m_r[i]+d*m_z[i-1];
 //   }
 //   for(int i=taille;i<n2;i++){
-//     z[i]=e*r[i]+d*(z[i-1]+z[i-taille]);
+//     m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]);
 //   }
 //   for(int i=n2;i<n3;i++){
-//     z[i]=e*r[i]+d*(z[i-1]+z[i-taille]+z[i-n2]);
+//     m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]+m_z[i-n2]);
 //   }
 
 //   // calcul de z tel que (D/w -TL)z=u
-//   z[n3-1]=f*z[n3-1];
+//   m_z[n3-1]=f*m_z[n3-1];
 //   for(int i=n3-2;i>=n3-taille;i--){
-//     z[i]=f*z[i]+d*z[i+1];
+//     m_z[i]=f*m_z[i]+d*m_z[i+1];
 //   }
 //   for(int i=n3-taille-1;i>=n3-n2;i--){
-//     z[i]=f*z[i]+d*(z[i+1]+z[i+taille]);
+//     m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]);
 //   }
 //   for(int i=n3-n2-1;i>=0;i--){
-//     z[i]=f*z[i]+d*(z[i+1]+z[i+taille]+z[i+n2]);
+//     m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]+m_z[i+n2]);
 //   }
 	
 //   // p=z
 //   for(int i=0; i< n3;i++){
-//     p[i]=z[i];
+//     m_p[i]=m_z[i];
 //   }
 
 //   // calcul de r.z
 //   rho0=0.0f;
 //   for(int i = 0; i<n3;i++){
-//     rho0+=r[i]*z[i];
+//     rho0+=m_r[i]*m_z[i];
 //   }
 //   for(int numiter=0;numiter<13;numiter++){
 //     //calcul de q =  A.p
-//     q[0]=diagonal*p[0]-a*(p[1]+p[taille]+p[n2]);
+//     m_q[0]=diagonal*m_p[0]-a*(m_p[1]+m_p[taille]+m_p[n2]);
 //     for(int i= 1; i<taille ; i++){
-//       q[i]=diagonal*p[i]-a*(p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+//       m_q[i]=diagonal*m_p[i]-a*(m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 //     }
 //     for(int i= taille; i<n2 ; i++){
-//       q[i]=diagonal*p[i]-a*(p[i-taille]+p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+//       m_q[i]=diagonal*m_p[i]-a*(m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 //     }
 //     for(int i= n2; i<n3-n2 ; i++){
-//       q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]+p[i+taille]+p[i+n2]);
+//       m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]+m_p[i+n2]);
 //     }
 //     for(int i= n3-n2; i<n3-taille ; i++){
-//       q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]+p[i+taille]);
+//       m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]+m_p[i+taille]);
 //     }
 //     for(int i= n3-taille; i<n3-1 ; i++){
-//       q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]+p[i+1]);
+//       m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]+m_p[i+1]);
 //     }
 //     int i=n3-1;
-//     q[i]=diagonal*p[i]-a*(p[i-n2]+p[i-taille]+p[i-1]);
+//     m_q[i]=diagonal*m_p[i]-a*(m_p[i-n2]+m_p[i-taille]+m_p[i-1]);
 
 
 //     //calcul du produit scalaire p.q
 //     alpha=0.0f;
 //     for(int i=0;i<n3;i++){
-//       alpha+=p[i]*q[i];
+//       alpha+=m_p[i]*m_q[i];
 //     }
 //     //calcul de alpha
 //     alpha=rho0/alpha;
 //     // calcul de x = x + alpha.p
 //     for(int i=0;i<n3;i++){
-//       x0[IX2(i)]+=alpha*p[i];
+//       x0[IX2(i)]+=alpha*m_p[i];
 //     }
 //     // calcul de r = r -alpha*q
 //     for(int i=0;i<n3;i++){
-//       r[i]-=alpha*q[i];
+//       m_r[i]-=alpha*m_q[i];
 //     }
 
 //     // calcul de z tel que Cz =r
 
 //     // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-//     z[0]=e*r[0];
+//     m_z[0]=e*m_r[0];
 //     for(int i=1;i<taille;i++){
-//       z[i]=e*r[i]+d*z[i-1];
+//       m_z[i]=e*m_r[i]+d*m_z[i-1];
 //     }
 //     for(int i=taille;i<n2;i++){
-//       z[i]=e*r[i]+d*(z[i-1]+z[i-taille]);
+//       m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]);
 //     }
 //     for(int i=n2;i<n3;i++){
-//       z[i]=e*r[i]+d*(z[i-1]+z[i-taille]+z[i-n2]);
+//       m_z[i]=e*m_r[i]+d*(m_z[i-1]+m_z[i-taille]+m_z[i-n2]);
 //     }
 
 //     // calcul de z tel que (D/w -TL)z=u
-//     z[n3-1]=f*z[n3-1];
+//     m_z[n3-1]=f*m_z[n3-1];
 //     for(int i=n3-2;i>=n3-taille;i--){
-//       z[i]=f*z[i]+d*z[i+1];
+//       m_z[i]=f*m_z[i]+d*m_z[i+1];
 //     }
 //     for(int i=n3-taille-1;i>=n3-n2;i--){
-//       z[i]=f*z[i]+d*(z[i+1]+z[i+taille]);
+//       m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]);
 //     }
 //     for(int i=n3-n2-1;i>=0;i--){
-//       z[i]=f*z[i]+d*(z[i+1]+z[i+taille]+z[i+n2]);
+//       m_z[i]=f*m_z[i]+d*(m_z[i+1]+m_z[i+taille]+m_z[i+n2]);
 //     }
 
 //     //calcul de rho1 = r.z
 //     rho1=0.0f;
 //     for(int i=0; i <n3;i++){
-//       rho1+=r[i]*z[i];
+//       rho1+=m_r[i]*m_z[i];
 //     }
 //     //calcul de beta =rho1/rho0
 //     beta=rho1/rho0;
 //     rho0=rho1;
 //     //calcul de p = z+ beta.p
 //     for(int i=0; i <n3;i++){
-//       p[i]=z[i] + beta*p[i];
+//       m_p[i]=m_z[i] + beta*m_p[i];
 //     }
 
 //   }//for numiter
@@ -544,7 +544,7 @@ Solver::diffuse (int b, double *const x, const double *const x0,
 				 double a, double diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
-  //GCSSOR(x,x0,a, (1.0 + 6.0 * a),  nb_step_gauss_seidel, 1.815);
+  //GCSSOR(x,x0,a, (1.0 + 6.0 * a),  m_nbStepsGS, 1.815);
 }
 
 /* Pas de diffusion */
@@ -558,15 +558,15 @@ Solver::diffuse_hybride (int b, double *const x, const double *const x0,
   double den = 0.0;
   double diff;
   /*double num=0.0, ei=0.0, sei=0.0,  den=0.0, dtmp, etmp *//*,ntmp */ ;
-  double a = dt * diff_visc * N_x * N_y * N_z;
+  double a = m_dt * diff_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   int i, j, k, l;
 
-  for (l = 0; l < nb_step_gauss_seidel; l++)
+  for (l = 0; l < m_nbStepsGS; l++)
     {
 
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      x[IX (i, j, k)] =
 		(x0[IX (i, j, k)] +
@@ -591,9 +591,9 @@ Solver::diffuse_hybride (int b, double *const x, const double *const x0,
       //set_bnd (b, x);
 
       /* calcul du terme alpha */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      diff = residu0[IX (i, j, k)] -
 		residu[IX (i, j, k)];
@@ -614,9 +614,9 @@ Solver::diffuse_hybride (int b, double *const x, const double *const x0,
       //printf("alpha : %f\n", alpha);
 
       /* hybridation des radiosites et des residus */
-      for (i = 1; i <= N_x; i++)
-	for (j = 1; j <= N_y; j++)
-	  for (k = 1; k <= N_z; k++)
+      for (i = 1; i <= m_nbVoxelsX; i++)
+	for (j = 1; j <= m_nbVoxelsY; j++)
+	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      x[IX (i, j, k)] = alpha * x[IX (i, j, k)] + (1 - alpha) * x0[IX (i, j, k)];
 	      residu0[IX (i, j, k)] = alpha * residu[IX (i, j, k)] + (1 - alpha) * residu0[IX (i, j, k)];
@@ -636,12 +636,12 @@ Solver::advect (int b, double *const d, const double *const d0,
   int i, j, k, i0, j0, k0, i1, j1, k1;
   double x, y, z, r0, s0, t0, r1, s1, t1, dt0_x, dt0_y, dt0_z;
 
-  dt0_x = dt * N_x;
-  dt0_y = dt * N_y;
-  dt0_z = dt * N_z;
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++)
+  dt0_x = m_dt * m_nbVoxelsX;
+  dt0_y = m_dt * m_nbVoxelsY;
+  dt0_z = m_dt * m_nbVoxelsZ;
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++)
 	{
 	  x = i - dt0_x * u[IX (i, j, k)];
 	  y = j - dt0_y * v[IX (i, j, k)];
@@ -649,20 +649,20 @@ Solver::advect (int b, double *const d, const double *const d0,
 
 	  if (x < 0.5)
 	    x = 0.5;
-	  if (x > N_x + 0.5)
-	    x = N_x + 0.5;
+	  if (x > m_nbVoxelsX + 0.5)
+	    x = m_nbVoxelsX + 0.5;
 	  i0 = (int) x;
 	  i1 = i0 + 1;
 	  if (y < 0.5)
 	    y = 0.5;
-	  if (y > N_y + 0.5)
-	    y = N_y + 0.5;
+	  if (y > m_nbVoxelsY + 0.5)
+	    y = m_nbVoxelsY + 0.5;
 	  j0 = (int) y;
 	  j1 = j0 + 1;
 	  if (z < 0.5)
 	    z = 0.5;
-	  if (z > N_z + 0.5)
-	    z = N_z + 0.5;
+	  if (z > m_nbVoxelsZ + 0.5)
+	    z = m_nbVoxelsZ + 0.5;
 	  k0 = (int) z;
 	  k1 = k0 + 1;
 
@@ -688,30 +688,30 @@ Solver::advect (int b, double *const d, const double *const d0,
 void
 Solver::project (double *const p, double *const div)
 {
-  double h_x = 1.0 / N_x, h_y = 1.0 / N_y, h_z = 1.0 / N_z;
-  int i, j, k, l;
+  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
+  int i, j, k;
   
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++){
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++){
 		div[IX (i, j, k)] =
-		-0.5 * (h_x * (u[IX (i + 1, j, k)] - u[IX (i - 1, j, k)]) +
-				h_y * (v[IX (i, j + 1, k)] - v[IX (i, j - 1, k)]) +
-				h_z * (w[IX (i, j, k + 1)] - w[IX (i, j, k - 1)]));
+		  -0.5 * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
+			  h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
+			  h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
 		p[IX (i, j, k)] = 0;
       }
 	  
   set_bnd (0, div);
   set_bnd (0, p);
-  GS_solve(0,p,div,1, 1/6.0, nb_step_gauss_seidel); 
-  //GCSSOR(p,div,1, 6.0,  nb_step_gauss_seidel, 1.815);
+  GS_solve(0,p,div,1, 1/6.0, m_nbStepsGS); 
+  //GCSSOR(p,div,1, 6.0,  m_nbStepsGS, 1.815);
 
-  for (i = 1; i <= N_x; i++)
-    for (j = 1; j <= N_y; j++)
-      for (k = 1; k <= N_z; k++){
-		u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
-		v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
-		w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
+  for (i = 1; i <= m_nbVoxelsX; i++)
+    for (j = 1; j <= m_nbVoxelsY; j++)
+      for (k = 1; k <= m_nbVoxelsZ; k++){
+		m_u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
+		m_v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
+		m_w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
       }
   //set_bnd (1, u);
   //set_bnd (2, v);
@@ -720,53 +720,53 @@ Solver::project (double *const p, double *const div)
 
 // void Solver::dens_step()
 // {
-//   add_source ( dens, dens_src);
-//   SWAP (dens_prev, dens); diffuse ( 0, dens, dens_prev, a_diff, diff);
-//   SWAP (dens_prev, dens); advect ( 0, dens, dens_prev, u, v, w);
+//   add_source ( m_dens, m_densSrc);
+//   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff, diff);
+//   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
 
 void
 Solver::vel_step ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
-  SWAP (u_prev, u);
-  diffuse (1, u, u_prev, a_visc, visc);
-  SWAP (v_prev, v);
-  diffuse (2, v, v_prev, a_visc, visc);
-  SWAP (w_prev, w);
-  diffuse (3, w, w_prev, a_visc, visc);
-  project (u_prev, v_prev);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
-  project (u_prev, v_prev);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
+  SWAP (m_uPrev, m_u);
+  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  SWAP (m_vPrev, m_v);
+  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  SWAP (m_wPrev, m_w);
+  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  project (m_uPrev, m_vPrev);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+  project (m_uPrev, m_vPrev);
 }
 
 void
 Solver::vel_step_hybride ()
 {
-  add_source (u, u_src);
-  add_source (v, v_src);
-  add_source (w, w_src);
-  SWAP (u_prev, u);
-  diffuse_hybride (1, u, u_prev, residu_u, residu_u_prev, visc);
-  SWAP (v_prev, v);
-  diffuse_hybride (2, v, v_prev, residu_v, residu_v_prev, visc);
-  SWAP (w_prev, w);
-  diffuse_hybride (3, w, w_prev, residu_w, residu_w_prev, visc);
-  project (u_prev, v_prev);
-  SWAP (u_prev, u);
-  SWAP (v_prev, v);
-  SWAP (w_prev, w);
-  advect (1, u, u_prev, u_prev, v_prev, w_prev);
-  advect (2, v, v_prev, u_prev, v_prev, w_prev);
-  advect (3, w, w_prev, u_prev, v_prev, w_prev);
-  project (u_prev, v_prev);
+  add_source (m_u, m_uSrc);
+  add_source (m_v, m_vSrc);
+  add_source (m_w, m_wSrc);
+  SWAP (m_uPrev, m_u);
+  diffuse_hybride (1, m_u, m_uPrev, m_uResidu, m_uPrevResidu, m_visc);
+  SWAP (m_vPrev, m_v);
+  diffuse_hybride (2, m_v, m_vPrev, m_vResidu, m_vPrevResidu, m_visc);
+  SWAP (m_wPrev, m_w);
+  diffuse_hybride (3, m_w, m_wPrev, m_wResidu, m_wPrevResidu, m_visc);
+  project (m_uPrev, m_vPrev);
+  SWAP (m_uPrev, m_u);
+  SWAP (m_vPrev, m_v);
+  SWAP (m_wPrev, m_w);
+  advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+  advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+  project (m_uPrev, m_vPrev);
 }
 
 void
@@ -785,53 +785,53 @@ Solver::iterate (bool flickering)
 
   //cout << IX2(3374) << "  " << IX2(3375) << " " << IX2(1) << " " << IX2(225) << endl;
 
-  for (int i = 0; i < nb_flammes; i++)
-    flammes[i]->add_forces (flickering);
+  for (int i = 0; i < m_nbFlames; i++)
+    m_flames[i]->add_forces (flickering);
 
   vel_step ();
   //  dens_step();
 
-  nb_iter++;
+  m_nbIter++;
 
-  set_bnd (0, u);
-  set_bnd (0, v);
-  set_bnd (0, w);
+  set_bnd (0, m_u);
+  set_bnd (0, m_v);
+  set_bnd (0, m_w);
 }
 
 void
 Solver::cleanSources ()
 {
-  u_src = (double *) memset (u_src, 0, size * sizeof (double));
-  v_src = (double *) memset (v_src, 0, size * sizeof (double));
-  w_src = (double *) memset (w_src, 0, size * sizeof (double));
+  m_uSrc = (double *) memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
+  m_vSrc = (double *) memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
+  m_wSrc = (double *) memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
 }
 
 void
 Solver::buildDLGrid ()
 {
-  double interx = dim_x / (double) N_x;
-  double intery = dim_y / (double) N_y;
-  double interz = dim_z / (double) N_z;
+  double interx = m_dimX / (double) m_nbVoxelsX;
+  double intery = m_dimY / (double) m_nbVoxelsY;
+  double interz = m_dimZ / (double) m_nbVoxelsZ;
   double i, j;
 
   glNewList (GRILLE, GL_COMPILE);
   glPushMatrix ();
-  glTranslatef (-dim_x / 2.0, 0, dim_z / 2.0);
+  glTranslatef (-m_dimX / 2.0, 0, m_dimZ / 2.0);
   glBegin (GL_LINES);
 
   glColor4f (0.5, 0.5, 0.5, 0.5);
 
-  for (j = 0.0; j <= dim_z; j += interz)
+  for (j = 0.0; j <= m_dimZ; j += interz)
     {
-      for (i = 0.0; i <= dim_x + interx / 2; i += interx)
+      for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
 	{
 	  glVertex3f (i, 0.0, -j);
-	  glVertex3f (i, dim_y, -j);
+	  glVertex3f (i, m_dimY, -j);
 	}
-      for (i = 0.0; i <= dim_y + intery / 2; i += intery)
+      for (i = 0.0; i <= m_dimY + intery / 2; i += intery)
 	{
 	  glVertex3f (0.0, i, -j);
-	  glVertex3f (dim_x, i, -j);
+	  glVertex3f (m_dimX, i, -j);
 	}
     }
   glEnd ();
@@ -842,26 +842,26 @@ Solver::buildDLGrid ()
 void
 Solver::buildDLBase ()
 {
-  double interx = dim_x / (double) N_x;
-  double interz = dim_z / (double) N_z;
+  double interx = m_dimX / (double) m_nbVoxelsX;
+  double interz = m_dimZ / (double) m_nbVoxelsZ;
   double i;
 
   glNewList (REPERE, GL_COMPILE);
   glPushMatrix ();
-  glTranslatef (-dim_x / 2.0, 0.0, dim_z / 2.0);
+  glTranslatef (-m_dimX / 2.0, 0.0, m_dimZ / 2.0);
   glBegin (GL_LINES);
 
   glLineWidth (1.0);
   glColor4f (0.5, 0.5, 0.5, 0.5);
-  for (i = 0.0; i <= dim_x + interx / 2; i += interx)
+  for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
     {
-      glVertex3f (i, 0.0, -dim_z);
+      glVertex3f (i, 0.0, -m_dimZ);
       glVertex3f (i, 0.0, 0.0);
     }
-  for (i = 0.0; i <= dim_z + interz / 2; i += interz)
+  for (i = 0.0; i <= m_dimZ + interz / 2; i += interz)
     {
-      glVertex3f (0.0, 0.0, i - dim_z);
-      glVertex3f (dim_x, 0.0, i - dim_z);
+      glVertex3f (0.0, 0.0, i - m_dimZ);
+      glVertex3f (m_dimX, 0.0, i - m_dimZ);
     }
   glEnd ();
   glPopMatrix ();
@@ -871,22 +871,22 @@ Solver::buildDLBase ()
 void 
 Solver::displayVelocityField (void)
 {
-  double inc_x = dim_x / (double) N_x;
-  double inc_y = dim_y / (double) N_y;
-  double inc_z = dim_z / (double) N_z;
+  double inc_x = m_dimX / (double) m_nbVoxelsX;
+  double inc_y = m_dimY / (double) m_nbVoxelsY;
+  double inc_z = m_dimZ / (double) m_nbVoxelsZ;
   
-  for (int i = 1; i <= N_x; i++)
+  for (int i = 1; i <= m_nbVoxelsX; i++)
     {
-      for (int j = 1; j <= N_y; j++)
+      for (int j = 1; j <= m_nbVoxelsY; j++)
 	{
-	  for (int k = 1; k <= N_z; k++)
+	  for (int k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      CVector vect;
 	      /* Affichage du champ de vélocité */
 	      glPushMatrix ();
-	      glTranslatef (inc_x * i - inc_x / 2.0 - N_x / 2.0,
+	      glTranslatef (inc_x * i - inc_x / 2.0 - m_nbVoxelsX / 2.0,
 			    inc_y * j - inc_y / 2.0, 
-			    inc_z * k - inc_z / 2.0 -  N_z / 2.0);
+			    inc_z * k - inc_z / 2.0 -  m_nbVoxelsZ / 2.0);
 	      //    printf("vélocité %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
 	      //SDL_mutexP (lock);
 	      vect.setX (getU (i, j, k));
@@ -907,7 +907,7 @@ Solver::displayArrow (CVector * const direction)
     sqrt (direction->getX () * direction->getX () +
 	  direction->getY () * direction->getY () +
 	  direction->getZ () * direction->getZ ());
-  double taille = dim_x * dim_y * dim_z * norme_vel / 2.5;
+  double taille = m_dimX * m_dimY * m_dimZ * norme_vel / 2.5;
   double angle;
   CVector axeRot, axeCone (0.0, 0.0, 1.0);
 

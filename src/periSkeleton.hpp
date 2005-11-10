@@ -20,20 +20,12 @@ public:
    * @param s pointeur sur le solveur de fluides
    * @param position position de la flamme dans l'espace
    * @param pt position de l'origine du squelette
-   * @param guide pointeur sur le squelette guide associé (généralement le plus proche,
-   * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
-   */
-  PeriSkeleton(Solver* const s, const CPoint position, const CPoint pt, LeadSkeleton *guide);
-
-  /** Constructeur de squelette périphérique
-   * @param s pointeur sur le solveur de fluides
-   * @param position position de la flamme dans l'espace
-   * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    * @param guide pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
-  PeriSkeleton(Solver* const s, const CPoint position, const CPoint pt, LeadSkeleton *guide, int pls);
+  PeriSkeleton(Solver* const s, const CPoint& position, const CPoint& pt, 
+	       const CPoint& rootMoveFactor, LeadSkeleton *guide, int pls);
   virtual ~PeriSkeleton();
   
   
@@ -47,12 +39,12 @@ private:
    * @param n indice de la particule dans le squelette
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_particle(Particle* const pos, int n);
+  int moveParticle(Particle* const pos, int n);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int move_origine();
+  int moveRoot();
   
   /** Pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)

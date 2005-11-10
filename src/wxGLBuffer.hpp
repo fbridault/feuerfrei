@@ -37,6 +37,7 @@ public:
   void OnMouseClick(wxMouseEvent& event);
     
   void InitGL(void);
+  void InitFlames(void);
   void InitScene(void);
   void InitUISettings(void);
   void Restart (void);
@@ -105,6 +106,7 @@ private:
   /********* Variables relatives à la simulation *************************/
   Flame **m_flames;
   int m_nbFlames;
+  int m_FlameType;
   CScene *m_scene;
   CgSVShader *m_SVShader;
 

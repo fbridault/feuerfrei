@@ -9,7 +9,7 @@
 #include "graphicsFn.hpp"
 #include "OBJReader.hpp"
 
-Wick::Wick (char *filename, int nb_lead_squelettes, CScene *scene) : CObject(scene)
+Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObject(scene)
 {
   CPoint ptMax[nb_lead_squelettes + 1], ptMin[nb_lead_squelettes + 1];
   CPoint ExtrGauche (DBL_MAX, 0, 0), ExtrDroite (DBL_MIN, 0, 0);

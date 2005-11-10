@@ -6,91 +6,80 @@
 #include "graphicsFn.hpp"
 
 
-Skeleton::Skeleton(Solver* const s, const CPoint position, const CPoint pt)
+Skeleton::Skeleton(Solver* const s, const CPoint& position, const CPoint& pt, 
+		   const CPoint& rootMoveFactor, int pls) : m_rootMoveFactor(rootMoveFactor)
 {
-  solveur = s;
-  flamePos = position;
-  file = new Particle[NB_PARTICULES];
-  queue = -1;
+  m_solver = s;
+  m_flamePos = position;
+  m_queue = new Particle[NB_PARTICULES];
+  m_headIndex = -1;
   
-  origine = origine_save = pt;
-  particle_lifespan = LIFE_SPAN_AT_BIRTH;
-  entree(&origine);
-}
-
-Skeleton::Skeleton(Solver* const s, const CPoint position, const CPoint pt, int pls)
-{
-  solveur = s;
-  flamePos = position;
-  file = new Particle[NB_PARTICULES];
-  queue = -1;
-  
-  origine = origine_save = pt;
-  particle_lifespan = pls;
-  entree(&origine);
+  m_root = m_rootSave = pt;
+  m_particleLifespan = pls;
+  addParticle(&m_root);
 }
 
 Skeleton::~Skeleton()
 {
-  delete [] file;
+  delete [] m_queue;
 }
 
-void Skeleton::entree(const CPoint* const pt)
+void Skeleton::addParticle(const CPoint* const pt)
 {
-  if(queue >= NB_PARTICULES-1){
+  if(m_headIndex >= NB_PARTICULES-1){
     puts("Erreur : trop de particules");
     return;
   }
-  queue++;
+  m_headIndex++;
   
-  file[queue] = *pt;
-  file[queue].birth(particle_lifespan);
+  m_queue[m_headIndex] = *pt;
+  m_queue[m_headIndex].birth(m_particleLifespan);
 }
 
-void Skeleton::sortie(int n)
+void Skeleton::removeParticle(int n)
 {
   int i;
   
-  for( i=n; i<queue ; i++)
-    file[i] = file[i+1];
+  for( i=n; i<m_headIndex ; i++)
+    m_queue[i] = m_queue[i+1];
   
-  queue--;
-  if(queue==-1){
+  m_headIndex--;
+  if(m_headIndex==-1){
     //puts("Erreur : file vide");
-    entree(&origine);
+    addParticle(&m_root);
     return;
   }
 }
 
-void Skeleton::setEltFile(int i, const CPoint* const pt)
+void Skeleton::updateParticle(int i, const CPoint* const pt)
 {
-  file[i] = *pt;
-  file[i].decreaseLife();
+  m_queue[i] = *pt;
+  m_queue[i].decreaseLife();
 }
 
 void Skeleton::swap(int i, int j)
 {
-  Particle tmp(file[i]);
+  Particle tmp(m_queue[i]);
   
-  file[i] = file[j];
+  m_queue[i] = m_queue[j];
   
-  file[j] = tmp;
+  m_queue[j] = tmp;
 }
 
 void Skeleton::draw ()
 {
   glDisable (GL_LIGHTING);
 
-  draw_origine();
+  drawRoot();
   for (int i = 0; i < getSize (); i++)
-    draw_particle( getElt (i) ) ;
+    drawParticle( getParticle (i) ) ;
 
   glEnable (GL_LIGHTING);
 }
 
-void Skeleton::draw_origine ()
+void Skeleton::drawRoot ()
 {
-  CPoint position (flamePos + origine);
+  CPoint position (m_flamePos + m_root);
     
   glColor4f (1.0, 0.0, 0.25, 0.8);
   glPushMatrix ();
@@ -100,9 +89,9 @@ void Skeleton::draw_origine ()
   glPopMatrix ();
 }
 
-void Skeleton::draw_particle (Particle * const particle)
+void Skeleton::drawParticle (Particle * const particle)
 {
-  CPoint position (flamePos + *particle);
+  CPoint position (m_flamePos + *particle);
 
   glColor4f (1.0, 1.0, 0.25, 0.8);
   glPushMatrix ();

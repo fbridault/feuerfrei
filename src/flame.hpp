@@ -181,9 +181,11 @@ protected:
   bool toggle;
   
   GLfloat lightPositions[8][4];
-  int nb_lights;
+  short nb_lights;
   
   int perturbate_count;
+
+  short m_lifeSpanAtBirth;
 
   CScene *sc;
 };

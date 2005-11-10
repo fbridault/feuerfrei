@@ -33,50 +33,50 @@ public:
    * @param f tableau contenant les pointeurs vers les flammes
    * @param nb_f nombre de flammes (taille du tableau)
    */
-  void setFlames (Flame ** const f, int nb_f)
+  void setFlames (Flame ** const flames, int nbFlames)
   {
-    flammes = f;
-    nb_flammes = nb_f;
+    m_flames = flames;
+    m_nbFlames = nbFlames;
   };
 
   double getU (int i, int j, int k)
   {
-    return u[IX (i, j, k)];
+    return m_u[IX (i, j, k)];
   };
   double getV (int i, int j, int k)
   {
-    return v[IX (i, j, k)];
+    return m_v[IX (i, j, k)];
   };
   double getW (int i, int j, int k)
   {
-    return w[IX (i, j, k)];
+    return m_w[IX (i, j, k)];
   };
 
   /** Ajout d'une force externe pour la composante U */
   void addUsrc (int i, int j, int k, double value)
   {
-    u_src[IX (i, j, k)] += value;
+    m_uSrc[IX (i, j, k)] += value;
   };
   /** Ajout d'une force externe pour la composante V */
   void addVsrc (int i, int j, int k, double value)
   {
-    v_src[IX (i, j, k)] += value;
+    m_vSrc[IX (i, j, k)] += value;
   };
   /** Ajout d'une force externe pour la composante W */
   void addWsrc (int i, int j, int k, double value)
   {
-    w_src[IX (i, j, k)] += value;
+    m_wSrc[IX (i, j, k)] += value;
   };
 
   /** Affectation d'une force externe pour la composante V */
   void setUsrc (int i, int j, int k, double value)
   {
-    u_src[IX (i, j, k)] = value;
+    m_uSrc[IX (i, j, k)] = value;
   };
   /** Affectation d'une force externe pour la composante V */
   void setVsrc (int i, int j, int k, double value)
   {
-    v_src[IX (i, j, k)] = value;
+    m_vSrc[IX (i, j, k)] = value;
   };
   /** Ajout des forces externes.
    * @param x composante à traiter
@@ -89,39 +89,39 @@ public:
   /** Retourne le nombre de voxels en X */
   int getX ()
   {
-    return N_x;
+    return m_nbVoxelsX;
   };
   /** Retourne le nombre de voxels en Y */
   int getY ()
   {
-    return N_y;
+    return m_nbVoxelsY;
   };
   /** Retourne le nombre de voxels en Z */
   int getZ ()
   {
-    return N_z;
+    return m_nbVoxelsZ;
   };
 
   /** Retourne la dimension en X */
   double getDimX ()
   {
-    return dim_x;
+    return m_dimX;
   };
   /** Retourne la dimension en Y */
   double getDimY ()
   {
-    return dim_y;
+    return m_dimY;
   };
   /** Retourne la dimension en Z */
   double getDimZ ()
   {
-    return dim_z;
+    return m_dimZ;
   };
 
   /** Retourne le pas de temps */
   double getTimeStep()
   {
-    return dt;
+    return m_dt;
   };
 
   /** NOTE : Les 6 méthodes ci-dessus pourraient faire partie d'un objet hérité Grid3D par exemple */
@@ -145,21 +145,21 @@ public:
 protected:
   int IX (int i, int j, int k)
   {
-    return ((i) + (N_x + 2) * (j) + (N_x + 2) * (N_y + 2) * (k));
+    return ((i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k));
   };
   int IX2 (int i)
   {
     int x,y,z,tmp,tmp2;
-    tmp2=N_x*N_y;
+    tmp2=m_nbVoxelsX*m_nbVoxelsY;
     z=i/tmp2;
     tmp=i-z*tmp2;
-    y=tmp/N_x;
-    x=tmp-y*N_x;
+    y=tmp/m_nbVoxelsX;
+    x=tmp-y*m_nbVoxelsX;
     
     return( IX( x+1, y+1, z+1 ) );
-   //int n=i/N_x; /* Nombre de lignes dans la grille */
+   //int n=i/m_nbVoxelsX; /* Nombre de lignes dans la grille */
     
-    //return ( (N_x+2)*(N_y+2) + N_x+3 + n/N_y * ((N_x+2)*(N_y+2)) + (n % N_x) *2 + (i % (N_x*N_y) ) );
+    //return ( (m_nbVoxelsX+2)*(m_nbVoxelsY+2) + m_nbVoxelsX+3 + n/m_nbVoxelsY * ((m_nbVoxelsX+2)*(m_nbVoxelsY+2)) + (n % m_nbVoxelsX) *2 + (i % (m_nbVoxelsX*m_nbVoxelsY) ) );
   };
 
   /** Traitement de valeurs aux bords du solveur.
@@ -246,41 +246,40 @@ protected:
   void vel_step_hybride ();
 
   /** Nombre de voxels sur un côté du cube de résolution. */
-  int N_x, N_y, N_z;
+  int m_nbVoxelsX, m_nbVoxelsY, m_nbVoxelsZ;
   
   /** Dimensions du solveur */
-  double dim_x, dim_y, dim_z;
+  double m_dimX, m_dimY, m_dimZ;
 
   /** Taille totale du cube en nombre de voxels, égal à (N+2)^3. */
-  int size;
-  double *u, *v, *w, *u_prev, *v_prev, *w_prev, *u_src, *v_src, *w_src;
-  double *dens, *dens_prev, *dens_src;
-  double *residu_u, *residu_u_prev, *residu_v, *residu_v_prev, *residu_w,
-    *residu_w_prev;
-  double *r, *z, *q, *p;
+  int m_nbVoxels;
+  double *m_u, *m_v, *m_w, *m_uPrev, *m_vPrev, *m_wPrev, *m_uSrc, *m_vSrc, *m_wSrc;
+  double *m_dens, *m_densPrev, *m_densSrc;
+  double *m_uResidu, *m_uPrevResidu, *m_vResidu, *m_vPrevResidu, *m_wResidu, *m_wPrevResidu;
+  double *m_r, *m_z, *m_q, *m_p;
 	
   /** Nombre de pas de résolutions de Gauss-seidel dans les méthodes de diffusion et de projection */
-  int nb_step_gauss_seidel;
+  int m_nbStepsGS;
 
   /** Tableau de pointeurs vers les flammes.
    * A REVOIR : il existe de ce fait une relation circulaire entre la classe Solver et la classe Flame
    * qu'il serait bon se supprimer.
    */
-  Flame **flammes;
+  Flame **m_flames;
   /** Nombre de flammes. */
-  int nb_flammes;
+  int m_nbFlames;
 
   /** Nombre d'itérations pour Gauss-Seidel */
-  int nb_iter;
-  const static int nb_iter_flickering = 50;
+  int m_nbIter;
+  const static int m_nbIterFlickering = 50;
   /** Viscosité cinématique de l'air 15*10E-6. */
-  double visc;
+  double m_visc;
   /** Diffusion. */
-  double diff;
+  double m_diff;
   /** Pas de temps. */
-  double dt;
+  double m_dt;
   
-  double a_visc, a_diff;
+  double m_aVisc, m_aDiff;
 };
 
 #endif

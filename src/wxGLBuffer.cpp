@@ -91,30 +91,45 @@ void wxGLBuffer::InitGL(void)
   m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context);
 }
 
-void wxGLBuffer::InitScene(void)
+void wxGLBuffer::InitFlames(void)
 {
-  int nb_squelettes_flammes;
+  short nbSkeletons;
+  m_flames = new Flame *[m_nbFlames];
+  short type = BOUGIE;
   
-  m_solver = new Solver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz, 1.0, m_currentConfig->timeStep);
+  CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
+
+  for(int i=0 ; i < m_nbFlames; i++)
+    //    switch(m_FlameType[i]){
+    switch(type){
+    case BOUGIE : 
+      nbSkeletons = 4;
+      m_flames[i] = new Bougie (m_solver, nbSkeletons, &pt, &pos, m_solver->getDimX()/ 7.0, 
+				m_SVShader,"bougie.obj",m_scene, &m_context);
+      break;
+    case FIRMALAMPE :
+      
+      nbSkeletons = 5;
+      m_flames[0] = new Firmalampe(m_solver,nbSkeletons,&pt,&pos,m_SVShader,
+				   m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
+      break;
+    }
+}
+
+void wxGLBuffer::InitScene(void)
+{  
+  m_solver = new Solver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
+			1.0, m_currentConfig->timeStep);
   //m_solver = new BenchSolver (solvx, solvy, solvz, 1.0, timeStep);
   
   m_scene = new CScene (m_currentConfig->sceneName.fn_str());
+  
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
-  m_flames = new Flame *[m_nbFlames];
   m_photoSolid = new SolidePhotometrique(m_scene, &m_context);
-#ifdef BOUGIE
-  CPoint pt (0.0, 0.0, 0.0), pos (0.0, 0.0, 0.0);
-  nb_squelettes_flammes = 4;
-  m_flames[0] = new Bougie (m_solver, nb_squelettes_flammes, &pt, &pos,
-			   m_solver->getDimX()/ 7.0, m_SVShader,"bougie.obj",m_scene, &m_context);
-#else
-  CPoint pt (0.0, 0.0, 0.0), pos (1.5, -1.8, 0.0);
-  //CPoint pt (0.0, 0.0, 0.0), pos (0.0, -0.5, 0.0);
-  nb_squelettes_flammes = 5;
-  m_flames[0] = new Firmalampe(m_solver,nb_squelettes_flammes,&pt,&pos,m_SVShader,m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
-#endif 
-  //AS_ERROR(chdir(".."),"chdir ..");
+  
+  InitFlames();
+    //AS_ERROR(chdir(".."),"chdir ..");
   m_solver->setFlames ((Flame **) m_flames, m_nbFlames);
   m_scene->createDisplayLists();
   m_eyeball = new Eyeball (m_width, m_height, m_currentConfig->clipping);
@@ -164,6 +179,7 @@ void wxGLBuffer::DestroyScene(void)
   for (int f = 0; f < m_nbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
+  
   delete m_solver;
 }
 

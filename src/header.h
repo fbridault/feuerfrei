@@ -33,14 +33,6 @@ using namespace std;
 
 #define NB_PARTICULES 8
 
-#define BOUGIE
-
-#ifdef BOUGIE
-#define LIFE_SPAN_AT_BIRTH 6
-#else
-#define LIFE_SPAN_AT_BIRTH 4
-#endif
-
 #define FPS .04
 
 #define COEFFICIENT_ROTATION_QUATERNION 1.0
@@ -49,28 +41,34 @@ using namespace std;
 #define AS_ERROR(ret,str) {if(ret==-1) perror(str);}
 
 /************************* Display lists *********************/
-#define REPERE 1
-#define GRILLE 2
-/* Tous les objets de la scÃ¨ne */
-#define SCENE_OBJECTS 3
-/* Objets texturÃ©s */
-#define SCENE_OBJECTS_TEX 4
-/* Objets sans textures */
-#define SCENE_OBJECTS_WTEX 5
-/* Objets texturÃ©s  qui projettent des ombres */
-#define SCENE_OBJECTS_WSV_TEX 6
-/* Objets sans textures qui projettent des ombres */
-#define SCENE_OBJECTS_WSV_WTEX 7
-/* Tous les objets qui projettent des ombres */
-#define SCENE_OBJECTS_WSV 8
-/* Tous les objets qui projettent des ombres, sans les textures éventuelles */
-#define SCENE_OBJECTS_WSV_WT 9
-/* Tous les objets de la scène sans les textures éventuelles */
-#define SCENE_OBJECTS_WT 10
-
-#define CYLINDRE 12
-#define MECHE 15
+enum{
+  REPERE = 1,
+    GRILLE,
+    /* Tous les objets de la scène */
+    SCENE_OBJECTS,
+    /* Objets texturés */
+    SCENE_OBJECTS_TEX,
+    /* Objets sans textures */
+    SCENE_OBJECTS_WTEX,
+    /* Objets texturés  qui projettent des ombres */
+    SCENE_OBJECTS_WSV_TEX,
+    /* Objets sans textures qui projettent des ombres */
+    SCENE_OBJECTS_WSV_WTEX,
+    /* Tous les objets qui projettent des ombres */
+    SCENE_OBJECTS_WSV,
+    /* Tous les objets qui projettent des ombres, sans les textures éventuelles */
+    SCENE_OBJECTS_WSV_WT,
+    /* Tous les objets de la scène sans les textures éventuelles */
+    SCENE_OBJECTS_WT,
+    CYLINDRE,
+    MECHE ,
+    };
 /*************************************************************/
+
+enum{
+  BOUGIE = 1,
+    FIRMALAMPE,
+    };
 
 // Pour le calcul du dÃ©gradÃ© de couleur des pyramides
 #define VELOCITE_MAX .2

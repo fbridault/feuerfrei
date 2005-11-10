@@ -27,7 +27,7 @@ public:
   /** Constructeur de mèche	
    * @param filename nom du fichier de scène où est stockée la mèche
    */
-  Wick(char *filename, int nb_lead_squelettes, CScene *scene);
+  Wick(const char *filename, int nb_lead_squelettes, CScene *scene);
   virtual ~Wick();
   	
   /**

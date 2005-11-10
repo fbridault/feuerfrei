@@ -9,14 +9,17 @@
 #endif
 
 Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
-			CgSVShader * shader, char *meche_name, const char *filename, CScene *scene):
+			CgSVShader * shader, const char *meche_name, const char *filename, CScene *scene):
   Flame (s, centre, pos, filename,scene),
   meche (meche_name, nb, scene),
   tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
   CPoint pt;
   float largeur = 0.03;
-	
+  m_lifeSpanAtBirth = 4;
+  
+  CPoint rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
+  
   nbLeadSkeletons = meche.getLeadPointsArraySize ();
   guides = new LeadSkeleton *[nbLeadSkeletons];
 
@@ -29,9 +32,10 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   for (int i = 1; i <= nbLeadSkeletons; i++)
     {
       pt = *meche.getLeadPoint (i - 1);
-      guides[i - 1] = new LeadSkeleton (solveur, position, pt);
+      guides[i - 1] = new LeadSkeleton (solveur, position, pt, rootMoveFactorL,m_lifeSpanAtBirth);
       pt.addZ (-largeur / 2.0);
-      squelettes[i] = new PeriSkeleton (solveur, position, pt, guides[i - 1],  LIFE_SPAN_AT_BIRTH - 2);
+      squelettes[i] = new PeriSkeleton (solveur, position, pt, rootMoveFactorP,
+					guides[i - 1], m_lifeSpanAtBirth - 2);
     }
 
   /* Génération de l'autre cÃ´té des squelettes périphériques */
@@ -39,41 +43,31 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   {
 	pt = *meche.getLeadPoint (j - 1);
 	pt.addZ (largeur / 2.0);
-	squelettes[i] =
-	new PeriSkeleton (solveur, position,
-					  pt,
-					  guides[j - 1],
-					  LIFE_SPAN_AT_BIRTH - 2);
+	squelettes[i] = new PeriSkeleton (solveur, position, pt, rootMoveFactorP,
+					  guides[j - 1], m_lifeSpanAtBirth - 2);
   }
   
   /* Ajout des extrémités */
   pt = *meche.getLeadPoint (0);
   pt.addX (-largeur / 2.0);
-  squelettes[0] = new PeriSkeleton (solveur, position,  pt, guides[0], LIFE_SPAN_AT_BIRTH - 2);
+  squelettes[0] = new PeriSkeleton (solveur, position,  pt, rootMoveFactorP, 
+				    guides[0], m_lifeSpanAtBirth - 2);
   pt = *meche.getLeadPoint (nbLeadSkeletons - 1);
   pt.addX (largeur / 2.0);
-  squelettes[nbLeadSkeletons + 1] =
-    new PeriSkeleton (solveur, position,
-		      pt,
-		      guides[nbLeadSkeletons - 1],
-		      LIFE_SPAN_AT_BIRTH - 2);
+  squelettes[nbLeadSkeletons + 1] = new PeriSkeleton (solveur, position, pt,rootMoveFactorP,
+						      guides[nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
 
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
-  ctrlpoints =
-    new GLfloat[(NB_PARTICULES + nb_pts_fixes) *
-		(nb_squelettes + uorder) * 3];
+  ctrlpoints =  new GLfloat[(NB_PARTICULES + nb_pts_fixes) * (nb_squelettes + uorder) * 3];
   uknots = new GLfloat[uorder + nb_squelettes + uorder - 1];
   vknots = new GLfloat[vorder + NB_PARTICULES + nb_pts_fixes];
   distances = new float[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
-  indices_distances_max =
-    new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
+  indices_distances_max = new int[NB_PARTICULES - 1 + nb_pts_fixes + vorder];
 
-  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 +
-    solveur->getX () / 2;
+  x = (int) (centre->getX () * solveur->getDimX() * solveur->getX ()) + 1 + solveur->getX () / 2;
   y = (int) (centre->getY () * solveur->getDimY() * solveur->getY ()) + 1;
-  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 +
-    solveur->getZ () / 2;
+  z = (int) (centre->getZ () * solveur->getDimZ() * solveur->getZ ()) + 1 + solveur->getZ () / 2;
 
   cgShader = shader;
 	
@@ -191,7 +185,7 @@ Firmalampe::eclaire ()
   for (int i = 0; i < nbLeadSkeletons  ; i++){
     guides[i]->move ();
     
-    tmp = guides[i]->getLastElt ();
+    tmp = guides[i]->getLastParticle ();
     
     nb_lights++;
     if( (i < 8 ) ){
@@ -246,14 +240,14 @@ Firmalampe::build ()
 	  /* On laisse les distances au carré pour des raisons évidentes de cot de calcul */
 
 	  distances[0] = 
-	    squelettes[k]->getLeadSkeleton ()->getElt (0)->squaredDistanceFrom (squelettes[k]->getElt (0));
+	    squelettes[k]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (squelettes[k]->getParticle (0));
 
 	  for (j = 0; j < squelettes[k]->getSize () - 1; j++)
 	    distances[j + 1] = 
-	      squelettes[k]->getElt (j)->squaredDistanceFrom(squelettes[k]->getElt (j + 1));
+	      squelettes[k]->getParticle (j)->squaredDistanceFrom(squelettes[k]->getParticle (j + 1));
 	  
 	  distances[squelettes[k]->getSize ()] = 
-	    squelettes[k]->getLastElt ()->squaredDistanceFrom (squelettes[k]->getOrigine ());
+	    squelettes[k]->getLastParticle ()->squaredDistanceFrom (squelettes[k]->getRoot ());
 
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaÃ¯Â¿Å“re les premiers */
@@ -288,12 +282,12 @@ Firmalampe::build ()
 	  count = 0;
 
 	  /* Remplissage des points de contrle */
-	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getParticle (0), 1.0);
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == 0)
 	      {
-		pt = CPoint::pointBetween(squelettes[k]->getLeadSkeleton ()->getElt (0), squelettes[k]->getElt (0));
+		pt = CPoint::pointBetween(squelettes[k]->getLeadSkeleton ()->getParticle (0), squelettes[k]->getParticle (0));
 		setCtrlPoint (i, count++, &pt);
 	      }
 
@@ -305,31 +299,31 @@ Firmalampe::build ()
 		  if (indices_distances_max[l] == j + 1)
 		    {
 		      /* On peut référencer j+1 puisque normalement, indices_distances_max[l] != j si j == squelettes[k]->getSize()-1 */
-		      pt = CPoint::pointBetween(squelettes[k]->getElt (j), squelettes[k]->getElt (j + 1));
+		      pt = CPoint::pointBetween(squelettes[k]->getParticle (j), squelettes[k]->getParticle (j + 1));
 		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
-	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getParticle (j));
 	    }
 	  
-	  setCtrlPoint (i, count++, squelettes[k]->getLastElt ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLastParticle ());
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == squelettes[k]->getSize ())
 	      {
-		pt = CPoint::pointBetween(squelettes[k]->getOrigine (), squelettes[k]-> getLastElt ());
+		pt = CPoint::pointBetween(squelettes[k]->getRoot (), squelettes[k]-> getLastParticle ());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
-	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getRoot ());
 
 	  bool prec = false;
 
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (indices_distances_max[l] == squelettes[k]->getSize () + 1)
 	      {
-		pt = CPoint::pointBetween(squelettes[k]->getOrigine (),
-					  squelettes[k]->getLeadSkeleton()->getOrigine ());
+		pt = CPoint::pointBetween(squelettes[k]->getRoot (),
+					  squelettes[k]->getLeadSkeleton()->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -341,26 +335,26 @@ Firmalampe::build ()
 		if (!prec)
 		  {
 		    pt = *squelettes[k]->
-		      getOrigine ();
+		      getRoot ();
 		  }
-		pt = CPoint::pointBetween (&pt, squelettes[k]->getLeadSkeleton()->getOrigine ());
+		pt = CPoint::pointBetween (&pt, squelettes[k]->getLeadSkeleton()->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
-	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getRoot ());
 	}
       else
 	{
 	  /* Cas sans problÃ¨me */
 	  count = 0;
 	  /* Remplissage des points de contrÃ´le */
-	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getElt (0), 1.0);
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getParticle (0), 1.0);
 	  for (j = 0; j < squelettes[k]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++, squelettes[k]->getElt (j));
+	      setCtrlPoint (i, count++, squelettes[k]->getParticle (j));
 	    }
-	  setCtrlPoint (i, count++, squelettes[k]->getOrigine ());
-	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getOrigine ());
+	  setCtrlPoint (i, count++, squelettes[k]->getRoot ());
+	  setCtrlPoint (i, count++, squelettes[k]->getLeadSkeleton ()->getRoot ());
 	}
     }
 
@@ -677,7 +671,7 @@ CVector Firmalampe::get_main_direction()
 {
   CVector direction;
   for(int i = 0; i < nbLeadSkeletons; i++){
-    direction = direction + *(guides[i]->getElt(0));
+    direction = direction + *(guides[i]->getParticle(0));
   }
   direction = direction / nbLeadSkeletons;
 

@@ -3,8 +3,8 @@
 CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context):
   CgShader (sourceName, shaderName, context, CG_GL_VERTEX)
 {
-  GLfloat fatnessVec[] = { -0.001, -0.001, -0.001, 0.0 };
-  GLfloat shadowExtrudeDistVec[] = { 5.0, 5.0, 5.0, 0.0 };
+  GLdouble fatnessVec[] = { -0.001, -0.001, -0.001, 0.0 };
+  GLdouble shadowExtrudeDistVec[] = { 5.0, 5.0, 5.0, 0.0 };
   
   // Récupération des paramètres
   lightPos = cgGetNamedParameter (program, "LightPos");

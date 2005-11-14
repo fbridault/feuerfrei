@@ -29,9 +29,9 @@ public:
   /** Désactive le glow, les appels suivants dessineront dans le color buffer */
   void deactivate();
   /** Plaque le blur à l'écran */
-  void drawBlur(float alpha);
+  void drawBlur(double alpha);
 
-  void setGaussSigma(float sigma)
+  void setGaussSigma(double sigma)
   {
     blurFragmentShader.computeWeights(sigma);
   }

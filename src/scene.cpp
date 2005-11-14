@@ -149,7 +149,7 @@ int CScene::getPolygonsCount()
   return nb;
 }
 
-int CScene::setMaterialToObjectByName(const char *name, CObject *currentObject)
+int CScene::getMaterialIndexByName(const char *name)
 { 
   int index=0;
   for (vector<CMaterial*>::iterator materialArrayIterator = m_materialArray.begin ();
@@ -162,5 +162,5 @@ int CScene::setMaterialToObjectByName(const char *name, CObject *currentObject)
       index++;
     } 
   cerr << "Error loading unknown material " << name << endl;
-  return setMaterialToObjectByName("default",currentObject);
+  return getMaterialIndexByName("default");
 }

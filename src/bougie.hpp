@@ -64,33 +64,28 @@ public:
   void draw_shadowVolumes(GLint objects_list_wsv);
 
   /** Retourne la direction de la base de la flamme vers la derniere particule
-   * pour orienter le solide photomÃ©trique.
+   * pour orienter le solide photom�trique.
    */
   CVector get_main_direction(){
-    return(*(guide->getParticle(0)));
+    return(*(m_lead->getParticle(0)));
   };
   
 private:
-  /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
+  /** Ajoute une force p�riodique dans le solveur, pour donner une petite fluctuation sur la flamme */
   void perturbate_forces();
   
   void draw_shadowVolume(GLint objects_list_wsv, int i);
   void draw_shadowVolume2(GLint objects_list_wsv, int i);
 
   /** Pointeur vers le squelette guide. */
-  LeadSkeleton *guide;
-
-  /** Nombre de points fixes pour chaque direction v = origine du guide + origine du squelette pÃ©riphÃ©rique + sommet du guide */
-  const static int nb_pts_fixes = 3;
-    
-  /** Identifiant de la texture. */
-  Texture tex;
+  LeadSkeleton *m_lead;
   
-  CgSVShader *cgShader;
+  /** Identifiant de la texture. */
+  Texture m_tex;
+  
+  CgSVShader *m_cgShader;
 //   CgBougieVertexShader cgBougieVertexShader;
 //   CgBougieFragmentShader cgBougieFragmentShader;
-
-  float gaussSigma;
 };
 
 #endif

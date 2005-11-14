@@ -23,7 +23,7 @@ public:
   * @param rayon rayon du cylindre
   * @param slices nombre de segments du cylindre
   */
-  static void cylindre(float hauteur, float rayon, float slices );
+  static void cylindre(double hauteur, double rayon, double slices );
 };
 
 #endif

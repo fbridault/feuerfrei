@@ -24,9 +24,9 @@ using namespace std;
 class CPoint  
 {
 public:
-  GLfloat x;/**< Coordonn&eacute;e spatiale en <CODE>x</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
-  GLfloat y;/**< Coordonn&eacute;e spatiale en <CODE>y</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
-  GLfloat z;/**< Coordonn&eacute;e spatiale en <CODE>z</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLdouble x;/**< Coordonn&eacute;e spatiale en <CODE>x</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLdouble y;/**< Coordonn&eacute;e spatiale en <CODE>y</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLdouble z;/**< Coordonn&eacute;e spatiale en <CODE>z</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
 public:
   /**
    * Constructeur par d&eacute;faut. Ce constructeur place le point en coordonn&eacute;es <CODE>(0, 0, 0)</CODE> par d&eacute;faut.
@@ -42,7 +42,7 @@ public:
    * @param yp	coordonn&eacute;e en <CODE>y</CODE> du point &agrave; cr&eacute;er.
    * @param zp	coordonn&eacute;e en <CODE>z</CODE> du point &agrave; cr&eacute;er.
    */
-  CPoint(const GLfloat& xp, const GLfloat& yp, const GLfloat& zp){x=xp; y=yp; z=zp;};
+  CPoint(const GLdouble& xp, const GLdouble& yp, const GLdouble& zp){x=xp; y=yp; z=zp;};
   /**
    * Destructeur par d&eacute;faut.
    */
@@ -78,7 +78,7 @@ public:
    * @param P	point distant du point courant.
    * @return	Constante de type <CODE>double</CODE> repr&eacute;sentant la distance entre les deux points.
    */
-  GLfloat distance (const CPoint& P) const
+  GLdouble distance (const CPoint& P) const
   {
     return(MathFn::Sqrt((x-P.x)*(x-P.x)+
 			(y-P.y)*(y-P.y)+
@@ -90,7 +90,7 @@ public:
    * @param K	facteur multiplicateur.
    * @return	El&eacute;ment de type Cpoint.
    */
-  CPoint operator*(const GLfloat &K)
+  CPoint operator*(const GLdouble &K)
   {
     return CPoint(x*K,y*K,z*K);
   };
@@ -100,7 +100,7 @@ public:
    * @param nY	nouvelle valeur pour l'attribut <CODE>Y</CODE>.
    * @param nZ	nouvelle valeur pour l'attribut <CODE>Z</CODE>.
    */
-  void set (const GLfloat& nX,const GLfloat& nY,const GLfloat& nZ){x=nX;y=nY;z=nZ;};
+  void set (const GLdouble& nX,const GLdouble& nY,const GLdouble& nZ){x=nX;y=nY;z=nZ;};
   
   /** Afficher les coordonnées d'un point */
   void display(){
@@ -114,7 +114,7 @@ public:
   }//operator+
 	
 	/** Diviser toutes les composantes par un scalaire */
-  virtual CPoint operator/(GLfloat div){
+  virtual CPoint operator/(GLdouble div){
     CPoint resultat(x/div,y/div,z/div);
     return resultat;
   }
@@ -177,7 +177,7 @@ public:
    * @param yp	coordonn&eacute;e en <CODE>y</CODE> du vecteur &agrave; cr&eacute;er.
    * @param zp	coordonn&eacute;e en <CODE>z</CODE>du vecteur &agrave; cr&eacute;er.
    */
-  CVector(const GLfloat& xp, const GLfloat& yp, const GLfloat& zp):CPoint(xp, yp, zp){};
+  CVector(const GLdouble& xp, const GLdouble& yp, const GLdouble& zp):CPoint(xp, yp, zp){};
   /**
    * Constructeur param&eacute;trique.
    * @param PA	point de d&eacute;part du vecteur &agrave; cr&eacute;er.
@@ -200,7 +200,7 @@ public:
    * @param V second membre du produit scalaire. 
    * @return El&eacute;ment de type double, r&eacute;sultat de l'op&eacute;ration.
    */
-  GLfloat operator*(const CVector& V) const
+  GLdouble operator*(const CVector& V) const
   {return (x*V.x + y*V.y + z*V.z);};
   /**
    * Op&eacute;rateur de produit par un scalaire.
@@ -208,7 +208,7 @@ public:
    * @return El&eacute;ment de type CVector correpondant au vecteur d'entr&eacute;e dont 
    * les coordonn&eacute;e ont &eacute;t&eacute; multipli&eacute;es par <CODE>K</CODE>.
    */
-  virtual CVector operator*(const GLfloat& K) const
+  virtual CVector operator*(const GLdouble& K) const
   {return CVector(x*K,y*K,z*K);};
 
   /**
@@ -267,7 +267,7 @@ public:
    * @param P point par lequel passe le plan.
    * @return Composante &agrave; l'origine du plan d&eacute;finit.
    */
-  GLfloat operator*(const CPoint& P) const
+  GLdouble operator*(const CPoint& P) const
   {return(x*P.x + y*P.y + z*P.z);};
 	
   /**
@@ -275,7 +275,7 @@ public:
    * @return Norme du vecteur courant. R&eacute;sultat diff&eacute;rent de 1 si le vecteur 
    * n'est pas normalis&eacute;.
    */
-  GLfloat length() const
+  GLdouble length() const
   {return (MathFn::Sqrt(x*x + y*y + z*z));};
   /**
    * Normalisation d'un vecteur. Cette fonction <B>modifie</B> le vecteur courant.

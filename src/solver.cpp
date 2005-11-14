@@ -784,7 +784,6 @@ Solver::iterate (bool flickering)
   //~ flickering = false;
 
   //cout << IX2(3374) << "  " << IX2(3375) << " " << IX2(1) << " " << IX2(225) << endl;
-
   for (int i = 0; i < m_nbFlames; i++)
     m_flames[i]->add_forces (flickering);
 
@@ -796,6 +795,8 @@ Solver::iterate (bool flickering)
   set_bnd (0, m_u);
   set_bnd (0, m_v);
   set_bnd (0, m_w);
+  
+  cleanSources ();
 }
 
 void
@@ -825,13 +826,13 @@ Solver::buildDLGrid ()
     {
       for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
 	{
-	  glVertex3f (i, 0.0, -j);
-	  glVertex3f (i, m_dimY, -j);
+	  glVertex3d (i, 0.0, -j);
+	  glVertex3d (i, m_dimY, -j);
 	}
       for (i = 0.0; i <= m_dimY + intery / 2; i += intery)
 	{
-	  glVertex3f (0.0, i, -j);
-	  glVertex3f (m_dimX, i, -j);
+	  glVertex3d (0.0, i, -j);
+	  glVertex3d (m_dimX, i, -j);
 	}
     }
   glEnd ();
@@ -855,13 +856,13 @@ Solver::buildDLBase ()
   glColor4f (0.5, 0.5, 0.5, 0.5);
   for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
     {
-      glVertex3f (i, 0.0, -m_dimZ);
-      glVertex3f (i, 0.0, 0.0);
+      glVertex3d (i, 0.0, -m_dimZ);
+      glVertex3d (i, 0.0, 0.0);
     }
   for (i = 0.0; i <= m_dimZ + interz / 2; i += interz)
     {
-      glVertex3f (0.0, 0.0, i - m_dimZ);
-      glVertex3f (m_dimX, 0.0, i - m_dimZ);
+      glVertex3d (0.0, 0.0, i - m_dimZ);
+      glVertex3d (m_dimX, 0.0, i - m_dimZ);
     }
   glEnd ();
   glPopMatrix ();
@@ -884,9 +885,9 @@ Solver::displayVelocityField (void)
 	      CVector vect;
 	      /* Affichage du champ de vélocité */
 	      glPushMatrix ();
-	      glTranslatef (inc_x * i - inc_x / 2.0 - m_nbVoxelsX / 2.0,
+	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dimX / 2.0,
 			    inc_y * j - inc_y / 2.0, 
-			    inc_z * k - inc_z / 2.0 -  m_nbVoxelsZ / 2.0);
+			    inc_z * k - inc_z / 2.0 - m_dimZ / 2.0);
 	      //    printf("vélocité %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
 	      //SDL_mutexP (lock);
 	      vect.x = getU (i, j, k);

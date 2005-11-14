@@ -18,12 +18,12 @@ public:
   virtual ~CgBlurVertexShader();
   
   void setOffsetsArray(){
-    cgGLSetParameterArray1f(paramOffsets, 0, 8, offsets);
+    cgGLSetParameterArray1d(paramOffsets, 0, 8, offsets);
   };
   
 private:
   CGparameter paramOffsets;
-  float offsets[8];
+  double offsets[8];
 };
 
 class CgBlurFragmentShader : public CgShader
@@ -32,11 +32,11 @@ public:
   CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgBlurFragmentShader();
   
-  void computeWeights(float sigma);
+  void computeWeights(double sigma);
 
   void setWeightsArray(){
-    cgGLSetParameterArray1f(paramWeights, 0, 8, weights);
-    cgGLSetParameter1f(paramDivide, divide);
+    cgGLSetParameterArray1d(paramWeights, 0, 8, weights);
+    cgGLSetParameter1d(paramDivide, divide);
   };
 
   void setTexture(Texture* tex){
@@ -53,8 +53,8 @@ private:
   CGparameter paramWeights;
   CGparameter paramDivide;
   CGparameter paramTexture;
-  float weights[8];
-  float divide;
+  double weights[8];
+  double divide;
 };
 
 #endif

@@ -100,7 +100,7 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
 	      barycentre.z += (*pointsIterator)->z;
 	      n++;
 	    }
-	  barycentre = barycentre / (float)n;
+	  barycentre = barycentre / (double)n;
 
 	  m_leadPointsArray.push_back (new CPoint (barycentre));
 	}

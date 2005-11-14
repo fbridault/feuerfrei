@@ -4,61 +4,92 @@
 
 Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filename, CScene *scene)
 {  
-  solveur = s;
-  sc = scene;
+  m_solver = s;
+  m_scene = scene;
   
-  nb_squelettes = nb;
+  m_nbSkeletons = nb;
   
-  position = *pos;
-  pos->y -= solveur->getDimY()/24.0;
+  m_startPosition = m_position = *pos;
+  pos->y -= m_solver->getDimY()/24.0;
   
-  squelettes = new PeriSkeleton* [nb_squelettes];
+  m_skeletons = new PeriSkeleton* [m_nbSkeletons];
   
-  uorder = 4;
-  vorder = 4;
+  m_uorder = 4;
+  m_vorder = 4;
   
-  nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(nurbs, GLU_SAMPLING_TOLERANCE, 20.0);
-  gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  gluNurbsCallback(nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
+  m_nurbs = gluNewNurbsRenderer();
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 20.0);
+  gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
-  toggle=false;
+  m_toggle=false;
   
-  nb_lights=0;
+  m_nbLights=0;
   
-  perturbate_count=0;
-
-  scene->loadObject(filename, new CObject(scene,pos));
+  m_perturbateCount=0;
+  
+  m_luminary = new CObject(m_scene,pos);
+  m_scene->loadObject(filename, m_luminary, true);
+  m_luminaryDL=glGenLists(1);
+  glNewList(m_luminaryDL,GL_COMPILE);
+  m_luminary->draw();
+  glEndList();
 }
 
 Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScene *scene)
 {  
-  solveur = s;
-  sc = scene;
+  m_solver = s;
+  m_scene = scene;
 
-  position = *pos;
+  m_position = *pos;
 
-  uorder = 4;
-  vorder = 4;
+  m_uorder = 4;
+  m_vorder = 4;
   
-  nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(nurbs, GLU_SAMPLING_TOLERANCE, 10.0);
-  gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  gluNurbsCallback(nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
+  m_nurbs = gluNewNurbsRenderer();
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 10.0);
+  gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
-  toggle=false;
+  m_toggle=false;
   
-  nb_lights=0;
+  m_nbLights=0;
   
-  perturbate_count=0;
+  m_perturbateCount=0;
     
-  scene->loadObject(filename, new CObject(scene,pos));
+  m_luminary = new CObject(m_scene,pos);
+  m_scene->loadObject(filename, m_luminary, true);
+  m_luminaryDL=glGenLists(1);
+  glNewList(m_luminaryDL,GL_COMPILE);
+  m_luminary->draw();
+  glEndList();
 }
 
 Flame::~Flame()
 {  
-  gluDeleteNurbsRenderer(nurbs);
-  /* On efface pas le luminaire, il appartient à la scène */
+  gluDeleteNurbsRenderer(m_nurbs);
+  /* On efface le luminaire, il n'appartient pas à la scène */
+  delete m_luminary;
+}
+
+void Flame::moveTo(CPoint& position)
+{
+  int i,j;
+  m_position=m_startPosition + position;
+  /* Ajouter des forces externes */
+  
+  for (i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes() / 4 + 1; i++)
+    for (j = -m_solver->getYRes() / 4 - 1; j < -m_solver->getYRes() / 4 + 1; j++)
+      m_solver->addUsrc (m_solver->getXRes() - 1,((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			((int) (ceil (m_solver->getZRes() / 2.0))) + i, position.x*10);
+  for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+    for (j = -m_solver->getZRes() / 4 - 1; j < -m_solver->getZRes() / 4 + 1; j++)
+      m_solver->addVsrc (m_solver->getYRes() - 1,((int) (ceil (m_solver->getZRes() / 2.0))) + j,
+			((int) (ceil (m_solver->getXRes() / 2.0))) + i, position.y*10);
+  for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+    for (j = -m_solver->getYRes() / 4 - 1; j < -m_solver->getYRes() / 4 - 1; j++)
+      m_solver->addWsrc (m_solver->getZRes() - 1,((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			((int) (ceil (m_solver->getXRes() / 2.0))) + i, position.z*10);
 }
 
 void CALLBACK Flame::nurbsError(GLenum errorCode)
@@ -72,18 +103,18 @@ void CALLBACK Flame::nurbsError(GLenum errorCode)
 
 void Flame::toggleSmoothShading()
 {
-  toggle = !toggle;
-  if(toggle)
-    gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_OUTLINE_POLYGON);
+  m_toggle = !m_toggle;
+  if(m_toggle)
+    gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_OUTLINE_POLYGON);
   else
-    gluNurbsProperty(nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+    gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
 }
 
 void Flame::switch_off_lights()
 {
   int n,light=0;
   
-  for( n = 0 ; n < nb_lights ; n++){
+  for( n = 0 ; n < m_nbLights ; n++){
     switch(n){
     case 0 : light = GL_LIGHT0; break;
     case 1 : light = GL_LIGHT1; break;
@@ -103,7 +134,7 @@ void Flame::switch_on_lights()
   int n,light=0;
   double coef;
 
-  for( n = 0 ; n < nb_lights ; n++){
+  for( n = 0 ; n < m_nbLights ; n++){
     switch(n){
     case 0 : light = GL_LIGHT0; break;
     case 1 : light = GL_LIGHT1; break;
@@ -115,12 +146,12 @@ void Flame::switch_on_lights()
     case 7 : light = GL_LIGHT7; break;
     }
     //    coef = 2/(double)(n+1);
-    coef = (-(n - nb_lights/2)*(n - nb_lights/2)+16)/10.0;
+    coef = (-(n - m_nbLights/2)*(n - m_nbLights/2)+16)/10.0;
     //cout << coef << endl;
     GLfloat val_diffuse[]={0.13*coef,0.09*coef,0.06*coef,1.0};
     //GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
     GLfloat null[]={0.0,0.0,0.0,1.0};
-    GLfloat val_position[]={lightPositions[n][0],lightPositions[n][1],lightPositions[n][2],1.0};
+    GLfloat val_position[]={m_lightPositions[n][0],m_lightPositions[n][1],m_lightPositions[n][2],1.0};
   
     glLightfv(light,GL_POSITION,val_position);
     glLightfv(light,GL_DIFFUSE,val_diffuse);
@@ -136,9 +167,9 @@ void Flame::enable_only_ambient_light(int i)
   double coef;
 
   //coef = 4/(double)(i+1);
-  coef = (-(i - nb_lights/2)*(i - nb_lights/2)+16)/10.0;
+  coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/10.0;
   GLfloat val_ambiant[]={0.25*coef,0.25*coef,0.25*coef,1.0};
-  // GLfloat val_ambiant[]={0.4,0.4,0.4,1.0};
+  // GLdouble val_ambiant[]={0.4,0.4,0.4,1.0};
   GLfloat null[]={0.0,0.0,0.0,1.0};
   
   switch(i){
@@ -165,7 +196,7 @@ void Flame::reset_diffuse_light(int i)
   double coef;
   
   //coef = 2/(double)(i+1);
-  coef = (-(i - nb_lights/2)*(i - nb_lights/2)+16)/10.0;
+  coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/10.0;
   GLfloat val_diffuse[]={0.13*coef,0.09*coef,0.06*coef,1.0};
   //GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
   GLfloat null[]={0.0,0.0,0.0,1.0};

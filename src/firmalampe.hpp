@@ -71,20 +71,17 @@ private:
   void draw_shadowVolume2(GLint objects_list_wsv, int i);
 
   /** Mèche de la flamme */
-  Wick meche;
+  Wick m_wick;
 
   /** Pointeur vers les squelettes guide. */
-  LeadSkeleton **guides;
+  LeadSkeleton **m_leads;
   /** Nombres de squelettes guides */
-  int nbLeadSkeletons;
+  int m_nbLeadSkeletons;
   
   /** Identifiant de la texture. */
-  Texture tex;
+  Texture m_tex;
 
-  /** Nombre de points fixes pour chaque direction v = origine du squelette périphérique + sommet du guide */
-  const static int nb_pts_fixes = 3;
-
-  CgSVShader *cgShader;
+  CgSVShader *m_cgShader;
 };
 
 #endif

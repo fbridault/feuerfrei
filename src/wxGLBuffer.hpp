@@ -26,7 +26,6 @@ public:
 	     long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
   
   ~wxGLBuffer();
-  //virtual bool Destroy();
   
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
@@ -68,6 +67,7 @@ public:
   void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
 
   void Swap(void) { m_photoSolid->swap(); };
+  void moveFlame(int selectedFlame, CPoint& pt){ m_flames[selectedFlame]->moveTo(pt); };
 
 private:
   void WriteFPS ();

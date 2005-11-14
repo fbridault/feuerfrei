@@ -6,12 +6,6 @@ CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxStrin
 {
   interp = type;
   iesList = ieslist;
-  // Chargement et creation de la texture du solide photometrique (image test)
-  
-  // Creation de la texture du solide photometrique
-  texture_solide_photometrique = new Texture(iesList->getCurrentIESfile()->getNbazimut(),
-					     iesList->getCurrentIESfile()->getNbzenith(),
-					     iesList->getCurrentIESfile()->getIntensites());
   
   // Récupération des paramètres
   paramTextureSP = cgGetNamedParameter(program, "textureSP");
@@ -26,5 +20,4 @@ CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxStrin
 
 CgSPFragmentShader::~CgSPFragmentShader()
 {
-  delete texture_solide_photometrique;
 }

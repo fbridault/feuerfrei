@@ -8,7 +8,7 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
   char buffer[255];
   int coord_textures = 0, normales = 0;
   bool objectWSV = false;
-  float x, y, z;
+  double x, y, z;
   int a, b, c, d, an, bn, cn, dn, at, bt, ct, dt, w, matIndex=0;
   int valeurLues;
   bool alreadyOneObject = false;
@@ -51,11 +51,12 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
 	    alreadyOneObject = true;
 	  }else
 	    currentObject = new CObject(scene,&offset);
-	    
-	  if (!strncmp (buffer, "WSV", 3))
-	    scene->addObject(currentObject, true);
-	  else
-	    scene->addObject(currentObject, false);
+	  
+	  if(!detached)
+	    if (!strncmp (buffer, "WSV", 3))
+	      scene->addObject(currentObject, true);
+	    else
+	      scene->addObject(currentObject, false);
 	  objectsAttributesSet = false;
 	  nbObjectVertex = nbVertex;
 	  nbObjectNormals = nbNormals;
@@ -207,7 +208,7 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
 	  break;
 	case 'u':
 	  objFile >> buffer >> buffer;
-	  matIndex = scene->setMaterialToObjectByName(buffer,currentObject);
+	  matIndex = scene->getMaterialIndexByName(buffer);
 	}
     }
   objFile.close ();
@@ -243,7 +244,7 @@ COBJReader::importMaterial (const char *filename, CScene *scene)
 	    {
 	    case 'd':
 	      {
-		float R, G, B;
+		double R, G, B;
 		matFile >> R >> G >> B;
 		Kd[0] = R;
 		Kd[1] = G;
@@ -252,7 +253,7 @@ COBJReader::importMaterial (const char *filename, CScene *scene)
 	      break;
 	    case 'a':
 	      {
-		float R, G, B;
+		double R, G, B;
 		matFile >> R >> G >> B;
 		Ka[0] = R;
 		Ka[1] = G;
@@ -261,7 +262,7 @@ COBJReader::importMaterial (const char *filename, CScene *scene)
 	      break;
 	    case 's':
 	      {
-		float R, G, B;
+		double R, G, B;
 		matFile >> R >> G >> B;
 		Ks[0] = R;
 		Ks[1] = G;

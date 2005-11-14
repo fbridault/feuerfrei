@@ -16,8 +16,8 @@ public:
   CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
   virtual ~CgBougieVertexShader();
   
-  void setTexTranslation(GLfloat value){
-    cgGLSetParameter1f(paramTexTranslation, value);
+  void setTexTranslation(GLdouble value){
+    cgGLSetParameter1d(paramTexTranslation, value);
   };
   
   void setInverseModelViewMatrix(){

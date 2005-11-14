@@ -42,7 +42,7 @@ public:
   {
     ieslist.swap();
     for(int i=0; i < NBSHADER; i++)
-      SPFragmentShader[i]->setTexture(ieslist.getCurrentIESfile()->getTexture());
+      SPFragmentShader[i]->setTexture();
   };
 private:
   /** Pointeur vers la scène 3D */
@@ -50,11 +50,11 @@ private:
   /** Centre du solide photométrique dans l'espace */
   CPoint centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation */
-  float orientationSPtheta;
+  double orientationSPtheta;
   /** Axe de rotation */
   CVector axeRotation;
   /** Valeur de l'intensité du solide */
-  float fluctuationIntensite;
+  double fluctuationIntensite;
   /** Nombre de fragments shaders dans le tableau SPFragmentShader */
   const static int NBSHADER=6;
   /** Liste des fichiers IES */

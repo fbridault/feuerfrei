@@ -69,14 +69,14 @@ Eyeball::Eyeball (int w, int h, double clipping)
 void
 Eyeball::recalcModelView (void)
 {
-  GLfloat m[4][4];
+  GLdouble m[4][4];
 
   glPopMatrix ();
   glPushMatrix ();
   build_rotmatrix (m, curquat);
   glTranslatef (centerx, centery, centerz);
   /*glTranslatef(eyex, eyey, eyez); */
-  glMultMatrixf (&m[0][0]);
+  glMultMatrixd (&m[0][0]);
   glTranslatef (-centerx, -centery, -centerz);
   /*glTranslatef(-eyex, -eyey, -eyez); */
 }
@@ -111,7 +111,7 @@ void Eyeball::OnMouseMotion (wxMouseEvent& event)
     {
       eyez += (event.GetY() - beginy) * zoomstep;
       if (eyez < centerz)
-	eyez = centerz + (float) 1.0;
+	eyez = centerz + (double) 1.0;
       //if(eyez > 5.0 * taillex) eyez = 5.0 * taillex;
       recalculer_matrice_initiale ();
     }

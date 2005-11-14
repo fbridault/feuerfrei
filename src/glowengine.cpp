@@ -65,16 +65,16 @@ void GlowEngine::blur()
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,0);
-  glVertex3f(-1.0,1.0,0.0);
+  glVertex3d(-1.0,1.0,0.0);
   
   glTexCoord2f(0,height);
-  glVertex3f(-1.0,-1.0,0.0);
+  glVertex3d(-1.0,-1.0,0.0);
 
   glTexCoord2f(width,height);
-  glVertex3f(1.0,-1.0,0.0);
+  glVertex3d(1.0,-1.0,0.0);
 
   glTexCoord2f(width,0);
-  glVertex3f(1.0,1.0,0.0);
+  glVertex3d(1.0,1.0,0.0);
   
   glEnd();
 
@@ -100,16 +100,16 @@ void GlowEngine::blur()
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,0);
-  glVertex3f(-1.0,1.0,0.0);
+  glVertex3d(-1.0,1.0,0.0);
   
   glTexCoord2f(0,height);
-  glVertex3f(-1.0,-1.0,0.0);
+  glVertex3d(-1.0,-1.0,0.0);
   
   glTexCoord2f(width,height);
-  glVertex3f(1.0,-1.0,0.0);
+  glVertex3d(1.0,-1.0,0.0);
   
   glTexCoord2f(width,0);
-  glVertex3f(1.0,1.0,0.0);
+  glVertex3d(1.0,1.0,0.0);
   
   glEnd();
   
@@ -132,7 +132,7 @@ void GlowEngine::deactivate()
   glViewport (0, 0, width*scaleFactor, height*scaleFactor);
 }
 
-void GlowEngine::drawBlur(float alpha)
+void GlowEngine::drawBlur(double alpha)
 {
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -149,16 +149,16 @@ void GlowEngine::drawBlur(float alpha)
   glBegin(GL_QUADS);
   
   glTexCoord2f(0,height);
-  glVertex3f(-1.0,1.0,0.0);
+  glVertex3d(-1.0,1.0,0.0);
   
   glTexCoord2f(0,0);
-  glVertex3f(-1.0,-1.0,0.0);
+  glVertex3d(-1.0,-1.0,0.0);
 
   glTexCoord2f(width,0);
-  glVertex3f(1.0,-1.0,0.0);
+  glVertex3d(1.0,-1.0,0.0);
 
   glTexCoord2f(width,height);
-  glVertex3f(1.0,1.0,0.0);
+  glVertex3d(1.0,1.0,0.0);
   
   glEnd();
 

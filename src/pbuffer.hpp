@@ -28,7 +28,7 @@
 // stencil      - must have a stencil buffer
 // double       - must support double buffered rendering
 // samples=n    - must support n-sample antialiasing (n can be 2 or 4)
-// float=n      - must support n-bit per channel floating point
+// double=n      - must support n-bit per channel floating point
 // 
 // texture2D
 // textureRECT
@@ -36,7 +36,7 @@
 //              - binding the depth buffer is also supporting by specifying
 //                '=depth' like so: texture2D=depth or textureRECT=depth
 //              - the internal format of the texture will be rgba by default or
-//                float if pbuffer is floating point
+//                double if pbuffer is floating point
 //      
 class PBuffer
 {

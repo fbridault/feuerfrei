@@ -17,10 +17,25 @@
 #include <wx/fileconf.h>
 #include <wx/stream.h>
 #include <wx/wfstream.h>
+#include <wx/spinctrl.h>
 
 #include "header.h"
 #include "wxGLBuffer.hpp"
 
+
+enum
+  {
+    IDSC_FXAP = 1,
+    IDSC_FYAP,
+    IDSC_FZAP,
+  };
+
+enum
+  {
+    IDST_FXAP = 1,
+    IDST_FYAP,
+    IDST_FZAP,
+  };
 
 enum
   {
@@ -85,7 +100,7 @@ public:
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
-  
+  void OnSpinPosChanged(wxSpinEvent& event);
   void SetFPS(int fps);
   
 private:
@@ -103,13 +118,18 @@ private:
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
   
-  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer;
+  wxSpinCtrl *m_flameXAxisPositionSpinCtrl, *m_flameYAxisPositionSpinCtrl, *m_flameZAxisPositionSpinCtrl;
+
+  wxStaticText *m_flameXAxisPositionLabel, *m_flameYAxisPositionLabel, *m_flameZAxisPositionLabel;
+  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_flamesSizer;
   wxBoxSizer *m_mainSizer, *m_rightSizer;
+  wxBoxSizer *m_flamesXAxisPositionSizer, *m_flamesYAxisPositionSizer, *m_flamesZAxisPositionSizer;
   FlameAppConfig m_currentConfig;
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   int m_nbFlamesMax;
+  int m_selectedFlame;
   
   DECLARE_EVENT_TABLE()
 };

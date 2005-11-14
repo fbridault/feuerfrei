@@ -74,7 +74,7 @@ public:
   /**
    * Affecte un matériau à un objet
    */
-  int setMaterialToObjectByName(const char *name, CObject *currentObject);
+  int getMaterialIndexByName(const char *name);
   
   /**
    * Ajoute une source lumineuse &agrave; la sc&egrave;ne.

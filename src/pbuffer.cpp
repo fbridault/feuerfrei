@@ -171,7 +171,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
   char *buf = strtok(mode, " ");
   while (buf != NULL)
     {
-      if (strstr(buf, "float") != NULL)
+      if (strstr(buf, "double") != NULL)
 	bIsFloatBuffer = true;
 
       if (strstr(buf, "texture") != NULL)
@@ -242,7 +242,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
 	  continue;
         }        
 
-      if (token.find("float") == 0)
+      if (token.find("double") == 0)
         {
 	  int precision = getIntegerValue(token);
 	  pfAttribList->push_back(WGL_RED_BITS_ARB);
@@ -496,7 +496,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
   char *buf = strtok(mode, " ");
   while (buf != NULL)
     {
-      if (strstr(buf, "float") != NULL)
+      if (strstr(buf, "double") != NULL)
 	bIsFloatBuffer = true;
 
       if (strstr(buf, "alpha") != NULL)
@@ -562,7 +562,7 @@ void PBuffer::parseModeString(const char *modeString, vector<int> *pfAttribList,
 	  continue;
         }        
         
-      if (token.find("float") == 0)
+      if (token.find("double") == 0)
         {
 	  int precision = getIntegerValue(token);
 	  pfAttribList->push_back(GLX_RED_SIZE);

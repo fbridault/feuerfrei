@@ -143,7 +143,7 @@ public:
   void displayArrow (CVector * const direction);
 
   /* Retrouver la cellule où est située la particule */
-  void findParticlePosition(CPoint *p, int *i, int *j, int *k)
+  void findPointPosition(CPoint *p, int *i, int *j, int *k)
   {
     *i = (int) (p->x * m_dimX * m_nbVoxelsX) + 1 + m_nbVoxelsX / 2;
     *j = (int) (p->y * m_dimY * m_nbVoxelsY) + 1;

@@ -33,7 +33,7 @@ CgBlurFragmentShader::CgBlurFragmentShader(const wxString& sourceName, const wxS
   computeWeights(4.5);
 }
 
-void CgBlurFragmentShader::computeWeights(float sigma)
+void CgBlurFragmentShader::computeWeights(double sigma)
 {
   //coef = 1/sqrt(2*PI*sigma);
   divide = 0.0;

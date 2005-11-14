@@ -2,22 +2,6 @@
 
 #include <fstream>
 
-void IES::test()
-{
-  int z,a;
-  float *pintensite;  
-
-  printf("nbazimut : %d  nbzenith : %d\n",nbazimut,nbzenith);
-
-  pintensite=intensites;
-  for(z=0;z<nbzenith;z++)
-    for(a=0;a<nbazimut;a++){
-      printf("%f ",*pintensite);
-      pintensite++;
-    }
-  printf("\n");
-}
-
 IES::IES(const char* const filename)
 {
   char extension[4],chaine[255];
@@ -39,16 +23,16 @@ IES::IES(const char* const filename)
       }
       iesFile >> chaine;
       if(!strcmp(chaine,"SPV1.0")){
-	iesFile >> chaine >> nbzenith >> chaine >> nbazimut;
-	nbazimut--;// la derniere colonne n'est pas lue
-	if((nbzenith>0) && (nbazimut>0)){
-	  if((intensites=(float*)malloc(nbzenith*nbazimut*sizeof(float)))){
-	    pintensite=intensites;
+	iesFile >> chaine >> m_nbzenith >> chaine >> m_nbazimut;
+	m_nbazimut--;// la derniere colonne n'est pas lue
+	if((m_nbzenith>0) && (m_nbazimut>0)){
+	  if((m_intensites=new float[m_nbzenith*m_nbazimut])){
+	    pintensite=m_intensites;
 	    // 	      test=true;
-	    for(z=0;z<nbzenith;z++){
-	      for(a=0;a<nbazimut;a++){
+	    for(z = 0 ; z < m_nbzenith ; z++){
+	      for(a = 0 ; a < m_nbazimut ; a++){
 		iesFile >> *(pintensite++);
-		//printf("z=%d a=%d lu : %f\n",z,a,*(pintensite-1));
+		//printf("z=%d a=%d lu : %lf\n",z,a,*(pintensite-1));
 	      }
 	      iesFile >> tmp;// la derniere colonne n'est pas lue
 	      // 		if(*(pintensite-nbazimut)!=*(pintensite-1))
@@ -57,18 +41,18 @@ IES::IES(const char* const filename)
 	    // 	      if(test)
 	    // 		printf("memes donnees sur la premiere et la derniere colonne\n");
 	    
-	    cout << "taille : " << nbazimut << "x"<< nbzenith << endl;
-	    lazimut = 2*M_PI/(nbazimut-1);
-	    lazimutTEX = 2*M_PI/nbazimut;
-	    lzenith = M_PI/(nbzenith-1);
-	    lzenithTEX = M_PI/nbzenith;
-	    denom = lazimut*lzenith;	      
+	    cout << "taille : " << m_nbazimut << "x"<< m_nbzenith << endl;
+	    m_lazimut = 2*M_PI/(m_nbazimut-1);
+	    m_lazimutTEX = 2*M_PI/m_nbazimut;
+	    m_lzenith = M_PI/(m_nbzenith-1);
+	    m_lzenithTEX = M_PI/m_nbzenith;
+	    m_denom = m_lazimut*m_lzenith;	      
 	  }
 	  else
 	    cout << "Erreur d'allocation des texels" << endl;
 	}
 	else
-	  cout << "Decoupage zenith/azimut incorrect : nbzenith=" << nbzenith << " nbazimut=" << nbazimut << endl;
+	  cout << "Decoupage zenith/azimut incorrect : nbzenith=" << m_nbzenith << " nbazimut=" << m_nbazimut << endl;
       }
       else
 	cout << "Format du fichier IES non reconnu" << endl;
@@ -81,5 +65,36 @@ IES::IES(const char* const filename)
   else
     cout << "Nom de fichier IES non reconnu" << endl;
   
-  texture = new Texture(getNbazimut(),getNbzenith(),getIntensites());
+  m_texture = new Texture(m_nbazimut,m_nbzenith,m_intensites);
+}
+
+void IES::test()
+{
+  int z,a;
+  float *pintensite;  
+
+  cout << "nbazimut : " << m_nbazimut << " nbzenith : " << m_nbzenith << endl;
+
+  pintensite=m_intensites;
+  for(z = 0; z < m_nbzenith ; z++)
+    for(a = 0; a < m_nbazimut ; a++){
+      printf("%f ",*pintensite);
+      pintensite++;
+    }
+  cout << endl;
+}
+
+IES::~IES()
+{
+  delete [] m_intensites;
+  delete m_texture;
+}
+
+IESList::~IESList()
+{
+  for (vector < IES * >::iterator IESArrayIterator = m_IESArray.begin (); 
+       IESArrayIterator != m_IESArray.end ();
+       IESArrayIterator++)
+    delete (*IESArrayIterator);
+  m_IESArray.clear ();
 }

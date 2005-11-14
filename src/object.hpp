@@ -31,7 +31,7 @@ public:
 };
 
 /** 
- * Classe repr&eacute;sentant une sc&egrave;ne g&eacute;om&eacute;trique.
+ * Classe repr&eacute;sentant un objet g&eacute;om&eacute;trique.
  * Une sc&egrave;ne comporte une liste index&eacute;e des polygones, une liste des mat&eacute;riaux 
  * associ&eacute;s &agrave; ces polygones et ainsi qu'une liste des sources lumineuses.
  *
@@ -153,8 +153,13 @@ public:
     m_attributes = attr;
   };
   
-  /** Fonction de dessin de l'objet */
-  virtual void draw(char drawCode, bool tex);
+  /** Fonction de dessin de l'objet
+   * @param drawCode si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
+   * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
+   * si ALL alors l'objet est dessiné inconditionnellement
+   * @param tex false si l'objet texturé doit être affiché sans sa texture
+   */
+  virtual void draw(char drawCode=ALL, bool tex=true);
 };
 
 #endif

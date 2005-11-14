@@ -22,6 +22,9 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
+  EVT_SPINCTRL(IDSC_FXAP, MainFrame::OnSpinPosChanged)
+  EVT_SPINCTRL(IDSC_FYAP, MainFrame::OnSpinPosChanged)
+  EVT_SPINCTRL(IDSC_FZAP, MainFrame::OnSpinPosChanged)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -41,7 +44,7 @@ bool FlamesApp::OnInit()
   
   MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(950,860) );
   
-  frame->Show(TRUE);  
+  frame->Show(TRUE);
   
   frame->GetSettingsFromConfigFile ();
   
@@ -58,6 +61,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
+  m_selectedFlame = 0;
   
   m_glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   
@@ -67,7 +71,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   // appelée lors d'un click sur ce bouton
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
-  m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));
   m_buttonSwap = new wxButton(this,IDB_Swap,_("Next IES file"));
   
   m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
@@ -75,31 +78,57 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
+  m_flameXAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FXAP,wxEmptyString,wxDefaultPosition,
+						wxDefaultSize,wxSP_ARROW_KEYS|wxCAPTION,-10,10,0,_("X"));
+  m_flameYAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FYAP,wxEmptyString,wxDefaultPosition,
+						wxDefaultSize,wxSP_ARROW_KEYS,-500,500,0,_("Y"));
+  m_flameZAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FZAP,wxEmptyString,wxDefaultPosition,
+						wxDefaultSize,wxSP_ARROW_KEYS,-500,500,0,_("Z"));
+  m_flameXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
+  m_flameYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
+  m_flameZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
+
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
-  m_globalSizer->Add(m_buttonRun, 0, 0, 0);
-  m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
-  m_globalSizer->Add(m_buttonFlickering, 0, 0, 0);  
+  m_globalSizer->Add(m_buttonRun, 1, 0, 0);
+  m_globalSizer->Add(m_buttonRestart, 1, 0, 0);
 
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
-  m_solidSizer->Add(m_enableSolidCheckBox, 0, 0, 0);
-  m_solidSizer->Add(m_interpolatedSolidCheckBox, 0, 0, 0);
-  m_solidSizer->Add(m_blendedSolidCheckBox, 0, 0, 0);
-  m_solidSizer->Add(m_buttonSwap, 0, 0, 0);
+  m_solidSizer->Add(m_enableSolidCheckBox, 1, 0, 0);
+  m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
+  m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
+  m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
   
   m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Glow"));
-  m_glowSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
+  m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
+  
+  m_flamesXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_flamesYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_flamesZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSpinCtrl, 5, 0, 0);
+  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSpinCtrl, 5, 0, 0);
+  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSpinCtrl, 5, 0, 0);
+
+  m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
+  m_flamesSizer->Add(m_flamesXAxisPositionSizer, 0, 0, 0);
+  m_flamesSizer->Add(m_flamesYAxisPositionSizer, 0, 0, 0);
+  m_flamesSizer->Add(m_flamesZAxisPositionSizer, 0, 0, 0);
   
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_globalSizer, 0, 0, 0);
   m_rightSizer->Add(m_solidSizer, 0, 0, 0);
   m_rightSizer->Add(m_glowSizer, 0, 0, 0);
-
+  m_rightSizer->Add(m_flamesSizer, 0, 0, 0);
+  
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
-  m_mainSizer->Add(m_rightSizer, 0, 0, 0);
-   
+  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
+  
   SetSizer(m_mainSizer);
-
+  
   m_menuFile = new wxMenu;
   
   m_menuFile->Append( IDM_OpenScene, _("&Open scene...") );
@@ -131,7 +160,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   SetStatusText( _("FPS will be here...") );
 }
 
-
 void MainFrame::GetSettingsFromConfigFile ()
 {
   wxFileInputStream* file = new wxFileInputStream( _("param.ini" ));
@@ -157,16 +185,20 @@ void MainFrame::GetSettingsFromConfigFile ()
   wxString groupName;  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
+      
+      m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));      
+      m_flamesSizer->Add(m_buttonFlickering, 4, 0, 0);
+      
       groupName.Printf(_("/Flame%d/"),i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
-      m_config->Read(groupName + _("Pos.x"),(double *) &m_currentConfig.flames[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"),(double *) &m_currentConfig.flames[i].position.y, 0.5);
-      m_config->Read(groupName + _("Pos.z"),(double *) &m_currentConfig.flames[i].position.z, 0.0);
+      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
+      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
+      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
-	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
+	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));      
+//       cout << m_currentConfig.flames[i].type << " " << m_currentConfig.flames[i].position.x << " " << m_currentConfig.flames[i].position.y << " " << m_currentConfig.flames[i].position.z << endl;
     }
-
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
   m_enableSolidCheckBox->SetValue(m_currentConfig.PSEnabled);
@@ -248,6 +280,14 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
   m_glBuffer->ToggleSP(); 
 }
 
+void MainFrame::OnSpinPosChanged(wxSpinEvent& event)
+{
+  CPoint pt(m_flameXAxisPositionSpinCtrl->GetValue()/10.0,
+	    m_flameYAxisPositionSpinCtrl->GetValue()/10.0,
+	    m_flameZAxisPositionSpinCtrl->GetValue()/10.0);
+  m_glBuffer->moveFlame(m_selectedFlame, pt);
+}
+
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
@@ -280,10 +320,8 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   
   m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);
-
-  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
-  wxString groupName;
   
+  wxString groupName;  
   for(int i=0; i < m_nbFlamesMax; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
@@ -296,9 +334,9 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       groupName.Printf(_("/Flame%d/"),i);
       
       m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
-      m_config->Write(groupName + _("Pos.x"),(double )m_currentConfig.flames[i].position.x);
-      m_config->Write(groupName + _("Pos.y"),(double )m_currentConfig.flames[i].position.y);
-      m_config->Write(groupName + _("Pos.z"),(double )m_currentConfig.flames[i].position.z);
+      m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
+      m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
+      m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
     }

@@ -26,18 +26,18 @@ public:
   virtual ~CgSVShader();
   
   /** Réglage de l'épaisseur des shadow volumes */
-  void setFatness(GLfloat *fatnessVec){
-    cgGLSetParameter4fv(fatness, fatnessVec);
+  void setFatness(GLdouble *fatnessVec){
+    cgGLSetParameter4dv(fatness, fatnessVec);
   };
   
   /** Réglage de la profondeur des shadow volumes */ 
-  void setshadowExtrudeDist(GLfloat *shadowExtrudeDistVec){
-    cgGLSetParameter4fv(shadowExtrudeDist, shadowExtrudeDistVec);
+  void setshadowExtrudeDist(GLdouble *shadowExtrudeDistVec){
+    cgGLSetParameter4dv(shadowExtrudeDist, shadowExtrudeDistVec);
   };
   
   /** Réglage de la position de la lumière */
-  void setLightPos(GLfloat lightPosition[4]){
-    cgGLSetParameter4fv(lightPos, lightPosition);
+  void setLightPos(GLdouble lightPosition[4]){
+    cgGLSetParameter4dv(lightPos, lightPosition);
   };
   
   /** Réglage de la matrice du modèle Ã  la matrice du modèle courante inverse */

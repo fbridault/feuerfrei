@@ -65,10 +65,8 @@ enum{
     };
 /*************************************************************/
 
-enum{
-  BOUGIE = 1,
-    FIRMALAMPE,
-    };
+#define BOUGIE 1
+#define FIRMALAMPE 2
 
 // Pour le calcul du dégradé de couleur des pyramides
 #define VELOCITE_MAX .2

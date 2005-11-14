@@ -62,7 +62,7 @@ GraphicsFn::SolidDisk (GLdouble rayon, GLint slices, GLint loops)
   gluDisk (quadObj, 0, rayon, slices, loops);
 }
 
-void GraphicsFn::cylindre(float hauteur, float rayon, float slices )
+void GraphicsFn::cylindre(double hauteur, double rayon, double slices )
 {
   double angle = 2*PI/slices;
   double k;
@@ -78,9 +78,9 @@ void GraphicsFn::cylindre(float hauteur, float rayon, float slices )
   for(k=0.0;k<(2*PI);k+=angle){
 	glBegin(GL_TRIANGLES);
 	glNormal3f(0.0, -1.0, 0.0);
-	glVertex3f(rayon*cos(k+angle),-2,rayon*sin(k+angle));
-	glVertex3f(rayon*cos(k),-2,rayon*sin(k));
-	glVertex3f(0,-2,0);
+	glVertex3d(rayon*cos(k+angle),-2,rayon*sin(k+angle));
+	glVertex3d(rayon*cos(k),-2,rayon*sin(k));
+	glVertex3d(0,-2,0);
 	glEnd();
 	
 	pts[0].x = rayon*cos(k);
@@ -107,19 +107,19 @@ void GraphicsFn::cylindre(float hauteur, float rayon, float slices )
 	
 	glBegin(GL_QUADS);
 	glNormal3f(v3.x, v3.y, v3.z);
-	glVertex3f(rayon*cos(k),-2,rayon*sin(k));
+	glVertex3d(rayon*cos(k),-2,rayon*sin(k));
 	glNormal3f(v3.x, v3.y, v3.z);
-	glVertex3f(rayon*cos(k),hauteur-2,rayon*sin(k));
+	glVertex3d(rayon*cos(k),hauteur-2,rayon*sin(k));
 	glNormal3f(v3.x, v3.y, v3.z);
-	glVertex3f(rayon*cos(k+angle),hauteur-2,rayon*sin(k+angle));
+	glVertex3d(rayon*cos(k+angle),hauteur-2,rayon*sin(k+angle));
 	glNormal3f(v3.x, v3.y, v3.z);
-	glVertex3f(rayon*cos(k+angle),-2,rayon*sin(k+angle));
+	glVertex3d(rayon*cos(k+angle),-2,rayon*sin(k+angle));
 	glEnd();
 	glBegin(GL_TRIANGLES);
 	glNormal3f(0.0, 1.0, 0.0);
-	glVertex3f(0,hauteur-2,0);
-	glVertex3f(rayon*cos(k+angle),hauteur-2,rayon*sin(k+angle));
-	glVertex3f(rayon*cos(k),hauteur-2,rayon*sin(k));
+	glVertex3d(0,hauteur-2,0);
+	glVertex3d(rayon*cos(k+angle),hauteur-2,rayon*sin(k+angle));
+	glVertex3d(rayon*cos(k),hauteur-2,rayon*sin(k));
     glEnd();
   }
   glEndList();

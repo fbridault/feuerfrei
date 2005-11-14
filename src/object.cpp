@@ -110,7 +110,7 @@ CObject::draw (char drawCode, bool tex)
       
       glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
-      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+      glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
 		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){
@@ -143,7 +143,7 @@ CObject::draw (char drawCode, bool tex)
       
       glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
-      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+      glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
 		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){
@@ -176,7 +176,7 @@ CObject::draw (char drawCode, bool tex)
       glTexCoord2f ( m_texCoordsArray[index->vt]->x, m_texCoordsArray[index->vt]->y );
       glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
-      glVertex3f (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
+      glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
 		  m_vertexArray[index->v]->z);
       vertexCount++;
       if(vertexCount==3){

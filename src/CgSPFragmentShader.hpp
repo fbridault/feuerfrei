@@ -28,26 +28,18 @@ public:
    */
   CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, IESList *ieslist, bool type);
   virtual ~CgSPFragmentShader();
-  
-  Texture* getTexture(void){
-    return texture_solide_photometrique;
-  };
-  
-  void setTexture(Texture *tex){
-    texture_solide_photometrique = tex;
-  };
-  
-  void setTextureSP(){
-    cgGLSetTextureParameter(paramTextureSP, texture_solide_photometrique->getTexture());
+    
+  void setTexture(){
+    cgGLSetTextureParameter(paramTextureSP, iesList->getCurrentIESfile()->getTexture()->getTexture());
     cgGLEnableTextureParameter(paramTextureSP);
   };
   
   void setAZD(){
-    cgGLSetParameter3f(lazimut_lzenith_denom,iesList->getCurrentIESfile()->getLazimut(),iesList->getCurrentIESfile()->getLzenith(),iesList->getCurrentIESfile()->getDenom());
+    cgGLSetParameter3d(lazimut_lzenith_denom,iesList->getCurrentIESfile()->getLazimut(),iesList->getCurrentIESfile()->getLzenith(),iesList->getCurrentIESfile()->getDenom());
   };
   
   void setLAzimutLZenith(){
-    cgGLSetParameter2f(lazimut_lzenith,iesList->getCurrentIESfile()->getLazimutTEX(),iesList->getCurrentIESfile()->getLzenithTEX());
+    cgGLSetParameter2d(lazimut_lzenith,iesList->getCurrentIESfile()->getLazimutTEX(),iesList->getCurrentIESfile()->getLzenithTEX());
   };
   
   void setTextureSPMatrix(){
@@ -55,16 +47,16 @@ public:
   };
   
   void setparamCentreSP(CPoint *centreSP){
-    cgGLSetParameter3f(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
+    cgGLSetParameter3d(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
   };
   
-  void setparamFluctuationIntensite(GLfloat fluctuationIntensite){
-    cgGLSetParameter1f(paramFluctuationIntensite,fluctuationIntensite);
+  void setparamFluctuationIntensite(GLdouble fluctuationIntensite){
+    cgGLSetParameter1d(paramFluctuationIntensite,fluctuationIntensite);
   };
   
-  void enableShader(CPoint *centreSP, GLfloat fluctuationIntensite){
+  void enableShader(CPoint *centreSP, GLdouble fluctuationIntensite){
     setTextureSPMatrix();
-    setTextureSP();
+    setTexture();
     setparamCentreSP(centreSP);
     setparamFluctuationIntensite(fluctuationIntensite);
     if(interp)
@@ -76,7 +68,6 @@ public:
   }
   
 private:
-  Texture *texture_solide_photometrique;
   IESList *iesList;
   bool interp;
   

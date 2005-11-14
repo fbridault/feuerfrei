@@ -68,7 +68,7 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
 void
 SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,CPoint* p, double dim_y)
 {
-  float r,y;
+  double r,y;
 
   // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
@@ -84,7 +84,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,C
   
   // l'angle de rotation theta est la coordonnée sphérique correspondante
   y=o.y;
-  r = (float)o.length();
+  r = (double)o.length();
   if(r - fabs(y) < EPSILON)
     orientationSPtheta = 0.0;
   else

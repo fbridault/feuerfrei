@@ -23,10 +23,10 @@ PeriSkeleton::moveRoot ()
 {
   int i, j, k;
   CPoint tmp;
-  float distx = 10 * m_solver->getDimX() / (float) m_solver->getXRes ();
-  float distz = m_solver->getDimZ() / (float) m_solver->getZRes ();
+  double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes ();
+  double distz = m_solver->getDimZ() / (double) m_solver->getZRes ();
   
-  m_solver->findParticlePosition(&m_root, &i, &j, &k);
+  m_solver->findPointPosition(&m_root, &i, &j, &k);
 
   /* Calculer la nouvelle position */
   /* IntÈgration d'Euler */
@@ -62,7 +62,7 @@ PeriSkeleton::moveParticle (Particle * const pos, int n)
   if (pos->isDead ())
     return 0;
   
-  m_solver->findParticlePosition(pos, &i, &j, &k);
+  m_solver->findPointPosition(pos, &i, &j, &k);
 
   /* Calculer la nouvelle position */
   /* Int√©gration d'Euler */

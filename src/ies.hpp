@@ -16,42 +16,42 @@ public:
    * @param filename Nom du fichier IES à charger
    */
   IES(const char* const filename);
-
+  virtual ~IES();
   /** Affiche les valeurs de luminances du solide */
   void test();
 
   /** Retourne le nombre de valeurs en zénithal */
-  const int getNbzenith() const {return nbzenith;};
+  const int getNbzenith() const {return m_nbzenith;};
 
   /** Retourne le nombre de valeurs en azimuthal */
-  const int getNbazimut() const {return nbazimut;};
+  const int getNbazimut() const {return m_nbazimut;};
 
   /** Retourne le nombre d'intensités total (zénithal*azimuthal) */
-  const float* getIntensites() const {return intensites;};
+  const float* getIntensites() const {return m_intensites;};
   
   
-  const float getLazimut() const {return lazimut;};
+  const double getLazimut() const {return m_lazimut;};
 
-  const float getLzenith() const {return lzenith;};
+  const double getLzenith() const {return m_lzenith;};
 
-  const float getLazimutTEX() const {return lazimutTEX;};
+  const double getLazimutTEX() const {return m_lazimutTEX;};
 
-  const float getLzenithTEX() const {return lzenithTEX;};
+  const double getLzenithTEX() const {return m_lzenithTEX;};
 
-  const float getDenom() const {return denom;};
+  const double getDenom() const {return m_denom;};
 
   /** Retourne une texture correspondant au fichier IES */
-  Texture* getTexture() const {return texture;};
+  Texture* getTexture() const {return m_texture;};
 
 private:
   /** Nombre de valeurs en zénithal et en azimuthal */
-  int nbzenith,nbazimut;
+  int m_nbzenith,m_nbazimut;
   /** Tableau contenant les intensités lumineuses */
-  float *intensites;
+  float *m_intensites;
   
-  float lazimut,lazimutTEX,lzenith,lzenithTEX,denom;
+  double m_lazimut,m_lazimutTEX,m_lzenith,m_lzenithTEX,m_denom;
   /** Pointeur sur la texture correspondant au fichier IES */
-  Texture *texture;
+  Texture *m_texture;
 };
 
 /** Classe permettant de gérer une liste de fichiers IES.<br>
@@ -66,14 +66,15 @@ public:
   /** Constructeur par défaut */
   IESList()
   {
-    currentIndex=0;
+    m_currentIndex=0;
   };
   
+  ~IESList();
   /** Ajout d'un fichier IES dans la liste
    * @param filename Nom du fichier IES à charger
    */
   void addIESFile (const char* const filename){
-    IESArray.push_back(new IES(filename));
+    m_IESArray.push_back(new IES(filename));
   };
   
   /** Récupération d'un fichier IES dans la liste
@@ -81,14 +82,14 @@ public:
    * @return Pointeur vers le fichier IES
    */
   const IES* getIESfile (int n) const{
-    return IESArray[n];
+    return m_IESArray[n];
   };
   
   /** Récupération du fichier IES actuellement sélectionné dans la liste
    * @return Pointeur vers le fichier IES
    */
   const IES* getCurrentIESfile () const{
-    return IESArray[currentIndex];
+    return m_IESArray[m_currentIndex];
   };
   
   /** Récupération de la taille de la liste
@@ -96,23 +97,23 @@ public:
    */
   const int getArraySize () const
   {
-    return IESArray.size ();
+    return m_IESArray.size ();
   };
   
   /** Méthode permettant de sélectionner le fichier IES suivant dans la liste */
   void swap(void)
   {
-    if(currentIndex == IESArray.size () - 1 )
-      currentIndex=0;
+    if(m_currentIndex == m_IESArray.size () - 1 )
+      m_currentIndex=0;
     else
-      currentIndex++;
+      m_currentIndex++;
   };
   
 private:
   /** Vecteur contenant les fichiers IES */
-  vector < IES *>IESArray;
+  vector < IES *>m_IESArray;
   /** Indice du fichier actuellement sélectionné */
-  unsigned int currentIndex;
+  unsigned int m_currentIndex;
 };
 
 #endif

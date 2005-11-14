@@ -54,7 +54,15 @@ public:
 
   /** Dessine la m�che de la flamme */
   virtual void drawWick() = 0;
-
+  
+  /** Dessine la m�che de la flamme */
+  virtual void drawLuminary(){
+    glPushMatrix();
+    glTranslatef (m_position.x, m_position.y, m_position.z);
+    glCallList(m_luminaryDL);
+    glPopMatrix();
+  };
+  
   /** Dessine la flamme et sa m�che */
   void draw(bool displayParticle){
     drawWick();
@@ -73,13 +81,15 @@ public:
   
   CPoint *getPosition ()
   {
-    return &position;
+    return &m_position;
   };
   
-  CObject *getLuminaire ()
+  void setPosition (CPoint& position)
   {
-    return luminaire;
+    m_position=position;
   };
+
+  void moveTo(CPoint& position);
   
   virtual void toggleSmoothShading ();
 
@@ -105,10 +115,10 @@ protected:
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt)
   {
-    ctrlpoints[(u * size + v) * 3] = pt->x;
-    ctrlpoints[(u * size + v) * 3 + 1] = pt->y;
-    ctrlpoints[(u * size + v) * 3 + 2] = pt->z;
-    //    ctrlpoints[(u*size+v)*4+3] = 1.0;
+    m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
+    m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
+    m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
+    //    m_ctrlPoints[(u*m_size+v)*4+3] = 1.0;
   }
 
   /** Fonction simplifiant l'affectation d'un point de contrôle. 
@@ -119,10 +129,10 @@ protected:
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt, double w)
   {
-    ctrlpoints[(u * size + v) * 3] = pt->x;
-    ctrlpoints[(u * size + v) * 3 + 1] = pt->y;
-    ctrlpoints[(u * size + v) * 3 + 2] = pt->z;
-    //    ctrlpoints[(u*size+v)*3+3] = w;
+    m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
+    m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
+    m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
+    //    m_ctrlPoints[(u*m_size+v)*3+3] = w;
   }
   
   virtual void switch_off_lights ();
@@ -136,58 +146,61 @@ protected:
   static void CALLBACK nurbsError (GLenum errorCode);
   
   /** Nombre de squelettes de la flamme. */
-  int nb_squelettes;
+  int m_nbSkeletons;
   /** Position en indices dans la grille de voxels du solveur. */
-  int x, y, z;
+  int m_x, m_y, m_z;
   /** Position de la flamme dans la scène. */
-  CPoint position;
+  CPoint m_position, m_startPosition;
   
   /** Ordre de la NURBS en u (égal au degré en u + 1). */
-  int uorder;
+  int m_uorder;
   /** Ordre de la NURBS en v (égal au degré en v + 1). */
-  int vorder;
+  int m_vorder;
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
-  PeriSkeleton **squelettes;
+  PeriSkeleton **m_skeletons;
   /** Matrice de points de contrôle */
-  GLfloat *ctrlpoints;
+  GLfloat *m_ctrlPoints;
   /** Vecteur de noeuds en u */
-  GLfloat *uknots;
+  GLfloat *m_uknots;
   /** Vecteur de noeuds en v */
-  GLfloat *vknots;
+  GLfloat *m_vknots;
   /** Tableau temporaire utilisé pour stocker les distances entre chaque point de contrôle d'un
    * squelette. Alloué une seule fois en début de programme à la taille maximale pour des raisons
    * évidentes d'optimisation du temps d'exécution.
    */
-  int uknotsCount, vknotsCount;
-  int max_particles;
+  int m_uknotsCount, m_vknotsCount;
+  int m_maxParticles;
   
-  float *distances;
+  double *m_distances;
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
    * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 
    * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps 
    * d'exécution.
    */
-  int *indices_distances_max;
+  int *m_maxDistancesIndexes;
   
   /** Objet OpenGL permettant de définir la NURBS */
-  GLUnurbsObj *nurbs;
+  GLUnurbsObj *m_nurbs;
   
   /** Pointeur sur le solveur de fluides */
-  Solver *solveur;
+  Solver *m_solver;
   
-  CObject *luminaire;
+  CObject *m_luminary;
+  GLuint m_luminaryDL;
   
-  int size;
-  bool toggle;
+  int m_size;
+  bool m_toggle;
   
-  GLfloat lightPositions[8][4];
-  short nb_lights;
+  GLdouble m_lightPositions[8][4];
+  short m_nbLights;
   
-  int perturbate_count;
+  int m_perturbateCount;
 
   short m_lifeSpanAtBirth;
+  /** Nombre de points fixes pour chaque direction v = origine du squelette p�riph�rique + sommet du guide */
+  short m_nbFixedPoints;
 
-  CScene *sc;
+  CScene *m_scene;
 };
 
 #endif

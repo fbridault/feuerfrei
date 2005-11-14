@@ -109,6 +109,9 @@ void wxGLBuffer::InitFlames(void)
       m_flames[i] = new Firmalampe(m_solver,nbSkeletons,&pt,&m_currentConfig->flames[i].position,
 				   m_SVShader, m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
       break;
+    default :
+      cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
+      ::wxExit();
     }
 }
 
@@ -226,12 +229,12 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(m_currentConfig->glowEnabled){
-    GLfloat m[4][4];
-    float dist, sigma;
+    GLdouble m[4][4];
+    double dist, sigma;
     
     /* Adaptation du flou en fonction de la distance */
     /* On module la largeur de la gaussienne */
-    glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
+    glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
     CVector direction(m[3][0], m[3][1], m[3][2]);
     
@@ -304,6 +307,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
 	  else{
 	    m_flames[f]->switch_on_lights ();
 	  }
+	  m_flames[f]->drawLuminary();
 	}
       m_scene->draw_scene ();
       

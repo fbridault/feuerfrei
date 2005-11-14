@@ -58,12 +58,12 @@ private:
   GLdouble vectviseex,vectviseey,vectviseez;
   int bouton_active;
   GLdouble ouverture;
-  float minx,miny,minz,maxx,maxy,maxz,taillex,zoomstep;
+  double minx,miny,minz,maxx,maxy,maxz,taillex,zoomstep;
   long beginx, beginy;
   int depl,depl_rapide;
   int W,H;
-  float curquat[4];
-  float lastquat[4];
+  double curquat[4];
+  double lastquat[4];
 
   double clipping_value;
 };

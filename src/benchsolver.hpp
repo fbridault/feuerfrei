@@ -13,7 +13,7 @@ class Solver;
  *
  * @author	Flavien Bridault
  */
-class BenchSolver:public Solver
+class BenchSolver : public Solver
 {
 public:
   /** Constructeur du solveur.

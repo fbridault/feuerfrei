@@ -1,8 +1,7 @@
 #include "firmalampe.hpp"
 
-#include <stdlib.h>
-
 #include "graphicsFn.hpp"
+#include "scene.hpp"
 
 #ifndef CALLBACK
 #define CALLBACK
@@ -377,7 +376,7 @@ Firmalampe::drawWick()
 {
   glPushMatrix();
   glTranslatef (m_position.x, m_position.y, m_position.z);
-  glCallList (MECHE);
+  m_wick.drawWick();
   glPopMatrix();
 }
 
@@ -445,7 +444,7 @@ Firmalampe::drawFlame (bool displayParticle)
 }
 
 void
-Firmalampe::draw_shadowVolumes (GLint objects_list_wsv)
+Firmalampe::draw_shadowVolumes ()
 {
   //int nbVol = 8 - 
   for (int i = 0; i < m_nbLights - 3; i++)
@@ -459,16 +458,16 @@ Firmalampe::draw_shadowVolumes (GLint objects_list_wsv)
       glLoadIdentity ();
       m_cgShader->setModelViewMatrixToInverse ();
       glPopMatrix ();
-      m_cgShader->setWorldViewMatrixToIdentity ();
+      m_cgShader->setModelViewProjectionMatrix ();
 
-      glCallList (objects_list_wsv);
+      m_scene->draw_sceneWSV();
 
       m_cgShader->disableProfile ();
     }
 }
 
 void
-Firmalampe::draw_shadowVolume (GLint objects_list_wsv, int i)
+Firmalampe::draw_shadowVolume (int i)
 {
   m_cgShader->setLightPos (m_lightPositions[i]);
   
@@ -479,15 +478,15 @@ Firmalampe::draw_shadowVolume (GLint objects_list_wsv, int i)
   glLoadIdentity ();
   m_cgShader->setModelViewMatrixToInverse ();
   glPopMatrix ();
-  m_cgShader->setWorldViewMatrixToIdentity ();
+  m_cgShader->setModelViewProjectionMatrix ();
   
-  glCallList (objects_list_wsv);
+  m_scene->draw_sceneWSV();
   
   m_cgShader->disableProfile ();
 }
 
 void
-Firmalampe::draw_shadowVolume2 (GLint objects_list_wsv, int i)
+Firmalampe::draw_shadowVolume2 (int i)
 {
   double pos[4];
   //  int ind = i / SHADOW_SAMPLE_PER_LIGHT;
@@ -516,15 +515,15 @@ Firmalampe::draw_shadowVolume2 (GLint objects_list_wsv, int i)
   glLoadIdentity ();
   m_cgShader->setModelViewMatrixToInverse ();
   glPopMatrix ();
-  m_cgShader->setWorldViewMatrixToIdentity ();
+  m_cgShader->setModelViewProjectionMatrix ();
   
-  glCallList (objects_list_wsv);
+  m_scene->draw_sceneWSV();
   
   m_cgShader->disableProfile ();
 }
 
 void
-Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
+Firmalampe::cast_shadows_double_multiple ()
 {
   switch_off_lights ();
   m_scene->draw_sceneWTEX ();
@@ -561,7 +560,7 @@ Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
       glStencilMask (~0);
       glStencilFunc (GL_ALWAYS, 0, ~0);
 
-      draw_shadowVolume2 (objects_list_wsv, i);
+      draw_shadowVolume2 (i);
 
       glPopAttrib ();
 
@@ -593,7 +592,7 @@ Firmalampe::cast_shadows_double_multiple (GLint objects_list_wsv)
 }
 
 void
-Firmalampe::cast_shadows_double (GLint objects_list_wsv)
+Firmalampe::cast_shadows_double ()
 {
   switch_off_lights ();
   m_scene->draw_sceneWTEX ();
@@ -623,7 +622,7 @@ Firmalampe::cast_shadows_double (GLint objects_list_wsv)
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
 
-  draw_shadowVolumes (objects_list_wsv);
+  draw_shadowVolumes ();
 
   glPopAttrib ();
 
@@ -641,14 +640,12 @@ Firmalampe::cast_shadows_double (GLint objects_list_wsv)
 
   switch_off_lights ();
   glDisable (GL_STENCIL_TEST);
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
+  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
     {
       enable_only_ambient_light (i);
     }
   m_scene->draw_sceneWTEX ();
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
+  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
     {
       reset_diffuse_light (i);
     }

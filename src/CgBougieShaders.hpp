@@ -4,13 +4,12 @@
 class CgBougieFragmentShader;
 
 #include "CgShader.hpp"
-#include "CgSPVertexShader.hpp"
 #include "texture.hpp"
-	
+
 class CgShader;
 class CgSPVertexShader;
 
-class CgBougieVertexShader : public CgSPVertexShader
+class CgBougieVertexShader : public CgBasicVertexShader
 {
 public:
   CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);

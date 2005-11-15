@@ -40,30 +40,9 @@ using namespace std;
 #define SWAP(x0,x) {double *tmp=x0;x0=x;x=tmp;}
 #define AS_ERROR(ret,str) {if(ret==-1) perror(str);}
 
-/************************* Display lists *********************/
-enum{
-  REPERE = 1,
-    GRILLE,
-    /* Tous les objets de la scène */
-    SCENE_OBJECTS,
-    /* Objets texturés */
-    SCENE_OBJECTS_TEX,
-    /* Objets sans textures */
-    SCENE_OBJECTS_WTEX,
-    /* Objets texturés  qui projettent des ombres */
-    SCENE_OBJECTS_WSV_TEX,
-    /* Objets sans textures qui projettent des ombres */
-    SCENE_OBJECTS_WSV_WTEX,
-    /* Tous les objets qui projettent des ombres */
-    SCENE_OBJECTS_WSV,
-    /* Tous les objets qui projettent des ombres, sans les textures éventuelles */
-    SCENE_OBJECTS_WSV_WT,
-    /* Tous les objets de la scène sans les textures éventuelles */
-    SCENE_OBJECTS_WT,
-    CYLINDRE,
-    MECHE ,
-    };
-/*************************************************************/
+#define ALL      0
+#define TEXTURED 1
+#define FLAT    -1
 
 #define BOUGIE 1
 #define FIRMALAMPE 2

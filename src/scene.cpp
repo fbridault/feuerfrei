@@ -1,13 +1,12 @@
 #include "scene.hpp"
 
-#define ALL      0
-#define TEXTURED 1
-#define FLAT    -1
-
 /* Construction/Destruction */
-CScene::CScene (const char* const filename)
+CScene::CScene (const char* const filename, Flame **flames, int nbFlames)
 {  
   double coeff[3] = { .8, .8, .8 };
+  
+  m_flames = flames;
+  m_nbFlames = nbFlames;
   
   addMaterial(new CMaterial("default",NULL, coeff, NULL, 0));
   cerr << "Chargement de la scène " << filename << endl;
@@ -22,28 +21,32 @@ void CScene::loadObject(const char *filename, CObject* const newObj, bool detach
 
 void CScene::createDisplayLists(void)
 {
-  glNewList(SCENE_OBJECTS,GL_COMPILE);
+  m_displayLists[0] = glGenLists(8);
+  for(int i=1; i<8; i++)
+    m_displayLists[i] = m_displayLists[0] + i;
+  
+  glNewList(m_displayLists[0],GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++)
     (*objectsArrayIterator)->draw(ALL,true);
   glEndList();
   
-  glNewList(SCENE_OBJECTS_TEX,GL_COMPILE);
+  glNewList(m_displayLists[1],GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++)
     (*objectsArrayIterator)->draw(TEXTURED,true);
   glEndList();
   
-  glNewList(SCENE_OBJECTS_WTEX,GL_COMPILE);
+  glNewList(m_displayLists[2],GL_COMPILE);
   for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++)
     (*objectsArrayIterator)->draw(FLAT,false);
   glEndList();  
   
-  glNewList(SCENE_OBJECTS_WSV_TEX,GL_COMPILE); 
+  glNewList(m_displayLists[3],GL_COMPILE); 
   for (vector<CObject*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++)
@@ -52,14 +55,14 @@ void CScene::createDisplayLists(void)
   
   /* Création de la display list des objets qui projettent des ombres sans les textures */
   /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  glNewList(SCENE_OBJECTS_WSV_WTEX,GL_COMPILE); 
+  glNewList(m_displayLists[4],GL_COMPILE); 
   for (vector<CObject*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++)
     (*objectsArrayIteratorWSV)->draw(FLAT,false);
   glEndList();	
   
-  glNewList (SCENE_OBJECTS_WT, GL_COMPILE);
+  glNewList (m_displayLists[7], GL_COMPILE);
   for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
@@ -67,7 +70,7 @@ void CScene::createDisplayLists(void)
   glEndList ();
   
   /* Création de la display list des objets qui projettent des ombres */
-  glNewList (SCENE_OBJECTS_WSV, GL_COMPILE);
+  glNewList (m_displayLists[5], GL_COMPILE);
   for (vector < CObject * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
@@ -76,7 +79,7 @@ void CScene::createDisplayLists(void)
   
   /* Création de la display list des objets qui projettent des ombres sans les textures */
   /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  glNewList (SCENE_OBJECTS_WSV_WT, GL_COMPILE);  
+  glNewList (m_displayLists[6], GL_COMPILE);  
   for (vector < CObject * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)

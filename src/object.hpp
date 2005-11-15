@@ -1,20 +1,15 @@
-/* Scene.h: interface for the CScene class. */
-
 #ifndef OBJECT_H
 #define OBJECT_H
-
-#define ALL      0
-#define TEXTURED 1
-#define FLAT    -1
 
 class CObject;
 
 #include "material.hpp"
 #include "source.hpp"
 #include "OBJReader.hpp"
-#include "scene.hpp"
 
 #include <vector>
+
+class CScene;
 
 using namespace std;
 

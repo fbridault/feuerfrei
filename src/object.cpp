@@ -1,11 +1,6 @@
-/***************************************************************************
- *            object.cpp
- *
- *  Mon Apr  4 10:38:28 2005
- *  Copyright  2005  Flavien Bridault
- *  bridault@lil.univ-littoral.fr
- ****************************************************************************/
 #include "object.hpp"
+
+#include "scene.hpp"
 
 CObject::~CObject ()
 {

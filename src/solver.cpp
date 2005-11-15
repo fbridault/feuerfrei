@@ -128,8 +128,8 @@ Solver::~Solver ()
   delete[]m_p;
   delete[]m_q;
 
-  glDeleteLists(REPERE,1);
-  glDeleteLists(GRILLE,1);
+  glDeleteLists(m_baseDisplayList,1);
+  glDeleteLists(m_gridDisplayList,1);
 }
 
 void
@@ -784,9 +784,7 @@ Solver::iterate (bool flickering)
   //~ flickering = false;
 
   //cout << IX2(3374) << "  " << IX2(3375) << " " << IX2(1) << " " << IX2(225) << endl;
-  for (int i = 0; i < m_nbFlames; i++)
-    m_flames[i]->add_forces (flickering);
-
+  
   vel_step ();
   //  dens_step();
 
@@ -814,8 +812,9 @@ Solver::buildDLGrid ()
   double intery = m_dimY / (double) m_nbVoxelsY;
   double interz = m_dimZ / (double) m_nbVoxelsZ;
   double i, j;
-
-  glNewList (GRILLE, GL_COMPILE);
+  
+  m_gridDisplayList=glGenLists(1);
+  glNewList (m_gridDisplayList, GL_COMPILE);
   glPushMatrix ();
   glTranslatef (-m_dimX / 2.0, 0, m_dimZ / 2.0);
   glBegin (GL_LINES);
@@ -847,7 +846,8 @@ Solver::buildDLBase ()
   double interz = m_dimZ / (double) m_nbVoxelsZ;
   double i;
 
-  glNewList (REPERE, GL_COMPILE);
+  m_baseDisplayList=glGenLists(1);
+  glNewList (m_baseDisplayList, GL_COMPILE);
   glPushMatrix ();
   glTranslatef (-m_dimX / 2.0, 0.0, m_dimZ / 2.0);
   glBegin (GL_LINES);

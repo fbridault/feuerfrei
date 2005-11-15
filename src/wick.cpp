@@ -1,13 +1,8 @@
-/***************************************************************************
- *            Wick.cpp
- *
- *  Tue Mar 29 16:22:08 2005
- *  Copyright  2005  Flavien Bridault
- *  bridault@lil.univ-littoral.fr
- ****************************************************************************/
 #include "wick.hpp"
+
 #include "graphicsFn.hpp"
 #include "OBJReader.hpp"
+#include "scene.hpp"
 
 Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObject(scene)
 {
@@ -22,7 +17,8 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
   /*******************************/
   /* Création de la display list */
   /*******************************/
-  glNewList (MECHE, GL_COMPILE);
+  m_wickDisplayList = glGenLists(1);
+  glNewList (m_wickDisplayList, GL_COMPILE);
   //glEnable (GL_LIGHTING);
   draw (ALL,true);
   //glDisable (GL_LIGHTING);

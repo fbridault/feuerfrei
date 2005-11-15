@@ -1,14 +1,11 @@
 #include "bougie.hpp"
 
-#include <stdlib.h>
-
 #include "graphicsFn.hpp"
+#include "scene.hpp"
 
 #ifndef CALLBACK
 #define CALLBACK
 #endif
-
-extern void draw_scene ();
 
 Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos, double rayon, 
 		CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
@@ -73,7 +70,7 @@ Bougie::add_forces (bool perturbate)
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
     for (int j = 1; j < m_solver->getYRes() + 1; j++)
       for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->setVsrc (i, j, k, .08 / (double) (j));
+	m_solver->addVsrc (i, j, k, .08 / (double) (j));
   m_solver->addVsrc (m_x, 1, m_z, .04);
 
   if (perturbate)
@@ -416,7 +413,7 @@ Bougie::drawFlame (bool displayParticle)
 }
 
 void
-Bougie::draw_shadowVolumes (GLint objects_list_wsv)
+Bougie::draw_shadowVolumes ()
 {
   m_cgShader->enableProfile ();
   m_cgShader->bindProgram ();
@@ -429,15 +426,15 @@ Bougie::draw_shadowVolumes (GLint objects_list_wsv)
       glLoadIdentity ();
       m_cgShader->setModelViewMatrixToInverse ();
       glPopMatrix ();
-      m_cgShader->setWorldViewMatrixToIdentity ();
+      m_cgShader->setModelViewProjectionMatrix ();
 
-      glCallList (objects_list_wsv);
+      m_scene->draw_sceneWSV();
     }
   m_cgShader->disableProfile ();
 }
 
 void
-Bougie::draw_shadowVolume (GLint objects_list_wsv, int i)
+Bougie::draw_shadowVolume (int i)
 {
   m_cgShader->setLightPos (m_lightPositions[i]);
 
@@ -448,15 +445,15 @@ Bougie::draw_shadowVolume (GLint objects_list_wsv, int i)
   glLoadIdentity ();
   m_cgShader->setModelViewMatrixToInverse ();
   glPopMatrix ();
-  m_cgShader->setWorldViewMatrixToIdentity ();
+  m_cgShader->setModelViewProjectionMatrix ();
 
-  glCallList (objects_list_wsv);
+  m_scene->draw_sceneWSV();
 
   m_cgShader->disableProfile ();
 }
 
 void
-Bougie::draw_shadowVolume2 (GLint objects_list_wsv, int i)
+Bougie::draw_shadowVolume2 (int i)
 {
   double pos[4];
   //  int ind = i/SHADOW_SAMPLE_PER_LIGHT;
@@ -479,15 +476,15 @@ Bougie::draw_shadowVolume2 (GLint objects_list_wsv, int i)
   glLoadIdentity ();
   m_cgShader->setModelViewMatrixToInverse ();
   glPopMatrix ();
-  m_cgShader->setWorldViewMatrixToIdentity ();
+  m_cgShader->setModelViewProjectionMatrix ();
 
-  glCallList (objects_list_wsv);
+  m_scene->draw_sceneWSV();
 
   m_cgShader->disableProfile ();
 }
 
 void
-Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
+Bougie::cast_shadows_double_multiple ()
 {
   switch_off_lights ();
   m_scene->draw_sceneWTEX ();
@@ -523,7 +520,7 @@ Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
       glStencilMask (~0);
       glStencilFunc (GL_ALWAYS, 0, ~0);
 
-      draw_shadowVolume2 (objects_list_wsv, i);
+      draw_shadowVolume2 (i);
 
       glPopAttrib ();
 
@@ -553,7 +550,7 @@ Bougie::cast_shadows_double_multiple (GLint objects_list_wsv)
 }
 
 void
-Bougie::cast_shadows_double (GLint objects_list_wsv)
+Bougie::cast_shadows_double ()
 {
   switch_off_lights ();
   m_scene->draw_sceneWTEX ();
@@ -583,7 +580,7 @@ Bougie::cast_shadows_double (GLint objects_list_wsv)
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
 
-  draw_shadowVolumes (objects_list_wsv);
+  draw_shadowVolumes ();
 
   glPopAttrib ();
 

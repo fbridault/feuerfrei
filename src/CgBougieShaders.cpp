@@ -1,7 +1,7 @@
 #include "CgBougieShaders.hpp"
 
 CgBougieVertexShader::CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
-  CgSPVertexShader (sourceName, shaderName, context)
+  CgBasicVertexShader (sourceName, shaderName, context)
 {
   // Récupération des paramètres
   paramTexTranslation = cgGetNamedParameter(program, "texTranslation");

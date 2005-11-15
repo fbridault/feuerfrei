@@ -84,7 +84,7 @@ vertexOutputsWTEX vpSPWTEX(vertexInputsWTEX IN,
 
 	// transformation des coordonnees 3D dans le repere de la camera
 	OUT.HPos = mul(ModelViewProj, IN.position);
-
+	
 	// passage de la couleur en sortie
 	OUT.Col0.xyz = IN.color.xyz;
 

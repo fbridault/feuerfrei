@@ -14,11 +14,12 @@ class Flame;
 #include "texture.hpp"
 #include "eyeball.hpp"
 #include "object.hpp"
-#include "scene.hpp"
+#include "CgShader.hpp"
 
 class PeriSkeleton;
 class Solver;
 class Object;
+class CScene;
 
 /** La classe Flame fournit un objet simple englobant les squelettes de flamme.
  * La fonction la plus importante et la plus complexe reste la fonction de dessin de la flamme dessine().
@@ -35,19 +36,20 @@ public:
    * @param nb nombre de squelettes. Pour le moment nb doit être pair en raison de l'affichage. A VERIFIER
    * @param centre position du centre de la flamme.
    * @param pos position absolue du centre de la flamme dans l'espace
-   * @param rayon rayon de la flamme.
+   * @param filename nom du fichier OBJ contenant le luminaire
+   * @param pointeur sur la scène
    */
   Flame (Solver * s, int nb, CPoint * centre, CPoint * pos, const char *filename, CScene *scene);
   Flame (Solver * s, CPoint * centre, CPoint * pos, const char *filename, CScene *scene);
   virtual ~Flame ();
   
-    /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle commence par dÃ©placer les particules 
-   * des squelettes pÃ©riphÃ©riques. Ensuite, elle dÃ©finit la matrice de points de contrÃ´le de la NURBS,
+    /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
+   * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
    */
   virtual void build() = 0;
     
-  /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture
    */
   virtual void drawFlame(bool displayParticle) = 0;
@@ -56,12 +58,22 @@ public:
   virtual void drawWick() = 0;
   
   /** Dessine la mèche de la flamme */
-  virtual void drawLuminary(){
+  void drawLuminary() const
+  {
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     glCallList(m_luminaryDL);
     glPopMatrix();
   };
+  
+  void drawLuminary(CgBasicVertexShader *shader) const
+  {
+    glPushMatrix();
+    glTranslatef (m_position.x, m_position.y, m_position.z);
+    shader->setModelViewProjectionMatrix();
+    glCallList(m_luminaryDL);
+    glPopMatrix();
+  }
   
   /** Dessine la flamme et sa mèche */
   void draw(bool displayParticle){
@@ -92,26 +104,26 @@ public:
   void moveTo(CPoint& position);
   
   virtual void toggleSmoothShading ();
-
-  virtual void draw_shadowVolumes (GLint objects_list_wsv) = 0;
-  virtual void cast_shadows_double_multiple (GLint objects_list_wsv) = 0;
-  virtual void cast_shadows_double (GLint objects_list_wsv) = 0;
+  
+  virtual void draw_shadowVolumes () = 0;
+  virtual void cast_shadows_double_multiple () = 0;
+  virtual void cast_shadows_double () = 0;
   virtual void switch_on_lights ();
 
-  /** Fonction permettant de rÃ©cupÃ©rer l'orientation principale de la flamme
-   * pour orienter le solide photomÃ©trique.
+  /** Fonction permettant de récupérer l'orientation principale de la flamme
+   * pour orienter le solide photométrique.
    */
   virtual CVector get_main_direction()=0;
 
 
 protected:
-  /** Ajoute une force pÃ©riodique dans le solveur, pour donner une petite fluctuation sur la flamme */
+  /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
   virtual void perturbate_forces () = 0;
 
-  /** Fonction simplifiant l'affectation d'un point de contrÃ´le.
-   * @param u indice u du point de contrÃ´le
-   * @param v indice v du point de contrÃ´le
-   * @param pt position du point de contrÃ´le dans l'espace
+  /** Fonction simplifiant l'affectation d'un point de contrôle.
+   * @param u indice u du point de contrôle
+   * @param v indice v du point de contrôle
+   * @param pt position du point de contrôle dans l'espace
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt)
   {
@@ -121,11 +133,11 @@ protected:
     //    m_ctrlPoints[(u*m_size+v)*4+3] = 1.0;
   }
 
-  /** Fonction simplifiant l'affectation d'un point de contrÃ´le. 
-   * @param u indice u du point de contrÃ´le
-   * @param v indice v du point de contrÃ´le
-   * @param pt position du point de contrÃ´le dans l'espace
-   * @param w coordonnÃ©e homogÃ¨ne du point de contrÃ´le, Ã©quivalente au poids du point de contrÃ´le
+  /** Fonction simplifiant l'affectation d'un point de contrôle. 
+   * @param u indice u du point de contrôle
+   * @param v indice v du point de contrôle
+   * @param pt position du point de contrôle dans l'espace
+   * @param w coordonnée homogène du point de contrôle, équivalente au poids du point de contrôle
    */
   void setCtrlPoint (int u, int v, const CPoint * const pt, double w)
   {
@@ -140,8 +152,8 @@ protected:
   virtual void enable_only_ambient_light (int i);
   virtual void reset_diffuse_light (int i);
   
-  virtual void draw_shadowVolume (GLint objects_list_wsv, int i) = 0;
-  virtual void draw_shadowVolume2 (GLint objects_list_wsv, int i) = 0;
+  virtual void draw_shadowVolume (int i) = 0;
+  virtual void draw_shadowVolume2 (int i) = 0;
   
   static void CALLBACK nurbsError (GLenum errorCode);
   
@@ -149,37 +161,37 @@ protected:
   int m_nbSkeletons;
   /** Position en indices dans la grille de voxels du solveur. */
   int m_x, m_y, m_z;
-  /** Position de la flamme dans la scÃ¨ne. */
+  /** Position de la flamme dans la scène. */
   CPoint m_position, m_startPosition;
   
-  /** Ordre de la NURBS en u (Ã©gal au degrÃ© en u + 1). */
+  /** Ordre de la NURBS en u (égal au degré en u + 1). */
   int m_uorder;
-  /** Ordre de la NURBS en v (Ã©gal au degrÃ© en v + 1). */
+  /** Ordre de la NURBS en v (égal au degré en v + 1). */
   int m_vorder;
-  /** Tableau contenant les pointeurs vers les squelettes pÃ©riphÃ©riques. */
+  /** Tableau contenant les pointeurs vers les squelettes périphériques. */
   PeriSkeleton **m_skeletons;
-  /** Matrice de points de contrÃ´le */
+  /** Matrice de points de contrôle */
   GLfloat *m_ctrlPoints;
   /** Vecteur de noeuds en u */
   GLfloat *m_uknots;
   /** Vecteur de noeuds en v */
   GLfloat *m_vknots;
-  /** Tableau temporaire utilisÃ© pour stocker les distances entre chaque point de contrÃ´le d'un
-   * squelette. AllouÃ© une seule fois en dÃ©but de programme Ã  la taille maximale pour des raisons
-   * Ã©videntes d'optimisation du temps d'exÃ©cution.
+  /** Tableau temporaire utilisé pour stocker les distances entre chaque point de contrôle d'un
+   * squelette. Alloué une seule fois en début de programme à la taille maximale pour des raisons
+   * évidentes d'optimisation du temps d'exécution.
    */
   int m_uknotsCount, m_vknotsCount;
   int m_maxParticles;
   
   double *m_distances;
-  /** Tableau temporaire utilisÃ© pour classer les indices des distances entre points de contrÃ´le
-   * lors de l'ajout de points de contrÃ´le supplÃ©mentaires dans la NURBS.  AllouÃ© une seule fois 
-   * en dÃ©but de programme Ã  la taille maximale pour des raisons Ã©videntes d'optimisation du temps 
-   * d'exÃ©cution.
+  /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
+   * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 
+   * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps 
+   * d'exécution.
    */
   int *m_maxDistancesIndexes;
   
-  /** Objet OpenGL permettant de dÃ©finir la NURBS */
+  /** Objet OpenGL permettant de définir la NURBS */
   GLUnurbsObj *m_nurbs;
   
   /** Pointeur sur le solveur de fluides */

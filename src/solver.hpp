@@ -4,9 +4,6 @@
 class Solver;
 
 #include "header.h"
-#include "flame.hpp"
-
-class Flame;
 
 /** La classe Solver propose une implémentation 3D de la méthode stable implicite semi-lagrangienne de Stam.
  * A noter que dans le cadre de notre modèle de flamme, le champ de densité n'est pas utilisé, ce qui,
@@ -27,17 +24,6 @@ public:
 
   /** Lance une itération du solveur. */
   virtual void iterate (bool flickering);
-
-  /** Informe au solveur la présence de flammes, en vue de leur contribution Ã  l'élévation thermique 
-   * (même si celle-ci n'est que fictive, puisque "simulée" par la vélocité)
-   * @param f tableau contenant les pointeurs vers les flammes
-   * @param nb_f nombre de flammes (taille du tableau)
-   */
-  void setFlames (Flame ** const flames, int nbFlames)
-  {
-    m_flames = flames;
-    m_nbFlames = nbFlames;
-  };
 
   double getU (int i, int j, int k)
   {
@@ -131,11 +117,11 @@ public:
   void buildDLBase ();
   /** Fonction de dessin de la grille */
   void displayGrid (){
-    glCallList (GRILLE);
+    glCallList (m_gridDisplayList);
   };
   /** Fonction de dessin du repère de base */
   void displayBase (){
-    glCallList (REPERE);
+    glCallList (m_baseDisplayList);
   };
   /** Fonction de dessin du champ de vélocité */
   void displayVelocityField (void);
@@ -269,15 +255,7 @@ protected:
 	
   /** Nombre de pas de résolutions de Gauss-seidel dans les méthodes de diffusion et de projection */
   int m_nbStepsGS;
-
-  /** Tableau de pointeurs vers les flammes.
-   * A REVOIR : il existe de ce fait une relation circulaire entre la classe Solver et la classe Flame
-   * qu'il serait bon se supprimer.
-   */
-  Flame **m_flames;
-  /** Nombre de flammes. */
-  int m_nbFlames;
-
+  
   /** Nombre d'itérations pour Gauss-Seidel */
   int m_nbIter;
   const static int m_nbIterFlickering = 50;
@@ -289,6 +267,8 @@ protected:
   double m_dt;
   
   double m_aVisc, m_aDiff;
+
+  GLuint m_gridDisplayList,  m_baseDisplayList;
 };
 
 #endif

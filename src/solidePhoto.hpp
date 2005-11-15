@@ -1,11 +1,10 @@
-#ifndef SOLIDEPHOTO
-#define SOLIDEPHOTO
+#ifndef SOLIDEPHOTO_H
+#define SOLIDEPHOTO_H
 
 class solidePhotometrique;
 
 #include "header.h"
 #include "ies.hpp"
-#include "CgSPVertexShader.hpp"
 #include "CgSPFragmentShader.hpp"
 #include "scene.hpp"
 
@@ -61,9 +60,9 @@ private:
   IESList ieslist;
   
   /** Vertex Shader pour les objets texturés */
-  CgSPVertexShader SPVertexShaderTex;
+  CgBasicVertexShader SPVertexShaderTex;
   /** Vertex Shader pour les objets non texturés */
-  CgSPVertexShader SPVertexShaderWTex;
+  CgBasicVertexShader SPVertexShaderWTex;
 
   /** 
    * [0] : SP non interpolé sans couleur des objets fpSPSeul<br>

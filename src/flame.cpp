@@ -1,6 +1,6 @@
 #include "flame.hpp"
 
-#include <stdlib.h>
+#include "scene.hpp"
 
 Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filename, CScene *scene)
 {  
@@ -75,21 +75,50 @@ Flame::~Flame()
 void Flame::moveTo(CPoint& position)
 {
   int i,j;
+  CPoint move = position - m_position;
+  double strength=1.5;
   m_position=m_startPosition + position;
-  /* Ajouter des forces externes */
   
-  for (i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes() / 4 + 1; i++)
-    for (j = -m_solver->getYRes() / 4 - 1; j < -m_solver->getYRes() / 4 + 1; j++)
-      m_solver->addUsrc (m_solver->getXRes() - 1,((int) (ceil (m_solver->getYRes() / 2.0))) + j,
-			((int) (ceil (m_solver->getZRes() / 2.0))) + i, position.x*10);
-  for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
-    for (j = -m_solver->getZRes() / 4 - 1; j < -m_solver->getZRes() / 4 + 1; j++)
-      m_solver->addVsrc (m_solver->getYRes() - 1,((int) (ceil (m_solver->getZRes() / 2.0))) + j,
-			((int) (ceil (m_solver->getXRes() / 2.0))) + i, position.y*10);
-  for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
-    for (j = -m_solver->getYRes() / 4 - 1; j < -m_solver->getYRes() / 4 - 1; j++)
-      m_solver->addWsrc (m_solver->getZRes() - 1,((int) (ceil (m_solver->getYRes() / 2.0))) + j,
-			((int) (ceil (m_solver->getXRes() / 2.0))) + i, position.z*10);
+  /* Ajouter des forces externes */
+  if(move.x)
+    if( move.x > 0)
+      for (i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes() / 4 + 1; i++)
+	for (j = -m_solver->getYRes() / 4 - 1; j <= m_solver->getYRes() / 4 + 1; j++)
+	  m_solver->addUsrc (m_solver->getXRes() - 1,
+			     ((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			     ((int) (ceil (m_solver->getZRes() / 2.0))) + i, -strength);
+    else
+      for (i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes() / 4 + 1; i++)
+	for (j = -m_solver->getYRes() / 4 - 1; j <= m_solver->getYRes() / 4 + 1; j++)
+	  m_solver->addUsrc (2,
+			     ((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			     ((int) (ceil (m_solver->getZRes() / 2.0))) + i, strength);  
+  if(move.y)
+    if( move.y > 0)
+      for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+	for (j = -m_solver->getZRes() / 4 - 1; j < m_solver->getZRes() / 4 + 1; j++)
+	  m_solver->addVsrc (((int) (ceil (m_solver->getXRes() / 2.0))) + i,
+			     m_solver->getYRes() - 1,
+			     ((int) (ceil (m_solver->getZRes() / 2.0))) + j, -strength);
+    else
+      for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+	for (j = -m_solver->getZRes() / 4 - 1; j <= m_solver->getZRes() / 4 + 1; j++)
+	  m_solver->addVsrc (((int) (ceil (m_solver->getXRes() / 2.0))) + i, 
+			     2,
+			     ((int) (ceil (m_solver->getZRes() / 2.0))) + j, strength/10.0);
+  if(move.z)
+    if( move.z > 0)
+      for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+	for (j = -m_solver->getYRes() / 4 - 1; j <= m_solver->getYRes() / 4 - 1; j++)
+	  m_solver->addWsrc (((int) (ceil (m_solver->getXRes() / 2.0))) + i,
+			     ((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			     m_solver->getZRes() - 1, -strength);
+    else
+      for (i = -m_solver->getXRes() / 4 - 1; i <= m_solver->getXRes() / 4 + 1; i++)
+	for (j = -m_solver->getYRes() / 4 - 1; j <= m_solver->getYRes() / 4 - 1; j++)
+	  m_solver->addWsrc (((int) (ceil (m_solver->getXRes() / 2.0))) + i,
+			     ((int) (ceil (m_solver->getYRes() / 2.0))) + j,
+			     2, strength);
 }
 
 void CALLBACK Flame::nurbsError(GLenum errorCode)

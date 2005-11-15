@@ -79,7 +79,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
   m_flameXAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FXAP,wxEmptyString,wxDefaultPosition,
-						wxDefaultSize,wxSP_ARROW_KEYS|wxCAPTION,-10,10,0,_("X"));
+						wxDefaultSize,wxSP_ARROW_KEYS|wxCAPTION,-500,500,0,_("X"));
   m_flameYAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FYAP,wxEmptyString,wxDefaultPosition,
 						wxDefaultSize,wxSP_ARROW_KEYS,-500,500,0,_("Y"));
   m_flameZAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FZAP,wxEmptyString,wxDefaultPosition,
@@ -285,7 +285,12 @@ void MainFrame::OnSpinPosChanged(wxSpinEvent& event)
   CPoint pt(m_flameXAxisPositionSpinCtrl->GetValue()/10.0,
 	    m_flameYAxisPositionSpinCtrl->GetValue()/10.0,
 	    m_flameZAxisPositionSpinCtrl->GetValue()/10.0);
+
   m_glBuffer->moveFlame(m_selectedFlame, pt);
+  
+  m_currentConfig.flames[m_selectedFlame].position.x = pt.x;
+  m_currentConfig.flames[m_selectedFlame].position.y = pt.y;
+  m_currentConfig.flames[m_selectedFlame].position.z = pt.z;
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
@@ -328,10 +333,10 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 
       m_config->DeleteGroup(groupName);
     }
-  
+ 
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
-      groupName.Printf(_("/Flame%d/"),i);
+      groupName.Printf(_("/Flame%d/"),i);       
       
       m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);

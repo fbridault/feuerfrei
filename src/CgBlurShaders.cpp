@@ -1,7 +1,7 @@
 #include "CgBlurShaders.hpp"
 
 CgBlurVertexShader::CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context) : 
-  CgSPVertexShader (sourceName, shaderName, context)
+  CgBasicVertexShader (sourceName, shaderName, context)
 {
   // Récupération des paramètres
   paramOffsets = cgGetNamedParameter(program, "offsets");

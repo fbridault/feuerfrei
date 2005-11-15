@@ -611,10 +611,7 @@ void
 BenchSolver::iterate (bool flickering, int nb_step_GS)
 {
   m_nbStepsGS = nb_step_GS;
-
-  for (int i = 0; i < m_nbFlames; i++)
-    m_flames[i]->add_forces (flickering);
-
+  
   //vel_step();
   //vel_step_compare_diffuse_normal();
   //vel_step_compare_diffuse_hybride();
@@ -694,9 +691,6 @@ BenchSolver::vel_step_save ()
 void
 BenchSolver::iterate_save (bool flickering)
 {  
-  for (int i = 0; i < m_nbFlames; i++)
-    m_flames[i]->add_forces (flickering);
-	
   vel_step_save();
   
   //  dens_step();
@@ -710,10 +704,7 @@ void
 BenchSolver::iterate_hybride (bool flickering, int nb_step_GS)
 {
   m_nbStepsGS = nb_step_GS;
-
-  for (int i = 0; i < m_nbFlames; i++)
-    m_flames[i]->add_forces (flickering);
-
+  
   vel_step_compare_project_hybride ();
   //  dens_step();
 

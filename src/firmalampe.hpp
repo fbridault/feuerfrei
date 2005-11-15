@@ -55,9 +55,9 @@ public:
    */
   void eclaire();
 
-  void cast_shadows_double_multiple(GLint objects_list_wsv);
-  void cast_shadows_double(GLint objects_list_wsv);
-  void draw_shadowVolumes(GLint objects_list_wsv);
+  void cast_shadows_double_multiple();
+  void cast_shadows_double();
+  void draw_shadowVolumes();
 
   /** Retroune la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
@@ -67,8 +67,8 @@ private:
   /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
   void perturbate_forces();
 
-  void draw_shadowVolume(GLint objects_list_wsv, int i);
-  void draw_shadowVolume2(GLint objects_list_wsv, int i);
+  void draw_shadowVolume(int i);
+  void draw_shadowVolume2(int i);
 
   /** Mèche de la flamme */
   Wick m_wick;

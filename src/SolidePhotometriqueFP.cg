@@ -57,7 +57,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float ColorSP = texRECT(textureSP, texcoordsSP);
+  float ColorSP = texRECT(textureSP, texcoordsSP).x;
     
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
@@ -103,7 +103,7 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
-  float ColorSP = texRECT(textureSP, texcoordsSP);
+  float ColorSP = texRECT(textureSP, texcoordsSP).x;
 
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
@@ -135,11 +135,11 @@ float4 fpSPSeul(in vertexOutputsWTEX IN,
   // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
   // attention y est suppose etre la hauteur et z la profondeur
   float r = length(IN.PT3D.xyz);
-  float theta=acos(IN.PT3D.y / r);
-  float phi=atan2(IN.PT3D.z,IN.PT3D.x);
+  float theta = acos(IN.PT3D.y / r);
+  float phi = atan2(IN.PT3D.z,IN.PT3D.x);
 
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
-  float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
+  float2 texcoordsSP = float2(phi / lazimut_lzenith.x, theta / lazimut_lzenith.y);
     
   // recuperation de l'intensite du fragment
   float ColorSP = texRECT(textureSP, texcoordsSP).x;

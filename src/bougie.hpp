@@ -6,7 +6,6 @@ class Bougie;
 #include "flame.hpp"
 #include "leadSkeleton.hpp"
 #include "CgSVShader.hpp"
-#include "CgSPVertexShader.hpp"
 #include "CgBougieShaders.hpp"
 	
 class Flame;
@@ -15,8 +14,8 @@ class CgSVShader;
 
 /** La classe Flamme fournit un objet simple englobant les squelettes de flamme.
  * La fonction la plus importante et la plus complexe reste la fonction de dessin de la flamme dessine().
- * Pour le moment la classe est assez fig√©e et ne permet
- * que la d√©finition d'une flamme de bougie.
+ * Pour le moment la classe est assez figÈe et ne permet
+ * que la dÈfinition d'une flamme de bougie.
  *
  * @author	Flavien Bridault
  */
@@ -29,19 +28,19 @@ public:
    * @param centre position du centre de la flamme, relativement √† la grille
    * @param pos position absolue du centre de la flamme dans l'espace
    * @param rayon rayon de la flamme.
-   * @param shader pointeur sur le shader qui g√©n√®re les shadow volumes
+   * @param shader pointeur sur le shader qui gÈn√®re les shadow volumes
    */
   Bougie(Solver *s, int nb, CPoint *centre, CPoint *pos, double rayon, 
 	 CgSVShader *shader, const char *filename, CScene *scene, CGcontext *context);
   virtual ~Bougie();
   
-  /** Fonction appel√©e par la fonction de dessin OpenGL. Elle commence par d√©placer les particules 
-   * des squelettes p√©riph√©riques. Ensuite, elle d√©finit la matrice de points de contr√¥le de la NURBS,
+  /** Fonction appelÈe par la fonction de dessin OpenGL. Elle commence par dÈplacer les particules 
+   * des squelettes pÈriphÈriques. Ensuite, elle dÈfinit la matrice de points de contr√¥le de la NURBS,
    * des vecteurs de noeuds.
    */
   void build();
     
-  /** Fonction appel√©e par la fonction de dessin OpenGL. Elle dessine la NURBS dÈfinie par la fonction
+  /** Fonction appelÈe par la fonction de dessin OpenGL. Elle dessine la NURBS dÈfinie par la fonction
    * build() avec le placage de texture
    */
   void drawFlame(bool displayParticle);
@@ -49,19 +48,19 @@ public:
   /** Dessine la mËche de la flamme */
   void drawWick();
 
-  /** Fonction appel√©e par le solveur de fluides pour ajouter l'√©l√©vation thermique de la flamme.
+  /** Fonction appelÈe par le solveur de fluides pour ajouter l'ÈlÈvation thermique de la flamme.
    */
   void add_forces(bool perturbate);
 
-  /** Fonction appel√©e par la fonction de dessin OpenGL. Elle fournit l'√©clairage d√ª √† la flamme, 
-   * au reste de la sc√®ne via les particules du squelette guide. Elle s'occupe √©galement de d√©placer
+  /** Fonction appelÈe par la fonction de dessin OpenGL. Elle fournit l'Èclairage d√ª √† la flamme, 
+   * au reste de la sc√®ne via les particules du squelette guide. Elle s'occupe Ègalement de dÈplacer
    * les particules du squelette guide.
    */
   void eclaire();
 
-  void cast_shadows_double_multiple(GLint objects_list_wsv);
-  void cast_shadows_double(GLint objects_list_wsv);
-  void draw_shadowVolumes(GLint objects_list_wsv);
+  void cast_shadows_double_multiple();
+  void cast_shadows_double();
+  void draw_shadowVolumes();
 
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photomÈtrique.
@@ -74,8 +73,8 @@ private:
   /** Ajoute une force pÈriodique dans le solveur, pour donner une petite fluctuation sur la flamme */
   void perturbate_forces();
   
-  void draw_shadowVolume(GLint objects_list_wsv, int i);
-  void draw_shadowVolume2(GLint objects_list_wsv, int i);
+  void draw_shadowVolume(int i);
+  void draw_shadowVolume2(int i);
 
   /** Pointeur vers le squelette guide. */
   LeadSkeleton *m_lead;

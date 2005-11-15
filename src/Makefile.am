@@ -59,8 +59,6 @@ flames_SOURCES = \
 	CgSVShader.hpp  \
 	CgSPFragmentShader.cpp  \
 	CgSPFragmentShader.hpp  \
-	CgSPVertexShader.cpp  \
-	CgSPVertexShader.hpp  \
 	CgBougieShaders.cpp  \
 	CgBougieShaders.hpp  \
 	solidePhoto.cpp  \

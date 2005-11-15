@@ -1,5 +1,6 @@
 #include "OBJReader.hpp"
 
+#include "scene.hpp"
 #include <fstream>
 
 COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bool detached)

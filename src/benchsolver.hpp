@@ -3,7 +3,6 @@
 
 class BenchSolver;
 
-#include "header.h"
 #include "solver.hpp"
 #include <fstream>
 

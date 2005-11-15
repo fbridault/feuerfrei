@@ -35,13 +35,13 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
   glPushMatrix();
   glLoadIdentity();
   glRotatef(orientationSPtheta,axeRotation.x,axeRotation.y,axeRotation.z);
-  
+  glMatrixMode(GL_MODELVIEW);
   /* Affichage des objets sans couleur */
   if(fragmentShaderIndex < 2){
     SPVertexShaderWTex.setModelViewProjectionMatrix();
     SPVertexShaderWTex.enableShader();
     SPFragmentShader[fragmentShaderIndex]->enableShader(&centreSP,fluctuationIntensite);
-    scene->draw_scene();
+    scene->draw_scene(&SPVertexShaderWTex);
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex]->disableProfile();
   }else{
@@ -49,18 +49,19 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
     SPVertexShaderTex.setModelViewProjectionMatrix();
     SPVertexShaderTex.enableShader();
     SPFragmentShader[fragmentShaderIndex]->enableShader(&centreSP,fluctuationIntensite);
-    scene->draw_sceneTEX();    
+    scene->draw_sceneTEX();
     SPVertexShaderTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex]->disableProfile();
     
     /* Affichage des objets sans texture */
     SPVertexShaderWTex.setModelViewProjectionMatrix();
-    SPVertexShaderWTex.enableShader();    
-    SPFragmentShader[fragmentShaderIndex+2]->enableShader(&centreSP,fluctuationIntensite);    
-    scene->draw_sceneWTEX();    
+    SPVertexShaderWTex.enableShader();
+    SPFragmentShader[fragmentShaderIndex+2]->enableShader(&centreSP,fluctuationIntensite);
+    scene->draw_sceneWTEX(&SPVertexShaderWTex);
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex+2]->disableProfile();
   }
+  glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
 }

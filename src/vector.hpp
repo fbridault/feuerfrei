@@ -103,10 +103,11 @@ public:
   void set (const GLdouble& nX,const GLdouble& nY,const GLdouble& nZ){x=nX;y=nY;z=nZ;};
   
   /** Afficher les coordonnées d'un point */
-  void display(){
-    cout <<"("<<x<<", "<<y<<", "<<z<<")";
-  }//afficher
-
+  friend ostream& operator << (ostream& os,const CPoint& pt)
+  {
+    os <<"("<< pt.x <<", "<< pt.y <<", "<< pt.z <<")";;
+    return os ;
+  }
   /** Aditionner deux points */
   virtual CPoint operator+(CPoint P){
     CPoint resultat(x+P.x,y+P.y,z+P.z);

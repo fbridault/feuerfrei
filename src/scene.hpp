@@ -3,6 +3,9 @@
 
 class CScene;
 
+class Flame;
+
+#include "flame.hpp"
 #include "material.hpp"
 #include "source.hpp"
 #include "object.hpp"
@@ -29,11 +32,26 @@ private:
   vector<CObject*> m_objectsArrayWSV;/**<Liste des objets de la scene projetant des ombres*/
   vector<CSource*> m_lightSourcesArray;/**<Liste des sources de lumiere*/
   vector<CMaterial*> m_materialArray;/**< Liste des mat&eacute;riaux.*/
+
+  /** Display lists de la scène
+   * [0] Tous les objets de la scène
+   * [1] Objets texturés
+   * [2] Objets sans textures
+   * [3] Objets texturés  qui projettent des ombres
+   * [4] Objets sans textures qui projettent des ombres
+   * [5] Tous les objets qui projettent des ombres
+   * [6] Tous les objets qui projettent des ombres, sans les textures éventuelles
+   * [7] Tous les objets de la scène sans les textures éventuelles 
+   */
+  GLuint m_displayLists[8];
+  int m_nbFlames;
+  Flame **m_flames;
+  
 public:
   /**
    * Constructeur par d&eacute;faut.
    */
-  CScene(const char* const filename);
+  CScene(const char* const filename, Flame **flames, int nbFlames);
   /**
    * Destructeur par d&eacute;faut.
    */
@@ -131,24 +149,54 @@ public:
   /** Dessin de la scène pour les objets texturés */
   void draw_sceneTEX(void) const
   {
-    glCallList(SCENE_OBJECTS_TEX);
-    glCallList(SCENE_OBJECTS_WSV_TEX);
+    glCallList(m_displayLists[1]);
+    glCallList(m_displayLists[3]);
   };
   
   /** Dessin de la scène pour les objets non texturés */
-  void draw_sceneWTEX(void) const
+  void draw_sceneWTEX() const
   {
-    glCallList(SCENE_OBJECTS_WTEX);
-    glCallList(SCENE_OBJECTS_WSV_WTEX);
+    glCallList(m_displayLists[2]);
+    glCallList(m_displayLists[4]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary();
+  };
+    /** Dessin de la scène pour les objets non texturés */
+  void draw_sceneWTEX(CgBasicVertexShader *shader) const
+  {
+    glCallList(m_displayLists[2]);
+    glCallList(m_displayLists[4]);
+    
+    for (int f = 0; f < m_nbFlames; f++){
+      m_flames[f]->drawLuminary(shader);
+    }
   };
   
   /** Dessin de la scène */
   void draw_scene (void) const
   {
-    glCallList (SCENE_OBJECTS);
-    glCallList (SCENE_OBJECTS_WSV);
+    glCallList (m_displayLists[0]);
+    glCallList (m_displayLists[5]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary();
   };
-  
+  /** Dessin de la scène */
+  void draw_scene (CgBasicVertexShader *shader) const
+  {
+    glCallList (m_displayLists[0]);
+    glCallList (m_displayLists[5]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary(shader);
+  };
+
+    /** Dessin de la scène */
+  void draw_sceneWSV (void) const
+  {
+    glCallList (m_displayLists[6]);
+  };
 };//Scene
 
 #endif

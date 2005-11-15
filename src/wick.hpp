@@ -14,6 +14,7 @@ class Wick;
 
 class CObject;
 class Solveur;
+class CScene;
 
 /** Classe reprÃ©sentant une mÃ¨che de bougie */
 class Wick : public CObject
@@ -21,7 +22,7 @@ class Wick : public CObject
 private:
   /**<Liste des points qui vont servir à  créer les squelettes guides */
   vector < CPoint * >m_leadPointsArray;
-  
+  GLuint m_wickDisplayList;
 public:
   /** Constructeur de mèche	
    * @param filename nom du fichier de scène où est stockée la mèche
@@ -29,6 +30,10 @@ public:
   Wick(const char *filename, int nb_lead_squelettes, CScene *scene);
   virtual ~Wick();
   	
+  virtual void drawWick()
+  {
+    glCallList(m_wickDisplayList);
+  };
   /**
    * Lecture du nombre de points des squelettes guides.
    */

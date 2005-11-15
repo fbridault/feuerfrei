@@ -5,13 +5,11 @@ class CgBlurVertexShader;
 class CgBlurFragmentShader;
 
 #include "CgShader.hpp"
-#include "CgSPVertexShader.hpp"
 #include "texture.hpp"
 	
 class CgShader;
-class CgSPVertexShader;
 
-class CgBlurVertexShader : public CgSPVertexShader
+class CgBlurVertexShader : public CgBasicVertexShader
 {
 public:
   CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);

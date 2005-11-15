@@ -14,7 +14,7 @@ class CgShader;
  *
  * @author	Flavien Bridault
  */
-class CgSVShader : public CgShader
+class CgSVShader : public CgBasicVertexShader
 {
 public:
     /** Constructeur par défaut
@@ -44,17 +44,11 @@ public:
   void setModelViewMatrixToInverse(){
     cgGLSetStateMatrixParameter(modelViewMatrix, CG_GL_MODELVIEW_MATRIX,CG_GL_MATRIX_INVERSE);
   };
-
-  /** Réglage de la matrice du monde Ã  la matrice modèle+projection courante */
-  void setWorldViewMatrixToIdentity(){
-    cgGLSetStateMatrixParameter(worldViewMatrix, CG_GL_MODELVIEW_PROJECTION_MATRIX,CG_GL_MATRIX_IDENTITY);
-  };
     
 private:
   /** Position de la lumière */
   CGparameter lightPos;
   CGparameter modelViewMatrix;
-  CGparameter worldViewMatrix;
   /** Epaisseur des shadow volumes */
   CGparameter fatness;
   /** Profondeur des shadow volumes */

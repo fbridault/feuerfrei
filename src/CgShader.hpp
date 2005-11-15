@@ -50,4 +50,29 @@ protected:
   CGprofile profile;
 };
 
+/** Classe pour un Vertex Shader "de base" avec comme seul paramètre
+ *  la matrice résultante de la concaténation de la projection et de la
+ *  modelview.
+ */
+class CgBasicVertexShader : public CgShader
+{
+public:
+  /** Constructeur par défaut
+   * @param sourceName Nom du fichier source
+   * @param shaderName Nom du programme Cg
+   * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
+   */
+  CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
+  virtual ~CgBasicVertexShader(){};
+  
+  /** Met à jour la matrice résultante de la concaténation de la projection et de la
+   * modelview. Cette méthode doit être appelée après chaque série de transformations OpenGL
+   * pour que celles-ci soit prises en compte par le vertex shader
+   */
+  void setModelViewProjectionMatrix(){
+    cgGLSetStateMatrixParameter(modelViewProjectionMatrix, CG_GL_MODELVIEW_PROJECTION_MATRIX,CG_GL_MATRIX_IDENTITY);
+  };
+private:  
+  CGparameter modelViewProjectionMatrix;
+};
 #endif

@@ -4,11 +4,12 @@
 class COBJReader;
 
 #include "object.hpp"
-#include "scene.hpp"
 
 #include <list>
 #include <string>
 #include <iostream>
+
+class CScene;
 
 //using namespace std;
 

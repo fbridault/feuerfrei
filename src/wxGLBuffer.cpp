@@ -1,7 +1,6 @@
 #include "wxGLBuffer.hpp"
 
 #include "main.hpp"
-
 #include <iostream>
 
 BEGIN_EVENT_TABLE(wxGLBuffer, wxGLCanvas)
@@ -94,9 +93,7 @@ void wxGLBuffer::InitFlames(void)
 {
   int nbSkeletons;
   CPoint pt(0,0,0);
-  
-  m_flames = new Flame *[m_currentConfig->nbFlames];
-  
+    
   for(int i=0 ; i < m_currentConfig->nbFlames; i++)
     switch(m_currentConfig->flames[i].type){
     case BOUGIE :
@@ -121,15 +118,16 @@ void wxGLBuffer::InitScene(void)
 			1.0, m_currentConfig->timeStep);
   //m_solver = new BenchSolver (solvx, solvy, solvz, 1.0, timeStep);
   
-  m_scene = new CScene (m_currentConfig->sceneName.fn_str());
+  m_flames = new Flame *[m_currentConfig->nbFlames];
+  
+  m_scene = new CScene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
   
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
   m_photoSolid = new SolidePhotometrique(m_scene, &m_context);
   
   InitFlames();
-    //AS_ERROR(chdir(".."),"chdir ..");
-  m_solver->setFlames ((Flame **) m_flames, m_currentConfig->nbFlames);
+  //AS_ERROR(chdir(".."),"chdir ..");
   m_scene->createDisplayLists();
   
   m_eyeball = new Eyeball (m_width, m_height, m_currentConfig->clipping);
@@ -185,9 +183,13 @@ void wxGLBuffer::DestroyScene(void)
 
 void wxGLBuffer::OnIdle(wxIdleEvent& event)
 {
-  if(m_run)
+  if(m_run){
+    for (int i = 0; i < m_currentConfig->nbFlames; i++)
+      m_flames[i]->add_forces (m_flickering);
+    
     m_solver->iterate (m_flickering);
-
+  }
+  
   this->Refresh();
   
   /*  draw();*/
@@ -284,7 +286,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     /******************* AFFICHAGE DE LA SCENE *******************************/
     /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
-    for (int f = 0; f < m_currentConfig->nbFlames; f++) 
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->drawWick ();
     
     if(m_currentConfig->PSEnabled){
@@ -301,13 +303,12 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
       for (int f = 0; f < m_currentConfig->nbFlames; f++)
 	{
 	  if (m_shadowVolumesEnabled)
-	    m_flames[f]->draw_shadowVolumes (SCENE_OBJECTS_WSV_WT);
+	    m_flames[f]->draw_shadowVolumes ();
 	  if (m_shadowsEnabled)
-	    m_flames[f]->cast_shadows_double (SCENE_OBJECTS_WSV_WT);
+	    m_flames[f]->cast_shadows_double ();
 	  else{
 	    m_flames[f]->switch_on_lights ();
 	  }
-	  m_flames[f]->drawLuminary();
 	}
       m_scene->draw_scene ();
       

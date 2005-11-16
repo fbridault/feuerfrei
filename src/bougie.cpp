@@ -43,7 +43,7 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos, double rayon,
   m_distances = new double[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
-  m_solver->findPointPosition(&m_position, &m_x, &m_y, &m_z);
+  m_solver->findPointPosition(centre, &m_x, &m_y, &m_z);
   
   m_cgShader = shader;
 }

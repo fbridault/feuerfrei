@@ -79,24 +79,18 @@ void Skeleton::draw ()
 
 void Skeleton::drawRoot ()
 {
-  CPoint position (m_flamePos + m_root);
-    
   glColor4f (1.0, 0.0, 0.25, 0.8);
   glPushMatrix ();
-  glTranslatef (position.x, position.y,
-		position.z);
+  glTranslatef (m_root.x, m_root.y, m_root.z);
   GraphicsFn::SolidSphere (0.01, 10, 10);
   glPopMatrix ();
 }
 
 void Skeleton::drawParticle (Particle * const particle)
 {
-  CPoint position (m_flamePos + *particle);
-
   glColor4f (1.0, 1.0, 0.25, 0.8);
   glPushMatrix ();
-  glTranslatef (position.x, position.y,
-		position.z);
+  glTranslatef (particle->x, particle->y, particle->z);
   GraphicsFn::SolidSphere (0.01, 10, 10);
   glPopMatrix ();
 }

@@ -28,7 +28,7 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   
   m_perturbateCount=0;
   
-  m_luminary = new CObject(m_scene,pos);
+  m_luminary = new CObject(m_scene);
   m_scene->loadObject(filename, m_luminary, true);
   m_luminaryDL=glGenLists(1);
   glNewList(m_luminaryDL,GL_COMPILE);
@@ -57,7 +57,7 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
   
   m_perturbateCount=0;
     
-  m_luminary = new CObject(m_scene,pos);
+  m_luminary = new CObject(m_scene);
   m_scene->loadObject(filename, m_luminary, true);
   m_luminaryDL=glGenLists(1);
   glNewList(m_luminaryDL,GL_COMPILE);

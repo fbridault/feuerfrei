@@ -1,6 +1,8 @@
 #if !defined(EYEBALL_H)
 #define EYEBALL_H
 
+#define COEFFICIENT_ROTATION_QUATERNION 1.0
+
 #include "header.h"
 
 /** Classe définissant un "eyeball" qui permet de tourner et de zoomer un point fixe dans
@@ -40,7 +42,12 @@ public:
   /** Récupération de la coordonnée y du centre du eyeball. */
   GLdouble getCentery(){return centery;};
   /** Récupération de la coordonnée z du centre du eyeball. */
-  GLdouble getCenterz(){return centerz;};
+  GLdouble getCenterz(){return centerz;};  
+
+  void addCenterX(double value){ centerx+=value; eyex+=value; 
+      recalculer_matrice_initiale (); };
+  void addCenterZ(double value){ centerz+=value; eyez+=value;
+      recalculer_matrice_initiale ();};
 
   void OnMouseClick (wxMouseEvent& event);
   void OnMouseMotion (wxMouseEvent& event);

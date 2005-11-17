@@ -35,8 +35,6 @@ using namespace std;
 
 #define FPS .04
 
-#define COEFFICIENT_ROTATION_QUATERNION 1.0
-
 #define SWAP(x0,x) {double *tmp=x0;x0=x;x=tmp;}
 #define AS_ERROR(ret,str) {if(ret==-1) perror(str);}
 

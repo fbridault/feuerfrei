@@ -101,6 +101,7 @@ public:
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
   void OnSpinPosChanged(wxSpinEvent& event);
+  void OnKeyPressed(wxKeyEvent& event);
   void SetFPS(int fps);
   
 private:

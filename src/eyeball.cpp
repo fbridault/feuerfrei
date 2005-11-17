@@ -46,7 +46,8 @@ Eyeball::Eyeball (int w, int h, double clipping)
   /* point de vue */
   eyex = centerx;
   eyey = centery;
-  eyez = 8.0 * (centerz != 0.0 ? centerz : 0.25);
+  eyez = 0.2;
+  //eyez = 8.0 * (centerz != 0.0 ? centerz : 0.25);
 
   /* initialisation et normalisation du vecteur de visee */
   vectviseex = centerx - eyex;

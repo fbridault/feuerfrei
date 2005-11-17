@@ -414,10 +414,10 @@ void MainFrame::OnKeyPressed(wxKeyEvent& event)
 {
   switch(event.GetKeyCode())
     {
-    case WXK_LEFT: m_glBuffer->addCenterZ(1.0); break;
-    case WXK_RIGHT: m_glBuffer->addCenterZ(-1.0); break;
-    case WXK_UP: m_glBuffer->addCenterX(-1.0); break;
-    case WXK_DOWN: m_glBuffer->addCenterX(1.0); break;
+//    case WXK_LEFT: m_glBuffer->addCenterZ(1.0); break;
+//    case WXK_RIGHT: m_glBuffer->addCenterZ(-1.0); break;
+//    case WXK_UP: m_glBuffer->addCenterX(-1.0); break;
+//    case WXK_DOWN: m_glBuffer->addCenterX(1.0); break;
     }      
 }
 

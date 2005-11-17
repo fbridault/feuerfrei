@@ -43,8 +43,6 @@ public:
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(FlameAppConfig *config);
-  void addCenterX(double value){ m_eyeball->addCenterX(value); };
-  void addCenterZ(double value){ m_eyeball->addCenterZ(value); };
 
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */

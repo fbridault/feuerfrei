@@ -25,7 +25,6 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_SPINCTRL(IDSC_FXAP, MainFrame::OnSpinPosChanged)
   EVT_SPINCTRL(IDSC_FYAP, MainFrame::OnSpinPosChanged)
   EVT_SPINCTRL(IDSC_FZAP, MainFrame::OnSpinPosChanged)
-  EVT_KEY_DOWN(MainFrame::OnKeyPressed)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -408,17 +407,6 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
     m_menuDisplayFlames->Check(IDM_Wired,false);
   }else
     m_menuDisplayFlames->Check(IDM_Shaded,true);
-}
-
-void MainFrame::OnKeyPressed(wxKeyEvent& event)
-{
-  switch(event.GetKeyCode())
-    {
-//    case WXK_LEFT: m_glBuffer->addCenterZ(1.0); break;
-//    case WXK_RIGHT: m_glBuffer->addCenterZ(-1.0); break;
-//    case WXK_UP: m_glBuffer->addCenterX(-1.0); break;
-//    case WXK_DOWN: m_glBuffer->addCenterX(1.0); break;
-    }      
 }
 
 void MainFrame::SetFPS(int fps)

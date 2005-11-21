@@ -41,7 +41,7 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
     SPVertexShaderWTex.setModelViewProjectionMatrix();
     SPVertexShaderWTex.enableShader();
     SPFragmentShader[fragmentShaderIndex]->enableShader(&centreSP,fluctuationIntensite);
-    scene->draw_scene(&SPVertexShaderWTex);
+    scene->draw_scene(SPVertexShaderWTex);
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex]->disableProfile();
   }else{
@@ -57,7 +57,7 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
     SPVertexShaderWTex.setModelViewProjectionMatrix();
     SPVertexShaderWTex.enableShader();
     SPFragmentShader[fragmentShaderIndex+2]->enableShader(&centreSP,fluctuationIntensite);
-    scene->draw_sceneWTEX(&SPVertexShaderWTex);
+    scene->draw_sceneWTEX(SPVertexShaderWTex);
     SPVertexShaderWTex.disableProfile();
     SPFragmentShader[fragmentShaderIndex+2]->disableProfile();
   }
@@ -66,8 +66,8 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
   glMatrixMode(GL_MODELVIEW);
 }
 
-void
-SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,CPoint* p, double dim_y)
+void 
+SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o, CPoint& p, double dim_y)
 {
   double r,y;
 
@@ -77,7 +77,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o,C
   
   // le centre du SP est la position de la flamme + la moitié du vecteur orientation
   // (orientation = vecteur position vers dernière particule)
-  centreSP= *p+(o/2.0);
+  centreSP= p+(o/2.0);
 
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan

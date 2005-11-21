@@ -141,7 +141,7 @@ public:
     return (m_vertexArray[index]);
   };
   
-  void getBoundingBox (CPoint & max, CPoint & min);
+  void getBoundingBox (CPoint& max, CPoint& min);
 
   void setAttributes (int attr)
   {

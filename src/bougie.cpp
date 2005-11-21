@@ -43,7 +43,7 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos, double rayon,
   m_distances = new double[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
-  m_solver->findPointPosition(centre, &m_x, &m_y, &m_z);
+  m_solver->findPointPosition(*centre, m_x, m_y, m_z);
   
   m_cgShader = shader;
 }
@@ -341,26 +341,26 @@ Bougie::drawFlame (bool displayParticle)
     }
   else
     {
-      /* Correction "√ la grosse" pour les UVs -> √† voir par la suite */
+      /* Correction "‡ la grosse" pour les UVs -> ‡ voir par la suite */
       double vtex = 1.0 / (double) (m_maxParticles);
 
       GLdouble texpts[2][2][2] = { {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };      
       double angle, angle2;
       
-      /************* D√©placement de la texture de mani√®re √† ce qu'elle reste "en face" de l'observateur ********************/
+      /* DÈplacement de la texture de mani√®re √† ce qu'elle reste "en face" de l'observateur */
       GLdouble m[4][4];
 
       glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
 
       /* Position de la bougie = translation dans la matrice courante */
-      CPoint bougiepos(m[3][0], m[3][1], m[3][2]);
+      CVector bougiepos(m[3][0], m[3][1], m[3][2]);
 
-      /* Position de l'axe de regard de bougie dans le rep√®re du monde = axe initial * Matrice de rotation */
+      /* Position de l'axe de regard de bougie dans le repËre du monde = axe initial * Matrice de rotation */
       /* Attention, ne pas prendre la translation en plus !!!! */
       CVector worldLookAt(m[2][0], m[2][1], m[2][2]);
       CVector worldLookX(m[0][0], m[0][1], m[0][2]);
       CVector direction(-bougiepos.x, 0.0, -bougiepos.z);
-      
+
       direction.normalize ();
       /* Apparemment, pas besoin de le normaliser, on laisse pour le moment */
       worldLookAt.normalize ();
@@ -368,6 +368,13 @@ Bougie::drawFlame (bool displayParticle)
       
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
+
+//       CVector direction2(-bougiepos.x, -bougiepos.y, -bougiepos.z);
+
+//       if( (worldLookAt * direction2) < 0) {
+// 	glPopMatrix();
+//  	return;
+//       }	
       
       if (angle2 < PI / 2.0) angle = PI - angle;
       
@@ -392,20 +399,22 @@ Bougie::drawFlame (bool displayParticle)
       glMatrixMode (GL_TEXTURE);
       glPushMatrix ();
       glLoadIdentity ();
+
       glTranslatef (0.0, angle / (double) (PI), 0.0);
 
       gluBeginSurface (m_nurbs);
+      cerr << "angle : " << angle << " " << angle / (double) (PI) << endl;
       gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount,
 		       m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
 		       3, m_ctrlPoints, m_uorder, m_vorder,
 		       GL_MAP2_VERTEX_3);
+      
       gluEndSurface (m_nurbs);
       
       glPopMatrix();
       glDisable (GL_TEXTURE_2D);
 
       glMatrixMode (GL_MODELVIEW);
-      
  //      cgBougieVertexShader.disableProfile();
 //       cgBougieFragmentShader.disableProfile();
     }

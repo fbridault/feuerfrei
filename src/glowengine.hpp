@@ -10,14 +10,14 @@ class GlowEngine;
 #include "pbuffer.hpp"
 #include "CgBlurShaders.hpp"
 #include "scene.hpp"
-#include "eyeball.hpp"
+#include "camera.hpp"
 
 
 class GlowEngine
 {
 public:
   
-  GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h, int sc);
+  GlowEngine(CScene *s, Camera *e, CGcontext *cgcontext, int w, int h, int sc);
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -52,7 +52,7 @@ private:
   GLuint texblur;
   
   CScene *scene;
-  Eyeball *eyeball;
+  Camera *camera;
   //Texture *textest;
 };
 

@@ -3,7 +3,7 @@
 #include "scene.hpp"
 #include <fstream>
 
-COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bool detached)
+COBJReader::COBJReader (const char *filename, CScene& scene, CObject* object, bool detached)
 {
   char lettre,drop;
   char buffer[255];
@@ -51,13 +51,13 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
 	    currentObject = object;
 	    alreadyOneObject = true;
 	  }else
-	    currentObject = new CObject(scene,&offset);
+	    currentObject = new CObject(&scene,&offset);
 	  
 	  if(!detached)
 	    if (!strncmp (buffer, "WSV", 3))
-	      scene->addObject(currentObject, true);
+	      scene.addObject(currentObject, true);
 	    else
-	      scene->addObject(currentObject, false);
+	      scene.addObject(currentObject, false);
 	  objectsAttributesSet = false;
 	  nbObjectVertex = nbVertex;
 	  nbObjectNormals = nbNormals;
@@ -209,7 +209,7 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
 	  break;
 	case 'u':
 	  objFile >> buffer >> buffer;
-	  matIndex = scene->getMaterialIndexByName(buffer);
+	  matIndex = scene.getMaterialIndexByName(buffer);
 	}
     }
   objFile.close ();
@@ -217,7 +217,7 @@ COBJReader::COBJReader (const char *filename, CScene* scene, CObject* object, bo
 }
 
 void
-COBJReader::importMaterial (const char *filename, CScene *scene)
+COBJReader::importMaterial (const char *filename, CScene& scene)
 {
   char lettre, lettre2;
   char buffer[255];
@@ -298,7 +298,7 @@ COBJReader::importMaterial (const char *filename, CScene *scene)
 	  //cout << name_nouvelle_matiere << endl;
 	  break;
 	case 'i':		// considéré comme le dernier, le matériau est créé
-	  scene->addMaterial(new CMaterial (name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
+	  scene.addMaterial(new CMaterial (name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
 	  nouvelle_texture = NULL;
 	  break;
 	case 'm':		//map_K?

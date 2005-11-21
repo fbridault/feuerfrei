@@ -8,7 +8,7 @@ class wxGLBuffer;
 #include <wx/glcanvas.h>
 
 #include "CgSVShader.hpp"
-#include "eyeball.hpp"
+#include "camera.hpp"
 
 #include "scene.hpp"
 #include "solidePhoto.hpp"
@@ -34,7 +34,18 @@ public:
   void OnMouseMotion(wxMouseEvent& event);
   /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
   void OnMouseClick(wxMouseEvent& event);
-    
+  void OnMouseWheel(wxMouseEvent& event);
+  void OnKeyPressed(wxKeyEvent& event);
+  
+//   void moveCameraOnFrontOrBehind(double value){
+//     m_camera->moveOnFrontOrBehind(value);
+//   };  
+//   void moveCameraOnSides(double value){
+//     m_camera->moveOnSides(value);
+//   };
+//   void moveCameraUpOrDown(double value){
+//     m_camera->moveUpOrDown(value);
+//   };
   void InitGL(void);
   void InitFlames(void);
   void InitScene(void);
@@ -86,7 +97,7 @@ private:
   int m_width, m_height;
   
   CGcontext m_context;
-  Eyeball *m_eyeball;
+  Camera *m_camera;
   /* Pour le compte des frames */
   int m_framesCount;
   int m_t;

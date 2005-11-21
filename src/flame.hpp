@@ -12,7 +12,7 @@ class Flame;
 #include "periSkeleton.hpp"
 #include "solver.hpp"
 #include "texture.hpp"
-#include "eyeball.hpp"
+#include "camera.hpp"
 #include "object.hpp"
 #include "CgShader.hpp"
 
@@ -66,11 +66,11 @@ public:
     glPopMatrix();
   };
   
-  void drawLuminary(CgBasicVertexShader *shader) const
+  void drawLuminary(CgBasicVertexShader& shader) const
   {
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
-    shader->setModelViewProjectionMatrix();
+    shader.setModelViewProjectionMatrix();
     glCallList(m_luminaryDL);
     glPopMatrix();
   }

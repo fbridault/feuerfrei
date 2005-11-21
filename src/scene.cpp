@@ -10,13 +10,13 @@ CScene::CScene (const char* const filename, Flame **flames, int nbFlames)
   
   addMaterial(new CMaterial("default",NULL, coeff, NULL, 0));
   cerr << "Chargement de la scène " << filename << endl;
-  COBJReader objReader(filename, this);
+  COBJReader objReader(filename, *this);
 }
 
 void CScene::loadObject(const char *filename, CObject* const newObj, bool detached)
 { 
   cerr << "Chargement de l'objet " << filename << endl;
-  COBJReader import(filename, this, newObj, detached);
+  COBJReader import(filename, *this, newObj, detached);
 }
 
 void CScene::createDisplayLists(void)

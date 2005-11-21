@@ -163,7 +163,7 @@ public:
       m_flames[f]->drawLuminary();
   };
     /** Dessin de la scène pour les objets non texturés */
-  void draw_sceneWTEX(CgBasicVertexShader *shader) const
+  void draw_sceneWTEX(CgBasicVertexShader& shader) const
   {
     glCallList(m_displayLists[2]);
     glCallList(m_displayLists[4]);
@@ -183,7 +183,7 @@ public:
       m_flames[f]->drawLuminary();
   };
   /** Dessin de la scène */
-  void draw_scene (CgBasicVertexShader *shader) const
+  void draw_scene (CgBasicVertexShader& shader) const
   {
     glCallList (m_displayLists[0]);
     glCallList (m_displayLists[5]);

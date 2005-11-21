@@ -37,7 +37,7 @@ public:
    * @param object objet dans lequel importer le fichier
    * @param detached permet de spécifier si l'objet doit appartenir à la scène ou non
    */
-  COBJReader(const char* filename, CScene *sceneToImportInto, CObject* object=NULL, bool detached=false);
+  COBJReader(const char* filename, CScene& sceneToImportInto, CObject* object=NULL, bool detached=false);
   /**
    * Destructeur par d&eacute;faut.
    */
@@ -46,7 +46,7 @@ private:
   /**
    * Lit un fichier MTL pass&eacute; en param&egrave;tres et importe les mat&eacute;riaux dans la sc&egrave;ne.
    */
-  void importMaterial(const char* filename, CScene* scene);
+  void importMaterial(const char* filename, CScene& scene);
 };
 
 #endif

@@ -11,6 +11,8 @@ BEGIN_EVENT_TABLE(wxGLBuffer, wxGLCanvas)
   EVT_MIDDLE_UP(wxGLBuffer::OnMouseClick)
   EVT_RIGHT_DOWN(wxGLBuffer::OnMouseClick)
   EVT_RIGHT_UP(wxGLBuffer::OnMouseClick)
+  EVT_MOUSEWHEEL(wxGLBuffer::OnMouseWheel)
+  EVT_KEY_DOWN(wxGLBuffer::OnKeyPressed)
 END_EVENT_TABLE();
 
 CGcontext *contextCopy;
@@ -130,10 +132,10 @@ void wxGLBuffer::InitScene(void)
   //AS_ERROR(chdir(".."),"chdir ..");
   m_scene->createDisplayLists();
   
-  m_eyeball = new Eyeball (m_width, m_height, m_currentConfig->clipping);
+  m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
-  m_glowEngine  = new GlowEngine (m_scene, m_eyeball, &m_context, m_width, m_height, 4);
-  m_glowEngine2 = new GlowEngine (m_scene, m_eyeball, &m_context, m_width, m_height, 1);
+  m_glowEngine  = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 4);
+  m_glowEngine2 = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 1);
 }
 
 /** Initialisation de l'interface */
@@ -171,7 +173,7 @@ void wxGLBuffer::DestroyScene(void)
 { 
   delete m_glowEngine;
   delete m_glowEngine2;
-  delete m_eyeball;
+  delete m_camera;
   delete m_scene;
   delete m_photoSolid;
   for (int f = 0; f < m_currentConfig->nbFlames; f++)
@@ -198,12 +200,32 @@ void wxGLBuffer::OnIdle(wxIdleEvent& event)
   
 void wxGLBuffer::OnMouseMotion(wxMouseEvent& event)
 {
-  m_eyeball->OnMouseMotion(event);
+  m_camera->OnMouseMotion(event);
 }
   
 void wxGLBuffer::OnMouseClick(wxMouseEvent& event)
 {
-  m_eyeball->OnMouseClick(event);
+  m_camera->OnMouseClick(event);
+}
+
+void wxGLBuffer::OnMouseWheel(wxMouseEvent& event)
+{
+  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/100);
+}
+
+void wxGLBuffer::OnKeyPressed(wxKeyEvent& event)
+{
+  double step=0.3;
+  switch(event.GetKeyCode())
+    {      
+    case WXK_LEFT: m_camera->moveOnSides(step); break;
+    case WXK_RIGHT: m_camera->moveOnSides(-step); break;
+    case WXK_UP: m_camera->moveOnFrontOrBehind(-step); break;
+    case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
+    case WXK_HOME: m_camera->moveUpOrDown(-step); break;
+    case WXK_END: m_camera->moveUpOrDown(step); break;
+    }
+  event.Skip();
 }
 
 /** Fonction de dessin global */
@@ -219,9 +241,11 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
   
   SetCurrent();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  /* Déplacement du eyeball */
-  m_eyeball->setView();
-  //m_eyeball->recalcModelView();
+  /* Déplacement du camera */
+
+  m_camera->setView();
+
+  //m_camera->recalcModelView();
   
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
@@ -229,7 +253,6 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();
   // SDL_mutexV (lock);
-  
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(m_currentConfig->glowEnabled){
     GLdouble m[4][4];
@@ -237,11 +260,13 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     /* Adaptation du flou en fonction de la distance */
     /* On module la largeur de la gaussienne */
+    
     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
     CVector direction(m[3][0], m[3][1], m[3][2]);
     
     dist = direction.length();
+
     sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
     
     m_glowEngine->activate();
@@ -292,7 +317,7 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     
     if(m_currentConfig->PSEnabled){
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(),
-								   m_flames[0]->getPosition(),
+								   *m_flames[0]->getPosition(),
 								   m_solver->getDimY());
       m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
     }else{
@@ -363,7 +388,6 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
 
     glEnable (GL_DEPTH_TEST);
   }
-  
   /******** A VERIFIER *******/
   glFlush();
   //glFinish();

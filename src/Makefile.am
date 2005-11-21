@@ -16,7 +16,7 @@ bin_PROGRAMS = flames
 flames_SOURCES = \
 	benchsolver.cpp  \
 	bougie.cpp  \
-	eyeball.cpp  \
+	camera.cpp  \
 	firmalampe.cpp  \
 	flame.cpp  \
 	graphicsFn.cpp  \
@@ -33,7 +33,7 @@ flames_SOURCES = \
 	wick.cpp  \
 	benchsolver.hpp  \
 	bougie.hpp  \
-	eyeball.hpp  \
+	camera.hpp  \
 	firmalampe.hpp  \
 	flame.hpp  \
 	graphicsFn.hpp  \
@@ -52,7 +52,6 @@ flames_SOURCES = \
 	texture.hpp  \
 	vector.hpp  \
 	wick.hpp  \
-	trackball.cpp  \  \
 	CgShader.cpp  \
 	CgShader.hpp  \
 	CgSVShader.cpp  \
@@ -74,8 +73,7 @@ flames_SOURCES = \
 	wxGLBuffer.cpp  \
 	wxGLBuffer.hpp  \
 	main.cpp  \
-	main.hpp  \
-	trackball.h  
+	main.hpp   
 flames_LDFLAGS = 
 
 flames_LDADD = 

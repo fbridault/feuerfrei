@@ -1,14 +1,14 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(CScene *s, Eyeball *e, CGcontext *cgcontext, int w, int h, int sc) : 
+GlowEngine::GlowEngine(CScene *s, Camera *e, CGcontext *cgcontext, int w, int h, int sc) : 
   pbuffer("rgb"), blurVertexShaderX(_("glowShaders.cg"),_("vertGlowX"),  cgcontext),
   blurVertexShaderY(_("glowShaders.cg"),_("vertGlowY"),  cgcontext),
   blurFragmentShader(_("glowShaders.cg"),_("fragGlow"),  cgcontext)
 {
   scene = s;
   context = cgcontext;
-  eyeball = e;
+  camera = e;
   scaleFactor=sc;
   width=w/scaleFactor;
   height=h/scaleFactor;

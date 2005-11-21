@@ -16,12 +16,8 @@ COBJReader::COBJReader (const char *filename, CScene& scene, CObject* object, bo
   bool objectsAttributesSet=0;
   int nbVertex=0, nbNormals=0, nbTexCoords=0;
   int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
-  CObject* currentObject=NULL;
+  CObject* currentObject=NULL;  
   bool importSingleObject = (object != NULL);
-  
-  CPoint offset(0,0,0);
-  //CPoint offset(-19,2.2,8);
-  //CPoint offset(-10,0.2,16);
   
   AS_ERROR(chdir("./scenes"),"chdir scenes dans COBJReader");
   ifstream objFile(filename, ios::in);
@@ -29,7 +25,6 @@ COBJReader::COBJReader (const char *filename, CScene& scene, CObject* object, bo
     throw (ios::failure ("Open error"));
     return;
   }
-  
   while (!objFile.eof())
     {
       objFile >> lettre;
@@ -51,7 +46,7 @@ COBJReader::COBJReader (const char *filename, CScene& scene, CObject* object, bo
 	    currentObject = object;
 	    alreadyOneObject = true;
 	  }else
-	    currentObject = new CObject(&scene,&offset);
+	    currentObject = new CObject(&scene);
 	  
 	  if(!detached)
 	    if (!strncmp (buffer, "WSV", 3))

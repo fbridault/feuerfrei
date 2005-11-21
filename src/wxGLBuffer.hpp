@@ -36,24 +36,19 @@ public:
   void OnMouseClick(wxMouseEvent& event);
   void OnMouseWheel(wxMouseEvent& event);
   void OnKeyPressed(wxKeyEvent& event);
-  
-//   void moveCameraOnFrontOrBehind(double value){
-//     m_camera->moveOnFrontOrBehind(value);
-//   };  
-//   void moveCameraOnSides(double value){
-//     m_camera->moveOnSides(value);
-//   };
-//   void moveCameraUpOrDown(double value){
-//     m_camera->moveUpOrDown(value);
-//   };
-  void InitGL(void);
+
+  /** Initialisations relatives à l'environnement OpenGL */
+  void InitGL(bool recompileShaders);
+  /** Initialisations relatives aux flammes */
   void InitFlames(void);
-  void InitScene(void);
+  /** Initialisations relatives à la scène */
+  void InitScene(bool recompileShaders);
+  /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
-  void Init(FlameAppConfig *config);
+  void Init(FlameAppConfig *config, bool recompileShaders);
 
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
@@ -87,8 +82,7 @@ private:
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
   bool m_run;
-  bool m_displayVelocity, m_displayBase, m_displayGrid,
-    m_displayFlame, m_displayParticles;
+  bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles;
   bool m_flickering, m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;

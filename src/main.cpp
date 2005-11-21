@@ -22,9 +22,10 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
-  EVT_SPINCTRL(IDSC_FXAP, MainFrame::OnSpinPosChanged)
-  EVT_SPINCTRL(IDSC_FYAP, MainFrame::OnSpinPosChanged)
-  EVT_SPINCTRL(IDSC_FZAP, MainFrame::OnSpinPosChanged)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
+  EVT_COMMAND_SCROLL_BOTTOM(IDSL_FXAP,MainFrame::OnThumbReleasePosition)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -38,15 +39,20 @@ IMPLEMENT_APP(FlamesApp)
 
 bool FlamesApp::OnInit()
 {
+  bool recompileShaders=false;
   /* Déclaration des handlers pour la gestion des formats d'image */
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
-  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(950,860) );
+  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(1100,860) );
   
   frame->Show(TRUE);
   
-  frame->GetSettingsFromConfigFile ();
+  if(argc == 2){
+    if(wxString(argv[1]) == _("--recompile"))
+      recompileShaders = true;
+  }
+  frame->GetSettingsFromConfigFile (recompileShaders);
   
   SetTopWindow(frame);
   return TRUE;
@@ -55,7 +61,7 @@ bool FlamesApp::OnInit()
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
-
+  int range=200;
   int attributelist[ 10 ] = { WX_GL_RGBA        ,
 			      WX_GL_DOUBLEBUFFER,
 			      WX_GL_STENCIL_SIZE,
@@ -78,16 +84,29 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
-  m_flameXAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FXAP,wxEmptyString,wxDefaultPosition,
-						wxDefaultSize,wxSP_ARROW_KEYS|wxCAPTION,-500,500,0,_("X"));
-  m_flameYAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FYAP,wxEmptyString,wxDefaultPosition,
-						wxDefaultSize,wxSP_ARROW_KEYS,-500,500,0,_("Y"));
-  m_flameZAxisPositionSpinCtrl = new wxSpinCtrl(this,IDSC_FZAP,wxEmptyString,wxDefaultPosition,
-						wxDefaultSize,wxSP_ARROW_KEYS,-500,500,0,_("Z"));
+  m_flameXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-range,range, wxDefaultPosition, 
+					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_flameYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-range,range, wxDefaultPosition,
+					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_flameZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-range,range, wxDefaultPosition, 
+					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_flameXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
   m_flameYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
   m_flameZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
+  m_flameXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN);
+  m_flameXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX);
+  m_flameYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN);
+  m_flameYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX);
+  m_flameZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN);
+  m_flameZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX);
 
+  (*m_flameXAxisPositionSliderMin) << -range;
+  (*m_flameXAxisPositionSliderMax) << range;
+  (*m_flameYAxisPositionSliderMin) << -range;
+  (*m_flameYAxisPositionSliderMax) << range;
+  (*m_flameZAxisPositionSliderMin) << -range;
+  (*m_flameZAxisPositionSliderMax) << range;
+  
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 1, 0, 0);
   m_globalSizer->Add(m_buttonRestart, 1, 0, 0);
@@ -106,17 +125,34 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_flamesZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
 
   m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSpinCtrl, 5, 0, 0);
+  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSlider, 20, 0, 0);
   m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSpinCtrl, 5, 0, 0);
+  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSlider, 20, 0, 0);
   m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSpinCtrl, 5, 0, 0);
+  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSlider, 20, 0, 0);
+  
+  m_flamesXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_flamesYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_flamesZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+
+  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMin, 1, 0, 0);
+  m_flamesXAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMax, 1, 0, 0);
+  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMin, 1, 0, 0);
+  m_flamesYAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMax, 1, 0, 0);
+  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMin, 1, 0, 0);
+  m_flamesZAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMax, 1, 0, 0);
 
   m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
   m_flamesSizer->Add(m_flamesXAxisPositionSizer, 0, 0, 0);
+  m_flamesSizer->Add(m_flamesXAxisPositionRangeSizer, 0, 0, 0);
   m_flamesSizer->Add(m_flamesYAxisPositionSizer, 0, 0, 0);
+  m_flamesSizer->Add(m_flamesYAxisPositionRangeSizer, 0, 0, 0);
   m_flamesSizer->Add(m_flamesZAxisPositionSizer, 0, 0, 0);
-  
+  m_flamesSizer->Add(m_flamesZAxisPositionRangeSizer, 0, 0, 0);
+    
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_globalSizer, 0, 0, 0);
   m_rightSizer->Add(m_solidSizer, 0, 0, 0);
@@ -160,7 +196,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   SetStatusText( _("FPS will be here...") );
 }
 
-void MainFrame::GetSettingsFromConfigFile ()
+void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
 {
   wxFileInputStream* file = new wxFileInputStream( _("param.ini" ));
   m_config = new wxFileConfig( *file );
@@ -213,8 +249,8 @@ void MainFrame::GetSettingsFromConfigFile ()
   }
 
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
-  m_glBuffer->Init(&m_currentConfig);
-  
+  m_glBuffer->Init(&m_currentConfig,recompileShaders);
+        
   delete file;
 
   return;
@@ -280,17 +316,22 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
   m_glBuffer->ToggleSP(); 
 }
 
-void MainFrame::OnSpinPosChanged(wxSpinEvent& event)
+void MainFrame::OnScrollPosition(wxScrollEvent& event)
 {
-  CPoint pt(m_flameXAxisPositionSpinCtrl->GetValue()/10.0,
-	    m_flameYAxisPositionSpinCtrl->GetValue()/10.0,
-	    m_flameZAxisPositionSpinCtrl->GetValue()/10.0);
+  CPoint pt(m_flameXAxisPositionSlider->GetValue()/50.0,
+	    m_flameYAxisPositionSlider->GetValue()/50.0,
+	    m_flameZAxisPositionSlider->GetValue()/50.0);
 
   m_glBuffer->moveFlame(m_selectedFlame, pt);
   
   m_currentConfig.flames[m_selectedFlame].position.x = pt.x;
   m_currentConfig.flames[m_selectedFlame].position.y = pt.y;
   m_currentConfig.flames[m_selectedFlame].position.z = pt.z;
+}
+
+void MainFrame::OnThumbReleasePosition(wxScrollEvent& event)
+{
+  cerr << event.GetId() << endl;
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)

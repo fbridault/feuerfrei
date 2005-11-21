@@ -12,7 +12,7 @@ class CgSPVertexShader;
 class CgBougieVertexShader : public CgBasicVertexShader
 {
 public:
-  CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
+  CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
   virtual ~CgBougieVertexShader();
   
   void setTexTranslation(GLdouble value){
@@ -31,7 +31,7 @@ private:
 class CgBougieFragmentShader : public CgShader
 {
 public:
-  CgBougieFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
+  CgBougieFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
   virtual ~CgBougieFragmentShader();
   
   void setTexture(Texture* tex){

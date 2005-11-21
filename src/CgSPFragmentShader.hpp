@@ -26,7 +26,8 @@ public:
    * @param ieslist Liste des fichiers IES
    * @param type : 1 ou 0 selon qu'il y ait interpolation ou non
    */
-  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, IESList *ieslist, bool type);
+  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, 
+		     IESList *ieslist, bool type, bool recompile=false);
   virtual ~CgSPFragmentShader();
     
   void setTexture(){

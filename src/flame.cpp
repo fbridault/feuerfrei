@@ -18,8 +18,10 @@ Flame::Flame(Solver *s, int nb, CPoint *centre, CPoint *pos, const char *filenam
   m_vorder = 4;
   
   m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 20.0);
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 50.0);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+  /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
+  gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
   m_toggle=false;
@@ -47,8 +49,10 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
   m_vorder = 4;
   
   m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 10.0);
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 50.0);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+  /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
+  gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
   m_toggle=false;

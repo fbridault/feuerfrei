@@ -23,6 +23,7 @@ Camera::Camera (int width, int height, double clipping) : m_position(0.0,0.0,-2.
   /* initialisation du deplacement trackball */
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
+  /* La caméra reste toujours centrée en (0,0,0) */
   gluLookAt (0.0,0.0,0.0,m_view.x, m_view.y, m_view.z, m_up.x, m_up.y, m_up.z);
   glPushMatrix ();
   glLoadIdentity ();
@@ -30,30 +31,18 @@ Camera::Camera (int width, int height, double clipping) : m_position(0.0,0.0,-2.
 
 void Camera::computeView(double x, double y)
 {  
-  // vector that describes mouseposition - center
   CVector mouseDirection;
-  // get the distance and direction the mouse moved in x (in
-  // pixels). We can't use the actual number of pixels in radians,
-  // as only six pixels  would cause a full 360 degree rotation.
-  // So we use a mousesensitivity variable that can be changed to
-  // vary how many radians we want to turn in the x-direction for
-  // a given mouse movement distance
-
-  // We have to remember that positive rotation is counter-clockwise. 
-  // Moving the mouse down is a negative rotation about the x axis
-  // Moving the mouse right is a negative rotation about the y axis
+  
   mouseDirection.x = (m_beginMouseX-x)/m_mouseSensitivity; 
   mouseDirection.y = (m_beginMouseY-y)/m_mouseSensitivity;
 
   m_currentRotationX += mouseDirection.y;
   
-  // We don't want to rotate up more than one radian, so we cap it.
   if(m_currentRotationX > m_maxAngleX)
   {
     m_currentRotationX = m_maxAngleX;
     return;
   }else
-    // We don't want to rotate down more than one radian, so we cap it.
     if(m_currentRotationX < -m_maxAngleX)
       {
 	m_currentRotationX = -m_maxAngleX;
@@ -61,19 +50,15 @@ void Camera::computeView(double x, double y)
       }
     else
       {
-	// get the axis to rotate around the x-axis. 
+	// Récupérer l'axe de rotation qui sera X
 	CVector axis = m_view ^ m_up;
-	cerr << axis << m_view << m_up << endl;
-	// To be able to use the quaternion conjugate, the axis to
-	// rotate around must be normalized.
+	
 	axis.normalize();	
-	// Rotate around the y axis
+	// Rotation autour de l'axe Y
 	rotate(mouseDirection.y, axis.x, axis.y, axis.z);
-	// Rotate around the x axis
+	// Rotation autour de l'axe X
 	rotate(mouseDirection.x, 0, 1, 0);
       }
-
-  cerr << "====" << endl;
 }
 
 void Camera::rotate(double angle, double x, double y, double z)

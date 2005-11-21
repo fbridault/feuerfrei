@@ -1,8 +1,8 @@
 #include "solidePhoto.hpp"
 
-SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context) :
-  SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context),
-  SPVertexShaderWTex(_("SolidePhotometriqueVP.cg"),_("vpSPWTEX"),context)
+SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context, bool recompileShaders) :
+  SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders),
+  SPVertexShaderWTex(_("SolidePhotometriqueVP.cg"),_("vpSPWTEX"),context,recompileShaders)
 {
   scene = s;
   orientationSPtheta = 0.0;
@@ -12,12 +12,12 @@ SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context) :
   ieslist.addIESFile("IES/out2518T1EF.IES");
   ieslist.addIESFile("IES/out8013H1EN.IES");
   
-  SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"),context,&ieslist,0);
-  SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeulInterpole"),context,&ieslist,1);
-  SPFragmentShader[2] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"),context,&ieslist,0);
-  SPFragmentShader[3] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestTEX"),context,&ieslist,1);
-  SPFragmentShader[4] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPWTEX"),context,&ieslist,0);
-  SPFragmentShader[5] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestWTEX"),context,&ieslist,1);
+  SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"),context,&ieslist,0,recompileShaders);
+  SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeulInterpole"),context,&ieslist,1,recompileShaders);
+  SPFragmentShader[2] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"),context,&ieslist,0,recompileShaders);
+  SPFragmentShader[3] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestTEX"),context,&ieslist,1,recompileShaders);
+  SPFragmentShader[4] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPWTEX"),context,&ieslist,0,recompileShaders);
+  SPFragmentShader[5] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestWTEX"),context,&ieslist,1,recompileShaders);
 }
 
 SolidePhotometrique::~SolidePhotometrique()

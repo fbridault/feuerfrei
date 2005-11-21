@@ -1,7 +1,7 @@
 #include "CgSVShader.hpp"
 
-CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context):
-  CgBasicVertexShader (sourceName, shaderName, context)
+CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile):
+  CgBasicVertexShader (sourceName, shaderName, context, recompile)
 {
   GLdouble fatnessVec[] = { -0.001, -0.001, -0.001, 0.0 };
   GLdouble shadowExtrudeDistVec[] = { 5.0, 5.0, 5.0, 0.0 };

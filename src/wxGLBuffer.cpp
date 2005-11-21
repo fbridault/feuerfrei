@@ -58,7 +58,7 @@ void wxGLBuffer::InitUISettings(void)
   m_shadowsEnabled = false; m_shadowVolumesEnabled = false;
 }
 
-void wxGLBuffer::InitGL(void)
+void wxGLBuffer::InitGL(bool recompileShaders)
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
@@ -88,7 +88,7 @@ void wxGLBuffer::InitGL(void)
   contextCopy = &m_context;
   cgSetErrorCallback(cgErrorCallback);
   
-  m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context);
+  m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, recompileShaders);
 }
 
 void wxGLBuffer::InitFlames(void)
@@ -106,7 +106,7 @@ void wxGLBuffer::InitFlames(void)
     case FIRMALAMPE :
       nbSkeletons = 5;
       m_flames[i] = new Firmalampe(m_solver,nbSkeletons,&pt,&m_currentConfig->flames[i].position,
-				   m_SVShader, m_currentConfig->mecheName.fn_str(),"firmalampe.obj",m_scene);
+				   m_SVShader, m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -114,7 +114,7 @@ void wxGLBuffer::InitFlames(void)
     }
 }
 
-void wxGLBuffer::InitScene(void)
+void wxGLBuffer::InitScene(bool recompileShaders)
 {  
   m_solver = new Solver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
 			1.0, m_currentConfig->timeStep);
@@ -126,7 +126,7 @@ void wxGLBuffer::InitScene(void)
   
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
-  m_photoSolid = new SolidePhotometrique(m_scene, &m_context);
+  m_photoSolid = new SolidePhotometrique(m_scene, &m_context, recompileShaders);
   
   InitFlames();
   //AS_ERROR(chdir(".."),"chdir ..");
@@ -134,20 +134,19 @@ void wxGLBuffer::InitScene(void)
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
-  m_glowEngine  = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 4);
-  m_glowEngine2 = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 1);
+  m_glowEngine  = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 4, recompileShaders);
+  m_glowEngine2 = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 1, recompileShaders);
 }
 
-/** Initialisation de l'interface */
-void wxGLBuffer::Init (FlameAppConfig *config)
+void wxGLBuffer::Init (FlameAppConfig *config, bool recompileShaders)
 {  
   m_currentConfig = config;
 
   InitUISettings();
   SetCurrent();
-  InitGL();
+  InitGL(recompileShaders);
   
-  InitScene();
+  InitScene(recompileShaders);
   
   ::wxStartTimer();
 
@@ -162,7 +161,7 @@ void wxGLBuffer::Restart (void)
   m_init = false;
   DestroyScene();
   InitUISettings();
-  InitScene();
+  InitScene(false);
   ::wxStartTimer();
   m_init = true;
   Enable();

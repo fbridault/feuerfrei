@@ -167,11 +167,11 @@ public:
   /**
    * Constructeur par recopie.
    */
-  CVector(const CVector& V){x=V.x; y=V.y; z=V.z;};
+  CVector(const CVector& V) : CPoint(V.x, V.y, V.z) {};
   /**
    * Constructeur par recopie d'un argument de type CPoint.
    */	
-  CVector(const CPoint& P){x=P.x; y=P.y; z=P.z;};
+  CVector(const CPoint& P) : CPoint(P) {};
   /**
    * Constructeur param&eacute;trique.
    * @param xp	coordonn&eacute;e en <CODE>x</CODE> du vecteur &agrave; cr&eacute;er.

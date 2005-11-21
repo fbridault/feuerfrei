@@ -21,7 +21,7 @@ public:
    * @param s Pointeur vers la scène 3D
    * @param context Pointeur vers le contexte Cg
    */
-  SolidePhotometrique(CScene *s, CGcontext *context);
+  SolidePhotometrique(CScene *s, CGcontext *context, bool recompileShaders);
   virtual ~SolidePhotometrique();
 
   /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique

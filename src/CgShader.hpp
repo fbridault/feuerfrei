@@ -19,7 +19,7 @@ public:
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    * @param type Type du shader : CG_GL_VERTEX ou CG_GL_FRAGMENT
    */
-  CgShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type);
+  CgShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile=false);
   virtual ~CgShader();
   
   /** Activation du profil */
@@ -62,7 +62,7 @@ public:
    * @param shaderName Nom du programme Cg
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    */
-  CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context);
+  CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
   virtual ~CgBasicVertexShader(){};
   
   /** Met à jour la matrice résultante de la concaténation de la projection et de la

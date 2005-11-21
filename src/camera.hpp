@@ -85,8 +85,15 @@ public:
 //       recalculer_matrice_initiale (); };
 //   void addCenterZ(double value){ centerz+=value; eyez+=value;
 //       recalculer_matrice_initiale ();};
+  /** Calcul de la rotation de la caméra 
+   * @param x position finale de la souris en x
+   * @param y position finale de la souris en y
+   */
   void computeView(double x, double y);
 
+  /** Placement de la caméra. Fonction à appeler au début de chaque tour de la
+   * boucle de dessin
+   */
   void setView(void){
     glPopMatrix ();
     glPushMatrix ();
@@ -95,6 +102,7 @@ public:
     glTranslatef(m_position.x, m_position.y, m_position.z);
   };  
 
+  /** Rotation de la caméra */
   void rotate(double angle, double x, double y, double z);
   
   void OnMouseClick (wxMouseEvent& event);
@@ -125,19 +133,29 @@ public:
   };
   
 private:
-  /* Variables pour la visu */
+  /** Position de la scène. La caméra reste toujours centrée en (0,0,0) */
   CPoint m_position;
+  /** Vecteur vers le haut et direction de visée */
   CVector m_up, m_view;
-  
+  /** Bouton de la souris actuellement appuyé */
   int m_buttonPressed;
+  /** Angle d'ouverture de la caméra en degrés */
   GLdouble m_ouverture;
+  /** Variables temporaires pour savoir à partir de quel endroit le glissement de la
+   * souris a commencé 
+   */
   int m_beginMouseX, m_beginMouseY;
+  /** Valeur de clipping de la caméra */
   double m_clipping_value;
+  /** Rotation actuelle autour de l'axe X */
   double m_currentRotationX;  
-  /** Angle maximal en radians */
+  /** Angle de rotation maximal autour de l'axe X en radians */
   double m_maxAngleX;
+  /** Variable temporaire indiquant qu'un mouvement a lieu avec la souris */
   bool m_move;
+  /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
   double m_mouseSensitivity;
+  /** Largeur et hauteur de la vue de la caméra */
   int m_width, m_height;  
 };
 

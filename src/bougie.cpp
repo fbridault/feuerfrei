@@ -368,14 +368,7 @@ Bougie::drawFlame (bool displayParticle)
       
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
-
-//       CVector direction2(-bougiepos.x, -bougiepos.y, -bougiepos.z);
-
-//       if( (worldLookAt * direction2) < 0) {
-// 	glPopMatrix();
-//  	return;
-//       }	
-      
+            
       if (angle2 < PI / 2.0) angle = PI - angle;
       
       /****************************************************************************************/
@@ -403,7 +396,6 @@ Bougie::drawFlame (bool displayParticle)
       glTranslatef (0.0, angle / (double) (PI), 0.0);
 
       gluBeginSurface (m_nurbs);
-      cerr << "angle : " << angle << " " << angle / (double) (PI) << endl;
       gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount,
 		       m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
 		       3, m_ctrlPoints, m_uorder, m_vorder,

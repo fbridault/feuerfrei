@@ -74,7 +74,7 @@ public:
   double timeStep;
   int width, height;
   double clipping;
-  wxString sceneName,mecheName;
+  wxString sceneName;
   bool PSEnabled,glowEnabled;
   /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;

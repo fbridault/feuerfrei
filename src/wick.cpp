@@ -11,7 +11,7 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
   vector < CPoint * >pointsPartitionsArray[nb_lead_squelettes];
 
   /* Chargement de la mèche */
-  cout << "Chargement de la mèche du fichier " << filename << "...";
+  cerr << "Chargement de la mèche du fichier " << filename << "...";
   scene->loadObject(filename, this, true);
   
   /*******************************/
@@ -23,7 +23,7 @@ Wick::Wick (const char *filename, int nb_lead_squelettes, CScene *scene) : CObje
   draw (ALL,true);
   //glDisable (GL_LIGHTING);
   glEndList ();
-  cout << "Terminé" << endl;
+  cerr << "Terminé" << endl;
 
   /*****************************************************************************/
   /* Création des points qui vont servir d'origines pour les squelettes guides */

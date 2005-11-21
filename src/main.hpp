@@ -25,9 +25,19 @@
 
 enum
   {
-    IDSC_FXAP = 1,
-    IDSC_FYAP,
-    IDSC_FZAP,
+    IDSL_FXAP = 1,
+    IDSL_FYAP,
+    IDSL_FZAP,
+  };
+
+enum
+  {
+    IDT_FXAPMIN = 1,  
+    IDT_FXAPMAX,    
+    IDT_FYAPMIN,
+    IDT_FYAPMAX,
+    IDT_FZAPMIN,
+    IDT_FZAPMAX,
   };
 
 enum
@@ -75,7 +85,7 @@ class MainFrame: public wxFrame
 public:
   MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size); 
   
-  void GetSettingsFromConfigFile ();
+  void GetSettingsFromConfigFile (bool recompileShaders);
   
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
@@ -100,7 +110,8 @@ public:
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
-  void OnSpinPosChanged(wxSpinEvent& event);
+  void OnScrollPosition(wxScrollEvent& event);
+  void OnThumbReleasePosition(wxScrollEvent& event);
   void SetFPS(int fps);
   
 private:
@@ -118,12 +129,16 @@ private:
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
   
-  wxSpinCtrl *m_flameXAxisPositionSpinCtrl, *m_flameYAxisPositionSpinCtrl, *m_flameZAxisPositionSpinCtrl;
-
+  wxSlider *m_flameXAxisPositionSlider, *m_flameYAxisPositionSlider, *m_flameZAxisPositionSlider;
+  wxTextCtrl *m_flameXAxisPositionSliderMax, *m_flameYAxisPositionSliderMax, *m_flameZAxisPositionSliderMax,
+    *m_flameXAxisPositionSliderMin, *m_flameYAxisPositionSliderMin, *m_flameZAxisPositionSliderMin;
   wxStaticText *m_flameXAxisPositionLabel, *m_flameYAxisPositionLabel, *m_flameZAxisPositionLabel;
+  
   wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_flamesSizer;
   wxBoxSizer *m_mainSizer, *m_rightSizer;
   wxBoxSizer *m_flamesXAxisPositionSizer, *m_flamesYAxisPositionSizer, *m_flamesZAxisPositionSizer;
+  wxBoxSizer *m_flamesXAxisPositionRangeSizer, *m_flamesYAxisPositionRangeSizer, *m_flamesZAxisPositionRangeSizer;
+  
   FlameAppConfig m_currentConfig;
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */

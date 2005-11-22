@@ -109,11 +109,16 @@ public:
     return os ;
   }
   /** Aditionner deux points */
-  virtual CPoint operator+(CPoint P){
+  virtual CPoint operator+(const CPoint& P){
     CPoint resultat(x+P.x,y+P.y,z+P.z);
     return resultat;
   }//operator+
-	
+  /** Aditionner deux points */
+  virtual void operator+=(const CPoint& P){
+    x += P.x;
+    y += P.y;
+    z += P.z;
+  }//operator+	
 	/** Diviser toutes les composantes par un scalaire */
   virtual CPoint operator/(GLdouble div){
     CPoint resultat(x/div,y/div,z/div);

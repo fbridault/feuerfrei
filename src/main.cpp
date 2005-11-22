@@ -18,6 +18,12 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
+  EVT_TEXT_ENTER(IDT_FXAPMIN, MainFrame::OnFXAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FXAPMAX, MainFrame::OnFXAPMAXEnter)
+  EVT_TEXT_ENTER(IDT_FYAPMIN, MainFrame::OnFYAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FYAPMAX, MainFrame::OnFYAPMAXEnter)
+  EVT_TEXT_ENTER(IDT_FZAPMIN, MainFrame::OnFZAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FZAPMAX, MainFrame::OnFZAPMAXEnter)
   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
@@ -25,7 +31,6 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_SCROLL(MainFrame::OnScrollPosition)
-  EVT_COMMAND_SCROLL_BOTTOM(IDSL_FXAP,MainFrame::OnThumbReleasePosition)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -44,7 +49,7 @@ bool FlamesApp::OnInit()
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
-  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(1100,860) );
+  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(1060,860) );
   
   frame->Show(TRUE);
   
@@ -61,14 +66,16 @@ bool FlamesApp::OnInit()
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
-  int range=200;
+  
   int attributelist[ 10 ] = { WX_GL_RGBA        ,
 			      WX_GL_DOUBLEBUFFER,
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
   m_selectedFlame = 0;
-  
+  SLIDER_SENSIBILITY=100.0;
+  SLIDER_RANGE=500;
+  /*********************************** Création des contrôles *************************************************/
   m_glBuffer = new wxGLBuffer( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   
   // Création d'un bouton. Ce bouton est associé à l'identifiant 
@@ -84,84 +91,101 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
-  m_flameXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-range,range, wxDefaultPosition, 
+  m_flameXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_flameYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-range,range, wxDefaultPosition,
+  m_flameYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_flameZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-range,range, wxDefaultPosition, 
+  m_flameZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_flameXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
   m_flameYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
   m_flameZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
-  m_flameXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN);
-  m_flameXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX);
-  m_flameYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN);
-  m_flameYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX);
-  m_flameZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN);
-  m_flameZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX);
+  m_flameXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  m_flameXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  m_flameYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  m_flameYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  m_flameZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  m_flameZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX,_(""),
+						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
 
-  (*m_flameXAxisPositionSliderMin) << -range;
-  (*m_flameXAxisPositionSliderMax) << range;
-  (*m_flameYAxisPositionSliderMin) << -range;
-  (*m_flameYAxisPositionSliderMax) << range;
-  (*m_flameZAxisPositionSliderMin) << -range;
-  (*m_flameZAxisPositionSliderMax) << range;
+  (*m_flameXAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_flameXAxisPositionSliderMax) << SLIDER_RANGE;
+  (*m_flameYAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_flameYAxisPositionSliderMax) << SLIDER_RANGE;
+  (*m_flameZAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_flameZAxisPositionSliderMax) << SLIDER_RANGE;
   
+  m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));      
+  
+  /* Réglages globaux */
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
-  m_globalSizer->Add(m_buttonRun, 1, 0, 0);
-  m_globalSizer->Add(m_buttonRestart, 1, 0, 0);
+  m_globalSizer->Add(m_buttonRun, 0, 0, 0);
+  m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
 
+  /* Réglages du solide photométrique */
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
   m_solidSizer->Add(m_enableSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
+
+  m_topSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_topSizer->Add(m_globalSizer, 2, wxEXPAND, 0);
+  m_topSizer->Add(m_solidSizer, 3, wxEXPAND, 0);
   
+  /* Réglages du glow */
   m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Glow"));
   m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   
+  /* Réglages des flammes */
   m_flamesXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
 
   m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSlider, 20, 0, 0);
+  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSlider, 18, 0, 0);
   m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSlider, 20, 0, 0);
+  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSlider, 18, 0, 0);
   m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSlider, 20, 0, 0);
+  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSlider, 18, 0, 0);
   
   m_flamesXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMin, 1, 0, 0);
+  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_flamesXAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMax, 1, 0, 0);
-  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMin, 1, 0, 0);
+  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_flamesYAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMax, 1, 0, 0);
-  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMin, 1, 0, 0);
+  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_flamesZAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMax, 1, 0, 0);
+  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
 
   m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
-  m_flamesSizer->Add(m_flamesXAxisPositionSizer, 0, 0, 0);
-  m_flamesSizer->Add(m_flamesXAxisPositionRangeSizer, 0, 0, 0);
-  m_flamesSizer->Add(m_flamesYAxisPositionSizer, 0, 0, 0);
-  m_flamesSizer->Add(m_flamesYAxisPositionRangeSizer, 0, 0, 0);
-  m_flamesSizer->Add(m_flamesZAxisPositionSizer, 0, 0, 0);
-  m_flamesSizer->Add(m_flamesZAxisPositionRangeSizer, 0, 0, 0);
-    
+  m_flamesSizer->Add(m_flamesXAxisPositionSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_flamesXAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_flamesYAxisPositionSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_flamesYAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_flamesZAxisPositionSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_flamesZAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_flamesSizer->Add(m_buttonFlickering, 0, 0, 0);
+
+  /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
-  m_rightSizer->Add(m_globalSizer, 0, 0, 0);
-  m_rightSizer->Add(m_solidSizer, 0, 0, 0);
-  m_rightSizer->Add(m_glowSizer, 0, 0, 0);
-  m_rightSizer->Add(m_flamesSizer, 0, 0, 0);
+  m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
+  m_rightSizer->Add(m_glowSizer, 0, wxEXPAND, 0);
+  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);
   
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
-  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
+  m_mainSizer->Add(m_rightSizer, 1, wxEXPAND, 0);
   
   SetSizer(m_mainSizer);
   
@@ -221,10 +245,6 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
   wxString groupName;  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
-      
-      m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));      
-      m_flamesSizer->Add(m_buttonFlickering, 4, 0, 0);
-      
       groupName.Printf(_("/Flame%d/"),i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
@@ -235,6 +255,7 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));      
 //       cout << m_currentConfig.flames[i].type << " " << m_currentConfig.flames[i].position.x << " " << m_currentConfig.flames[i].position.y << " " << m_currentConfig.flames[i].position.z << endl;
     }
+  ComputeSlidersValues();
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
   m_enableSolidCheckBox->SetValue(m_currentConfig.PSEnabled);
@@ -254,6 +275,34 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
   delete file;
 
   return;
+}
+
+void MainFrame::ComputeSlidersValues(void)
+{
+  int valx = (int)(m_currentConfig.flames[m_selectedFlame].position.x*SLIDER_SENSIBILITY);
+  int valy = (int)(m_currentConfig.flames[m_selectedFlame].position.y*SLIDER_SENSIBILITY);
+  int valz = (int)(m_currentConfig.flames[m_selectedFlame].position.z*SLIDER_SENSIBILITY);
+  
+  m_flameXAxisPositionSlider->SetValue(valx);
+  m_flameYAxisPositionSlider->SetValue(valy);
+  m_flameZAxisPositionSlider->SetValue(valz);
+  m_flameXAxisPositionSlider->SetRange(valx-SLIDER_RANGE,valx+SLIDER_RANGE);
+  m_flameYAxisPositionSlider->SetRange(valy-SLIDER_RANGE,valy+SLIDER_RANGE);
+  m_flameZAxisPositionSlider->SetRange(valz-SLIDER_RANGE,valz+SLIDER_RANGE);
+
+  m_flameXAxisPositionSliderMin->Clear();
+  m_flameXAxisPositionSliderMax->Clear();
+  m_flameYAxisPositionSliderMin->Clear();
+  m_flameYAxisPositionSliderMax->Clear();
+  m_flameZAxisPositionSliderMin->Clear();
+  m_flameZAxisPositionSliderMax->Clear();
+  
+  (*m_flameXAxisPositionSliderMin) << valx-SLIDER_RANGE;
+  (*m_flameXAxisPositionSliderMax) << valx+SLIDER_RANGE;
+  (*m_flameYAxisPositionSliderMin) << valy-SLIDER_RANGE;
+  (*m_flameYAxisPositionSliderMax) << valy+SLIDER_RANGE;
+  (*m_flameZAxisPositionSliderMin) << valz-SLIDER_RANGE;
+  (*m_flameZAxisPositionSliderMax) << valz+SLIDER_RANGE;
 }
 
 void MainFrame::OnClose(wxCloseEvent& event)
@@ -318,20 +367,13 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)
 {
-  CPoint pt(m_flameXAxisPositionSlider->GetValue()/50.0,
-	    m_flameYAxisPositionSlider->GetValue()/50.0,
-	    m_flameZAxisPositionSlider->GetValue()/50.0);
+  CPoint pt(m_flameXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	    m_flameYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	    m_flameZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
 
   m_glBuffer->moveFlame(m_selectedFlame, pt);
   
-  m_currentConfig.flames[m_selectedFlame].position.x = pt.x;
-  m_currentConfig.flames[m_selectedFlame].position.y = pt.y;
-  m_currentConfig.flames[m_selectedFlame].position.z = pt.z;
-}
-
-void MainFrame::OnThumbReleasePosition(wxScrollEvent& event)
-{
-  cerr << event.GetId() << endl;
+  m_currentConfig.flames[m_selectedFlame].position = pt;
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
@@ -456,4 +498,46 @@ void MainFrame::SetFPS(int fps)
   s += wxString::Format(_("%d FPS"), fps);
   
   SetStatusText(s);
+}
+
+void MainFrame::OnFXAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_flameXAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_flameXAxisPositionSlider->SetRange(val, m_flameXAxisPositionSlider->GetMax());
+}
+
+void MainFrame::OnFXAPMAXEnter(wxCommandEvent& event)
+{
+  long val;
+  m_flameXAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_flameXAxisPositionSlider->SetRange(m_flameXAxisPositionSlider->GetMin(), val);
+}
+
+void MainFrame::OnFYAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_flameYAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_flameYAxisPositionSlider->SetRange(val, m_flameYAxisPositionSlider->GetMax());
+}
+
+void MainFrame::OnFYAPMAXEnter(wxCommandEvent& event)
+{
+ long val;
+  m_flameYAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_flameYAxisPositionSlider->SetRange(m_flameYAxisPositionSlider->GetMin(), val);
+}
+
+void MainFrame::OnFZAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_flameZAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_flameZAxisPositionSlider->SetRange(val, m_flameZAxisPositionSlider->GetMax());
+}
+
+void MainFrame::OnFZAPMAXEnter(wxCommandEvent& event)
+{
+  long val;
+  m_flameZAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_flameZAxisPositionSlider->SetRange(m_flameZAxisPositionSlider->GetMin(), val);
 }

@@ -111,9 +111,15 @@ public:
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
   void OnScrollPosition(wxScrollEvent& event);
-  void OnThumbReleasePosition(wxScrollEvent& event);
   void SetFPS(int fps);
-  
+  void OnFXAPMINEnter(wxCommandEvent& event);
+  void OnFXAPMAXEnter(wxCommandEvent& event);
+  void OnFYAPMINEnter(wxCommandEvent& event);
+  void OnFYAPMAXEnter(wxCommandEvent& event);
+  void OnFZAPMINEnter(wxCommandEvent& event);
+  void OnFZAPMAXEnter(wxCommandEvent& event);
+  void ComputeSlidersValues(void);
+
 private:
   /** Pointeur sur le fichier de configuration */
   wxFileConfig *m_config;
@@ -135,7 +141,7 @@ private:
   wxStaticText *m_flameXAxisPositionLabel, *m_flameYAxisPositionLabel, *m_flameZAxisPositionLabel;
   
   wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_flamesSizer;
-  wxBoxSizer *m_mainSizer, *m_rightSizer;
+  wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
   wxBoxSizer *m_flamesXAxisPositionSizer, *m_flamesYAxisPositionSizer, *m_flamesZAxisPositionSizer;
   wxBoxSizer *m_flamesXAxisPositionRangeSizer, *m_flamesYAxisPositionRangeSizer, *m_flamesZAxisPositionRangeSizer;
   
@@ -145,7 +151,8 @@ private:
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   int m_nbFlamesMax;
   int m_selectedFlame;
-  
+  double SLIDER_SENSIBILITY;
+  int SLIDER_RANGE;
   DECLARE_EVENT_TABLE()
 };
 

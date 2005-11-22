@@ -70,7 +70,7 @@ Flame::Flame(Solver *s, CPoint *centre, CPoint *pos, const char *filename, CScen
 }
 
 Flame::~Flame()
-{  
+{
   gluDeleteNurbsRenderer(m_nurbs);
   /* On efface le luminaire, il n'appartient pas à la scène */
   delete m_luminary;
@@ -81,8 +81,9 @@ void Flame::moveTo(CPoint& position)
   int i,j;
   CPoint move = position - m_position;
   double strength=1.5;
-  m_position=m_startPosition + position;
   
+  m_position=position;
+
   /* Ajouter des forces externes */
   if(move.x)
     if( move.x > 0)

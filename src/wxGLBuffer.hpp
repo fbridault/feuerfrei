@@ -7,7 +7,7 @@ class wxGLBuffer;
 
 #include <wx/glcanvas.h>
 
-#include "CgSVShader.hpp"
+#include "shaders/CgSVShader.hpp"
 #include "camera.hpp"
 
 #include "scene.hpp"
@@ -15,8 +15,8 @@ class wxGLBuffer;
 #include "graphicsFn.hpp"
 #include "bougie.hpp"
 #include "firmalampe.hpp"
-#include "solver.hpp"
-#include "benchsolver.hpp"
+#include "solvers/GSsolver.hpp"
+#include "solvers/GCSSORsolver.hpp"
 #include "glowengine.hpp"
 
 class wxGLBuffer : public wxGLCanvas

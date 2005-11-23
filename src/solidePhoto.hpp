@@ -5,7 +5,7 @@ class solidePhotometrique;
 
 #include "header.h"
 #include "ies.hpp"
-#include "CgSPFragmentShader.hpp"
+#include "shaders/CgSPFragmentShader.hpp"
 #include "scene.hpp"
 
 /** Abstraction d'un solide photométrique.<br>

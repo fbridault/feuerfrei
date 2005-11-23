@@ -8,7 +8,7 @@ class GlowEngine;
 #include <Cg/cgGL.h>
 
 #include "pbuffer.hpp"
-#include "CgBlurShaders.hpp"
+#include "shaders/CgBlurShaders.hpp"
 #include "scene.hpp"
 #include "camera.hpp"
 

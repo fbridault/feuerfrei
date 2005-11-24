@@ -6,9 +6,8 @@
 #include "graphicsFn.hpp"
 #include "solvers/solver.hpp"
 
-LeadSkeleton::LeadSkeleton (Solver * const s, const CPoint& position, const CPoint& pt, 
-			    const CPoint& rootMoveFactor,  int pls) :
-  Skeleton (s, position, pt, rootMoveFactor, pls)
+LeadSkeleton::LeadSkeleton (Solver * const s, const CPoint& position, const CPoint& rootMoveFactor,  int pls) :
+  Skeleton (s, position, rootMoveFactor, pls)
 {
 }
 

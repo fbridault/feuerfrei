@@ -39,8 +39,8 @@ public:
    * @param filename nom du fichier OBJ contenant le luminaire
    * @param pointeur sur la scène
    */
-  Flame (Solver * s, int nb, CPoint * centre, CPoint * pos, const char *filename, CScene *scene);
-  Flame (Solver * s, CPoint * centre, CPoint * pos, const char *filename, CScene *scene);
+  Flame (Solver * s, int nb, CPoint& posRel, const char *filename, CScene *scene);
+  Flame (Solver * s, CPoint& posRel, const char *filename, CScene *scene);
   virtual ~Flame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -58,18 +58,20 @@ public:
   virtual void drawWick() = 0;
   
   /** Dessine la mèche de la flamme */
-  void drawLuminary() const
+  void drawLuminary()
   {
+    CPoint pt(getPosition());
     glPushMatrix();
-    glTranslatef (m_position.x, m_position.y, m_position.z);
+    glTranslatef (pt.x, pt.y, pt.z);
     glCallList(m_luminaryDL);
     glPopMatrix();
   };
   
-  void drawLuminary(CgBasicVertexShader& shader) const
+  void drawLuminary(CgBasicVertexShader& shader)
   {
+    CPoint pt(getPosition());
     glPushMatrix();
-    glTranslatef (m_position.x, m_position.y, m_position.z);
+    glTranslatef (pt.x, pt.y, pt.z);
     shader.setModelViewProjectionMatrix();
     glCallList(m_luminaryDL);
     glPopMatrix();
@@ -91,17 +93,10 @@ public:
    */
   virtual void eclaire () = 0;
   
-  CPoint *getPosition ()
+  CPoint getPosition ()
   {
-    return &m_position;
+    return CPoint(m_position+m_solver->getPosition());
   };
-  
-  void setPosition (CPoint& position)
-  {
-    m_position=position;
-  };
-
-  void moveTo(CPoint& position);
   
   virtual void toggleSmoothShading ();
   
@@ -114,7 +109,6 @@ public:
    * pour orienter le solide photométrique.
    */
   virtual CVector get_main_direction()=0;
-
 
 protected:
   /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
@@ -161,8 +155,11 @@ protected:
   int m_nbSkeletons;
   /** Position en indices dans la grille de voxels du solveur. */
   int m_x, m_y, m_z;
-  /** Position de la flamme dans la scène. */
-  CPoint m_position, m_startPosition;
+  /** Position relative de la flamme dans le solveur.
+   * Il s'agit d'une fraction (entre -0,5 et +0,5) de la dimension
+   * du solveur en x,y,z
+   */  
+  CPoint m_position;
   
   /** Ordre de la NURBS en u (égal au degré en u + 1). */
   int m_uorder;

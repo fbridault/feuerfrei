@@ -58,8 +58,9 @@ am_flames_OBJECTS = bougie.$(OBJEXT) camera.$(OBJEXT) \
 	CgSPFragmentShader.$(OBJEXT) CgBougieShaders.$(OBJEXT) \
 	solidePhoto.$(OBJEXT) ies.$(OBJEXT) pbuffer.$(OBJEXT) \
 	CgBlurShaders.$(OBJEXT) glowengine.$(OBJEXT) \
-	wxGLBuffer.$(OBJEXT) main.$(OBJEXT) solver.$(OBJEXT) \
-	GSsolver.$(OBJEXT) Hsolver.$(OBJEXT) GCSSORsolver.$(OBJEXT)
+	wxGLBuffer.$(OBJEXT) solverDialog.$(OBJEXT) main.$(OBJEXT) \
+	solver.$(OBJEXT) GSsolver.$(OBJEXT) Hsolver.$(OBJEXT) \
+	GCSSORsolver.$(OBJEXT)
 flames_OBJECTS = $(am_flames_OBJECTS)
 flames_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -233,6 +234,8 @@ flames_SOURCES = \
 	glowengine.hpp  \
 	wxGLBuffer.cpp  \
 	wxGLBuffer.hpp  \
+	solverDialog.cpp  \
+	solverDialog.hpp  \
 	main.cpp  \
 	main.hpp  \
 	solvers/solver.cpp  \
@@ -338,6 +341,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/skeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/solidePhoto.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/solver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/solverDialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/source.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/texture.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wick.Po@am__quote@

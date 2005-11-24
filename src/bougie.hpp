@@ -30,7 +30,7 @@ public:
    * @param rayon rayon de la flamme.
    * @param shader pointeur sur le shader qui génÃ¨re les shadow volumes
    */
-  Bougie(Solver *s, int nb, CPoint *centre, CPoint *pos, double rayon, 
+  Bougie(Solver *s, int nb, CPoint& posRel, double rayon, 
 	 CgSVShader *shader, const char *filename, CScene *scene, CGcontext *context);
   virtual ~Bougie();
   

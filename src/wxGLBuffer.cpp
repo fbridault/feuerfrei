@@ -94,19 +94,21 @@ void wxGLBuffer::InitGL(bool recompileShaders)
 void wxGLBuffer::InitFlames(void)
 {
   int nbSkeletons;
-  CPoint pt(0,0,0);
     
   for(int i=0 ; i < m_currentConfig->nbFlames; i++)
     switch(m_currentConfig->flames[i].type){
     case BOUGIE :
       nbSkeletons = 4;
-      m_flames[i] = new Bougie (m_solver, nbSkeletons, &pt, &m_currentConfig->flames[i].position,
-				m_solver->getDimX()/ 7.0, m_SVShader,"bougie.obj",m_scene, &m_context);
+      m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], nbSkeletons,
+				m_currentConfig->flames[i].position, 
+				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
+				m_SVShader,"bougie.obj",m_scene, &m_context);
       break;
     case FIRMALAMPE :
       nbSkeletons = 5;
-      m_flames[i] = new Firmalampe(m_solver,nbSkeletons,&pt,&m_currentConfig->flames[i].position,
-				   m_SVShader, m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
+      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],nbSkeletons,
+				   m_currentConfig->flames[i].position, m_SVShader, 
+				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -114,13 +116,31 @@ void wxGLBuffer::InitFlames(void)
     }
 }
 
+void wxGLBuffer::InitSolvers(void)
+{
+  m_solvers = new Solver *[m_currentConfig->nbSolvers];
+  for(int i=0 ; i < m_currentConfig->nbSolvers; i++)    
+    switch(m_currentConfig->solvers[i].type){
+    case GS_SOLVER :
+      m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				  m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep);
+      break;
+    case GCSSOR_SOLVER :
+      m_solvers[i] = new GCSSORsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep);
+      break;
+    default :
+      cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
+      ::wxExit();
+    }
+}
+
 void wxGLBuffer::InitScene(bool recompileShaders)
 {  
-  m_solver = new GSsolver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
-			  1.0, m_currentConfig->timeStep);
-//   m_solver = new GCSSORsolver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
-// 			      1.0, m_currentConfig->timeStep);
-  
+  InitSolvers();
+
   m_flames = new Flame *[m_currentConfig->nbFlames];
   
   m_scene = new CScene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
@@ -179,8 +199,9 @@ void wxGLBuffer::DestroyScene(void)
   for (int f = 0; f < m_currentConfig->nbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
-  
-  delete m_solver;
+   for (int s = 0; s < m_currentConfig->nbSolvers; s++)
+    delete m_solvers[s];
+  delete[]m_solvers;
 }
 
 void wxGLBuffer::OnIdle(wxIdleEvent& event)
@@ -189,7 +210,8 @@ void wxGLBuffer::OnIdle(wxIdleEvent& event)
     for (int i = 0; i < m_currentConfig->nbFlames; i++)
       m_flames[i]->add_forces (m_flickering);
     
-    m_solver->iterate (m_flickering);
+    for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
+      m_solvers[i]->iterate (m_flickering);
   }
   
   this->Refresh();
@@ -316,9 +338,11 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
       m_flames[f]->drawWick ();
     
     if(m_currentConfig->PSEnabled){
+      /* 3e paramètre doit être la hauteur du solveur de la flamme */
+      CPoint pos(m_flames[0]->getPosition());
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(),
-								   *m_flames[0]->getPosition(),
-								   m_solver->getDimY());
+								    pos,
+								    1.0);
       m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
     }else{
       /**** Affichage de la scène ****/
@@ -346,18 +370,18 @@ void wxGLBuffer::OnPaint (wxPaintEvent& event)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (int s = 0; s < m_currentConfig->nbSolvers; s++)
       {
-	CPoint position (*(m_flames[f]->getPosition ()));
+	CPoint position(m_solvers[s]->getPosition ());
 	
 	glPushMatrix ();
 	glTranslatef (position.x, position.y, position.z);
 	if (m_displayBase)
-	  m_solver->displayBase();
+	  m_solvers[s]->displayBase();
 	if (m_displayGrid)
-	  m_solver->displayGrid();
+	  m_solvers[s]->displayGrid();
 	if (m_displayVelocity)
-	  m_solver->displayVelocityField();
+	  m_solvers[s]->displayVelocityField();
 	
 	glPopMatrix ();
       }

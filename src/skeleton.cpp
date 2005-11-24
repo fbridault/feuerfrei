@@ -6,15 +6,14 @@
 #include "graphicsFn.hpp"
 
 
-Skeleton::Skeleton(Solver* const s, const CPoint& position, const CPoint& pt, 
-		   const CPoint& rootMoveFactor, int pls) : m_rootMoveFactor(rootMoveFactor)
+Skeleton::Skeleton(Solver* const s, const CPoint& position, const CPoint& rootMoveFactor, int pls) : 
+  m_rootMoveFactor(rootMoveFactor)
 {
   m_solver = s;
-  m_flamePos = position;
   m_queue = new Particle[NB_PARTICULES];
   m_headIndex = -1;
   
-  m_root = m_rootSave = pt;
+  m_root = m_rootSave = position;
   m_particleLifespan = pls;
   addParticle(&m_root);
 }

@@ -3,7 +3,7 @@
 #include <math.h>
 #include "graphicsFn.hpp"
 
-Solver::Solver (int n_x, int n_y, int n_z, double dim, double timeStep)
+Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : m_position(position)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -369,4 +369,55 @@ void Solver::displayArrow (CVector * const direction)
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
 
   GraphicsFn::SolidCone (taille / 4, taille, 3, 3);
+}
+
+
+void Solver::moveTo(CPoint& position)
+{
+  int i,j;
+  CPoint move = position - m_position;
+  double strength=1.5;
+  
+  m_position=position;
+
+  /* Ajouter des forces externes */
+  if(move.x)
+    if( move.x > 0)
+      for (i = -m_nbVoxelsZ / 4 - 1; i <= m_nbVoxelsZ / 4 + 1; i++)
+	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 + 1; j++)
+	  addUsrc (m_nbVoxelsX - 1,
+		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + i, -strength);
+    else
+      for (i = -m_nbVoxelsZ / 4 - 1; i <= m_nbVoxelsZ / 4 + 1; i++)
+	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 + 1; j++)
+	  addUsrc (2,
+		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + i, strength);  
+  if(move.y)
+    if( move.y > 0)
+      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
+	for (j = -m_nbVoxelsZ / 4 - 1; j < m_nbVoxelsZ / 4 + 1; j++)
+	  addVsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
+		   m_nbVoxelsY - 1,
+		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + j, -strength);
+    else
+      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
+	for (j = -m_nbVoxelsZ / 4 - 1; j <= m_nbVoxelsZ / 4 + 1; j++)
+	  addVsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i, 
+		   2,
+		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + j, strength/10.0);
+  if(move.z)
+    if( move.z > 0)
+      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
+	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 - 1; j++)
+	  addWsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
+		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   m_nbVoxelsZ - 1, -strength);
+    else
+      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
+	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 - 1; j++)
+	  addWsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
+		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   2, strength);
 }

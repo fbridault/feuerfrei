@@ -42,8 +42,13 @@ using namespace std;
 #define TEXTURED 1
 #define FLAT    -1
 
+/* Types de flammes */
 #define BOUGIE 1
 #define FIRMALAMPE 2
+
+/* Types de solveurs */
+#define GS_SOLVER 1
+#define GCSSOR_SOLVER 2
 
 // Pour le calcul du dégradé de couleur des pyramides
 #define VELOCITE_MAX .2
@@ -61,23 +66,35 @@ using namespace std;
 
 #include "vector.hpp"
 
+class SolverConfig{
+public:
+  char type;
+  CPoint position;
+  int resx, resy, resz;
+  double dim;
+  double timeStep;
+};
 class FlameConfig{
 public:
   char type;
+  int solverIndex;
+  /** La position de la flamme est RELATIVE par rapport au solveur,
+   *  il s'agit d'une fraction de la dimension du solveur 
+   */
   CPoint position;
   wxString wickName;
 };
 
 class FlameAppConfig{
 public:
-  int solvx, solvy, solvz;
-  double timeStep;
   int width, height;
   double clipping;
   wxString sceneName;
   bool PSEnabled,glowEnabled;
   /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
+  int nbSolvers;
+  SolverConfig *solvers;
   int nbFlames;
   FlameConfig *flames;
 };

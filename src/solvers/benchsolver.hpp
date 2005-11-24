@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  BenchSolver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
 
     virtual ~ BenchSolver ();
 

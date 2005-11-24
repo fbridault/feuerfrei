@@ -1,7 +1,7 @@
 #include "GSsolver.hpp"
 
-GSsolver::GSsolver (int n_x, int n_y, int n_z, double dim, double timeStep) : 
-  Solver(n_x, n_y, n_z, dim, timeStep)
+GSsolver::GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
+  Solver(position, n_x, n_y, n_z, dim, timeStep)
 {
 }
 

@@ -67,8 +67,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  Skeleton(Solver* const s, const CPoint& position, const CPoint& pt,
-	   const CPoint& rootMoveFactor, int pls);
+  Skeleton(Solver* const s, const CPoint& position, const CPoint& rootMoveFactor, int pls);
   virtual ~Skeleton();
   
   /** Donne l'élément en tête de file.
@@ -143,8 +142,6 @@ protected:
 
   /** Pointeur sur le solveur de fluides. */
   Solver *m_solver;
-  /** Position de la flamme à laquelle appartient le squelette */
-  CPoint m_flamePos;
 
   /** Contient trois facteurs correctifs pour le déplacement de l'origine 
    * des squelettes. Selon le type de flamme, il est en effet nécessaire

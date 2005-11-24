@@ -1,12 +1,6 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <wx/wxprec.h>
-
-#ifndef WX_PRECOMP
-#include <wx/wx.h>
-#endif
-
 #if wxUSE_IOSTREAMH
     #include <fstream.h>
 #else
@@ -83,7 +77,7 @@ enum
     IDM_Hide,
     IDM_Wired,
     IDM_Shaded,
-    IDM_Settings,
+    IDM_Solvers,
   };
 
 /** Fenêtre principale */
@@ -113,6 +107,7 @@ public:
   void OnHideMenu(wxCommandEvent& event);
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);
+  void OnSolversMenu(wxCommandEvent& event);
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
@@ -136,33 +131,37 @@ private:
   /** Boutons */
   wxButton *m_buttonRun, *m_buttonRestart, *m_buttonFlickering, *m_buttonSwap;
   /** Menus */
-  wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames;
+  wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
   wxMenuBar *m_menuBar;
   
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
   
-  wxSlider *m_flameXAxisPositionSlider, *m_flameYAxisPositionSlider, *m_flameZAxisPositionSlider;
-  wxTextCtrl *m_flameXAxisPositionSliderMax, *m_flameYAxisPositionSliderMax, *m_flameZAxisPositionSliderMax,
-    *m_flameXAxisPositionSliderMin, *m_flameYAxisPositionSliderMin, *m_flameZAxisPositionSliderMin;
-  wxStaticText *m_flameXAxisPositionLabel, *m_flameYAxisPositionLabel, *m_flameZAxisPositionLabel;
-  wxStaticText *m_selectFlameLabel;
+  wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
+  wxTextCtrl *m_solverXAxisPositionSliderMax, *m_solverYAxisPositionSliderMax, *m_solverZAxisPositionSliderMax,
+    *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
+  wxStaticText *m_solverXAxisPositionLabel, *m_solverYAxisPositionLabel, *m_solverZAxisPositionLabel;
+  wxStaticText *m_selectSolverLabel;
   
-  wxComboBox *m_selectFlameComboBox;
+  wxComboBox *m_selectSolverComboBox;
   
-  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_flamesSizer;
+  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_solversSizer;
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
-  wxBoxSizer *m_flameSelectSizer;
-  wxBoxSizer *m_flamesXAxisPositionSizer, *m_flamesYAxisPositionSizer, *m_flamesZAxisPositionSizer;
-  wxBoxSizer *m_flamesXAxisPositionRangeSizer, *m_flamesYAxisPositionRangeSizer, *m_flamesZAxisPositionRangeSizer;
+  wxBoxSizer *m_solverSelectSizer;
+  wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
+  wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
   
   FlameAppConfig m_currentConfig;
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
+  int m_nbSolversMax;
+  /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
+  /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   int m_nbFlamesMax;
-  int m_selectedFlame;
+  
+  int m_selectedSolver;
   double SLIDER_SENSIBILITY;
   int SLIDER_RANGE;
   DECLARE_EVENT_TABLE()

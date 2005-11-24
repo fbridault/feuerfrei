@@ -1,7 +1,7 @@
 #include "Hsolver.hpp"
 
-Hsolver::Hsolver (int n_x, int n_y, int n_z, double dim, double timeStep) : 
-  GSsolver(n_x, n_y, n_z, dim, timeStep)
+Hsolver::Hsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
+  GSsolver(position, n_x, n_y, n_z, dim, timeStep)
 {
   m_uResidu = new double[m_nbVoxels];
   memset (m_uResidu, 0, m_nbVoxels * sizeof (double));

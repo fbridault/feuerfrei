@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GSsolver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
   virtual ~GSsolver ();
   
 protected:

@@ -24,8 +24,8 @@ public:
    * @param guide pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
-  PeriSkeleton(Solver* const s, const CPoint& position, const CPoint& pt, 
-	       const CPoint& rootMoveFactor, LeadSkeleton *guide, int pls);
+  PeriSkeleton(Solver* const s, const CPoint& position, const CPoint& rootMoveFactor, 
+	       LeadSkeleton *guide, int pls);
   virtual ~PeriSkeleton();
   
   

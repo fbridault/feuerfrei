@@ -41,6 +41,8 @@ public:
   void InitGL(bool recompileShaders);
   /** Initialisations relatives aux flammes */
   void InitFlames(void);
+  /** Initialisations relatives aux solveurs */
+  void InitSolvers(void);
   /** Initialisations relatives à la scène */
   void InitScene(bool recompileShaders);
   /** Initialisations relatives aux paramètres de visualisation */
@@ -71,7 +73,7 @@ public:
   void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
 
   void Swap(void) { m_photoSolid->swap(); };
-  void moveFlame(int selectedFlame, CPoint& pt){ m_flames[selectedFlame]->moveTo(pt); };
+  void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
 
 private:
   void WriteFPS ();
@@ -104,7 +106,7 @@ private:
   GlowEngine *m_glowEngine2;
 
   /********* Variables relatives au solveur ******************************/
-  Solver *m_solver;
+  Solver **m_solvers;
     
   /********* Variables relatives à la simulation *************************/
   Flame **m_flames;

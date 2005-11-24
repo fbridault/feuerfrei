@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  Solver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
   virtual ~Solver ();
 
   /** Lance une itération du solveur. */
@@ -135,8 +135,14 @@ public:
     j = (int) (p.y * m_dimY * m_nbVoxelsY) + 1;
     k = (int) (p.z * m_dimZ * m_nbVoxelsZ) + 1 + m_nbVoxelsZ / 2;
   };
-
-
+  
+  CPoint& getPosition ()
+  {
+    return (m_position);
+  };
+  
+  void moveTo(CPoint& position);
+  
 protected:
   int IX (int i, int j, int k)
   {
@@ -191,6 +197,9 @@ protected:
   
   /** Dimensions du solveur */
   double m_dimX, m_dimY, m_dimZ;
+
+  /** Position du solveur dans l'espace */
+  CPoint m_position;
 
   /** Taille totale du cube en nombre de voxels, égal à (N+2)^3. */
   int m_nbVoxels;

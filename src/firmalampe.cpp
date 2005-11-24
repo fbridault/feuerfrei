@@ -7,14 +7,15 @@
 #define CALLBACK
 #endif
 
-Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
-			CgSVShader * shader, const char *meche_name, const char *filename, CScene *scene):
-  Flame (s, centre, pos, filename,scene),
+Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, CgSVShader * shader, const char *meche_name, 
+			const char *filename, CScene *scene):
+  Flame (s, posRel, filename,scene),
   m_wick (meche_name, nb, scene),
   m_tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
   CPoint pt;
   double largeur = 0.03;
+
   m_lifeSpanAtBirth = 4;
   m_nbFixedPoints = 3;
   
@@ -31,30 +32,30 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   /* Génération d'un côté des squelettes périphériques */
   for (int i = 1; i <= m_nbLeadSkeletons; i++)
     {
-      pt = *m_wick.getLeadPoint (i - 1);
-      m_leads[i - 1] = new LeadSkeleton (m_solver, m_position, pt, rootMoveFactorL,m_lifeSpanAtBirth);
+      pt = posRel + *m_wick.getLeadPoint (i - 1);
+      m_leads[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL,m_lifeSpanAtBirth);
       pt.z += (-largeur / 2.0);
-      m_skeletons[i] = new PeriSkeleton (m_solver, m_position, pt, rootMoveFactorP,
+      m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP,
 					m_leads[i - 1], m_lifeSpanAtBirth - 2);
     }
 
   /* Génération de l'autre cÃ´té des squelettes périphériques */
   for (int j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
   {
-	pt = *m_wick.getLeadPoint (j - 1);
+	pt = posRel + *m_wick.getLeadPoint (j - 1);
 	pt.z += (largeur / 2.0);
-	m_skeletons[i] = new PeriSkeleton (m_solver, m_position, pt, rootMoveFactorP,
+	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP,
 					  m_leads[j - 1], m_lifeSpanAtBirth - 2);
   }
   
   /* Ajout des extrémités */
-  pt = *m_wick.getLeadPoint (0);
+  pt = posRel + *m_wick.getLeadPoint (0);
   pt.x += (-largeur / 2.0);
-  m_skeletons[0] = new PeriSkeleton (m_solver, m_position,  pt, rootMoveFactorP, 
+  m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, 
 				    m_leads[0], m_lifeSpanAtBirth - 2);
-  pt = *m_wick.getLeadPoint (m_nbLeadSkeletons - 1);
+  pt = posRel + *m_wick.getLeadPoint (m_nbLeadSkeletons - 1);
   pt.x += (largeur / 2.0);
-  m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, m_position, pt,rootMoveFactorP,
+  m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP,
 						      m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
 
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
@@ -65,7 +66,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint * centre, CPoint * pos,
   m_distances = new double[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
-  m_solver->findPointPosition(*centre, m_x, m_y, m_z);
+  m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 
   m_cgShader = shader;
 }
@@ -374,8 +375,9 @@ Firmalampe::build ()
 void 
 Firmalampe::drawWick()
 {
+  CPoint pt(getPosition());
   glPushMatrix();
-  glTranslatef (m_position.x, m_position.y, m_position.z);
+  glTranslatef (pt.x, pt.y, pt.z);
   m_wick.drawWick();
   glPopMatrix();
 }
@@ -384,9 +386,11 @@ void
 Firmalampe::drawFlame (bool displayParticle)
 {
   int i;
-
+  CPoint pt(m_solver->getPosition());
+  
   glPushMatrix();
-  glTranslatef (m_position.x, m_position.y, m_position.z);
+  glTranslatef (pt.x, pt.y, pt.z);
+  
   /* Affichage des particules */
   if(displayParticle){
     /* Déplacement et détermination du maximum */

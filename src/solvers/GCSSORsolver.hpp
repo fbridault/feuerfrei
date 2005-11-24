@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GCSSORsolver (int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
   virtual ~GCSSORsolver ();
   
 protected:
@@ -31,8 +31,8 @@ protected:
     tmp=i-z*tmp2;
     y=tmp/m_nbVoxelsX;
     x=tmp-y*m_nbVoxelsX;
-   
-//     return( IX( x+1, y+1, z+1 ) );
+    
+    //     return( IX( x+1, y+1, z+1 ) );
     int a = IX( x+1, y+1, z+1 );
     if(a < 0 || a >= m_nbVoxels)
       cerr << "ALERTE" << endl;
@@ -51,8 +51,8 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, 
-		     double nb_steps, double omega );
+  void GCSSOR(double *const x0, const double *const b, double a, double diagonal,
+		      double nb_steps, double omega );
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -63,7 +63,7 @@ protected:
    * du pas de vélocité
    */
   virtual void diffuse (int b, double *const x, const double *const x0,
-				double a, double diff_visc);
+			double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection

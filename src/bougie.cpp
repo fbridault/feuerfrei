@@ -7,30 +7,29 @@
 #define CALLBACK
 #endif
 
-Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos, double rayon, 
+Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, 
 		CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
-  Flame (s, nb, centre, pos, filename, scene),
+  Flame (s, nb, posRel, filename, scene),
   m_tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 //   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
 //   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {
   int i;
-  double angle;  
+  double angle;
+
   m_lifeSpanAtBirth = 6;
   m_nbFixedPoints = 3;
   
-  m_lead = new LeadSkeleton (m_solver, m_position, *centre, CPoint(4,.75,4),m_lifeSpanAtBirth);
-  /* On crÃ©Ã© les squelettes en cercle */
+  m_lead = new LeadSkeleton (m_solver, posRel, CPoint(4,.75,4),m_lifeSpanAtBirth);
+  /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      m_skeletons[i] =
-	new PeriSkeleton (m_solver, m_position, CPoint (cos (angle) * rayon + centre->x, 
-						     centre->y, 
-						     sin (angle) * rayon + centre->z),
-			  CPoint(4,.75,4),
-			  m_lead, m_lifeSpanAtBirth);
-
+      m_skeletons[i] = new PeriSkeleton (m_solver, CPoint (cos (angle) * rayon + posRel.x, 
+							   posRel.y, 
+							   sin (angle) * rayon + posRel.z),
+					 CPoint(4,.75,4),
+					 m_lead, m_lifeSpanAtBirth);
       angle += 2 * PI / m_nbSkeletons;
     }
   
@@ -43,7 +42,7 @@ Bougie::Bougie (Solver * s, int nb, CPoint * centre, CPoint * pos, double rayon,
   m_distances = new double[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
-  m_solver->findPointPosition(*centre, m_x, m_y, m_z);
+  m_solver->findPointPosition(posRel, m_x, m_y, m_z);
   
   m_cgShader = shader;
 }
@@ -300,11 +299,13 @@ Bougie::build ()
 void
 Bougie::drawWick ()
 {
+  CPoint pt(getPosition());
+  
   double hauteur = m_solver->getDimY() / 6.0;
   double largeur = m_solver->getDimX() / 60.0;
   /* Affichage de la mèche */
   glPushMatrix ();
-  glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);
+  glTranslatef (pt.x, pt.y-hauteur/2.0, pt.z);
   glRotatef (-90.0, 1.0, 0.0, 0.0);
   glColor3f (0.0, 0.0, 0.0);
   GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
@@ -317,9 +318,10 @@ void
 Bougie::drawFlame (bool displayParticle)
 {
   int i;
-
+  CPoint pt(m_solver->getPosition());
+  
   glPushMatrix();
-  glTranslatef (m_position.x, m_position.y, m_position.z);
+  glTranslatef (pt.x, pt.y, pt.z);
   
   /* Affichage des particules */
   if(displayParticle){

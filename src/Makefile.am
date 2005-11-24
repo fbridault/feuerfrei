@@ -64,6 +64,8 @@ flames_SOURCES = \
 	glowengine.hpp  \
 	wxGLBuffer.cpp  \
 	wxGLBuffer.hpp  \
+	solverDialog.cpp  \
+	solverDialog.hpp  \
 	main.cpp  \
 	main.hpp  \
 	solvers/solver.cpp  \

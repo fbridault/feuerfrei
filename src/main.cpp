@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+#include "solverDialog.hpp"
+
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
@@ -18,6 +20,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
+  EVT_MENU(IDM_Solvers, MainFrame::OnSolversMenu)
   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
@@ -34,6 +37,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_TEXT_ENTER(IDT_FZAPMAX, MainFrame::OnFZAPMAXEnter)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
+
+/******************************** FlamesApp Class definition & methods ******g*************************/
 
 class FlamesApp : public wxApp
 {
@@ -64,6 +69,8 @@ bool FlamesApp::OnInit()
   return TRUE;
 } 
 
+/**************************************** MainFrame Class methods **************************************/
+
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
@@ -73,7 +80,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
-  m_selectedFlame = 0;
+  m_selectedSolver = 0;
   SLIDER_SENSIBILITY=100.0;
   SLIDER_RANGE=500;
   /*********************************** Création des contrôles *************************************************/
@@ -92,37 +99,37 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
-  m_selectFlameLabel = new wxStaticText(this,IDT_SELECT,_("Selected flame :"));
-  m_selectFlameComboBox = new wxComboBox(this,IDCB_SELECT,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
+  m_selectSolverLabel = new wxStaticText(this,IDT_SELECT,_("Selected solver :"));
+  m_selectSolverComboBox = new wxComboBox(this,IDCB_SELECT,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
 
-  m_flameXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+  m_solverXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_flameYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
+  m_solverYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_flameZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+  m_solverZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_flameXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
-  m_flameYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
-  m_flameZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
-  m_flameXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN,_(""),
+  m_solverXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
+  m_solverYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
+  m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
+  m_solverXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  m_flameXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX,_(""),
+  m_solverXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  m_flameYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN,_(""),
+  m_solverYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  m_flameYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX,_(""),
+  m_solverYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  m_flameZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN,_(""),
+  m_solverZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  m_flameZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX,_(""),
+  m_solverZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX,_(""),
 						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
 
-  (*m_flameXAxisPositionSliderMin) << -SLIDER_RANGE;
-  (*m_flameXAxisPositionSliderMax) << SLIDER_RANGE;
-  (*m_flameYAxisPositionSliderMin) << -SLIDER_RANGE;
-  (*m_flameYAxisPositionSliderMax) << SLIDER_RANGE;
-  (*m_flameZAxisPositionSliderMin) << -SLIDER_RANGE;
-  (*m_flameZAxisPositionSliderMax) << SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMax) << SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMax) << SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMin) << -SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMax) << SLIDER_RANGE;
   
   m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));      
   
@@ -147,50 +154,50 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   
   /* Réglages des flammes */
-  m_flameSelectSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flameSelectSizer->Add(m_selectFlameLabel,0,0,0);
-  m_flameSelectSizer->Add(m_selectFlameComboBox,0,0,0);
+  m_solverSelectSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solverSelectSizer->Add(m_selectSolverLabel,0,0,0);
+  m_solverSelectSizer->Add(m_selectSolverComboBox,0,0,0);
   
-  m_flamesXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flamesYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flamesZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesXAxisPositionSizer->Add(m_flameXAxisPositionSlider, 18, 0, 0);
-  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesYAxisPositionSizer->Add(m_flameYAxisPositionSlider, 18, 0, 0);
-  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
-  m_flamesZAxisPositionSizer->Add(m_flameZAxisPositionSlider, 18, 0, 0);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 18, 0, 0);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 18, 0, 0);
   
-  m_flamesXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flamesYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flamesZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
 
-  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
-  m_flamesXAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesXAxisPositionRangeSizer->Add(m_flameXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
-  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
-  m_flamesYAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesYAxisPositionRangeSizer->Add(m_flameYAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
-  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
-  m_flamesZAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversXAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversYAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
+  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
 
-  m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
-  m_flamesSizer->Add(m_flameSelectSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesXAxisPositionSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesXAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesYAxisPositionSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesYAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesZAxisPositionSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_flamesZAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_flamesSizer->Add(m_buttonFlickering, 0, 0, 0);
+  m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
+  m_solversSizer->Add(m_solverSelectSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversXAxisPositionSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversXAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversYAxisPositionSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversYAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversZAxisPositionSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_solversZAxisPositionRangeSizer, 1, wxEXPAND, 0);
+  m_solversSizer->Add(m_buttonFlickering, 0, 0, 0);
 
   /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_glowSizer, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);
+  m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
   
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
@@ -207,8 +214,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuFile->Append( IDM_Quit, _("E&xit") );
   
   m_menuDisplayFlames = new wxMenu;
-  m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("Hide"));
-  m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("Wired"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("&Hide"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("&Wired"));
   m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("Shaded"));
   m_menuDisplayFlames->Check(IDM_Shaded,true);
   
@@ -219,9 +226,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("Particles"));
   m_menuDisplay->Append( IDM_Flames, _("Flames"), m_menuDisplayFlames);
   
+  m_menuSettings = new wxMenu;  
+  m_menuSettings->Append( IDM_Solvers, _("&Solvers..."));
+
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
   m_menuBar->Append( m_menuDisplay, _("&Display") );
+  m_menuBar->Append( m_menuSettings, _("&Settings") );
   
   SetMenuBar( m_menuBar );
   
@@ -234,10 +245,6 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
   wxFileInputStream* file = new wxFileInputStream( _("param.ini" ));
   m_config = new wxFileConfig( *file );
   
-  m_currentConfig.solvx = m_config->Read(_("/Solver/X_res"), 15);
-  m_currentConfig.solvy = m_config->Read(_("/Solver/Y_res"), 15);
-  m_currentConfig.solvz = m_config->Read(_("/Solver/Z_res"), 15);
-  m_config->Read(_("/Solver/TimeStep"),&m_currentConfig.timeStep,0.4);
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
@@ -246,25 +253,48 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
+  
+  m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
+  m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
+  m_nbSolversMax = m_currentConfig.nbSolvers;
+
+  wxString groupName,itemName;  
+  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+    {
+      groupName.Printf(_("/Solver%d/"),i);
+      
+      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
+
+      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.solvers[i].position.x, 0.0);
+      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.solvers[i].position.y, 0.0);
+      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.solvers[i].position.z, 0.0);
+
+      m_currentConfig.solvers[i].resx = m_config->Read(groupName + _("X_res"), 15);
+      m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
+      m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
+
+      m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
+      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);
+      
+      itemName.Printf(_("Solver #%d"),i+1);
+      m_selectSolverComboBox->Append(itemName);
+    }
 
   m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
   m_nbFlamesMax = m_currentConfig.nbFlames;
 
-  wxString groupName,itemName;  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
+      m_config->Read(groupName + _("Solver"), &m_currentConfig.flames[i].solverIndex, 0);
       m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
       m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
-//       cout << m_currentConfig.flames[i].type << " " << m_currentConfig.flames[i].position.x << " " << m_currentConfig.flames[i].position.y << " " << m_currentConfig.flames[i].position.z << endl;
-      itemName.Printf(_("Flame #%d"),i+1);
-      m_selectFlameComboBox->Append(itemName);
     }
   ComputeSlidersValues();
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
@@ -290,30 +320,30 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
 
 void MainFrame::ComputeSlidersValues(void)
 {
-  int valx = (int)(m_currentConfig.flames[m_selectedFlame].position.x*SLIDER_SENSIBILITY);
-  int valy = (int)(m_currentConfig.flames[m_selectedFlame].position.y*SLIDER_SENSIBILITY);
-  int valz = (int)(m_currentConfig.flames[m_selectedFlame].position.z*SLIDER_SENSIBILITY);
+  int valx = (int)(m_currentConfig.solvers[m_selectedSolver].position.x*SLIDER_SENSIBILITY);
+  int valy = (int)(m_currentConfig.solvers[m_selectedSolver].position.y*SLIDER_SENSIBILITY);
+  int valz = (int)(m_currentConfig.solvers[m_selectedSolver].position.z*SLIDER_SENSIBILITY);
   
-  m_flameXAxisPositionSlider->SetValue(valx);
-  m_flameYAxisPositionSlider->SetValue(valy);
-  m_flameZAxisPositionSlider->SetValue(valz);
-  m_flameXAxisPositionSlider->SetRange(valx-SLIDER_RANGE,valx+SLIDER_RANGE);
-  m_flameYAxisPositionSlider->SetRange(valy-SLIDER_RANGE,valy+SLIDER_RANGE);
-  m_flameZAxisPositionSlider->SetRange(valz-SLIDER_RANGE,valz+SLIDER_RANGE);
+  m_solverXAxisPositionSlider->SetValue(valx);
+  m_solverYAxisPositionSlider->SetValue(valy);
+  m_solverZAxisPositionSlider->SetValue(valz);
+  m_solverXAxisPositionSlider->SetRange(valx-SLIDER_RANGE,valx+SLIDER_RANGE);
+  m_solverYAxisPositionSlider->SetRange(valy-SLIDER_RANGE,valy+SLIDER_RANGE);
+  m_solverZAxisPositionSlider->SetRange(valz-SLIDER_RANGE,valz+SLIDER_RANGE);
 
-  m_flameXAxisPositionSliderMin->Clear();
-  m_flameXAxisPositionSliderMax->Clear();
-  m_flameYAxisPositionSliderMin->Clear();
-  m_flameYAxisPositionSliderMax->Clear();
-  m_flameZAxisPositionSliderMin->Clear();
-  m_flameZAxisPositionSliderMax->Clear();
+  m_solverXAxisPositionSliderMin->Clear();
+  m_solverXAxisPositionSliderMax->Clear();
+  m_solverYAxisPositionSliderMin->Clear();
+  m_solverYAxisPositionSliderMax->Clear();
+  m_solverZAxisPositionSliderMin->Clear();
+  m_solverZAxisPositionSliderMax->Clear();
   
-  (*m_flameXAxisPositionSliderMin) << valx-SLIDER_RANGE;
-  (*m_flameXAxisPositionSliderMax) << valx+SLIDER_RANGE;
-  (*m_flameYAxisPositionSliderMin) << valy-SLIDER_RANGE;
-  (*m_flameYAxisPositionSliderMax) << valy+SLIDER_RANGE;
-  (*m_flameZAxisPositionSliderMin) << valz-SLIDER_RANGE;
-  (*m_flameZAxisPositionSliderMax) << valz+SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMin) << valx-SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMax) << valx+SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMin) << valy-SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMax) << valy+SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMin) << valz-SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMax) << valz+SLIDER_RANGE;
 }
 
 void MainFrame::OnClose(wxCloseEvent& event)
@@ -378,18 +408,18 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
 
 void MainFrame::OnSelectFlame(wxCommandEvent& event)
 {
-  cerr << "Selected : " << m_selectFlameComboBox->GetValue();
+  cerr << "Selected : " << m_selectSolverComboBox->GetValue();
 }
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)
 {
-  CPoint pt(m_flameXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-	    m_flameYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-	    m_flameZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+  CPoint pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	    m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	    m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
 
-  m_glBuffer->moveFlame(m_selectedFlame, pt);
+  m_glBuffer->moveSolver(m_selectedSolver, pt);
   
-  m_currentConfig.flames[m_selectedFlame].position = pt;
+  m_currentConfig.solvers[m_selectedSolver].position = pt;
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
@@ -410,10 +440,6 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 
 void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
-  m_config->Write(_("/Solver/X_res"),m_currentConfig.solvx);
-  m_config->Write(_("/Solver/Y_res"),m_currentConfig.solvy);
-  m_config->Write(_("/Solver/Z_res"),m_currentConfig.solvz);
-  m_config->Write(_("/Solver/TimeStep"),m_currentConfig.timeStep);
   m_config->Write(_("/Display/Width"), m_currentConfig.width);
   m_config->Write(_("/Display/Height"), m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
@@ -423,9 +449,36 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   
-  m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);
+  m_config->Write(_("/Solvers/Number"), m_currentConfig.nbSolvers);
   
-  wxString groupName;  
+  wxString groupName;
+  for(int i=0; i < m_nbSolversMax; i++)
+    {
+      groupName.Printf(_("/Solver%d/"),i);
+
+      m_config->DeleteGroup(groupName);
+    }
+ 
+  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+    {
+      groupName.Printf(_("/Solver%d/"),i);
+      
+      m_config->Write(groupName + _("Type"), (int )m_currentConfig.solvers[i].type);
+
+      m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);
+      m_config->Write(groupName + _("Pos.y"),m_currentConfig.solvers[i].position.y);
+      m_config->Write(groupName + _("Pos.z"),m_currentConfig.solvers[i].position.z);
+
+      m_config->Write(groupName + _("X_res"),m_currentConfig.solvers[i].resx);
+      m_config->Write(groupName + _("Y_res"),m_currentConfig.solvers[i].resy);
+      m_config->Write(groupName + _("Z_res"),m_currentConfig.solvers[i].resz);
+      
+      m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
+      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
+    }
+  
+  m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);
+
   for(int i=0; i < m_nbFlamesMax; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
@@ -438,6 +491,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       groupName.Printf(_("/Flame%d/"),i);       
       
       m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
+      m_config->Write(groupName + _("Solver"), m_currentConfig.flames[i].solverIndex);
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
@@ -508,6 +562,11 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
     m_menuDisplayFlames->Check(IDM_Shaded,true);
 }
 
+void MainFrame::OnSolversMenu(wxCommandEvent& event)
+{
+  SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"));
+  solverDialog->ShowModal();
+}
 void MainFrame::SetFPS(int fps)
 {
   wxString s;
@@ -519,41 +578,41 @@ void MainFrame::SetFPS(int fps)
 void MainFrame::OnFXAPMINEnter(wxCommandEvent& event)
 {
   long val;
-  m_flameXAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_flameXAxisPositionSlider->SetRange(val, m_flameXAxisPositionSlider->GetMax());
+  m_solverXAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverXAxisPositionSlider->SetRange(val, m_solverXAxisPositionSlider->GetMax());
 }
 
 void MainFrame::OnFXAPMAXEnter(wxCommandEvent& event)
 {
   long val;
-  m_flameXAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_flameXAxisPositionSlider->SetRange(m_flameXAxisPositionSlider->GetMin(), val);
+  m_solverXAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverXAxisPositionSlider->SetRange(m_solverXAxisPositionSlider->GetMin(), val);
 }
 
 void MainFrame::OnFYAPMINEnter(wxCommandEvent& event)
 {
   long val;
-  m_flameYAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_flameYAxisPositionSlider->SetRange(val, m_flameYAxisPositionSlider->GetMax());
+  m_solverYAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverYAxisPositionSlider->SetRange(val, m_solverYAxisPositionSlider->GetMax());
 }
 
 void MainFrame::OnFYAPMAXEnter(wxCommandEvent& event)
 {
  long val;
-  m_flameYAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_flameYAxisPositionSlider->SetRange(m_flameYAxisPositionSlider->GetMin(), val);
+  m_solverYAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverYAxisPositionSlider->SetRange(m_solverYAxisPositionSlider->GetMin(), val);
 }
 
 void MainFrame::OnFZAPMINEnter(wxCommandEvent& event)
 {
   long val;
-  m_flameZAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_flameZAxisPositionSlider->SetRange(val, m_flameZAxisPositionSlider->GetMax());
+  m_solverZAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverZAxisPositionSlider->SetRange(val, m_solverZAxisPositionSlider->GetMax());
 }
 
 void MainFrame::OnFZAPMAXEnter(wxCommandEvent& event)
 {
   long val;
-  m_flameZAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_flameZAxisPositionSlider->SetRange(m_flameZAxisPositionSlider->GetMin(), val);
+  m_solverZAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverZAxisPositionSlider->SetRange(m_solverZAxisPositionSlider->GetMin(), val);
 }

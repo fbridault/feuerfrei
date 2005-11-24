@@ -6,9 +6,9 @@
 #include "graphicsFn.hpp"
 #include "solvers/solver.hpp"
 
-PeriSkeleton::PeriSkeleton (Solver * const s, const CPoint& position, const CPoint& pt,
+PeriSkeleton::PeriSkeleton (Solver * const s, const CPoint& position,
 			    const CPoint& rootMoveFactor, LeadSkeleton * guide, int pls) :
-  Skeleton (s, position, pt, rootMoveFactor, pls)
+  Skeleton (s, position, rootMoveFactor, pls)
 {
   this->guide = guide;
 }

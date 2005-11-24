@@ -3,8 +3,8 @@
 #define MAXITER 100
 #define EPSILON2 1e-20
 
-GCSSORsolver::GCSSORsolver (int n_x, int n_y, int n_z, double dim, double timeStep) : 
-  Solver(n_x, n_y, n_z, dim, timeStep)
+GCSSORsolver::GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
+  Solver(position, n_x, n_y, n_z, dim, timeStep)
 {
   int n3 = m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   m_r=new double[n3];
@@ -27,11 +27,11 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
-
+  
   int taille=m_nbVoxelsX;
-  int n2=m_nbVoxelsX * m_nbVoxelsY; // Problème là !!!!!!!!!!!!!!!!!!!!!
+  int n2=m_nbVoxelsX * m_nbVoxelsY; // Problème là !!???????!!???!!
   int n3=m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
-
+  
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
   // calcul du carré de la norme de b

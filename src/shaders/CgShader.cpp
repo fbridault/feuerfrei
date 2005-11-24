@@ -7,8 +7,10 @@ void fini()
 
 CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile)
 {
-  wxString compiledName = shaderName + _(".o");
-
+  wxString sourcePath = _("shaders/") + sourceName;
+  wxString shaderPath = _("shaders/") + shaderName;
+  wxString compiledName = shaderPath + _(".o");
+  
   char buffer[255];
   
   //   wxString cmd; 
@@ -36,32 +38,32 @@ CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGco
   if(type == CG_GL_VERTEX){
     profile = CG_PROFILE_ARBVP1;
     if(recompile) {
-      cerr << "RECOMPILE" << endl;
+      cerr << "Compiling Cg shader : " << shaderPath.ToAscii() << endl;
       sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile arbvp1 %s",
-	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourceName.ToAscii());
+	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourcePath.ToAscii());
       system(buffer);
     }
   }else{
     profile = CG_PROFILE_ARBFP1;
     if(recompile) {
-      cerr << "RECOMPILE" << endl;
+      cerr << "Compiling Cg shader : " << shaderPath.ToAscii() << endl;
       sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile arbfp1 %s",
-	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourceName.ToAscii());
+	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourcePath.ToAscii());
       system(buffer);
     }
   }
      
-  program = cgCreateProgramFromFile (*context, CG_OBJECT, compiledName.mb_str(), profile, shaderName.mb_str(), 0);
+  program = cgCreateProgramFromFile (*context, CG_OBJECT, compiledName.mb_str(), profile, shaderPath.mb_str(), 0);
   
   // Initialiser les profils et les options du compilateur CG
   //    profile = cgGLGetLatestProfile(type);
   //    if(profile==CG_PROFILE_UNKNOWN)
-  //      cerr << "Cg Error : Unknown Profile for shader " << shaderName.mb_str() << endl;
+  //      cerr << "Cg Error : Unknown Profile for shader " << shaderPath.mb_str() << endl;
   //    else
-  //      cerr << "profile for shader " <<  shaderName.mb_str() << " : " << cgGetProfileString(profile) << endl;
+  //      cerr << "profile for shader " <<  shaderPath.mb_str() << " : " << cgGetProfileString(profile) << endl;
   
   //   cgGLSetOptimalOptions(profile);
-  //   program = cgCreateProgramFromFile (*context, CG_SOURCE, sourceName.mb_str(), profile, shaderName.mb_str(), 0);
+  //   program = cgCreateProgramFromFile (*context, CG_SOURCE, sourceName.mb_str(), profile, shaderPath.mb_str(), 0);
   
   cgGLLoadProgram (program);
 }

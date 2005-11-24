@@ -4,8 +4,7 @@
 #include <math.h>
 
 #include "graphicsFn.hpp"
-#include "solver.hpp"
-
+#include "solvers/solver.hpp"
 
 PeriSkeleton::PeriSkeleton (Solver * const s, const CPoint& position, const CPoint& pt,
 			    const CPoint& rootMoveFactor, LeadSkeleton * guide, int pls) :

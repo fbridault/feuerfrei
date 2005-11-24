@@ -45,6 +45,12 @@ enum
     IDST_FXAP = 1,
     IDST_FYAP,
     IDST_FZAP,
+    IDT_SELECT,
+  };
+
+enum
+  {
+    IDCB_SELECT = 1,
   };
 
 enum
@@ -77,6 +83,7 @@ enum
     IDM_Hide,
     IDM_Wired,
     IDM_Shaded,
+    IDM_Settings,
   };
 
 /** Fenêtre principale */
@@ -110,8 +117,8 @@ public:
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
+  void OnSelectFlame(wxCommandEvent& event);
   void OnScrollPosition(wxScrollEvent& event);
-  void SetFPS(int fps);
   void OnFXAPMINEnter(wxCommandEvent& event);
   void OnFXAPMAXEnter(wxCommandEvent& event);
   void OnFYAPMINEnter(wxCommandEvent& event);
@@ -119,6 +126,7 @@ public:
   void OnFZAPMINEnter(wxCommandEvent& event);
   void OnFZAPMAXEnter(wxCommandEvent& event);
   void ComputeSlidersValues(void);
+  void SetFPS(int fps);
 
 private:
   /** Pointeur sur le fichier de configuration */
@@ -139,9 +147,13 @@ private:
   wxTextCtrl *m_flameXAxisPositionSliderMax, *m_flameYAxisPositionSliderMax, *m_flameZAxisPositionSliderMax,
     *m_flameXAxisPositionSliderMin, *m_flameYAxisPositionSliderMin, *m_flameZAxisPositionSliderMin;
   wxStaticText *m_flameXAxisPositionLabel, *m_flameYAxisPositionLabel, *m_flameZAxisPositionLabel;
+  wxStaticText *m_selectFlameLabel;
+  
+  wxComboBox *m_selectFlameComboBox;
   
   wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_flamesSizer;
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
+  wxBoxSizer *m_flameSelectSizer;
   wxBoxSizer *m_flamesXAxisPositionSizer, *m_flamesYAxisPositionSizer, *m_flamesZAxisPositionSizer;
   wxBoxSizer *m_flamesXAxisPositionRangeSizer, *m_flamesYAxisPositionRangeSizer, *m_flamesZAxisPositionRangeSizer;
   

@@ -1,7 +1,3 @@
-## Process this file with automake to produce Makefile.in
-
-## Created by Anjuta
-
 INCLUDES = \
 	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
 	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
@@ -14,7 +10,6 @@ AM_CXXFLAGS =
 bin_PROGRAMS = flames
 
 flames_SOURCES = \
-	benchsolver.cpp  \
 	bougie.cpp  \
 	camera.cpp  \
 	firmalampe.cpp  \
@@ -27,11 +22,9 @@ flames_SOURCES = \
 	periSkeleton.cpp  \
 	scene.cpp  \
 	skeleton.cpp  \
-	solver.cpp  \
 	source.cpp  \
 	texture.cpp  \
 	wick.cpp  \
-	benchsolver.hpp  \
 	bougie.hpp  \
 	camera.hpp  \
 	firmalampe.hpp  \
@@ -47,33 +40,41 @@ flames_SOURCES = \
 	periSkeleton.hpp  \
 	scene.hpp  \
 	skeleton.hpp  \
-	solver.hpp  \
 	source.hpp  \
 	texture.hpp  \
 	vector.hpp  \
 	wick.hpp  \
-	CgShader.cpp  \
-	CgShader.hpp  \
-	CgSVShader.cpp  \
-	CgSVShader.hpp  \
-	CgSPFragmentShader.cpp  \
-	CgSPFragmentShader.hpp  \
-	CgBougieShaders.cpp  \
-	CgBougieShaders.hpp  \
+	shaders/CgShader.cpp  \
+	shaders/CgShader.hpp  \
+	shaders/CgSVShader.cpp  \
+	shaders/CgSVShader.hpp  \
+	shaders/CgSPFragmentShader.cpp  \
+	shaders/CgSPFragmentShader.hpp  \
+	shaders/CgBougieShaders.cpp  \
+	shaders/CgBougieShaders.hpp  \
 	solidePhoto.cpp  \
 	solidePhoto.hpp  \
 	ies.cpp  \
 	ies.hpp \
 	pbuffer.cpp  \
 	pbuffer.hpp  \
-	CgBlurShaders.cpp  \
-	CgBlurShaders.hpp  \
+	shaders/CgBlurShaders.cpp  \
+	shaders/CgBlurShaders.hpp  \
 	glowengine.cpp  \
 	glowengine.hpp  \
 	wxGLBuffer.cpp  \
 	wxGLBuffer.hpp  \
 	main.cpp  \
-	main.hpp   
+	main.hpp  \
+	solvers/solver.cpp  \
+	solvers/solver.hpp  \
+	solvers/GSsolver.cpp  \
+	solvers/GSsolver.hpp  \
+	solvers/Hsolver.cpp  \
+	solvers/Hsolver.hpp  \
+	solvers/GCSSORsolver.cpp  \
+	solvers/GCSSORsolver.hpp  
+
 flames_LDFLAGS = 
 
 flames_LDADD = 

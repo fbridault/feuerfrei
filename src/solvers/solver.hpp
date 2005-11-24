@@ -140,21 +140,10 @@ public:
 protected:
   int IX (int i, int j, int k)
   {
-    return ((i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k));
-  };
-  int IX2 (int i)
-  {
-    int x,y,z,tmp,tmp2;
-    tmp2=m_nbVoxelsX*m_nbVoxelsY;
-    z=i/tmp2;
-    tmp=i-z*tmp2;
-    y=tmp/m_nbVoxelsX;
-    x=tmp-y*m_nbVoxelsX;
-    
-    return( IX( x+1, y+1, z+1 ) );
-   //int n=i/m_nbVoxelsX; /* Nombre de lignes dans la grille */
-    
-    //return ( (m_nbVoxelsX+2)*(m_nbVoxelsY+2) + m_nbVoxelsX+3 + n/m_nbVoxelsY * ((m_nbVoxelsX+2)*(m_nbVoxelsY+2)) + (n % m_nbVoxelsX) *2 + (i % (m_nbVoxelsX*m_nbVoxelsY) ) );
+    int a = (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k);
+    if(a < 0 || a >= m_nbVoxels)
+      cerr << "ALERTEIII " << a << " " << m_nbVoxels << endl;
+    return( a );
   };
 
   /** Traitement de valeurs aux bords du solveur.
@@ -162,32 +151,6 @@ protected:
    * @param x composante à traiter
    */
   void set_bnd (int b, double *const x);
-
-  /** Effectue une résolution des systèmes linéaires de la diffusion
-  * et de la projection à l'aide de la méthode itérative de Gauss-Seidel
-  * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-  * @param x composante à traiter
-  * @param x0 composante x au pas de temps précédent
-  * @param a valeur des coefficients dans la matrice A
-  * @param div fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
-  * et 1/6 pour la projection
-  * @param nb_steps nombre d'itérations à effectuer
-  */
-  void GS_solve(int b, double *const x, const double *const x0,
-				double a, double div, double nb_steps);
-  
-  /** Effectue une résolution des systèmes linéaires de la diffusion
-  * et de la projection à l'aide de la méthode du Gradient Conjugué
-  * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-  * @param x composante à traiter
-  * @param x0 composante x au pas de temps précédent
-  * @param a valeur des coefficients dans la matrice A
-  * @param div fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
-  * et 1/6 pour la projection
-  * @param nb_steps nombre d'itérations à effectuer
-  */
-  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, 
-		     double nb_steps, double omega );
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -197,23 +160,9 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  void diffuse (int b, double *const x, const double *const x0,
-				double a, double diff_visc);
-
-  /** Pas de diffusion avec hybridation avec relance de la méthode de Gauss-Seidel
-   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param x composante à traiter
-   * @param x0 composante x au pas de temps précédent
-   * @param residu residu de la composante à traiter
-   * @param residu0 residu au pas de temps précédent
-   * @param diff_visc paramètre correspondant soit à la diffusion si la fonction est utilisée pour
-   * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
-   * du pas de vélocité
-   */
-  void diffuse_hybride (int b, double *const x, const double *const x0,
-			double *const residu, double *const residu0,
-			double diff_visc);
-
+  virtual void diffuse (int b, double *const x, const double *const x0, double a, 
+			double diff_visc) = 0;
+  
   /** Pas d'advection => déplacement du fluide sur lui-mÃªme.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
    * @param d composante à traiter
@@ -222,23 +171,20 @@ protected:
    * @param v vecteur de vélocité en v
    * @param w vecteur de vélocité en w
    */
-  void advect (int b, double *const d, const double *const d0,
-	       const double *const u, const double *const v,
-	       const double *const w);
+  virtual void advect (int b, double *const d, const double *const d0,
+		       const double *const u, const double *const v,
+		       const double *const w);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
    */
-  void project (double *const p, double *const div);
+  virtual void project (double *const p, double *const div) = 0;
 
   /** Pas de résolution de la densité. */
   void dens_step ();
 
   /** Pas de résolution de la vélocité. */
   virtual void vel_step ();
-
-  /** Pas de résolution de la vélocité, en utilisant l'hybridation */
-  void vel_step_hybride ();
 
   /** Nombre de voxels sur un côté du cube de résolution. */
   int m_nbVoxelsX, m_nbVoxelsY, m_nbVoxelsZ;
@@ -250,13 +196,8 @@ protected:
   int m_nbVoxels;
   double *m_u, *m_v, *m_w, *m_uPrev, *m_vPrev, *m_wPrev, *m_uSrc, *m_vSrc, *m_wSrc;
   double *m_dens, *m_densPrev, *m_densSrc;
-  double *m_uResidu, *m_uPrevResidu, *m_vResidu, *m_vPrevResidu, *m_wResidu, *m_wPrevResidu;
-  double *m_r, *m_z, *m_q, *m_p;
-	
-  /** Nombre de pas de résolutions de Gauss-seidel dans les méthodes de diffusion et de projection */
-  int m_nbStepsGS;
   
-  /** Nombre d'itérations pour Gauss-Seidel */
+  /** Nombre d'itérations */
   int m_nbIter;
   const static int m_nbIterFlickering = 50;
   /** Viscosité cinématique de l'air 15*10E-6. */
@@ -269,6 +210,9 @@ protected:
   double m_aVisc, m_aDiff;
 
   GLuint m_gridDisplayList,  m_baseDisplayList;
+
+  /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
+  int m_nbSteps;
 };
 
 #endif

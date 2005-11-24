@@ -18,20 +18,19 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
-  EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
-  EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
-  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
-  EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
-  EVT_COMBOBOX(IDCB_SELECT, MainFrame::OnSelectFlame)
-  EVT_SCROLL(MainFrame::OnScrollPosition)
-  EVT_SCROLL(MainFrame::OnScrollPosition)
-  EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_TEXT_ENTER(IDT_FXAPMIN, MainFrame::OnFXAPMINEnter)
   EVT_TEXT_ENTER(IDT_FXAPMAX, MainFrame::OnFXAPMAXEnter)
   EVT_TEXT_ENTER(IDT_FYAPMIN, MainFrame::OnFYAPMINEnter)
   EVT_TEXT_ENTER(IDT_FYAPMAX, MainFrame::OnFYAPMAXEnter)
   EVT_TEXT_ENTER(IDT_FZAPMIN, MainFrame::OnFZAPMINEnter)
   EVT_TEXT_ENTER(IDT_FZAPMAX, MainFrame::OnFZAPMAXEnter)
+  EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
+  EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
+  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
+  EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -92,9 +91,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
-  m_selectFlameLabel = new wxStaticText(this,IDT_SELECT,_("Selected flame :"));
-  m_selectFlameComboBox = new wxComboBox(this,IDCB_SELECT,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
-
   m_flameXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
 					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_flameYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
@@ -130,14 +126,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 0, 0, 0);
   m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
-  
+
   /* Réglages du solide photométrique */
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
   m_solidSizer->Add(m_enableSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
-  
+
   m_topSizer = new wxBoxSizer(wxHORIZONTAL);
   m_topSizer->Add(m_globalSizer, 2, wxEXPAND, 0);
   m_topSizer->Add(m_solidSizer, 3, wxEXPAND, 0);
@@ -147,10 +143,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   
   /* Réglages des flammes */
-  m_flameSelectSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_flameSelectSizer->Add(m_selectFlameLabel,0,0,0);
-  m_flameSelectSizer->Add(m_selectFlameComboBox,0,0,0);
-  
   m_flamesXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_flamesZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -177,7 +169,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_flamesZAxisPositionRangeSizer->Add(m_flameZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
 
   m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
-  m_flamesSizer->Add(m_flameSelectSizer, 1, wxEXPAND, 0);
   m_flamesSizer->Add(m_flamesXAxisPositionSizer, 1, wxEXPAND, 0);
   m_flamesSizer->Add(m_flamesXAxisPositionRangeSizer, 1, wxEXPAND, 0);
   m_flamesSizer->Add(m_flamesYAxisPositionSizer, 1, wxEXPAND, 0);
@@ -251,7 +242,7 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
   m_nbFlamesMax = m_currentConfig.nbFlames;
 
-  wxString groupName,itemName;  
+  wxString groupName;  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
@@ -261,10 +252,8 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
       m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
-	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
+	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));      
 //       cout << m_currentConfig.flames[i].type << " " << m_currentConfig.flames[i].position.x << " " << m_currentConfig.flames[i].position.y << " " << m_currentConfig.flames[i].position.z << endl;
-      itemName.Printf(_("Flame #%d"),i+1);
-      m_selectFlameComboBox->Append(itemName);
     }
   ComputeSlidersValues();
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
@@ -279,7 +268,7 @@ void MainFrame::GetSettingsFromConfigFile (bool recompileShaders)
     m_interpolatedSolidCheckBox->Disable();
     m_blendedSolidCheckBox->Disable();
   }
-  
+
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig,recompileShaders);
         
@@ -374,11 +363,6 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
     m_blendedSolidCheckBox->Disable();
   }
   m_glBuffer->ToggleSP(); 
-}
-
-void MainFrame::OnSelectFlame(wxCommandEvent& event)
-{
-  cerr << "Selected : " << m_selectFlameComboBox->GetValue();
 }
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)

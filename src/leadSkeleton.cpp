@@ -4,7 +4,8 @@
 #include <math.h>
 
 #include "graphicsFn.hpp"
-#include "solvers/solver.hpp"
+#include "solver.hpp"
+
 
 LeadSkeleton::LeadSkeleton (Solver * const s, const CPoint& position, const CPoint& pt, 
 			    const CPoint& rootMoveFactor,  int pls) :

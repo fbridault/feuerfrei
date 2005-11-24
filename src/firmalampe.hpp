@@ -4,7 +4,7 @@
 class Firmalampe;
 
 #include "flame.hpp"
-#include "shaders/CgSVShader.hpp"
+#include "CgSVShader.hpp"
 #include "leadSkeleton.hpp"
 #include "wick.hpp"
 

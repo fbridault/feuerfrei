@@ -5,8 +5,8 @@ class Bougie;
 
 #include "flame.hpp"
 #include "leadSkeleton.hpp"
-#include "shaders/CgSVShader.hpp"
-#include "shaders/CgBougieShaders.hpp"
+#include "CgSVShader.hpp"
+#include "CgBougieShaders.hpp"
 	
 class Flame;
 class LeadSkeleton;

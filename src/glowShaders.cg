@@ -1,0 +1,88 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+struct vertin
+{
+  float4 position   : POSITION;
+  float3 color	    : COLOR0;
+  float2 texcoords  : TEXCOORD0;
+};
+
+struct vertout
+{
+  float4 position : POSITION;
+  float3 color    : COLOR0;
+  float2 tc0      : TEXCOORD0;
+  float2 tc1      : TEXCOORD1;
+  float2 tc2      : TEXCOORD2;
+  float2 tc3      : TEXCOORD3;
+  float2 tc4      : TEXCOORD4;
+  float2 tc5      : TEXCOORD5;
+  float2 tc6      : TEXCOORD6;
+  float2 tc7      : TEXCOORD7;
+};
+
+vertout vertGlowX(vertin IN, uniform float offsets[8], uniform float4x4 ModelViewProj)
+{
+  vertout OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage de la couleur en sortie
+  OUT.color = IN.color;
+  // passage des coordonnees de texture
+  OUT.tc0.x = IN.texcoords.x + offsets[0];
+  OUT.tc1.x = IN.texcoords.x + offsets[1];
+  OUT.tc2.x = IN.texcoords.x + offsets[2];
+  OUT.tc3.x = IN.texcoords.x + offsets[3];
+  OUT.tc4.x = IN.texcoords.x + offsets[4];
+  OUT.tc5.x = IN.texcoords.x + offsets[5];
+  OUT.tc6.x = IN.texcoords.x + offsets[6];
+  OUT.tc7.x = IN.texcoords.x + offsets[7];
+  OUT.tc0.y = IN.texcoords.y;
+  OUT.tc1.y = IN.texcoords.y;
+  OUT.tc2.y = IN.texcoords.y;
+  OUT.tc3.y = IN.texcoords.y;
+  OUT.tc4.y = IN.texcoords.y;
+  OUT.tc5.y = IN.texcoords.y;
+  OUT.tc6.y = IN.texcoords.y;
+  OUT.tc7.y = IN.texcoords.y;
+  return OUT;
+}
+
+vertout vertGlowY(vertin IN, uniform float offsets[8], uniform float4x4 ModelViewProj)
+{
+  vertout OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage de la couleur en sortie
+  OUT.color = IN.color;
+  // passage des coordonnees de texture
+  OUT.tc0.x = IN.texcoords.x;
+  OUT.tc1.x = IN.texcoords.x;
+  OUT.tc2.x = IN.texcoords.x;
+  OUT.tc3.x = IN.texcoords.x;
+  OUT.tc4.x = IN.texcoords.x;
+  OUT.tc5.x = IN.texcoords.x;
+  OUT.tc6.x = IN.texcoords.x;
+  OUT.tc7.x = IN.texcoords.x;
+  OUT.tc0.y = IN.texcoords.y + offsets[0];
+  OUT.tc1.y = IN.texcoords.y + offsets[1];
+  OUT.tc2.y = IN.texcoords.y + offsets[2];
+  OUT.tc3.y = IN.texcoords.y + offsets[3];
+  OUT.tc4.y = IN.texcoords.y + offsets[4];
+  OUT.tc5.y = IN.texcoords.y + offsets[5];
+  OUT.tc6.y = IN.texcoords.y + offsets[6];
+  OUT.tc7.y = IN.texcoords.y + offsets[7];
+  
+  return OUT;
+}
+
+float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, uniform samplerRECT text ) : COLOR
+{
+  float4 color;
+
+  color = (texRECT(text,IN.tc0) * weights[0] + texRECT(text,IN.tc1) * weights[1] + texRECT(text,IN.tc2) * weights[2] + texRECT(text,IN.tc3) * weights[3] + texRECT(text,IN.tc4) * weights[4] + texRECT(text,IN.tc5) * weights[5] + texRECT(text,IN.tc6) * weights[6] + texRECT(text,IN.tc7) * weights[7])/divide;
+  
+  return color;
+}

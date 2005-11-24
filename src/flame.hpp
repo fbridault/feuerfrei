@@ -9,12 +9,12 @@ class Flame;
 
 #include "header.h"
 
-#include "solvers/solver.hpp"
 #include "periSkeleton.hpp"
+#include "solver.hpp"
 #include "texture.hpp"
 #include "camera.hpp"
 #include "object.hpp"
-#include "shaders/CgShader.hpp"
+#include "CgShader.hpp"
 
 class PeriSkeleton;
 class Solver;

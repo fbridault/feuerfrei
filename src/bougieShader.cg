@@ -1,0 +1,53 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+struct vertin
+{
+  float4 position     : POSITION;
+  float3 normale      : NORMAL;
+  float4 color	      : COLOR0;
+  float2 texcoords    : TEXCOORD0;
+};
+
+struct vertout
+{
+  float4 position     : POSITION;
+  float4 color        : COLOR0;
+  float2 texcoords    : TEXCOORD0;
+  float3 normale      : TEXCOORD1;
+  float3 direction    : TEXCOORD2;
+};
+
+vertout vertBougie(vertin IN, uniform float texTranslation, uniform float4x4 ModelViewInv, uniform float4x4 ModelViewProj)
+{
+  vertout OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage de la couleur en sortie
+  OUT.color = IN.color;
+  // passage des coordonnees de texture
+  OUT.texcoords = IN.texcoords;
+  OUT.texcoords.y += texTranslation;
+  
+  //IN.normale.z = 0;
+  OUT.normale = IN.normale;
+
+  OUT.direction = normalize(mul(ModelViewInv, float4(0,0,1,0))).xyz;
+  
+  return OUT;
+}
+
+float4 fragBougie(vertout IN, uniform sampler2D texture) : COLOR
+{  
+  // cos de l'angle entre la direction de visée et la normale au poi
+  float cosa = dot(IN.direction, normalize(IN.normale));
+	     
+  // couleur de la texture de l'objet
+  float4 color = tex2D(texture, IN.texcoords);
+  
+  //color.rgb = IN.color.rgb;
+  color.a = cosa*color.a;
+  
+  // melange de la couleur de l'objet, de sa texture et de l'intensite
+  return color;
+}

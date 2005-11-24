@@ -116,10 +116,9 @@ void wxGLBuffer::InitFlames(void)
 
 void wxGLBuffer::InitScene(bool recompileShaders)
 {  
-  m_solver = new GSsolver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
-			  1.0, m_currentConfig->timeStep);
-//   m_solver = new GCSSORsolver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
-// 			      1.0, m_currentConfig->timeStep);
+  m_solver = new Solver(m_currentConfig->solvx, m_currentConfig->solvy, m_currentConfig->solvz,
+			1.0, m_currentConfig->timeStep);
+  //m_solver = new BenchSolver (solvx, solvy, solvz, 1.0, timeStep);
   
   m_flames = new Flame *[m_currentConfig->nbFlames];
   

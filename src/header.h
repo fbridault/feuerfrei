@@ -45,7 +45,7 @@ using namespace std;
 #define BOUGIE 1
 #define FIRMALAMPE 2
 
-// Pour le calcul du dégradé de couleur des pyramides
+// Pour le calcul du dÃ©gradÃ© de couleur des pyramides
 #define VELOCITE_MAX .2
 
 #define EPSILON                 1.0e-8

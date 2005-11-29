@@ -564,8 +564,10 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
 
 void MainFrame::OnSolversMenu(wxCommandEvent& event)
 {
-  SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"));
-  solverDialog->ShowModal();
+  SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
+  if(solverDialog->ShowModal() == wxID_OK)
+    m_glBuffer->Restart();
+  solverDialog->Destroy();
 }
 void MainFrame::SetFPS(int fps)
 {

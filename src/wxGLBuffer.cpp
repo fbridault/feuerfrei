@@ -119,7 +119,7 @@ void wxGLBuffer::InitFlames(void)
 void wxGLBuffer::InitSolvers(void)
 {
   m_solvers = new Solver *[m_currentConfig->nbSolvers];
-  for(int i=0 ; i < m_currentConfig->nbSolvers; i++)    
+  for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
       m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 

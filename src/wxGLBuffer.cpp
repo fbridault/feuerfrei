@@ -114,6 +114,7 @@ void wxGLBuffer::InitFlames(void)
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
       ::wxExit();
     }
+  prevNbFlames = m_currentConfig->nbFlames;
 }
 
 void wxGLBuffer::InitSolvers(void)
@@ -135,6 +136,7 @@ void wxGLBuffer::InitSolvers(void)
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
       ::wxExit();
     }
+  prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
 void wxGLBuffer::InitScene(bool recompileShaders)
@@ -196,10 +198,10 @@ void wxGLBuffer::DestroyScene(void)
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
-  for (int f = 0; f < m_currentConfig->nbFlames; f++)
+  for (int f = 0; f < prevNbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
-   for (int s = 0; s < m_currentConfig->nbSolvers; s++)
+   for (int s = 0; s < prevNbSolvers; s++)
     delete m_solvers[s];
   delete[]m_solvers;
 }

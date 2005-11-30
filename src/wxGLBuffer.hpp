@@ -91,6 +91,7 @@ private:
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
   int m_width, m_height;
+  int prevNbSolvers, prevNbFlames;
   
   CGcontext m_context;
   Camera *m_camera;

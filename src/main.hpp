@@ -112,7 +112,7 @@ public:
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
-  void OnSelectFlame(wxCommandEvent& event);
+  void OnSelectSolver(wxCommandEvent& event);
   void OnScrollPosition(wxScrollEvent& event);
   void OnFXAPMINEnter(wxCommandEvent& event);
   void OnFXAPMAXEnter(wxCommandEvent& event);

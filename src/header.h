@@ -47,8 +47,8 @@ using namespace std;
 #define FIRMALAMPE 2
 
 /* Types de solveurs */
-#define GS_SOLVER 1
-#define GCSSOR_SOLVER 2
+#define GS_SOLVER 0
+#define GCSSOR_SOLVER 1
 
 // Pour le calcul du dégradé de couleur des pyramides
 #define VELOCITE_MAX .2

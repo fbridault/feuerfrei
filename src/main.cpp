@@ -25,7 +25,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
-  EVT_COMBOBOX(IDCB_SELECT, MainFrame::OnSelectFlame)
+  EVT_COMBOBOX(IDCB_SELECT, MainFrame::OnSelectSolver)
   EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_SCROLL(MainFrame::OnScrollPosition)
@@ -406,9 +406,10 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
   m_glBuffer->ToggleSP(); 
 }
 
-void MainFrame::OnSelectFlame(wxCommandEvent& event)
+void MainFrame::OnSelectSolver(wxCommandEvent& event)
 {
-  cerr << "Selected : " << m_selectSolverComboBox->GetValue();
+  m_selectedSolver = m_selectSolverComboBox->GetSelection();
+  ComputeSlidersValues();
 }
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)
@@ -564,11 +565,20 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
 
 void MainFrame::OnSolversMenu(wxCommandEvent& event)
 {
+  wxString itemName;
   SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
-  if(solverDialog->ShowModal() == wxID_OK)
+  if(solverDialog->ShowModal() == wxID_OK){
     m_glBuffer->Restart();
+    m_selectSolverComboBox->Clear();
+    for(int i=0; i < m_currentConfig.nbSolvers; i++)
+      {
+	itemName.Printf(_("Solver #%d"),i+1);
+	m_selectSolverComboBox->Append(itemName);
+      } 
+  }
   solverDialog->Destroy();
 }
+
 void MainFrame::SetFPS(int fps)
 {
   wxString s;

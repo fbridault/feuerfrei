@@ -6,17 +6,17 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   m_posLabel = new wxStaticText(this, -1, _("Position"));
-  m_posXTextCtrl = new wxTextCtrl(this, -1, _(""));
-  m_posYTextCtrl = new wxTextCtrl(this, -1, _(""));
-  m_posZTextCtrl = new wxTextCtrl(this, -1, _(""));
+  m_posXTextCtrl = new wxTextCtrl(this, -1, _("0"));
+  m_posYTextCtrl = new wxTextCtrl(this, -1, _("0"));
+  m_posZTextCtrl = new wxTextCtrl(this, -1, _("0"));
   m_dimLabel = new wxStaticText(this, -1, _("Dimension"));
-  m_dimTextCtrl = new wxTextCtrl(this, -1, _(""));
+  m_dimTextCtrl = new wxTextCtrl(this, -1, _("1"));
   m_resLabel = new wxStaticText(this, -1, _("Resolution"));
-  m_resXTextCtrl = new wxTextCtrl(this, -1, _(""));
-  m_resYTextCtrl = new wxTextCtrl(this, -1, _(""));
-  m_resZTextCtrl = new wxTextCtrl(this, -1, _(""));
+  m_resXTextCtrl = new wxTextCtrl(this, -1, _("15"));
+  m_resYTextCtrl = new wxTextCtrl(this, -1, _("15"));
+  m_resZTextCtrl = new wxTextCtrl(this, -1, _("15"));
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
-  m_timeStepTextCtrl = new wxTextCtrl(this, -1, _(""));
+  m_timeStepTextCtrl = new wxTextCtrl(this, -1, _("0,4"));
     
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
@@ -76,6 +76,15 @@ void SolverPanel::doLayout()
 
 void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
 {
+  m_posXTextCtrl->Clear();
+  m_posYTextCtrl->Clear();
+  m_posZTextCtrl->Clear();
+  m_dimTextCtrl->Clear();
+  m_resXTextCtrl->Clear();
+  m_resYTextCtrl->Clear();
+  m_resZTextCtrl->Clear();
+  m_timeStepTextCtrl->Clear();
+
   (*m_posXTextCtrl) << solverConfig->position.x;
   (*m_posYTextCtrl) << solverConfig->position.y;
   (*m_posZTextCtrl) << solverConfig->position.z;
@@ -84,7 +93,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   (*m_resYTextCtrl) << solverConfig->resy;
   (*m_resZTextCtrl) << solverConfig->resz;
   (*m_timeStepTextCtrl) << solverConfig->timeStep;
-  m_solverTypeRadioBox->SetSelection(solverConfig->type-1);
+  m_solverTypeRadioBox->SetSelection(solverConfig->type);
 }
 
 void SolverPanel::getCtrlValues(SolverConfig* solverConfig)
@@ -98,7 +107,7 @@ void SolverPanel::getCtrlValues(SolverConfig* solverConfig)
   solverConfig->resz = getLongTextCtrlValue(m_resZTextCtrl);
   solverConfig->timeStep = getDoubleTextCtrlValue(m_timeStepTextCtrl);
 
-  m_solverTypeRadioBox->SetSelection(solverConfig->type-1);
+  solverConfig->type = m_solverTypeRadioBox->GetSelection();
 }
 
 /**************************************** SolverDialog Class methods **************************************/

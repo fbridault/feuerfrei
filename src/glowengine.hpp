@@ -12,12 +12,37 @@ class GlowEngine;
 #include "scene.hpp"
 #include "camera.hpp"
 
-
+/** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
+ * qui va instancier un pbuffer, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
+ * glowEngine.activate();<br>
+ * // Réglages de la largeur de la Gaussienne utilisée pour le blur<br>
+ * m_glowEngine->setGaussSigma(4.5);<br>
+ * // Opérations de dessin - 1ère passe<br>
+ * ......................<br>
+ * // Réalisation du blur<br>
+ * glowEngine.blur();<br>
+ * glowEngine.deactivate();<br>
+ *<br>
+ * // Opérations de dessin - 2ème passe<br>
+ * ......................<br>
+ *<br>
+ * // Dessin du blur<br>
+ * glBlendFunc (GL_ONE, GL_ONE);<br>
+ * glDisable (GL_DEPTH_TEST);<br>
+ * glowEngine.drawBlur(1.0);<br>
+ * glEnable (GL_DEPTH_TEST); 
+ */
 class GlowEngine
 {
 public:
-  
-  GlowEngine(CScene *s, Camera *e, CGcontext *cgcontext, int w, int h, int sc, bool recompileShaders);
+  /** Contructeur par défaut.
+   * @param w largeur du viewport
+   * @param h hauteur du viewport
+   * @param scaleFactor rapport entre le viewport et la texture utilisée, typiquement > 1
+   * @param recompileShaders indique s'il faut compiler ou non les shaders
+   * @param cgcontext contexte Cg
+   */
+  GlowEngine(int w, int h, int scaleFactor, bool recompileShaders, CGcontext *cgcontext );
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -33,26 +58,26 @@ public:
 
   void setGaussSigma(double sigma)
   {
-    blurFragmentShader.computeWeights(sigma);
+    m_blurFragmentShader.computeWeights(sigma);
   }
 
 private: 
-  int width, height; // dimensions de la texture
-  int scaleFactor;
+  /** Dimensions de la texture */
+  int m_width, m_height;
+  /** Rapport d'échelle entre la taille du viewport et de la texture du blur */
+  int m_scaleFactor;
   
   /** Pbuffer */
-  PBuffer pbuffer;
-  /** Pointeur sur le contexte CG */
-  CGcontext *context;
-  /** Vertex Shader pour le blur */
-  CgBlurVertexShader blurVertexShaderX, blurVertexShaderY;
+  PBuffer m_pbuffer;
+  /** Vertex Shader pour le blur en X */
+  CgBlurVertexShader m_blurVertexShaderX;
+  /** Vertex Shader pour le blur en Y */
+  CgBlurVertexShader m_blurVertexShaderY;
   /** Fragment Shader pour le blur */
-  CgBlurFragmentShader blurFragmentShader;
+  CgBlurFragmentShader m_blurFragmentShader;
   /** Indice de la texture servant à réaliser le blur */
-  GLuint texblur;
+  GLuint m_texblur;
   
-  CScene *scene;
-  Camera *camera;
   //Texture *textest;
 };
 

@@ -159,8 +159,8 @@ void wxGLBuffer::InitScene(bool recompileShaders)
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
-  m_glowEngine  = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 4, recompileShaders);
-  m_glowEngine2 = new GlowEngine (m_scene, m_camera, &m_context, m_width, m_height, 1, recompileShaders);
+  m_glowEngine  = new GlowEngine (m_width, m_height, 4, recompileShaders, &m_context);
+  m_glowEngine2 = new GlowEngine (m_width, m_height, 1, recompileShaders, &m_context);
 }
 
 void wxGLBuffer::Init (FlameAppConfig *config, bool recompileShaders)

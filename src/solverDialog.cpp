@@ -117,7 +117,7 @@ BEGIN_EVENT_TABLE(SolverDialog, wxDialog)
   EVT_BUTTON(IDB_OK, SolverDialog::OnOK)
   EVT_BUTTON(IDB_Cancel, SolverDialog::OnCancel)
   EVT_NOTEBOOK_PAGE_CHANGING(IDNB_Solvers, SolverDialog::OnPageChanging)
-  END_EVENT_TABLE();
+END_EVENT_TABLE();
 
 
 SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig *config, 
@@ -166,7 +166,7 @@ void SolverDialog::doLayout()
 
 void SolverDialog::OnClickButtonAdd(wxCommandEvent& event)
 {
-  if(m_nbPanels < m_nbMaxPanels){
+  if(m_nbPanels < NB_MAXSOLVERS){
     m_solverPanels[m_nbPanels] = new SolverPanel(m_solverNotebook, -1);
     m_nbPanels++;
     wxString tabName(_("Solver #")); tabName << m_nbPanels;

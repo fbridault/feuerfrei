@@ -61,12 +61,13 @@ public:
 };
 
 
-/** Classe définissant un "camera" qui permet de tourner et de zoomer un point fixe dans
- * l'espace. Elle fournit les fonctions pour le déplacement
- * de la souris void mouseButton(SDL_MouseButtonEvent *event) et du mouvement void mouseMotion(SDL_MouseMotionEvent *event).
+/** Classe définissant une caméra subjective à la première personne, qui permet donc 
+ * de tourner, de se déplacer et de zoomer autour d'un point quelconque dans
+ * l'espace. Elle fournit les fonctions pour les clics de la souris void OnMouseClick (wxMouseEvent& event) 
+ * et du mouvement void OnMouseMotion (wxMouseEvent& event)<br>
  * Pour l'utiliser, il suffit de déclarer un objet de type Camera. Dans la fonction de dessin de la scène, il
- * ne reste alors plus qu'à appeler la fonction publique recalcModelView() avant de tracer l'objet à visualiser.
- * Cette classe peut donc être utilisée ainsi avec une application SDL quelconque.
+ * ne reste alors plus qu'à appeler la fonction publique setView() avant de tracer l'objet à visualiser.
+ * Cette classe peut donc être utilisée ainsi avec une application wxWidgets quelconque.
  *
  * @author	Flavien Bridault
  */

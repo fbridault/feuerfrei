@@ -68,6 +68,8 @@ flames_SOURCES = \
 	solverDialog.hpp  \
 	flameDialog.cpp  \
 	flameDialog.hpp  \
+	mainPanels.cpp  \
+	mainPanels.hpp  \
 	main.cpp  \
 	main.hpp  \
 	solvers/solver.cpp  \

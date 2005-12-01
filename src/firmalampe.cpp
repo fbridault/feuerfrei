@@ -90,7 +90,7 @@ Firmalampe::add_forces (bool perturbate)
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
     for (int j = 1; j < m_solver->getYRes() + 1; j++)
       for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->setVsrc (i, j, k, .02 / (double) (j));
+	m_solver->addVsrc (i, j, k, .02 / (double) (j));
 
   // cout << x << " " << z << endl;
   //  m_solver->addVsrc(x,1,z,.3);

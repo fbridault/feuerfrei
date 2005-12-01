@@ -11,41 +11,11 @@
 #include <wx/fileconf.h>
 #include <wx/stream.h>
 #include <wx/wfstream.h>
-#include <wx/spinctrl.h>
 
 #include "header.h"
 #include "wxGLBuffer.hpp"
+#include "mainPanels.hpp"
 
-
-enum
-  {
-    IDSL_FXAP = 1,
-    IDSL_FYAP,
-    IDSL_FZAP,
-  };
-
-enum
-  {
-    IDT_FXAPMIN = 1,  
-    IDT_FXAPMAX,    
-    IDT_FYAPMIN,
-    IDT_FYAPMAX,
-    IDT_FZAPMIN,
-    IDT_FZAPMAX,
-  };
-
-enum
-  {
-    IDST_FXAP = 1,
-    IDST_FYAP,
-    IDST_FZAP,
-    IDT_SELECT,
-  };
-
-enum
-  {
-    IDCB_SELECT = 1,
-  };
 
 enum
   {
@@ -59,7 +29,6 @@ enum
   {
     IDB_Run = 1,
     IDB_Restart,
-    IDB_Flickering,
     IDB_Swap,
   };
 
@@ -87,7 +56,8 @@ class MainFrame: public wxFrame
 public:
   MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size); 
   
-  void GetSettingsFromConfigFile (bool recompileShaders);
+  void GetSettingsFromConfigFile (void);
+  void InitGLBuffer (bool recompileShaders);
   
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
@@ -115,14 +85,6 @@ public:
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
-  void OnScrollPosition(wxScrollEvent& event);
-  void OnFXAPMINEnter(wxCommandEvent& event);
-  void OnFXAPMAXEnter(wxCommandEvent& event);
-  void OnFYAPMINEnter(wxCommandEvent& event);
-  void OnFYAPMAXEnter(wxCommandEvent& event);
-  void OnFZAPMINEnter(wxCommandEvent& event);
-  void OnFZAPMAXEnter(wxCommandEvent& event);
-  void ComputeSlidersValues(void);
   void SetFPS(int fps);
 
 private:
@@ -131,7 +93,7 @@ private:
   /** Zone d'affichage OpenGL */
   wxGLBuffer *m_glBuffer;
   /** Boutons */
-  wxButton *m_buttonRun, *m_buttonRestart, *m_buttonFlickering, *m_buttonSwap;
+  wxButton *m_buttonRun, *m_buttonRestart, *m_buttonSwap;
   /** Menus */
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
@@ -139,20 +101,12 @@ private:
   
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
-  
-  wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
-  wxTextCtrl *m_solverXAxisPositionSliderMax, *m_solverYAxisPositionSliderMax, *m_solverZAxisPositionSliderMax,
-    *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
-  wxStaticText *m_solverXAxisPositionLabel, *m_solverYAxisPositionLabel, *m_solverZAxisPositionLabel;
-  wxStaticText *m_selectSolverLabel;
-  
-  wxComboBox *m_selectSolverComboBox;
-  
-  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer, *m_solversSizer;
+    
+  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer;  
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
-  wxBoxSizer *m_solverSelectSizer;
-  wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
-  wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
+  
+  SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
+  wxNotebook* m_solversNotebook;
   
   FlameAppConfig m_currentConfig;
   
@@ -163,9 +117,6 @@ private:
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   int m_nbFlamesMax;
   
-  int m_selectedSolver;
-  double SLIDER_SENSIBILITY;
-  int SLIDER_RANGE;
   DECLARE_EVENT_TABLE()
 };
 

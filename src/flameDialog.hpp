@@ -15,6 +15,7 @@ enum
   };
 
 
+/** Panneau pour les onglets de la boîte de dialogue des réglages des flammes */
 class FlamePanel: public wxPanel 
 {
 public:
@@ -68,6 +69,7 @@ protected:
   wxComboBox* m_solverComboBox;
 };
 
+/** Boîte de dialogue pour les réglages des flammes */
 class FlameDialog: public wxDialog 
 {
 public:
@@ -79,7 +81,7 @@ private:
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
   
-  const static int m_nbMaxPanels=5;
+  const static int m_nbMaxPanels=10;
   int m_nbPanels;
   FlamePanel* m_flamePanels[m_nbMaxPanels];
   wxNotebook* m_flameNotebook;

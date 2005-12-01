@@ -39,31 +39,32 @@ public:
   /** Passe au fichier suivant dans la liste des fichiers IES */
   void swap()
   {
-    ieslist.swap();
-    for(int i=0; i < NBSHADER; i++)
-      SPFragmentShader[i]->setTexture();
+    m_ieslist.swap();
+    for(int i=0; i < m_NBSHADER; i++)
+      m_SPFragmentShader[i]->setTexture();
   };
+  
 private:
   /** Pointeur vers la scène 3D */
-  CScene *scene;
+  CScene *m_scene;
   /** Centre du solide photométrique dans l'espace */
-  CPoint centreSP;
+  CPoint m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation */
-  double orientationSPtheta;
+  double m_orientationSPtheta;
   /** Axe de rotation */
-  CVector axeRotation;
+  CVector m_axeRotation;
   /** Valeur de l'intensité du solide */
-  double fluctuationIntensite;
+  double m_fluctuationIntensite;
   /** Nombre de fragments shaders dans le tableau SPFragmentShader */
-  const static int NBSHADER=6;
+  const static int m_NBSHADER=6;
   /** Liste des fichiers IES */
-  IESList ieslist;
+  IESList m_ieslist;
   
   /** Vertex Shader pour les objets texturés */
-  CgBasicVertexShader SPVertexShaderTex;
+  CgBasicVertexShader m_SPVertexShaderTex;
   /** Vertex Shader pour les objets non texturés */
-  CgBasicVertexShader SPVertexShaderWTex;
-
+  CgBasicVertexShader m_SPVertexShaderWTex;
+  
   /** 
    * [0] : SP non interpolé sans couleur des objets fpSPSeul<br>
    * [1] : SP interpolé sans couleur des objets fpSPSeulInterpole<br>
@@ -72,8 +73,7 @@ private:
    * [4] : SP non interpolé avec couleur pour les objets non texturés fpSPWTEX<br>
    * [5] : SP interpolé avec couleur pour les objets non texturés fpSPTestWTEX
    */
-  CgSPFragmentShader *SPFragmentShader[NBSHADER];
-  
+  CgSPFragmentShader *m_SPFragmentShader[m_NBSHADER];  
 };
 
 #endif

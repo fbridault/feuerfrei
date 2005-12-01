@@ -13,7 +13,7 @@ enum
     IDNB_Solvers,
   };
 
-
+/** Panneau pour les onglets de la boîte de dialogue des solveurs */
 class SolverPanel: public wxPanel 
 {
 public:
@@ -66,6 +66,7 @@ protected:
     wxRadioBox* m_solverTypeRadioBox;
 };
 
+/** Boîte de dialogue pour les réglages du solveur */
 class SolverDialog: public wxDialog 
 {
 public:
@@ -77,12 +78,15 @@ private:
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
   void OnPageChanging(wxNotebookEvent& event);
+  /** Vérifie si un solveur est utilisé par des flammes.
+   * Si c'est le cas, le bouton d'effacement du solveur est désactivé
+   * @param solverIndex index du solveur à vérifier
+   */
   void checkSolverUsage(int solverIndex);
   
-  const static int m_nbMaxPanels=5;
   int m_nbPanels;
-  SolverPanel* m_solverPanels[m_nbMaxPanels];
-  wxNotebook* m_solverNotebook;
+  SolverPanel *m_solverPanels[NB_MAXSOLVERS];
+  wxNotebook *m_solverNotebook;
   wxButton *m_addSolverButton, *m_deleteSolverButton, *m_okButton, *m_cancelButton;
   FlameAppConfig *m_currentConfig;
   DECLARE_EVENT_TABLE()

@@ -1,28 +1,26 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(CScene *s, Camera *e, CGcontext *cgcontext, int w, int h, int sc, bool recompileShaders) : 
-  pbuffer("rgb"), blurVertexShaderX(_("glowShaders.cg"),_("vertGlowX"),  cgcontext, recompileShaders),
-  blurVertexShaderY(_("glowShaders.cg"),_("vertGlowY"),  cgcontext, recompileShaders),
-  blurFragmentShader(_("glowShaders.cg"),_("fragGlow"),  cgcontext, recompileShaders)
+GlowEngine::GlowEngine(int w, int h, int scaleFactor, bool recompileShaders, CGcontext *cgcontext) : 
+  m_pbuffer("rgb"), 
+  m_blurVertexShaderX(_("glowShaders.cg"),_("vertGlowX"),  cgcontext, recompileShaders),
+  m_blurVertexShaderY(_("glowShaders.cg"),_("vertGlowY"),  cgcontext, recompileShaders),
+  m_blurFragmentShader(_("glowShaders.cg"),_("fragGlow"),  cgcontext, recompileShaders)
 {
-  scene = s;
-  context = cgcontext;
-  camera = e;
-  scaleFactor=sc;
-  width=w/scaleFactor;
-  height=h/scaleFactor;
+  m_scaleFactor=scaleFactor;
+  m_width=w/m_scaleFactor;
+  m_height=h/m_scaleFactor;
 
   // Initialiser le pbuffer
-  pbuffer.Initialize(width, height, true, true);
+  m_pbuffer.Initialize(m_width, m_height, true, true);
   
-  glGenTextures(1, &texblur);
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
+  glGenTextures(1, &m_texblur);
+  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
   
   //textest = new Texture("texture.jpg",GL_TEXTURE_RECTANGLE_NV);
 }
@@ -33,8 +31,8 @@ GlowEngine::~GlowEngine()
 
 void GlowEngine::activate()
 {
-  pbuffer.Activate();
-  glViewport (0, 0, width, height);
+  m_pbuffer.Activate();
+  glViewport (0, 0, m_width, m_height);
 }
 
 void GlowEngine::blur()
@@ -49,17 +47,17 @@ void GlowEngine::blur()
   glLoadIdentity();
 
   /* On récupère le rendu des zones de glow dans la texture */
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
-  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, width, height);
+  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
+  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
 
   /* Premier blur */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  blurVertexShaderX.setOffsetsArray();
-  blurVertexShaderX.setModelViewProjectionMatrix();
-  blurFragmentShader.setWeightsArray();
-  blurFragmentShader.setTexture(texblur);
-  blurVertexShaderX.enableShader();
-  blurFragmentShader.enableShader();
+  m_blurVertexShaderX.setOffsetsArray();
+  m_blurVertexShaderX.setModelViewProjectionMatrix();
+  m_blurFragmentShader.setWeightsArray();
+  m_blurFragmentShader.setTexture(m_texblur);
+  m_blurVertexShaderX.enableShader();
+  m_blurFragmentShader.enableShader();
   
   glColor3f(1.0,1.0,1.0);
   glBegin(GL_QUADS);
@@ -67,33 +65,33 @@ void GlowEngine::blur()
   glTexCoord2f(0,0);
   glVertex3d(-1.0,1.0,0.0);
   
-  glTexCoord2f(0,height);
+  glTexCoord2f(0,m_height);
   glVertex3d(-1.0,-1.0,0.0);
 
-  glTexCoord2f(width,height);
+  glTexCoord2f(m_width,m_height);
   glVertex3d(1.0,-1.0,0.0);
 
-  glTexCoord2f(width,0);
+  glTexCoord2f(m_width,0);
   glVertex3d(1.0,1.0,0.0);
   
   glEnd();
 
-  blurVertexShaderX.disableProfile();
-  blurFragmentShader.disableProfile();
+  m_blurVertexShaderX.disableProfile();
+  m_blurFragmentShader.disableProfile();
  
   /* On récupère le premier blur dans la texture */
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
-  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, width, height);
+  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
+  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
   
   /* Deuxième blur */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
-  blurVertexShaderY.setOffsetsArray();
-  blurVertexShaderY.setModelViewProjectionMatrix();
-  blurFragmentShader.setWeightsArray();
-  blurFragmentShader.setTexture(texblur);
-  blurVertexShaderY.enableShader();
-  blurFragmentShader.enableShader();
+  m_blurVertexShaderY.setOffsetsArray();
+  m_blurVertexShaderY.setModelViewProjectionMatrix();
+  m_blurFragmentShader.setWeightsArray();
+  m_blurFragmentShader.setTexture(m_texblur);
+  m_blurVertexShaderY.enableShader();
+  m_blurFragmentShader.enableShader();
   
   glColor3f(1.0,1.0,1.0);
   
@@ -102,23 +100,23 @@ void GlowEngine::blur()
   glTexCoord2f(0,0);
   glVertex3d(-1.0,1.0,0.0);
   
-  glTexCoord2f(0,height);
+  glTexCoord2f(0,m_height);
   glVertex3d(-1.0,-1.0,0.0);
   
-  glTexCoord2f(width,height);
+  glTexCoord2f(m_width,m_height);
   glVertex3d(1.0,-1.0,0.0);
   
-  glTexCoord2f(width,0);
+  glTexCoord2f(m_width,0);
   glVertex3d(1.0,1.0,0.0);
   
   glEnd();
   
-  blurVertexShaderY.disableProfile();
-  blurFragmentShader.disableProfile();
+  m_blurVertexShaderY.disableProfile();
+  m_blurFragmentShader.disableProfile();
   
   /* On récupère le deuxième blur dans la texture */
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
-  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, width, height);
+  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
+  glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
 
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
@@ -128,8 +126,8 @@ void GlowEngine::blur()
 
 void GlowEngine::deactivate()
 {
-  pbuffer.Deactivate();
-  glViewport (0, 0, width*scaleFactor, height*scaleFactor);
+  m_pbuffer.Deactivate();
+  glViewport (0, 0, m_width*m_scaleFactor, m_height*m_scaleFactor);
 }
 
 void GlowEngine::drawBlur(double alpha)
@@ -143,21 +141,21 @@ void GlowEngine::drawBlur(double alpha)
   glLoadIdentity();
 
   glEnable(GL_TEXTURE_RECTANGLE_NV);
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, texblur);
+  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   
   glColor4f(1.0,1.0,1.0, alpha);
   glBegin(GL_QUADS);
   
-  glTexCoord2f(0,height);
+  glTexCoord2f(0,m_height);
   glVertex3d(-1.0,1.0,0.0);
   
   glTexCoord2f(0,0);
   glVertex3d(-1.0,-1.0,0.0);
 
-  glTexCoord2f(width,0);
+  glTexCoord2f(m_width,0);
   glVertex3d(1.0,-1.0,0.0);
 
-  glTexCoord2f(width,height);
+  glTexCoord2f(m_width,m_height);
   glVertex3d(1.0,1.0,0.0);
   
   glEnd();

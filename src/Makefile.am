@@ -66,6 +66,8 @@ flames_SOURCES = \
 	wxGLBuffer.hpp  \
 	solverDialog.cpp  \
 	solverDialog.hpp  \
+	flameDialog.cpp  \
+	flameDialog.hpp  \
 	main.cpp  \
 	main.hpp  \
 	solvers/solver.cpp  \

@@ -43,8 +43,8 @@ using namespace std;
 #define FLAT    -1
 
 /* Types de flammes */
-#define BOUGIE 1
-#define FIRMALAMPE 2
+#define BOUGIE 0
+#define FIRMALAMPE 1
 
 /* Types de solveurs */
 #define GS_SOLVER 0
@@ -60,9 +60,6 @@ using namespace std;
 #define BLUE                    2
 
 #define SHADOW_SAMPLE_PER_LIGHT 3
-
-#define BOUGIE 1
-#define FIRMALAMPE 2
 
 #include "vector.hpp"
 

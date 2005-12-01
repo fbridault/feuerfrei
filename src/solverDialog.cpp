@@ -32,14 +32,14 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
 
 void SolverPanel::setProperties()
 {
-  m_posXTextCtrl->SetMinSize(wxSize(40, 22));
-  m_posYTextCtrl->SetMinSize(wxSize(40, 22));
-  m_posZTextCtrl->SetMinSize(wxSize(40, 22));
-  m_dimTextCtrl->SetMinSize(wxSize(40, 22));
-  m_resXTextCtrl->SetMinSize(wxSize(40, 22));
-  m_resYTextCtrl->SetMinSize(wxSize(40, 22));
-  m_resZTextCtrl->SetMinSize(wxSize(40, 22));
-  m_timeStepTextCtrl->SetMinSize(wxSize(40, 22));
+  m_posXTextCtrl->SetMinSize(wxSize(50, 22));
+  m_posYTextCtrl->SetMinSize(wxSize(50, 22));
+  m_posZTextCtrl->SetMinSize(wxSize(50, 22));
+  m_dimTextCtrl->SetMinSize(wxSize(50, 22));
+  m_resXTextCtrl->SetMinSize(wxSize(50, 22));
+  m_resYTextCtrl->SetMinSize(wxSize(50, 22));
+  m_resZTextCtrl->SetMinSize(wxSize(50, 22));
+  m_timeStepTextCtrl->SetMinSize(wxSize(50, 22));
   m_solverTypeRadioBox->SetSelection(0);
 }
 
@@ -51,21 +51,21 @@ void SolverPanel::doLayout()
   wxBoxSizer* m_resSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_dimSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_posSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_posSizer->Add(m_posLabel, 0, wxRIGHT|wxADJUST_MINSIZE, 15);
+  m_posSizer->Add(m_posLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_posSizer->Add(m_posXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_posSizer->Add(m_posYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_posSizer->Add(m_posZTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 10);
   m_panelSizer->Add(m_posSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  m_dimSizer->Add(m_dimLabel, 0, wxADJUST_MINSIZE, 0);
+  m_dimSizer->Add(m_dimLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_dimSizer->Add(m_dimTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
   m_panelSizer->Add(m_dimSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  m_resSizer->Add(m_resLabel, 0, wxADJUST_MINSIZE, 0);
+  m_resSizer->Add(m_resLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_resSizer->Add(m_resXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_resSizer->Add(m_resYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_resSizer->Add(m_resZTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_panelSizer->Add(m_resSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  m_timeStepSizer->Add(m_timeStepLabel, 0, wxRIGHT|wxADJUST_MINSIZE, 12);
-  m_timeStepSizer->Add(m_timeStepTextCtrl, 0, wxADJUST_MINSIZE, 0);
+  m_timeStepSizer->Add(m_timeStepLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_timeStepSizer->Add(m_timeStepTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 12);
   m_panelSizer->Add(m_timeStepSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
   m_panelSizer->Add(m_solverTypeRadioBox, 0, wxADJUST_MINSIZE, 0);
   SetAutoLayout(true);
@@ -116,6 +116,7 @@ BEGIN_EVENT_TABLE(SolverDialog, wxDialog)
   EVT_BUTTON(IDB_Delete, SolverDialog::OnClickButtonDelete)
   EVT_BUTTON(IDB_OK, SolverDialog::OnOK)
   EVT_BUTTON(IDB_Cancel, SolverDialog::OnCancel)
+  EVT_NOTEBOOK_PAGE_CHANGING(IDNB_Solvers, SolverDialog::OnPageChanging)
   END_EVENT_TABLE();
 
 
@@ -123,7 +124,7 @@ SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  Fla
 			   const wxPoint& pos, const wxSize& size, long style):
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
-  m_solverNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
+  m_solverNotebook = new wxNotebook(this, IDNB_Solvers, wxDefaultPosition, wxDefaultSize, 0);
   m_currentConfig = config;
   m_nbPanels = m_currentConfig->nbSolvers;
   for(int i = 0; i < m_currentConfig->nbSolvers; i++)
@@ -136,6 +137,8 @@ SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  Fla
   m_deleteSolverButton = new wxButton(this, IDB_Delete, _("Delete a solver"));
   m_okButton = new wxButton(this, IDB_OK, _("OK"));
   m_cancelButton = new wxButton(this, IDB_Cancel, _("Cancel"));
+
+  checkSolverUsage(0);
   doLayout();
 }
 
@@ -168,6 +171,7 @@ void SolverDialog::OnClickButtonAdd(wxCommandEvent& event)
     m_nbPanels++;
     wxString tabName(_("Solver #")); tabName << m_nbPanels;
     m_solverNotebook->AddPage(m_solverPanels[m_nbPanels-1], tabName);
+    m_solverNotebook->SetSelection(m_nbPanels-1);
   }
 }
 
@@ -177,6 +181,13 @@ void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
   if(sel != -1){
     m_solverNotebook->DeletePage(sel);
     m_nbPanels--;
+    /* Décalage vers la gauche pour combler le trou dans le tableau */
+    for(int i=sel; i < m_nbPanels; i++)
+      m_solverPanels[i] = m_solverPanels[i+1];
+    /* Réindexage des index des solveurs des flammes en conséquence */
+    for(int i = 0; i < m_currentConfig->nbFlames; i++)
+      if( m_currentConfig->flames[i].solverIndex > sel)
+	m_currentConfig->flames[i].solverIndex--;
   }
 }
 
@@ -193,4 +204,21 @@ void SolverDialog::OnOK(wxCommandEvent& event)
       m_solverPanels[i]->getCtrlValues(&m_currentConfig->solvers[i]);
     }
   wxDialog::OnOK(event);
+}
+
+void SolverDialog::OnPageChanging(wxNotebookEvent& event)
+{
+  checkSolverUsage(event.GetSelection());
+}
+
+void SolverDialog::checkSolverUsage(int solverIndex)
+{
+  for(int i = 0; i < m_currentConfig->nbFlames; i++)
+    {
+      if(m_currentConfig->flames[i].solverIndex == solverIndex){
+	m_deleteSolverButton->Disable();
+	return;
+      }	
+    }
+  m_deleteSolverButton->Enable();
 }

@@ -10,6 +10,7 @@ enum
     IDB_Delete,
     IDB_OK,
     IDB_Cancel,
+    IDNB_Solvers,
   };
 
 
@@ -75,6 +76,8 @@ private:
   void OnClickButtonAdd(wxCommandEvent& event);
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
+  void OnPageChanging(wxNotebookEvent& event);
+  void checkSolverUsage(int solverIndex);
   
   const static int m_nbMaxPanels=5;
   int m_nbPanels;

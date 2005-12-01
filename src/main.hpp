@@ -77,7 +77,8 @@ enum
     IDM_Hide,
     IDM_Wired,
     IDM_Shaded,
-    IDM_Solvers,
+    IDM_SolversSettings,
+    IDM_FlamesSettings,
   };
 
 /** Fenêtre principale */
@@ -108,6 +109,7 @@ public:
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);
   void OnSolversMenu(wxCommandEvent& event);
+  void OnFlamesMenu(wxCommandEvent& event);
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);

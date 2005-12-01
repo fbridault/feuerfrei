@@ -1,6 +1,7 @@
 #include "main.hpp"
 
 #include "solverDialog.hpp"
+#include "flameDialog.hpp"
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
@@ -20,7 +21,8 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
-  EVT_MENU(IDM_Solvers, MainFrame::OnSolversMenu)
+  EVT_MENU(IDM_SolversSettings, MainFrame::OnSolversMenu)
+  EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
@@ -205,6 +207,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   SetSizer(m_mainSizer);
   
+  /* Création des menus */
   m_menuFile = new wxMenu;
   
   m_menuFile->Append( IDM_OpenScene, _("&Open scene...") );
@@ -226,9 +229,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("Particles"));
   m_menuDisplay->Append( IDM_Flames, _("Flames"), m_menuDisplayFlames);
   
-  m_menuSettings = new wxMenu;  
-  m_menuSettings->Append( IDM_Solvers, _("&Solvers..."));
-
+  m_menuSettings = new wxMenu;
+  m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
+  m_menuSettings->Append( IDM_FlamesSettings, _("&Flames..."));
+  
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
   m_menuBar->Append( m_menuDisplay, _("&Display") );
@@ -408,7 +412,7 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
 
 void MainFrame::OnSelectSolver(wxCommandEvent& event)
 {
-  m_selectedSolver = m_selectSolverComboBox->GetSelection();
+  m_selectedSolver = event.GetSelection();
   ComputeSlidersValues();
 }
 
@@ -574,9 +578,20 @@ void MainFrame::OnSolversMenu(wxCommandEvent& event)
       {
 	itemName.Printf(_("Solver #%d"),i+1);
 	m_selectSolverComboBox->Append(itemName);
-      } 
+      }
+    m_selectedSolver = 0;
   }
   solverDialog->Destroy();
+}
+
+void MainFrame::OnFlamesMenu(wxCommandEvent& event)
+{
+  wxString itemName;
+  FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
+  if(flameDialog->ShowModal() == wxID_OK){
+    m_glBuffer->Restart();
+  }
+  flameDialog->Destroy();
 }
 
 void MainFrame::SetFPS(int fps)

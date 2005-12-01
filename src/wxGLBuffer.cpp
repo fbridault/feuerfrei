@@ -95,7 +95,7 @@ void wxGLBuffer::InitFlames(void)
 {
   int nbSkeletons;
     
-  for(int i=0 ; i < m_currentConfig->nbFlames; i++)
+  for(int i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case BOUGIE :
       nbSkeletons = 4;
@@ -114,13 +114,14 @@ void wxGLBuffer::InitFlames(void)
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
       ::wxExit();
     }
+  }
   prevNbFlames = m_currentConfig->nbFlames;
 }
 
 void wxGLBuffer::InitSolvers(void)
 {
   m_solvers = new Solver *[m_currentConfig->nbSolvers];
-  for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
+  for(int i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
       m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
@@ -136,6 +137,7 @@ void wxGLBuffer::InitSolvers(void)
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
       ::wxExit();
     }
+  }
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
@@ -187,6 +189,7 @@ void wxGLBuffer::Restart (void)
   InitScene(false);
   ::wxStartTimer();
   m_init = true;
+  cerr << "Réinitialisation terminée" << endl;
   Enable();
 }
 

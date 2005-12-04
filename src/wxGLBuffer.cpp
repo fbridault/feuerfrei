@@ -102,12 +102,14 @@ void wxGLBuffer::InitFlames(void)
       m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], nbSkeletons,
 				m_currentConfig->flames[i].position, 
 				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
+				m_currentConfig->flames[i].fieldForces,m_currentConfig->flames[i].innerForce,
 				m_SVShader,"bougie.obj",m_scene, &m_context);
       break;
     case FIRMALAMPE :
       nbSkeletons = 5;
       m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],nbSkeletons,
-				   m_currentConfig->flames[i].position, m_SVShader, 
+				   m_currentConfig->flames[i].position, m_currentConfig->flames[i].fieldForces,
+				   m_currentConfig->flames[i].innerForce, m_SVShader, 
 				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
       break;
     default :

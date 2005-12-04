@@ -62,6 +62,7 @@ using namespace std;
 #define SHADOW_SAMPLE_PER_LIGHT 3
 
 #define NB_MAXSOLVERS 10
+#define NB_MAXFLAMMES 20
 
 #include "vector.hpp"
 
@@ -82,6 +83,8 @@ public:
    */
   CPoint position;
   wxString wickName;
+  double fieldForces;
+  double innerForce;
 };
 
 class FlameAppConfig{

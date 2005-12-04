@@ -74,6 +74,7 @@ public:
 
   void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
+  void setFlameForces(int index, double valField, double valInner){ m_flames[index]->setForces(valField, valInner); };
 
 private:
   void WriteFPS ();

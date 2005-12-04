@@ -102,11 +102,13 @@ private:
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
     
-  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer;  
+  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer, *m_flamesSizer;  
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
   
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
-  wxNotebook* m_solversNotebook;
+  FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];
+  
+  wxNotebook *m_solversNotebook, *m_flamesNotebook;
   
   FlameAppConfig m_currentConfig;
   

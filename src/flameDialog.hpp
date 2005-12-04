@@ -81,9 +81,8 @@ private:
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
   
-  const static int m_nbMaxPanels=10;
   int m_nbPanels;
-  FlamePanel* m_flamePanels[m_nbMaxPanels];
+  FlamePanel* m_flamePanels[NB_MAXFLAMMES];
   wxNotebook* m_flameNotebook;
   wxButton *m_addFlameButton, *m_deleteFlameButton, *m_okButton, *m_cancelButton;
   FlameAppConfig *m_currentConfig;

@@ -7,9 +7,10 @@
 #define CALLBACK
 #endif
 
-Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, CgSVShader * shader, const char *meche_name, 
+Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double fieldForces, double innerForce,
+			CgSVShader * shader, const char *meche_name, 
 			const char *filename, CScene *scene):
-  Flame (s, posRel, filename,scene),
+  Flame (s, posRel, filename,scene, fieldForces, innerForce),
   m_wick (meche_name, nb, scene),
   m_tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
@@ -90,7 +91,7 @@ Firmalampe::add_forces (bool perturbate)
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
     for (int j = 1; j < m_solver->getYRes() + 1; j++)
       for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->addVsrc (i, j, k, .02 / (double) (j));
+	m_solver->addVsrc (i, j, k, m_fieldForces / (double) (j));
 
   // cout << x << " " << z << endl;
   //  m_solver->addVsrc(x,1,z,.3);
@@ -121,7 +122,7 @@ Firmalampe::add_forces (bool perturbate)
       //cout << (*pointsIterator)->y << endl;
       for (int i = pty ; i > 0 ; i--) 
 	//m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
-	m_solver->addVsrc (ptx, i, ptz, .005* exp(((double)pty+(*pointsIterator)->y) ));
+	m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
     }
   
   /* Recherche d'un point maximum */

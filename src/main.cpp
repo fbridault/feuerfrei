@@ -90,6 +90,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
+  m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
   /* Réglages globaux */
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
@@ -114,11 +115,15 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
 
+  m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
+  m_flamesSizer->Add(m_flamesNotebook, 1, wxEXPAND, 0);
+  
   /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_glowSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
+  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);
   
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
@@ -220,8 +225,18 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
       m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
-      if(m_currentConfig.flames[i].type == FIRMALAMPE)
+      if(m_currentConfig.flames[i].type == FIRMALAMPE){
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
+	m_config->Read(groupName + _("FieldForces"), &m_currentConfig.flames[i].fieldForces, 0.02);
+	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
+      }else{
+	m_config->Read(groupName + _("FieldForces"), &m_currentConfig.flames[i].fieldForces, 0.08);
+	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
+      }
+      tabName.Printf(_("Flame #%d"),i+1);
+      
+      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
+      m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
   
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
@@ -374,13 +389,15 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
  
   for(int i=0; i < m_currentConfig.nbFlames; i++)
     {
-      groupName.Printf(_("/Flame%d/"),i);       
+      groupName.Printf(_("/Flame%d/"),i);
       
       m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
       m_config->Write(groupName + _("Solver"), m_currentConfig.flames[i].solverIndex);
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
+      m_config->Write(groupName + _("FieldForces"), m_currentConfig.flames[i].fieldForces);
+      m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
     }
@@ -469,10 +486,19 @@ void MainFrame::OnSolversMenu(wxCommandEvent& event)
 
 void MainFrame::OnFlamesMenu(wxCommandEvent& event)
 {
-  wxString itemName;
+  wxString tabName;
+  
   FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog->ShowModal() == wxID_OK){
     m_glBuffer->Restart();
+    m_flamesNotebook->DeleteAllPages();
+    
+    for(int i=0; i < m_currentConfig.nbFlames; i++)
+      {
+	m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);     
+	tabName.Printf(_("Flame #%d"),i+1);       
+	m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
+      }
   }
   flameDialog->Destroy();
 }

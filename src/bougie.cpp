@@ -7,9 +7,9 @@
 #define CALLBACK
 #endif
 
-Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, 
+Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, double fieldForces, double innerForce,
 		CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
-  Flame (s, nb, posRel, filename, scene),
+  Flame (s, nb, posRel, filename, scene, fieldForces, innerForce),
   m_tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 //   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
 //   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
@@ -69,8 +69,8 @@ Bougie::add_forces (bool perturbate)
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
     for (int j = 1; j < m_solver->getYRes() + 1; j++)
       for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->addVsrc (i, j, k, .08 / (double) (j));
-  m_solver->addVsrc (m_x, 1, m_z, .04);
+	m_solver->addVsrc (i, j, k, m_fieldForces / (double) (j));
+  m_solver->addVsrc (m_x, 1, m_z, m_innerForce);
 
   if (perturbate)
     perturbate_forces ();

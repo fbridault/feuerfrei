@@ -145,11 +145,8 @@ public:
   
 protected:
   int IX (int i, int j, int k)
-  {
-    int a = (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k);
-    if(a < 0 || a >= m_nbVoxels)
-      cerr << "ALERTEIII " << a << " " << m_nbVoxels << endl;
-    return( a );
+  {  
+    return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
   };
 
   /** Traitement de valeurs aux bords du solveur.

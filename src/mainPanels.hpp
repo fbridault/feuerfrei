@@ -30,16 +30,13 @@ enum
     IDT_FZAPMAX,
   };
 
-/** Panneau pour les onglets de la boîte de dialogue des solveurs */
+/** Panneau pour les onglets des solveurs dans la fenêtre principale */
 class SolverMainPanel: public wxPanel 
 {
 public:
   SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, wxGLBuffer *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(SolverConfig* solverConfig);
-  void getCtrlValues(SolverConfig* solverConfig);
 private:
-
   void OnScrollPosition(wxScrollEvent& event);
   void OnFXAPMINEnter(wxCommandEvent& event);
   void OnFXAPMAXEnter(wxCommandEvent& event);
@@ -48,9 +45,6 @@ private:
   void OnFZAPMINEnter(wxCommandEvent& event);
   void OnFZAPMAXEnter(wxCommandEvent& event);
   void ComputeSlidersValues(void);
-
-  void setProperties();
-  void doLayout();
   
   wxButton *m_buttonFlickering;
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
@@ -63,6 +57,33 @@ private:
   wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
   
   SolverConfig *m_solverConfig;
+  /* Index du solveur */
+  int m_index;
+  wxGLBuffer *m_glBuffer;
+  
+  double SLIDER_SENSIBILITY;
+  int SLIDER_RANGE;
+  
+  DECLARE_EVENT_TABLE()
+};
+
+
+/** Panneau pour les onglets des solveurs dans la fenêtre principale */
+class FlameMainPanel: public wxPanel 
+{
+public:
+  FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, wxGLBuffer *glBuffer, 
+		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+private:
+  void OnScrollPosition(wxScrollEvent& event);
+  
+  wxSlider *m_fieldForcesSlider, *m_innerForceSlider;
+  wxStaticText *m_fieldForcesLabel, *m_innerForceLabel;
+  
+  wxBoxSizer *m_panelSizer;
+  wxFlexGridSizer *m_forcesSizer;
+  
+  FlameConfig *m_flameConfig;
   /* Index du solveur */
   int m_index;
   wxGLBuffer *m_glBuffer;

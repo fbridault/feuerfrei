@@ -2,7 +2,7 @@
 
 #include "scene.hpp"
 
-Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene)
+Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce)
 {  
   m_solver = s;
   m_scene = scene;
@@ -34,6 +34,9 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   
   m_perturbateCount=0;
   
+  m_fieldForces=fieldForces;
+  m_innerForce=innerForce;
+  
   m_luminary = new CObject(m_scene);
   m_scene->loadObject(filename, m_luminary, true);
   m_luminaryDL=glGenLists(1);
@@ -42,7 +45,7 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   glEndList();
 }
 
-Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene)
+Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce)
 {  
   m_solver = s;
   m_scene = scene;
@@ -64,6 +67,9 @@ Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene)
   m_nbLights=0;
   
   m_perturbateCount=0;
+  
+  m_fieldForces=fieldForces;
+  m_innerForce=innerForce;
     
   m_luminary = new CObject(m_scene);
   m_scene->loadObject(filename, m_luminary, true);

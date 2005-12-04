@@ -157,7 +157,6 @@ FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  Flame
       m_flamePanels[i] = new FlamePanel(m_flameNotebook, -1, m_currentConfig->nbSolvers);
       m_flamePanels[i]->setCtrlValues(&m_currentConfig->flames[i]);
     }
-  //     m_nbMaxPanels = 5;
   m_addFlameButton = new wxButton(this, IDBF_Add, _("Add a flame"));
   m_deleteFlameButton = new wxButton(this, IDBF_Delete, _("Delete a flame"));
   m_okButton = new wxButton(this, IDBF_OK, _("OK"));
@@ -189,7 +188,7 @@ void FlameDialog::doLayout()
 
 void FlameDialog::OnClickButtonAdd(wxCommandEvent& event)
 {
-  if(m_nbPanels < m_nbMaxPanels){
+  if(m_nbPanels < NB_MAXFLAMMES){
     m_flamePanels[m_nbPanels] = new FlamePanel(m_flameNotebook, -1, m_currentConfig->nbSolvers);
     m_nbPanels++;
     wxString tabName(_("Flame #")); tabName << m_nbPanels;
@@ -220,6 +219,13 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   for(int i = 0; i < m_currentConfig->nbFlames; i++)
     {
       m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]);
+      if(m_currentConfig->flames[i].type == FIRMALAMPE){
+	m_currentConfig->flames[i].fieldForces = 0.02;
+	m_currentConfig->flames[i].innerForce = 0.005;
+      }else{
+	m_currentConfig->flames[i].fieldForces = 0.08;
+	m_currentConfig->flames[i].innerForce = 0.04;
+      }
     }
   wxDialog::OnOK(event);
 }

@@ -2,8 +2,6 @@
 
 BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_SCROLL(SolverMainPanel::OnScrollPosition)
-  EVT_SCROLL(SolverMainPanel::OnScrollPosition)
-  EVT_SCROLL(SolverMainPanel::OnScrollPosition)
   EVT_TEXT_ENTER(IDT_FXAPMIN, SolverMainPanel::OnFXAPMINEnter)
   EVT_TEXT_ENTER(IDT_FXAPMAX, SolverMainPanel::OnFXAPMAXEnter)
   EVT_TEXT_ENTER(IDT_FYAPMIN, SolverMainPanel::OnFYAPMINEnter)
@@ -174,4 +172,56 @@ void SolverMainPanel::ComputeSlidersValues(void)
   (*m_solverYAxisPositionSliderMax) << valy+SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMin) << valz-SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMax) << valz+SLIDER_RANGE;
+}
+
+/************************ FlameMainPanel class definition *********************************************/
+
+BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
+  EVT_SCROLL(FlameMainPanel::OnScrollPosition)
+END_EVENT_TABLE();
+
+
+FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, 
+				 wxGLBuffer *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+  wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
+{
+  SLIDER_SENSIBILITY=1000.0;
+  SLIDER_RANGE=200;
+  
+  m_flameConfig = flameConfig;
+  m_index = index;
+  m_glBuffer = glBuffer;
+  
+  m_fieldForcesSlider = new wxSlider(this,-1,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_innerForceSlider = new wxSlider(this,-1,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
+					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_fieldForcesLabel = new wxStaticText(this,-1,_("Field forces"));
+  m_innerForceLabel = new wxStaticText(this,-1,_("Inner force"));
+  
+  m_forcesSizer = new wxFlexGridSizer(2,2);
+  m_forcesSizer->AddGrowableCol(1,3);
+  m_forcesSizer->Add(m_fieldForcesLabel, 1, wxTOP|wxLEFT, 4);
+  m_forcesSizer->Add(m_fieldForcesSlider, 10, wxEXPAND, 0);
+  m_forcesSizer->Add(m_innerForceLabel, 1, wxTOP|wxLEFT, 4);
+  m_forcesSizer->Add(m_innerForceSlider, 10, wxEXPAND, 0);
+  
+  m_panelSizer = new wxBoxSizer(wxVERTICAL);
+  m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
+  
+  m_fieldForcesSlider->SetValue((int)(m_flameConfig->fieldForces*SLIDER_SENSIBILITY));
+  m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
+
+  SetSizer(m_panelSizer);
+}
+
+void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
+{
+  double valField = m_fieldForcesSlider->GetValue()/SLIDER_SENSIBILITY;
+  double valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
+
+  m_glBuffer->setFlameForces(m_index, valField, valInner);
+  
+  m_flameConfig->fieldForces = valField;
+  m_flameConfig->innerForce = valInner;
 }

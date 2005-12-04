@@ -28,7 +28,8 @@ public:
    * @param pos position absolue du centre de la flamme dans l'espace
    * @param shader pointeur sur le shader qui génère les shadow volumes
    */
-  Firmalampe(Solver *s, int nb, CPoint& posRel, CgSVShader *shader, const char *meche_name, const char *filename, CScene *scene);
+  Firmalampe(Solver *s, int nb, CPoint& posRel, double fieldForces, double innerForce,
+	     CgSVShader *shader, const char *meche_name, const char *filename, CScene *scene);
   virtual ~Firmalampe();
   
   /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle commence par dÃ©placer les particules 

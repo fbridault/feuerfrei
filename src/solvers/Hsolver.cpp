@@ -47,25 +47,14 @@ void Hsolver::diffuse (int b, double *const x, const double *const x0,
 	for (j = 1; j <= m_nbVoxelsY; j++)
 	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
-	      x[IX (i, j, k)] =
-		(x0[IX (i, j, k)] +
-		 a * (x[IX (i - 1, j, k)] +
-		      x[IX (i + 1, j, k)] +
-		      x[IX (i, j - 1, k)] +
-		      x[IX (i, j + 1, k)] +
-		      x[IX (i, j, k - 1)] +
-		      x[IX (i, j, k + 1)])) /
-		(1.0 + 6.0 * a);
-	      residu[IX (i, j, k)] =
-		x0[IX (i, j, k)] -
-		(x[IX (i, j, k)] -
-		 a * (x[IX (i - 1, j, k)] +
-		      x[IX (i + 1, j, k)] +
-		      x[IX (i, j - 1, k)] +
-		      x[IX (i, j + 1, k)] +
-		      x[IX (i, j, k - 1)] +
-		      x[IX (i, j, k + 1)] -
-		      6 * x[IX (i, j, k)]));
+	      x[IX (i, j, k)] =	(x0[IX (i, j, k)] + a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
+							 x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
+							 x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)])) / (1.0 + 6.0 * a);
+	      residu[IX (i, j, k)] = x0[IX (i, j, k)] -	(x[IX (i, j, k)] - 
+							 a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
+							      x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
+							      x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)] -
+							      6 * x[IX (i, j, k)]));
 	    }
       //set_bnd (b, x);
 

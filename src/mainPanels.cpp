@@ -89,7 +89,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_panelSizer->Add(m_buttonFlickering, 0, 0, 0);
   
   SetSizer(m_panelSizer);
-
+  
   ComputeSlidersValues();
 }
 

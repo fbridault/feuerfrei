@@ -66,7 +66,7 @@ public:
    * pour orienter le solide photométrique.
    */
   CVector get_main_direction(){
-    return(*(m_lead->getParticle(0)));
+    return(*(m_lead->getMiddleParticle()));
   };
   
 private:

@@ -3,7 +3,6 @@
 #include <memory.h>
 #include <assert.h>
 
-//#include "extgl.h"
 // sous linux decommenter les 2 lignes ci-dessous (pb a regler car normalement inutiles)
 #define GLX_FLOAT_COMPONENTS_NV         0x20B0
 
@@ -404,7 +403,7 @@ bool PBuffer::Initialize(int iWidth, int iHeight, bool bShareContexts, bool bSha
   Display *pDisplay = glXGetCurrentDisplay();
   int iScreen = DefaultScreen(pDisplay);
   GLXContext glxContext = glXGetCurrentContext();
-    
+  
   GLXFBConfig *glxConfig;
   int iConfigCount;   
     
@@ -413,7 +412,7 @@ bool PBuffer::Initialize(int iWidth, int iHeight, bool bShareContexts, bool bSha
     
   m_iWidth = iWidth;
   m_iHeight = iHeight;
-    
+  
   if (m_bSharedContext)
     {
       glxConfig = glXGetFBConfigs(pDisplay, iScreen, &iConfigCount);

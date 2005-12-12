@@ -84,7 +84,14 @@ public:
   Particle *getParticle(int i) const{
     return &m_queue[i];
   };
-
+  
+  /** Donne l'élément situé au milieu
+   * @param i indice
+   * @return particule à l'indice i
+   */
+  Particle *getMiddleParticle() const{
+    return &m_queue[m_headIndex/2];
+  };
   /** Donne l'origine du squelette.
    * @return position de l'origine du squelette
    */

@@ -1,7 +1,7 @@
 #include "main.hpp"
 
-#include "solverDialog.hpp"
-#include "flameDialog.hpp"
+#include "interface/solverDialog.hpp"
+#include "interface/flameDialog.hpp"
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions

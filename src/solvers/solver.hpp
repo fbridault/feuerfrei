@@ -1,9 +1,19 @@
 #if !defined(SOLVER_H)
 #define SOLVER_H
 
-class Solver;
+#define SWAP(x0,x) {double *tmp=x0;x0=x;x=tmp;}
+// Pour le calcul du dégradé de couleur des pyramides
+#define VELOCITE_MAX .2
 
-#include "header.h"
+#define RAD_TO_DEG 180/PI
+
+#include <GL/gl.h>
+#include <math.h>
+
+#include "../common.hpp"
+#include "../vector.hpp"
+
+class Solver;
 
 /** La classe Solver propose une implémentation 3D de la méthode stable implicite semi-lagrangienne de Stam.
  * A noter que dans le cadre de notre modèle de flamme, le champ de densité n'est pas utilisé, ce qui,

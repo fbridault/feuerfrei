@@ -1,15 +1,15 @@
 #include "CgShader.hpp"
 
-void fini()
-{
-  cout << "fini !" << endl;
-}
+#include <iostream>
+
+using namespace std;
+
 
 CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile)
 {
   wxString sourcePath = _("shaders/") + sourceName;
   wxString shaderPath = _("shaders/") + shaderName;
-  wxString compiledName = shaderPath + _(".o");
+  wxString compiledName = shaderName + _(".o");
   
   char buffer[255];
   

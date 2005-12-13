@@ -5,8 +5,8 @@ class CgSPFragmentShader;
 
 #include <math.h>
 
-#include "ies.hpp"
-#include "texture.hpp"
+#include "../flames/ies.hpp"
+#include "../scene/texture.hpp"
 #include "CgShader.hpp"
 
 class CgShader;

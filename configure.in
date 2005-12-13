@@ -2,7 +2,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
 AC_INIT(configure.in)
-AM_INIT_AUTOMAKE(flames, 0.1)
+AM_INIT_AUTOMAKE(rtflames, 0.1)
 AM_CONFIG_HEADER(config.h)
 AM_MAINTAINER_MODE
 

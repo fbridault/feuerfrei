@@ -7,43 +7,64 @@ AM_CFLAGS =
 
 AM_CXXFLAGS = 
 
-bin_PROGRAMS = flames
+bin_PROGRAMS = rtflames
 
-flames_SOURCES = \
-	bougie.cpp  \
-	camera.cpp  \
-	firmalampe.cpp  \
-	flame.cpp  \
-	graphicsFn.cpp  \
-	leadSkeleton.cpp  \
-	material.cpp  \
-	object.cpp  \
-	OBJReader.cpp  \
-	periSkeleton.cpp  \
-	scene.cpp  \
-	skeleton.cpp  \
-	source.cpp  \
-	texture.cpp  \
-	wick.cpp  \
-	bougie.hpp  \
-	camera.hpp  \
-	firmalampe.hpp  \
-	flame.hpp  \
-	graphicsFn.hpp  \
-	header.h  \
-	intensity.hpp  \
-	leadSkeleton.hpp  \
-	material.hpp  \
-	mathFn.hpp  \
-	object.hpp  \
-	OBJReader.hpp  \
-	periSkeleton.hpp  \
-	scene.hpp  \
-	skeleton.hpp  \
-	source.hpp  \
-	texture.hpp  \
+rtflames_SOURCES = \
 	vector.hpp  \
-	wick.hpp  \
+	header.h  \
+	main.cpp  \
+	main.hpp  \
+	wxGLBuffer.cpp  \
+	wxGLBuffer.hpp  \
+	flames/bougie.cpp  \
+	flames/bougie.hpp  \
+	flames/firmalampe.cpp  \
+	flames/firmalampe.hpp  \
+	flames/flame.cpp  \
+	flames/flame.hpp  \
+	flames/flames.hpp  \
+	flames/glowengine.cpp  \
+	flames/glowengine.hpp  \
+	flames/ies.cpp  \
+	flames/ies.hpp \
+	flames/leadSkeleton.cpp  \
+	flames/leadSkeleton.hpp  \
+	flames/periSkeleton.cpp  \
+	flames/periSkeleton.hpp  \
+	flames/pbuffer.cpp  \
+	flames/pbuffer.hpp  \
+	flames/skeleton.cpp  \
+	flames/skeleton.hpp  \
+	flames/solidePhoto.cpp  \
+	flames/solidePhoto.hpp  \
+	flames/wick.cpp  \
+	flames/wick.hpp  \
+	interface/solverDialog.cpp  \
+	interface/solverDialog.hpp  \
+	interface/flameDialog.cpp  \
+	interface/flameDialog.hpp  \
+	interface/interface.hpp  \
+	interface/mainPanels.cpp  \
+	interface/mainPanels.hpp  \
+	interface/numTextCtrl.cpp  \
+	interface/numTextCtrl.hpp  \
+	scene/camera.cpp  \
+	scene/camera.hpp  \
+	scene/graphicsFn.cpp  \
+	scene/graphicsFn.hpp  \
+	scene/intensity.hpp  \
+	scene/material.cpp  \
+	scene/material.hpp  \
+	scene/OBJReader.cpp  \
+	scene/OBJReader.hpp  \
+	scene/object.cpp  \
+	scene/object.hpp  \
+	scene/scene.cpp  \
+	scene/scene.hpp  \
+	scene/source.cpp  \
+	scene/source.hpp  \
+	scene/texture.cpp  \
+	scene/texture.hpp  \
 	shaders/CgShader.cpp  \
 	shaders/CgShader.hpp  \
 	shaders/CgSVShader.cpp  \
@@ -52,26 +73,8 @@ flames_SOURCES = \
 	shaders/CgSPFragmentShader.hpp  \
 	shaders/CgBougieShaders.cpp  \
 	shaders/CgBougieShaders.hpp  \
-	solidePhoto.cpp  \
-	solidePhoto.hpp  \
-	ies.cpp  \
-	ies.hpp \
-	pbuffer.cpp  \
-	pbuffer.hpp  \
 	shaders/CgBlurShaders.cpp  \
 	shaders/CgBlurShaders.hpp  \
-	glowengine.cpp  \
-	glowengine.hpp  \
-	wxGLBuffer.cpp  \
-	wxGLBuffer.hpp  \
-	solverDialog.cpp  \
-	solverDialog.hpp  \
-	flameDialog.cpp  \
-	flameDialog.hpp  \
-	mainPanels.cpp  \
-	mainPanels.hpp  \
-	main.cpp  \
-	main.hpp  \
 	solvers/solver.cpp  \
 	solvers/solver.hpp  \
 	solvers/GSsolver.cpp  \

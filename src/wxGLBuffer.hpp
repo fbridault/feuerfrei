@@ -3,22 +3,24 @@
 
 class wxGLBuffer;
 
-#include "header.h"
+#include "common.hpp"
+#include "interface/interface.hpp"
 
 #include <wx/glcanvas.h>
 
 #include "shaders/CgSVShader.hpp"
-#include "camera.hpp"
 
-#include "scene.hpp"
-#include "solidePhoto.hpp"
-#include "graphicsFn.hpp"
-#include "bougie.hpp"
-#include "firmalampe.hpp"
+#include "scene/camera.hpp"
+#include "scene/scene.hpp"
+#include "scene/graphicsFn.hpp"
+
+#include "flames/bougie.hpp"
+#include "flames/firmalampe.hpp"
+#include "flames/glowengine.hpp"
+#include "flames/solidePhoto.hpp"
+
 #include "solvers/GSsolver.hpp"
 #include "solvers/GCSSORsolver.hpp"
-#include "glowengine.hpp"
-
 class wxGLBuffer : public wxGLCanvas
 {
 public:

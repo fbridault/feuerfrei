@@ -4,7 +4,7 @@
 class CgBougieFragmentShader;
 
 #include "CgShader.hpp"
-#include "texture.hpp"
+#include "../scene/texture.hpp"
 
 class CgShader;
 class CgSPVertexShader;

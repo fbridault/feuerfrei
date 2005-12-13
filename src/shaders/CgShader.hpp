@@ -3,8 +3,12 @@
 
 class CgShader;
 
-#include "header.h"
-  
+#include <Cg/cg.h>
+#include <Cg/cgGL.h>
+
+#include <wx/string.h>
+#include <wx/intl.h>
+
 /** Abstraction d'un shader Cg. Il est recommandé d'utiliser cette classe
  * pour implémenter de nouveaux types de shaders
  *

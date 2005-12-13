@@ -1,5 +1,7 @@
 #include "CgBlurShaders.hpp"
 
+#include <math.h>
+
 CgBlurVertexShader::CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, 
 				       CGcontext *context, bool recompile) : 
   CgBasicVertexShader (sourceName, shaderName, context, recompile)

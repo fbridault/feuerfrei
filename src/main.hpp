@@ -12,9 +12,9 @@
 #include <wx/stream.h>
 #include <wx/wfstream.h>
 
-#include "header.h"
+#include "common.hpp"
 #include "wxGLBuffer.hpp"
-#include "mainPanels.hpp"
+#include "interface/mainPanels.hpp"
 
 
 enum

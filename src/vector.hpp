@@ -5,9 +5,11 @@
 class CPoint;
 class CVector;
 
-/* Parametres globaux.*/
-#include "header.h"
-#include "mathFn.hpp"
+/* Parametres globaux */
+#include "common.hpp"
+
+#include <GL/gl.h>
+#include <math.h>
 
 using namespace std;
 
@@ -80,9 +82,9 @@ public:
    */
   GLdouble distance (const CPoint& P) const
   {
-    return(MathFn::Sqrt((x-P.x)*(x-P.x)+
-			(y-P.y)*(y-P.y)+
-			(z-P.z)*(z-P.z)));
+    return(sqrt((x-P.x)*(x-P.x)+
+		(y-P.y)*(y-P.y)+
+		(z-P.z)*(z-P.z)));
   };
   /** 
    * Obtenir un point obtenu en multipliant le point courant
@@ -282,7 +284,7 @@ public:
    * n'est pas normalis&eacute;.
    */
   GLdouble length() const
-  {return (MathFn::Sqrt(x*x + y*y + z*z));};
+  {return (sqrt(x*x + y*y + z*z));};
   /**
    * Normalisation d'un vecteur. Cette fonction <B>modifie</B> le vecteur courant.
    * @return Vecteur courant normalis&eacute;.

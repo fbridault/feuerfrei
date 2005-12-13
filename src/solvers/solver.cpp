@@ -1,7 +1,7 @@
 #include "solver.hpp"
 
 #include <math.h>
-#include "graphicsFn.hpp"
+#include "../scene/graphicsFn.hpp"
 
 Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : m_position(position)
 {

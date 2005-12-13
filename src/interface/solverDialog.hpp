@@ -1,0 +1,73 @@
+#ifndef SOLVERDIALOG_H
+#define SOLVERDIALOG_H
+
+#include <wx/notebook.h>
+#include "interface.hpp"
+#include "numTextCtrl.hpp"
+
+class NumTextCtrl;
+
+enum
+  {
+    IDB_Add = 1,
+    IDB_Delete,
+    IDB_OK,
+    IDB_Cancel,
+    IDNB_Solvers,
+  };
+
+/** Panneau pour les onglets de la boîte de dialogue des solveurs */
+class SolverPanel: public wxPanel 
+{
+public:
+  SolverPanel(wxWindow* parent, int id, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+  void setCtrlValues(SolverConfig* solverConfig);
+  bool getCtrlValues(SolverConfig* solverConfig);
+
+private:
+  void setProperties();
+  void doLayout();
+
+protected:
+    wxStaticText* m_posLabel;
+    NumTextCtrl* m_posXTextCtrl;
+    NumTextCtrl* m_posYTextCtrl;
+    NumTextCtrl* m_posZTextCtrl;
+    wxStaticText* m_dimLabel;
+    NumTextCtrl* m_dimTextCtrl;
+    wxStaticText* m_resLabel;
+    NumTextCtrl* m_resXTextCtrl;
+    NumTextCtrl* m_resYTextCtrl;
+    NumTextCtrl* m_resZTextCtrl;
+    wxStaticText* m_timeStepLabel;
+    NumTextCtrl* m_timeStepTextCtrl;
+    wxRadioBox* m_solverTypeRadioBox;
+};
+
+/** Boîte de dialogue pour les réglages du solveur */
+class SolverDialog: public wxDialog 
+{
+public:
+  SolverDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
+
+private:
+  void doLayout();
+  void OnClickButtonAdd(wxCommandEvent& event);
+  void OnClickButtonDelete(wxCommandEvent& event);
+  void OnOK(wxCommandEvent& event);
+  void OnPageChanging(wxNotebookEvent& event);
+  /** Vérifie si un solveur est utilisé par des flammes.
+   * Si c'est le cas, le bouton d'effacement du solveur est désactivé
+   * @param solverIndex index du solveur à vérifier
+   */
+  void checkSolverUsage(int solverIndex);
+  
+  int m_nbPanels;
+  SolverPanel *m_solverPanels[NB_MAXSOLVERS];
+  wxNotebook *m_solverNotebook;
+  wxButton *m_addSolverButton, *m_deleteSolverButton, *m_okButton, *m_cancelButton;
+  FlameAppConfig *m_currentConfig;
+  DECLARE_EVENT_TABLE()
+};
+
+#endif

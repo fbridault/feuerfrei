@@ -1,5 +1,7 @@
-#ifndef MAIN_H
-#define MAIN_H
+#ifndef MAINFRAME_H
+#define MAINFRAME_H
+
+class MainFrame;
 
 #if wxUSE_IOSTREAMH
     #include <fstream.h>
@@ -12,10 +14,9 @@
 #include <wx/stream.h>
 #include <wx/wfstream.h>
 
-#include "common.hpp"
-#include "wxGLBuffer.hpp"
-#include "interface/mainPanels.hpp"
-
+#include "interface.hpp"
+#include "GLFlameCanvas.hpp"
+#include "mainPanels.hpp"
 
 enum
   {
@@ -91,7 +92,7 @@ private:
   /** Pointeur sur le fichier de configuration */
   wxFileConfig *m_config;
   /** Zone d'affichage OpenGL */
-  wxGLBuffer *m_glBuffer;
+  GLFlameCanvas *m_glBuffer;
   /** Boutons */
   wxButton *m_buttonRun, *m_buttonRestart, *m_buttonSwap;
   /** Menus */

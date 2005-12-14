@@ -34,9 +34,9 @@ private:
 
 protected:
   wxStaticText* m_posLabel;
-  NumTextCtrl* m_posXTextCtrl;
-  NumTextCtrl* m_posYTextCtrl;
-  NumTextCtrl* m_posZTextCtrl;
+  DoubleTextCtrl* m_posXTextCtrl;
+  DoubleTextCtrl* m_posYTextCtrl;
+  DoubleTextCtrl* m_posZTextCtrl;
   wxStaticText* m_wickLabel;
   wxTextCtrl* m_wickTextCtrl;
   wxButton* m_wickBrowseButton;

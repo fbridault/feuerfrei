@@ -6,17 +6,17 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   m_posLabel = new wxStaticText(this, -1, _("Position"));
-  m_posXTextCtrl = new NumTextCtrl(this, -1, _("0"));
-  m_posYTextCtrl = new NumTextCtrl(this, -1, _("0"));
-  m_posZTextCtrl = new NumTextCtrl(this, -1, _("0"));
+  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_dimLabel = new wxStaticText(this, -1, _("Dimension"));
-  m_dimTextCtrl = new NumTextCtrl(this, -1, _("1"));
+  m_dimTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
   m_resLabel = new wxStaticText(this, -1, _("Resolution"));
-  m_resXTextCtrl = new NumTextCtrl(this, -1, _("15"));
-  m_resYTextCtrl = new NumTextCtrl(this, -1, _("15"));
-  m_resZTextCtrl = new NumTextCtrl(this, -1, _("15"));
+  m_resXTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
+  m_resYTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
+  m_resZTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
-  m_timeStepTextCtrl = new NumTextCtrl(this, -1, _("0,4"));
+  m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
     
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
@@ -100,21 +100,17 @@ bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
 {
   try
     {
-      solverConfig->position.x = m_posXTextCtrl->getValueAsDouble();
-      solverConfig->position.y = m_posYTextCtrl->getValueAsDouble();
-      solverConfig->position.z = m_posZTextCtrl->getValueAsDouble();
-      solverConfig->dim = m_dimTextCtrl->getValueAsDouble();
-      solverConfig->resx = m_resXTextCtrl->getValueAsLong();
-      solverConfig->resy = m_resYTextCtrl->getValueAsLong();
-      solverConfig->resz = m_resZTextCtrl->getValueAsLong();
-      solverConfig->timeStep = m_timeStepTextCtrl->getValueAsDouble();
+      solverConfig->position.x = m_posXTextCtrl->GetSafelyValue();
+      solverConfig->position.y = m_posYTextCtrl->GetSafelyValue();
+      solverConfig->position.z = m_posZTextCtrl->GetSafelyValue();
+      solverConfig->dim = m_dimTextCtrl->GetSafelyValue();
+      solverConfig->resx = m_resXTextCtrl->GetSafelyValue();
+      solverConfig->resy = m_resYTextCtrl->GetSafelyValue();
+      solverConfig->resz = m_resZTextCtrl->GetSafelyValue();
+      solverConfig->timeStep = m_timeStepTextCtrl->GetSafelyValue();
     }
   catch(wxString s)
     {
-      wxMessageDialog *errorDialog = new wxMessageDialog(this,_("\"") + s + _("\" is a non-numeric value"),
-							 _("Error"),wxOK|wxICON_ERROR);
-      errorDialog->ShowModal();
-      errorDialog->Destroy();
       return false;
     }
 

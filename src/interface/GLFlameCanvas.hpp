@@ -1,33 +1,33 @@
 #ifndef WXGLBUFFER_H
 #define WXGLBUFFER_H
 
-class wxGLBuffer;
+class GLFlameCanvas;
 
-#include "common.hpp"
-#include "interface/interface.hpp"
+#include "../common.hpp"
+#include "interface.hpp"
 
 #include <wx/glcanvas.h>
 
-#include "shaders/CgSVShader.hpp"
+#include "../shaders/CgSVShader.hpp"
 
-#include "scene/camera.hpp"
-#include "scene/scene.hpp"
-#include "scene/graphicsFn.hpp"
+#include "../scene/camera.hpp"
+#include "../scene/scene.hpp"
+#include "../scene/graphicsFn.hpp"
 
-#include "flames/bougie.hpp"
-#include "flames/firmalampe.hpp"
-#include "flames/glowengine.hpp"
-#include "flames/solidePhoto.hpp"
+#include "../flames/bougie.hpp"
+#include "../flames/firmalampe.hpp"
+#include "../flames/glowengine.hpp"
+#include "../flames/solidePhoto.hpp"
 
-#include "solvers/GSsolver.hpp"
-#include "solvers/GCSSORsolver.hpp"
-class wxGLBuffer : public wxGLCanvas
+#include "../solvers/GSsolver.hpp"
+#include "../solvers/GCSSORsolver.hpp"
+class GLFlameCanvas : public wxGLCanvas
 {
 public:
-  wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
+  GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
 	     long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
   
-  ~wxGLBuffer();
+  ~GLFlameCanvas();
   
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);

@@ -5,8 +5,6 @@
 #include "interface.hpp"
 #include "numTextCtrl.hpp"
 
-class NumTextCtrl;
-
 enum
   {
     IDB_Add = 1,
@@ -30,17 +28,17 @@ private:
 
 protected:
     wxStaticText* m_posLabel;
-    NumTextCtrl* m_posXTextCtrl;
-    NumTextCtrl* m_posYTextCtrl;
-    NumTextCtrl* m_posZTextCtrl;
+    DoubleTextCtrl* m_posXTextCtrl;
+    DoubleTextCtrl* m_posYTextCtrl;
+    DoubleTextCtrl* m_posZTextCtrl;
     wxStaticText* m_dimLabel;
-    NumTextCtrl* m_dimTextCtrl;
+    DoubleTextCtrl* m_dimTextCtrl;
     wxStaticText* m_resLabel;
-    NumTextCtrl* m_resXTextCtrl;
-    NumTextCtrl* m_resYTextCtrl;
-    NumTextCtrl* m_resZTextCtrl;
+    LongTextCtrl* m_resXTextCtrl;
+    LongTextCtrl* m_resYTextCtrl;
+    LongTextCtrl* m_resZTextCtrl;
     wxStaticText* m_timeStepLabel;
-    NumTextCtrl* m_timeStepTextCtrl;
+    DoubleTextCtrl* m_timeStepTextCtrl;
     wxRadioBox* m_solverTypeRadioBox;
 };
 

@@ -3,7 +3,7 @@
 
 #include "interface.hpp"
 #include <wx/spinctrl.h>
-#include "../wxGLBuffer.hpp"
+#include "GLFlameCanvas.hpp"
 
 enum
   {
@@ -34,7 +34,7 @@ enum
 class SolverMainPanel: public wxPanel 
 {
 public:
-  SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, wxGLBuffer *glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFlameCanvas *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 private:
   void OnScrollPosition(wxScrollEvent& event);
@@ -59,7 +59,7 @@ private:
   SolverConfig *m_solverConfig;
   /* Index du solveur */
   int m_index;
-  wxGLBuffer *m_glBuffer;
+  GLFlameCanvas *m_glBuffer;
   
   double SLIDER_SENSIBILITY;
   int SLIDER_RANGE;
@@ -72,7 +72,7 @@ private:
 class FlameMainPanel: public wxPanel 
 {
 public:
-  FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, wxGLBuffer *glBuffer, 
+  FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, GLFlameCanvas *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 private:
   void OnScrollPosition(wxScrollEvent& event);
@@ -86,7 +86,7 @@ private:
   FlameConfig *m_flameConfig;
   /* Index du solveur */
   int m_index;
-  wxGLBuffer *m_glBuffer;
+  GLFlameCanvas *m_glBuffer;
   
   double SLIDER_SENSIBILITY;
   int SLIDER_RANGE;

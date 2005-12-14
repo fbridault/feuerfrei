@@ -12,9 +12,9 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   wxString itemName;
   
   m_posLabel = new wxStaticText(this, -1, _("Position"));
-  m_posXTextCtrl = new NumTextCtrl(this, -1, _("0"));
-  m_posYTextCtrl = new NumTextCtrl(this, -1, _("0"));
-  m_posZTextCtrl = new NumTextCtrl(this, -1, _("0"));
+  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
 
   m_solverLabel = new wxStaticText(this,-1,_("Use solver :"));
   m_solverComboBox = new wxComboBox(this,-1,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
@@ -102,20 +102,20 @@ bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
 {
   try
     {
-      flameConfig->position.x = m_posXTextCtrl->getValueAsDouble();
-      flameConfig->position.y = m_posYTextCtrl->getValueAsDouble();
-      flameConfig->position.z = m_posZTextCtrl->getValueAsDouble();
+      flameConfig->position.x = m_posXTextCtrl->GetSafelyValue();
+      flameConfig->position.y = m_posYTextCtrl->GetSafelyValue();
+      flameConfig->position.z = m_posZTextCtrl->GetSafelyValue();
     }
   catch(wxString s)
     {
-      return -1;
+      return false;
     }
   if(!m_wickTextCtrl->GetValue().IsEmpty())
     flameConfig->wickName = m_wickTextCtrl->GetValue();
 
   flameConfig->solverIndex = m_solverComboBox->GetSelection();
   flameConfig->type = m_flameTypeRadioBox->GetSelection();
-  return 0;
+  return true;
 }
 
 void FlamePanel::OnSelectType(wxCommandEvent& event)
@@ -229,7 +229,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   
   for(int i = 0; i < m_currentConfig->nbFlames; i++)
     {
-      if(! m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
+      if( m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
 	if(m_currentConfig->flames[i].type == FIRMALAMPE){
 	  if(m_currentConfig->flames[i].wickName.IsEmpty()){
 	    wxMessageDialog *errorDialog = new wxMessageDialog(this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);

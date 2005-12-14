@@ -1,18 +1,18 @@
-#include "wxGLBuffer.hpp"
+#include "GLFlameCanvas.hpp"
 
-#include "main.hpp"
+#include "interface/mainFrame.hpp"
 #include <iostream>
 
-BEGIN_EVENT_TABLE(wxGLBuffer, wxGLCanvas)
-  EVT_PAINT(wxGLBuffer::OnPaint)
-  EVT_IDLE(wxGLBuffer::OnIdle)
-  EVT_MOTION(wxGLBuffer::OnMouseMotion)
-  EVT_MIDDLE_DOWN(wxGLBuffer::OnMouseClick)
-  EVT_MIDDLE_UP(wxGLBuffer::OnMouseClick)
-  EVT_RIGHT_DOWN(wxGLBuffer::OnMouseClick)
-  EVT_RIGHT_UP(wxGLBuffer::OnMouseClick)
-  EVT_MOUSEWHEEL(wxGLBuffer::OnMouseWheel)
-  EVT_KEY_DOWN(wxGLBuffer::OnKeyPressed)
+BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
+  EVT_PAINT(GLFlameCanvas::OnPaint)
+  EVT_IDLE(GLFlameCanvas::OnIdle)
+  EVT_MOTION(GLFlameCanvas::OnMouseMotion)
+  EVT_MIDDLE_DOWN(GLFlameCanvas::OnMouseClick)
+  EVT_MIDDLE_UP(GLFlameCanvas::OnMouseClick)
+  EVT_RIGHT_DOWN(GLFlameCanvas::OnMouseClick)
+  EVT_RIGHT_UP(GLFlameCanvas::OnMouseClick)
+  EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
+  EVT_KEY_DOWN(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
 CGcontext *contextCopy;
@@ -32,7 +32,7 @@ void cgErrorCallback(void)
   }
 }
 
-wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
+GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
 		       long style, const wxString& name, const wxPalette& palette)
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
@@ -40,7 +40,7 @@ wxGLBuffer::wxGLBuffer(wxWindow* parent, wxWindowID id, const wxPoint& pos, cons
   m_run = 0;
 }
 
-wxGLBuffer::~wxGLBuffer()
+GLFlameCanvas::~GLFlameCanvas()
 {
   DestroyScene();
   delete m_SVShader;
@@ -48,7 +48,7 @@ wxGLBuffer::~wxGLBuffer()
     cgDestroyContext (m_context);
 }
 
-void wxGLBuffer::InitUISettings(void)
+void GLFlameCanvas::InitUISettings(void)
 {
   /* Pour l'affichage */
   m_run = true; 
@@ -58,7 +58,7 @@ void wxGLBuffer::InitUISettings(void)
   m_shadowsEnabled = false; m_shadowVolumesEnabled = false;
 }
 
-void wxGLBuffer::InitGL(bool recompileShaders)
+void GLFlameCanvas::InitGL(bool recompileShaders)
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
@@ -91,7 +91,7 @@ void wxGLBuffer::InitGL(bool recompileShaders)
   m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, recompileShaders);
 }
 
-void wxGLBuffer::InitFlames(void)
+void GLFlameCanvas::InitFlames(void)
 {
   int nbSkeletons;
     
@@ -120,7 +120,7 @@ void wxGLBuffer::InitFlames(void)
   prevNbFlames = m_currentConfig->nbFlames;
 }
 
-void wxGLBuffer::InitSolvers(void)
+void GLFlameCanvas::InitSolvers(void)
 {
   m_solvers = new Solver *[m_currentConfig->nbSolvers];
   for(int i=0 ; i < m_currentConfig->nbSolvers; i++){
@@ -143,7 +143,7 @@ void wxGLBuffer::InitSolvers(void)
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
-void wxGLBuffer::InitScene(bool recompileShaders)
+void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
   InitSolvers();
 
@@ -165,7 +165,7 @@ void wxGLBuffer::InitScene(bool recompileShaders)
   m_glowEngine2 = new GlowEngine (m_width, m_height, 1, recompileShaders, &m_context);
 }
 
-void wxGLBuffer::Init (FlameAppConfig *config, bool recompileShaders)
+void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
 {  
   m_currentConfig = config;
 
@@ -182,7 +182,7 @@ void wxGLBuffer::Init (FlameAppConfig *config, bool recompileShaders)
   cerr << "Initialisation terminée" << endl;
 }
 
-void wxGLBuffer::Restart (void)
+void GLFlameCanvas::Restart (void)
 {
   Disable();
   m_init = false;
@@ -196,7 +196,7 @@ void wxGLBuffer::Restart (void)
 }
 
 
-void wxGLBuffer::DestroyScene(void)
+void GLFlameCanvas::DestroyScene(void)
 { 
   delete m_glowEngine;
   delete m_glowEngine2;
@@ -211,7 +211,7 @@ void wxGLBuffer::DestroyScene(void)
   delete[]m_solvers;
 }
 
-void wxGLBuffer::OnIdle(wxIdleEvent& event)
+void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
     for (int i = 0; i < m_currentConfig->nbFlames; i++)
@@ -227,22 +227,22 @@ void wxGLBuffer::OnIdle(wxIdleEvent& event)
   //event.RequestMore();
 }
   
-void wxGLBuffer::OnMouseMotion(wxMouseEvent& event)
+void GLFlameCanvas::OnMouseMotion(wxMouseEvent& event)
 {
   m_camera->OnMouseMotion(event);
 }
   
-void wxGLBuffer::OnMouseClick(wxMouseEvent& event)
+void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 {
   m_camera->OnMouseClick(event);
 }
 
-void wxGLBuffer::OnMouseWheel(wxMouseEvent& event)
+void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 {
   m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/100);
 }
 
-void wxGLBuffer::OnKeyPressed(wxKeyEvent& event)
+void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 {
   double step=0.3;
   switch(event.GetKeyCode())
@@ -258,7 +258,7 @@ void wxGLBuffer::OnKeyPressed(wxKeyEvent& event)
 }
 
 /** Fonction de dessin global */
-void wxGLBuffer::OnPaint (wxPaintEvent& event)
+void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
   if(!m_init)
     return;

@@ -126,13 +126,6 @@ public:
     CPoint resultat(x/div,y/div,z/div);
     return resultat;
   }
-  /** Affecter trois coordonnées à un point */
-/*  void set(double xx, double yy, double zz){
-    x=xx;
-    y=yy;
-    z=zz;
-  }//set
-*/
 
   /** Donne la distance au carré entre deux points de l'espace.
    * @param pt1 position du premier point de contrôle

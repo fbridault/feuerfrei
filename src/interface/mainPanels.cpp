@@ -12,7 +12,7 @@ END_EVENT_TABLE();
 
 
 SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, 
-				 wxGLBuffer *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=100.0;
@@ -182,7 +182,7 @@ END_EVENT_TABLE();
 
 
 FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, 
-				 wxGLBuffer *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=1000.0;

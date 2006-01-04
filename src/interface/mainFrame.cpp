@@ -18,6 +18,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
   EVT_MENU(IDM_Particles, MainFrame::OnParticlesMenu)
+  EVT_MENU(IDM_Shadows, MainFrame::OnShadowsMenu)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
@@ -112,15 +113,16 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplayFlames = new wxMenu;
   m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("&Hide"));
   m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("&Wired"));
-  m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("Shaded"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("&Shaded"));
   m_menuDisplayFlames->Check(IDM_Shaded,true);
   
   m_menuDisplay = new wxMenu;
-  m_menuDisplay->AppendCheckItem( IDM_Grid, _("Grid"));
-  m_menuDisplay->AppendCheckItem( IDM_Base, _("Base"));
-  m_menuDisplay->AppendCheckItem( IDM_Velocity, _("Velocity"));
-  m_menuDisplay->AppendCheckItem( IDM_Particles, _("Particles"));
-  m_menuDisplay->Append( IDM_Flames, _("Flames"), m_menuDisplayFlames);
+  m_menuDisplay->AppendCheckItem( IDM_Grid, _("&Grid"));
+  m_menuDisplay->AppendCheckItem( IDM_Base, _("&Base"));
+  m_menuDisplay->AppendCheckItem( IDM_Velocity, _("&Velocity"));
+  m_menuDisplay->AppendCheckItem( IDM_Particles, _("&Particles"));
+  m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
+  m_menuDisplay->AppendCheckItem( IDM_Shadows, _("&Shadows"));
   
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
@@ -147,7 +149,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
-  m_config->Read(_("/Display/PhotometricSolid"), &m_currentConfig.PSEnabled, false);
+  m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
   m_config->Read(_("/Display/IPSEnabled"), &m_currentConfig.IPSEnabled, 0);
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
@@ -210,7 +212,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
-  m_enableSolidCheckBox->SetValue(m_currentConfig.PSEnabled);
+  m_enableSolidCheckBox->SetValue(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   
   if(m_enableSolidCheckBox->IsChecked()){
@@ -282,14 +284,16 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 
 void MainFrame::OnCheckES(wxCommandEvent& event)
 {
-  if(m_enableSolidCheckBox->IsChecked()){
+  if(event.IsChecked()){
+    m_menuDisplayFlames->Check(IDM_Shadows,false);
     m_interpolatedSolidCheckBox->Enable();
     m_blendedSolidCheckBox->Enable();
+    m_currentConfig.lightingMode=LIGHTING_PHOTOMETRIC;    
   }else{
     m_interpolatedSolidCheckBox->Disable();
-    m_blendedSolidCheckBox->Disable();
+    m_blendedSolidCheckBox->Disable();    
+    m_currentConfig.lightingMode=LIGHTING_STANDARD;
   }
-  m_glBuffer->ToggleSP(); 
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
@@ -313,7 +317,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Width"), m_currentConfig.width);
   m_config->Write(_("/Display/Height"), m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
-  m_config->Write(_("/Display/PhotometricSolid"), m_currentConfig.PSEnabled);
+  m_config->Write(_("/Display/LightingMode"), m_currentConfig.lightingMode);
   m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
@@ -414,6 +418,20 @@ void MainFrame::OnParticlesMenu(wxCommandEvent& event)
 void MainFrame::OnHideMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleFlamesDisplay();
+}
+
+void MainFrame::OnShadowsMenu(wxCommandEvent& event)
+{ 
+  if(event.IsChecked()){
+    m_enableSolidCheckBox->SetValue(false);
+    m_interpolatedSolidCheckBox->Disable();
+    m_blendedSolidCheckBox->Disable();
+    m_currentConfig.lightingMode=LIGHTING_SHADOWS;
+  }else{
+    m_interpolatedSolidCheckBox->Enable();
+    m_blendedSolidCheckBox->Enable();
+    m_currentConfig.lightingMode=LIGHTING_STANDARD;
+  }
 }
 
 void MainFrame::OnWiredMenu(wxCommandEvent& event)

@@ -59,8 +59,6 @@ public:
   void ToggleRun(void) { m_run=!m_run; };
   /** Lance/arrête l'animation */
   void ToggleFlickering(void) { m_flickering=!m_flickering; };
-  /** Active/Désactive le solide photométrique */
-  void ToggleSP(void) { m_currentConfig->PSEnabled=!m_currentConfig->PSEnabled; };
   /** Active/Désactive le glow */
   void ToggleGlow(void) { m_currentConfig->glowEnabled=!m_currentConfig->glowEnabled; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
@@ -73,7 +71,6 @@ public:
     m_flames[f]->toggleSmoothShading (); };
   void ToggleBlendedSP(void) { m_currentConfig->BPSEnabled = 2-m_currentConfig->BPSEnabled; };
   void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
-
   void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setFlameForces(int index, double valField, double valInner){ m_flames[index]->setForces(valField, valInner); };

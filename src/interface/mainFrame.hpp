@@ -44,6 +44,7 @@ enum
     IDM_Velocity,
     IDM_Particles,
     IDM_Flames,
+    IDM_Shadows,
     IDM_Hide,
     IDM_Wired,
     IDM_Shaded,
@@ -81,6 +82,7 @@ public:
   void OnShadedMenu(wxCommandEvent& event);
   void OnSolversMenu(wxCommandEvent& event);
   void OnFlamesMenu(wxCommandEvent& event);
+  void OnShadowsMenu(wxCommandEvent& event);
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);

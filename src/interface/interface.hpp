@@ -24,6 +24,10 @@
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 20
 
+#define LIGHTING_STANDARD 0
+#define LIGHTING_SHADOWS 1
+#define LIGHTING_PHOTOMETRIC 2
+
 class SolverConfig{
 public:
   char type;
@@ -50,7 +54,9 @@ public:
   int width, height;
   double clipping;
   wxString sceneName;
-  bool PSEnabled,glowEnabled;
+  /* LIGHTING_STANDARD normal, LIGHTING_SHADOWS shadow Volumes, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
+  int lightingMode;
+  bool glowEnabled;
   /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
   int nbSolvers;
@@ -60,4 +66,3 @@ public:
 };
 
 #endif
-

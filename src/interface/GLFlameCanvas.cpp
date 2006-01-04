@@ -344,7 +344,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->drawWick ();
     
-    if(m_currentConfig->PSEnabled){
+    if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
       /* 3e paramètre doit être la hauteur du solveur de la flamme */
       CPoint pos(m_flames[0]->getPosition());
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(),
@@ -361,7 +361,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	{
 	  if (m_shadowVolumesEnabled)
 	    m_flames[f]->draw_shadowVolumes ();
-	  if (m_shadowsEnabled)
+	  if (m_currentConfig->lightingMode == LIGHTING_SHADOWS)
 	    m_flames[f]->cast_shadows_double ();
 	  else{
 	    m_flames[f]->switch_on_lights ();

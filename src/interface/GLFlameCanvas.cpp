@@ -133,7 +133,16 @@ void GLFlameCanvas::InitSolvers(void)
     case GCSSOR_SOLVER :
       m_solvers[i] = new GCSSORsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep);
+				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+				      m_currentConfig->solvers[i].epsilon);
+      break;
+    case BENCH_SOLVER :
+      m_solvers[i] = new BenchSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+				     m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].omegaDiff, 
+				     m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -347,9 +356,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
       /* 3e paramètre doit être la hauteur du solveur de la flamme */
       CPoint pos(m_flames[0]->getPosition());
-      m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(),
-								    pos,
-								    1.0);
+      m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(), pos, 1.0);
       m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
     }else{
       /**** Affichage de la scène ****/

@@ -3,96 +3,59 @@
 
 class BenchSolver;
 
-#include "solver.hpp"
+#include "GSsolver.hpp"
+#include "GCSSORsolver.hpp"
+
 #include <fstream>
 
-class Solver;
+class GSsolver;
+class GCSSORsolver;
 
-/** La classe Solver propose une implémentation de la méthode stable implicite semi-lagrangienne de Stam.
+/** La classe BenchSolver permet de loguer les valeurs de résidus des solveurs à base
+ * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
+ * Elle hérite de GSsolver et GCSSORsolver qui tous deux héritent <b>virtuellement</b> de Solver
+ * de manière à n'avoir qu'une seule instance de Solver.
  *
  * @author	Flavien Bridault
  */
-class BenchSolver : public Solver
+class BenchSolver: public GSsolver, public GCSSORsolver
 {
 public:
   /** Constructeur du solveur.
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
-
-    virtual ~ BenchSolver ();
-
-  /** Lance plusieurs itérations du solveur avec différents pas de résolutions pour les méthodes
-   * de Gauss-Seidel, en vue du profiling
-   */
-  void iterate (bool flickering);
-
+  BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double nbTimeSteps,
+	       double omegaDiff, double omegaProj, double epsilon);
+  virtual ~ BenchSolver ();
+  
 private:
-  int IX2 (int i, int j, int k)
-  {
-    return ((i) + (m_nbVoxelsX) * (j) + (m_nbVoxelsX) * (m_nbVoxelsY) * (k));
-  };
+  void vel_step ();
   
-  void diffuse_log (int b, double *const x, const double *const x0,
-		    const double *const xref, double *const xlog,
-		    double a, double diff_visc);
-  void diffuse_hybride_log (int b, double *const x, const double *const x0,
-			    const double *const xref, double *const residu,
-			    double *const residu0, double *const xlog,
-			    double a, double diff_visc);
-  void project_log (double *const p, double *const div, double *const xref,
-		    double *const xlog);
-  void project_log_hybride (double *p, double *const div, double *const xref,
-			    double *const xlog, double *const residu,
-			    double *const residu0);
-  void project_save (double *const p, double *const div, int num);
-
-  void iterate (bool flickering, int nb_step_GS);
-  void iterate_hybride (bool flickering, int nb_step_GS);
-
+  void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
+  void project (double *const p, double *const div);
+  
+  void GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps);
+  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega);
+  
+  void saveState (const double *const x, const double *const x2);
   /** Sauvegarde les différentes composantes du solveur comme valeur de référence */
-//  void save_ref ();
-
-  void save_state (const double *const x, double *x_save);
-  void save_ref (const double *const x, double *x_ref);
-  void set_previous_state (double *x, const double *const x_save);
-
-  /** Sauvegarde les différentes composantes du solveur */
-  void save_state ();
-  /** Restaure le solveur dans l'état précédent sauvegardé par save_state() */
-  void set_previous_state ();
-
-  void vel_step_save ();
-  void vel_step_compare_diffuse_normal ();
-  void vel_step_compare_diffuse_hybride ();
-  void vel_step_compare_project_normal ();
-  void vel_step_compare_project_hybride ();
-  /** Compare les valeurs de la vélocité à celles stockés dans save_ref().
-   *  La méthode calcule une valeur d'erreur RMS pour chaque composante u,v,w
-   *  et l'écrit ensuite dans le fichier "solver.log"
-   */
-  void compare ();
-  void compare (int n, const double *const x, double *const xlog,
-		const double *const xref);
-  void writeLog ();
-
-  const void save (const double *const x);
-  void iterate_save (bool flickering);
+  //void save_ref (const double *const x, double *x_ref);
+  void setPreviousState (double *const x, double *const x2);
   
-  ofstream m_file;
+  void logResidu (double value);
+  
+  ofstream m_fileDiff[6];
+  ofstream m_fileProj[4];
+  /* Pointeur sur le fichier courant */
+  ofstream *m_file;
 
-  double *m_uSave, *m_vSave, *m_wSave, *m_uPrevSave, *m_vPrevSave, *m_wPrevSave;
-  double *m_densSave, *m_densPrevSave, *m_densSrcSave;
-  double *m_uSrcSave, *m_vSrcSave, *m_wSrcSave;
-  double *m_pSave;
-  double *m_rowSave;
-  double *m_uRef, *m_vRef, *m_wRef, *m_pRef, *m_densRef;
-  /** Tableaux temporaires pour loguer les valeurs calculées */
-  double *m_uLog, *m_vLog, *m_wLog, *m_pLog;
+  double *m_save, *m_save2;
 
-  int m_rowSize;
-  static const int m_refVal = 25;
+  short m_index;
+  
+  /* Nombre maximum de pas de temps à simuler */
+  int m_nbMaxIter;
 };
 
 #endif

@@ -144,7 +144,7 @@ public:
     return CPoint( (pt2->x + pt1->x)/2.0, (pt2->y + pt1->y)/2.0, (pt2->z + pt1->z)/2.0);
   }
 	
-	void resetToNull(){x=0.0; y=0.0; z=0.0;};
+  void resetToNull(){x=0.0; y=0.0; z=0.0;};
 };//CPoint
 
 /** 

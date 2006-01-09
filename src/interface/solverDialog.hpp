@@ -12,6 +12,7 @@ enum
     IDB_OK,
     IDB_Cancel,
     IDNB_Solvers,
+    IDRS_Type,
   };
 
 /** Panneau pour les onglets de la boîte de dialogue des solveurs */
@@ -22,24 +23,36 @@ public:
   void setCtrlValues(SolverConfig* solverConfig);
   bool getCtrlValues(SolverConfig* solverConfig);
 
+  void OnSelectType(wxCommandEvent& event);
+
 private:
   void setProperties();
   void doLayout();
 
 protected:
-    wxStaticText* m_posLabel;
-    DoubleTextCtrl* m_posXTextCtrl;
-    DoubleTextCtrl* m_posYTextCtrl;
-    DoubleTextCtrl* m_posZTextCtrl;
-    wxStaticText* m_dimLabel;
-    DoubleTextCtrl* m_dimTextCtrl;
-    wxStaticText* m_resLabel;
-    LongTextCtrl* m_resXTextCtrl;
-    LongTextCtrl* m_resYTextCtrl;
-    LongTextCtrl* m_resZTextCtrl;
-    wxStaticText* m_timeStepLabel;
-    DoubleTextCtrl* m_timeStepTextCtrl;
-    wxRadioBox* m_solverTypeRadioBox;
+  wxStaticText* m_posLabel;
+  DoubleTextCtrl* m_posXTextCtrl;
+  DoubleTextCtrl* m_posYTextCtrl;
+  DoubleTextCtrl* m_posZTextCtrl;
+  wxStaticText* m_dimLabel;
+  DoubleTextCtrl* m_dimTextCtrl;
+  wxStaticText* m_resLabel;
+  LongTextCtrl* m_resXTextCtrl;
+  LongTextCtrl* m_resYTextCtrl;
+  LongTextCtrl* m_resZTextCtrl;
+  wxStaticText* m_timeStepLabel;
+  DoubleTextCtrl* m_timeStepTextCtrl;
+  wxRadioBox* m_solverTypeRadioBox;
+  wxStaticText* m_omegaDiffLabel;
+  DoubleTextCtrl* m_omegaDiffTextCtrl;
+  wxStaticText* m_omegaProjLabel;
+  DoubleTextCtrl* m_omegaProjTextCtrl;
+  wxStaticText* m_epsilonLabel;
+  DoubleTextCtrl* m_epsilonTextCtrl;
+  wxStaticText* m_nbMaxIterLabel;
+  LongTextCtrl* m_nbMaxIterTextCtrl;
+
+  DECLARE_EVENT_TABLE()
 };
 
 /** Boîte de dialogue pour les réglages du solveur */

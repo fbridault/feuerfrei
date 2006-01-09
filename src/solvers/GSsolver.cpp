@@ -5,12 +5,15 @@ GSsolver::GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, dou
 {
 }
 
+GSsolver::GSsolver ()
+{
+}
+
 GSsolver::~GSsolver ()
 {
 }
 
-void GSsolver::GS_solve(int b, double *const x, const double *const x0,
-			  double a, double div, double nb_steps)
+void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps)
 {
   int i, j, k, l;
   
@@ -27,8 +30,7 @@ void GSsolver::GS_solve(int b, double *const x, const double *const x0,
 }
 
 /* Pas de diffusion */
-void GSsolver::diffuse (int b, double *const x, const double *const x0,
-				 double a, double diff_visc)
+void GSsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }

@@ -44,7 +44,8 @@ rtflames_SOURCES = \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \
 	solvers/Hsolver.cpp  \
-	solvers/GCSSORsolver.cpp
+	solvers/GCSSORsolver.cpp \
+	solvers/benchsolver.cpp
 
 rtflames_LDFLAGS = 
 

@@ -1,10 +1,19 @@
 #include "solverDialog.hpp"
 
 /**************************************** SolverPanel Class methods **************************************/
+BEGIN_EVENT_TABLE(SolverPanel, wxPanel)
+  EVT_RADIOBOX(IDRS_Type, SolverPanel::OnSelectType)
+END_EVENT_TABLE();
 
 SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
-{
+{ 
+  const wxString m_solverTypeRadioBoxChoices[] = {
+    _("Gauss-Seidel"),
+    _("Preconditioned Conjugated Gradient"),
+    _("BenchMark")
+  };
+  
   m_posLabel = new wxStaticText(this, -1, _("Position"));
   m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
@@ -17,14 +26,19 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_resZTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
-    
-  const wxString m_solverTypeRadioBoxChoices[] = {
-    _("Gauss-Seidel"),
-    _("Preconditioned Conjugated Gradient")
-  };
-  m_solverTypeRadioBox = new wxRadioBox(this, -1, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					2, m_solverTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
 
+  m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
+					3, m_solverTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+
+  m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
+  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,815"));
+  m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
+  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,815"));
+  m_epsilonLabel = new wxStaticText(this, -1, _("Error threshold"));
+  m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0,00001"));
+  m_nbMaxIterLabel = new wxStaticText(this, -1, _("Max iterations number"));
+  m_nbMaxIterTextCtrl = new LongTextCtrl(this, -1, 0, 1000, _("100"));
+  
   setProperties();
   doLayout();
 }
@@ -39,8 +53,12 @@ void SolverPanel::setProperties()
   m_resXTextCtrl->SetMinSize(wxSize(50, 22));
   m_resYTextCtrl->SetMinSize(wxSize(50, 22));
   m_resZTextCtrl->SetMinSize(wxSize(50, 22));
-  m_timeStepTextCtrl->SetMinSize(wxSize(50, 22));
+  m_timeStepTextCtrl->SetMinSize(wxSize(60, 22));
   m_solverTypeRadioBox->SetSelection(0);
+  m_omegaDiffTextCtrl->SetMinSize(wxSize(60, 22));
+  m_omegaProjTextCtrl->SetMinSize(wxSize(60, 22));
+  m_epsilonTextCtrl->SetMinSize(wxSize(100, 22));
+  m_nbMaxIterTextCtrl->SetMinSize(wxSize(50, 22));
 }
 
 
@@ -51,23 +69,49 @@ void SolverPanel::doLayout()
   wxBoxSizer* m_resSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_dimSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_posSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_omegaDiffSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_omegaProjSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_epsilonSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_nbMaxIterSizer = new wxBoxSizer(wxHORIZONTAL);
+  
   m_posSizer->Add(m_posLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_posSizer->Add(m_posXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_posSizer->Add(m_posYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_posSizer->Add(m_posZTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 10);
   m_panelSizer->Add(m_posSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
   m_dimSizer->Add(m_dimLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_dimSizer->Add(m_dimTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
   m_panelSizer->Add(m_dimSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
   m_resSizer->Add(m_resLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_resSizer->Add(m_resXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_resSizer->Add(m_resYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_resSizer->Add(m_resZTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_panelSizer->Add(m_resSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
   m_timeStepSizer->Add(m_timeStepLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_timeStepSizer->Add(m_timeStepTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 12);
   m_panelSizer->Add(m_timeStepSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
   m_panelSizer->Add(m_solverTypeRadioBox, 0, wxADJUST_MINSIZE, 0);
+
+  m_omegaDiffSizer->Add(m_omegaDiffLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_omegaDiffSizer->Add(m_omegaDiffTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_panelSizer->Add(m_omegaDiffSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
+  m_omegaProjSizer->Add(m_omegaProjLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_omegaProjSizer->Add(m_omegaProjTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_panelSizer->Add(m_omegaProjSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+
+  m_epsilonSizer->Add(m_epsilonLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_epsilonSizer->Add(m_epsilonTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_panelSizer->Add(m_epsilonSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+  
+  m_nbMaxIterSizer->Add(m_nbMaxIterLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_nbMaxIterSizer->Add(m_nbMaxIterTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_panelSizer->Add(m_nbMaxIterSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+  
   SetAutoLayout(true);
   SetSizer(m_panelSizer);
   m_panelSizer->Fit(this);
@@ -76,6 +120,8 @@ void SolverPanel::doLayout()
 
 void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
 {
+  wxString tmp;
+  
   m_posXTextCtrl->Clear();
   m_posYTextCtrl->Clear();
   m_posZTextCtrl->Clear();
@@ -84,6 +130,10 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   m_resYTextCtrl->Clear();
   m_resZTextCtrl->Clear();
   m_timeStepTextCtrl->Clear();
+  m_omegaDiffTextCtrl->Clear();
+  m_omegaProjTextCtrl->Clear();
+  m_epsilonTextCtrl->Clear();
+  m_nbMaxIterTextCtrl->Clear();
 
   (*m_posXTextCtrl) << solverConfig->position.x;
   (*m_posYTextCtrl) << solverConfig->position.y;
@@ -92,8 +142,31 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   (*m_resXTextCtrl) << solverConfig->resx;
   (*m_resYTextCtrl) << solverConfig->resy;
   (*m_resZTextCtrl) << solverConfig->resz;
-  (*m_timeStepTextCtrl) << solverConfig->timeStep;
+  tmp.Printf(_("%.4lf"), solverConfig->timeStep);
+  (*m_timeStepTextCtrl) << tmp;
   m_solverTypeRadioBox->SetSelection(solverConfig->type);
+  tmp.Printf(_("%.5lf"), solverConfig->omegaDiff);
+  (*m_omegaDiffTextCtrl) << tmp;
+  tmp.Printf(_("%.5lf"), solverConfig->omegaProj);
+  (*m_omegaProjTextCtrl) << tmp;
+  tmp.Printf(_("%.10lf"), solverConfig->epsilon);
+  (*m_epsilonTextCtrl) << tmp;
+  (*m_nbMaxIterTextCtrl) << solverConfig->nbMaxIter;
+
+  if(solverConfig->type == GS_SOLVER)
+    {
+      m_omegaDiffLabel->Disable();
+      m_omegaDiffTextCtrl->Disable();
+      m_omegaProjLabel->Disable();
+      m_omegaProjTextCtrl->Disable();
+      m_epsilonLabel->Disable();
+      m_epsilonTextCtrl->Disable();
+    }
+  if(solverConfig->type != BENCH_SOLVER)
+    {
+      m_nbMaxIterLabel->Disable();
+      m_nbMaxIterTextCtrl->Disable();
+    }
 }
 
 bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
@@ -108,6 +181,10 @@ bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
       solverConfig->resy = m_resYTextCtrl->GetSafelyValue();
       solverConfig->resz = m_resZTextCtrl->GetSafelyValue();
       solverConfig->timeStep = m_timeStepTextCtrl->GetSafelyValue();
+      solverConfig->omegaDiff = m_omegaDiffTextCtrl->GetSafelyValue();
+      solverConfig->omegaProj = m_omegaProjTextCtrl->GetSafelyValue();
+      solverConfig->epsilon = m_epsilonTextCtrl->GetSafelyValue();
+      solverConfig->nbMaxIter = m_nbMaxIterTextCtrl->GetSafelyValue();
     }
   catch(wxString s)
     {
@@ -117,6 +194,38 @@ bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
   solverConfig->type = m_solverTypeRadioBox->GetSelection();
   
   return true;
+}
+
+void SolverPanel::OnSelectType(wxCommandEvent& event)
+{
+  if(event.GetSelection() != GS_SOLVER)
+    {
+      m_omegaDiffLabel->Enable();
+      m_omegaDiffTextCtrl->Enable();
+      m_omegaProjLabel->Enable();
+      m_omegaProjTextCtrl->Enable();
+      m_epsilonLabel->Enable();
+      m_epsilonTextCtrl->Enable();
+    } 
+  else 
+    {
+      m_omegaDiffLabel->Disable();
+      m_omegaDiffTextCtrl->Disable();
+      m_omegaProjLabel->Disable();
+      m_omegaProjTextCtrl->Disable();
+      m_epsilonLabel->Disable();
+      m_epsilonTextCtrl->Disable();
+    }
+  if(event.GetSelection() != BENCH_SOLVER)
+    {
+      m_nbMaxIterLabel->Disable();
+      m_nbMaxIterTextCtrl->Disable();
+    }
+  else
+    {
+      m_nbMaxIterLabel->Enable();
+      m_nbMaxIterTextCtrl->Enable();
+    }
 }
 
 /**************************************** SolverDialog Class methods **************************************/
@@ -228,7 +337,7 @@ void SolverDialog::checkSolverUsage(int solverIndex)
       if(m_currentConfig->flames[i].solverIndex == solverIndex){
 	m_deleteSolverButton->Disable();
 	return;
-      }	
+      }
     }
   m_deleteSolverButton->Enable();
 }

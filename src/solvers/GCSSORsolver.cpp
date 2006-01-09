@@ -1,9 +1,24 @@
 #include "GCSSORsolver.hpp"
 
-#define MAXITER 100
-#define EPSILON2 1e-5
+GCSSORsolver::GCSSORsolver (double omegaDiff, double omegaProj, double epsilon)
+{
+  m_r=new double[m_nbVoxels];
+  m_z=new double[m_nbVoxels];
+  m_p=new double[m_nbVoxels];
+  m_q=new double[m_nbVoxels];
 
-GCSSORsolver::GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
+  memset (m_r, 0, m_nbVoxels * sizeof (double));
+  memset (m_z, 0, m_nbVoxels * sizeof (double));
+  memset (m_p, 0, m_nbVoxels * sizeof (double));
+  memset (m_q, 0, m_nbVoxels * sizeof (double));
+  
+  m_omegaDiff = omegaDiff;
+  m_omegaProj = omegaProj;
+  m_epsilon = epsilon;
+}
+
+GCSSORsolver::GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, 
+			    double omegaDiff, double omegaProj, double epsilon) : 
   Solver(position, n_x, n_y, n_z, dim, timeStep)
 {
   m_r=new double[m_nbVoxels];
@@ -15,6 +30,10 @@ GCSSORsolver::GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double 
   memset (m_z, 0, m_nbVoxels * sizeof (double));
   memset (m_p, 0, m_nbVoxels * sizeof (double));
   memset (m_q, 0, m_nbVoxels * sizeof (double));
+
+  m_omegaDiff = omegaDiff;
+  m_omegaProj = omegaProj;
+  m_epsilon = epsilon;
 }
 
 GCSSORsolver::~GCSSORsolver ()
@@ -42,7 +61,7 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
 	normb2+=b[IX(i,j,k)]*b[IX(i,j,k)];
   
   // calcul de eb2 le second membre du test d'arrêt
-  eb2=EPSILON2*normb2;
+  eb2=m_epsilon*normb2;
   // calcul du premier résidu r
   //calcul de r = b - A*x0
   
@@ -167,10 +186,9 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
 
 /* Pas de diffusion */
 void
-GCSSORsolver::diffuse (int b, double *const x, const double *const x0,
-		       double a, double diff_visc)
+GCSSORsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
 {
-  GCSSOR(x,x0,a, (1.0 + 6.0 * a), 1.815);
+  GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff);
 }
 
 void
@@ -193,7 +211,7 @@ GCSSORsolver::project (double *const p, double *const div)
   memset (p, 0, m_nbVoxels * sizeof (double));
   //set_bnd (0, p);
   
-  GCSSOR(p,div,1, 6.0, 1.815);
+  GCSSOR(p,div,1, 6.0, m_omegaProj);
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)

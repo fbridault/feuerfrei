@@ -1,6 +1,8 @@
 #if !defined(GCSSORSOLVER_H)
 #define GCSSORSOLVER_H
 
+#define MAXITER 100
+
 class GCSSORsolver;
 
 #include "solver.hpp"
@@ -12,14 +14,18 @@ class GCSSORsolver;
  * 
  * @author	Flavien Bridault
  */
-class GCSSORsolver : public Solver
+class GCSSORsolver : public virtual Solver
 {
 public:
   /** Constructeur du solveur.
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, 
+		double omegaDiff, double omegaProj, double epsilon);
+  
+  /** Constructeur nécessaire pour l'héritage multiple */
+  GCSSORsolver (double omegaDiff, double omegaProj, double epsilon);
   virtual ~GCSSORsolver ();
   
 protected:
@@ -33,7 +39,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega );
+  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -43,7 +49,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, const double *const x0,	double a, double diff_visc);
+  virtual void diffuse (int b, double *const x, double *const x0,	double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
@@ -52,6 +58,9 @@ protected:
   
   /** Résidu, pour SSOR, direction de descente et ? */
   double *m_r, *m_z, *m_p, *m_q;
+  
+  double m_omegaDiff, m_omegaProj;
+  double m_epsilon;
 };
 
 #endif

@@ -25,6 +25,8 @@ class Solver;
 class Solver
 {
 public:
+  /** Constructeur par défaut nécessaire pour l'héritage multiple */
+  Solver ();
   /** Constructeur du solveur.
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
@@ -173,8 +175,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, const double *const x0, double a, 
-			double diff_visc) = 0;
+  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc) = 0;
   
   /** Pas d'advection => déplacement du fluide sur lui-mÃªme.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w

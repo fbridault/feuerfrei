@@ -21,6 +21,8 @@ class GLFlameCanvas;
 
 #include "../solvers/GSsolver.hpp"
 #include "../solvers/GCSSORsolver.hpp"
+#include "../solvers/benchsolver.hpp"
+
 class GLFlameCanvas : public wxGLCanvas
 {
 public:

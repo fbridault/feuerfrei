@@ -3,6 +3,10 @@
 #include <math.h>
 #include "../scene/graphicsFn.hpp"
 
+Solver::Solver ()
+{
+}
+
 Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : m_position(position)
 {
   m_nbVoxelsX = n_x;

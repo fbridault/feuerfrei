@@ -20,6 +20,7 @@
 /* Types de solveurs */
 #define GS_SOLVER 0
 #define GCSSOR_SOLVER 1
+#define BENCH_SOLVER 2
 
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 20
@@ -35,6 +36,9 @@ public:
   int resx, resy, resz;
   double dim;
   double timeStep;
+  double omegaDiff, omegaProj;
+  double epsilon;
+  int nbMaxIter;
 };
 class FlameConfig{
 public:

@@ -12,9 +12,11 @@ class GSsolver;
  * 
  * @author	Flavien Bridault
  */
-class GSsolver : public Solver
+class GSsolver : public virtual Solver
 {
 public:
+  /** Constructeur par défaut nécessaire pour l'héritage multiple */
+  GSsolver ();
   /** Constructeur du solveur.
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
@@ -33,7 +35,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  void GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps);
+  virtual void GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -43,7 +45,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, const double *const x0, double a, double diff_visc);
+  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection

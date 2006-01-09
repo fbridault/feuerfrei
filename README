@@ -1,22 +1,30 @@
-Instructions pour gÃ©rer l'archive :
+Instructions pour gérer l'archive :
 
-Mise Ã  jour de l'archive :
+Mise à jour de l'archive :
 <A COMPLETER>
 
 Compilation :
 ./autogen.sh <options>
 make
 
+Lancement :
+cd src
+rtflames --recompile
+
+L'option --recompile ordonne de recompiler les shaders Cg. Ceci n'est plus
+nécessaire ensuite de, rtflames peut donc être lancé sans argument après ceci. 
+
+
 Soumission des changements :
 make distclean
 tla commit -s "Description"
 
-NOTE : Le script autogen.sh standard a Ã©tÃ© modifiÃ© pour ne pas rentrer dans le
-sous-rÃ©pertoire .{arch}, car ceci corrompait systÃ©matiquement les pristines Ã 
-chaque exÃ©cution. Il considÃ©rait en effet chaque rÃ©vision comme un nouvel arbre
+NOTE : Le script autogen.sh standard a été modifié pour ne pas rentrer dans le
+sous-répertoire .{arch}, car ceci corrompait systématiquement les pristines Ã 
+chaque exécution. Il considérait en effet chaque révision comme un nouvel arbre
 de sources...
 
-Voici les modifications qui ont Ã©tÃ© apportÃ©es :
+Voici les modifications qui ont été apportées :
 
 --- orig/autogen.sh
 +++ mod/autogen.sh

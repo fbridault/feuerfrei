@@ -176,6 +176,11 @@ void MainFrame::GetSettingsFromConfigFile (void)
 
       m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
       m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);
+
+      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.815);
+      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.815);
+      m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon,0.00001);
+      m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
       
       tabName.Printf(_("Solver #%d"),i+1);
       
@@ -349,6 +354,12 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       
       m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
       m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
+
+      m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
+      m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
+      m_config->Write(groupName + _("epsilon"),m_currentConfig.solvers[i].epsilon);
+
+      m_config->Write(groupName + _("nbMaxIter"),m_currentConfig.solvers[i].nbMaxIter);
     }
   
   m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);

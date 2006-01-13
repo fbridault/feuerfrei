@@ -50,94 +50,175 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   double d=f*a;
   double e=2.0-omega;
   int i,j,k;
-  
+
+  int t;
+  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  int nx = m_nbVoxelsX+2;
+  int t1=n2 + nx +1;
+  int t2nx=2*nx;
+ 
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
   // calcul du carré de la norme de b
+  t = t1;
   normb2=0.0;
-  for ( k = 1; k <= m_nbVoxelsZ; k++)
-    for ( j = 1; j <= m_nbVoxelsY; j++)
-      for ( i = 1; i <= m_nbVoxelsX; i++)
-	normb2+=b[IX(i,j,k)]*b[IX(i,j,k)];
+  //traiter les couches de voxels de la grille
+  for (int k = 1; k <= m_nbVoxelsZ; k++){
+    //traiter une couche de voxels
+    for (int j = 1; j <= m_nbVoxelsY; j++){
+      //traiter une ligne de voxels
+      for (int i = 1; i<= m_nbVoxelsX; i++){
+	normb2+=b[t]*b[t];
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+  }//for k
   
   // calcul de eb2 le second membre du test d'arrêt
   eb2=m_epsilon*normb2;
+
   // calcul du premier résidu r
   //calcul de r = b - A*x0
-  
-  for ( k = 1; k <= m_nbVoxelsZ; k++)
-    for ( j = 1; j <= m_nbVoxelsY; j++)
-      for ( i = 1; i <= m_nbVoxelsX; i++)
-	m_r[IX (i, j, k)] = b[IX (i, j, k)] - diagonal * x0[IX (i, j, k)] + 
-	  a * (x0[IX (i - 1, j, k)] + x0[IX (i + 1, j, k)] +
-	       x0[IX (i, j - 1, k)] + x0[IX (i, j + 1, k)] +
-	       x0[IX (i, j, k - 1)] + x0[IX (i, j, k + 1)]);
-  
+  t = t1; 
+  for ( k = 1; k <= m_nbVoxelsZ; k++){
+    for ( j= 1; j <= m_nbVoxelsY; j++){
+      for ( i = 1; i <= m_nbVoxelsX; i++){
+	m_r[t] = b[t] - diagonal * x0[t] + 
+	  a * (x0[t-nx] + x0[t+nx] +
+	       x0[t-1] + x0[t+1] +
+	       x0[t-n2] + x0[t+n2]);
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+  }// for k  
+
   // calcul de z tel que Cz=r
   
   // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-  for ( k = 1; k <= m_nbVoxelsZ; k++)
-    for ( j = 1; j <= m_nbVoxelsY; j++)
-      for ( i = 1; i <= m_nbVoxelsX; i++)
-	m_z[IX(i,j,k)] = e*m_r[IX(i,j,k)]+d*(m_z[IX(i-1,j,k)]+m_z[IX(i,j-1,k)]+m_z[IX(i,j,k-1)]);
-  
+  t = t1; 
+  for ( k = 1; k <= m_nbVoxelsZ; k++){
+    for ( j = 1; j <= m_nbVoxelsY; j++){
+      for ( i = 1; i <= m_nbVoxelsX; i++){
+	m_z[t] = e*m_r[t]+d*(m_z[t-nx]+m_z[t-1]+m_z[t-n2]);
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+  }//for k
+
   // calcul de z tel que (D/w -TL)z=u
-  for ( k = m_nbVoxelsZ; k>= 1 ; k--)
-    for ( j = m_nbVoxelsY; j>=1 ; j--)
-      for ( i = m_nbVoxelsX; i>=1; i--)
-	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
+
+  t=IX(m_nbVoxelsY,m_nbVoxelsX,m_nbVoxelsZ);
+  for ( k = m_nbVoxelsZ; k>= 1 ; k--){
+    for ( j = m_nbVoxelsY; j>=1; j--){
+      for ( i = m_nbVoxelsX; i>=1 ; i--){
+	m_z[t] = f*m_z[t]+d*(m_z[t+nx]+m_z[t+1]+m_z[t+n2]);
+	t--;
+      }//for i
+      t-=2;
+    }//for j
+    t-=t2nx;
+  }//for k
 	
   // p=z
   memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
     
   // calcul de r.z
+  t = t1;
   rho0=0.0;
-  for ( k = 1; k <= m_nbVoxelsZ; k++)
-    for ( j = 1; j <= m_nbVoxelsY; j++)
-      for ( i = 1; i <= m_nbVoxelsX; i++)
-	rho0+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
+  for ( k = 1; k <= m_nbVoxelsZ; k++){   
+    for ( j= 1; j <= m_nbVoxelsY; j++){
+      for ( i = 1; i <= m_nbVoxelsX; i++){
+	rho0+=m_r[t]*m_z[t];
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+  }//for k
   
   // début des itérations
   for( int numiter=0;numiter<MAXITER;numiter++){
     //calcul de q =  A.p
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  m_q[IX (i, j, k)] = diagonal * m_p[IX (i, j, k)] - 
-	    a * (m_p[IX (i - 1, j, k)] + m_p[IX (i + 1, j, k)] +
-		 m_p[IX (i, j - 1, k)] + m_p[IX (i, j + 1, k)] +
-		 m_p[IX (i, j, k - 1)] + m_p[IX (i, j, k + 1)]);
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  m_q[t] = diagonal * m_p[t] - 
+	    a * (m_p[t-nx] + m_p[t+nx] +
+		 m_p[t-1] + m_p[t+1] +
+		 m_p[t-n2] + m_p[t+n2]);
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
     
     //calcul du produit scalaire p.q
     alpha=0.0;
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  alpha+=m_p[IX(i,j,k)]*m_q[IX(i,j,k)];
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  alpha+=m_p[t]*m_q[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
     
     //calcul de alpha
-//    alpha= rho0/alpha;
+    // alpha= rho0/alpha;
     alpha=(alpha) ? rho0/alpha : 0;
+		
     // calcul de x = x + alpha.p
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  x0[IX(i,j,k)]+=alpha*m_p[IX(i,j,k)];
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  x0[t]+=alpha*m_p[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=2*nx;
+    }//for k
     
     // calcul de r = r -alpha*q
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  m_r[IX(i,j,k)]-=alpha*m_q[IX(i,j,k)];
-    
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  m_r[t]-=alpha*m_q[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
+
     // calcul du carré de la norme du résidu
     norm2=0.0f;
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  norm2+=m_r[IX(i,j,k)]*m_r[IX(i,j,k)];
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  norm2+=m_r[t]*m_r[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
 
-    //test d'arrÃªt
+    //test d'arrêt
     if(norm2 < eb2){
       //cerr<<"précision atteinte : nbiter = "<<numiter<<endl;
       break;
@@ -145,24 +226,45 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
     // calcul de z tel que Cz =r
 
     // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  m_z[IX(i,j,k)] = e*m_r[IX(i,j,k)]+d*(m_z[IX(i-1,j,k)]+m_z[IX(i,j-1,k)]+m_z[IX(i,j,k-1)]);
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  m_z[t] = e*m_r[t]+d*(m_z[t-nx]+m_z[t-1]+m_z[t-n2]);
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
     
     // calcul de z tel que (D/w -TL)z=u
-    for ( k = m_nbVoxelsZ; k>= 1 ; k--)
-      for ( j = m_nbVoxelsY; j>=1 ; j--)
-	for ( i = m_nbVoxelsX; i>=1; i--)
-	  m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
-    
+
+    t =IX(m_nbVoxelsY,m_nbVoxelsX,m_nbVoxelsZ) ;
+    for ( k = m_nbVoxelsZ; k>= 1 ; k--){
+      for ( j = m_nbVoxelsY; j>=1 ; j--){
+	for ( i = m_nbVoxelsX; i>=1; i--){
+	  m_z[t] = f*m_z[t]+d*(m_z[t+nx]+m_z[t+1]+m_z[t+n2]);
+	  t--;
+	}//for i
+	t-=2;
+      }//for j
+      t-=t2nx;
+    }//for k
+
     //calcul de rho1 = r.z
     rho1=0.0;
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  rho1+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  rho1+=m_r[t]*m_z[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
     
     //calcul de beta =rho1/rho0
     //    beta= rho1/rho0;
@@ -170,11 +272,17 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
 
     rho0=rho1;
     //calcul de p = z+ beta.p
-    for ( k = 1; k <= m_nbVoxelsZ; k++)
-      for ( j = 1; j <= m_nbVoxelsY; j++)
-	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  m_p[IX(i,j,k)]=m_z[IX(i,j,k)] + beta*m_p[IX(i,j,k)];
-    
+    t = t1;
+    for ( k = 1; k <= m_nbVoxelsZ; k++){
+      for ( j = 1; j <= m_nbVoxelsY; j++){
+	for ( i = 1; i <= m_nbVoxelsX; i++){
+	  m_p[t]=m_z[t] + beta*m_p[t];
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
   }//for numiter
   if(norm2 > eb2){
     cerr<<"précision non atteinte !!!"<<endl;
@@ -182,7 +290,6 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   
   return;
 }//GCSSOR
-
 
 /* Pas de diffusion */
 void
@@ -196,16 +303,26 @@ GCSSORsolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
-  
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++)
-	{
-	  div[IX (i, j, k)] = -0.5 * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
-				      h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
-				      h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
-	  //p[IX (i, j, k)] = 0;
-	}
+
+  int t;
+  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  int nx = m_nbVoxelsX+2;
+  int t1=n2 + nx +1;
+  int t2nx=2*nx;
+
+  t = t1;
+  for ( k = 1; k <= m_nbVoxelsZ; k++){
+    for ( j = 1; j <= m_nbVoxelsY; j++){
+      for ( i = 1; i <= m_nbVoxelsX; i++){
+	div[t] = -0.5 * (h_x * (m_u[t+1] - m_u[t-1]) + h_y * (m_v[t+nx] - m_v[t-nx]) +
+			 h_z * (m_w[t+n2] - m_w[t-n2]));
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+    //p[IX (i, j, k)] = 0;
+  }// for k
   
   set_bnd (0, div);
   memset (p, 0, m_nbVoxels * sizeof (double));
@@ -213,13 +330,19 @@ GCSSORsolver::project (double *const p, double *const div)
   
   GCSSOR(p,div,1, 6.0, m_omegaProj);
   
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++){
-	m_u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
-	m_v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
-	m_w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
-      }
+  t = t1;
+  for (k = 1; k <= m_nbVoxelsZ; k++){
+    for (j = 1; j <= m_nbVoxelsY; j++){
+      for (i = 1; i <= m_nbVoxelsX; i++){
+	m_u[t] -= 0.5 * (p[t+1] - p[t-1]) / h_x;
+	m_v[t] -= 0.5 * (p[t+nx] - p[t-nx]) / h_y;
+	m_w[t] -= 0.5 * (p[t+n2] - p[t-n2]) / h_z;
+	t++;
+      }// for i
+      t+=2;
+    }// for j
+    t+=t2nx;
+  }//for k
   
   //set_bnd (1, u);
   //set_bnd (2, v);

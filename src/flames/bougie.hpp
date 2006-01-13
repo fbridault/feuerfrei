@@ -50,7 +50,7 @@ public:
 
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  void add_forces(bool perturbate);
+  void add_forces(char perturbate);
 
   /** Fonction appelée par la fonction de dessin OpenGL. Elle fournit l'éclairage dÃ» Ã  la flamme, 
    * au reste de la scÃ¨ne via les particules du squelette guide. Elle s'occupe également de déplacer
@@ -70,8 +70,6 @@ public:
   };
   
 private:
-  /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
-  void perturbate_forces();
   
   void draw_shadowVolume(int i);
   void draw_shadowVolume2(int i);

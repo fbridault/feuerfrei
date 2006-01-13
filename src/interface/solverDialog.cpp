@@ -11,7 +11,8 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
-    _("BenchMark")
+    _("Both - log residuals"),
+    _("Both - log residuals averages")
   };
   
   m_posLabel = new wxStaticText(this, -1, _("Position"));
@@ -28,7 +29,7 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
 
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					3, m_solverTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+					4, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,815"));
@@ -162,7 +163,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
       m_epsilonLabel->Disable();
       m_epsilonTextCtrl->Disable();
     }
-  if(solverConfig->type != BENCH_SOLVER)
+  if(solverConfig->type != LOGRES_SOLVER && solverConfig->type != LOGRESAVG_SOLVER)
     {
       m_nbMaxIterLabel->Disable();
       m_nbMaxIterTextCtrl->Disable();
@@ -216,7 +217,7 @@ void SolverPanel::OnSelectType(wxCommandEvent& event)
       m_epsilonLabel->Disable();
       m_epsilonTextCtrl->Disable();
     }
-  if(event.GetSelection() != BENCH_SOLVER)
+  if(event.GetSelection() != LOGRES_SOLVER && event.GetSelection() != LOGRESAVG_SOLVER)
     {
       m_nbMaxIterLabel->Disable();
       m_nbMaxIterTextCtrl->Disable();

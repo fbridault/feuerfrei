@@ -59,7 +59,7 @@ Bougie::~Bougie ()
 }
 
 void
-Bougie::add_forces (bool perturbate)
+Bougie::add_forces (char perturbate)
 {
   /* Cellule(s) génératrice(s) */
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
@@ -68,29 +68,27 @@ Bougie::add_forces (bool perturbate)
 	m_solver->addVsrc (i, j, k, m_fieldForces / (double) (j));
   m_solver->addVsrc (m_x, 1, m_z, m_innerForce);
 
-  if (perturbate)
-    perturbate_forces ();
-}
-
-void
-Bougie::perturbate_forces ()
-{
-  if(m_perturbateCount==4){
-    m_solver->setVsrc(((int)(ceil(m_solver->getXRes()/2.0))),1,((int)(ceil(m_solver->getZRes()/2.0))),0.25);
-    m_perturbateCount = 0;
-  }else
-    m_perturbateCount++;
-
-  //  for (int i = -m_solver->z / 4 - 1; i <= m_solver->getZ () / 4 + 1; i++)
-  //     for (int j = -2 * m_solver->y / 4;
-  // 	 j < -m_solver->y / 4; j++)
-  //       m_solver->setUsrc (m_solver->x,
-  // 			((int)
-  // 			 (ceil (m_solver->y / 2.0))) +
-  // 			j,
-  // 			((int)
-  // 			 (ceil (m_solver->z / 2.0))) +
-  // 			i, -1);
+  switch(perturbate){
+  case FLICKERING_VERTICAL : 
+    if(m_perturbateCount>=4){
+      m_solver->setVsrc(((int)(ceil(m_solver->getXRes()/2.0))),1,((int)(ceil(m_solver->getZRes()/2.0))),0.25);
+      m_perturbateCount = 0;
+    }else
+      m_perturbateCount++;
+    break;
+  case FLICKERING_RIGHT :
+    if(m_perturbateCount>=24)
+      m_perturbateCount = 0;
+    else{
+      if(m_perturbateCount>=20){
+	for (int i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes () / 4 + 1; i++)
+	  for (int j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
+	    m_solver->setUsrc (m_solver->getXRes(), ((int) (ceil (m_solver->getYRes() / 2.0))) + j, ((int) (ceil (m_solver->getZRes() / 2.0))) + i, -1);
+      }
+      m_perturbateCount++;
+    }
+    break;
+  }
 }
 
 void

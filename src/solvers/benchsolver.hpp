@@ -8,10 +8,14 @@ class BenchSolver;
 
 #include <fstream>
 
+#define NB_DIFF_LOGS 6
+#define NB_PROJ_LOGS 4
+
 class GSsolver;
 class GCSSORsolver;
 
-/** La classe BenchSolver permet de loguer les valeurs de résidus des solveurs à base
+/** La classe BenchSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
+ * des solveurs à base
  * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
  * Elle hérite de GSsolver et GCSSORsolver qui tous deux héritent <b>virtuellement</b> de Solver
  * de manière à n'avoir qu'une seule instance de Solver.
@@ -29,33 +33,35 @@ public:
 	       double omegaDiff, double omegaProj, double epsilon);
   virtual ~ BenchSolver ();
   
-private:
-  void vel_step ();
-  
-  void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
-  void project (double *const p, double *const div);
-  
-  void GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps);
-  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega);
-  
+protected:
+  /** Pas de diffusion.
+   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
+   * @param x composante à traiter
+   * @param x0 composante x au pas de temps précédent
+   * @param diff_visc paramètre correspondant soit à la diffusion si la fonction est utilisée pour
+   * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
+   * du pas de vélocité
+   */
+  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc) = 0;
+
+  /** Pas de projection pour garantir la conservation de la masse.
+   * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
+   */
+  virtual void project (double *const p, double *const div) = 0;  
+
   void saveState (const double *const x, const double *const x2);
   /** Sauvegarde les différentes composantes du solveur comme valeur de référence */
   //void save_ref (const double *const x, double *x_ref);
   void setPreviousState (double *const x, double *const x2);
   
-  void logResidu (double value);
-  
-  ofstream m_fileDiff[6];
-  ofstream m_fileProj[4];
-  /* Pointeur sur le fichier courant */
-  ofstream *m_file;
-
-  double *m_save, *m_save2;
-
-  short m_index;
-  
   /* Nombre maximum de pas de temps à simuler */
   int m_nbMaxIter;
+  
+  short m_index;
+
+private:
+  double *m_save, *m_save2;
+  
 };
 
 #endif

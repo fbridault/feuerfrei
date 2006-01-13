@@ -35,7 +35,7 @@ public:
   virtual ~Solver ();
 
   /** Lance une itération du solveur. */
-  virtual void iterate (bool flickering);
+  virtual void iterate ();
 
   double getU (int i, int j, int k)
   {
@@ -122,6 +122,11 @@ public:
     return m_dt;
   };
 
+  /** Retourne l'itération en cours */
+  double getNbIter()
+  {
+    return m_nbIter;
+  };
   /** NOTE : Les 6 méthodes ci-dessus pourraient faire partie d'un objet hérité Grid3D par exemple */
   /** Fonction de construction de la display list de la grille du solveur */
   void buildDLGrid ();
@@ -216,7 +221,6 @@ protected:
   
   /** Nombre d'itérations */
   int m_nbIter;
-  const static int m_nbIterFlickering = 50;
   /** Viscosité cinématique de l'air 15*10E-6. */
   double m_visc;
   /** Diffusion. */

@@ -85,7 +85,7 @@ public:
 
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  virtual void add_forces (bool perturbate) = 0;
+  virtual void add_forces (char perturbate) = 0;
   
   virtual void setForces(double valField, double valInner){ m_fieldForces=valField; m_innerForce=valInner; };
 
@@ -113,9 +113,6 @@ public:
   virtual CVector get_main_direction()=0;
 
 protected:
-  /** Ajoute une force périodique dans le solveur, pour donner une petite fluctuation sur la flamme */
-  virtual void perturbate_forces () = 0;
-
   /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
    * @param v indice v du point de contrôle

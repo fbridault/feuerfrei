@@ -52,7 +52,7 @@ void GLFlameCanvas::InitUISettings(void)
 {
   /* Pour l'affichage */
   m_run = true; 
-  m_flickering = m_glowOnly = false;
+  m_glowOnly = false;
   m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = false;
   m_displayFlame = true;
   m_shadowsEnabled = false; m_shadowVolumesEnabled = false;
@@ -137,8 +137,15 @@ void GLFlameCanvas::InitSolvers(void)
 				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
 				      m_currentConfig->solvers[i].epsilon);
       break;
-    case BENCH_SOLVER :
-      m_solvers[i] = new BenchSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+    case LOGRES_SOLVER :
+      m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+				     m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].omegaDiff, 
+				     m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      break;
+    case LOGRESAVG_SOLVER :
+      m_solvers[i] = new LogResAvgSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				     m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].omegaDiff, 
@@ -185,7 +192,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
   InitScene(recompileShaders);
   
   ::wxStartTimer();
-
+  
   m_init = true;
   
   cerr << "Initialisation terminée" << endl;
@@ -224,10 +231,10 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
     for (int i = 0; i < m_currentConfig->nbFlames; i++)
-      m_flames[i]->add_forces (m_flickering);
+      m_flames[i]->add_forces (m_currentConfig->flames[i].flickering);
     
     for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
-      m_solvers[i]->iterate (m_flickering);
+      m_solvers[i]->iterate ();
   }
   
   this->Refresh();

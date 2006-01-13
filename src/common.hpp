@@ -12,4 +12,8 @@ using namespace std;
 #define EPSILON                 1.0e-8
 #define PI 3.14159265358979323846
 
+#define FLICKERING_NONE 0
+#define FLICKERING_VERTICAL 1
+#define FLICKERING_RIGHT 2
+
 #endif

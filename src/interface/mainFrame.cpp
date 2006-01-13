@@ -8,7 +8,6 @@
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
-  EVT_BUTTON(IDB_Flickering, MainFrame::OnClickButtonFlickering)
   EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
   EVT_MENU(IDM_OpenScene, MainFrame::OnOpenSceneMenu)
   EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
@@ -208,6 +207,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
       }else{
 	m_config->Read(groupName + _("FieldForces"), &m_currentConfig.flames[i].fieldForces, 0.08);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
+	m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       }
       tabName.Printf(_("Flame #%d"),i+1);
       
@@ -260,11 +260,6 @@ void MainFrame::OnClickButtonRun(wxCommandEvent& event)
 void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
 {
   m_glBuffer->Restart();
-}
-
-void MainFrame::OnClickButtonFlickering(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleFlickering();
 }
 
 void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
@@ -384,6 +379,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
+      m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
     }
 
   wxFileOutputStream* file = new wxFileOutputStream( _("param.ini" ));

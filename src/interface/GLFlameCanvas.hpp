@@ -21,7 +21,8 @@ class GLFlameCanvas;
 
 #include "../solvers/GSsolver.hpp"
 #include "../solvers/GCSSORsolver.hpp"
-#include "../solvers/benchsolver.hpp"
+#include "../solvers/logResSolver.hpp"
+#include "../solvers/logResAvgSolver.hpp"
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -59,8 +60,6 @@ public:
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
   void ToggleRun(void) { m_run=!m_run; };
-  /** Lance/arrête l'animation */
-  void ToggleFlickering(void) { m_flickering=!m_flickering; };
   /** Active/Désactive le glow */
   void ToggleGlow(void) { m_currentConfig->glowEnabled=!m_currentConfig->glowEnabled; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
@@ -87,7 +86,7 @@ private:
   /* true si la simulation est en cours, 0 sinon */
   bool m_run;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles;
-  bool m_flickering, m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
+  bool m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 
@@ -116,6 +115,7 @@ private:
   CScene *m_scene;
   CgSVShader *m_SVShader;
 
+  const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()
 };
 

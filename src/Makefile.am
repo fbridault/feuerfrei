@@ -44,8 +44,10 @@ rtflames_SOURCES = \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \
 	solvers/Hsolver.cpp  \
-	solvers/GCSSORsolver.cpp \
-	solvers/benchsolver.cpp
+	solvers/GCSSORsolver.cpp  \
+	solvers/benchsolver.cpp  \
+	solvers/logResSolver.cpp  \
+	solvers/logResAvgSolver.cpp
 
 rtflames_LDFLAGS = 
 

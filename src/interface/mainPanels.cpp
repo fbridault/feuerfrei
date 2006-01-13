@@ -51,8 +51,6 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   (*m_solverZAxisPositionSliderMin) << -SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMax) << SLIDER_RANGE;
   
-  m_buttonFlickering = new wxButton(this,IDB_Flickering,_("Flickering"));      
-  
   /* Réglages des solveurs */  
   m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -86,7 +84,6 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_panelSizer->Add(m_solversYAxisPositionRangeSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_buttonFlickering, 0, 0, 0);
   
   SetSizer(m_panelSizer);
   
@@ -178,13 +175,21 @@ void SolverMainPanel::ComputeSlidersValues(void)
 
 BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
   EVT_SCROLL(FlameMainPanel::OnScrollPosition)
+  EVT_RADIOBOX(IDRB_Flickering, FlameMainPanel::OnSelectType)
 END_EVENT_TABLE();
 
 
 FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, 
 				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
-{
+{ 
+  const wxString m_flickeringRadioBoxChoices[] = {
+    _("None"),
+    _("Vertical"),
+    _("From right")
+  };
+  
+
   SLIDER_SENSIBILITY=1000.0;
   SLIDER_RANGE=200;
   
@@ -200,6 +205,10 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_innerForceLabel = new wxStaticText(this,-1,_("Inner force"));
   
   m_forcesSizer = new wxFlexGridSizer(2,2);
+
+  m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
+					3, m_flickeringRadioBoxChoices, 1, wxRA_SPECIFY_ROWS);
+
   m_forcesSizer->AddGrowableCol(1,3);
   m_forcesSizer->Add(m_fieldForcesLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_fieldForcesSlider, 10, wxEXPAND, 0);
@@ -208,9 +217,11 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
+  m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
   
   m_fieldForcesSlider->SetValue((int)(m_flameConfig->fieldForces*SLIDER_SENSIBILITY));
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
+  m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
 
   SetSizer(m_panelSizer);
 }
@@ -224,4 +235,9 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
   
   m_flameConfig->fieldForces = valField;
   m_flameConfig->innerForce = valInner;
+}
+
+void FlameMainPanel::OnSelectType(wxCommandEvent& event)
+{
+  m_flameConfig->flickering = event.GetSelection();
 }

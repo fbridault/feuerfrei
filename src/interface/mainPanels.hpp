@@ -10,7 +10,7 @@ enum
     IDSL_FXAP = 1,
     IDSL_FYAP,
     IDSL_FZAP,
-    IDB_Flickering,
+    IDRB_Flickering,
   };
 
 enum
@@ -46,7 +46,6 @@ private:
   void OnFZAPMAXEnter(wxCommandEvent& event);
   void ComputeSlidersValues(void);
   
-  wxButton *m_buttonFlickering;
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
   wxTextCtrl *m_solverXAxisPositionSliderMax, *m_solverYAxisPositionSliderMax, *m_solverZAxisPositionSliderMax,
     *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
@@ -76,13 +75,15 @@ public:
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 private:
   void OnScrollPosition(wxScrollEvent& event);
+  void OnSelectType(wxCommandEvent& event);
   
   wxSlider *m_fieldForcesSlider, *m_innerForceSlider;
   wxStaticText *m_fieldForcesLabel, *m_innerForceLabel;
   
   wxBoxSizer *m_panelSizer;
   wxFlexGridSizer *m_forcesSizer;
-  
+  wxRadioBox *m_flickeringRadioBox;
+
   FlameConfig *m_flameConfig;
   /* Index du solveur */
   int m_index;

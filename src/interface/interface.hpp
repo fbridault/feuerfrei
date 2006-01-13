@@ -20,7 +20,8 @@
 /* Types de solveurs */
 #define GS_SOLVER 0
 #define GCSSOR_SOLVER 1
-#define BENCH_SOLVER 2
+#define LOGRES_SOLVER 2
+#define LOGRESAVG_SOLVER 3
 
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 20
@@ -51,6 +52,8 @@ public:
   wxString wickName;
   double fieldForces;
   double innerForce;
+  /* O non, 1 vertical, 2 vers la gauche */
+  char flickering;
 };
 
 class FlameAppConfig{

@@ -18,9 +18,9 @@ void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a
   int i, j, k, l;
   
   for (l = 0; l < nb_steps; l++){
-    for (i = 1; i <= m_nbVoxelsX; i++)
+    for (k = 1; k <= m_nbVoxelsZ; k++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	for (k = 1; k <= m_nbVoxelsZ; k++)
+	for (i = 1; i <= m_nbVoxelsX; i++)
 	  x[IX (i, j, k)] = (x0[IX (i, j, k)] +
 			     a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +

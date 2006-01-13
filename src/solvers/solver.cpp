@@ -77,6 +77,7 @@ Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double 
   /* Construction des display lists */
   buildDLBase ();
   buildDLGrid ();
+
 }
 
 Solver::~Solver ()
@@ -219,29 +220,18 @@ void Solver::vel_step ()
   project (m_uPrev, m_vPrev);
 }
 
-void Solver::iterate (bool flickering)
-{
-  /* Temporaire : ajout de forces pÃ©riodiques */
-  //~ if ((nb_iter % nb_iter_flickering) == 5)
-  //~ {
-  //~ cleanSources ();
-  //~ flickering = false;
-  //~ }
-  //~ else if ((nb_iter % nb_iter_flickering) < 5)
-  //~ flickering = true;
-  //~ else
-  //~ flickering = false;
-  
+void Solver::iterate ()
+{ 
   vel_step ();
   //  dens_step();
 
   m_nbIter++;
 
-  set_bnd (0, m_u);
-  set_bnd (0, m_v);
-  set_bnd (0, m_w);
-  
   cleanSources ();
+//   set_bnd (0, m_u);
+//   set_bnd (0, m_v);
+//   set_bnd (0, m_w);
+  
 }
 
 void Solver::cleanSources ()

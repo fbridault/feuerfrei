@@ -59,7 +59,8 @@ am_rtflames_OBJECTS = main.$(OBJEXT) bougie.$(OBJEXT) \
 	texture.$(OBJEXT) CgShader.$(OBJEXT) CgSVShader.$(OBJEXT) \
 	CgSPFragmentShader.$(OBJEXT) CgBougieShaders.$(OBJEXT) \
 	CgBlurShaders.$(OBJEXT) solver.$(OBJEXT) GSsolver.$(OBJEXT) \
-	Hsolver.$(OBJEXT) GCSSORsolver.$(OBJEXT) benchsolver.$(OBJEXT)
+	Hsolver.$(OBJEXT) GCSSORsolver.$(OBJEXT) benchsolver.$(OBJEXT) \
+	logResSolver.$(OBJEXT) logResAvgSolver.$(OBJEXT)
 rtflames_OBJECTS = $(am_rtflames_OBJECTS)
 rtflames_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -209,8 +210,10 @@ rtflames_SOURCES = \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \
 	solvers/Hsolver.cpp  \
-	solvers/GCSSORsolver.cpp \
-	solvers/benchsolver.cpp
+	solvers/GCSSORsolver.cpp  \
+	solvers/benchsolver.cpp  \
+	solvers/logResSolver.cpp  \
+	solvers/logResAvgSolver.cpp
 
 rtflames_LDFLAGS = 
 rtflames_LDADD = 
@@ -300,6 +303,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/graphicsFn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ies.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/leadSkeleton.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logResAvgSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logResSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mainFrame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mainPanels.Po@am__quote@
@@ -820,6 +825,34 @@ benchsolver.obj: solvers/benchsolver.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/benchsolver.cpp' object='benchsolver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o benchsolver.obj `if test -f 'solvers/benchsolver.cpp'; then $(CYGPATH_W) 'solvers/benchsolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/benchsolver.cpp'; fi`
+
+logResSolver.o: solvers/logResSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResSolver.o -MD -MP -MF "$(DEPDIR)/logResSolver.Tpo" -c -o logResSolver.o `test -f 'solvers/logResSolver.cpp' || echo '$(srcdir)/'`solvers/logResSolver.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResSolver.Tpo" "$(DEPDIR)/logResSolver.Po"; else rm -f "$(DEPDIR)/logResSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResSolver.cpp' object='logResSolver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResSolver.o `test -f 'solvers/logResSolver.cpp' || echo '$(srcdir)/'`solvers/logResSolver.cpp
+
+logResSolver.obj: solvers/logResSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResSolver.obj -MD -MP -MF "$(DEPDIR)/logResSolver.Tpo" -c -o logResSolver.obj `if test -f 'solvers/logResSolver.cpp'; then $(CYGPATH_W) 'solvers/logResSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResSolver.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResSolver.Tpo" "$(DEPDIR)/logResSolver.Po"; else rm -f "$(DEPDIR)/logResSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResSolver.cpp' object='logResSolver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResSolver.obj `if test -f 'solvers/logResSolver.cpp'; then $(CYGPATH_W) 'solvers/logResSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResSolver.cpp'; fi`
+
+logResAvgSolver.o: solvers/logResAvgSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResAvgSolver.o -MD -MP -MF "$(DEPDIR)/logResAvgSolver.Tpo" -c -o logResAvgSolver.o `test -f 'solvers/logResAvgSolver.cpp' || echo '$(srcdir)/'`solvers/logResAvgSolver.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResAvgSolver.Tpo" "$(DEPDIR)/logResAvgSolver.Po"; else rm -f "$(DEPDIR)/logResAvgSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResAvgSolver.cpp' object='logResAvgSolver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResAvgSolver.o `test -f 'solvers/logResAvgSolver.cpp' || echo '$(srcdir)/'`solvers/logResAvgSolver.cpp
+
+logResAvgSolver.obj: solvers/logResAvgSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResAvgSolver.obj -MD -MP -MF "$(DEPDIR)/logResAvgSolver.Tpo" -c -o logResAvgSolver.obj `if test -f 'solvers/logResAvgSolver.cpp'; then $(CYGPATH_W) 'solvers/logResAvgSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResAvgSolver.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResAvgSolver.Tpo" "$(DEPDIR)/logResAvgSolver.Po"; else rm -f "$(DEPDIR)/logResAvgSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResAvgSolver.cpp' object='logResAvgSolver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResAvgSolver.obj `if test -f 'solvers/logResAvgSolver.cpp'; then $(CYGPATH_W) 'solvers/logResAvgSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResAvgSolver.cpp'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

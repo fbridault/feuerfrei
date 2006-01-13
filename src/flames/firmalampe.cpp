@@ -81,7 +81,7 @@ Firmalampe::~Firmalampe ()
 }
 
 void
-Firmalampe::add_forces (bool perturbate)
+Firmalampe::add_forces (char perturbate)
 {
   /* Cellule(s) génératrice(s) */
   for (int i = 1; i < m_solver->getXRes() + 1; i++)
@@ -145,22 +145,19 @@ Firmalampe::add_forces (bool perturbate)
 //   m_solver->addVsrc (ptx, pty, ptz, 4 * ((*wickLeadPointsArray)[ind_max])->y );
 //   m_solver->addVsrc (ptx+1, pty, ptz, 3 * ((*wickLeadPointsArray)[ind_max])->y );
   
-  if (perturbate)
-    perturbate_forces ();
-}
-
-void
-Firmalampe::perturbate_forces ()
-{
-  if (m_perturbateCount == 4)
-    {
-      m_solver->addVsrc (m_x, 1, m_z, .4);
-      m_solver->addVsrc (m_x+1, 1, m_z, .3);
-      m_solver->addVsrc (m_x-1, 1, m_z, .3);
-      m_perturbateCount = 0;
-    }
-  else
-    m_perturbateCount++;
+  switch(perturbate){    
+  case FLICKERING_VERTICAL : 
+    if (m_perturbateCount == 4)
+      {
+	m_solver->addVsrc (m_x, 1, m_z, .4);
+	m_solver->addVsrc (m_x+1, 1, m_z, .3);
+	m_solver->addVsrc (m_x-1, 1, m_z, .3);
+	m_perturbateCount = 0;
+      }
+    else
+      m_perturbateCount++;
+    break;
+  }
 }
 
 void

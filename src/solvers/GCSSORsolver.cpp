@@ -301,7 +301,9 @@ GCSSORsolver::diffuse (int b, double *const x, double *const x0, double a, doubl
 void
 GCSSORsolver::project (double *const p, double *const div)
 {
-  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
+  double h_x = 1.0 / m_nbVoxelsX, 
+		h_y = 1.0 / m_nbVoxelsY, 
+		h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
 
 	int t;
@@ -314,7 +316,8 @@ GCSSORsolver::project (double *const p, double *const div)
 	for ( k = 1; k <= m_nbVoxelsZ; k++){
 		for ( j = 1; j <= m_nbVoxelsY; j++){
 			for ( i = 1; i <= m_nbVoxelsX; i++){
-				div[t] = -0.5 * (h_x * (m_u[t+1] - m_u[t-1]) + h_y * (m_v[t+nx] - m_v[t-nx]) +
+				div[t] = -0.5 * (h_x * (m_u[t+1] - m_u[t-1]) + 
+												 h_y * (m_v[t+nx] - m_v[t-nx]) +
 												 h_z * (m_w[t+n2] - m_w[t-n2]));
 				t++;
 			}//for i

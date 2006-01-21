@@ -24,6 +24,7 @@ enum
     IDCHK_BS,
     IDCHK_ES,
     IDCHK_Glow,
+    IDCHK_SaveImages,
   };
 
 enum
@@ -86,6 +87,7 @@ public:
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
+  void OnCheckSaveImages(wxCommandEvent& event);
   void OnCheckES(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
   void SetFPS(int fps);
@@ -104,7 +106,8 @@ private:
   
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
-    
+  wxCheckBox *m_saveImagesCheckBox;
+  
   wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer, *m_flamesSizer;  
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
   

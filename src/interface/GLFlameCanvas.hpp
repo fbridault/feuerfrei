@@ -72,6 +72,7 @@ public:
     m_flames[f]->toggleSmoothShading (); };
   void ToggleBlendedSP(void) { m_currentConfig->BPSEnabled = 2-m_currentConfig->BPSEnabled; };
   void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
+  void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setFlameForces(int index, double valField, double valInner){ m_flames[index]->setForces(valField, valInner); };
@@ -84,7 +85,7 @@ private:
   FlameAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
-  bool m_run;
+  bool m_run, m_saveImages;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles;
   bool m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
@@ -97,9 +98,12 @@ private:
   CGcontext m_context;
   Camera *m_camera;
   /* Pour le compte des frames */
-  int m_framesCount;
+  int m_framesCount, m_globalFramesCount;
   int m_t;
   
+  /* Tableau de pixels pour la sauvegarde des images */
+  unsigned char *m_pixels;
+
   /********* Variables relatives aux solides photométriques **************/
   SolidePhotometrique *m_photoSolid;
 

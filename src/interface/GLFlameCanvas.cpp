@@ -38,6 +38,11 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 {
   m_init = false;
   m_run = 0;
+  m_pixels = new unsigned char[size.GetWidth()*size.GetHeight()*3];
+  m_framesCount = 0;
+  /* Pour éviter de faire un calcul pour ajouter des 0... */
+  /* Un jour je ferais mieux, promis... */
+  m_globalFramesCount = 100000;
 }
 
 GLFlameCanvas::~GLFlameCanvas()
@@ -51,7 +56,8 @@ GLFlameCanvas::~GLFlameCanvas()
 void GLFlameCanvas::InitUISettings(void)
 {
   /* Pour l'affichage */
-  m_run = true; 
+  m_run = true;
+  m_saveImages = false;
   m_glowOnly = false;
   m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = false;
   m_displayFlame = true;
@@ -443,11 +449,36 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   /******************** CALCUL DU FRAMERATE *************************************/
   m_framesCount++;
+  m_globalFramesCount++;
   
   m_t = ::wxGetElapsedTime (false);
   if (m_t >= 2000){    
     ((MainFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
     ::wxStartTimer();
     m_framesCount = 0;
-  } 
+  }
+
+  if(m_saveImages){
+    wxString filename;
+    wxString zeros;
+    
+    glReadPixels (0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
+//     for (idx = 0; idx < h; idx++)
+//       {
+// 	memcpy ((unsigned char *) (temp->pixels) + 4 * w * idx,
+// 		(unsigned char *) (image->pixels) + 4 * w * (h - idx),
+// 		4 * w);
+//       }
+//     memcpy (image->pixels, temp->pixels, w * h * 4);
+    //image.Create(m_width, m_height, true);
+
+    
+    filename << _("captures/capture") << m_globalFramesCount << _(".png");
+    /* Création d'une image, le dernier paramètre précise que wxImage ne doit pas détruire */
+    /* le tableau de données dans son destructeur */
+    wxImage image(m_width,m_height,m_pixels,true),image2;
+    image2 = image.Mirror(false);
+    if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
+      cerr << "Image saving error !!" << endl;
+  }
 }

@@ -16,18 +16,27 @@ GSsolver::~GSsolver ()
 void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps)
 {
   int i, j, k, l;
+  int t;
+  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  int nx = m_nbVoxelsX+2;
+  int t1=n2 + nx +1;
+  int t2nx=2*nx;
   
   for (l = 0; l < nb_steps; l++){
-    for (k = 1; k <= m_nbVoxelsZ; k++)
-      for (j = 1; j <= m_nbVoxelsY; j++)
-	for (i = 1; i <= m_nbVoxelsX; i++)
-	  x[IX (i, j, k)] = (x0[IX (i, j, k)] +
-			     a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
-				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +
-				  x[IX (i, j, k - 1)] +	x[IX (i, j, k + 1)])) * div;
-    //set_bnd (b, x);
-  }
-}
+    t=t1;
+    for (k = 1; k <= m_nbVoxelsZ; k++){
+      for (j = 1; j <= m_nbVoxelsY; j++){
+	for (i = 1; i <= m_nbVoxelsZ; i++){
+	  x[t] = ( x0[t] + a * (x[t-1] + x[t+1] + x[t-nx] + x[t+nx] + x[t-n2] +x[t+n2]) ) * div;
+	  //set_bnd (b, x);
+	  t++;
+	}//for i
+	t+=2;
+      }//for j
+      t+=t2nx;
+    }//for k
+  }//for l
+}//GS_solve
 
 /* Pas de diffusion */
 void GSsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
@@ -39,16 +48,29 @@ void GSsolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
+
+	int t;
+ 	int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+	int nx = m_nbVoxelsX+2;
+	int t1=n2 + nx +1;
+	int t2nx=2*nx;
   
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++){
-		div[IX (i, j, k)] =
-		  -0.5 * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
-			  h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
-			  h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
+	t=t1;
+  for (k = 1; k <= m_nbVoxelsZ; k++){
+    for (j = 1; j <= m_nbVoxelsY; j++){
+      for (i = 1; i <= m_nbVoxelsX; i++){
+				div[t] = -0.5 * (
+												 h_x * (m_u[t+1] - m_u[t-1]) +
+												 h_y * (m_v[t+nx] - m_v[t-nx]) +
+												 h_z * (m_w[t+n2] - m_w[t-n2])
+												 );
+				t++;
+			}//for i
+			t+=2;
+		}//for j
+		t+=t2nx;
 		//p[IX (i, j, k)] = 0;
-      }
+	}// for k
   
   set_bnd (0, div);
   memset (p, 0, m_nbVoxels * sizeof (double));
@@ -56,14 +78,20 @@ void GSsolver::project (double *const p, double *const div)
   
   GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 
   
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++){
-		m_u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
-		m_v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
-		m_w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
-      }
+	t=t1;
+  for (k = 1; k <= m_nbVoxelsZ; k++){
+    for (j = 1; j <= m_nbVoxelsY; j++){
+      for (i = 1; i <= m_nbVoxelsX; i++){
+				m_u[t] -= 0.5 * (p[t+1] - p[t-1]) / h_x;
+				m_v[t] -= 0.5 * (p[t+nx] - p[t-nx]) / h_y;
+				m_w[t] -= 0.5 * (p[t+n2] - p[t-n2]) / h_z;
+				t++;
+      }//for i
+			t+=2;
+		}//for j
+		t+=t2nx;
+	}//for k
   //set_bnd (1, u);
   //set_bnd (2, v);
   //set_bnd (3, w);
-}
+}//project

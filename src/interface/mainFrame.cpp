@@ -25,8 +25,9 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
-  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
+  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
+  EVT_CHECKBOX(IDCHK_SaveImages, MainFrame::OnCheckSaveImages)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -57,6 +58,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
   m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
+  m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
@@ -65,6 +67,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 0, 0, 0);
   m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
+  m_globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
   
   /* Réglages du solide photométrique */
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
@@ -276,12 +279,6 @@ void MainFrame::OnCheckIS(wxCommandEvent& event)
 {
   m_glBuffer->ToggleInterpolationSP();
 }
-
-void MainFrame::OnCheckGlow(wxCommandEvent& event)
-{
-  m_glBuffer->ToggleGlow();
-}
-
 void MainFrame::OnCheckES(wxCommandEvent& event)
 {
   if(event.IsChecked()){
@@ -294,6 +291,17 @@ void MainFrame::OnCheckES(wxCommandEvent& event)
     m_blendedSolidCheckBox->Disable();    
     m_currentConfig.lightingMode=LIGHTING_STANDARD;
   }
+}
+
+
+void MainFrame::OnCheckGlow(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleGlow();
+}
+
+void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleSaveImages();  
 }
 
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)

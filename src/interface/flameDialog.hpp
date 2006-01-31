@@ -39,6 +39,8 @@ protected:
   DoubleTextCtrl* m_posZTextCtrl;
   wxStaticText* m_wickLabel;
   wxTextCtrl* m_wickTextCtrl;
+  wxStaticText* m_skeletonsNumberLabel;
+  LongTextCtrl* m_skeletonsNumberCtrl;
   wxButton* m_wickBrowseButton;
   wxRadioBox* m_flameTypeRadioBox;  
   wxStaticText* m_solverLabel;  

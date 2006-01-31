@@ -21,8 +21,10 @@ class GLFlameCanvas;
 
 #include "../solvers/GSsolver.hpp"
 #include "../solvers/GCSSORsolver.hpp"
+#include "../solvers/HybridSolver.hpp"
 #include "../solvers/logResSolver.hpp"
 #include "../solvers/logResAvgSolver.hpp"
+#include "../solvers/logResAvgTimeSolver.hpp"
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -75,7 +77,8 @@ public:
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
-  void setFlameForces(int index, double valField, double valInner){ m_flames[index]->setForces(valField, valInner); };
+  void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
+  void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
 
 private:
   void WriteFPS ();

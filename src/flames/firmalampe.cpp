@@ -3,10 +3,9 @@
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
 
-Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double fieldForces, double innerForce,
-			CgSVShader * shader, const char *meche_name, 
-			const char *filename, CScene *scene):
-  Flame (s, posRel, filename,scene, fieldForces, innerForce),
+Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, CgSVShader * shader, 
+			const char *meche_name, const char *filename, CScene *scene):
+  Flame (s, posRel, filename,scene, innerForce),
   m_wick (meche_name, nb, scene),
   m_tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
@@ -83,12 +82,6 @@ Firmalampe::~Firmalampe ()
 void
 Firmalampe::add_forces (char perturbate)
 {
-  /* Cellule(s) génératrice(s) */
-  for (int i = 1; i < m_solver->getXRes() + 1; i++)
-    for (int j = 1; j < m_solver->getYRes() + 1; j++)
-      for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->addVsrc (i, j, k, m_fieldForces / (double) (j));
-
   // cout << x << " " << z << endl;
   //  m_solver->addVsrc(x,1,z,.3);
 
@@ -147,7 +140,7 @@ Firmalampe::add_forces (char perturbate)
   
   switch(perturbate){    
   case FLICKERING_VERTICAL : 
-    if (m_perturbateCount == 4)
+    if (m_perturbateCount == 2)
       {
 	m_solver->addVsrc (m_x, 1, m_z, .4);
 	m_solver->addVsrc (m_x+1, 1, m_z, .3);
@@ -412,7 +405,7 @@ Firmalampe::drawFlame (bool displayParticle)
   else
     {
       /* Correction "à la grosse" pour les UVs -> à voir par la suite */
-      double vtex = 1.0 / (double) (m_maxParticles);
+      double vtex = 1.1 / (double) (m_maxParticles);
 
       GLdouble texpts[2][2][2] =
 	{ {{0.0, 0}, {0.0, 1.0}}, {{vtex, 0}, {vtex, 1.0}} };

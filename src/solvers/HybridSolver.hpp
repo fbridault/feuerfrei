@@ -1,5 +1,5 @@
-#if !defined(BENCHSOLVER_H)
-#define BENCHSOLVER_H
+#if !defined(HYBRIDSOLVER_H)
+#define HYBRIDSOLVER_H
 
 class BenchSolver;
 
@@ -14,7 +14,7 @@ class BenchSolver;
 class GSsolver;
 class GCSSORsolver;
 
-/** La classe BenchSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
+/** La classe HybridSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
  * des solveurs à base
  * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
  * Elle hérite de GSsolver et GCSSORsolver qui tous deux héritent <b>virtuellement</b> de Solver
@@ -22,19 +22,20 @@ class GCSSORsolver;
  *
  * @author	Flavien Bridault
  */
-class BenchSolver: public GSsolver, public GCSSORsolver
+class HybridSolver: public GSsolver, public GCSSORsolver
 {
 public:
   /** Constructeur du solveur.
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy, 
-	       double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
-  BenchSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
-  virtual ~ BenchSolver ();
+  HybridSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep,
+		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  virtual ~ HybridSolver ();
   
 protected:
+  //virtual void iterate ();
+
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
    * @param x composante à traiter
@@ -43,26 +44,14 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc) = 0;
+  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
    */
-  virtual void project (double *const p, double *const div) = 0;  
+  virtual void project (double *const p, double *const div);
 
-  void saveState (const double *const x, const double *const x2);
-  /** Sauvegarde les différentes composantes du solveur comme valeur de référence */
-  //void save_ref (const double *const x, double *x_ref);
-  void setPreviousState (double *const x, double *const x2);
-  
-  /* Nombre maximum de pas de temps à simuler */
-  int m_nbMaxIter;
-  
-  short m_index;
-
-private:
-  double *m_save, *m_save2;
-  
+  double m_time;
 };
 
 #endif

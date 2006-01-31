@@ -43,11 +43,12 @@ rtflames_SOURCES = \
 	shaders/CgBlurShaders.cpp  \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \
-	solvers/Hsolver.cpp  \
 	solvers/GCSSORsolver.cpp  \
+	solvers/HybridSolver.cpp  \
 	solvers/benchsolver.cpp  \
 	solvers/logResSolver.cpp  \
-	solvers/logResAvgSolver.cpp
+	solvers/logResAvgSolver.cpp  \
+	solvers/logResAvgTimeSolver.cpp
 
 rtflames_LDFLAGS = 
 

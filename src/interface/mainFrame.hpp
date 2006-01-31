@@ -57,7 +57,7 @@ enum
 class MainFrame: public wxFrame
 {
 public:
-  MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size); 
+  MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini")); 
   
   void GetSettingsFromConfigFile (void);
   void InitGLBuffer (bool recompileShaders);
@@ -93,6 +93,7 @@ public:
   void SetFPS(int fps);
 
 private:
+  wxString m_configFileName;
   /** Pointeur sur le fichier de configuration */
   wxFileConfig *m_config;
   /** Zone d'affichage OpenGL */

@@ -31,7 +31,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, double buoyancy);
   virtual ~Solver ();
 
   /** Lance une itération du solveur. */
@@ -160,6 +160,8 @@ public:
   
   void moveTo(CPoint& position);
   
+  virtual void setBuoyancy(double value){ m_buoyancy=value; };
+  
 protected:
   int IX (int i, int j, int k)
   {  
@@ -218,7 +220,9 @@ protected:
   int m_nbVoxels;
   double *m_u, *m_v, *m_w, *m_uPrev, *m_vPrev, *m_wPrev, *m_uSrc, *m_vSrc, *m_wSrc;
   double *m_dens, *m_densPrev, *m_densSrc;
-  
+
+  double m_buoyancy;
+
   /** Nombre d'itérations */
   int m_nbIter;
   /** Viscosité cinématique de l'air 15*10E-6. */

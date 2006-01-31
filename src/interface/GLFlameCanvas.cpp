@@ -42,12 +42,13 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   m_framesCount = 0;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
-  m_globalFramesCount = 100000;
+  m_globalFramesCount = 1000000;
 }
 
 GLFlameCanvas::~GLFlameCanvas()
 {
   DestroyScene();
+  delete [] m_pixels;
   delete m_SVShader;
   if (m_context)
     cgDestroyContext (m_context);
@@ -98,24 +99,17 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
 }
 
 void GLFlameCanvas::InitFlames(void)
-{
-  int nbSkeletons;
-    
+{    
   for(int i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case BOUGIE :
-      nbSkeletons = 4;
-      m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], nbSkeletons,
-				m_currentConfig->flames[i].position, 
-				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
-				m_currentConfig->flames[i].fieldForces,m_currentConfig->flames[i].innerForce,
-				m_SVShader,"bougie.obj",m_scene, &m_context);
+      m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
+				m_currentConfig->flames[i].position, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
+				m_currentConfig->flames[i].innerForce, m_SVShader,"bougie.obj",m_scene, &m_context);
       break;
     case FIRMALAMPE :
-      nbSkeletons = 5;
-      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],nbSkeletons,
-				   m_currentConfig->flames[i].position, m_currentConfig->flames[i].fieldForces,
-				   m_currentConfig->flames[i].innerForce, m_SVShader, 
+      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
+				   m_currentConfig->flames[i].position, m_currentConfig->flames[i].innerForce, m_SVShader, 
 				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
       break;
     default :
@@ -134,28 +128,46 @@ void GLFlameCanvas::InitSolvers(void)
     case GS_SOLVER :
       m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				  m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep);
+				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
+				  m_currentConfig->solvers[i].buoyancy);
       break;
     case GCSSOR_SOLVER :
       m_solvers[i] = new GCSSORsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-				      m_currentConfig->solvers[i].epsilon);
+				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      break;
+    case HYBRID_SOLVER :
+      m_solvers[i] = new HybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRES_SOLVER :
       m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				     m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].omegaDiff, 
-				     m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
+				      m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRESAVG_SOLVER :
       m_solvers[i] = new LogResAvgSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				     m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].omegaDiff, 
-				     m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+					 m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					 m_currentConfig->solvers[i].epsilon);
+      break;
+    case LOGRESAVGTIME_SOLVER :
+      m_solvers[i] = new LogResAvgTimeSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+					     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+					     m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+					     m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
+					     m_currentConfig->solvers[i].epsilon);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -462,21 +474,12 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     wxString filename;
     wxString zeros;
     
-    glReadPixels (0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
-//     for (idx = 0; idx < h; idx++)
-//       {
-// 	memcpy ((unsigned char *) (temp->pixels) + 4 * w * idx,
-// 		(unsigned char *) (image->pixels) + 4 * w * (h - idx),
-// 		4 * w);
-//       }
-//     memcpy (image->pixels, temp->pixels, w * h * 4);
-    //image.Create(m_width, m_height, true);
-
+    glReadPixels (0, 0, m_width-4, m_height-4, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
     
     filename << _("captures/capture") << m_globalFramesCount << _(".png");
     /* Création d'une image, le dernier paramètre précise que wxImage ne doit pas détruire */
     /* le tableau de données dans son destructeur */
-    wxImage image(m_width,m_height,m_pixels,true),image2;
+    wxImage image(m_width-4,m_height-4,m_pixels,true),image2;
     image2 = image.Mirror(false);
     if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
       cerr << "Image saving error !!" << endl;

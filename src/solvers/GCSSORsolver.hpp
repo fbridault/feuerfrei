@@ -1,8 +1,6 @@
 #if !defined(GCSSORSOLVER_H)
 #define GCSSORSOLVER_H
 
-#define MAXITER 100
-
 class GCSSORsolver;
 
 #include "solver.hpp"
@@ -22,7 +20,7 @@ public:
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
   GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, 
-		double omegaDiff, double omegaProj, double epsilon);
+		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple */
   GCSSORsolver (double omegaDiff, double omegaProj, double epsilon);
@@ -39,7 +37,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega);
+  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w

@@ -16,6 +16,9 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
 
+  m_skeletonsNumberLabel = new wxStaticText(this, -1, _("Skeletons number"));
+  m_skeletonsNumberCtrl = new LongTextCtrl(this, -1, 0, 100, _("4"));
+
   m_solverLabel = new wxStaticText(this,-1,_("Use solver :"));
   m_solverComboBox = new wxComboBox(this,-1,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
   
@@ -57,6 +60,7 @@ void FlamePanel::doLayout()
   wxBoxSizer* m_panelSizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* m_solverSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_wickSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_skeletonsNumberSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_posSizer = new wxBoxSizer(wxHORIZONTAL);
   m_posSizer->Add(m_posLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_posSizer->Add(m_posXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
@@ -67,6 +71,9 @@ void FlamePanel::doLayout()
   m_wickSizer->Add(m_wickTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
   m_wickSizer->Add(m_wickBrowseButton, 0, wxADJUST_MINSIZE, 0);
   m_panelSizer->Add(m_wickSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);  
+  m_skeletonsNumberSizer->Add(m_skeletonsNumberLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_skeletonsNumberSizer->Add(m_skeletonsNumberCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
+  m_panelSizer->Add(m_skeletonsNumberSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);  
   m_solverSizer->Add(m_solverLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_solverSizer->Add(m_solverComboBox, 0, wxLEFT|wxADJUST_MINSIZE, 15);
   m_panelSizer->Add(m_solverSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
@@ -83,6 +90,7 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
   m_posYTextCtrl->Clear();
   m_posZTextCtrl->Clear();
   m_wickTextCtrl->Clear();
+  m_skeletonsNumberCtrl->Clear();
   
   (*m_posXTextCtrl) << flameConfig->position.x;
   (*m_posYTextCtrl) << flameConfig->position.y;
@@ -91,6 +99,9 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
 
   m_solverComboBox->SetSelection(flameConfig->solverIndex);
   m_flameTypeRadioBox->SetSelection(flameConfig->type);
+
+  (*m_skeletonsNumberCtrl) << flameConfig->skeletonsNumber;
+  
   if(flameConfig->type != FIRMALAMPE){
     m_wickLabel->Disable();
     m_wickTextCtrl->Disable();
@@ -113,6 +124,8 @@ bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
   if(!m_wickTextCtrl->GetValue().IsEmpty())
     flameConfig->wickName = m_wickTextCtrl->GetValue();
 
+  flameConfig->skeletonsNumber = m_skeletonsNumberCtrl->GetSafelyValue();
+    
   flameConfig->solverIndex = m_solverComboBox->GetSelection();
   flameConfig->type = m_flameTypeRadioBox->GetSelection();
   return true;
@@ -238,10 +251,8 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    errorDialog->Destroy();
 	    return;
 	  }
-	  m_currentConfig->flames[i].fieldForces = 0.02;
 	  m_currentConfig->flames[i].innerForce = 0.005;
 	}else{
-	  m_currentConfig->flames[i].fieldForces = 0.08;
 	  m_currentConfig->flames[i].innerForce = 0.04;
 	}
       }else

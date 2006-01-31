@@ -59,8 +59,9 @@ am_rtflames_OBJECTS = main.$(OBJEXT) bougie.$(OBJEXT) \
 	texture.$(OBJEXT) CgShader.$(OBJEXT) CgSVShader.$(OBJEXT) \
 	CgSPFragmentShader.$(OBJEXT) CgBougieShaders.$(OBJEXT) \
 	CgBlurShaders.$(OBJEXT) solver.$(OBJEXT) GSsolver.$(OBJEXT) \
-	Hsolver.$(OBJEXT) GCSSORsolver.$(OBJEXT) benchsolver.$(OBJEXT) \
-	logResSolver.$(OBJEXT) logResAvgSolver.$(OBJEXT)
+	GCSSORsolver.$(OBJEXT) HybridSolver.$(OBJEXT) \
+	benchsolver.$(OBJEXT) logResSolver.$(OBJEXT) \
+	logResAvgSolver.$(OBJEXT) logResAvgTimeSolver.$(OBJEXT)
 rtflames_OBJECTS = $(am_rtflames_OBJECTS)
 rtflames_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -209,11 +210,12 @@ rtflames_SOURCES = \
 	shaders/CgBlurShaders.cpp  \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \
-	solvers/Hsolver.cpp  \
 	solvers/GCSSORsolver.cpp  \
+	solvers/HybridSolver.cpp  \
 	solvers/benchsolver.cpp  \
 	solvers/logResSolver.cpp  \
-	solvers/logResAvgSolver.cpp
+	solvers/logResAvgSolver.cpp  \
+	solvers/logResAvgTimeSolver.cpp
 
 rtflames_LDFLAGS = 
 rtflames_LDADD = 
@@ -291,7 +293,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GCSSORsolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GLFlameCanvas.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GSsolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Hsolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HybridSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OBJReader.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchsolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bougie.Po@am__quote@
@@ -304,6 +306,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ies.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/leadSkeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logResAvgSolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logResAvgTimeSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/logResSolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mainFrame.Po@am__quote@
@@ -784,20 +787,6 @@ GSsolver.obj: solvers/GSsolver.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GSsolver.obj `if test -f 'solvers/GSsolver.cpp'; then $(CYGPATH_W) 'solvers/GSsolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/GSsolver.cpp'; fi`
 
-Hsolver.o: solvers/Hsolver.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Hsolver.o -MD -MP -MF "$(DEPDIR)/Hsolver.Tpo" -c -o Hsolver.o `test -f 'solvers/Hsolver.cpp' || echo '$(srcdir)/'`solvers/Hsolver.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Hsolver.Tpo" "$(DEPDIR)/Hsolver.Po"; else rm -f "$(DEPDIR)/Hsolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/Hsolver.cpp' object='Hsolver.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Hsolver.o `test -f 'solvers/Hsolver.cpp' || echo '$(srcdir)/'`solvers/Hsolver.cpp
-
-Hsolver.obj: solvers/Hsolver.cpp
-@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Hsolver.obj -MD -MP -MF "$(DEPDIR)/Hsolver.Tpo" -c -o Hsolver.obj `if test -f 'solvers/Hsolver.cpp'; then $(CYGPATH_W) 'solvers/Hsolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/Hsolver.cpp'; fi`; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/Hsolver.Tpo" "$(DEPDIR)/Hsolver.Po"; else rm -f "$(DEPDIR)/Hsolver.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/Hsolver.cpp' object='Hsolver.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Hsolver.obj `if test -f 'solvers/Hsolver.cpp'; then $(CYGPATH_W) 'solvers/Hsolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/Hsolver.cpp'; fi`
-
 GCSSORsolver.o: solvers/GCSSORsolver.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT GCSSORsolver.o -MD -MP -MF "$(DEPDIR)/GCSSORsolver.Tpo" -c -o GCSSORsolver.o `test -f 'solvers/GCSSORsolver.cpp' || echo '$(srcdir)/'`solvers/GCSSORsolver.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/GCSSORsolver.Tpo" "$(DEPDIR)/GCSSORsolver.Po"; else rm -f "$(DEPDIR)/GCSSORsolver.Tpo"; exit 1; fi
@@ -811,6 +800,20 @@ GCSSORsolver.obj: solvers/GCSSORsolver.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/GCSSORsolver.cpp' object='GCSSORsolver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o GCSSORsolver.obj `if test -f 'solvers/GCSSORsolver.cpp'; then $(CYGPATH_W) 'solvers/GCSSORsolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/GCSSORsolver.cpp'; fi`
+
+HybridSolver.o: solvers/HybridSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT HybridSolver.o -MD -MP -MF "$(DEPDIR)/HybridSolver.Tpo" -c -o HybridSolver.o `test -f 'solvers/HybridSolver.cpp' || echo '$(srcdir)/'`solvers/HybridSolver.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/HybridSolver.Tpo" "$(DEPDIR)/HybridSolver.Po"; else rm -f "$(DEPDIR)/HybridSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/HybridSolver.cpp' object='HybridSolver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o HybridSolver.o `test -f 'solvers/HybridSolver.cpp' || echo '$(srcdir)/'`solvers/HybridSolver.cpp
+
+HybridSolver.obj: solvers/HybridSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT HybridSolver.obj -MD -MP -MF "$(DEPDIR)/HybridSolver.Tpo" -c -o HybridSolver.obj `if test -f 'solvers/HybridSolver.cpp'; then $(CYGPATH_W) 'solvers/HybridSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/HybridSolver.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/HybridSolver.Tpo" "$(DEPDIR)/HybridSolver.Po"; else rm -f "$(DEPDIR)/HybridSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/HybridSolver.cpp' object='HybridSolver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o HybridSolver.obj `if test -f 'solvers/HybridSolver.cpp'; then $(CYGPATH_W) 'solvers/HybridSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/HybridSolver.cpp'; fi`
 
 benchsolver.o: solvers/benchsolver.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT benchsolver.o -MD -MP -MF "$(DEPDIR)/benchsolver.Tpo" -c -o benchsolver.o `test -f 'solvers/benchsolver.cpp' || echo '$(srcdir)/'`solvers/benchsolver.cpp; \
@@ -853,6 +856,20 @@ logResAvgSolver.obj: solvers/logResAvgSolver.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResAvgSolver.cpp' object='logResAvgSolver.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResAvgSolver.obj `if test -f 'solvers/logResAvgSolver.cpp'; then $(CYGPATH_W) 'solvers/logResAvgSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResAvgSolver.cpp'; fi`
+
+logResAvgTimeSolver.o: solvers/logResAvgTimeSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResAvgTimeSolver.o -MD -MP -MF "$(DEPDIR)/logResAvgTimeSolver.Tpo" -c -o logResAvgTimeSolver.o `test -f 'solvers/logResAvgTimeSolver.cpp' || echo '$(srcdir)/'`solvers/logResAvgTimeSolver.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResAvgTimeSolver.Tpo" "$(DEPDIR)/logResAvgTimeSolver.Po"; else rm -f "$(DEPDIR)/logResAvgTimeSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResAvgTimeSolver.cpp' object='logResAvgTimeSolver.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResAvgTimeSolver.o `test -f 'solvers/logResAvgTimeSolver.cpp' || echo '$(srcdir)/'`solvers/logResAvgTimeSolver.cpp
+
+logResAvgTimeSolver.obj: solvers/logResAvgTimeSolver.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT logResAvgTimeSolver.obj -MD -MP -MF "$(DEPDIR)/logResAvgTimeSolver.Tpo" -c -o logResAvgTimeSolver.obj `if test -f 'solvers/logResAvgTimeSolver.cpp'; then $(CYGPATH_W) 'solvers/logResAvgTimeSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResAvgTimeSolver.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/logResAvgTimeSolver.Tpo" "$(DEPDIR)/logResAvgTimeSolver.Po"; else rm -f "$(DEPDIR)/logResAvgTimeSolver.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='solvers/logResAvgTimeSolver.cpp' object='logResAvgTimeSolver.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o logResAvgTimeSolver.obj `if test -f 'solvers/logResAvgTimeSolver.cpp'; then $(CYGPATH_W) 'solvers/logResAvgTimeSolver.cpp'; else $(CYGPATH_W) '$(srcdir)/solvers/logResAvgTimeSolver.cpp'; fi`
 uninstall-info-am:
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)

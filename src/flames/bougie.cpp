@@ -3,9 +3,9 @@
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
 
-Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, double fieldForces, double innerForce,
-		CgSVShader * shader, const char *filename, CScene *scene, CGcontext *context):
-  Flame (s, nb, posRel, filename, scene, fieldForces, innerForce),
+Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, double innerForce, CgSVShader * shader, 
+		const char *filename, CScene *scene, CGcontext *context):
+  Flame (s, nb, posRel, filename, scene, innerForce),
   m_tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 //   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
 //   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
@@ -61,17 +61,12 @@ Bougie::~Bougie ()
 void
 Bougie::add_forces (char perturbate)
 {
-  /* Cellule(s) génératrice(s) */
-  for (int i = 1; i < m_solver->getXRes() + 1; i++)
-    for (int j = 1; j < m_solver->getYRes() + 1; j++)
-      for (int k = 1; k < m_solver->getZRes() + 1; k++)
-	m_solver->addVsrc (i, j, k, m_fieldForces / (double) (j));
   m_solver->addVsrc (m_x, 1, m_z, m_innerForce);
 
   switch(perturbate){
   case FLICKERING_VERTICAL : 
-    if(m_perturbateCount>=4){
-      m_solver->setVsrc(((int)(ceil(m_solver->getXRes()/2.0))),1,((int)(ceil(m_solver->getZRes()/2.0))),0.25);
+    if(m_perturbateCount>=2){
+      m_solver->setVsrc(((int)(ceil(m_solver->getXRes()/2.0))),1,((int)(ceil(m_solver->getZRes()/2.0))),0.15);
       m_perturbateCount = 0;
     }else
       m_perturbateCount++;

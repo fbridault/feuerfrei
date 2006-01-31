@@ -39,8 +39,8 @@ public:
    * @param filename nom du fichier OBJ contenant le luminaire
    * @param pointeur sur la scène
    */
-  Flame (Solver * s, int nb, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce);
-  Flame (Solver * s, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce);
+  Flame (Solver * s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce);
+  Flame (Solver * s, CPoint& posRel, const char *filename, CScene *scene, double innerForce);
   virtual ~Flame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -87,7 +87,7 @@ public:
    */
   virtual void add_forces (char perturbate) = 0;
   
-  virtual void setForces(double valField, double valInner){ m_fieldForces=valField; m_innerForce=valInner; };
+  virtual void setForces(double value){  m_innerForce=value; };
 
   /** Fonction appelée par la fonction de dessin OpenGL. Elle fournit l'éclairage dû à la flamme, 
    * au reste de la scène via les particules du squelette guide. Elle s'occupe également de déplacer
@@ -208,7 +208,7 @@ protected:
   /** Nombre de points fixes pour chaque direction v = origine du squelette périphérique + sommet du guide */
   short m_nbFixedPoints;
   
-  double m_fieldForces, m_innerForce;
+  double m_innerForce;
 
   CScene *m_scene;
 };

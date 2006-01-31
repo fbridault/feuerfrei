@@ -1,7 +1,7 @@
 #include "GSsolver.hpp"
 
-GSsolver::GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
-  Solver(position, n_x, n_y, n_z, dim, timeStep)
+GSsolver::GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : 
+  Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
 }
 
@@ -41,7 +41,7 @@ void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a
 /* Pas de diffusion */
 void GSsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
 {
-  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
+  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 20);
 }
 
 void GSsolver::project (double *const p, double *const div)
@@ -56,22 +56,22 @@ void GSsolver::project (double *const p, double *const div)
 	int t2nx=2*nx;
   
 	t=t1;
-  for (k = 1; k <= m_nbVoxelsZ; k++){
-    for (j = 1; j <= m_nbVoxelsY; j++){
-      for (i = 1; i <= m_nbVoxelsX; i++){
-				div[t] = -0.5 * (
-												 h_x * (m_u[t+1] - m_u[t-1]) +
-												 h_y * (m_v[t+nx] - m_v[t-nx]) +
-												 h_z * (m_w[t+n2] - m_w[t-n2])
-												 );
-				t++;
-			}//for i
-			t+=2;
-		}//for j
-		t+=t2nx;
-		//p[IX (i, j, k)] = 0;
+	for (k = 1; k <= m_nbVoxelsZ; k++){
+	  for (j = 1; j <= m_nbVoxelsY; j++){
+	    for (i = 1; i <= m_nbVoxelsX; i++){
+	      div[t] = -0.5 * (
+			       h_x * (m_u[t+1] - m_u[t-1]) +
+			       h_y * (m_v[t+nx] - m_v[t-nx]) +
+			       h_z * (m_w[t+n2] - m_w[t-n2])
+			       );
+	      t++;
+	    }//for i
+	    t+=2;
+	  }//for j
+	  t+=t2nx;
+	  //p[IX (i, j, k)] = 0;
 	}// for k
-  
+	
   set_bnd (0, div);
   memset (p, 0, m_nbVoxels * sizeof (double));
 //  set_bnd (0, p);

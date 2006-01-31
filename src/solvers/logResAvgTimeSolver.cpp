@@ -1,34 +1,28 @@
-#include "logResSolver.hpp"
+#include "logResAvgTimeSolver.hpp"
+
+#include <wx/wxprec.h>
+
+#ifndef WX_PRECOMP
+#include <wx/wx.h>
+#endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResSolver::LogResSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
-			    double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+LogResAvgTimeSolver::LogResAvgTimeSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
+					  double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
-  BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
+  LogResAvgSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_fileDiff[0].open ("solvers/GSsolverDiff.u.log", ios::out | ios::trunc);
-  m_fileDiff[3].open ("solvers/GCSSORsolverDiff.u.log", ios::out | ios::trunc);
-  m_fileDiff[1].open ("solvers/GSsolverDiff.v.log", ios::out | ios::trunc);
-  m_fileDiff[4].open ("solvers/GCSSORsolverDiff.v.log", ios::out | ios::trunc);
-  m_fileDiff[2].open ("solvers/GSsolverDiff.w.log", ios::out | ios::trunc);
-  m_fileDiff[5].open ("solvers/GCSSORsolverDiff.w.log", ios::out | ios::trunc);
+  m_times = new double[m_nbAverages];
   
-  m_fileProj[0].open ("solvers/GSsolverProj1.log", ios::out | ios::trunc);
-  m_fileProj[2].open ("solvers/GCSSORsolverProj1.log", ios::out | ios::trunc);
-  m_fileProj[1].open ("solvers/GSsolverProj2.log", ios::out | ios::trunc);
-  m_fileProj[3].open ("solvers/GCSSORsolverProj2.log", ios::out | ios::trunc);
+  memset (m_times, 0, m_nbAverages * sizeof (double));
 }
 
-LogResSolver::~LogResSolver ()
+LogResAvgTimeSolver::~LogResAvgTimeSolver ()
 {
-  for(int i=0; i<6; i++)
-    m_fileDiff[i].close ();
-  
-  for(int i=0; i<4; i++)
-    m_fileProj[i].close ();
+  delete[]m_times;
 }
 
-void LogResSolver::vel_step ()
+void LogResAvgTimeSolver::vel_step ()
 {
   if(m_nbIter > m_nbMaxIter)
     return;
@@ -41,7 +35,8 @@ void LogResSolver::vel_step ()
   diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
   SWAP (m_wPrev, m_w);
   diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
-  m_index = 0;
+  
+  m_index = NB_DIFF_LOGS;
   project (m_uPrev, m_vPrev);
   SWAP (m_uPrev, m_u);
   SWAP (m_vPrev, m_v);
@@ -49,68 +44,26 @@ void LogResSolver::vel_step ()
   advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
   advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
   advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
-  m_index = 1;
+  
+  m_index = NB_DIFF_LOGS+1;
   project (m_uPrev, m_vPrev);
+  
+  if(m_nbIter == m_nbMaxIter)
+    for(int i=0; i < m_nbSteps; i++){
+      m_file << i << " ";
+      
+      for(int j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
+	m_file << m_times[j*m_nbSteps + i] << " " << m_averages[j*m_nbSteps + i] << " ";
+      
+      m_file << endl;
+    } 
 }
 
-/* Pas de diffusion */
-void LogResSolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
-{
-  m_file = &m_fileDiff[b-1];
-  
-  saveState(x, x0);
-  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), m_nbSteps);
-  
-  m_file = &m_fileDiff[b+2];
-  
-  setPreviousState(x, x0);
-  GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
-}
+void LogResAvgTimeSolver::GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps)
+{  
+  double t=0;
+  ::wxStartTimer();
 
-
-void LogResSolver::project (double *const p, double *const div)
-{
-  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
-  
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++){
-		div[IX (i, j, k)] =
-		  -0.5 * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
-			  h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
-			  h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
-		//p[IX (i, j, k)] = 0;
-      }
-  set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
-  //  set_bnd (0, p);
-  
-  m_file = &m_fileProj[m_index];
-  
-  saveState(p, div);
-  GS_solve(0,p,div,1, 1/6.0, m_nbSteps);
-  
-  m_file = &m_fileProj[m_index+2];
-  
-  setPreviousState(p, div);  
-  GCSSOR(p,div,1, 6.0, m_omegaProj,100);
-  
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++){
-	m_u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
-	m_v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
-	m_w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
-      }
-  //set_bnd (1, u);
-  //set_bnd (2, v);
-  //set_bnd (3, w);
-}
-
-
-void LogResSolver::GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps)
-{
   int i, j, k, l;
   double diagonal = 1/div;
   double norm2;
@@ -138,15 +91,19 @@ void LogResSolver::GS_solve(int b, double *const x, double *const x0, double a, 
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
 	  norm2+=m_r[IX(i,j,k)]*m_r[IX(i,j,k)];
+    t += ::wxGetElapsedTime (false);
     
-    logResidu(l,norm2); 
+    computeAverage(l,norm2,t);
+    ::wxStartTimer();
   }
-  *m_file << endl;
   //set_bnd (b, x);
 }
 
-void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
+void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
 {
+  double t=0;
+  ::wxStartTimer();
+  
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
@@ -187,10 +144,10 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
     for ( j = m_nbVoxelsY; j>=1 ; j--)
       for ( i = m_nbVoxelsX; i>=1; i--)
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
-	
+  
   // p=z
   memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
-    
+  
   // calcul de r.z
   rho0=0.0;
   for ( k = 1; k <= m_nbVoxelsZ; k++)
@@ -237,18 +194,21 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
 	  norm2+=m_r[IX(i,j,k)]*m_r[IX(i,j,k)];
-
-    logResidu(numiter,norm2);
-
+    
+    t += ::wxGetElapsedTime (false);
+    
+    computeAverage(numiter,norm2,t);
+    ::wxStartTimer();
+    
     //test d'arrÃªt
 //     if(norm2 < eb2){
 //       //cerr<<"précision atteinte : nbiter = "<<numiter<<endl;
 //       break;
 //     }
     // calcul de z tel que Cz =r
-
+    
     // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-
+    
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
@@ -270,7 +230,7 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
     //calcul de beta =rho1/rho0
     //    beta= rho1/rho0;
     beta=(rho0) ? rho1/rho0 : 0;
-
+    
     rho0=rho1;
     //calcul de p = z+ beta.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
@@ -283,12 +243,13 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
     cerr<<"précision non atteinte !!!"<<endl;
   }
   
-  *m_file << endl;
-  
   return;
 }//GCSSOR
 
-void LogResSolver::logResidu (int iter, double value)
+void LogResAvgTimeSolver::computeAverage (int iter, double value, double time)
 {
-  *m_file << m_nbIter << " " << iter << " " << sqrt(value) << " " << endl;
+  int i = m_index*m_nbSteps + iter;
+  
+  m_averages[i] = (m_averages[i] * m_nbIter + sqrt(value))/(double)(m_nbIter+1);
+  m_times[i] = (m_times[i] * m_nbIter + time)/(double)(m_nbIter+1);
 }

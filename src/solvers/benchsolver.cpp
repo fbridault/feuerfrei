@@ -1,9 +1,8 @@
 #include "benchsolver.hpp"
 
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 BenchSolver::BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
-			  double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps), GCSSORsolver(omegaDiff, omegaProj, epsilon)
+			  double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
   m_save = new double[m_nbVoxels];
   m_save2 = new double[m_nbVoxels];
@@ -11,7 +10,21 @@ BenchSolver::BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double di
   memset (m_save, 0, m_nbVoxels * sizeof (double));
   memset (m_save2, 0, m_nbVoxels * sizeof (double));
   
-  m_nbSteps = 100;
+  m_nbSteps = 20;
+  m_nbMaxIter = nbTimeSteps;
+}
+
+/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
+BenchSolver::BenchSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+  GCSSORsolver(omegaDiff, omegaProj, epsilon)
+{
+  m_save = new double[m_nbVoxels];
+  m_save2 = new double[m_nbVoxels];
+  
+  memset (m_save, 0, m_nbVoxels * sizeof (double));
+  memset (m_save2, 0, m_nbVoxels * sizeof (double));
+  
+  m_nbSteps = 20;
   m_nbMaxIter = nbTimeSteps;
 }
 

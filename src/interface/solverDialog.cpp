@@ -11,8 +11,10 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
+    _("Hybrid"),
     _("Both - log residuals"),
-    _("Both - log residuals averages")
+    _("Both - log residuals averages"),
+    _("Both - log residuals averages + time")
   };
   
   m_posLabel = new wxStaticText(this, -1, _("Position"));
@@ -29,12 +31,12 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
 
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					4, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					6, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
-  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,815"));
+  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
-  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,815"));
+  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
   m_epsilonLabel = new wxStaticText(this, -1, _("Error threshold"));
   m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0,00001"));
   m_nbMaxIterLabel = new wxStaticText(this, -1, _("Max iterations number"));
@@ -163,7 +165,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
       m_epsilonLabel->Disable();
       m_epsilonTextCtrl->Disable();
     }
-  if(solverConfig->type != LOGRES_SOLVER && solverConfig->type != LOGRESAVG_SOLVER)
+  if(solverConfig->type != LOGRES_SOLVER && solverConfig->type != LOGRESAVG_SOLVER && solverConfig->type != LOGRESAVGTIME_SOLVER)
     {
       m_nbMaxIterLabel->Disable();
       m_nbMaxIterTextCtrl->Disable();
@@ -217,7 +219,7 @@ void SolverPanel::OnSelectType(wxCommandEvent& event)
       m_epsilonLabel->Disable();
       m_epsilonTextCtrl->Disable();
     }
-  if(event.GetSelection() != LOGRES_SOLVER && event.GetSelection() != LOGRESAVG_SOLVER)
+  if(event.GetSelection() != LOGRES_SOLVER && event.GetSelection() != LOGRESAVG_SOLVER && event.GetSelection() != LOGRESAVGTIME_SOLVER)
     {
       m_nbMaxIterLabel->Disable();
       m_nbMaxIterTextCtrl->Disable();

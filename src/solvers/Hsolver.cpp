@@ -36,7 +36,7 @@ void Hsolver::diffuse (int b, double *const x, const double *const x0,
   double num = 0.0;
   double den = 0.0;
   double diff;
-  /*double num=0.0, ei=0.0, sei=0.0,  den=0.0, dtmp, etmp *//*,ntmp */ ;
+  /*double num=0.0, ei=0.0, sei=0.0,  den=0.0, dtmp, etmp *//*,ntmp ;*/
   double a = m_dt * diff_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   int i, j, k, l;
 

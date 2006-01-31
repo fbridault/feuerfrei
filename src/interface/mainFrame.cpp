@@ -33,7 +33,7 @@ END_EVENT_TABLE();
 
 /**************************************** MainFrame Class methods **************************************/
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size)
+MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
   
@@ -179,8 +179,10 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
       m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);
 
-      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.815);
-      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.815);
+      m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
+	
+      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.5);
+      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.5);
       m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon,0.00001);
       m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
       
@@ -205,10 +207,10 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type == FIRMALAMPE){
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
-	m_config->Read(groupName + _("FieldForces"), &m_currentConfig.flames[i].fieldForces, 0.02);
+	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 5);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
       }else{
-	m_config->Read(groupName + _("FieldForces"), &m_currentConfig.flames[i].fieldForces, 0.08);
+	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 4);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
 	m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       }
@@ -357,6 +359,8 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       
       m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
       m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
+      
+      m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
 
       m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
       m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
@@ -383,7 +387,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
-      m_config->Write(groupName + _("FieldForces"), m_currentConfig.flames[i].fieldForces);
+      m_config->Write(groupName + _("SkeletonsNumber"),m_currentConfig.flames[i].skeletonsNumber);
       m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
       if(m_currentConfig.flames[i].type == FIRMALAMPE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);

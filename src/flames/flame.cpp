@@ -2,7 +2,7 @@
 
 #include "../scene/scene.hpp"
 
-Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce)
+Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce)
 {  
   m_solver = s;
   m_scene = scene;
@@ -34,7 +34,6 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   
   m_perturbateCount=0;
   
-  m_fieldForces=fieldForces;
   m_innerForce=innerForce;
   
   m_luminary = new CObject(m_scene);
@@ -45,7 +44,7 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   glEndList();
 }
 
-Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, double fieldForces, double innerForce)
+Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, double innerForce)
 {  
   m_solver = s;
   m_scene = scene;
@@ -68,7 +67,6 @@ Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, dou
   
   m_perturbateCount=0;
   
-  m_fieldForces=fieldForces;
   m_innerForce=innerForce;
     
   m_luminary = new CObject(m_scene);

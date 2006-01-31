@@ -10,6 +10,8 @@ enum
     IDSL_FXAP = 1,
     IDSL_FYAP,
     IDSL_FZAP,
+    IDSL_SF,
+    IDSL_FF,
     IDRB_Flickering,
   };
 
@@ -47,6 +49,9 @@ private:
   void ComputeSlidersValues(void);
   
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
+  wxSlider *m_buoyancySlider;
+  wxStaticText *m_buoyancyLabel;
+  
   wxTextCtrl *m_solverXAxisPositionSliderMax, *m_solverYAxisPositionSliderMax, *m_solverZAxisPositionSliderMax,
     *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
   wxStaticText *m_solverXAxisPositionLabel, *m_solverYAxisPositionLabel, *m_solverZAxisPositionLabel;
@@ -54,6 +59,7 @@ private:
   wxBoxSizer *m_panelSizer;
   wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
   wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
+  wxBoxSizer *m_forcesSizer;
   
   SolverConfig *m_solverConfig;
   /* Index du solveur */
@@ -77,11 +83,10 @@ private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);
   
-  wxSlider *m_fieldForcesSlider, *m_innerForceSlider;
-  wxStaticText *m_fieldForcesLabel, *m_innerForceLabel;
+  wxSlider *m_innerForceSlider;
+  wxStaticText *m_innerForceLabel;
   
-  wxBoxSizer *m_panelSizer;
-  wxFlexGridSizer *m_forcesSizer;
+  wxBoxSizer *m_panelSizer, *m_forcesSizer;
   wxRadioBox *m_flickeringRadioBox;
 
   FlameConfig *m_flameConfig;

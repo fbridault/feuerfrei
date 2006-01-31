@@ -7,7 +7,7 @@ Solver::Solver ()
 {
 }
 
-Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep) : m_position(position)
+Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : m_position(position)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -68,7 +68,7 @@ Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double 
   
   m_visc = 0.00000015;
   m_diff = 0.001;
-  m_nbSteps = 15;
+  m_nbSteps = 20;
   m_nbIter = 0;
   
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
@@ -78,6 +78,7 @@ Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double 
   buildDLBase ();
   buildDLGrid ();
 
+  m_buoyancy=buoyancy;
 }
 
 Solver::~Solver ()
@@ -222,6 +223,12 @@ void Solver::vel_step ()
 
 void Solver::iterate ()
 { 
+  /* Cellule(s) génératrice(s) */
+  for (int i = 1; i < m_nbVoxelsX + 1; i++)
+    for (int j = 1; j < m_nbVoxelsY + 1; j++)
+      for (int k = 1; k < m_nbVoxelsZ + 1; k++)
+	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (j);
+  
   vel_step ();
   //  dens_step();
 

@@ -29,7 +29,7 @@ public:
    * @param shader pointeur sur le shader qui génère les shadow volumes
    */
   Firmalampe(Solver *s, int nb, CPoint& posRel, double innerForce, CgSVShader *shader, 
-	     const char *meche_name, const char *filename, CScene *scene);
+	     const char *meche_name, const char *filename, CScene *scene, int index);
   virtual ~Firmalampe();
   
   /** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle commence par dÃ©placer les particules 
@@ -56,8 +56,6 @@ public:
    */
   void eclaire();
 
-  void cast_shadows_double_multiple();
-  void cast_shadows_double();
   void draw_shadowVolumes();
 
   /** Retroune la direction de la base de la flamme vers la derniere particule

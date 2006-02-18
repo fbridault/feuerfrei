@@ -43,6 +43,7 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
+  intensities = NULL;
 }
 
 GLFlameCanvas::~GLFlameCanvas()
@@ -62,7 +63,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_glowOnly = false;
   m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = false;
   m_displayFlame = true;
-  m_shadowsEnabled = false; m_shadowVolumesEnabled = false;
+  m_drawShadowVolumes = false;
 }
 
 void GLFlameCanvas::InitGL(bool recompileShaders)
@@ -72,30 +73,31 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   glClearColor (0.0, 0.0, 0.0, 1.0);
   /* Restriction de la zone d'affichage */
   glViewport (0, 0, m_width, m_height);
-
+  
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_BLEND);
   //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+  
   glShadeModel (GL_SMOOTH);
   glEnable (GL_LINE_SMOOTH);
   /*glEnable(GL_POLYGON_SMOOTH); */
-
+  
   glEnable (GL_CULL_FACE);
   glCullFace (GL_BACK);
-
+  
   glEnable (GL_AUTO_NORMAL);
   glEnable (GL_NORMALIZE);
-
+  
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
+  
   // Création du contexte CG
   m_context = cgCreateContext();
   
   contextCopy = &m_context;
   cgSetErrorCallback(cgErrorCallback);
   
-  m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, recompileShaders);
+  m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, 
+			       m_currentConfig->fatness, m_currentConfig->extrudeDist, recompileShaders);
 }
 
 void GLFlameCanvas::InitFlames(void)
@@ -105,12 +107,12 @@ void GLFlameCanvas::InitFlames(void)
     case BOUGIE :
       m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
 				m_currentConfig->flames[i].position, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
-				m_currentConfig->flames[i].innerForce, m_SVShader,"bougie.obj",m_scene, &m_context);
+				m_currentConfig->flames[i].innerForce, m_SVShader,"bougie.obj",m_scene, &m_context, i);
       break;
     case FIRMALAMPE :
       m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
 				   m_currentConfig->flames[i].position, m_currentConfig->flames[i].innerForce, m_SVShader, 
-				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene);
+				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene, i);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -118,6 +120,9 @@ void GLFlameCanvas::InitFlames(void)
     }
   }
   prevNbFlames = m_currentConfig->nbFlames;
+  
+  if( intensities ) delete intensities;
+  intensities = new double[m_currentConfig->nbFlames];
 }
 
 void GLFlameCanvas::InitSolvers(void)
@@ -305,9 +310,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   SetCurrent();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /* Déplacement du camera */
-
   m_camera->setView();
-
+  
   //m_camera->recalcModelView();
   
   /********** CONSTRUCTION DES FLAMMES *******************************/
@@ -330,6 +334,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     dist = direction.length();
 
+    /* Définition de la largeur de la gaussienne */
     sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
     
     m_glowEngine->activate();
@@ -374,7 +379,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     glBlendFunc (GL_ONE, GL_ZERO);
     
     /******************* AFFICHAGE DE LA SCENE *******************************/
-    /* !!!!!! Ceci n'est PAS CORRECT, dans le cas de PLUSIEURS flammes !!!!! */
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->drawWick ();
     
@@ -382,32 +386,37 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       /* 3e paramètre doit être la hauteur du solveur de la flamme */
       CPoint pos(m_flames[0]->getPosition());
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(), pos, 1.0);
-      m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
-    }else{
-      /**** Affichage de la scène ****/
-      glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-      
-      glEnable (GL_LIGHTING);
-      
-      for (int f = 0; f < m_currentConfig->nbFlames; f++)
-	{
-	  if (m_shadowVolumesEnabled)
-	    m_flames[f]->draw_shadowVolumes ();
-	  if (m_currentConfig->lightingMode == LIGHTING_SHADOWS)
-	    m_flames[f]->cast_shadows_double ();
-	  else{
-	    m_flames[f]->switch_on_lights ();
-	  }
-	}
-      m_scene->draw_scene ();
-      
-      glPopAttrib ();
-      
-      glDisable (GL_LIGHTING);
     }
+
+    /**** Affichage de la scène ****/
+    glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
+    glEnable (GL_LIGHTING);
+    
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+      {
+	/* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
+	intensities[f] = m_flames[f]->get_main_direction().length() * 1.5;
+	if (m_drawShadowVolumes)
+	  m_flames[f]->draw_shadowVolumes ();
+	if (!m_currentConfig->shadowsEnabled)
+	  m_flames[f]->switch_on_lights (intensities[f]);
+      }
+    
+    if (m_currentConfig->shadowsEnabled)
+      cast_shadows_double();
+    else
+      if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
+	m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
+      else
+	m_scene->draw_scene ();
+    
+    glPopAttrib ();
+    
+    glDisable (GL_LIGHTING);      
+  
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
+  
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
     for (int s = 0; s < m_currentConfig->nbSolvers; s++)
       {
@@ -433,17 +442,17 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   /********************* PLACAGE DU GLOW ****************************************/
   if(m_currentConfig->glowEnabled){
     glDisable (GL_DEPTH_TEST);
- //    glBlendColor(0.0,0.0,0.0,1.0);
+    //    glBlendColor(0.0,0.0,0.0,1.0);
     //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
-//     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
-//     //m_glowEngine2->drawBlur(0.5);
+    //     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
+    //     //m_glowEngine2->drawBlur(0.5);
     
-//     m_glowEngine->drawBlur(1.0);
+    //     m_glowEngine->drawBlur(1.0);
     
-//     glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-//     m_glowEngine2->drawBlur(0.5);
-//     glBlendFunc (GL_ONE, GL_ONE);
-//     m_glowEngine->drawBlur(1.0);
+    //     glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+    //     m_glowEngine2->drawBlur(0.5);
+    //     glBlendFunc (GL_ONE, GL_ONE);
+    //     m_glowEngine->drawBlur(1.0);
     
     glBlendFunc (GL_ONE, GL_ONE);
     m_glowEngine2->drawBlur(1.0);
@@ -484,4 +493,150 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
       cerr << "Image saving error !!" << endl;
   }
+}
+
+// void
+// GLFlameCanvas::cast_shadows_double_multiple ()
+// {
+//   switch_off_lights ();
+//   m_scene->draw_sceneWTEX ();
+
+//   glBlendFunc (GL_ONE, GL_ONE);
+//   for (int i = 0; i < 1 /*m_nbLights *//**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
+//     {
+//       enable_only_ambient_light (i);
+//       glClear (GL_STENCIL_BUFFER_BIT);
+//       glDepthFunc (GL_LESS);
+//       glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+// 		    GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
+
+//       glColorMask (0, 0, 0, 0);
+//       glDepthMask (0);
+
+//       glDisable (GL_CULL_FACE);
+//       glEnable (GL_STENCIL_TEST);
+//       glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
+
+//       glActiveStencilFaceEXT (GL_BACK);
+//       glStencilOp (GL_KEEP,	// stencil test fail
+// 		   GL_DECR_WRAP_EXT,	// depth test fail
+// 		   GL_KEEP);	// depth test pass
+//       glStencilMask (~0);
+//       glStencilFunc (GL_ALWAYS, 0, ~0);
+
+//       glActiveStencilFaceEXT (GL_FRONT);
+//       glStencilOp (GL_KEEP,	// stencil test fail
+// 		   GL_INCR_WRAP_EXT,	// depth test fail
+// 		   GL_KEEP);	// depth test pass
+//       glStencilMask (~0);
+//       glStencilFunc (GL_ALWAYS, 0, ~0);
+
+//       draw_shadowVolume2 (i);
+
+//       glPopAttrib ();
+
+//       glDepthFunc (GL_EQUAL);
+
+//       glEnable (GL_STENCIL_TEST);
+//       glStencilFunc (GL_EQUAL, 0, ~0);
+//       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+//       m_scene->draw_sceneWTEX ();
+      
+//       reset_diffuse_light (i);
+//     }
+//   glDisable (GL_STENCIL_TEST);
+//   for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
+//     {
+//       enable_only_ambient_light (i);
+//     }
+//   m_scene->draw_sceneWTEX ();
+//   for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
+//     {
+//       reset_diffuse_light (i);
+//     }
+//   switch_on_lights ();
+//   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+//   m_scene->draw_scene ();
+// }
+
+void
+GLFlameCanvas::cast_shadows_double ()
+{
+  CPoint pos(m_flames[0]->getPosition());
+  m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(), pos, 1.0);
+
+  for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    m_flames[f]->switch_off_lights ();
+  m_scene->draw_sceneWT ();
+
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
+    for (int f = 0; f < m_currentConfig->nbFlames; f++){
+      m_flames[f]->switch_on_lights (intensities[f]);
+    }
+  
+  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
+		GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
+
+  glColorMask (0, 0, 0, 0);
+  glDepthMask (0);
+
+  glDisable (GL_CULL_FACE);
+  glEnable (GL_STENCIL_TEST);
+  glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
+
+  glActiveStencilFaceEXT (GL_BACK);
+  glStencilOp (GL_KEEP,	// stencil test fail
+	       GL_DECR_WRAP_EXT,	// depth test fail
+	       GL_KEEP);	// depth test pass
+  glStencilMask (~0);
+  glStencilFunc (GL_ALWAYS, 0, ~0);
+
+  glActiveStencilFaceEXT (GL_FRONT);
+  glStencilOp (GL_KEEP,	// stencil test fail
+	       GL_INCR_WRAP_EXT,	// depth test fail
+	       GL_KEEP);	// depth test pass
+  glStencilMask (~0);
+  glStencilFunc (GL_ALWAYS, 0, ~0);
+  
+  for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    m_flames[f]->draw_shadowVolumes ();
+
+  glPopAttrib ();
+
+  /* On teste ensuite Ã  l'endroit où il faut dessiner */
+  glDepthFunc (GL_EQUAL);
+
+  glEnable (GL_STENCIL_TEST);
+  glStencilFunc (GL_EQUAL, 0, ~0);
+  glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  glBlendFunc (GL_ONE, GL_ONE);
+
+  /* Activation de l'éclairage ambiant uniquement */
+   GLfloat val_ambiant[]={1.0,1.0,1.0,1.0};
+   GLfloat null[]={0.0,0.0,0.0,1.0};
+  
+   glLightfv(GL_LIGHT0,GL_DIFFUSE,null);
+   glLightfv(GL_LIGHT0,GL_SPECULAR,null);
+   glLightfv(GL_LIGHT0,GL_AMBIENT,val_ambiant);
+   glEnable(GL_LIGHT0);
+  
+  /* Dessin des ombres en noir & blanc */
+  m_scene->draw_sceneWT ();
+  
+  glDisable (GL_STENCIL_TEST);
+  /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
+
+  glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+      m_flames[f]->reset_diffuse_light ();
+    
+    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+      m_flames[f]->switch_on_lights (intensities[f]);
+    
+    m_scene->draw_scene ();
+  }else
+    m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
+  
 }

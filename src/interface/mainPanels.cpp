@@ -23,30 +23,30 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_glBuffer = glBuffer;
   
   m_solverXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
-					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_solverYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
-					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_solverZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
-					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_solverXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
   m_solverYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
   m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
   m_solverXAxisPositionSliderMin = new wxTextCtrl(this,IDT_FXAPMIN,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverXAxisPositionSliderMax = new wxTextCtrl(this,IDT_FXAPMAX,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverYAxisPositionSliderMin = new wxTextCtrl(this,IDT_FYAPMIN,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverYAxisPositionSliderMax = new wxTextCtrl(this,IDT_FYAPMAX,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverZAxisPositionSliderMin = new wxTextCtrl(this,IDT_FZAPMIN,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX,_(""),
-						 wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-
+						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
+  
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
   m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
-				     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*SLIDER_SENSIBILITY*10));
   
@@ -61,7 +61,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
-
+  
   m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
   m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
   m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
@@ -72,7 +72,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_solversXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-
+  
   m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversXAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
@@ -85,7 +85,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
   m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
-  m_forcesSizer->Add(m_buoyancySlider, 3, wxEXPAND, 0);
+  m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_solversXAxisPositionSizer, 1, wxEXPAND, 0);
@@ -177,7 +177,7 @@ void SolverMainPanel::ComputeSlidersValues(void)
   m_solverXAxisPositionSlider->SetRange(valx-SLIDER_RANGE,valx+SLIDER_RANGE);
   m_solverYAxisPositionSlider->SetRange(valy-SLIDER_RANGE,valy+SLIDER_RANGE);
   m_solverZAxisPositionSlider->SetRange(valz-SLIDER_RANGE,valz+SLIDER_RANGE);
-
+  
   m_solverXAxisPositionSliderMin->Clear();
   m_solverXAxisPositionSliderMax->Clear();
   m_solverYAxisPositionSliderMin->Clear();
@@ -209,9 +209,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("None"),
     _("Vertical"),
     _("From right")
-  };
+  };  
   
-
   SLIDER_SENSIBILITY=1000.0;
   SLIDER_RANGE=200;
   
@@ -220,11 +219,11 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_glBuffer = glBuffer;
   
   m_innerForceSlider = new wxSlider(this,-1,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
-					    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_innerForceLabel = new wxStaticText(this,IDSL_FF,_("Force"));
   
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
-
+  
   m_forcesSizer->Add(m_innerForceLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_innerForceSlider, 2, wxEXPAND, 0);
   
@@ -237,14 +236,14 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
-
+  
   SetSizer(m_panelSizer);
 }
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   double valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
-
+  
   m_glBuffer->setFlameForces(m_index, valInner);
   
   m_flameConfig->innerForce = valInner;

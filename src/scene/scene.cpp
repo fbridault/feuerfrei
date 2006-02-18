@@ -3,12 +3,10 @@
 /* Construction/Destruction */
 CScene::CScene (const char* const filename, Flame **flames, int nbFlames)
 {  
-  double coeff[3] = { .8, .8, .8 };
-  
   m_flames = flames;
   m_nbFlames = nbFlames;
   
-  addMaterial(new CMaterial("default",NULL, coeff, NULL, 0));
+  addMaterial(new CMaterial());
   cerr << "Chargement de la scène " << filename << endl;
   COBJReader objReader(filename, *this);
 }
@@ -21,7 +19,7 @@ void CScene::loadObject(const char *filename, CObject* const newObj, bool detach
 
 void CScene::createDisplayLists(void)
 {
-  m_displayLists[0] = glGenLists(8);
+  m_displayLists[0] = glGenLists(NB_DISPLAY_LISTS);
   for(int i=1; i<8; i++)
     m_displayLists[i] = m_displayLists[0] + i;
   
@@ -66,7 +64,7 @@ void CScene::createDisplayLists(void)
   for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
-    (*objectsArrayIterator)->draw (ALL,false);
+    (*objectsArrayIterator)->draw (AMBIENT,false);
   glEndList ();
   
   /* Création de la display list des objets qui projettent des ombres */
@@ -83,7 +81,7 @@ void CScene::createDisplayLists(void)
   for (vector < CObject * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
-    (*objectsArrayIteratorWSV)->draw (ALL,false);
+    (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
   glEndList ();
   
   cout << "Terminé" << endl;
@@ -118,6 +116,8 @@ CScene::~CScene ()
        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
     delete (*materialArrayIterator);
   m_materialArray.clear ();
+  
+  glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
 }
 
 int CScene::getVertexCount()

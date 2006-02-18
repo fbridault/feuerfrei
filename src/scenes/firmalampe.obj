@@ -1,6 +1,6 @@
 #Produced by Art of Illusion 2.1, Sat Jul 23 01:56:42 CEST 2005
 mtllib firmalampe.mtl
-g JoinedMesh
+g WSVFirmalampe 
 usemtl Default_Texture
 v -0.89254 0.03378 0.03119
 v -0.89797 0.06724 0.03119

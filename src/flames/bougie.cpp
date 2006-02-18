@@ -4,15 +4,15 @@
 #include "../scene/scene.hpp"
 
 Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, double innerForce, CgSVShader * shader, 
-		const char *filename, CScene *scene, CGcontext *context):
-  Flame (s, nb, posRel, filename, scene, innerForce),
+		const char *filename, CScene *scene, CGcontext *context, int index):
+  Flame (s, nb, posRel, filename, scene, innerForce, index),
   m_tex (_("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 //   cgBougieVertexShader (_("bougieShader.cg"),_("vertBougie"),context),
 //   cgBougieFragmentShader (_("bougieShader.cg"),_("fragBougie"),context)
 {
   int i;
   double angle;
-
+  
   m_lifeSpanAtBirth = 6;
   m_nbFixedPoints = 3;
   
@@ -41,6 +41,8 @@ Bougie::Bougie (Solver * s, int nb, CPoint& posRel, double rayon, double innerFo
   m_solver->findPointPosition(posRel, m_x, m_y, m_z);
   
   m_cgShader = shader;
+  
+  m_nbLights = 1;
 }
 
 Bougie::~Bougie ()
@@ -66,7 +68,7 @@ Bougie::add_forces (char perturbate)
   switch(perturbate){
   case FLICKERING_VERTICAL : 
     if(m_perturbateCount>=2){
-      m_solver->setVsrc(((int)(ceil(m_solver->getXRes()/2.0))),1,((int)(ceil(m_solver->getZRes()/2.0))),0.15);
+      m_solver->setVsrc(m_x, 1, m_z, 0.2);
       m_perturbateCount = 0;
     }else
       m_perturbateCount++;
@@ -89,23 +91,29 @@ Bougie::add_forces (char perturbate)
 void
 Bougie::eclaire ()
 {
-  m_nbLights = 0;
+  CPoint pt(getPosition());
   Particle *tmp;
 		
   switch_off_lights ();
   /* D�placement du guide */
   m_lead->move ();
-	
-  for (int i = 0; i < m_lead->getSize (); i++)
-    {
-      tmp = m_lead->getParticle (i);
+  
+  tmp = m_lead->getParticle (0);
+  m_lightPositions[0][0] = tmp->x+pt.x;
+  m_lightPositions[0][1] = tmp->y+pt.y;
+  m_lightPositions[0][2] = tmp->z+pt.z;
+  m_lightPositions[0][3] = 1.0;
 
-      m_nbLights++;
-      m_lightPositions[i][0] = tmp->x;
-      m_lightPositions[i][1] = tmp->y;
-      m_lightPositions[i][2] = tmp->z;
-      m_lightPositions[i][3] = 1.0;
-    }
+//   for (int i = 0; i < m_lead->getSize (); i++)
+//     {
+//       tmp = m_lead->getParticle (i);
+
+//       m_nbLights++;
+//       m_lightPositions[i][0] = tmp->x+pt.x;
+//       m_lightPositions[i][1] = tmp->y+pt.y;
+//       m_lightPositions[i][2] = tmp->z+pt.z;
+//       m_lightPositions[i][3] = 1.0;
+//     }
 }
 
 void
@@ -409,17 +417,17 @@ Bougie::draw_shadowVolumes ()
 {
   m_cgShader->enableProfile ();
   m_cgShader->bindProgram ();
-
-  for (int i = 0; i < m_nbLights - 3; i++)
+  
+  for (int i = 0; i < m_nbLights; i++)
     {
       m_cgShader->setLightPos (m_lightPositions[i]);
-
+      
       glPushMatrix ();
       glLoadIdentity ();
       m_cgShader->setModelViewMatrixToInverse ();
       glPopMatrix ();
       m_cgShader->setModelViewProjectionMatrix ();
-
+      
       m_scene->draw_sceneWSV();
     }
   m_cgShader->disableProfile ();
@@ -454,152 +462,23 @@ Bougie::draw_shadowVolume2 (int i)
   //   pos[0] = m_lightPositions[ind][0]+modulo*(m_lightPositions[ind+1][0]-m_lightPositions[ind][0])/SHADOW_SAMPLE_PER_LIGHT;
   //   pos[1] = m_lightPositions[ind][1]+modulo*(m_lightPositions[ind+1][1]-m_lightPositions[ind][1])/SHADOW_SAMPLE_PER_LIGHT;
   //   pos[2] = m_lightPositions[ind][2]+modulo*(m_lightPositions[ind+1][2]-m_lightPositions[ind][2])/SHADOW_SAMPLE_PER_LIGHT;
-
+  
   pos[0] = m_lightPositions[0][0] + i * (m_lightPositions[m_nbLights][0] - m_lightPositions[0][0]) / 5.0;
   pos[1] = m_lightPositions[0][1] + i * (m_lightPositions[m_nbLights][1] - m_lightPositions[0][1]) / 5.0;
   pos[2] = m_lightPositions[0][2] + i * (m_lightPositions[m_nbLights][2] - m_lightPositions[0][2]) / 5.0;
-
+  
   m_cgShader->setLightPos (pos);
-
+  
   m_cgShader->enableProfile ();
   m_cgShader->bindProgram ();
-
+  
   glPushMatrix ();
   glLoadIdentity ();
   m_cgShader->setModelViewMatrixToInverse ();
   glPopMatrix ();
   m_cgShader->setModelViewProjectionMatrix ();
-
+  
   m_scene->draw_sceneWSV();
-
+  
   m_cgShader->disableProfile ();
 }
-
-void
-Bougie::cast_shadows_double_multiple ()
-{
-  switch_off_lights ();
-  m_scene->draw_sceneWTEX ();
-
-  glBlendFunc (GL_ONE, GL_ONE);
-  for (int i = 0; i < 1 /*m_nbLights *//**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
-    {
-      enable_only_ambient_light (i);
-      glClear (GL_STENCIL_BUFFER_BIT);
-      glDepthFunc (GL_LESS);
-      glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-		    GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
-
-      glColorMask (0, 0, 0, 0);
-      glDepthMask (0);
-
-      glDisable (GL_CULL_FACE);
-      glEnable (GL_STENCIL_TEST);
-      glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
-      glActiveStencilFaceEXT (GL_BACK);
-      glStencilOp (GL_KEEP,	// stencil test fail
-		   GL_DECR_WRAP_EXT,	// depth test fail
-		   GL_KEEP);	// depth test pass
-      glStencilMask (~0);
-      glStencilFunc (GL_ALWAYS, 0, ~0);
-
-      glActiveStencilFaceEXT (GL_FRONT);
-      glStencilOp (GL_KEEP,	// stencil test fail
-		   GL_INCR_WRAP_EXT,	// depth test fail
-		   GL_KEEP);	// depth test pass
-      glStencilMask (~0);
-      glStencilFunc (GL_ALWAYS, 0, ~0);
-
-      draw_shadowVolume2 (i);
-
-      glPopAttrib ();
-
-      glDepthFunc (GL_EQUAL);
-
-      glEnable (GL_STENCIL_TEST);
-      glStencilFunc (GL_EQUAL, 0, ~0);
-      glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-
-      m_scene->draw_sceneWTEX ();
-      
-      reset_diffuse_light (i);
-    }
-  glDisable (GL_STENCIL_TEST);
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      enable_only_ambient_light (i);
-    }
-  m_scene->draw_sceneWTEX ();
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      reset_diffuse_light (i);
-    }
-  switch_on_lights ();
-  glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  m_scene->draw_scene ();
-}
-
-void
-Bougie::cast_shadows_double ()
-{
-  switch_off_lights ();
-  m_scene->draw_sceneWTEX ();
-  switch_on_lights ();
-
-  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-		GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
-
-  glColorMask (0, 0, 0, 0);
-  glDepthMask (0);
-
-  glDisable (GL_CULL_FACE);
-  glEnable (GL_STENCIL_TEST);
-  glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
-  glActiveStencilFaceEXT (GL_BACK);
-  glStencilOp (GL_KEEP,	// stencil test fail
-	       GL_DECR_WRAP_EXT,	// depth test fail
-	       GL_KEEP);	// depth test pass
-  glStencilMask (~0);
-  glStencilFunc (GL_ALWAYS, 0, ~0);
-
-  glActiveStencilFaceEXT (GL_FRONT);
-  glStencilOp (GL_KEEP,	// stencil test fail
-	       GL_INCR_WRAP_EXT,	// depth test fail
-	       GL_KEEP);	// depth test pass
-  glStencilMask (~0);
-  glStencilFunc (GL_ALWAYS, 0, ~0);
-
-  draw_shadowVolumes ();
-
-  glPopAttrib ();
-
-  /* On teste ensuite à l'endroit où il faut dessiner */
-  glDepthFunc (GL_EQUAL);
-
-  glEnable (GL_STENCIL_TEST);
-  glStencilFunc (GL_EQUAL, 0, ~0);
-  glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  glBlendFunc (GL_ONE, GL_ONE);
-  m_scene->draw_sceneWTEX ();
-
-  switch_off_lights ();
-  glDisable (GL_STENCIL_TEST);
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      enable_only_ambient_light (i);
-    }
-  m_scene->draw_sceneWTEX ();
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      reset_diffuse_light (i);
-    }
-
-  switch_on_lights ();
-  glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-
-  m_scene->draw_scene ();
-}
-

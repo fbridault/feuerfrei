@@ -22,7 +22,7 @@ enum
   {
     IDCHK_IS = 1,
     IDCHK_BS,
-    IDCHK_ES,
+    IDCHK_Shadows,
     IDCHK_Glow,
     IDCHK_SaveImages,
   };
@@ -32,6 +32,7 @@ enum
     IDB_Run = 1,
     IDB_Restart,
     IDB_Swap,
+    IDRB_Lighting,
   };
 
 enum
@@ -45,12 +46,13 @@ enum
     IDM_Velocity,
     IDM_Particles,
     IDM_Flames,
-    IDM_Shadows,
+    IDM_ShadowVolumes,
     IDM_Hide,
     IDM_Wired,
     IDM_Shaded,
     IDM_SolversSettings,
     IDM_FlamesSettings,
+    IDM_ShadowVolumesSettings,
   };
 
 /** Fenêtre principale */
@@ -84,11 +86,14 @@ public:
   void OnSolversMenu(wxCommandEvent& event);
   void OnFlamesMenu(wxCommandEvent& event);
   void OnShadowsMenu(wxCommandEvent& event);
+  void OnShadowVolumesMenu(wxCommandEvent& event);
+  void OnShadowVolumesSettingsMenu(wxCommandEvent& event);
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
+  void OnCheckShadows(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckSaveImages(wxCommandEvent& event);
-  void OnCheckES(wxCommandEvent& event);
+  void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
   void SetFPS(int fps);
 
@@ -104,12 +109,14 @@ private:
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
   wxMenuBar *m_menuBar;
-  
+
+  wxRadioBox *m_lightingRadioBox;
+
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
-  wxCheckBox *m_enableSolidCheckBox, *m_glowEnabledCheckBox;
+  wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox;
   
-  wxStaticBoxSizer *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer, *m_flamesSizer;  
+  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer, *m_flamesSizer;  
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
   
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];

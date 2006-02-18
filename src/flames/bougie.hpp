@@ -31,7 +31,7 @@ public:
    * @param shader pointeur sur le shader qui génÃ¨re les shadow volumes
    */
   Bougie(Solver *s, int nb, CPoint& posRel, double rayon, double innerForce,
-	 CgSVShader *shader, const char *filename, CScene *scene, CGcontext *context);
+	 CgSVShader *shader, const char *filename, CScene *scene, CGcontext *context, int index);
   virtual ~Bougie();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -58,8 +58,6 @@ public:
    */
   void eclaire();
 
-  void cast_shadows_double_multiple();
-  void cast_shadows_double();
   void draw_shadowVolumes();
 
   /** Retourne la direction de la base de la flamme vers la derniere particule

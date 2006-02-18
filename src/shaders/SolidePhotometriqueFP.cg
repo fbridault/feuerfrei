@@ -32,18 +32,18 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
 {
   // Couleur de la flamme (en dur pour l'instant)
   float4 CouleurFlamme = float4(R,G,B,1.0);
-
+  
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
   
   // - cos de l'angle entre la direction de la source et la normale au point
   float cosSN = dot(normalize(direction),normalize(IN.normale));
-
+  
   // couleur de la texture de l'objet codee dans le fichier OBJ
   float4 ColorOBJ = tex2D(textureFichierOBJ, IN.texcoords);
-
+  
   // calcul de l'intensite d'eclairage stockee dans la texture du solide photometrique
-
+  
   // application de la rotation du SP selon l'inclinaison de la flamme
   IN.PT3D = mul(TextureSPMatrix, IN.PT3D);
   // translation inverse du centre du SP
@@ -53,12 +53,12 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
   float r = length(IN.PT3D.xyz);
   float theta=acos(IN.PT3D.y / r);
   float phi=atan2(IN.PT3D.z,IN.PT3D.x);
-
+  
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
   float ColorSP = texRECT(textureSP, texcoordsSP).x;
-    
+  
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
   // attenuation de l'intensite en fonction de la distance
@@ -67,7 +67,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     ColorSP *= attenuation;
   // attenuation de l'intensite en fonction de la flamme
   ColorSP *= fluctuationIntensite;
-
+  
   // melange de la couleur de l'objet, de sa texture et de l'intensite
   return float4(ColorSP.rrr,1.0) * CouleurFlamme * ColorOBJ * IN.Col0;
 }
@@ -81,13 +81,13 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
 {
   // Couleur de la flamme (en dur pour l'instant)
   float4 CouleurFlamme = float4(R,G,B,1.0);
-
+  
   // Calcul de la direction du point3D vers le centre du SP 
   float3 direction = centreSP - IN.PT3D.xyz;
   
   // - cos de l'angle entre la direction de la source et la normale au point
   float cosSN = dot(normalize(direction),normalize(IN.normale));
-
+  
   // calcul de l'intensite d'eclairage stockee dans la texture du solide photometrique
 
   // application de la rotation du SP selon l'inclinaison de la flamme
@@ -99,12 +99,12 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
   float r = length(IN.PT3D.xyz);
   float theta=acos(IN.PT3D.y / r);
   float phi=atan2(IN.PT3D.z,IN.PT3D.x);
-
+  
   // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
   float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
   // recuperation de l'intensite du fragment
   float ColorSP = texRECT(textureSP, texcoordsSP).x;
-
+  
   // attenuation de l'intensite en fonction de l'angle d'eclairage
   ColorSP *= cosSN;
   // attenuation de l'intensite en fonction de la distance
@@ -113,7 +113,7 @@ float4 fpSPWTEX(in vertexOutputsWTEX IN,
     ColorSP *= attenuation;
   // attenuation de l'intensite en fonction de la flamme
   ColorSP *= fluctuationIntensite;
-    
+  
   return float4(ColorSP.rrr,1.0) * CouleurFlamme * IN.Col0;
 }
 

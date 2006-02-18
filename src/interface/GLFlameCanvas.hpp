@@ -63,26 +63,30 @@ public:
   /** Lance/arrête l'animation */
   void ToggleRun(void) { m_run=!m_run; };
   /** Active/Désactive le glow */
-  void ToggleGlow(void) { m_currentConfig->glowEnabled=!m_currentConfig->glowEnabled; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
   void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };
   void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
   void ToggleParticlesDisplay(void) { m_displayParticles=!m_displayParticles; };
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
+  void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
   void ToggleSmoothShading(void) { 
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->toggleSmoothShading (); };
-  void ToggleBlendedSP(void) { m_currentConfig->BPSEnabled = 2-m_currentConfig->BPSEnabled; };
-  void ToggleInterpolationSP(void) { m_currentConfig->IPSEnabled = 1-m_currentConfig->IPSEnabled; };
+    m_flames[f]->toggleSmoothShading ();
+  };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
-
+  
+  void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
+  void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
 private:
   void WriteFPS ();
   void DrawVelocity (void);
+  
+  void cast_shadows_double_multiple();
+  void cast_shadows_double();
   
   /** Configuration de l'application */
   FlameAppConfig *m_currentConfig;
@@ -90,7 +94,7 @@ private:
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles;
-  bool m_shadowsEnabled, m_shadowVolumesEnabled, m_glowOnly;
+  bool m_drawShadowVolumes, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 
@@ -121,6 +125,8 @@ private:
   Flame **m_flames;
   CScene *m_scene;
   CgSVShader *m_SVShader;
+  
+  double *intensities;
 
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()

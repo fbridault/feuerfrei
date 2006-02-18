@@ -39,8 +39,8 @@ public:
    * @param filename nom du fichier OBJ contenant le luminaire
    * @param pointeur sur la scène
    */
-  Flame (Solver * s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce);
-  Flame (Solver * s, CPoint& posRel, const char *filename, CScene *scene, double innerForce);
+  Flame (Solver * s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce, int index);
+  Flame (Solver * s, CPoint& posRel, const char *filename, CScene *scene, double innerForce, int index);
   virtual ~Flame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -48,12 +48,12 @@ public:
    * des vecteurs de noeuds.
    */
   virtual void build() = 0;
-    
+  
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture
    */
   virtual void drawFlame(bool displayParticle) = 0;
-
+  
   /** Dessine la mèche de la flamme */
   virtual void drawWick() = 0;
   
@@ -82,13 +82,13 @@ public:
     drawWick();
     drawFlame(displayParticle);
   };
-
+  
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
   virtual void add_forces (char perturbate) = 0;
   
   virtual void setForces(double value){  m_innerForce=value; };
-
+  
   /** Fonction appelée par la fonction de dessin OpenGL. Elle fournit l'éclairage dû à la flamme, 
    * au reste de la scène via les particules du squelette guide. Elle s'occupe également de déplacer
    * les particules du squelette guide.
@@ -103,9 +103,11 @@ public:
   virtual void toggleSmoothShading ();
   
   virtual void draw_shadowVolumes () = 0;
-  virtual void cast_shadows_double_multiple () = 0;
-  virtual void cast_shadows_double () = 0;
-  virtual void switch_on_lights ();
+  virtual void switch_on_lights (double coef);
+  
+  virtual void switch_off_lights ();
+  
+  virtual void reset_diffuse_light ();
 
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    * pour orienter le solide photométrique.
@@ -139,11 +141,6 @@ protected:
     m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
     //    m_ctrlPoints[(u*m_size+v)*3+3] = w;
   }
-  
-  virtual void switch_off_lights ();
-  
-  virtual void enable_only_ambient_light (int i);
-  virtual void reset_diffuse_light (int i);
   
   virtual void draw_shadowVolume (int i) = 0;
   virtual void draw_shadowVolume2 (int i) = 0;
@@ -200,6 +197,7 @@ protected:
   bool m_toggle;
   
   GLdouble m_lightPositions[8][4];
+  short m_light;
   short m_nbLights;
   
   int m_perturbateCount;

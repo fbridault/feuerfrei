@@ -4,13 +4,13 @@
 #include "../scene/scene.hpp"
 
 Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, CgSVShader * shader, 
-			const char *meche_name, const char *filename, CScene *scene):
-  Flame (s, posRel, filename,scene, innerForce),
+			const char *meche_name, const char *filename, CScene *scene, int index):
+  Flame (s, posRel, filename,scene, innerForce, index),
   m_wick (meche_name, nb, scene),
   m_tex (_("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP)
 {
   CPoint pt;
-  double largeur = 0.03;
+  double largeur = .03;
 
   m_lifeSpanAtBirth = 4;
   m_nbFixedPoints = 3;
@@ -32,7 +32,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, C
       m_leads[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL,m_lifeSpanAtBirth);
       pt.z += (-largeur / 2.0);
       m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP,
-					m_leads[i - 1], m_lifeSpanAtBirth - 2);
+					 m_leads[i - 1], m_lifeSpanAtBirth - 2);
     }
 
   /* Génération de l'autre cÃ´té des squelettes périphériques */
@@ -41,7 +41,7 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, C
 	pt = posRel + *m_wick.getLeadPoint (j - 1);
 	pt.z += (largeur / 2.0);
 	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP,
-					  m_leads[j - 1], m_lifeSpanAtBirth - 2);
+					   m_leads[j - 1], m_lifeSpanAtBirth - 2);
   }
   
   /* Ajout des extrémités */
@@ -52,8 +52,8 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, C
   pt = posRel + *m_wick.getLeadPoint (m_nbLeadSkeletons - 1);
   pt.x += (largeur / 2.0);
   m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP,
-						      m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
-
+							 m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
+  
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
   m_ctrlPoints =  new GLfloat[(NB_PARTICULES + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3];
@@ -65,6 +65,8 @@ Firmalampe::Firmalampe (Solver * s, int nb, CPoint& posRel, double innerForce, C
   m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 
   m_cgShader = shader;
+  
+  m_nbLights = 1;
 }
 
 Firmalampe::~Firmalampe ()
@@ -109,7 +111,7 @@ Firmalampe::add_forces (char perturbate)
       ptz = (int) ((*pointsIterator)->z * m_solver->getDimZ() * m_solver->getZRes()) + 1 + m_solver->getZRes() / 2;
       //cout << ptx << " " << pty << " " << ptz << endl;
       //cout << (*pointsIterator)->y << endl;
-      for (int i = pty ; i > 0 ; i--) 
+      for (int i = pty ; i > 0 ; i--)
 	//m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
 	m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
     }
@@ -156,25 +158,25 @@ Firmalampe::add_forces (char perturbate)
 void
 Firmalampe::eclaire ()
 {
+  CPoint pt(getPosition()), averagePos;
   Particle *tmp;
+  int nb=0;
   
-  m_nbLights = 0;
-
   switch_off_lights ();
-  /* Déplacement des m_leads + éclairage */
+  /* Déplacement des m_leads + éclairage */  
+  m_lightPositions[0][0] = 0.0;
+  m_lightPositions[0][1] = 0.0;
+  m_lightPositions[0][2] = 0.0;
+  m_lightPositions[0][3] = 1.0;
   
-  for (int i = 0; i < m_nbLeadSkeletons  ; i++){
+  for (int i = 0, nb=1; i < m_nbLeadSkeletons  ; i++, nb++){
     m_leads[i]->move ();
     
-    tmp = m_leads[i]->getLastParticle ();
+    tmp = m_leads[i]->getMiddleParticle ();
     
-    m_nbLights++;
-    if( (i < 8 ) ){
-      m_lightPositions[i][0] = tmp->x;
-      m_lightPositions[i][1] = tmp->y;
-      m_lightPositions[i][2] = tmp->z;
-      m_lightPositions[i][3] = 1.0;
-    }
+    m_lightPositions[0][0] = (m_lightPositions[0][0]*nb + (tmp->x+pt.x))/(nb+1);
+    m_lightPositions[0][1] = (m_lightPositions[0][1]*nb + (tmp->y+pt.y))/(nb+1);
+    m_lightPositions[0][2] = (m_lightPositions[0][2]*nb + (tmp->z+pt.z))/(nb+1);
   }
 }
 
@@ -438,7 +440,7 @@ void
 Firmalampe::draw_shadowVolumes ()
 {
   //int nbVol = 8 - 
-  for (int i = 0; i < m_nbLights - 3; i++)
+  for (int i = 0; i < m_nbLights; i++)
     {
       m_cgShader->setLightPos (m_lightPositions[i]);
 
@@ -511,139 +513,6 @@ Firmalampe::draw_shadowVolume2 (int i)
   m_scene->draw_sceneWSV();
   
   m_cgShader->disableProfile ();
-}
-
-void
-Firmalampe::cast_shadows_double_multiple ()
-{
-  switch_off_lights ();
-  m_scene->draw_sceneWTEX ();
-
-  glBlendFunc (GL_ONE, GL_ONE);
-  for (int i = 0; i < 1 /*m_nbLights *//**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
-    {
-      enable_only_ambient_light (i);
-      glClear (GL_STENCIL_BUFFER_BIT);
-      glDepthFunc (GL_LESS);
-      glPushAttrib (GL_COLOR_BUFFER_BIT |
-		    GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT |
-		    GL_STENCIL_BUFFER_BIT);
-
-      glColorMask (0, 0, 0, 0);
-      glDepthMask (0);
-
-      glDisable (GL_CULL_FACE);
-      glEnable (GL_STENCIL_TEST);
-      glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
-      glActiveStencilFaceEXT (GL_BACK);
-      glStencilOp (GL_KEEP,	// stencil test fail
-		   GL_DECR_WRAP_EXT,	// depth test fail
-		   GL_KEEP);	// depth test pass
-      glStencilMask (~0);
-      glStencilFunc (GL_ALWAYS, 0, ~0);
-
-      glActiveStencilFaceEXT (GL_FRONT);
-      glStencilOp (GL_KEEP,	// stencil test fail
-		   GL_INCR_WRAP_EXT,	// depth test fail
-		   GL_KEEP);	// depth test pass
-      glStencilMask (~0);
-      glStencilFunc (GL_ALWAYS, 0, ~0);
-
-      draw_shadowVolume2 (i);
-
-      glPopAttrib ();
-
-      glDepthFunc (GL_EQUAL);
-
-      glEnable (GL_STENCIL_TEST);
-      glStencilFunc (GL_EQUAL, 0, ~0);
-      glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-
-      m_scene->draw_sceneWTEX ();
-
-      reset_diffuse_light (i);
-    }
-  glDisable (GL_STENCIL_TEST);
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
-    {
-      enable_only_ambient_light (i);
-    }
-  m_scene->draw_sceneWTEX ();
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ;
-       i++)
-    {
-      reset_diffuse_light (i);
-    }
-  switch_on_lights ();
-  glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  m_scene->draw_scene ();
-}
-
-void
-Firmalampe::cast_shadows_double ()
-{
-  switch_off_lights ();
-  m_scene->draw_sceneWTEX ();
-  switch_on_lights ();
-
-  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-		GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
-
-  glColorMask (0, 0, 0, 0);
-  glDepthMask (0);
-
-  glDisable (GL_CULL_FACE);
-  glEnable (GL_STENCIL_TEST);
-  glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
-  glActiveStencilFaceEXT (GL_BACK);
-  glStencilOp (GL_KEEP,	// stencil test fail
-	       GL_DECR_WRAP_EXT,	// depth test fail
-	       GL_KEEP);	// depth test pass
-  glStencilMask (~0);
-  glStencilFunc (GL_ALWAYS, 0, ~0);
-
-  glActiveStencilFaceEXT (GL_FRONT);
-  glStencilOp (GL_KEEP,	// stencil test fail
-	       GL_INCR_WRAP_EXT,	// depth test fail
-	       GL_KEEP);	// depth test pass
-  glStencilMask (~0);
-  glStencilFunc (GL_ALWAYS, 0, ~0);
-
-  draw_shadowVolumes ();
-
-  glPopAttrib ();
-
-  /* On teste ensuite à l'endroit où il faut dessiner */
-  glDepthFunc (GL_EQUAL);
-
-  glEnable (GL_STENCIL_TEST);
-  glStencilFunc (GL_EQUAL, 0, ~0);
-  glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  glBlendFunc (GL_ONE, GL_ONE);
-  m_scene->draw_sceneWTEX ();
-
-  glDisable (GL_STENCIL_TEST);
-  //  glDepthFunc(GL_LESS);
-
-  switch_off_lights ();
-  glDisable (GL_STENCIL_TEST);
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      enable_only_ambient_light (i);
-    }
-  m_scene->draw_sceneWTEX ();
-  for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-    {
-      reset_diffuse_light (i);
-    }
-
-  switch_on_lights ();
-  glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  m_scene->draw_scene ();
 }
 
 CVector Firmalampe::get_main_direction()

@@ -32,7 +32,7 @@ private:
   Texture *m_diffuseTexture;
 public:
   /**
-   * Constructeur par d&eacute;faut. Cr&eacute;e un mat&eacute;riau noir opaque.
+   * Constructeur par d&eacute;faut. Cr&eacute;e un mat&eacute;riau blanc ambiant.
    */
   CMaterial();
   /**

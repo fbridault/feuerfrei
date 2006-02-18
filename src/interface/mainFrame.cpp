@@ -2,10 +2,12 @@
 
 #include "solverDialog.hpp"
 #include "flameDialog.hpp"
+#include "shadowsDialog.hpp"
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
+  EVT_RADIOBOX(IDRB_Lighting, MainFrame::OnSelectLighting)
   EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
   EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
@@ -17,15 +19,16 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
   EVT_MENU(IDM_Particles, MainFrame::OnParticlesMenu)
-  EVT_MENU(IDM_Shadows, MainFrame::OnShadowsMenu)
+  EVT_MENU(IDM_ShadowVolumes, MainFrame::OnShadowVolumesMenu)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
   EVT_MENU(IDM_SolversSettings, MainFrame::OnSolversMenu)
   EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
+  EVT_MENU(IDM_ShadowVolumesSettings, MainFrame::OnShadowVolumesSettingsMenu)  
   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
-  EVT_CHECKBOX(IDCHK_ES, MainFrame::OnCheckES)
+  EVT_CHECKBOX(IDCHK_Shadows, MainFrame::OnCheckShadows)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_SaveImages, MainFrame::OnCheckSaveImages)
   EVT_CLOSE(MainFrame::OnClose)
@@ -36,13 +39,16 @@ END_EVENT_TABLE();
 MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
-  
-  int attributelist[ 10 ] = { WX_GL_RGBA        ,
+  int attributelist[ 10 ] = { WX_GL_RGBA,
 			      WX_GL_DOUBLEBUFFER,
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
   
+  const wxString m_lightingChoices[] = {
+    _("Standard"),
+    _("Photometric Solid")
+  };  
   /*********************************** Création des contrôles *************************************************/
   m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   
@@ -50,19 +56,23 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
+   
+  m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Lighting"), wxDefaultPosition, wxDefaultSize, 
+				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
+  
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
   m_buttonSwap = new wxButton(this,IDB_Swap,_("Next IES file"));
   
   m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
-  m_enableSolidCheckBox = new wxCheckBox(this,IDCHK_ES,_("Enabled"));
-  m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Enabled"));
+  m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
+  m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
-  
+  		       
   /* Réglages globaux */
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 0, 0, 0);
@@ -71,17 +81,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   /* Réglages du solide photométrique */
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
-  m_solidSizer->Add(m_enableSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
   
   m_topSizer = new wxBoxSizer(wxHORIZONTAL);
   m_topSizer->Add(m_globalSizer, 2, wxEXPAND, 0);
-  m_topSizer->Add(m_solidSizer, 3, wxEXPAND, 0);
+  m_topSizer->Add(m_solidSizer, 2, wxEXPAND, 0);
   
   /* Réglages du glow */
-  m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Glow"));
+  m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
+  m_glowSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
   m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
@@ -92,6 +102,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
+  m_rightSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_glowSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
@@ -124,11 +135,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->AppendCheckItem( IDM_Velocity, _("&Velocity"));
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("&Particles"));
   m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
-  m_menuDisplay->AppendCheckItem( IDM_Shadows, _("&Shadows"));
+  m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));
   
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
   m_menuSettings->Append( IDM_FlamesSettings, _("&Flames..."));
+  m_menuSettings->Append( IDM_ShadowVolumesSettings, _("S&hadows..."));
   
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
@@ -154,8 +166,18 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
   m_config->Read(_("/Display/IPSEnabled"), &m_currentConfig.IPSEnabled, 0);
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
+  m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
+  
+  m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
+  m_config->Read(_("/Shadows/Fatness.y"), &m_currentConfig.fatness[1], -.001);
+  m_config->Read(_("/Shadows/Fatness.z"), &m_currentConfig.fatness[2], -.001);
+  m_config->Read(_("/Shadows/ExtrudeDist.x"), &m_currentConfig.extrudeDist[0], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.y"), &m_currentConfig.extrudeDist[1], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.z"), &m_currentConfig.extrudeDist[2], 5);
+  m_currentConfig.fatness[3] = 0;
+  m_currentConfig.extrudeDist[3] = 0;
   
   m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
@@ -222,16 +244,23 @@ void MainFrame::GetSettingsFromConfigFile (void)
   
   m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
-  m_enableSolidCheckBox->SetValue(m_currentConfig.lightingMode);
+  m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
+  m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   
-  if(m_enableSolidCheckBox->IsChecked()){
-    m_interpolatedSolidCheckBox->Enable();
-    m_blendedSolidCheckBox->Enable();
-  }else{
-    m_interpolatedSolidCheckBox->Disable();
-    m_blendedSolidCheckBox->Disable();
-  }
+  switch(m_currentConfig.lightingMode)
+    {
+    case LIGHTING_STANDARD : 
+      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
+      m_interpolatedSolidCheckBox->Disable();
+      m_blendedSolidCheckBox->Disable();
+      break;
+    case LIGHTING_PHOTOMETRIC :
+      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
+      m_interpolatedSolidCheckBox->Enable();
+      m_blendedSolidCheckBox->Enable();
+      break;
+    }
           
   delete file;
 
@@ -274,31 +303,40 @@ void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
 
 void MainFrame::OnCheckBS(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleBlendedSP();
+  m_currentConfig.BPSEnabled = 2-m_currentConfig.BPSEnabled;
 }
 
 void MainFrame::OnCheckIS(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleInterpolationSP();
-}
-void MainFrame::OnCheckES(wxCommandEvent& event)
-{
-  if(event.IsChecked()){
-    m_menuDisplayFlames->Check(IDM_Shadows,false);
-    m_interpolatedSolidCheckBox->Enable();
-    m_blendedSolidCheckBox->Enable();
-    m_currentConfig.lightingMode=LIGHTING_PHOTOMETRIC;    
-  }else{
-    m_interpolatedSolidCheckBox->Disable();
-    m_blendedSolidCheckBox->Disable();    
-    m_currentConfig.lightingMode=LIGHTING_STANDARD;
-  }
+  m_currentConfig.IPSEnabled = 1-m_currentConfig.IPSEnabled;
 }
 
+void MainFrame::OnSelectLighting(wxCommandEvent& event)
+{
+  m_currentConfig.lightingMode = event.GetSelection();
+
+  switch(m_currentConfig.lightingMode)
+    {
+    case LIGHTING_STANDARD : 
+      m_interpolatedSolidCheckBox->Disable();
+      m_blendedSolidCheckBox->Disable();
+      break;
+    case LIGHTING_PHOTOMETRIC :
+      m_interpolatedSolidCheckBox->Enable();
+      m_blendedSolidCheckBox->Enable();
+      break;
+    }
+}
+
+
+void MainFrame::OnCheckShadows(wxCommandEvent& event)
+{
+  m_currentConfig.shadowsEnabled = !m_currentConfig.shadowsEnabled;
+}
 
 void MainFrame::OnCheckGlow(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleGlow();
+  m_currentConfig.glowEnabled = !m_currentConfig.glowEnabled;
 }
 
 void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
@@ -330,8 +368,16 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/LightingMode"), m_currentConfig.lightingMode);
   m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
+  m_config->Write(_("/Display/Shadows"), m_currentConfig.shadowsEnabled);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
+  
+  m_config->Write(_("/Shadows/Fatness.x"), m_currentConfig.fatness[0]);
+  m_config->Write(_("/Shadows/Fatness.y"), m_currentConfig.fatness[1]);
+  m_config->Write(_("/Shadows/Fatness.z"), m_currentConfig.fatness[2]);
+  m_config->Write(_("/Shadows/ExtrudeDist.x"), m_currentConfig.extrudeDist[0]);
+  m_config->Write(_("/Shadows/ExtrudeDist.y"), m_currentConfig.extrudeDist[1]);
+  m_config->Write(_("/Shadows/ExtrudeDist.z"), m_currentConfig.extrudeDist[2]);
   
   m_config->Write(_("/Solvers/Number"), m_currentConfig.nbSolvers);
   
@@ -439,18 +485,16 @@ void MainFrame::OnHideMenu(wxCommandEvent& event)
   m_glBuffer->ToggleFlamesDisplay();
 }
 
-void MainFrame::OnShadowsMenu(wxCommandEvent& event)
+void MainFrame::OnShadowVolumesMenu(wxCommandEvent& event)
 { 
-  if(event.IsChecked()){
-    m_enableSolidCheckBox->SetValue(false);
-    m_interpolatedSolidCheckBox->Disable();
-    m_blendedSolidCheckBox->Disable();
-    m_currentConfig.lightingMode=LIGHTING_SHADOWS;
-  }else{
-    m_interpolatedSolidCheckBox->Enable();
-    m_blendedSolidCheckBox->Enable();
-    m_currentConfig.lightingMode=LIGHTING_STANDARD;
-  }
+  m_glBuffer->ToggleShadowVolumesDisplay();
+}
+
+void MainFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
+{
+  ShadowsDialog *shadowsDialog = new ShadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
+  shadowsDialog->ShowModal();  
+  shadowsDialog->Destroy();
 }
 
 void MainFrame::OnWiredMenu(wxCommandEvent& event)

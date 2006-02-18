@@ -22,37 +22,37 @@ public:
    * @param shaderName Nom du programme Cg
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
    */
-  CgSVShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  CgSVShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, double *fatness, double *extrudeDist, bool recompile=false );
   virtual ~CgSVShader();
   
   /** Réglage de l'épaisseur des shadow volumes */
   void setFatness(GLdouble *fatnessVec){
-    cgGLSetParameter4dv(fatness, fatnessVec);
+    cgGLSetParameter4dv(m_fatness, fatnessVec);
   };
   
   /** Réglage de la profondeur des shadow volumes */ 
-  void setshadowExtrudeDist(GLdouble *shadowExtrudeDistVec){
-    cgGLSetParameter4dv(shadowExtrudeDist, shadowExtrudeDistVec);
+  void setShadowExtrudeDist(GLdouble *shadowExtrudeDistVec){
+    cgGLSetParameter4dv(m_shadowExtrudeDist, shadowExtrudeDistVec);
   };
   
   /** Réglage de la position de la lumière */
   void setLightPos(GLdouble lightPosition[4]){
-    cgGLSetParameter4dv(lightPos, lightPosition);
+    cgGLSetParameter4dv(m_lightPos, lightPosition);
   };
   
   /** Réglage de la matrice du modèle Ã  la matrice du modèle courante inverse */
   void setModelViewMatrixToInverse(){
-    cgGLSetStateMatrixParameter(modelViewMatrix, CG_GL_MODELVIEW_MATRIX,CG_GL_MATRIX_INVERSE);
+    cgGLSetStateMatrixParameter(m_modelViewMatrix, CG_GL_MODELVIEW_MATRIX,CG_GL_MATRIX_INVERSE);
   };
-    
+  
 private:
   /** Position de la lumière */
-  CGparameter lightPos;
-  CGparameter modelViewMatrix;
+  CGparameter m_lightPos;
+  CGparameter m_modelViewMatrix;
   /** Epaisseur des shadow volumes */
-  CGparameter fatness;
+  CGparameter m_fatness;
   /** Profondeur des shadow volumes */
-  CGparameter shadowExtrudeDist;
+  CGparameter m_shadowExtrudeDist;
 };
 
 #endif

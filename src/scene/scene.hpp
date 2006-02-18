@@ -16,6 +16,8 @@ class Flame;
 class COBJReader;
 class CObject;
 
+#define NB_DISPLAY_LISTS 8
+
 /** 
  * Classe repr&eacute;sentant une sc&egrave;ne g&eacute;om&eacute;trique.
  * Une sc&egrave;ne comporte une liste index&eacute;e des polygones, une liste des mat&eacute;riaux 
@@ -34,14 +36,14 @@ private:
   vector<CMaterial*> m_materialArray;/**< Liste des mat&eacute;riaux.*/
 
   /** Display lists de la scène
-   * [0] Tous les objets de la scène
-   * [1] Objets texturés
-   * [2] Objets sans textures
-   * [3] Objets texturés  qui projettent des ombres
+   * [0] Tous les objets de la scène ne projetant pas d'ombres
+   * [1] Objets texturés ne projetant pas d'ombres
+   * [2] Objets sans textures ne projetant pas d'ombres
+   * [3] Objets texturés qui projettent des ombres
    * [4] Objets sans textures qui projettent des ombres
    * [5] Tous les objets qui projettent des ombres
    * [6] Tous les objets qui projettent des ombres, sans les textures éventuelles
-   * [7] Tous les objets de la scène sans les textures éventuelles 
+   * [7] Tous les objets sans les textures éventuelles 
    */
   GLuint m_displayLists[8];
   int m_nbFlames;
@@ -168,12 +170,22 @@ public:
     glCallList(m_displayLists[2]);
     glCallList(m_displayLists[4]);
     
-    for (int f = 0; f < m_nbFlames; f++){
+    for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
-    }
+    
+  };
+
+  /** Dessin de tous les objets de la scène sans les textures */
+  void draw_sceneWT(void) const
+  {
+    glCallList(m_displayLists[6]);
+    glCallList(m_displayLists[7]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary();
   };
   
-  /** Dessin de la scène */
+  /** Dessin de tous les objets de la scène */
   void draw_scene (void) const
   {
     glCallList (m_displayLists[0]);
@@ -182,7 +194,7 @@ public:
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
   };
-  /** Dessin de la scène */
+  /** Dessin de tous les objets de la scène */
   void draw_scene (CgBasicVertexShader& shader) const
   {
     glCallList (m_displayLists[0]);
@@ -192,10 +204,13 @@ public:
       m_flames[f]->drawLuminary(shader);
   };
 
-    /** Dessin de la scène */
+    /** Dessin de tous les objets qui projettent des ombres */
   void draw_sceneWSV (void) const
   {
     glCallList (m_displayLists[6]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary();
   };
 };//Scene
 

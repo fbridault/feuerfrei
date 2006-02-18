@@ -88,18 +88,22 @@ CObject::draw (char drawCode, bool tex)
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
       
-      if(drawCode > 0){
+      if(drawCode == TEXTURED){
 	/* Ne dessiner que si il y a une texture */
 	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
-	if(drawCode < 0)
+	if(drawCode == FLAT)
 	  /* Ne dessiner que si il n'y a pas de texture */
 	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
-      
+	  
       if(!vertexCount){
-	checkAndApplyMaterial(index->vm,tex);
+	if(drawCode == AMBIENT)
+	  checkAndApplyMaterial(0,tex);
+	else
+	  checkAndApplyMaterial(index->vm,tex);
+	  
 	glBegin (GL_POLYGON);
       }
       
@@ -121,18 +125,21 @@ CObject::draw (char drawCode, bool tex)
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
 
-     if(drawCode > 0){
+     if(drawCode == TEXTURED){
 	/* Ne dessiner que si il y a une texture */
 	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
-	if(drawCode < 0)
+	if(drawCode == FLAT)
 	  /* Ne dessiner que si il n'y a pas de texture */
 	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
 
       if(!vertexCount){
-	checkAndApplyMaterial(index->vm,tex);
+	if(drawCode == AMBIENT)
+	  checkAndApplyMaterial(0,tex);
+	else
+	  checkAndApplyMaterial(index->vm,tex);
 	glBegin (GL_POLYGON);
       }
       
@@ -153,18 +160,21 @@ CObject::draw (char drawCode, bool tex)
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
 
-     if(drawCode > 0){
+     if(drawCode == TEXTURED){
 	/* Ne dessiner que si il y a une texture */
 	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
       }else
-	if(drawCode < 0)
+	if(drawCode == FLAT)
 	  /* Ne dessiner que si il n'y a pas de texture */
 	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
 
       if(!vertexCount){
-	checkAndApplyMaterial(index->vm,tex);
+	if(drawCode == AMBIENT)
+	  checkAndApplyMaterial(0,tex);
+	else
+	  checkAndApplyMaterial(index->vm,tex);
 	glBegin (GL_POLYGON);
       }
       

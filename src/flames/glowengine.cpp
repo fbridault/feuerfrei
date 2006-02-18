@@ -10,7 +10,7 @@ GlowEngine::GlowEngine(int w, int h, int scaleFactor, bool recompileShaders, CGc
   m_scaleFactor=scaleFactor;
   m_width=w/m_scaleFactor;
   m_height=h/m_scaleFactor;
-
+  
   // Initialiser le pbuffer
   m_pbuffer.Initialize(m_width, m_height, true, true);
   
@@ -45,11 +45,11 @@ void GlowEngine::blur()
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
-
+  
   /* On récupère le rendu des zones de glow dans la texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
-
+  
   /* Premier blur */
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   m_blurVertexShaderX.setOffsetsArray();
@@ -67,18 +67,18 @@ void GlowEngine::blur()
   
   glTexCoord2f(0,m_height);
   glVertex3d(-1.0,-1.0,0.0);
-
+  
   glTexCoord2f(m_width,m_height);
   glVertex3d(1.0,-1.0,0.0);
-
+  
   glTexCoord2f(m_width,0);
   glVertex3d(1.0,1.0,0.0);
   
   glEnd();
-
+  
   m_blurVertexShaderX.disableProfile();
   m_blurFragmentShader.disableProfile();
- 
+  
   /* On récupère le premier blur dans la texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
@@ -117,7 +117,7 @@ void GlowEngine::blur()
   /* On récupère le deuxième blur dans la texture */
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   glCopyTexSubImage2D(GL_TEXTURE_RECTANGLE_NV, 0, 0, 0, 0, 0, m_width, m_height);
-
+  
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
@@ -139,7 +139,7 @@ void GlowEngine::drawBlur(double alpha)
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
-
+  
   glEnable(GL_TEXTURE_RECTANGLE_NV);
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texblur);
   
@@ -151,17 +151,17 @@ void GlowEngine::drawBlur(double alpha)
   
   glTexCoord2f(0,0);
   glVertex3d(-1.0,-1.0,0.0);
-
+  
   glTexCoord2f(m_width,0);
   glVertex3d(1.0,-1.0,0.0);
-
+  
   glTexCoord2f(m_width,m_height);
   glVertex3d(1.0,1.0,0.0);
   
   glEnd();
-
+  
   glDisable(GL_TEXTURE_RECTANGLE_NV);
-
+  
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);

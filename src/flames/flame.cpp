@@ -2,7 +2,7 @@
 
 #include "../scene/scene.hpp"
 
-Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce)
+Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *scene, double innerForce, int index)
 {  
   m_solver = s;
   m_scene = scene;
@@ -31,7 +31,18 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   m_toggle=false;
   
   m_nbLights=0;
-  
+
+  switch(index){
+    case 0 : m_light = GL_LIGHT0; break;
+    case 1 : m_light = GL_LIGHT1; break;
+    case 2 : m_light = GL_LIGHT2; break;
+    case 3 : m_light = GL_LIGHT3; break;
+    case 4 : m_light = GL_LIGHT4; break;
+    case 5 : m_light = GL_LIGHT5; break;
+    case 6 : m_light = GL_LIGHT6; break;
+    case 7 : m_light = GL_LIGHT7; break;
+  }
+      
   m_perturbateCount=0;
   
   m_innerForce=innerForce;
@@ -44,7 +55,7 @@ Flame::Flame(Solver *s, int nb, CPoint& posRel, const char *filename, CScene *sc
   glEndList();
 }
 
-Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, double innerForce)
+Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, double innerForce, int index)
 {  
   m_solver = s;
   m_scene = scene;
@@ -64,6 +75,17 @@ Flame::Flame(Solver *s, CPoint& posRel, const char *filename, CScene *scene, dou
   m_toggle=false;
   
   m_nbLights=0;
+  
+  switch(index){
+    case 0 : m_light = GL_LIGHT0; break;
+    case 1 : m_light = GL_LIGHT1; break;
+    case 2 : m_light = GL_LIGHT2; break;
+    case 3 : m_light = GL_LIGHT3; break;
+    case 4 : m_light = GL_LIGHT4; break;
+    case 5 : m_light = GL_LIGHT5; break;
+    case 6 : m_light = GL_LIGHT6; break;
+    case 7 : m_light = GL_LIGHT7; break;
+  }
   
   m_perturbateCount=0;
   
@@ -102,110 +124,137 @@ void Flame::toggleSmoothShading()
     gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
 }
 
-void Flame::switch_off_lights()
-{
-  int n,light=0;
+// void Flame::switch_off_lights()
+// {
+//   int n,light=0;
   
-  for( n = 0 ; n < m_nbLights ; n++){
-    switch(n){
-    case 0 : light = GL_LIGHT0; break;
-    case 1 : light = GL_LIGHT1; break;
-    case 2 : light = GL_LIGHT2; break;
-    case 3 : light = GL_LIGHT3; break;
-    case 4 : light = GL_LIGHT4; break;
-    case 5 : light = GL_LIGHT5; break;
-    case 6 : light = GL_LIGHT6; break;
-    case 7 : light = GL_LIGHT7; break;
-    }
-    glDisable(light);
-  }
-}
+//   for( n = 0 ; n < m_nbLights ; n++){
+//     switch(n){
+//     case 0 : light = GL_LIGHT0; break;
+//     case 1 : light = GL_LIGHT1; break;
+//     case 2 : light = GL_LIGHT2; break;
+//     case 3 : light = GL_LIGHT3; break;
+//     case 4 : light = GL_LIGHT4; break;
+//     case 5 : light = GL_LIGHT5; break;
+//     case 6 : light = GL_LIGHT6; break;
+//     case 7 : light = GL_LIGHT7; break;
+//     }
+//     glDisable(light);
+//   }
+// }
 
-void Flame::switch_on_lights()
-{
-  int n,light=0;
-  double coef;
+// void Flame::switch_on_lights()
+// {
+//   int n,light=0;
+//   double coef;
 
-  for( n = 0 ; n < m_nbLights ; n++){
-    switch(n){
-    case 0 : light = GL_LIGHT0; break;
-    case 1 : light = GL_LIGHT1; break;
-    case 2 : light = GL_LIGHT2; break;
-    case 3 : light = GL_LIGHT3; break;
-    case 4 : light = GL_LIGHT4; break;
-    case 5 : light = GL_LIGHT5; break;
-    case 6 : light = GL_LIGHT6; break;
-    case 7 : light = GL_LIGHT7; break;
-    }
-    //    coef = 2/(double)(n+1);
-    coef = (-(n - m_nbLights/2)*(n - m_nbLights/2)+16)/10.0;
-    //cout << coef << endl;
-    GLfloat val_diffuse[]={0.13*coef,0.09*coef,0.06*coef,1.0};
-    //GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
-    GLfloat null[]={0.0,0.0,0.0,1.0};
-    GLfloat val_position[]={m_lightPositions[n][0],m_lightPositions[n][1],m_lightPositions[n][2],1.0};
+//   for( n = 0 ; n < m_nbLights ; n++){
+//     switch(n){
+//     case 0 : light = GL_LIGHT0; break;
+//     case 1 : light = GL_LIGHT1; break;
+//     case 2 : light = GL_LIGHT2; break;
+//     case 3 : light = GL_LIGHT3; break;
+//     case 4 : light = GL_LIGHT4; break;
+//     case 5 : light = GL_LIGHT5; break;
+//     case 6 : light = GL_LIGHT6; break;
+//     case 7 : light = GL_LIGHT7; break;
+//     }
+//        coef = 2/(double)(n+1);
+//     coef = (-(n - m_nbLights/2)*(n - m_nbLights/2)+16)/100.0;
+//     cout << coef << endl;
+//     GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
+//     GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
+//     GLfloat null[]={0.0,0.0,0.0,1.0};
+//     GLfloat val_position[]={m_lightPositions[n][0],m_lightPositions[n][1],m_lightPositions[n][2],1.0};
+//     GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
   
-    glLightfv(light,GL_POSITION,val_position);
-    glLightfv(light,GL_DIFFUSE,val_diffuse);
-    glLightfv(light,GL_SPECULAR,null);
-    glLightfv(light,GL_AMBIENT,null);
-    glEnable(light);
-  }
-}
+//     glLightfv(light,GL_POSITION,val_position);
+//     glLightfv(light,GL_DIFFUSE,val_diffuse);
+//     glLightfv(light,GL_SPECULAR,val_specular);
+//     glLightfv(light,GL_AMBIENT,null);
+//     glEnable(light);
+//   }
+// }
 
-void Flame::enable_only_ambient_light(int i)
-{
-  int light=0;
-  double coef;
+// void Flame::enable_only_ambient_light(int i)
+// {
+//   int light=0;
+//   double coef;
 
-  //coef = 4/(double)(i+1);
-  coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/10.0;
-  GLfloat val_ambiant[]={0.25*coef,0.25*coef,0.25*coef,1.0};
-  // GLdouble val_ambiant[]={0.4,0.4,0.4,1.0};
-  GLfloat null[]={0.0,0.0,0.0,1.0};
+//   coef = 4/(double)(i+1);
+//   coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/10.0;
+//   GLfloat val_ambiant[]={0.25*coef,0.25*coef,0.25*coef,1.0};
+//   GLdouble val_ambiant[]={0.4,0.4,0.4,1.0};
+//   GLfloat null[]={0.0,0.0,0.0,1.0};
   
-  switch(i){
-  case 0 : light = GL_LIGHT0; break;
-  case 1 : light = GL_LIGHT1; break;
-  case 2 : light = GL_LIGHT2; break;
-  case 3 : light = GL_LIGHT3; break;
-  case 4 : light = GL_LIGHT4; break;
-  case 5 : light = GL_LIGHT5; break;
-  case 6 : light = GL_LIGHT6; break;
-  case 7 : light = GL_LIGHT7; break;
-  }
+//   switch(i){
+//   case 0 : light = GL_LIGHT0; break;
+//   case 1 : light = GL_LIGHT1; break;
+//   case 2 : light = GL_LIGHT2; break;
+//   case 3 : light = GL_LIGHT3; break;
+//   case 4 : light = GL_LIGHT4; break;
+//   case 5 : light = GL_LIGHT5; break;
+//   case 6 : light = GL_LIGHT6; break;
+//   case 7 : light = GL_LIGHT7; break;
+//   }
 
-  glLightfv(light,GL_DIFFUSE,null);
-  //    glLightfv(light,GL_SPECULAR,null);
-  glLightfv(light,GL_AMBIENT,val_ambiant);
+//   glLightfv(light,GL_DIFFUSE,null);
+//      glLightfv(light,GL_SPECULAR,null);
+//   glLightfv(light,GL_AMBIENT,val_ambiant);
 
-  glEnable(light);
-}
+//   glEnable(light);
+// }
 
-void Flame::reset_diffuse_light(int i)
-{
-  int light=0;
-  double coef;
+// void Flame::reset_diffuse_light(int i)
+// {
+//   int light=0;
+//   double coef;
   
-  //coef = 2/(double)(i+1);
-  coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/10.0;
-  GLfloat val_diffuse[]={0.13*coef,0.09*coef,0.06*coef,1.0};
-  //GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
-  GLfloat null[]={0.0,0.0,0.0,1.0};
+//   coef = 2/(double)(i+1);
+//   coef = (-(i - m_nbLights/2)*(i - m_nbLights/2)+16)/100.0;
+//   GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
+//   GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
+//   GLfloat val_ambiant[]={0.2,0.2,0.2,1.0};
+//   GLfloat null[]={0.0,0.0,0.0,1.0};
     
-  switch(i){
-  case 0 : light = GL_LIGHT0; break;
-  case 1 : light = GL_LIGHT1; break;
-  case 2 : light = GL_LIGHT2; break;
-  case 3 : light = GL_LIGHT3; break;
-  case 4 : light = GL_LIGHT4; break;
-  case 5 : light = GL_LIGHT5; break;
-  case 6 : light = GL_LIGHT6; break;
-  case 7 : light = GL_LIGHT7; break;
-  }
+//   switch(i){
+//   case 0 : light = GL_LIGHT0; break;
+//   case 1 : light = GL_LIGHT1; break;
+//   case 2 : light = GL_LIGHT2; break;
+//   case 3 : light = GL_LIGHT3; break;
+//   case 4 : light = GL_LIGHT4; break;
+//   case 5 : light = GL_LIGHT5; break;
+//   case 6 : light = GL_LIGHT6; break;
+//   case 7 : light = GL_LIGHT7; break;
+//   }
   
-  glLightfv(light,GL_DIFFUSE,val_diffuse);
-  //    glLightfv(light,GL_SPECULAR,null);
-  glLightfv(light,GL_AMBIENT,null);
-  glDisable(light);
+//   glLightfv(light,GL_DIFFUSE,val_diffuse);
+//   glLightfv(light,GL_SPECULAR,val_specular);
+//   glLightfv(light,GL_AMBIENT,null);
+//   glDisable(light);
+// }
+
+void Flame::switch_off_lights()
+{ 
+  glDisable(m_light);
+}
+
+void Flame::switch_on_lights(double coef)
+{  
+  GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
+  GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
+  GLfloat val_null[]={0.0,0.0,0.0,1.0};
+  GLfloat val_position[]={m_lightPositions[0][0],m_lightPositions[0][1],m_lightPositions[0][2],1.0};
+  GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
+  
+  glLightfv(m_light,GL_POSITION,val_position);
+  glLightfv(m_light,GL_DIFFUSE,val_diffuse);
+  glLightfv(m_light,GL_SPECULAR,val_specular);
+  glLightfv(m_light,GL_AMBIENT,val_null);
+  glEnable(m_light);
+}
+
+void Flame::reset_diffuse_light()
+{
+  glDisable(m_light);
 }

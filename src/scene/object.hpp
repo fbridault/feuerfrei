@@ -9,7 +9,8 @@ class CObject;
 
 #define ALL      0
 #define TEXTURED 1
-#define FLAT    -1
+#define FLAT     2
+#define AMBIENT  3
 
 #include <vector>
 
@@ -151,9 +152,11 @@ public:
   };
   
   /** Fonction de dessin de l'objet
-   * @param drawCode si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
+   * @param drawCode 
+   * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
    * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
    * si ALL alors l'objet est dessiné inconditionnellement
+   * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
    * @param tex false si l'objet texturé doit être affiché sans sa texture
    */
   virtual void draw(char drawCode=ALL, bool tex=true);

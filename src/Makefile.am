@@ -22,6 +22,7 @@ rtflames_SOURCES = \
 	flames/skeleton.cpp  \
 	flames/solidePhoto.cpp  \
 	flames/wick.cpp  \
+	interface/shadowsDialog.cpp  \
 	interface/solverDialog.cpp  \
 	interface/flameDialog.cpp  \
 	interface/GLFlameCanvas.cpp  \

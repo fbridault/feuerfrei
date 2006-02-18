@@ -51,17 +51,18 @@ am_rtflames_OBJECTS = main.$(OBJEXT) bougie.$(OBJEXT) \
 	firmalampe.$(OBJEXT) flame.$(OBJEXT) glowengine.$(OBJEXT) \
 	ies.$(OBJEXT) leadSkeleton.$(OBJEXT) periSkeleton.$(OBJEXT) \
 	pbuffer.$(OBJEXT) skeleton.$(OBJEXT) solidePhoto.$(OBJEXT) \
-	wick.$(OBJEXT) solverDialog.$(OBJEXT) flameDialog.$(OBJEXT) \
-	GLFlameCanvas.$(OBJEXT) mainFrame.$(OBJEXT) \
-	mainPanels.$(OBJEXT) numTextCtrl.$(OBJEXT) camera.$(OBJEXT) \
-	graphicsFn.$(OBJEXT) material.$(OBJEXT) OBJReader.$(OBJEXT) \
-	object.$(OBJEXT) scene.$(OBJEXT) source.$(OBJEXT) \
-	texture.$(OBJEXT) CgShader.$(OBJEXT) CgSVShader.$(OBJEXT) \
-	CgSPFragmentShader.$(OBJEXT) CgBougieShaders.$(OBJEXT) \
-	CgBlurShaders.$(OBJEXT) solver.$(OBJEXT) GSsolver.$(OBJEXT) \
-	GCSSORsolver.$(OBJEXT) HybridSolver.$(OBJEXT) \
-	benchsolver.$(OBJEXT) logResSolver.$(OBJEXT) \
-	logResAvgSolver.$(OBJEXT) logResAvgTimeSolver.$(OBJEXT)
+	wick.$(OBJEXT) shadowsDialog.$(OBJEXT) solverDialog.$(OBJEXT) \
+	flameDialog.$(OBJEXT) GLFlameCanvas.$(OBJEXT) \
+	mainFrame.$(OBJEXT) mainPanels.$(OBJEXT) numTextCtrl.$(OBJEXT) \
+	camera.$(OBJEXT) graphicsFn.$(OBJEXT) material.$(OBJEXT) \
+	OBJReader.$(OBJEXT) object.$(OBJEXT) scene.$(OBJEXT) \
+	source.$(OBJEXT) texture.$(OBJEXT) CgShader.$(OBJEXT) \
+	CgSVShader.$(OBJEXT) CgSPFragmentShader.$(OBJEXT) \
+	CgBougieShaders.$(OBJEXT) CgBlurShaders.$(OBJEXT) \
+	solver.$(OBJEXT) GSsolver.$(OBJEXT) GCSSORsolver.$(OBJEXT) \
+	HybridSolver.$(OBJEXT) benchsolver.$(OBJEXT) \
+	logResSolver.$(OBJEXT) logResAvgSolver.$(OBJEXT) \
+	logResAvgTimeSolver.$(OBJEXT)
 rtflames_OBJECTS = $(am_rtflames_OBJECTS)
 rtflames_DEPENDENCIES =
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
@@ -189,6 +190,7 @@ rtflames_SOURCES = \
 	flames/skeleton.cpp  \
 	flames/solidePhoto.cpp  \
 	flames/wick.cpp  \
+	interface/shadowsDialog.cpp  \
 	interface/solverDialog.cpp  \
 	interface/flameDialog.cpp  \
 	interface/GLFlameCanvas.cpp  \
@@ -317,6 +319,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pbuffer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/periSkeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/scene.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shadowsDialog.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/skeleton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/solidePhoto.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/solver.Po@am__quote@
@@ -492,6 +495,20 @@ wick.obj: flames/wick.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='flames/wick.cpp' object='wick.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o wick.obj `if test -f 'flames/wick.cpp'; then $(CYGPATH_W) 'flames/wick.cpp'; else $(CYGPATH_W) '$(srcdir)/flames/wick.cpp'; fi`
+
+shadowsDialog.o: interface/shadowsDialog.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT shadowsDialog.o -MD -MP -MF "$(DEPDIR)/shadowsDialog.Tpo" -c -o shadowsDialog.o `test -f 'interface/shadowsDialog.cpp' || echo '$(srcdir)/'`interface/shadowsDialog.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/shadowsDialog.Tpo" "$(DEPDIR)/shadowsDialog.Po"; else rm -f "$(DEPDIR)/shadowsDialog.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='interface/shadowsDialog.cpp' object='shadowsDialog.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o shadowsDialog.o `test -f 'interface/shadowsDialog.cpp' || echo '$(srcdir)/'`interface/shadowsDialog.cpp
+
+shadowsDialog.obj: interface/shadowsDialog.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT shadowsDialog.obj -MD -MP -MF "$(DEPDIR)/shadowsDialog.Tpo" -c -o shadowsDialog.obj `if test -f 'interface/shadowsDialog.cpp'; then $(CYGPATH_W) 'interface/shadowsDialog.cpp'; else $(CYGPATH_W) '$(srcdir)/interface/shadowsDialog.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/shadowsDialog.Tpo" "$(DEPDIR)/shadowsDialog.Po"; else rm -f "$(DEPDIR)/shadowsDialog.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='interface/shadowsDialog.cpp' object='shadowsDialog.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o shadowsDialog.obj `if test -f 'interface/shadowsDialog.cpp'; then $(CYGPATH_W) 'interface/shadowsDialog.cpp'; else $(CYGPATH_W) '$(srcdir)/interface/shadowsDialog.cpp'; fi`
 
 solverDialog.o: interface/solverDialog.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT solverDialog.o -MD -MP -MF "$(DEPDIR)/solverDialog.Tpo" -c -o solverDialog.o `test -f 'interface/solverDialog.cpp' || echo '$(srcdir)/'`interface/solverDialog.cpp; \

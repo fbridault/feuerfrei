@@ -79,7 +79,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o, 
 
   // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
-  m_fluctuationIntensite=o.length()/dim_y * 3.0;
+  m_fluctuationIntensite=o.length()/dim_y * 5.0;
   
   // le centre du SP est la position de la flamme + la moitié du vecteur orientation
   // (orientation = vecteur position vers dernière particule)

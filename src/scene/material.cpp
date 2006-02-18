@@ -1,6 +1,17 @@
 /* Material.cpp: implementation of the Material class. */
 #include "material.hpp"
 
+CMaterial::CMaterial () : m_name("default")
+{
+  double coeff[3] = { 1.0, 1.0, 1.0 };
+  
+  m_Kss = 0;
+
+  m_Ka = CIntensity (coeff);
+  
+  m_diffuseTexture = NULL;
+}
+
 CMaterial::CMaterial ( const string& name, 
 		       double *const ambientCoefficients,
 		       double *const diffuseCoefficients,
@@ -36,16 +47,16 @@ void CMaterial::apply () const
     {
       matDiffuse[i] = m_Kd.getColor (i);
       matSpecular[i] = m_Ks.getColor (i);
-      matAmbient[i] = 0.3;  // m_Ka
-    } 
+      matAmbient[i] = m_Ka.getColor (i);
+    }
   /* Mis à 0 pour indiquer que l'on ne fait pas de glow */
   matDiffuse[3] = 0.0;
   matSpecular[3] = 1.0;
   matAmbient[3] = 1.0;
   
-//     for (int i = 0; i < COMPOSANTES-1; i++)
-//       cout << matDiffuse[i] << " ";
-//     cout << endl;
+  //     for (int i = 0; i < COMPOSANTES-1; i++)
+  //       cout << matDiffuse[i] << " ";
+  //     cout << endl;
 
   glMaterialfv (GL_FRONT, GL_DIFFUSE, matDiffuse);
   glMaterialfv (GL_FRONT, GL_AMBIENT, matAmbient);

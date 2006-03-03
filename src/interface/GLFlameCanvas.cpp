@@ -104,15 +104,16 @@ void GLFlameCanvas::InitFlames(void)
 {    
   for(int i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
-    case BOUGIE :
-      m_flames[i] = new Bougie (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
-				m_currentConfig->flames[i].position, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
-				m_currentConfig->flames[i].innerForce, m_SVShader,"bougie.obj",m_scene, &m_context, i);
+    case CANDLE :
+      m_flames[i] = new Candle (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].position, 
+				m_scene, m_currentConfig->flames[i].innerForce, "bougie.obj", i, m_SVShader,
+				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
+				m_currentConfig->flames[i].skeletonsNumber);
       break;
     case FIRMALAMPE :
-      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].skeletonsNumber,
-				   m_currentConfig->flames[i].position, m_currentConfig->flames[i].innerForce, m_SVShader, 
-				   m_currentConfig->flames[i].wickName.fn_str(),"firmalampe.obj",m_scene, i);
+      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
+				   m_scene, m_currentConfig->flames[i].innerForce,"firmalampe.obj", i, m_SVShader, 
+				   m_currentConfig->flames[i].skeletonsNumber, m_currentConfig->flames[i].wickName.fn_str());
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -186,7 +187,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
   InitSolvers();
 
-  m_flames = new Flame *[m_currentConfig->nbFlames];
+  m_flames = new FireSource *[m_currentConfig->nbFlames];
   
   m_scene = new CScene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
   
@@ -254,7 +255,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
     for (int i = 0; i < m_currentConfig->nbFlames; i++)
-      m_flames[i]->add_forces (m_currentConfig->flames[i].flickering);
+      m_flames[i]->addForces (m_currentConfig->flames[i].flickering);
     
     for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->iterate ();
@@ -385,7 +386,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
       /* 3e paramètre doit être la hauteur du solveur de la flamme */
       CPoint pos(m_flames[0]->getPosition());
-      m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(), pos, 1.0);
+      m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
     }
 
     /**** Affichage de la scène ****/
@@ -396,11 +397,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
       {
 	/* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
-	intensities[f] = m_flames[f]->get_main_direction().length() * 1.5;
+	intensities[f] = m_flames[f]->getMainDirection().length() * 1.5;
 	if (m_drawShadowVolumes)
-	  m_flames[f]->draw_shadowVolumes ();
+	  m_flames[f]->drawShadowVolume ();
 	if (!m_currentConfig->shadowsEnabled)
-	  m_flames[f]->switch_on_lights (intensities[f]);
+	  m_flames[f]->switchOn (intensities[f]);
       }
     
     if (m_currentConfig->shadowsEnabled)
@@ -564,15 +565,15 @@ void
 GLFlameCanvas::cast_shadows_double ()
 {
   CPoint pos(m_flames[0]->getPosition());
-  m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->get_main_direction(), pos, 1.0);
+  m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
 
   for (int f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->switch_off_lights ();
+    m_flames[f]->switchOff ();
   m_scene->draw_sceneWT ();
 
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
     for (int f = 0; f < m_currentConfig->nbFlames; f++){
-      m_flames[f]->switch_on_lights (intensities[f]);
+      m_flames[f]->switchOn (intensities[f]);
     }
   
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
@@ -600,7 +601,7 @@ GLFlameCanvas::cast_shadows_double ()
   glStencilFunc (GL_ALWAYS, 0, ~0);
   
   for (int f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->draw_shadowVolumes ();
+    m_flames[f]->drawShadowVolume ();
 
   glPopAttrib ();
 
@@ -630,10 +631,10 @@ GLFlameCanvas::cast_shadows_double ()
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->reset_diffuse_light ();
+      m_flames[f]->resetDiffuseLight ();
     
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->switch_on_lights (intensities[f]);
+      m_flames[f]->switchOn (intensities[f]);
     
     m_scene->draw_scene ();
   }else

@@ -14,8 +14,9 @@
 #include "../vector.hpp"
 
 /* Types de flammes */
-#define BOUGIE 0
+#define CANDLE 0
 #define FIRMALAMPE 1
+#define LINE 2
 
 /* Types de solveurs */
 #define GS_SOLVER 0

@@ -1,7 +1,7 @@
 #include "scene.hpp"
 
 /* Construction/Destruction */
-CScene::CScene (const char* const filename, Flame **flames, int nbFlames)
+CScene::CScene (const char* const filename, FireSource **flames, int nbFlames)
 {  
   m_flames = flames;
   m_nbFlames = nbFlames;

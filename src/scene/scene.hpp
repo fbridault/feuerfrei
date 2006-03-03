@@ -3,9 +3,9 @@
 
 class CScene;
 
-class Flame;
+class FireSource;
 
-#include "../flames/flame.hpp"
+#include "../flames/fire.hpp"
 #include "material.hpp"
 #include "source.hpp"
 #include "object.hpp"
@@ -47,13 +47,13 @@ private:
    */
   GLuint m_displayLists[8];
   int m_nbFlames;
-  Flame **m_flames;
+  FireSource **m_flames;
   
 public:
   /**
    * Constructeur par d&eacute;faut.
    */
-  CScene(const char* const filename, Flame **flames, int nbFlames);
+  CScene(const char* const filename, FireSource **flames, int nbFlames);
   /**
    * Destructeur par d&eacute;faut.
    */

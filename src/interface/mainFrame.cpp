@@ -234,8 +234,8 @@ void MainFrame::GetSettingsFromConfigFile (void)
       }else{
 	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 4);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
-	m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       }
+      m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       tabName.Printf(_("Flame #%d"),i+1);
       
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
@@ -394,11 +394,11 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       groupName.Printf(_("/Solver%d/"),i);
       
       m_config->Write(groupName + _("Type"), (int )m_currentConfig.solvers[i].type);
-
+      
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.solvers[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.solvers[i].position.z);
-
+      
       m_config->Write(groupName + _("X_res"),m_currentConfig.solvers[i].resx);
       m_config->Write(groupName + _("Y_res"),m_currentConfig.solvers[i].resy);
       m_config->Write(groupName + _("Z_res"),m_currentConfig.solvers[i].resz);
@@ -407,11 +407,11 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
       
       m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
-
+      
       m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
       m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
       m_config->Write(groupName + _("epsilon"),m_currentConfig.solvers[i].epsilon);
-
+      
       m_config->Write(groupName + _("nbMaxIter"),m_currentConfig.solvers[i].nbMaxIter);
     }
   

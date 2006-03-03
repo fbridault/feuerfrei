@@ -11,9 +11,9 @@ bin_PROGRAMS = rtflames
 
 rtflames_SOURCES = \
 	main.cpp  \
-	flames/bougie.cpp  \
-	flames/firmalampe.cpp  \
-	flames/flame.cpp  \
+	flames/basicFlames.cpp  \
+	flames/fire.cpp  \
+	flames/firesources.cpp \
 	flames/glowengine.cpp  \
 	flames/ies.cpp  \
 	flames/leadSkeleton.cpp  \
@@ -40,7 +40,7 @@ rtflames_SOURCES = \
 	shaders/CgShader.cpp  \
 	shaders/CgSVShader.cpp  \
 	shaders/CgSPFragmentShader.cpp  \
-	shaders/CgBougieShaders.cpp  \
+	shaders/CgCandleShaders.cpp  \
 	shaders/CgBlurShaders.cpp  \
 	solvers/solver.cpp  \
 	solvers/GSsolver.cpp  \

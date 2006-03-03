@@ -14,8 +14,7 @@ class GLFlameCanvas;
 #include "../scene/scene.hpp"
 #include "../scene/graphicsFn.hpp"
 
-#include "../flames/bougie.hpp"
-#include "../flames/firmalampe.hpp"
+#include "../flames/firesources.hpp"
 #include "../flames/glowengine.hpp"
 #include "../flames/solidePhoto.hpp"
 
@@ -122,7 +121,7 @@ private:
   Solver **m_solvers;
     
   /********* Variables relatives à la simulation *************************/
-  Flame **m_flames;
+  FireSource **m_flames;
   CScene *m_scene;
   CgSVShader *m_SVShader;
   

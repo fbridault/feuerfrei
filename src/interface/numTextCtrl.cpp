@@ -55,7 +55,6 @@ double DoubleTextCtrl::GetSafelyValue(void)
 {
   wxString tmp;
   double val;
-  unsigned int i=0;
     
   tmp = GetValue();
   

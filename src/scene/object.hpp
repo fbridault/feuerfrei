@@ -67,11 +67,11 @@ public:
    * Constructeur permettant de donner une position absolue à l'objet
    * @param pos Position à donner à l'objet
    */
-  CObject (CScene *scene, CPoint* pos)
+  CObject (CScene *scene, CPoint& offset)
   {
     m_scene = scene;
     m_attributes = 0;
-    m_offset = *pos;
+    m_offset = offset;
   };
   /**
    * Destructeur par d&eacute;faut.

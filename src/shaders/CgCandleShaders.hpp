@@ -1,7 +1,7 @@
-#ifndef CGBOUGIESHADERS_H
-#define CGBOUGIESHADERS_H
+#ifndef CGCANDLESHADERS_H
+#define CGCANDLESHADERS_H
 
-class CgBougieFragmentShader;
+class CgCandleFragmentShader;
 
 #include "CgShader.hpp"
 #include "../scene/texture.hpp"
@@ -9,11 +9,11 @@ class CgBougieFragmentShader;
 class CgShader;
 class CgSPVertexShader;
 
-class CgBougieVertexShader : public CgBasicVertexShader
+class CgCandleVertexShader : public CgBasicVertexShader
 {
 public:
-  CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
-  virtual ~CgBougieVertexShader();
+  CgCandleVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  virtual ~CgCandleVertexShader();
   
   void setTexTranslation(GLdouble value){
     cgGLSetParameter1d(paramTexTranslation, value);
@@ -28,11 +28,11 @@ private:
   CGparameter paramModelViewInv;
 };
 
-class CgBougieFragmentShader : public CgShader
+class CgCandleFragmentShader : public CgShader
 {
 public:
-  CgBougieFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
-  virtual ~CgBougieFragmentShader();
+  CgCandleFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  virtual ~CgCandleFragmentShader();
   
   void setTexture(Texture* tex){
     cgGLSetTextureParameter(paramTexture, tex->getTexture());

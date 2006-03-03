@@ -1,6 +1,6 @@
-#include "CgBougieShaders.hpp"
+#include "CgCandleShaders.hpp"
 
-CgBougieVertexShader::CgBougieVertexShader(const wxString& sourceName, const wxString& shaderName, 
+CgCandleVertexShader::CgCandleVertexShader(const wxString& sourceName, const wxString& shaderName, 
 					   CGcontext *context, bool recompile) : 
   CgBasicVertexShader (sourceName, shaderName, context, recompile)
 {
@@ -9,13 +9,13 @@ CgBougieVertexShader::CgBougieVertexShader(const wxString& sourceName, const wxS
   paramModelViewInv = cgGetNamedParameter(program, "ModelViewInv");
 }
 
-CgBougieVertexShader::~CgBougieVertexShader()
+CgCandleVertexShader::~CgCandleVertexShader()
 {
 }
 
 /***********************************************************************************************************/
 
-CgBougieFragmentShader::CgBougieFragmentShader(const wxString& sourceName, const wxString& shaderName,
+CgCandleFragmentShader::CgCandleFragmentShader(const wxString& sourceName, const wxString& shaderName,
 					       CGcontext *context, bool recompile) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT, recompile)
 {
@@ -23,6 +23,6 @@ CgBougieFragmentShader::CgBougieFragmentShader(const wxString& sourceName, const
   paramTexture = cgGetNamedParameter(program, "texture");
 }
 
-CgBougieFragmentShader::~CgBougieFragmentShader()
+CgCandleFragmentShader::~CgCandleFragmentShader()
 {
 }

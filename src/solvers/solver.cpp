@@ -227,7 +227,7 @@ void Solver::iterate ()
   for (int i = 1; i < m_nbVoxelsX + 1; i++)
     for (int j = 1; j < m_nbVoxelsY + 1; j++)
       for (int k = 1; k < m_nbVoxelsZ + 1; k++)
-	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (j);
+	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
   
   vel_step ();
   //  dens_step();

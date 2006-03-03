@@ -16,18 +16,25 @@ class CObject;
 class Solveur;
 class CScene;
 
-/** Classe reprÃ©sentant une mÃ¨che de bougie */
+/** Classe représentant une mèche longiligne de flamme.<br>
+ * Le constructeur prend en entrée un fichier OBJ. L'objet est découpé en nb_lead_skeletons
+ * partitions. Une racine de squelette périphérique est placée au centre de chaque partition.
+ * Deux racines sont également ajoutées aux extrémités de la mèche.<br>
+ * L'ensemble de ces points est stocké dans la variable membre m_leadPointsArray est sera utilisé
+ * par la flamme pour générer tous ses squelettes.
+ */
 class Wick : public CObject
 {
 private:
   /**<Liste des points qui vont servir à  créer les squelettes guides */
   vector < CPoint * >m_leadPointsArray;
   GLuint m_wickDisplayList;
+  
 public:
   /** Constructeur de mèche	
    * @param filename nom du fichier de scène où est stockée la mèche
    */
-  Wick(const char *filename, int nb_lead_squelettes, CScene *scene);
+  Wick(const char *filename, int nb_lead_squelettes, CScene *scene, CPoint& offset);
   virtual ~Wick();
   	
   virtual void drawWick()

@@ -94,10 +94,6 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
   /* Toutefois cette fonction plante si on la met dans le destructeur, je la laisse */
   /* donc ici pour le moment */
   m_wxtex->Destroy();
-  //  if(hasAlpha)
-  //     glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,GL_UNSIGNED_BYTE,texture);
-  //   else
-  //     glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,width,height,0,GL_RGB,GL_UNSIGNED_BYTE,texture);
 }
 
 Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)

@@ -36,8 +36,8 @@ public:
   };
   
   /** Réglage de la position de la lumière */
-  void setLightPos(GLdouble lightPosition[4]){
-    cgGLSetParameter4dv(m_lightPos, lightPosition);
+  void setLightPos(GLfloat lightPosition[4]){
+    cgGLSetParameter4fv(m_lightPos, lightPosition);
   };
   
   /** Réglage de la matrice du modèle Ã  la matrice du modèle courante inverse */

@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(CScene *scene, int index, CgSVShader * shader)
+FlameLight::FlameLight(Scene *scene, int index, CgSVShader * shader)
 {  
   m_scene = scene;
   
@@ -76,16 +76,16 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(Solver * s, int nbFlames, CPoint& posRel, CScene *scene, double innerForce,  const char *filename, 
+FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
 		       int index, CgSVShader * shader) : FlameLight(scene, index, shader)
 {  
   m_solver = s;
   
   m_nbFlames=nbFlames;
-  m_flames = new BasicFlame* [m_nbFlames];
+  if(m_nbFlames) m_flames = new BasicFlame* [m_nbFlames];
   
-  m_luminary = new CObject(scene);
-  scene->loadObject(filename, m_luminary, true);
+  m_luminary = new Object(scene);
+  scene->importOBJ(filename, m_luminary, true);
   m_luminaryDL=glGenLists(1);
   glNewList(m_luminaryDL,GL_COMPILE);
   m_luminary->draw();
@@ -106,7 +106,7 @@ FireSource::~FireSource()
 
 void FireSource::build()
 {
-  CPoint averagePos, tmp;
+  Point averagePos, tmp;
   
   for (int i = 0; i < m_nbFlames; i++){
     averagePos = (averagePos*i + m_flames[i]->getCenter ())/(i+1);
@@ -116,9 +116,9 @@ void FireSource::build()
   setLightPosition(averagePos);
 }
 
-CVector FireSource::getMainDirection()
+Vector FireSource::getMainDirection()
 {
-  CVector averageVec, tmp;
+  Vector averageVec, tmp;
   
   for (int i = 0; i < m_nbFlames; i++)
     averageVec = (averageVec*i + m_flames[i]->getMainDirection ())/(i+1);

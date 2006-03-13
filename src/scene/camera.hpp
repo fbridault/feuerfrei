@@ -119,7 +119,7 @@ public:
    * @param value valeur de la translation
    */
   void moveOnSides(double value){
-    CVector axis = m_view ^ m_up;
+    Vector axis = m_view ^ m_up;
     m_position = m_position + (axis * value);
   }; 
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
@@ -139,9 +139,9 @@ public:
   
 private:
   /** Position de la scène. La caméra reste toujours centrée en (0,0,0) */
-  CPoint m_position;
+  Point m_position;
   /** Vecteur vers le haut et direction de visée */
-  CVector m_up, m_view;
+  Vector m_up, m_view;
   /** Bouton de la souris actuellement appuyé */
   int m_buttonPressed;
   /** Angle d'ouverture de la caméra en degrés */

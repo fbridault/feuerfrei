@@ -6,7 +6,7 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
-LeadSkeleton::LeadSkeleton (Solver * const s, const CPoint& position, const CPoint& rootMoveFactor,  int pls) :
+LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  int pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
 }
@@ -19,7 +19,7 @@ int
 LeadSkeleton::moveRoot ()
 {
   int i, j, k;
-  CPoint tmp;
+  Point tmp;
   double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes();
   double distz = m_solver->getDimZ() / (double) m_solver->getZRes();
   

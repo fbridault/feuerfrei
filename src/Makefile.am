@@ -32,7 +32,6 @@ rtflames_SOURCES = \
 	scene/camera.cpp  \
 	scene/graphicsFn.cpp  \
 	scene/material.cpp  \
-	scene/OBJReader.cpp  \
 	scene/object.cpp  \
 	scene/scene.cpp  \
 	scene/source.cpp  \

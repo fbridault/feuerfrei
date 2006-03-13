@@ -1,18 +1,17 @@
 #include "wick.hpp"
 
 #include "../scene/graphicsFn.hpp"
-#include "../scene/OBJReader.hpp"
 #include "../scene/scene.hpp"
 
-Wick::Wick (const char *filename, int nb_lead_skeletons, CScene *scene, CPoint& offset) : CObject(scene, offset)
+Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point& offset, const char*wickName) : Object(scene, offset)
 {
-  CPoint ptMax[nb_lead_skeletons + 1], ptMin[nb_lead_skeletons + 1];
-  CPoint ExtrGauche (DBL_MAX, 0, 0), ExtrDroite (DBL_MIN, 0, 0);
-  vector < CPoint * >pointsPartitionsArray[nb_lead_skeletons];
+  Point ptMax[nb_lead_skeletons + 1], ptMin[nb_lead_skeletons + 1];
+  Point ExtrGauche (DBL_MAX, 0, 0), ExtrDroite (DBL_MIN, 0, 0);
+  vector < Point * >pointsPartitionsArray[nb_lead_skeletons];
 
   /* Chargement de la mèche */
-  cerr << "Chargement de la mèche du fichier " << filename << "...";
-  scene->loadObject(filename, this, true);
+  cerr << "Chargement de la mèche du fichier " << wickFileName << "...";
+  scene->importOBJ(wickFileName, this, true, wickName);
   
   /*******************************/
   /* Création de la display list */
@@ -33,7 +32,7 @@ Wick::Wick (const char *filename, int nb_lead_skeletons, CScene *scene, CPoint& 
   /* La bounding box est délimitée par les points ptMax[nb_lead_skeletons] et ptMin[0] */
   getBoundingBox (ptMax[nb_lead_skeletons], ptMin[0]);
 
-  for (vector < CPoint * >::iterator vertexIterator = m_vertexArray.begin ();
+  for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
        vertexIterator != m_vertexArray.end (); vertexIterator++)
     {
       /* Calcul du max */
@@ -61,7 +60,7 @@ Wick::Wick (const char *filename, int nb_lead_skeletons, CScene *scene, CPoint& 
   /* Tri des points dans les partitions */
   /* Il serait possible de faire un tri par dichotomie */
   /* pour aller un peu plus vite */
-  for (vector < CPoint * >::iterator vertexIterator = m_vertexArray.begin ();
+  for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
        vertexIterator != m_vertexArray.end (); vertexIterator++)
     for (int i = 1; i <= nb_lead_skeletons; i++)
       if ((*vertexIterator)->x > ptMin[i-1].x &&
@@ -74,18 +73,18 @@ Wick::Wick (const char *filename, int nb_lead_skeletons, CScene *scene, CPoint& 
   
   /* Création des leadPoints */
   /* On prend simplement le barycentre de chaque partition */
-  m_leadPointsArray.push_back (new CPoint(ExtrGauche));
+  m_leadPointsArray.push_back (new Point(ExtrGauche));
   
   for (int i = 0; i < nb_lead_skeletons; i++)
     {
-      CPoint barycentre;
+      Point barycentre;
       int n;
 
       if (!pointsPartitionsArray[i].empty ())
 	{
 	  barycentre.resetToNull ();
 	  n = 0;
-	  for (vector < CPoint * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
+	  for (vector < Point * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
 	       pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
 	    {
 	      barycentre.x += (*pointsIterator)->x;
@@ -95,15 +94,15 @@ Wick::Wick (const char *filename, int nb_lead_skeletons, CScene *scene, CPoint& 
 	    }
 	  barycentre = barycentre / (double)n;
 	  
-	  m_leadPointsArray.push_back (new CPoint (barycentre));
+	  m_leadPointsArray.push_back (new Point (barycentre));
 	}
     }
-  m_leadPointsArray.push_back (new CPoint(ExtrDroite));  
+  m_leadPointsArray.push_back (new Point(ExtrDroite));  
 }
 
 Wick::~Wick ()
 {
-  for (vector < CPoint * >::iterator pointsIterator = m_leadPointsArray.begin ();
+  for (vector < Point * >::iterator pointsIterator = m_leadPointsArray.begin ();
        pointsIterator != m_leadPointsArray.end (); pointsIterator++)
     delete (*pointsIterator);
   m_leadPointsArray.clear ();

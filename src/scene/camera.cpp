@@ -31,7 +31,7 @@ Camera::Camera (int width, int height, double clipping) : m_position(0.0,0.0,-2.
 
 void Camera::computeView(double x, double y)
 {  
-  CVector mouseDirection;
+  Vector mouseDirection;
   
   mouseDirection.x = (m_beginMouseX-x)/m_mouseSensitivity; 
   mouseDirection.y = (m_beginMouseY-y)/m_mouseSensitivity;
@@ -51,7 +51,7 @@ void Camera::computeView(double x, double y)
     else
       {
 	// Récupérer l'axe de rotation qui sera X
-	CVector axis = m_view ^ m_up;
+	Vector axis = m_view ^ m_up;
 	
 	axis.normalize();	
 	// Rotation autour de l'axe Y

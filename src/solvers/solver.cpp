@@ -7,7 +7,7 @@ Solver::Solver ()
 {
 }
 
-Solver::Solver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : m_position(position)
+Solver::Solver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : m_position(position)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -107,6 +107,7 @@ void Solver::set_bnd (int b, double *const x)
 {
   int i, j;
 
+  /* Attention cela ne prend pas en compte les coins et les arêtes entre les coins */
   for (i = 1; i <= m_nbVoxelsY; i++)
     {
       for (j = 1; j <= m_nbVoxelsZ; j++)
@@ -322,7 +323,7 @@ void Solver::displayVelocityField (void)
 	{
 	  for (int k = 1; k <= m_nbVoxelsZ; k++)
 	    {
-	      CVector vect;
+	      Vector vect;
 	      /* Affichage du champ de vélocité */
 	      glPushMatrix ();
 	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dimX / 2.0,
@@ -341,14 +342,14 @@ void Solver::displayVelocityField (void)
     }
 }
 
-void Solver::displayArrow (CVector * const direction)
+void Solver::displayArrow (Vector * const direction)
 {
   double norme_vel = sqrt (direction->x * direction->x +
 			   direction->y * direction->z +
 			   direction->z * direction->z);
   double taille = m_dimX * m_dimY * m_dimZ * norme_vel / 2.5;
   double angle;
-  CVector axeRot, axeCone (0.0, 0.0, 1.0);
+  Vector axeRot, axeCone (0.0, 0.0, 1.0);
 
   direction->normalize ();
 
@@ -373,10 +374,10 @@ void Solver::displayArrow (CVector * const direction)
 }
 
 
-void Solver::moveTo(CPoint& position)
+void Solver::moveTo(Point& position)
 {
   int i,j;
-  CPoint move = position - m_position;
+  Point move = position - m_position;
   double strength=1.5;
   
   m_position=position;

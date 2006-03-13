@@ -1,6 +1,6 @@
 #include "GSsolver.hpp"
 
-GSsolver::GSsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : 
+GSsolver::GSsolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : 
   Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
 }

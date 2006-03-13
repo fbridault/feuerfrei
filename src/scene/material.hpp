@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-class CMaterial;
+class Material;
 
 #include <string>
 #include <GL/gl.h>
@@ -18,23 +18,23 @@ using namespace std;
  * @author	Christophe Cassagnab&egrave;re modifi&eacute; par Flavien Bridault
  * @version	%I%, %G%
  * @since	1.0
- * @see CIntensity
+ * @see Intensity
  */
-class CMaterial 
+class Material 
 {
 private:
   string m_name;
-  CIntensity m_Kd;        /**<composante de r&eacute;flexion diffuse.*/
-  CIntensity m_Ks;        /**<composante de r&eacute;flexion sp&eacute;culaire.*/
+  Intensity m_Kd;        /**<composante de r&eacute;flexion diffuse.*/
+  Intensity m_Ks;        /**<composante de r&eacute;flexion sp&eacute;culaire.*/
   double m_Kss;       /**<indice de tache sp&eacute;culaire*/
-  CIntensity m_Ka;        /**<composante de r&eacute;flexion ambiante.*/
+  Intensity m_Ka;        /**<composante de r&eacute;flexion ambiante.*/
 
   Texture *m_diffuseTexture;
 public:
   /**
    * Constructeur par d&eacute;faut. Cr&eacute;e un mat&eacute;riau blanc ambiant.
    */
-  CMaterial();
+  Material();
   /**
    * Constructeur param&eacute;trique.
    * @param ambientCoefficients	composante de r&eacute;flexion ambiante.
@@ -44,31 +44,31 @@ public:
    * @param specularExponent	indice de tache sp&eacute;culaire.
    * @param refractionIndex	indice de r&eacute;fraction.
    */
-  CMaterial( const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
+  Material( const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~CMaterial(){if(m_diffuseTexture!=NULL) delete m_diffuseTexture;};
+  ~Material(){if(m_diffuseTexture!=NULL) delete m_diffuseTexture;};
 
   const string *getName() const
   { return &m_name;};
   /*
    * Lecture de la composante sp&eacute;culaire. 
-   * @return Une variable de type CIntensity.
+   * @return Une variable de type Intensity.
    */
-  CIntensity getSpecularCoefficients() const
+  Intensity getSpecularCoefficients() const
   { return (m_Ks);};
   /**
    * Lecture de la composante diffuse. 
-   * @return Une variable de type CIntensity.
+   * @return Une variable de type Intensity.
    */ 
-  CIntensity getDiffuseCoefficients() const
+  Intensity getDiffuseCoefficients() const
   { return (m_Kd);};
   /**
    * Lecture de la composante ambiante. 
-   * @return Une variable de type CIntensity.
+   * @return Une variable de type Intensity.
    */ 
-  const CIntensity& getAmbientCoefficients() const
+  const Intensity& getAmbientCoefficients() const
   { return (m_Ka); };
   
   void apply () const;
@@ -78,6 +78,6 @@ public:
 
   const GLuint getDiffuseTexture() const
   { return (m_diffuseTexture->getTexture());};
-};//CMaterial
+};//Material
 
 #endif 

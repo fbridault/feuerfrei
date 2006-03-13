@@ -1,6 +1,6 @@
 #include "benchsolver.hpp"
 
-BenchSolver::BenchSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
+BenchSolver::BenchSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
 			  double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {

@@ -21,7 +21,7 @@ public:
    * @param s Pointeur vers la scène 3D
    * @param context Pointeur vers le contexte Cg
    */
-  SolidePhotometrique(CScene *s, CGcontext *context, bool recompileShaders);
+  SolidePhotometrique(Scene *s, CGcontext *context, bool recompileShaders);
   virtual ~SolidePhotometrique();
 
   /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique
@@ -34,7 +34,7 @@ public:
    * @param o Orientation du solide
    * @param p Centre du solide
    */
-  void calculerFluctuationIntensiteCentreEtOrientation(CVector o,CPoint& p, double dim_y);
+  void calculerFluctuationIntensiteCentreEtOrientation(Vector o,Point& p, double dim_y);
 
   /** Passe au fichier suivant dans la liste des fichiers IES */
   void swap()
@@ -46,13 +46,13 @@ public:
   
 private:
   /** Pointeur vers la scène 3D */
-  CScene *m_scene;
+  Scene *m_scene;
   /** Centre du solide photométrique dans l'espace */
-  CPoint m_centreSP;
+  Point m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation */
   double m_orientationSPtheta;
   /** Axe de rotation */
-  CVector m_axeRotation;
+  Vector m_axeRotation;
   /** Valeur de l'intensité du solide */
   double m_fluctuationIntensite;
   /** Nombre de fragments shaders dans le tableau SPFragmentShader */

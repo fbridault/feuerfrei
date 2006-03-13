@@ -115,6 +115,11 @@ void GLFlameCanvas::InitFlames(void)
 				   m_scene, m_currentConfig->flames[i].innerForce,"firmalampe.obj", i, m_SVShader, 
 				   m_currentConfig->flames[i].skeletonsNumber, m_currentConfig->flames[i].wickName.fn_str());
       break;
+    case TORCH :
+      m_flames[i] = new Torch(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
+			      m_scene, m_currentConfig->flames[i].innerForce,"firmalampe.obj", i, m_SVShader, 
+			      m_currentConfig->flames[i].skeletonsNumber, m_currentConfig->flames[i].wickName.fn_str());
+      break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
       ::wxExit();
@@ -189,7 +194,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 
   m_flames = new FireSource *[m_currentConfig->nbFlames];
   
-  m_scene = new CScene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
+  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
   
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
@@ -331,7 +336,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
-    CVector direction(m[3][0], m[3][1], m[3][2]);
+    Vector direction(m[3][0], m[3][1], m[3][2]);
     
     dist = direction.length();
 
@@ -385,7 +390,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
       /* 3e paramètre doit être la hauteur du solveur de la flamme */
-      CPoint pos(m_flames[0]->getPosition());
+      Point pos(m_flames[0]->getPosition());
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
     }
 
@@ -421,7 +426,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
     for (int s = 0; s < m_currentConfig->nbSolvers; s++)
       {
-	CPoint position(m_solvers[s]->getPosition ());
+	Point position(m_solvers[s]->getPosition ());
 	
 	glPushMatrix ();
 	glTranslatef (position.x, position.y, position.z);
@@ -564,7 +569,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void
 GLFlameCanvas::cast_shadows_double ()
 {
-  CPoint pos(m_flames[0]->getPosition());
+  Point pos(m_flames[0]->getPosition());
   m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
 
   for (int f = 0; f < m_currentConfig->nbFlames; f++)

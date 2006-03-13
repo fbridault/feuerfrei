@@ -7,7 +7,7 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver::HybridSolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
+HybridSolver::HybridSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {

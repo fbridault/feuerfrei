@@ -1,6 +1,6 @@
 #include "solidePhoto.hpp"
 
-SolidePhotometrique::SolidePhotometrique(CScene *s, CGcontext *context, bool recompileShaders) :
+SolidePhotometrique::SolidePhotometrique(Scene *s, CGcontext *context, bool recompileShaders) :
   m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders),
   m_SPVertexShaderWTex(_("SolidePhotometriqueVP.cg"),_("vpSPWTEX"),context,recompileShaders)
 {
@@ -73,7 +73,7 @@ SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
 }
 
 void 
-SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(CVector o, CPoint& p, double dim_y)
+SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector o, Point& p, double dim_y)
 {
   double r,y;
 

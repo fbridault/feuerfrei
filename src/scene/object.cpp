@@ -2,27 +2,27 @@
 
 #include "scene.hpp"
 
-CObject::~CObject ()
+Object::~Object ()
 {
-  for (vector < CPoint * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
+  for (vector < Point * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
        vertexArrayIterator != m_vertexArray.end ();
        vertexArrayIterator++)
     delete (*vertexArrayIterator);
   m_vertexArray.clear ();
   
-  for (vector < CVector * >::iterator normalsArrayIterator = m_normalsArray.begin (); 
+  for (vector < Vector * >::iterator normalsArrayIterator = m_normalsArray.begin (); 
        normalsArrayIterator != m_normalsArray.end ();
        normalsArrayIterator++)
     delete (*normalsArrayIterator);
   m_normalsArray.clear ();
 
-  for (vector < CPoint * >::iterator texCoordsArrayIterator = m_texCoordsArray.begin (); 
+  for (vector < Point * >::iterator texCoordsArrayIterator = m_texCoordsArray.begin (); 
        texCoordsArrayIterator != m_texCoordsArray.end ();
        texCoordsArrayIterator++)
     delete (*texCoordsArrayIterator);
   m_texCoordsArray.clear ();
 
-  for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+  for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
        vertexIndexArrayIterator != m_vertexIndexArray.end (); 
        vertexIndexArrayIterator++)
     delete (*vertexIndexArrayIterator);
@@ -30,11 +30,11 @@ CObject::~CObject ()
 }
 
 void
-CObject::getBoundingBox (CPoint & max, CPoint & min)
+Object::getBoundingBox (Point & max, Point & min)
 {
-  CPoint ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   /* Création de la bounding box */
-  for (vector < CPoint * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
+  for (vector < Point * >::iterator vertexArrayIterator = m_vertexArray.begin (); 
        vertexArrayIterator != m_vertexArray.end ();
        vertexArrayIterator++){
     /* Calcul du max */
@@ -57,7 +57,7 @@ CObject::getBoundingBox (CPoint & max, CPoint & min)
 }
 
 void
-CObject::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
+Object::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 {
   if(currentMaterialIndex != m_lastMaterialIndex){
     if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
@@ -72,9 +72,9 @@ CObject::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 }
 
 void
-CObject::draw (char drawCode, bool tex)
+Object::draw (char drawCode, bool tex)
 {  
-  CIndex *index;
+  PointIndices *index;
   int vertexCount=0;
   m_lastMaterialIndex=-1;
   
@@ -83,7 +83,7 @@ CObject::draw (char drawCode, bool tex)
     cerr << "Cas non pris en compte pour l'instant" << endl;
     break;
   case 1:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+    for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
 	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
@@ -106,7 +106,6 @@ CObject::draw (char drawCode, bool tex)
 	  
 	glBegin (GL_POLYGON);
       }
-      
       glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
       glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
@@ -120,7 +119,7 @@ CObject::draw (char drawCode, bool tex)
     
     break;
   case 2:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+    for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
 	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
@@ -155,7 +154,7 @@ CObject::draw (char drawCode, bool tex)
     }
     break;
   case 3:
-    for (vector < CIndex * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+    for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
 	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;

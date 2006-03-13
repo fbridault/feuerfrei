@@ -2,7 +2,7 @@
 #ifndef INTENSITY_H
 #define INTENSITY_H
 
-class CIntensity;
+class Intensity;
 
 #define COMPOSANTES             4
 #define RED                     0
@@ -18,7 +18,7 @@ class CIntensity;
  * @version	%I%, %G%
  * @since	1.0
  */
-class CIntensity
+class Intensity
 {
 private:
   double color[COMPOSANTES];
@@ -33,14 +33,14 @@ public:
    * Constructeur par d&eacute;faut. Cr&eacute;e une intensit&eacute;
    * lumineuse nulle.
    */
-  CIntensity (){
+  Intensity (){
     for(int i=0;i<COMPOSANTES; i++)
       color[i]=0.0;
   }
   /**
    * Constructeur par recopie.
    */
-  CIntensity (const CIntensity& I){
+  Intensity (const Intensity& I){
     for(int i=0; i<COMPOSANTES; i++)
       color[i]=I.color[i];
   }
@@ -49,14 +49,14 @@ public:
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
    * &eacute;l&eacute;ments de type <CODE>double</CODE>
    */
-  CIntensity (double* c){
+  Intensity (double* c){
     for(int i=0; i<COMPOSANTES; i++) 
       color[i]=c[i];
   }
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~CIntensity(){
+  ~Intensity(){
     
   };
 
@@ -67,13 +67,13 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 
    * sont prises en compte.
    */
-  CIntensity operator+(const CIntensity& I) const
+  Intensity operator+(const Intensity& I) const
   {
     double result[COMPOSANTES];
     for(int i=0;i<COMPOSANTES;i++)
       result[i]= (color[i]>0.0?color[i]:0.0) +
 	(I.color[i]>0.0?I.color[i]:0.0);
-    CIntensity intensity(result);
+    Intensity intensity(result);
     return intensity;
   }
   /**
@@ -82,12 +82,12 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
    * en compte.
    */
-  CIntensity operator/(const double& K) const
+  Intensity operator/(const double& K) const
   {
     double result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>0.0?color[i]:0.0)/K;
-    CIntensity intensity(result);
+    Intensity intensity(result);
     return intensity;
   }
   /**
@@ -96,12 +96,12 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
    * en compte.
    */
-  CIntensity operator*(const double& K) const
+  Intensity operator*(const double& K) const
   {
     double result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>0.0?color[i]:0.0)*K;
-    CIntensity intensity(result);
+    Intensity intensity(result);
     return intensity;
   }
 
@@ -112,19 +112,19 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
    * en compte.
    */
-  CIntensity operator*(const CIntensity& I) const
+  Intensity operator*(const Intensity& I) const
   {
     double result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>=0.0?color[i]:0.0)*
 	(I.color[i]>=0.0?I.color[i]:0.0);
-    CIntensity intensity(result);
+    Intensity intensity(result);
     return intensity;
   }	
   /**
    * Op&eacute;rateur d'&eacute;galit&eacute;.
    */
-  bool operator==(const CIntensity& I) const
+  bool operator==(const Intensity& I) const
   {
     for (int i=0;i<COMPOSANTES;i++)
       if(color[i]!=I.color[i])
@@ -140,7 +140,7 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 
    *sont prises en compte.
    */
-  CIntensity& operator+=(const CIntensity& I){
+  Intensity& operator+=(const Intensity& I){
     for(int i=0;i<COMPOSANTES;i++)
       color[i]= (color[i]>0.0?color[i]:0.0) +
 	(I.color[i]>0.0?I.color[i]:0.0);
@@ -153,7 +153,7 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises en
    * compte.
    */
-  CIntensity& operator/=(const double& K){
+  Intensity& operator/=(const double& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=(color[i]>0.0?color[i]:0.0)/K;
     return *this;
@@ -165,7 +165,7 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises en
    * compte.
    */
-  CIntensity& operator*=(const double& K){
+  Intensity& operator*=(const double& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=(color[i]>0.0?color[i]:0.0)*K;
     return *this;
@@ -178,7 +178,7 @@ public:
    * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
    * en compte.
    */
-  CIntensity& operator*=(const CIntensity& I){
+  Intensity& operator*=(const Intensity& I){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=(color[i]>=0.0?color[i]:0.0)*
 	(I.color[i]>=0.0?I.color[i]:0.0);
@@ -187,7 +187,7 @@ public:
   /**
    * Op&eacute;rateur d'allocation.
    */
-  CIntensity& operator=(const CIntensity& I) {
+  Intensity& operator=(const Intensity& I) {
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=I.color[i];
     return *this;

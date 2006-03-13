@@ -30,10 +30,11 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
 
   const wxString m_flameTypeRadioBoxChoices[] = {
     _("Candle"),
-    _("Oil Lamp")
+    _("Oil Lamp"),
+    _("Torch")
   };
   m_flameTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					2, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+					3, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
   m_wickLabel = new wxStaticText(this, -1, _("Wick"));
   m_wickTextCtrl = new wxTextCtrl(this, -1, _("meche2.obj"));
   m_wickBrowseButton = new wxButton(this, IDBF_BrowseWick, _("Browse..."));
@@ -102,7 +103,7 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
 
   (*m_skeletonsNumberCtrl) << flameConfig->skeletonsNumber;
   
-  if(flameConfig->type != FIRMALAMPE){
+  if(flameConfig->type == CANDLE){
     m_wickLabel->Disable();
     m_wickTextCtrl->Disable();
     m_wickBrowseButton->Disable();
@@ -133,7 +134,7 @@ bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
 
 void FlamePanel::OnSelectType(wxCommandEvent& event)
 {
-  if(event.GetSelection() == FIRMALAMPE)
+  if(event.GetSelection() != CANDLE)
     {
       m_wickLabel->Enable();
       m_wickTextCtrl->Enable();    

@@ -20,7 +20,7 @@ class PointFlame;
 class PeriSkeleton;
 class LeadSkeleton;
 class Solver;
-class CScene;
+class Scene;
 
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE BASICFLAME ****************************************/
@@ -51,7 +51,7 @@ public:
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  BasicFlame (Solver * s, int nbSkeletons, int nbFixedPoints, CPoint& posRel, double innerForce, CScene *scene, 
+  BasicFlame (Solver * s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, Scene *scene, 
 	      const wxString& texname, GLint wrap_s, GLint wrap_t);
   virtual ~BasicFlame ();
   
@@ -86,9 +86,9 @@ public:
     /** Retroune la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
-  virtual CVector getMainDirection() = 0;
+  virtual Vector getMainDirection() = 0;
 
-  virtual CPoint getCenter () = 0;
+  virtual Point getCenter () = 0;
   
 protected:
   /** Fonction simplifiant l'affectation d'un point de contrôle.
@@ -96,7 +96,7 @@ protected:
    * @param v indice v du point de contrôle
    * @param pt position du point de contrôle dans l'espace
    */
-  void setCtrlPoint (int u, int v, const CPoint * const pt)
+  void setCtrlPoint (int u, int v, const Point * const pt)
   {
     m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
     m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
@@ -110,7 +110,7 @@ protected:
    * @param pt position du point de contrôle dans l'espace
    * @param w coordonnée homogène du point de contrôle, équivalente au poids du point de contrôle
    */
-  void setCtrlPoint (int u, int v, const CPoint * const pt, double w)
+  void setCtrlPoint (int u, int v, const Point * const pt, double w)
   {
     m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
     m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
@@ -169,13 +169,13 @@ protected:
   
   double m_innerForce;
   
-  CScene *m_scene;
+  Scene *m_scene;
   
   /** Identifiant de la texture. */
   Texture m_tex;
   
   /** Position relative de la flamme dans le feu auquel elle appartient */
-  CPoint m_position;
+  Point m_position;
 };
 
 
@@ -187,6 +187,9 @@ protected:
 /** La classe LineFlame implémente une flamme qui provient d'une mèche "linéaire".<br>
  * Elle génère ses squelettes à partir du maillage de la mèche dont le nom est fourni au
  * constructeur.
+ * L'objet Wick appartient à la classe LineFlame, il est donc précisé dans le constructeur
+ * de Wick que l'objet doit être importé dans la scène dans l'état "detached", de sorte que 
+ * le constructeur de la scène ne cherche pas à le référencer ni à le détruire.
  *
  * @author	Flavien Bridault
  */
@@ -201,7 +204,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param wickName Chaîne de caractère contenant le nom du fichier contenant la mèche
    */
-  LineFlame(Solver *s, int nbSkeletons, CPoint& posRel, double innerForce, CScene *scene, const char *wickName);
+  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const char *wickFileName, const char*wickName=NULL);
   virtual ~LineFlame();
 
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -225,9 +228,9 @@ public:
   /** Retroune la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
-  CVector getMainDirection();
+  Vector getMainDirection();
   
-  virtual CPoint getCenter ();
+  virtual Point getCenter ();
   
 private:
   /** Mèche de la flamme */
@@ -263,7 +266,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  PointFlame(Solver *s, int nbSkeletons, CPoint& posRel, double innerForce, CScene *scene, double rayon);
+  PointFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, double rayon);
   virtual ~PointFlame();
   
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -287,11 +290,11 @@ public:
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
-  CVector getMainDirection(){
+  Vector getMainDirection(){
     return(*(m_lead->getMiddleParticle()));
   };
   
-  virtual CPoint getCenter (){    
+  virtual Point getCenter (){    
     return (*m_lead->getMiddleParticle () + m_position);
   };
   

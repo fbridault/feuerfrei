@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, 
+  GCSSORsolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, 
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple */

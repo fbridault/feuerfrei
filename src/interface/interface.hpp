@@ -16,7 +16,7 @@
 /* Types de flammes */
 #define CANDLE 0
 #define FIRMALAMPE 1
-#define LINE 2
+#define TORCH 2
 
 /* Types de solveurs */
 #define GS_SOLVER 0
@@ -35,7 +35,7 @@
 class SolverConfig{
 public:
   char type;
-  CPoint position;
+  Point position;
   int resx, resy, resz;
   double dim;
   double timeStep;
@@ -51,7 +51,7 @@ public:
   /** La position de la flamme est RELATIVE par rapport au solveur,
    *  il s'agit d'une fraction de la dimension du solveur 
    */
-  CPoint position;
+  Point position;
   wxString wickName;
   int skeletonsNumber;
   double innerForce;

@@ -15,7 +15,7 @@ class FireSource;
 class BasicFlame;
 class Solver;
 class Object;
-class CScene;
+class Scene;
 
 
 /**********************************************************************************************************************/
@@ -34,10 +34,10 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    */
-  FlameLight (CScene *scene, int index, CgSVShader* shader);
+  FlameLight (Scene *scene, int index, CgSVShader* shader);
   virtual ~FlameLight();
   
-  void setLightPosition (CPoint& pos)
+  void setLightPosition (Point& pos)
   {
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
@@ -55,7 +55,7 @@ public:
 private:
   short m_light;
   
-  CScene *m_scene;
+  Scene *m_scene;
   CgSVShader *m_cgShader;
   
   GLfloat m_lightPosition[4];  
@@ -90,16 +90,16 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    */
-  FireSource (Solver * s, int nbFlames, CPoint& posRel, CScene *scene, double innerForce,  const char *filename, 
+  FireSource (Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
 	      int index, CgSVShader * shader);
   virtual ~FireSource ();
 
   /** Retourne la position absolue dans le repère du monde .
    * @return position absolue dans le repère du monde
    */
-  CPoint getPosition ()
+  Point getPosition ()
   {
-    return CPoint(m_position+m_solver->getPosition());
+    return Point(m_position+m_solver->getPosition());
   }
   
   /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
@@ -112,7 +112,7 @@ public:
    */
   virtual void drawWick()
   {      
-    CPoint pt(getPosition());
+    Point pt(getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
     for (int i = 0; i < m_nbFlames; i++)
@@ -128,7 +128,7 @@ public:
    */
   void drawFlame(bool displayParticle)
   {
-    CPoint pt(m_solver->getPosition());
+    Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
     for (int i = 0; i < m_nbFlames; i++)
@@ -151,7 +151,7 @@ public:
    */
   void drawLuminary()
   {
-    CPoint position(getPosition());
+    Point position(getPosition());
     glPushMatrix();
     glTranslatef (position.x, position.y, position.z);
     glCallList(m_luminaryDL);
@@ -165,7 +165,7 @@ public:
    */
   void drawLuminary(CgBasicVertexShader& shader)
   {
-    CPoint position(getPosition());
+    Point position(getPosition());
     glPushMatrix();
     glTranslatef (position.x, position.y, position.z);
     shader.setModelViewProjectionMatrix();
@@ -199,7 +199,7 @@ public:
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    * pour orienter le solide photométrique.
    */
-  virtual CVector getMainDirection(); 
+  virtual Vector getMainDirection(); 
   
 protected:
   /** Nombre de flammes */
@@ -208,7 +208,7 @@ protected:
   BasicFlame **m_flames;
   
   /** Luminaire */
-  CObject *m_luminary;
+  Object *m_luminary;
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;
   
@@ -216,7 +216,7 @@ protected:
   Solver *m_solver;
 
   /** Position relative de la source dans le solveur auquel elle appartient */
-  CPoint m_position;
+  Point m_position;
 };
 
 #endif

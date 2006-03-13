@@ -12,9 +12,9 @@ class Wick;
 #include "../scene/material.hpp"
 #include "../scene/object.hpp"
 
-class CObject;
+class Object;
 class Solveur;
-class CScene;
+class Scene;
 
 /** Classe représentant une mèche longiligne de flamme.<br>
  * Le constructeur prend en entrée un fichier OBJ. L'objet est découpé en nb_lead_skeletons
@@ -23,18 +23,18 @@ class CScene;
  * L'ensemble de ces points est stocké dans la variable membre m_leadPointsArray est sera utilisé
  * par la flamme pour générer tous ses squelettes.
  */
-class Wick : public CObject
+class Wick : public Object
 {
 private:
   /**<Liste des points qui vont servir à  créer les squelettes guides */
-  vector < CPoint * >m_leadPointsArray;
+  vector < Point * >m_leadPointsArray;
   GLuint m_wickDisplayList;
   
 public:
   /** Constructeur de mèche	
    * @param filename nom du fichier de scène où est stockée la mèche
    */
-  Wick(const char *filename, int nb_lead_squelettes, CScene *scene, CPoint& offset);
+  Wick(const char *wickFileName, int nb_lead_squelettes, Scene *scene, Point& offset, const char*wickName=NULL);
   virtual ~Wick();
   	
   virtual void drawWick()
@@ -53,11 +53,11 @@ public:
    * @param index indice du point &agrave; obtenir.
    * @return Un pointeur vers le point recherch&eacute;.
    */
-  virtual const CPoint *getLeadPoint(int index) const
+  virtual const Point *getLeadPoint(int index) const
   {
     return (m_leadPointsArray[index]);
   };
-  virtual vector < CPoint * > *getLeadPointsArray ()
+  virtual vector < Point * > *getLeadPointsArray ()
   {
     return ( &m_leadPointsArray );
   };

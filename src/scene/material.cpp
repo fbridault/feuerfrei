@@ -1,18 +1,18 @@
 /* Material.cpp: implementation of the Material class. */
 #include "material.hpp"
 
-CMaterial::CMaterial () : m_name("default")
+Material::Material () : m_name("default")
 {
   double coeff[3] = { 1.0, 1.0, 1.0 };
   
   m_Kss = 0;
 
-  m_Ka = CIntensity (coeff);
+  m_Ka = Intensity (coeff);
   
   m_diffuseTexture = NULL;
 }
 
-CMaterial::CMaterial ( const string& name, 
+Material::Material ( const string& name, 
 		       double *const ambientCoefficients,
 		       double *const diffuseCoefficients,
 		       double *const specularCoefficients,
@@ -22,21 +22,21 @@ CMaterial::CMaterial ( const string& name,
 
   if (ambientCoefficients != NULL)
     {
-      m_Ka = CIntensity (ambientCoefficients);
+      m_Ka = Intensity (ambientCoefficients);
     }
   if (diffuseCoefficients != NULL)
     {
-      m_Kd = CIntensity (diffuseCoefficients);
+      m_Kd = Intensity (diffuseCoefficients);
     }
   if (specularCoefficients != NULL)
     {
-      m_Ks = CIntensity (specularCoefficients);
+      m_Ks = Intensity (specularCoefficients);
     }
   m_Kss = specularExponent;
   m_diffuseTexture = tex;
 }
 
-void CMaterial::apply () const
+void Material::apply () const
 {
   GLfloat matDiffuse[COMPOSANTES], matSpecular[COMPOSANTES],
     matAmbient[COMPOSANTES], matShininess[1];

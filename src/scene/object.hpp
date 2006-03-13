@@ -1,11 +1,10 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-class CObject;
+class Object;
 
 #include "material.hpp"
 #include "source.hpp"
-#include "OBJReader.hpp"
 
 #define ALL      0
 #define TEXTURED 1
@@ -14,18 +13,18 @@ class CObject;
 
 #include <vector>
 
-class CScene;
+class Scene;
 
 /** 
  * Classe englobant, pour un point donné, les indices du point, de la normale,
  * de la coordonnée de texture, et du matériau
 */
-class CIndex
+class PointIndices
 {
 public:
   int v,vn,vt,vm;
   
-  CIndex(int nv, int nvn, int nvt, int nvm){ v=nv; vn=nvn; vt=nvt; vm=nvm;};
+  PointIndices(int nv, int nvn, int nvt, int nvm){ v=nv; vn=nvn; vt=nvt; vm=nvm;};
 };
 
 /** 
@@ -37,28 +36,28 @@ public:
  * @version	%I%, %G%
  * @since	1.0
  */
-class CObject
+class Object
 {
 protected:
   /**<Liste des points de l'objet */
-  vector < CPoint *>m_vertexArray;
+  vector < Point *>m_vertexArray;
   /**<Liste des coordonnées de textures de l'objet */
-  vector < CPoint *>m_texCoordsArray;
+  vector < Point *>m_texCoordsArray;
   /**<Liste des normales de l'objet */
-  vector < CVector *>m_normalsArray;
+  vector < Vector *>m_normalsArray;
   /**<Liste des indices des points des facettes */
-  vector < CIndex *>m_vertexIndexArray;
+  vector < PointIndices *>m_vertexIndexArray;
   
   int m_attributes;
   int m_lastMaterialIndex;
-  CPoint m_offset;
-  CScene *m_scene;
+  Point m_offset;
+  Scene *m_scene;
   
 public:
   /**
    * Constructeur par d&eacute;faut.
    */
-  CObject (CScene *scene)
+  Object (Scene *scene)
   {
     m_scene = scene;
     m_attributes = 0;
@@ -67,7 +66,7 @@ public:
    * Constructeur permettant de donner une position absolue à l'objet
    * @param pos Position à donner à l'objet
    */
-  CObject (CScene *scene, CPoint& offset)
+  Object (Scene *scene, Point& offset)
   {
     m_scene = scene;
     m_attributes = 0;
@@ -76,12 +75,12 @@ public:
   /**
    * Destructeur par d&eacute;faut.
    */
-  virtual ~CObject ();
+  virtual ~Object ();
   
   /** Ajoute un point dans l'objet
    * @param newVertex point à ajouter 
    */
-  virtual void addVertex ( CPoint* const newVertex)
+  virtual void addVertex ( Point* const newVertex)
   {
     newVertex->x = newVertex->x + m_offset.x ;
     newVertex->y = newVertex->y + m_offset.y ;
@@ -92,7 +91,7 @@ public:
   /** Ajoute une normale dans l'objet
    * @param newNormal normale à ajouter 
    */
-  virtual void addNormal (CVector* const newNormal)
+  virtual void addNormal (Vector* const newNormal)
   {
     m_normalsArray.push_back(newNormal);
   };
@@ -100,7 +99,7 @@ public:
   /** Ajoute une coordonnée de texture dans l'objet
    * @param newTexCoord coordonnée de texture à ajouter 
    */
-  virtual void addTexCoord (CPoint* const newTexCoord)
+  virtual void addTexCoord (Point* const newTexCoord)
   {
     m_texCoordsArray.push_back(newTexCoord);
   };
@@ -108,7 +107,7 @@ public:
   /** Ajoute une facette dans l'objet
    * @param  à ajouter 
    */
-  virtual void addFacet (CIndex* const vertexIndex1, CIndex* const vertexIndex2, CIndex* const vertexIndex3)
+  virtual void addFacet (PointIndices* const vertexIndex1, PointIndices* const vertexIndex2, PointIndices* const vertexIndex3)
   {
     m_vertexIndexArray.push_back(vertexIndex1);
     m_vertexIndexArray.push_back(vertexIndex2);
@@ -139,12 +138,12 @@ public:
    * @param index indice du point &agrave; obtenir.
    * @return Un pointeur vers le point recherch&eacute;.
    */
-  virtual CPoint *getPoint(int index) const
+  virtual Point *getPoint(int index) const
   {
     return (m_vertexArray[index]);
   };
   
-  void getBoundingBox (CPoint& max, CPoint& min);
+  void getBoundingBox (Point& max, Point& min);
 
   void setAttributes (int attr)
   {

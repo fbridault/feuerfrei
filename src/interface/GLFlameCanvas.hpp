@@ -74,7 +74,7 @@ public:
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void Swap(void) { m_photoSolid->swap(); };
-  void moveSolver(int selectedSolver, CPoint& pt){ m_solvers[selectedSolver]->moveTo(pt); };
+  void moveSolver(int selectedSolver, Point& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
   
@@ -122,7 +122,7 @@ private:
     
   /********* Variables relatives à la simulation *************************/
   FireSource **m_flames;
-  CScene *m_scene;
+  Scene *m_scene;
   CgSVShader *m_SVShader;
   
   double *intensities;

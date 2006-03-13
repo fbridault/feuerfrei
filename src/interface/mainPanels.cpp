@@ -113,7 +113,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
     }
   else
     {
-      CPoint pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+      Point pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 		m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 		m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       

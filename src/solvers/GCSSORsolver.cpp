@@ -17,7 +17,7 @@ GCSSORsolver::GCSSORsolver (double omegaDiff, double omegaProj, double epsilon)
   m_epsilon = epsilon;
 }
 
-GCSSORsolver::GCSSORsolver (CPoint& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy,
+GCSSORsolver::GCSSORsolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy,
 			    double omegaDiff, double omegaProj, double epsilon) : 
   Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {

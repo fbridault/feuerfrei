@@ -47,7 +47,7 @@ public:
     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX,CG_GL_MATRIX_IDENTITY);
   };
   
-  void setparamCentreSP(CPoint *centreSP){
+  void setparamCentreSP(Point *centreSP){
     cgGLSetParameter3d(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
   };
   
@@ -55,7 +55,7 @@ public:
     cgGLSetParameter1d(paramFluctuationIntensite,fluctuationIntensite);
   };
   
-  void enableShader(CPoint *centreSP, GLdouble fluctuationIntensite){
+  void enableShader(Point *centreSP, GLdouble fluctuationIntensite){
     setTextureSPMatrix();
     setTexture();
     setparamCentreSP(centreSP);

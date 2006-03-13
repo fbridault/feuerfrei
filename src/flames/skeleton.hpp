@@ -12,7 +12,7 @@ class Particle;
  *
  * @author	Flavien Bridault
  */
-class Particle : public CPoint
+class Particle : public Point
 {
 public:
   /** Durée de vie de la particule */
@@ -20,10 +20,10 @@ public:
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */
-  Particle():CPoint(){lifespan=0;};
+  Particle():Point(){lifespan=0;};
   
   /** Constructeur par recopie */
-  Particle(const Particle& P):CPoint(P)
+  Particle(const Particle& P):Point(P)
   {
     lifespan=P.lifespan;
   };
@@ -38,7 +38,7 @@ public:
   void birth(int l){lifespan=l;};
   
   virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; lifespan=P.lifespan; return *this;};
-  virtual Particle& operator= (const CPoint& P){x=P.x; y=P.y; z=P.z; return *this;};
+  virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
 	
 private:
 };
@@ -67,7 +67,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  Skeleton(Solver* const s, const CPoint& position, const CPoint& rootMoveFactor, int pls);
+  Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, int pls);
   virtual ~Skeleton();
   
   /** Donne l'élément en tête de file.
@@ -95,7 +95,7 @@ public:
   /** Donne l'origine du squelette.
    * @return position de l'origine du squelette
    */
-  CPoint *getRoot(){
+  Point *getRoot(){
     return &m_root;
   };
 
@@ -118,7 +118,7 @@ protected:
   /** Insère une particule en queue de file.
    * @param pt position de la particule
    */
-  void addParticle(const CPoint* const pt);
+  void addParticle(const Point* const pt);
 
   /** Supprime la particule à une position donnée.
    * @param n indice
@@ -136,16 +136,16 @@ protected:
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
-  void updateParticle(int i, const CPoint* const pt);
+  void updateParticle(int i, const Point* const pt);
 
   virtual void drawRoot ();
 
   virtual void drawParticle (Particle * const particle);
 
   /** Origine actuelle du squelette. */
-  CPoint m_root;
+  Point m_root;
   /** Origine initiale du squelette. */
-  CPoint m_rootSave;
+  Point m_rootSave;
 
   /** Pointeur sur le solveur de fluides. */
   Solver *m_solver;
@@ -154,7 +154,7 @@ protected:
    * des squelettes. Selon le type de flamme, il est en effet nécessaire
    * que les origines se déplacent différemment
    */
-  CPoint m_rootMoveFactor;
+  Point m_rootMoveFactor;
 private:
   /** File de particules. */
   Particle *m_queue;

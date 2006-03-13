@@ -227,7 +227,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
       m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
-      if(m_currentConfig.flames[i].type == FIRMALAMPE){
+      if(m_currentConfig.flames[i].type != CANDLE){
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
 	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 5);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
@@ -435,7 +435,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
       m_config->Write(groupName + _("SkeletonsNumber"),m_currentConfig.flames[i].skeletonsNumber);
       m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
-      if(m_currentConfig.flames[i].type == FIRMALAMPE)
+      if(m_currentConfig.flames[i].type != CANDLE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
       m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
     }

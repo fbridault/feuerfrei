@@ -7,7 +7,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE BASICFLAME ****************************************/
 /**********************************************************************************************************************/
 
-BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, CPoint& posRel, double innerForce, CScene *scene, 
+BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, Scene *scene, 
 		       const wxString& texname, GLint wrap_s, GLint wrap_t) :
   m_tex (texname, wrap_s, wrap_t)
 {  
@@ -83,21 +83,21 @@ void BasicFlame::toggleSmoothShading()
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
-LineFlame::LineFlame (Solver *s, int nbSkeletons, CPoint& posRel, double innerForce, CScene *scene, const char *wickName):
+LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const char *wickFileName, const char *wickName) :
   BasicFlame (s, (nbSkeletons+2)*2 + 2, 3, posRel, innerForce, scene, _("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP),
-  m_wick (wickName, nbSkeletons, scene, posRel)
+  m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
 {
-  CPoint pt;
+  Point pt;
   double largeur = .03;
   
   m_lifeSpanAtBirth = 4;
   
-  CPoint rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
+  Point rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
   
   m_nbLeadSkeletons = m_wick.getLeadPointsArraySize ();
   m_leads = new LeadSkeleton *[m_nbLeadSkeletons];
   
-  /* Squelettes périphériques = deux par squelette périphérique */
+  /* Allocation des squelettes périphériques = deux par squelette périphérique */
   /* plus 2 aux extrémités pour fermer la NURBS */
   /* FAIT DANS BASICFLAME DESORMAIS */
   // m_nbSkeletons = (m_nbLeadSkeletons * 2 + 2);
@@ -144,9 +144,9 @@ void LineFlame::addForces (char perturbate)
 {  
   int ptxPrev=MININT,ptyPrev=MININT,ptzPrev=MININT;
   int ptx,pty,ptz,i=0;
-  vector < CPoint * >*wickLeadPointsArray = m_wick.getLeadPointsArray();
+  vector < Point * >*wickLeadPointsArray = m_wick.getLeadPointsArray();
   
-  for (vector < CPoint * >::iterator pointsIterator = wickLeadPointsArray->begin ();
+  for (vector < Point * >::iterator pointsIterator = wickLeadPointsArray->begin ();
        pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
     {
       m_solver->findPointPosition(**pointsIterator, ptx, pty, ptz);
@@ -160,8 +160,8 @@ void LineFlame::addForces (char perturbate)
       }
     }
   
-  switch(perturbate){    
-  case FLICKERING_VERTICAL : 
+  switch(perturbate){
+  case FLICKERING_VERTICAL :
     if (m_perturbateCount == 2)
       {
 	m_solver->addVsrc (m_x, 1, m_z, .4);
@@ -175,9 +175,9 @@ void LineFlame::addForces (char perturbate)
   }
 }
 
-CPoint LineFlame::getCenter ()
+Point LineFlame::getCenter ()
 {
-  CPoint averagePos;
+  Point averagePos;
   Particle *tmp;
   
   for (int i = 0; i < m_nbLeadSkeletons  ; i++){
@@ -226,7 +226,7 @@ void LineFlame::build ()
       if (m_skeletons[k]->getSize () < m_maxParticles)
 	{
 	  int nb_pts_supp = m_maxParticles - m_skeletons[k]->getSize ();;	// Nombre de points de contrÃ´le supplémentaires
-	  CPoint pt;
+	  Point pt;
 	  
 	  //cout << "cas à la con" << endl;
 	  /* On calcule les distances entre les particules successives */
@@ -281,7 +281,7 @@ void LineFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
-		pt = CPoint::pointBetween(m_skeletons[k]->getLeadSkeleton ()->getParticle (0), m_skeletons[k]->getParticle (0));
+		pt = Point::pointBetween(m_skeletons[k]->getLeadSkeleton ()->getParticle (0), m_skeletons[k]->getParticle (0));
 		setCtrlPoint (i, count++, &pt);
 	      }
 
@@ -293,7 +293,7 @@ void LineFlame::build ()
 		  if (m_maxDistancesIndexes[l] == j + 1)
 		    {
 		      /* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[k]->getSize()-1 */
-		      pt = CPoint::pointBetween(m_skeletons[k]->getParticle (j), m_skeletons[k]->getParticle (j + 1));
+		      pt = Point::pointBetween(m_skeletons[k]->getParticle (j), m_skeletons[k]->getParticle (j + 1));
 		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
@@ -305,7 +305,7 @@ void LineFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize ())
 	      {
-		pt = CPoint::pointBetween(m_skeletons[k]->getRoot (), m_skeletons[k]-> getLastParticle ());
+		pt = Point::pointBetween(m_skeletons[k]->getRoot (), m_skeletons[k]-> getLastParticle ());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
@@ -316,7 +316,7 @@ void LineFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize () + 1)
 	      {
-		pt = CPoint::pointBetween(m_skeletons[k]->getRoot (),
+		pt = Point::pointBetween(m_skeletons[k]->getRoot (),
 					  m_skeletons[k]->getLeadSkeleton()->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
@@ -331,7 +331,7 @@ void LineFlame::build ()
 		    pt = *m_skeletons[k]->
 		      getRoot ();
 		  }
-		pt = CPoint::pointBetween (&pt, m_skeletons[k]->getLeadSkeleton()->getRoot ());
+		pt = Point::pointBetween (&pt, m_skeletons[k]->getLeadSkeleton()->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -433,9 +433,9 @@ void LineFlame::drawFlame (bool displayParticle)
     }
 }
 
-CVector LineFlame::getMainDirection()
+Vector LineFlame::getMainDirection()
 {
-  CVector direction;
+  Vector direction;
   for(int i = 0; i < m_nbLeadSkeletons; i++){
     direction = direction + *(m_leads[i]->getParticle(0));
   }
@@ -448,7 +448,7 @@ CVector LineFlame::getMainDirection()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (Solver * s, int nbSkeletons, CPoint& posRel, double innerForce, CScene *scene, double rayon):
+PointFlame::PointFlame (Solver * s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, double rayon):
   BasicFlame (s, nbSkeletons, 3, posRel, innerForce, scene, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
 //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
@@ -458,15 +458,15 @@ PointFlame::PointFlame (Solver * s, int nbSkeletons, CPoint& posRel, double inne
   
   m_lifeSpanAtBirth = 6;
   
-  m_lead = new LeadSkeleton (m_solver, posRel, CPoint(4,.75,4),m_lifeSpanAtBirth);
+  m_lead = new LeadSkeleton (m_solver, posRel, Point(4,.75,4),m_lifeSpanAtBirth);
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      m_skeletons[i] = new PeriSkeleton (m_solver, CPoint (cos (angle) * rayon + posRel.x, 
+      m_skeletons[i] = new PeriSkeleton (m_solver, Point (cos (angle) * rayon + posRel.x, 
 							   posRel.y, 
 							   sin (angle) * rayon + posRel.z),
-					 CPoint(4,.75,4),
+					 Point(4,.75,4),
 					 m_lead, m_lifeSpanAtBirth);
       angle += 2 * PI / m_nbSkeletons;
     }
@@ -544,7 +544,7 @@ void PointFlame::build ()
       if (m_skeletons[k]->getSize () < m_maxParticles)
 	{
 	  int nb_pts_supp = m_maxParticles - m_skeletons[k]->getSize ();;	// Nombre de points de contrÃ´e supplÃ©mentaires
-	  CPoint pt;
+	  Point pt;
 
 	  //cout << "cas Ã  la con" << endl;
 	  /* On calcule les distances entre les particules successives */
@@ -597,7 +597,7 @@ void PointFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
-		pt = CPoint::pointBetween (m_lead->getParticle (0), m_skeletons[k]->getParticle(0));
+		pt = Point::pointBetween (m_lead->getParticle (0), m_skeletons[k]->getParticle(0));
 		setCtrlPoint (i, count++, &pt);
 	      }
 	  
@@ -609,7 +609,7 @@ void PointFlame::build ()
 		  if (m_maxDistancesIndexes[l] == j + 1)
 		    {
 		      /* On peut rÃ©fÃ©rencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[k]->getSize()-1 */
-		      pt = CPoint::pointBetween(m_skeletons[k]->getParticle(j), m_skeletons[k]->getParticle(j + 1));
+		      pt = Point::pointBetween(m_skeletons[k]->getParticle(j), m_skeletons[k]->getParticle(j + 1));
 		      setCtrlPoint (i, count++, &pt);
 		    }
 		}
@@ -621,7 +621,7 @@ void PointFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize ())
 	      {
-		pt = CPoint::pointBetween (m_skeletons[k]->getRoot (), m_skeletons[k]->getLastParticle());
+		pt = Point::pointBetween (m_skeletons[k]->getRoot (), m_skeletons[k]->getLastParticle());
 		setCtrlPoint (i, count++, &pt);
 	      }
 
@@ -632,7 +632,7 @@ void PointFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize () + 1)
 	      {
-		pt = CPoint::pointBetween (m_skeletons[k]->getRoot (), m_lead->getRoot ());
+		pt = Point::pointBetween (m_skeletons[k]->getRoot (), m_lead->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -644,7 +644,7 @@ void PointFlame::build ()
 		if (!prec)
 		  pt = *m_skeletons[k]-> getRoot ();
 		
-		pt = CPoint::pointBetween (&pt, m_lead->getRoot());
+		pt = Point::pointBetween (&pt, m_lead->getRoot());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
@@ -736,13 +736,13 @@ void PointFlame::drawFlame (bool displayParticle)
       glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
 
       /* Position de la bougie = translation dans la matrice courante */
-      CVector bougiepos(m[3][0], m[3][1], m[3][2]);
+      Vector bougiepos(m[3][0], m[3][1], m[3][2]);
 
       /* Position de l'axe de regard de bougie dans le repère du monde = axe initial * Matrice de rotation */
       /* Attention, ne pas prendre la translation en plus !!!! */
-      CVector worldLookAt(m[2][0], m[2][1], m[2][2]);
-      CVector worldLookX(m[0][0], m[0][1], m[0][2]);
-      CVector direction(-bougiepos.x, 0.0, -bougiepos.z);
+      Vector worldLookAt(m[2][0], m[2][1], m[2][2]);
+      Vector worldLookX(m[0][0], m[0][1], m[0][2]);
+      Vector direction(-bougiepos.x, 0.0, -bougiepos.z);
 
       direction.normalize ();
       /* Apparemment, pas besoin de le normaliser, on laisse pour le moment */

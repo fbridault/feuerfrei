@@ -2,11 +2,11 @@
 #include "source.hpp"
 
 /* Operators */
-CSource & CSource::operator= (const CSource & S)
+Source & Source::operator= (const Source & S)
 {
   lightIntensity = S.lightIntensity;
-  position = new CPoint (*(S.position));
-  direction = new CVector (*(S.direction));
+  position = new Point (*(S.position));
+  direction = new Vector (*(S.direction));
   aperture = S.aperture;
   lightCategory = S.lightCategory;
   sampling = S.sampling;

@@ -6,8 +6,8 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
-PeriSkeleton::PeriSkeleton (Solver * const s, const CPoint& position,
-			    const CPoint& rootMoveFactor, LeadSkeleton * guide, int pls) :
+PeriSkeleton::PeriSkeleton (Solver * const s, const Point& position,
+			    const Point& rootMoveFactor, LeadSkeleton * guide, int pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
   this->guide = guide;
@@ -21,7 +21,7 @@ int
 PeriSkeleton::moveRoot ()
 {
   int i, j, k;
-  CPoint tmp;
+  Point tmp;
   double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes ();
   double distz = m_solver->getDimZ() / (double) m_solver->getZRes ();
   

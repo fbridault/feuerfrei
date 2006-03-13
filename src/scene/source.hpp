@@ -3,7 +3,7 @@
 #ifndef SOURCE_H
 #define SOURCE_H
 
-class CSource;
+class Source;
 
 #include "intensity.hpp"
 #include "vector.hpp"
@@ -23,14 +23,14 @@ typedef enum
  * @author	Christophe Cassagnab&egrave;re modifi&eacute; par Flavien Bridault
  * @version	%I%, %G%
  * @since	1.0
- * @see CMaterial, CIntensity
+ * @see Material, Intensity
  */
-class CSource
+class Source
 {
 private:
-  CIntensity lightIntensity;
-  CPoint *position;
-  CVector *direction;
+  Intensity lightIntensity;
+  Point *position;
+  Vector *direction;
 
   double aperture;
   lightCategoryType lightCategory;
@@ -41,7 +41,7 @@ public:
    * Constructeur par d&eacute;faut.
    * Par d&eacute;faut la source cr&eacute;e est de type pointLight et n'a pas de g&eacute;om&eacute;trie associ&eacute;e.
    */
-    CSource (const CIntensity & I)
+    Source (const Intensity & I)
   {
     lightIntensity = I;
     lightCategory = POINTLIGHT;
@@ -53,18 +53,18 @@ public:
    * @param P position de la source.
    * @param I intensit&eacute; lumineuse de la source.
    */
-  CSource (const CPoint & P, const CIntensity & I)
+  Source (const Point & P, const Intensity & I)
   {
     lightIntensity = I;
     lightCategory = POINTLIGHT;
-    position = new CPoint (P);
+    position = new Point (P);
     direction = NULL;
   };
 
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~CSource ()
+  ~Source ()
   {
     if (position != NULL)
       delete[]position;
@@ -76,12 +76,12 @@ public:
   /**
    * Op&eacute;rateur d'affectation.
    */
-  CSource & operator= (const CSource & aSource);
+  Source & operator= (const Source & aSource);
 
   /**
    * Lecture de l'intensit&eacute; lumineuse de la source.
    */
-  const CIntensity & getPureIntensity () const
+  const Intensity & getPureIntensity () const
   {
     return lightIntensity;
   };

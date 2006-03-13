@@ -1,7 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-class CScene;
+class Scene;
 
 class FireSource;
 
@@ -9,12 +9,11 @@ class FireSource;
 #include "material.hpp"
 #include "source.hpp"
 #include "object.hpp"
-#include "OBJReader.hpp"
 #include <vector>
 #include <list>
 
 class COBJReader;
-class CObject;
+class Object;
 
 #define NB_DISPLAY_LISTS 8
 
@@ -27,13 +26,13 @@ class CObject;
  * @version	%I%, %G%
  * @since	1.0
  */
-class CScene
+class Scene
 {
 private:
-  vector<CObject*> m_objectsArray;/**<Liste des objets de la scene ne projetant pas d'ombres*/
-  vector<CObject*> m_objectsArrayWSV;/**<Liste des objets de la scene projetant des ombres*/
-  vector<CSource*> m_lightSourcesArray;/**<Liste des sources de lumiere*/
-  vector<CMaterial*> m_materialArray;/**< Liste des mat&eacute;riaux.*/
+  vector<Object*> m_objectsArray;/**<Liste des objets de la scene ne projetant pas d'ombres*/
+  vector<Object*> m_objectsArrayWSV;/**<Liste des objets de la scene projetant des ombres*/
+  vector<Source*> m_lightSourcesArray;/**<Liste des sources de lumiere*/
+  vector<Material*> m_materialArray;/**< Liste des mat&eacute;riaux.*/
 
   /** Display lists de la scène
    * [0] Tous les objets de la scène ne projetant pas d'ombres
@@ -53,11 +52,46 @@ public:
   /**
    * Constructeur par d&eacute;faut.
    */
-  CScene(const char* const filename, FireSource **flames, int nbFlames);
+  Scene(const char* const fileName, FireSource **flames, int nbFlames);
   /**
    * Destructeur par d&eacute;faut.
    */
-  ~CScene();
+  ~Scene();
+  
+  /** Lit un fichier OBJ pass&eacute; en param&egrave;tres et l'importe dans la sc&egrave;ne.
+   * Si object est non nul, on ne charge qu'un seul objet sinon on charge tous les objets.
+   * Si false est à nul, l'objet ne sera pas compris dans la scène.
+   *
+   * @param fileName nom du fichier OBJ &agrave; importer
+   * @param object optionnel, objet dans lequel importer le fichier
+   * @param detached optionnel, permet de spécifier si l'objet object doit appartenir à la scène ou non
+   */
+  void importOBJ(const char* fileName, Object* object=NULL, bool detached=false, const char* objName=NULL);
+  
+  /** Lit un fichier OBJ pass&eacute; en param&egrave;tres et importe les objets correspondant
+   * au préfixe prefix. La liste des objets est retournée dans objectsList, ceux-ci ne sont en effet
+   * pas stockés dans la liste des objets de la scène.
+   *
+   * @param fileName nom du fichier OBJ
+   * @param objectsList liste des noms des objets
+   */  
+  void getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList);
+  
+  /** Lit un fichier OBJ pass&eacute; en param&egrave;tre et cherche le nom du fichier MTL.
+   *
+   * @param fileName nom du fichier OBJ à lire
+   * @param mtlName nom du fichier récupéré, la chaîne doit être allouée au préalable
+   *
+   * @return true si trouve un fichier MTL
+   */
+  bool getMTLFileNameFromOBJ(const char* fileName, char* mtlName);
+  
+   /** Lit un fichier MTL pass&eacute; en param&egrave;tres et importe les matériaux qu'il contient 
+    * dans la sc&egrave;ne.
+   *
+   * @param fileName nom du fichier OBJ &agrave; importer
+   */
+  void importMTL(const char* fileName);
 
   /** Crée les display lists - A n'appeler qu'une fois que tous les objets
    * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
@@ -70,7 +104,7 @@ public:
    * @param newObj pointeur vers l'objet &agrave; ajouter.
    * @param object WSV true si l'objet projette des ombres, false sinon
    */
-  void addObject(CObject* const newObj, bool objectWSV = false)
+  void addObject(Object* const newObj, bool objectWSV = false)
   { 
     if(objectWSV)
       m_objectsArrayWSV.push_back(newObj);
@@ -78,17 +112,8 @@ public:
       m_objectsArray.push_back(newObj);
   };
   
-  /**
-   * Charge un objet contenu dans un fichier OBJ et l'ajoute &agrave; la sc&egrave;ne.
-   * @param newObj pointeur vers le polygone &agrave; ajouter.
-   * @param detached si true, alors l'objet ne sera pas contenu dans la liste des objets de la scène
-   * (pour le moment, cela n'est utile que pour dessiner la mèche d'une flamme) mais son matériau
-   * le sera
-   */
-  void loadObject(const char *filename, CObject* const newObj, bool detached = false);
-
   /** Ajoute un matériau */
-  void addMaterial(CMaterial *material)
+  void addMaterial(Material *material)
   { m_materialArray.push_back(material); };
 
   /**
@@ -100,7 +125,7 @@ public:
    * Ajoute une source lumineuse &agrave; la sc&egrave;ne.
    * @param newSource pointeur vers la source lumineuse &agrave; ajouter.
    */
-  void addSource(CSource* const newSource)
+  void addSource(Source* const newSource)
   { m_lightSourcesArray.push_back(newSource); };
  
   /**
@@ -129,7 +154,7 @@ public:
    * @param index indice du polygone &agrave; obtenir.
    * @return Un pointeur vers le polygone recherch&eacute;.
    */
-  CObject* getObject(const int& index) const
+  Object* getObject(const int& index) const
   { return (m_objectsArray[index]); };
 
   /**
@@ -137,7 +162,7 @@ public:
    * @param index indice de la source &agrave; obtenir.
    * @return Un pointeur vers la source recherch&eacute;e.
    */
-  CSource* getSource(const int& index) const
+  Source* getSource(const int& index) const
   { return (m_lightSourcesArray[index]); };
 
   /**
@@ -145,7 +170,7 @@ public:
    * @param index indice du matériau &agrave; obtenir.
    * @return Un pointeur vers le matériau recherch&eacute;.
    */
-  CMaterial* getMaterial(const int& index) const
+  Material* getMaterial(const int& index) const
   { return (m_materialArray[index]); };
 
   /** Dessin de la scène pour les objets texturés */

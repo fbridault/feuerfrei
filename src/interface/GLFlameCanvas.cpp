@@ -44,6 +44,8 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
   intensities = NULL;
+
+  srand(45542);
 }
 
 GLFlameCanvas::~GLFlameCanvas()
@@ -117,8 +119,8 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case TORCH :
       m_flames[i] = new Torch(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-			      m_scene, m_currentConfig->flames[i].innerForce,"firmalampe.obj", i, m_SVShader, 
-			      m_currentConfig->flames[i].skeletonsNumber, m_currentConfig->flames[i].wickName.fn_str());
+			      m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].wickName.fn_str(),
+			      i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;

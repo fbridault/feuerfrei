@@ -208,7 +208,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   const wxString m_flickeringRadioBoxChoices[] = {
     _("None"),
     _("Vertical"),
-    _("From right")
+    _("From right"),
+    _("Random")
   };  
   
   SLIDER_SENSIBILITY=1000.0;
@@ -228,7 +229,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_forcesSizer->Add(m_innerForceSlider, 2, wxEXPAND, 0);
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
-					3, m_flickeringRadioBoxChoices, 1, wxRA_SPECIFY_ROWS);
+					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);

@@ -77,8 +77,8 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  Torch(Solver * s, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-	int index, CgSVShader * shader, int nbSkeletons, const char *torchName);
+  Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *torchName, 
+	int index, CgSVShader * shader, int nbSkeletons);
   virtual ~Torch(){};
 };
 

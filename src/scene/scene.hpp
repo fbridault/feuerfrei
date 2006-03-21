@@ -73,9 +73,10 @@ public:
    * pas stockés dans la liste des objets de la scène.
    *
    * @param fileName nom du fichier OBJ
-   * @param objectsList liste des noms des objets
+   * @param objectsList liste des noms des objets retournés
+   * @param prefix préfixe servant de filtre pour les noms des objets
    */  
-  void getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList);
+  void getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList, const char* prefix);
   
   /** Lit un fichier OBJ pass&eacute; en param&egrave;tre et cherche le nom du fichier MTL.
    *

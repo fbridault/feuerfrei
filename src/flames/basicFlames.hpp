@@ -204,7 +204,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param wickName Chaîne de caractère contenant le nom du fichier contenant la mèche
    */
-  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const char *wickFileName, const char*wickName=NULL);
+  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char*wickName=NULL);
   virtual ~LineFlame();
 
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 

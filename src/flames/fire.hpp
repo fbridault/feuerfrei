@@ -82,16 +82,18 @@ class FireSource : public FlameLight
 public:
   /** Constructeur d'une source de flammes. La position de la source est donnée dans le repère du solveur.
    * @param s pointeur sur le solveur de fluides
-   * @param nbFlames nombre de flammes
+   * @param nbFlames nombre de flammes, si = 0 alors le tableau contenant les flammes n'est pas alloué
+   * et ceci doit alors être réalisé par la classe fille
    * @param posRel position du centre de la flamme dans le solveur.
    * @param scene pointeur sur la scène
    * @param innerForce force intérieure de la flamme
    * @param filename nom du fichier contenant le luminaire
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
+   * @param objname nom du luminaire à charger dans le fichier filename
    */
   FireSource (Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-	      int index, CgSVShader * shader);
+	      int index, CgSVShader * shader, const char *objName=NULL);
   virtual ~FireSource ();
 
   /** Retourne la position absolue dans le repère du monde .

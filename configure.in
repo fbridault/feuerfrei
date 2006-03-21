@@ -23,24 +23,11 @@ AC_MSG_CHECKING(for debug mode)
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [enable debugging mode]),, enable_debug="no")
 if test "x${enable_debug}" != "xno"; then
-    CXXFLAGS="-g -ggdb -Wall -W -DDEBUG"
+    CXXFLAGS="-g3 -Wall -DDEBUG"
     AC_MSG_RESULT([enabled])
 else
     CXXFLAGS="-O3 -Wall"
     AC_MSG_RESULT([disabled])
-fi
-
-PKG_CHECK_MODULES(PACKAGE, [libpng ])
-
-dnl --------------------------------------------------------------------------
-dnl Check for png.h
-dnl --------------------------------------------------------------------------
-
-AC_ARG_WITH(png-inc, AC_HELP_STRING([--with-png-inc=DIR], [Specify png header file location]))
-if test "x$with_png_inc" = "x" ; then
-    PNG_CPPFLAGS=""
-else
-    PNG_CPPFLAGS="-I$with_png_inc"
 fi
 
 dnl --------------------------------------------------------------------------
@@ -65,8 +52,14 @@ fi
 
 WX_CPPFLAGS="`$WXCONFIG --cppflags`"
 WX_CXXFLAGS="`$WXCONFIG --cxxflags | sed -e 's/-fno-exceptions//'`"
-WX_LIBS="`$WXCONFIG --libs`"
-WX_GL_LIBS="`$WXCONFIG --gl-libs`"
+# Remove -s (strip option), if present this will prevent debugging !!!!
+if test "x${enable_debug}" != "xno"; then
+    WX_LIBS="`$WXCONFIG --libs | sed 's/-s//'`"
+    WX_GL_LIBS="`$WXCONFIG --gl-libs | sed 's/-s//'`"
+else
+    WX_LIBS="`$WXCONFIG --libs`"
+    WX_GL_LIBS="`$WXCONFIG --gl-libs`"
+fi
 
 CPPFLAGS="$CPPFLAGS $WX_CPPFLAGS"
 CXXFLAGS="$CXXFLAGS $WX_CPPFLAGS"

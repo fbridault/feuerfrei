@@ -348,11 +348,13 @@ void Scene::importOBJ(const char* fileName, Object* object, bool detached, const
   chdir("..");
 }
 
-void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList)
+void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList, const char* prefix)
 {
   char lettre;
   char buffer[255];
   string objName;
+  
+  int len = strlen(prefix);
   
   AS_ERROR(chdir("./scenes"),"chdir scenes dans getObjectsNameFromOBJ");
   ifstream objFile(fileName, ios::in);
@@ -368,8 +370,10 @@ void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsL
 	{
 	case 'g':
 	  objFile >> buffer;
-	  objName = buffer;
-	  objectsList.push_back(objName);
+	  if(!strncmp(prefix,buffer,len)){
+	    objName = buffer;
+	    objectsList.push_back(objName);
+	  }
 	  break;
 	default:
 	  objFile.getline(buffer, sizeof (buffer));
@@ -497,6 +501,7 @@ void Scene::importMTL(const char* fileName)
 	  break;
 	case 'i':		// considéré comme le dernier, le matériau est créé
 	  addMaterial(new Material (name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
+	  cerr << "ajout matériau :" << name_nouvelle_matiere << endl;
 	  nouvelle_texture = NULL;
 	  break;
 	case 'm':		//map_K?

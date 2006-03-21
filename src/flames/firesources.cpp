@@ -6,7 +6,8 @@
 #include <vector>
 #include <string>
 
-#define WICKPREFIX "Wick"
+#define WICK_NAME_PREFIX "Wick"
+#define TORCH_NAME "Torch"
 
 Candle::Candle (Solver * s, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
 		int index, CgSVShader * shader, double rayon, int nbSkeletons):
@@ -21,24 +22,17 @@ Firmalampe::Firmalampe(Solver * s, Point& posRel, Scene *scene, double innerForc
 		       int index, CgSVShader * shader, int nbSkeletons, const char *wickFileName):
   FireSource (s, 1, posRel, scene, innerForce, filename, index, shader)
 {
-  m_flames[0] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, wickFileName);
+  m_flames[0] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, _("textures/firmalampe.png"), wickFileName);
 }
 
-Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-	     int index, CgSVShader * shader, int nbSkeletons, const char *torchName):
-  FireSource (s, 0, posRel, scene, innerForce, filename, index, shader)
+Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *torchName, 
+	     int index, CgSVShader * shader, int nbSkeletons):
+  FireSource (s, 0, posRel, scene, innerForce, torchName, index, shader, TORCH_NAME)
 {
-  char mtlName[255];
   vector<string> objList;
   int i=0;
   
-  if(scene->getMTLFileNameFromOBJ(torchName, mtlName)){
-    cerr << torchName << " utilise le fichier MTL " << mtlName << endl;
-    AS_ERROR(chdir("./scenes"),"chdir scenes dans getMTLFileNameFromOBJ");
-    scene->importMTL(mtlName);
-    chdir("..");
-  }
-  scene->getObjectsNameFromOBJ(torchName, objList);
+  scene->getObjectsNameFromOBJ(torchName, objList, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new BasicFlame* [m_nbFlames];
@@ -46,8 +40,7 @@ Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce,  const 
   for (vector < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      int len = strlen(WICKPREFIX);
-      if(!strncmp(WICKPREFIX,(*objListIterator).c_str(),len))
-	m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, torchName, (*objListIterator).c_str());
+	m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, _("textures/torch.png"), 
+				    torchName, (*objListIterator).c_str());
     }
 }

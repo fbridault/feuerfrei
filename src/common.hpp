@@ -15,5 +15,6 @@ using namespace std;
 #define FLICKERING_NONE 0
 #define FLICKERING_VERTICAL 1
 #define FLICKERING_RIGHT 2
+#define FLICKERING_RANDOM 3
 
 #endif

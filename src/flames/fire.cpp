@@ -77,15 +77,23 @@ void FlameLight::drawShadowVolume ()
 /**********************************************************************************************************************/
 
 FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-		       int index, CgSVShader * shader) : FlameLight(scene, index, shader)
+		       int index, CgSVShader * shader,  const char *objName) : FlameLight(scene, index, shader)
 {  
+  char mtlName[255];
   m_solver = s;
   
   m_nbFlames=nbFlames;
   if(m_nbFlames) m_flames = new BasicFlame* [m_nbFlames];
   
+  if(objName != NULL && scene->getMTLFileNameFromOBJ(filename, mtlName)){
+    cerr << filename << " utilise le fichier MTL " << mtlName << endl;
+    AS_ERROR(chdir("./scenes"),"chdir scenes dans getMTLFileNameFromOBJ");
+    scene->importMTL(mtlName);
+    chdir("..");
+  }
+  
   m_luminary = new Object(scene);
-  scene->importOBJ(filename, m_luminary, true);
+  scene->importOBJ(filename, m_luminary, true, objName);
   m_luminaryDL=glGenLists(1);
   glNewList(m_luminaryDL,GL_COMPILE);
   m_luminary->draw();

@@ -83,8 +83,8 @@ void BasicFlame::toggleSmoothShading()
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
-LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const char *wickFileName, const char *wickName) :
-  BasicFlame (s, (nbSkeletons+2)*2 + 2, 3, posRel, innerForce, scene, _("textures/firmalampe.png"), GL_CLAMP, GL_CLAMP),
+LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
+  BasicFlame (s, (nbSkeletons+2)*2 + 2, 3, posRel, innerForce, scene, textureName, GL_CLAMP, GL_REPEAT),
   m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
 {
   Point pt;
@@ -123,12 +123,11 @@ LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerFor
   /* Ajout des extrémités */
   pt = *m_wick.getLeadPoint (0);
   pt.x += (-largeur / 2.0);
-  m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, 
-				     m_leads[0], m_lifeSpanAtBirth - 2);
+  m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[0], m_lifeSpanAtBirth - 2);
+  
   pt = *m_wick.getLeadPoint (m_nbLeadSkeletons - 1);
   pt.x += (largeur / 2.0);
-  m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP,
-							 m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
+  m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
   
   m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 }
@@ -154,7 +153,8 @@ void LineFlame::addForces (char perturbate)
       if(ptxPrev != ptx || ptyPrev != pty || ptzPrev != ptz){
 	  //m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
 	  // 	m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
-	m_solver->addVsrc (ptx, pty, ptz, m_innerForce * exp(i));
+	// m_solver->addVsrc (ptx, pty, ptz, m_innerForce * exp(i));
+	m_solver->addVsrc (ptx, pty, ptz, m_innerForce * expf(-(i*i/(6*6))));
 	ptxPrev = ptx; ptyPrev = pty; ptzPrev = ptz;
 	i++;
       }
@@ -411,11 +411,9 @@ void LineFlame::drawFlame (bool displayParticle)
       double vtex = 1.1 / (double) (m_maxParticles);
 
       GLdouble texpts[2][2][2] =
-	{ {{0.0, 0}, {0.0, 1.0}}, {{vtex, 0}, {vtex, 1.0}} };
+	{ {{0.0, 0}, {0.0, 0.25}}, {{vtex, 0}, {vtex, 0.25}} };
 
       glEnable (GL_TEXTURE_2D);
-
-      glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
       glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4,
 	       2, &texpts[0][0][0]);
       glEnable (GL_MAP2_TEXTURE_COORD_2);
@@ -504,6 +502,13 @@ void PointFlame::addForces (char perturbate)
       }
       m_perturbateCount++;
     }
+    break;
+  case FLICKERING_RANDOM :
+    m_solver->addVsrc(m_x, 1, m_z, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_x+1, 1, m_z, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_x-1, 1, m_z, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_x, 1, m_z+1, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_x, 1, m_z-1, rand()/(10*(double)RAND_MAX));
     break;
   }
 }

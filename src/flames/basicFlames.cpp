@@ -18,6 +18,8 @@ BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& pos
   m_nbFixedPoints = nbFixedPoints;
   
   m_skeletons = new PeriSkeleton* [m_nbSkeletons];
+  for (int i = 0; i < m_nbSkeletons; i++)
+    m_skeletons[i]=NULL;
   
   m_uorder = 4;
   m_vorder = 4;
@@ -84,14 +86,14 @@ void BasicFlame::toggleSmoothShading()
 /************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
-  BasicFlame (s, (nbSkeletons+2)*2 + 2, 3, posRel, innerForce, scene, textureName, GL_CLAMP, GL_REPEAT),
+  BasicFlame (s, (nbSkeletons+2)*2 + 2, 2, posRel, innerForce, scene, textureName, GL_CLAMP, GL_REPEAT),
   m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
 {
   Point pt;
   double largeur = .03;
+  int i,j;
   
-  m_lifeSpanAtBirth = 4;
-  
+  m_lifeSpanAtBirth = 6;
   Point rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
   
   m_nbLeadSkeletons = m_wick.getLeadPointsArraySize ();
@@ -104,28 +106,29 @@ LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerFor
   // m_skeletons = new PeriSkeleton *[m_nbSkeletons];
   
   /* Génération d'un côté des squelettes périphériques */
-  for (int i = 1; i <= m_nbLeadSkeletons; i++)
+  for (i = 1; i <= m_nbLeadSkeletons; i++)
     {
-      pt = *m_wick.getLeadPoint (i - 1);
+      pt = m_wick.getLeadPoint (i - 1)->m_pt;
       m_leads[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL,m_lifeSpanAtBirth);
       pt.z += (-largeur / 2.0);
       m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[i - 1], m_lifeSpanAtBirth - 2);
     }
   
   /* Génération de l'autre côté des squelettes périphériques */
-  for (int j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
+  for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
   {
-	pt = *m_wick.getLeadPoint (j - 1);
+	pt = m_wick.getLeadPoint (j - 1)->m_pt;
 	pt.z += (largeur / 2.0);
 	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[j - 1], m_lifeSpanAtBirth - 2);
   }
+  cerr << (nbSkeletons+2)*2 + 2 << " " << i << endl;
   
   /* Ajout des extrémités */
-  pt = *m_wick.getLeadPoint (0);
+  pt = m_wick.getLeadPoint (0)->m_pt;
   pt.x += (-largeur / 2.0);
   m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[0], m_lifeSpanAtBirth - 2);
   
-  pt = *m_wick.getLeadPoint (m_nbLeadSkeletons - 1);
+  pt = m_wick.getLeadPoint (m_nbLeadSkeletons - 1)->m_pt;
   pt.x += (largeur / 2.0);
   m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
   
@@ -139,40 +142,56 @@ LineFlame::~LineFlame ()
   delete[]m_leads;
 }
 
-void LineFlame::addForces (char perturbate)
-{  
+void LineFlame::addForces (char perturbate, char fdf)
+{ 
   int ptxPrev=MININT,ptyPrev=MININT,ptzPrev=MININT;
   int ptx,pty,ptz,i=0;
-  vector < Point * >*wickLeadPointsArray = m_wick.getLeadPointsArray();
+  vector < WickPoint * >*wickLeadPointsArray = m_wick.getLeadPointsArray();
   
-  for (vector < Point * >::iterator pointsIterator = wickLeadPointsArray->begin ();
+  for (vector < WickPoint * >::iterator pointsIterator = wickLeadPointsArray->begin ();
        pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
     {
-      m_solver->findPointPosition(**pointsIterator, ptx, pty, ptz);
+      m_solver->findPointPosition((*pointsIterator)->m_pt, ptx, pty, ptz);
       
       if(ptxPrev != ptx || ptyPrev != pty || ptzPrev != ptz){
-	  //m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
-	  // 	m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
+	// m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
+	// m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
 	// m_solver->addVsrc (ptx, pty, ptz, m_innerForce * exp(i));
-	m_solver->addVsrc (ptx, pty, ptz, m_innerForce * expf(-(i*i/(6*6))));
+
+	//
+	switch(fdf){
+	case FDF_LINEAR :
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u);
+	  break;
+	case FDF_EXPONENTIAL :
+	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
+	  break;
+	case FDF_GAUSS:
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
+	  break;
+	case FDF_RANDOM:
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * rand()/((double)RAND_MAX));
+	  break;
+	}
+
+	switch(perturbate){
+	case FLICKERING_VERTICAL :
+	  if (m_perturbateCount == 2)
+	    {
+	      m_solver->addVsrc (ptx, pty, ptz, m_innerForce);
+	      m_perturbateCount = 0;
+	    }
+	  else
+	    m_perturbateCount++;
+	  break;
+	case FLICKERING_RANDOM :
+	  m_solver->addVsrc (ptx, pty, ptz, .4*rand()/((double)RAND_MAX)-.2);
+	  break;
+	}
 	ptxPrev = ptx; ptyPrev = pty; ptzPrev = ptz;
 	i++;
       }
     }
-  
-  switch(perturbate){
-  case FLICKERING_VERTICAL :
-    if (m_perturbateCount == 2)
-      {
-	m_solver->addVsrc (m_x, 1, m_z, .4);
-	m_solver->addVsrc (m_x+1, 1, m_z, .3);
-	m_solver->addVsrc (m_x-1, 1, m_z, .3);
-	m_perturbateCount = 0;
-      }
-    else
-      m_perturbateCount++;
-    break;
-  }
 }
 
 Point LineFlame::getCenter ()
@@ -203,6 +222,8 @@ void LineFlame::build ()
   /* Déplacement et détermination du maximum */
   for (i = 0; i < m_nbSkeletons; i++)
     {
+      if(m_skeletons[i]==NULL)
+	cerr << "buite" << endl;
       m_skeletons[i]->move ();
       if (m_skeletons[i]->getSize () > m_maxParticles)
 	m_maxParticles = m_skeletons[i]->getSize ();
@@ -372,11 +393,11 @@ void LineFlame::build ()
       m_vknots[j] += 1;
 }
 
-void LineFlame::drawWick()
+void LineFlame::drawWick(bool displayBoxes)
 {
   glPushMatrix();
   glTranslatef (m_position.x, m_position.y, m_position.z);
-  m_wick.drawWick();
+  m_wick.drawWick(displayBoxes);
   glPopMatrix();
 }
 
@@ -468,7 +489,7 @@ PointFlame::PointFlame (Solver * s, int nbSkeletons, Point& posRel, double inner
 					 m_lead, m_lifeSpanAtBirth);
       angle += 2 * PI / m_nbSkeletons;
     }
-    
+  
   m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 }
 
@@ -477,7 +498,7 @@ PointFlame::~PointFlame ()
   delete m_lead;
 }
 
-void PointFlame::addForces (char perturbate)
+void PointFlame::addForces (char perturbate, char fdf)
 {
   m_solver->addVsrc (m_x, 1, m_z, m_innerForce);
   
@@ -690,7 +711,7 @@ void PointFlame::build ()
       m_vknots[j] += 1;
 }
 
-void PointFlame::drawWick ()
+void PointFlame::drawWick (bool displayBoxes)
 {
   double hauteur = m_solver->getDimY() / 6.0;
   double largeur = m_solver->getDimX() / 60.0;

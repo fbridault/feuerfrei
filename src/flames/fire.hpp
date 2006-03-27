@@ -112,13 +112,13 @@ public:
   /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
-  virtual void drawWick()
+  virtual void drawWick(bool displayBoxes)
   {      
     Point pt(getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
     for (int i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawWick();
+      m_flames[i]->drawWick(displayBoxes);
     glPopMatrix();
   }
   
@@ -142,9 +142,9 @@ public:
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  void draw(bool displayParticle)
+  void draw(bool displayParticle, bool displayBoxes)
   {
-    drawWick();
+    drawWick(displayBoxes);
     drawFlame(displayParticle);
   }
   
@@ -180,10 +180,10 @@ public:
    *
    * @param perturbate type de perturbation dans l'élévation thermique
    */
-  virtual void addForces (char perturbate)
+  virtual void addForces (char perturbate, char fdf=0)
   {
     for (int i = 0; i < m_nbFlames; i++)
-      m_flames[i]->addForces(perturbate);
+      m_flames[i]->addForces(perturbate,fdf);
   }
   
   virtual void setForces(double value)

@@ -45,6 +45,7 @@ enum
     IDM_Base,
     IDM_Velocity,
     IDM_Particles,
+    IDM_WickBoxes,
     IDM_Flames,
     IDM_ShadowVolumes,
     IDM_Hide,
@@ -80,6 +81,7 @@ public:
   void OnBaseMenu(wxCommandEvent& event);
   void OnVelocityMenu(wxCommandEvent& event);
   void OnParticlesMenu(wxCommandEvent& event);
+  void OnWickBoxesMenu(wxCommandEvent& event);
   void OnHideMenu(wxCommandEvent& event);
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);

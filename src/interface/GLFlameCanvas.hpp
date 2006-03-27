@@ -66,6 +66,7 @@ public:
   void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };
   void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
   void ToggleParticlesDisplay(void) { m_displayParticles=!m_displayParticles; };
+  void ToggleWickBoxesDisplay(void) { m_displayWickBoxes=!m_displayWickBoxes; };
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
   void ToggleSmoothShading(void) { 
@@ -92,7 +93,7 @@ private:
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
-  bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles;
+  bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
   bool m_drawShadowVolumes, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;

@@ -16,6 +16,15 @@ class Object;
 class Solveur;
 class Scene;
 
+class WickPoint
+{
+public:
+  WickPoint(Point& pt, double u) : m_pt(pt), m_u(u) {};
+  virtual ~WickPoint() {};
+  Point m_pt;
+  double m_u;
+};
+
 /** Classe représentant une mèche longiligne de flamme.<br>
  * Le constructeur prend en entrée un fichier OBJ. L'objet est découpé en nb_lead_skeletons
  * partitions. Une racine de squelette périphérique est placée au centre de chaque partition.
@@ -27,8 +36,9 @@ class Wick : public Object
 {
 private:
   /**<Liste des points qui vont servir à  créer les squelettes guides */
-  vector < Point * >m_leadPointsArray;
+  vector < WickPoint * >m_leadPointsArray;
   GLuint m_wickDisplayList;
+  GLuint m_boxesDisplayList;
   
 public:
   /** Constructeur de mèche	
@@ -37,9 +47,14 @@ public:
   Wick(const char *wickFileName, int nb_lead_squelettes, Scene *scene, Point& offset, const char*wickName=NULL);
   virtual ~Wick();
   	
-  virtual void drawWick()
+  /** Affiche la mèche
+   * @param displayBoxes affiche ou non le partitionnement de la mèche
+   */
+  virtual void drawWick(bool displayBoxes)
   {
     glCallList(m_wickDisplayList);
+    if(displayBoxes)
+      glCallList(m_boxesDisplayList);
   };
   /**
    * Lecture du nombre de points des squelettes guides.
@@ -53,11 +68,11 @@ public:
    * @param index indice du point &agrave; obtenir.
    * @return Un pointeur vers le point recherch&eacute;.
    */
-  virtual const Point *getLeadPoint(int index) const
+  virtual const WickPoint *getLeadPoint(int index) const
   {
     return (m_leadPointsArray[index]);
   };
-  virtual vector < Point * > *getLeadPointsArray ()
+  virtual vector < WickPoint * > *getLeadPointsArray ()
   {
     return ( &m_leadPointsArray );
   };

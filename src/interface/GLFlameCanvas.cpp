@@ -63,7 +63,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_run = true;
   m_saveImages = false;
   m_glowOnly = false;
-  m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = false;
+  m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = m_displayWickBoxes = false;
   m_displayFlame = true;
   m_drawShadowVolumes = false;
 }
@@ -262,7 +262,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
     for (int i = 0; i < m_currentConfig->nbFlames; i++)
-      m_flames[i]->addForces (m_currentConfig->flames[i].flickering);
+      m_flames[i]->addForces (m_currentConfig->flames[i].flickering, m_currentConfig->flames[i].fdf);
     
     for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->iterate ();
@@ -388,7 +388,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     /******************* AFFICHAGE DE LA SCENE *******************************/
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->drawWick ();
+      m_flames[f]->drawWick (m_displayWickBoxes);
     
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
       /* 3e paramètre doit être la hauteur du solveur de la flamme */

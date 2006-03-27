@@ -19,6 +19,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
   EVT_MENU(IDM_Particles, MainFrame::OnParticlesMenu)
+  EVT_MENU(IDM_WickBoxes, MainFrame::OnWickBoxesMenu)
   EVT_MENU(IDM_ShadowVolumes, MainFrame::OnShadowVolumesMenu)
   EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
   EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
@@ -134,6 +135,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->AppendCheckItem( IDM_Base, _("&Base"));
   m_menuDisplay->AppendCheckItem( IDM_Velocity, _("&Velocity"));
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("&Particles"));
+  m_menuDisplay->AppendCheckItem( IDM_WickBoxes, _("&Wick Boxes"));
   m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
   m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));
   
@@ -189,20 +191,20 @@ void MainFrame::GetSettingsFromConfigFile (void)
       groupName.Printf(_("/Solver%d/"),i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
-
+      
       m_config->Read(groupName + _("Pos.x"), &m_currentConfig.solvers[i].position.x, 0.0);
       m_config->Read(groupName + _("Pos.y"), &m_currentConfig.solvers[i].position.y, 0.0);
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.solvers[i].position.z, 0.0);
-
+      
       m_currentConfig.solvers[i].resx = m_config->Read(groupName + _("X_res"), 15);
       m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
       m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
-
+      
       m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
       m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);
-
+      
       m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
-	
+      
       m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.5);
       m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.5);
       m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon,0.00001);
@@ -236,6 +238,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
       }
       m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
+      m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
       tabName.Printf(_("Flame #%d"),i+1);
       
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
@@ -438,6 +441,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       if(m_currentConfig.flames[i].type != CANDLE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
       m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
+      m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
     }
 
   wxFileOutputStream* file = new wxFileOutputStream( _("param.ini" ));
@@ -478,6 +482,11 @@ void MainFrame::OnVelocityMenu(wxCommandEvent& event)
 void MainFrame::OnParticlesMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleParticlesDisplay();
+}
+
+void MainFrame::OnWickBoxesMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleWickBoxesDisplay();
 }
 
 void MainFrame::OnHideMenu(wxCommandEvent& event)

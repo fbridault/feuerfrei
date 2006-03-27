@@ -62,23 +62,24 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_solversYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   
-  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxLEFT, 4);
   m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
-  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxLEFT, 4);
   m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 18, 0, 0);
-  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxTOP|wxLEFT, 4);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxLEFT, 4);
   m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 18, 0, 0);
   
-  m_solversXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_solversYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_solversZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  
+  m_solversXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);  
   m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversXAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  
+  m_solversYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversYAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  
+  m_solversZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
@@ -88,13 +89,13 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
-  m_panelSizer->Add(m_solversXAxisPositionSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_solversXAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_solversYAxisPositionSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_solversYAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_solversZAxisPositionSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversXAxisPositionRangeSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversYAxisPositionRangeSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
   
   SetSizer(m_panelSizer);
   
@@ -198,6 +199,7 @@ void SolverMainPanel::ComputeSlidersValues(void)
 BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
   EVT_SCROLL(FlameMainPanel::OnScrollPosition)
   EVT_RADIOBOX(IDRB_Flickering, FlameMainPanel::OnSelectType)
+  EVT_RADIOBOX(IDRB_FDF, FlameMainPanel::OnSelectFDF)
 END_EVENT_TABLE();
 
 
@@ -210,10 +212,16 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("Vertical"),
     _("From right"),
     _("Random")
-  };  
+  };
+  const wxString m_FDFRadioBoxChoices[] = {
+    _("Linear"),
+    _("Exponential"),
+    _("Gauss"),
+    _("Random")
+  };
   
   SLIDER_SENSIBILITY=1000.0;
-  SLIDER_RANGE=200;
+  SLIDER_RANGE=500;
   
   m_flameConfig = flameConfig;
   m_index = index;
@@ -230,13 +238,17 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
-  
+  m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
+					4, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
+
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
+  m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
+  m_flickeringRadioBox->SetSelection(m_flameConfig->fdf);
   
   SetSizer(m_panelSizer);
 }
@@ -253,4 +265,9 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 void FlameMainPanel::OnSelectType(wxCommandEvent& event)
 {
   m_flameConfig->flickering = event.GetSelection();
+}
+
+void FlameMainPanel::OnSelectFDF(wxCommandEvent& event)
+{
+  m_flameConfig->fdf = event.GetSelection();
 }

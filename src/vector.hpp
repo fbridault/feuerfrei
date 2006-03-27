@@ -115,6 +115,10 @@ public:
     Point resultat(x+P.x,y+P.y,z+P.z);
     return resultat;
   }//operator+
+  Point operator+(const GLdouble &K)
+  {
+    return Point(x+K,y+K,z+K);
+  };
   /** Aditionner deux points */
   virtual void operator+=(const Point& P){
     x += P.x;

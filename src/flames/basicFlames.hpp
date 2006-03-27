@@ -66,18 +66,22 @@ public:
    */
   virtual void drawFlame(bool displayParticle) = 0;
   
-  /** Dessine la mèche de la flamme */
-  virtual void drawWick() = 0; 
+  /** Dessine la mèche de la flamme 
+   * @param displayBoxes affiche ou non le partitionnement de la mèche
+   */
+  virtual void drawWick(bool displayBoxes) = 0; 
 
-  /** Dessine la flamme et sa mèche */
-  void draw(bool displayParticle){
-    drawWick();
+  /** Dessine la flamme et sa mèche 
+   * @param displayBoxes affiche ou non le partitionnement de la mèche
+   */
+  void draw(bool displayParticle, bool displayBoxes){
+    drawWick(displayBoxes);
     drawFlame(displayParticle);
   };
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  virtual void addForces (char perturbate) = 0;
+  virtual void addForces (char perturbate, char fdf=0) = 0;
   
   virtual void setForces(double value){  m_innerForce=value; };
   
@@ -218,12 +222,14 @@ public:
    */
   virtual void drawFlame(bool displayParticle);
   
-  /** Dessine la mèche de la flamme */
-  virtual void drawWick();
+  /** Dessine la mèche de la flamme 
+   * @param displayBoxes affiche ou non le partitionnement de la mèche
+   */
+  virtual void drawWick(bool displayBoxes);
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  void addForces(char perturbate);
+  void addForces(char perturbate, char fdf);
   
   /** Retroune la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
@@ -280,12 +286,15 @@ public:
    */
   virtual void drawFlame(bool displayParticle);
   
-  /** Dessine la mèche de la flamme */
-  virtual void drawWick(); 
+  /** Dessine la mèche de la flamme 
+   * @param displayBoxes affiche ou non le partitionnement de la mèche. Ce paramètre
+   * est ignoré pour ce type de flamme puisque la mèche n'est pas découpé. 
+   */
+  virtual void drawWick(bool displayBoxes);
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  void addForces(char perturbate);
+  void addForces(char perturbate, char fdf=0);
   
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.

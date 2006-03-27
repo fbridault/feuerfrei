@@ -146,6 +146,6 @@ PeriSkeleton::move ()
 	  if (i < getSize () - 1)
 	    i--;
 	}
-    }			/* for */
-
+    }	/* for */
+  
 }

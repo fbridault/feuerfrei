@@ -13,6 +13,7 @@ enum
     IDSL_SF,
     IDSL_FF,
     IDRB_Flickering,
+    IDRB_FDF,
   };
 
 enum
@@ -82,12 +83,13 @@ public:
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);
+  void OnSelectFDF(wxCommandEvent& event);
   
   wxSlider *m_innerForceSlider;
   wxStaticText *m_innerForceLabel;
   
   wxBoxSizer *m_panelSizer, *m_forcesSizer;
-  wxRadioBox *m_flickeringRadioBox;
+  wxRadioBox *m_flickeringRadioBox, *m_FDFRadioBox;
 
   FlameConfig *m_flameConfig;
   /* Index du solveur */

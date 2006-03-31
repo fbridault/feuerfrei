@@ -12,13 +12,13 @@ bin_PROGRAMS = rtflames
 rtflames_SOURCES = \
 	main.cpp  \
 	flames/basicFlames.cpp  \
+	flames/fbo.cpp  \
 	flames/fire.cpp  \
 	flames/firesources.cpp \
 	flames/glowengine.cpp  \
 	flames/ies.cpp  \
 	flames/leadSkeleton.cpp  \
 	flames/periSkeleton.cpp  \
-	flames/pbuffer.cpp  \
 	flames/skeleton.cpp  \
 	flames/solidePhoto.cpp  \
 	flames/wick.cpp  \

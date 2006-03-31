@@ -49,7 +49,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   const wxString m_lightingChoices[] = {
     _("Standard"),
     _("Photometric Solid")
-  };  
+  };
   /*********************************** Création des contrôles *************************************************/
   m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
   

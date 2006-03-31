@@ -33,7 +33,7 @@ BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& pos
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
   m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 50.0);
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 10000.0);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
   /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
@@ -83,8 +83,9 @@ void BasicFlame::toggleSmoothShading()
 
 
 /**********************************************************************************************************************/
-/************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
+/*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
+
 LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
   BasicFlame (s, (nbSkeletons+2)*2 + 2, 2, posRel, innerForce, scene, textureName, GL_CLAMP, GL_REPEAT),
   m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
@@ -121,7 +122,6 @@ LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerFor
 	pt.z += (largeur / 2.0);
 	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[j - 1], m_lifeSpanAtBirth - 2);
   }
-  cerr << (nbSkeletons+2)*2 + 2 << " " << i << endl;
   
   /* Ajout des extrémités */
   pt = m_wick.getLeadPoint (0)->m_pt;
@@ -157,23 +157,23 @@ void LineFlame::addForces (char perturbate, char fdf)
 	// m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
 	// m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
 	// m_solver->addVsrc (ptx, pty, ptz, m_innerForce * exp(i));
-
-	//
+	
 	switch(fdf){
 	case FDF_LINEAR :
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u);
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u);
 	  break;
 	case FDF_EXPONENTIAL :
 	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
 	  break;
 	case FDF_GAUSS:
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
+	  m_solver->addVsrc (ptx, pty, ptz, -m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u+m_innerForce);
+	  //m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
 	  break;
 	case FDF_RANDOM:
 	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * rand()/((double)RAND_MAX));
 	  break;
 	}
-
+	
 	switch(perturbate){
 	case FLICKERING_VERTICAL :
 	  if (m_perturbateCount == 2)
@@ -185,7 +185,7 @@ void LineFlame::addForces (char perturbate, char fdf)
 	    m_perturbateCount++;
 	  break;
 	case FLICKERING_RANDOM :
-	  m_solver->addVsrc (ptx, pty, ptz, .4*rand()/((double)RAND_MAX)-.2);
+	  m_solver->addVsrc (ptx, pty, ptz, 1*rand()/((double)RAND_MAX)-.5);
 	  break;
 	}
 	ptxPrev = ptx; ptyPrev = pty; ptzPrev = ptz;
@@ -222,8 +222,8 @@ void LineFlame::build ()
   /* Déplacement et détermination du maximum */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      if(m_skeletons[i]==NULL)
-	cerr << "buite" << endl;
+//       if(m_skeletons[i]==NULL)
+// 	cerr << "Error" << endl;
       m_skeletons[i]->move ();
       if (m_skeletons[i]->getSize () > m_maxParticles)
 	m_maxParticles = m_skeletons[i]->getSize ();
@@ -429,7 +429,7 @@ void LineFlame::drawFlame (bool displayParticle)
   else
     {
       /* Correction "à la grosse" pour les UVs -> à voir par la suite */
-      double vtex = 1.1 / (double) (m_maxParticles);
+      double vtex = 1.2 / (double) (m_maxParticles);
 
       GLdouble texpts[2][2][2] =
 	{ {{0.0, 0}, {0.0, 0.25}}, {{vtex, 0}, {vtex, 0.25}} };

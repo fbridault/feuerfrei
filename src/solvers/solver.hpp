@@ -148,9 +148,9 @@ public:
   /* Retrouver la cellule où est située la particule */
   void findPointPosition(Point& p, int& i, int& j, int& k)
   {
-    i = (int) (p.x * m_dimX * m_nbVoxelsX) + 1 + m_nbVoxelsX / 2;
-    j = (int) (p.y * m_dimY * m_nbVoxelsY) + 1;
-    k = (int) (p.z * m_dimZ * m_nbVoxelsZ) + 1 + m_nbVoxelsZ / 2;
+    i = (int) (p.x * m_dimXTimesNbVoxelsX) + 1 + m_halfNbVoxelsX;
+    j = (int) (p.y * m_dimXTimesNbVoxelsY) + 1;
+    k = (int) (p.z * m_dimXTimesNbVoxelsZ) + 1 + m_halfNbVoxelsZ;
   };
   
   Point& getPosition ()
@@ -213,6 +213,9 @@ protected:
   /** Dimensions du solveur */
   double m_dimX, m_dimY, m_dimZ;
 
+  double m_dimXTimesNbVoxelsX,  m_dimXTimesNbVoxelsY,  m_dimXTimesNbVoxelsZ;
+  int m_halfNbVoxelsX,  m_halfNbVoxelsZ;
+
   /** Position du solveur dans l'espace */
   Point m_position;
 
@@ -238,6 +241,8 @@ protected:
 
   /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
   int m_nbSteps;
+  
+  int t, n2, nx, t1, t2nx;
 };
 
 #endif

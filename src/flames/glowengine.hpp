@@ -4,13 +4,15 @@
 class GlowEngine;
 
 #include "flames.hpp"
-#include "pbuffer.hpp"
+#include "fbo.hpp"
 #include "../shaders/CgBlurShaders.hpp"
 #include "../scene/scene.hpp"
 #include "../scene/camera.hpp"
 
+#define GLOW_LEVELS 2
+
 /** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
- * qui va instancier un pbuffer, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
+ * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
  * glowEngine.activate();<br>
  * // Réglages de la largeur de la Gaussienne utilisée pour le blur<br>
  * m_glowEngine->setGaussSigma(4.5);<br>
@@ -39,7 +41,7 @@ public:
    * @param recompileShaders indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  GlowEngine(int w, int h, int scaleFactor, bool recompileShaders, CGcontext *cgcontext );
+  GlowEngine(unsigned int w, unsigned int h, int scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext );
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -60,20 +62,24 @@ public:
 
 private: 
   /** Dimensions de la texture */
-  int m_width, m_height;
+  unsigned int m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
+  unsigned int m_initialWidth, m_initialHeight;
+  
   /** Rapport d'échelle entre la taille du viewport et de la texture du blur */
-  int m_scaleFactor;
+  unsigned int m_scaleFactor[GLOW_LEVELS];
   
   /** Pbuffer */
-  PBuffer m_pbuffer;
+  //  PBuffer m_pbuffer;
+  FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS];
   /** Vertex Shader pour le blur en X */
   CgBlurVertexShader m_blurVertexShaderX;
   /** Vertex Shader pour le blur en Y */
   CgBlurVertexShader m_blurVertexShaderY;
   /** Fragment Shader pour le blur */
   CgBlurFragmentShader m_blurFragmentShader;
-  /** Indice de la texture servant à réaliser le blur */
-  GLuint m_texblur;
+  /** Textures servant à réaliser le blur */
+  Texture *m_firstPassTex[GLOW_LEVELS], *m_secondPassTex[GLOW_LEVELS];
 };
 
 #endif
+

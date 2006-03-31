@@ -16,12 +16,19 @@
 class Texture
 {
 public:
+  /** Construit une texture vide.
+   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_NV,...
+   * @param width largeur de la texture
+   * @param height hauteur de la texture
+   */
+  Texture(GLenum type, int width, int height);
+
   /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger
    */
   Texture(const wxString& filename);
 
-  Texture(const wxString& filename, GLenum gltexture);
+  Texture(const wxString& filename, GLenum type);
   virtual ~Texture();
   
     /** Construit une texture à partir d'un fichier image.
@@ -42,9 +49,14 @@ public:
   /** Donne l'identifiant de la texture à utiliser avec glBindTexture(). */
   const GLuint getTexture() const {return m_texName;};
 
+  /** Donne l'identifiant de la texture à utiliser avec glBindTexture(). */
+  const void bind() const { glBindTexture(m_type, m_texName); };
+  
 private:
   /** Identifiant OpenGL de la texture */
   GLuint m_texName;
+
+  GLenum m_type;
   /** Image */
   wxImage *m_wxtex;
 };

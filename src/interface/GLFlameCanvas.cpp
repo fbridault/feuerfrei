@@ -192,6 +192,7 @@ void GLFlameCanvas::InitSolvers(void)
 
 void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
+  int glowScales[2] = { 1, 14 };
   InitSolvers();
 
   m_flames = new FireSource *[m_currentConfig->nbFlames];
@@ -208,8 +209,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
-  m_glowEngine  = new GlowEngine (m_width, m_height, 4, recompileShaders, &m_context);
-  m_glowEngine2 = new GlowEngine (m_width, m_height, 1, recompileShaders, &m_context);
+  m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
@@ -328,14 +328,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     for (int f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();
   // SDL_mutexV (lock);
+  
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
   if(m_currentConfig->glowEnabled){
     GLdouble m[4][4];
     double dist, sigma;
     
     /* Adaptation du flou en fonction de la distance */
-    /* On module la largeur de la gaussienne */
-    
+    /* On module la largeur de la gaussienne */    
     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
     Vector direction(m[3][0], m[3][1], m[3][2]);
@@ -362,24 +362,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     m_glowEngine->blur();
     
     m_glowEngine->deactivate();
-    
-    m_glowEngine2->activate();
-    m_glowEngine2->setGaussSigma(sigma);
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-    
-    m_scene->draw_scene ();
-    
-    /* Dessin de la flamme */
-    if(m_displayFlame)
-      for (int f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]->drawFlame (m_displayParticles);
-    
-    m_glowEngine2->blur();
-    
-    m_glowEngine2->deactivate();
   }
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   
@@ -449,7 +431,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   }
   /********************* PLACAGE DU GLOW ****************************************/
   if(m_currentConfig->glowEnabled){
-    glDisable (GL_DEPTH_TEST);
     //    glBlendColor(0.0,0.0,0.0,1.0);
     //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
     //     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
@@ -462,11 +443,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     //     glBlendFunc (GL_ONE, GL_ONE);
     //     m_glowEngine->drawBlur(1.0);
     
-    glBlendFunc (GL_ONE, GL_ONE);
-    m_glowEngine2->drawBlur(1.0);
     m_glowEngine->drawBlur(1.0);
-
-    glEnable (GL_DEPTH_TEST);
   }
   /******** A VERIFIER *******/
   glFlush();

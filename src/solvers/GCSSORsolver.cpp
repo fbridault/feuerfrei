@@ -50,13 +50,7 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   double d=f*a;
   double e=2.0-omega;
   int i,j,k;
-
-  int t;
-  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-  int nx = m_nbVoxelsX+2;
-  int t1=n2 + nx +1;
-  int t2nx=2*nx;
- 
+  
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
   // calcul du carré de la norme de b
@@ -85,10 +79,7 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j= 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	m_r[t] = b[t] - diagonal * x0[t] + 
-	  a * (x0[t-nx] + x0[t+nx] +
-	       x0[t-1] + x0[t+1] +
-	       x0[t-n2] + x0[t+n2]);
+	m_r[t] = b[t] - diagonal * x0[t] + a * (x0[t-nx] + x0[t+nx] + x0[t-1] + x0[t+1] + x0[t-n2] + x0[t+n2]);
 	t++;
       }//for i
       t+=2;
@@ -305,13 +296,7 @@ GCSSORsolver::project (double *const p, double *const div)
 		h_y = 1.0 / m_nbVoxelsY, 
 		h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
-
-  int t;
-  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-  int nx = m_nbVoxelsX+2;
-  int t1=n2 + nx +1;
-  int t2nx=2*nx;
-
+  
   t = t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
@@ -325,7 +310,7 @@ GCSSORsolver::project (double *const p, double *const div)
     //p[IX (i, j, k)] = 0;
   }// for k
   
-  set_bnd (0, div);
+  //set_bnd (0, div);
   memset (p, 0, m_nbVoxels * sizeof (double));
   //set_bnd (0, p);
   

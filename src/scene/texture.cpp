@@ -4,9 +4,27 @@
 
 using namespace std;
 
+Texture::Texture(GLenum type, int width, int height)
+{  
+  m_type = type;
+  
+  glGenTextures(1, &m_texName);
+  glBindTexture(m_type, m_texName); 
+  
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  //  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
+  
+  glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+}
+
 Texture::Texture(const wxString& filename)
 {
   glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+  
+  m_type = GL_TEXTURE_2D;
   
   glGenTextures(1, &m_texName);
   glBindTexture(GL_TEXTURE_2D, m_texName);
@@ -28,15 +46,17 @@ Texture::Texture(const wxString& filename)
   }
 }
 
-Texture::Texture(const wxString& filename, GLenum gltexture)
+Texture::Texture(const wxString& filename, GLenum type)
 {  
+  m_type = type;
+
   glGenTextures(1, &m_texName);
-  glBindTexture(gltexture, m_texName);
- 
-  glTexParameteri(gltexture,GL_TEXTURE_WRAP_S,GL_CLAMP);
-  glTexParameteri(gltexture,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(gltexture,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(gltexture,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glBindTexture(m_type, m_texName); 
+  
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 //  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
@@ -45,7 +65,7 @@ Texture::Texture(const wxString& filename, GLenum gltexture)
     cout << "Error";
   }else{
     cout << "OK" << endl;
-    glTexImage2D (gltexture, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
+    glTexImage2D (m_type, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		  GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
   }
   
@@ -53,6 +73,7 @@ Texture::Texture(const wxString& filename, GLenum gltexture)
 
 Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 {
+  m_type = GL_TEXTURE_2D;
 
   glGenTextures(1, &m_texName);
   glBindTexture(GL_TEXTURE_2D, m_texName);
@@ -99,6 +120,8 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
 {  
   m_wxtex = NULL;
+  m_type = GL_TEXTURE_RECTANGLE_NV;
+  
   glGenTextures(1, &m_texName);
   
   glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texName);

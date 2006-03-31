@@ -55,7 +55,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  if ((*vertexIterator)->x <= MinBound.x)
 	    MinBound = *(*vertexIterator);
 	}
-      cerr << "Découpe en x" << endl;
+//       cerr << "Découpe en x" << endl;
     }else{
       /* Découpage en z */
       for (int i = 1; i < nb_lead_skeletons; i++){
@@ -74,7 +74,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  if ((*vertexIterator)->z <= MinBound.z)
 	    MinBound = *(*vertexIterator);
 	}
-      cerr << "Découpe en z" << endl;
+//       cerr << "Découpe en z" << endl;
     }
   else
     if(midDist.y > midDist.z){
@@ -95,7 +95,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  if ((*vertexIterator)->y <= MinBound.y)
 	    MinBound = *(*vertexIterator);
 	}
-      cerr << "Découpe en y" << endl;
+//       cerr << "Découpe en y" << endl;
     }else{
       /* Découpage en z */      
       for (int i = 1; i < nb_lead_skeletons; i++){
@@ -114,7 +114,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  if ((*vertexIterator)->z <= MinBound.z)
 	    MinBound = *(*vertexIterator);
 	}
-      cerr << "Découpe en z" << endl;
+//       cerr << "Découpe en z" << endl;
     }
   
 //    cerr << nb_lead_skeletons << endl;
@@ -214,7 +214,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  barycentre = barycentre / (double)n;
 	  
 	  m_leadPointsArray.push_back (new WickPoint (barycentre, 2*(i+1)/(double)(nb_lead_skeletons+1)-1));
-	  cerr << 2*(i+1)/(double)(nb_lead_skeletons+1)-1 << endl;
+// 	  cerr << 2*(i+1)/(double)(nb_lead_skeletons+1)-1 << endl;
  	}
       else
 	 cerr << "Partition " << i << " vide" << endl;

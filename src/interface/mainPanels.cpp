@@ -216,7 +216,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   const wxString m_FDFRadioBoxChoices[] = {
     _("Linear"),
     _("Exponential"),
-    _("Gauss"),
+    _("Bilinear"),
     _("Random")
   };
   
@@ -248,7 +248,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
-  m_flickeringRadioBox->SetSelection(m_flameConfig->fdf);
+  m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
   
   SetSizer(m_panelSizer);
 }

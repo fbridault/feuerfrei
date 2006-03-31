@@ -27,16 +27,10 @@ void HybridSolver::diffuse (int b, double *const x, double *const x0, double a, 
 void HybridSolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, 
-		h_y = 1.0 / m_nbVoxelsY, 
-		h_z = 1.0 / m_nbVoxelsZ;
+    h_y = 1.0 / m_nbVoxelsY,
+    h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
-
-  int t;
-  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-  int nx = m_nbVoxelsX+2;
-  int t1=n2 + nx +1;
-  int t2nx=2*nx;
-
+    
   t = t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
@@ -50,7 +44,7 @@ void HybridSolver::project (double *const p, double *const div)
     //p[IX (i, j, k)] = 0;
   }// for k
   
-  set_bnd (0, div);
+  //set_bnd (0, div);
   memset (p, 0, m_nbVoxels * sizeof (double));
   //set_bnd (0, p);
     

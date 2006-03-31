@@ -16,11 +16,6 @@ GSsolver::~GSsolver ()
 void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps)
 {
   int i, j, k, l;
-  int t;
-  int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-  int nx = m_nbVoxelsX+2;
-  int t1=n2 + nx +1;
-  int t2nx=2*nx;
   
   for (l = 0; l < nb_steps; l++){
     t=t1;
@@ -48,49 +43,43 @@ void GSsolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   int i, j, k;
-
-	int t;
- 	int n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-	int nx = m_nbVoxelsX+2;
-	int t1=n2 + nx +1;
-	int t2nx=2*nx;
   
-	t=t1;
-	for (k = 1; k <= m_nbVoxelsZ; k++){
-	  for (j = 1; j <= m_nbVoxelsY; j++){
-	    for (i = 1; i <= m_nbVoxelsX; i++){
-	      div[t] = -0.5 * (
-			       h_x * (m_u[t+1] - m_u[t-1]) +
-			       h_y * (m_v[t+nx] - m_v[t-nx]) +
-			       h_z * (m_w[t+n2] - m_w[t-n2])
-			       );
-	      t++;
-	    }//for i
-	    t+=2;
-	  }//for j
-	  t+=t2nx;
-	  //p[IX (i, j, k)] = 0;
-	}// for k
-	
-  set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
-//  set_bnd (0, p);
-  
-  GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 
-  
-	t=t1;
+  t=t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
-				m_u[t] -= 0.5 * (p[t+1] - p[t-1]) / h_x;
-				m_v[t] -= 0.5 * (p[t+nx] - p[t-nx]) / h_y;
-				m_w[t] -= 0.5 * (p[t+n2] - p[t-n2]) / h_z;
-				t++;
+	div[t] = -0.5 * (
+			 h_x * (m_u[t+1] - m_u[t-1]) +
+			 h_y * (m_v[t+nx] - m_v[t-nx]) +
+			 h_z * (m_w[t+n2] - m_w[t-n2])
+			 );
+	t++;
       }//for i
-			t+=2;
-		}//for j
-		t+=t2nx;
-	}//for k
+      t+=2;
+    }//for j
+    t+=t2nx;
+    //p[IX (i, j, k)] = 0;
+  }// for k
+  
+  //  set_bnd (0, div);
+  memset (p, 0, m_nbVoxels * sizeof (double));
+  //  set_bnd (0, p);
+  
+  GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 
+  
+  t=t1;
+  for (k = 1; k <= m_nbVoxelsZ; k++){
+    for (j = 1; j <= m_nbVoxelsY; j++){
+      for (i = 1; i <= m_nbVoxelsX; i++){
+	m_u[t] -= 0.5 * (p[t+1] - p[t-1]) / h_x;
+	m_v[t] -= 0.5 * (p[t+nx] - p[t-nx]) / h_y;
+	m_w[t] -= 0.5 * (p[t+n2] - p[t-n2]) / h_z;
+	t++;
+      }//for i
+      t+=2;
+    }//for j
+    t+=t2nx;
+  }//for k
   //set_bnd (1, u);
   //set_bnd (2, v);
   //set_bnd (3, w);

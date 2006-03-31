@@ -79,6 +79,18 @@ Solver::Solver (Point& position, int n_x, int n_y, int n_z, double dim, double t
   buildDLGrid ();
 
   m_buoyancy=buoyancy;
+
+  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
+  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+
+  m_halfNbVoxelsX = m_nbVoxelsX/2;
+  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
+  
+  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  nx = m_nbVoxelsX+2;
+  t1=n2 + nx +1;
+  t2nx=2*nx;
 }
 
 Solver::~Solver ()

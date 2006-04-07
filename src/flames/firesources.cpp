@@ -40,7 +40,7 @@ Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, const c
   for (vector < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-	m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, _("textures/torch2.png"), 
-				    torchName, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, _("textures/torch2.png"), 
+				  torchName, (*objListIterator).c_str());
     }
 }

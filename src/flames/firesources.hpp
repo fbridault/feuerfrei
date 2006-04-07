@@ -58,7 +58,9 @@ public:
   virtual ~Firmalampe(){};
 };
 
-/** La classe Firmalampe permet la définition d'une firmalampe.
+/** La classe Torche permet la définition d'une flamme de type torche.
+ * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
+ * en Wick*. Le luminaire en tant que tel doit s'appeler Torch.
  *
  * @author	Flavien Bridault
  */

@@ -1,0 +1,11 @@
+#Produced by Art of Illusion 2.2, Mon Mar 27 17:20:43 CEST 2006
+newmtl Bois
+Kd 0.55 0.38731 0.2695
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Meche
+Kd 0.22 0.22 0.22
+Ks 0 0 0
+Ka 0 0 0
+illum 1

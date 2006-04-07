@@ -206,7 +206,7 @@ Point LineFlame::getCenter ()
   }
   
   averagePos += m_position;
-
+  
   return averagePos;
 }
 
@@ -263,7 +263,7 @@ void LineFlame::build ()
 	  
 	  m_distances[m_skeletons[k]->getSize ()] = 
 	    m_skeletons[k]->getLastParticle ()->squaredDistanceFrom (m_skeletons[k]->getRoot ());
-
+	  
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de conna�tre les premiers */
 			
@@ -272,7 +272,7 @@ void LineFlame::build ()
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
 	      double dist_max = FLT_MIN;
-
+	      
 	      for (j = 0;
 		   j < m_skeletons[k]->getSize () + 2; j++)
 		{
@@ -289,23 +289,23 @@ void LineFlame::build ()
 	      else
 		/* On met ï¿œ0 la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
 		m_distances[m_maxDistancesIndexes[l]] = 0;
-
+	      
 	      //cout << FLT_MIN << endl << "dist max :" << dist_max << endl << m_maxDistancesIndexes[l] << endl;
 	    }
 	  //cout << "prout" << endl;
 	  /* Les particules les plus ï¿œartï¿œs sont maintenant connues, on peut passer ï¿œl'affichage */
 	  count = 0;
-
+	  
 	  /* Remplissage des points de contr�le */
 	  setCtrlPoint (i, count++, m_skeletons[k]->getLeadSkeleton ()->getParticle (0), 1.0);
-
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
 		pt = Point::pointBetween(m_skeletons[k]->getLeadSkeleton ()->getParticle (0), m_skeletons[k]->getParticle (0));
 		setCtrlPoint (i, count++, &pt);
 	      }
-
+	  
 	  for (j = 0; j < m_skeletons[k]->getSize () - 1; j++)
 	    {
 	      /* On regarde s'il ne faut pas ajouter un point */
@@ -322,27 +322,27 @@ void LineFlame::build ()
 	    }
 	  
 	  setCtrlPoint (i, count++, m_skeletons[k]->getLastParticle ());
-
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize ())
 	      {
 		pt = Point::pointBetween(m_skeletons[k]->getRoot (), m_skeletons[k]-> getLastParticle ());
 		setCtrlPoint (i, count++, &pt);
 	      }
-
+	  
 	  setCtrlPoint (i, count++, m_skeletons[k]->getRoot ());
-
+	  
 	  bool prec = false;
-
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == m_skeletons[k]->getSize () + 1)
 	      {
 		pt = Point::pointBetween(m_skeletons[k]->getRoot (),
-					  m_skeletons[k]->getLeadSkeleton()->getRoot ());
+					 m_skeletons[k]->getLeadSkeleton()->getRoot ());
 		setCtrlPoint (i, count++, &pt);
 		prec = true;
 	      }
-
+	  
 	  /* Points suppl�mentaires au cas où il n'y a "plus de place" ailleurs entre les particules */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == -1)
@@ -376,18 +376,18 @@ void LineFlame::build ()
   /* Affichage en NURBS */
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
   m_vknotsCount = m_maxParticles + m_vorder + m_nbFixedPoints;
-
+  
   for (i = 0; i < m_uknotsCount; i++)
     m_uknots[i] = i;
-
+  
   for (j = 0; j < m_vknotsCount; j++)
     m_vknots[j] = (j < m_vorder) ? 0 : (j - m_vorder + 1);
-
+  
   for (j = m_vknotsCount - m_vorder; j < m_vknotsCount; j++)
     m_vknots[j] = m_vknots[m_vknotsCount - m_vorder];
-
+  
   m_vknots[m_vorder] += 0.9;
-
+  
   if (m_vknots[m_vorder] > m_vknots[m_vorder + 1])
     for (j = m_vorder + 1; j < m_vknotsCount; j++)
       m_vknots[j] += 1;
@@ -430,10 +430,10 @@ void LineFlame::drawFlame (bool displayParticle)
     {
       /* Correction "� la grosse" pour les UVs -> � voir par la suite */
       double vtex = 1.2 / (double) (m_maxParticles);
-
+      
       GLdouble texpts[2][2][2] =
 	{ {{0.0, 0}, {0.0, 0.25}}, {{vtex, 0}, {vtex, 0.25}} };
-
+      
       glEnable (GL_TEXTURE_2D);
       glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4,
 	       2, &texpts[0][0][0]);
@@ -442,12 +442,12 @@ void LineFlame::drawFlame (bool displayParticle)
       glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_tex.getTexture ());
-
+      
       gluBeginSurface (m_nurbs);
       gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
 		       3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
       gluEndSurface (m_nurbs);
-
+      
       glDisable (GL_TEXTURE_2D);
     }
 }

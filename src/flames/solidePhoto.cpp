@@ -84,7 +84,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector o, P
   // le centre du SP est la position de la flamme + la moitié du vecteur orientation
   // (orientation = vecteur position vers dernière particule)
   m_centreSP= p+(o/2.0);
-
+  
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan
   m_axeRotation.set(-o.z,0.0,o.x);
@@ -96,7 +96,7 @@ SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector o, P
     m_orientationSPtheta = 0.0;
   else
     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
-
+  
 //   printf("theta : %g ",orientationSPtheta);
 //  printf("fluctint : %g ",fluctuationIntensite);
 //   p->afficher();

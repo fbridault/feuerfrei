@@ -23,6 +23,8 @@ void FBO::Attach(GLuint tex, unsigned int colorAttachment)
 {
   GLenum l_colorAttachment;
     
+  /* A compléter par la suite, sachant que le nombre d'attachements possibles */
+  /* est dépendant du driver */
   switch(colorAttachment){
   case 0 : l_colorAttachment = GL_COLOR_ATTACHMENT0_EXT; break;
   case 1 : l_colorAttachment = GL_COLOR_ATTACHMENT1_EXT; break;
@@ -32,7 +34,6 @@ void FBO::Attach(GLuint tex, unsigned int colorAttachment)
   case 5 : l_colorAttachment = GL_COLOR_ATTACHMENT5_EXT; break;
   case 6 : l_colorAttachment = GL_COLOR_ATTACHMENT6_EXT; break;
   case 7 : l_colorAttachment = GL_COLOR_ATTACHMENT7_EXT; break;
-  case 8 : l_colorAttachment = GL_COLOR_ATTACHMENT8_EXT; break;
   }
     
   glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );

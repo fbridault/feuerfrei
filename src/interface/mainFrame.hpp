@@ -37,8 +37,10 @@ enum
 
 enum
   {
-    IDM_OpenScene = 1,
+    IDM_LoadParam = 1,
+    IDM_OpenScene,
     IDM_SaveSettings,
+    IDM_SaveSettingsAs,
     IDM_Quit,
     IDM_About,
     IDM_Grid,
@@ -64,6 +66,8 @@ public:
   
   void GetSettingsFromConfigFile (void);
   void InitGLBuffer (bool recompileShaders);
+  void InitSolversPanels();
+  void InitFlamesPanels();
   
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
@@ -73,8 +77,10 @@ public:
   void OnClickButtonSwap(wxCommandEvent& event);
   
   /** Actions des menus */
+  void OnLoadParamMenu(wxCommandEvent& event);
   void OnOpenSceneMenu(wxCommandEvent& event);
   void OnSaveSettingsMenu(wxCommandEvent& event);
+  void OnSaveSettingsAsMenu(wxCommandEvent& event);
   void OnQuitMenu(wxCommandEvent& event);
   void OnAboutMenu(wxCommandEvent& event);
   void OnGridMenu(wxCommandEvent& event);
@@ -90,6 +96,7 @@ public:
   void OnShadowsMenu(wxCommandEvent& event);
   void OnShadowVolumesMenu(wxCommandEvent& event);
   void OnShadowVolumesSettingsMenu(wxCommandEvent& event);
+  /** Actions des checkboxes et autres */
   void OnCheckBS(wxCommandEvent& event);
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckShadows(wxCommandEvent& event);

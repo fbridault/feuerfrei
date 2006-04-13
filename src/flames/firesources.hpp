@@ -110,7 +110,7 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *torchName, 
+  CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *fireName, 
 	int index, CgSVShader * shader, int nbSkeletons);
   virtual ~CampFire(){}; 
 };

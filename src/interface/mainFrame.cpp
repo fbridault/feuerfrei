@@ -11,8 +11,10 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
   EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
+  EVT_MENU(IDM_LoadParam, MainFrame::OnLoadParamMenu)
   EVT_MENU(IDM_OpenScene, MainFrame::OnOpenSceneMenu)
   EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
+  EVT_MENU(IDM_SaveSettingsAs, MainFrame::OnSaveSettingsAsMenu)
   EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
   EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
   EVT_MENU(IDM_Grid, MainFrame::OnGridMenu)
@@ -118,8 +120,10 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   /* Création des menus */
   m_menuFile = new wxMenu;
   
+  m_menuFile->Append( IDM_LoadParam, _("&Load simulation file...") );
   m_menuFile->Append( IDM_OpenScene, _("&Open scene...") );
   m_menuFile->Append( IDM_SaveSettings, _("&Save settings") );
+  m_menuFile->Append( IDM_SaveSettingsAs, _("&Save settings as...") );
   m_menuFile->Append( IDM_About, _("&About...") );
   m_menuFile->AppendSeparator();
   m_menuFile->Append( IDM_Quit, _("E&xit") );
@@ -154,12 +158,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
 
+  m_configFileName = configFileName;
   GetSettingsFromConfigFile();
 }
 
 void MainFrame::GetSettingsFromConfigFile (void)
 {
-  wxFileInputStream* file = new wxFileInputStream( _("param.ini" ));
+  wxFileInputStream* file = new wxFileInputStream( m_configFileName );
   m_config = new wxFileConfig( *file );
   
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
@@ -276,6 +281,35 @@ void MainFrame::InitGLBuffer(bool recompileShaders)
   m_glBuffer->Init(&m_currentConfig,recompileShaders);
 }
 
+void MainFrame::InitSolversPanels()
+{
+  wxString tabName;
+  
+  m_solversNotebook->DeleteAllPages();
+  
+  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+    {
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);	
+      tabName.Printf(_("Solver #%d"),i+1);
+      m_solversNotebook->AddPage(m_solverPanels[i], tabName);
+    }
+}
+
+
+void MainFrame::InitFlamesPanels()
+{
+  wxString tabName;
+  
+  m_flamesNotebook->DeleteAllPages();
+  
+  for(int i=0; i < m_currentConfig.nbFlames; i++)
+    {
+      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);     
+      tabName.Printf(_("Flame #%d"),i+1);       
+      m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
+    }
+}
+
 void MainFrame::OnClose(wxCloseEvent& event)
 {
   delete m_config;
@@ -354,10 +388,29 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
   wxFileDialog fileDialog(this, _("Choose a scene file"), _("scenes"), _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetFilename();
-  
-    cout << filename.fn_str() << endl;
+    
     if(!filename.IsEmpty()){
       m_currentConfig.sceneName = filename;
+      m_glBuffer->Restart();
+    }
+  }
+}
+
+void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
+{
+  wxString filename;
+  
+  wxFileDialog fileDialog(this, _("Choose a simulation file"), _("."), _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
+  if(fileDialog.ShowModal() == wxID_OK){
+    filename = fileDialog.GetFilename();
+    
+    if(!filename.IsEmpty()){
+      m_configFileName = filename;
+      
+      SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
+      m_solversNotebook->DeleteAllPages();
+      m_flamesNotebook->DeleteAllPages();
+      GetSettingsFromConfigFile();
       m_glBuffer->Restart();
     }
   }
@@ -444,13 +497,31 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
     }
 
-  wxFileOutputStream* file = new wxFileOutputStream( _("param.ini" ));
+  wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );
   
   if (m_config->Save(*file) )  
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
 
   delete file;
+}
+
+void MainFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
+{
+  
+  wxString filename;
+  
+  wxFileDialog fileDialog(this, _("Enter a simulation file"), _("."), _(""), _("*.ini"), wxSAVE|wxHIDE_READONLY|wxOVERWRITE_PROMPT);
+  if(fileDialog.ShowModal() == wxID_OK){
+    filename = fileDialog.GetFilename();
+  
+    if(!filename.IsEmpty()){
+      m_configFileName = filename;
+      
+      SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
+      OnSaveSettingsMenu(event);
+    }
+  }
 }
 
 void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
@@ -526,38 +597,20 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
 
 void MainFrame::OnSolversMenu(wxCommandEvent& event)
 {
-  wxString tabName;
-  
   SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog->ShowModal() == wxID_OK){
     m_glBuffer->Restart();
-    m_solversNotebook->DeleteAllPages();
-      
-    for(int i=0; i < m_currentConfig.nbSolvers; i++)
-      {
-	m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);	
-	tabName.Printf(_("Solver #%d"),i+1);
-	m_solversNotebook->AddPage(m_solverPanels[i], tabName);
-      }
+    InitSolversPanels();
   }
   solverDialog->Destroy();
 }
 
 void MainFrame::OnFlamesMenu(wxCommandEvent& event)
 {
-  wxString tabName;
-  
   FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog->ShowModal() == wxID_OK){
     m_glBuffer->Restart();
-    m_flamesNotebook->DeleteAllPages();
-    
-    for(int i=0; i < m_currentConfig.nbFlames; i++)
-      {
-	m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);     
-	tabName.Printf(_("Flame #%d"),i+1);       
-	m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
-      }
+    InitFlamesPanels();
   }
   flameDialog->Destroy();
 }

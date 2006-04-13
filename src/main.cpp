@@ -19,7 +19,7 @@ bool FlamesApp::OnInit()
       recompileShaders = true;
   }
   
-  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames"), wxDefaultPosition, wxSize(1060,860) );
+  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames - param.ini"), wxDefaultPosition, wxSize(1060,860), _("param.ini") );
  
   frame->Show(TRUE);
 

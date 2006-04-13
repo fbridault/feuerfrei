@@ -45,14 +45,14 @@ Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, const c
     }
 }
 
-CampFire::CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *torchName, 
+CampFire::CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, const char *fireName, 
 	     int index, CgSVShader * shader, int nbSkeletons):
-  FireSource (s, 0, posRel, scene, innerForce, torchName, index, shader, TORCH_NAME)
+  FireSource (s, 0, posRel, scene, innerForce, fireName, index, shader, TORCH_NAME)
 {
   vector<string> objList;
   int i=0;
   
-  scene->getObjectsNameFromOBJ(torchName, objList, WICK_NAME_PREFIX);
+  scene->getObjectsNameFromOBJ(fireName, objList, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new BasicFlame* [m_nbFlames];
@@ -61,6 +61,6 @@ CampFire::CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, c
        objListIterator != objList.end (); objListIterator++, i++)
     {
       m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, scene, _("textures/torch2.png"), 
-				  torchName, (*objListIterator).c_str());
+				  fireName, (*objListIterator).c_str());
     }
 }

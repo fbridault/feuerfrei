@@ -349,7 +349,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
     /* Définition de la largeur de la gaussienne en fonction de la distance */
     /* A définir de manière plus précise par la suite */
-    sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
+    sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
     
     m_glowEngine->activate();
     m_glowEngine->setGaussSigma(sigma);

@@ -122,6 +122,11 @@ void GLFlameCanvas::InitFlames(void)
 			      m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].wickName.fn_str(),
 			      i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
       break;
+    case CAMPFIRE :
+      m_flames[i] = new CampFire(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
+				 m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].wickName.fn_str(),
+				 i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
+      break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
       ::wxExit();
@@ -342,7 +347,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     dist = direction.length();
 
-    /* Définition de la largeur de la gaussienne */
+    /* Définition de la largeur de la gaussienne en fonction de la distance */
+    /* A définir de manière plus précise par la suite */
     sigma = dist > 0.1 ? -log(6*dist)+6 : 6.0;
     
     m_glowEngine->activate();
@@ -373,7 +379,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       m_flames[f]->drawWick (m_displayWickBoxes);
     
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
-      /* 3e paramètre doit être la hauteur du solveur de la flamme */
+      /* Le 3e paramètre doit être la hauteur du solveur de la flamme */
       Point pos(m_flames[0]->getPosition());
       m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
     }
@@ -404,9 +410,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     glPopAttrib ();
     
     glDisable (GL_LIGHTING);      
-  
+    
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
+    
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
     for (int s = 0; s < m_currentConfig->nbSolvers; s++)
       {

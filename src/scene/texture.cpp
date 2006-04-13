@@ -102,7 +102,6 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 	  *(tmp++) = m_wxtex->GetAlpha(i,j);
       }
       
-      cout << "Canal alpha présent" << endl;
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		  GL_RGBA, GL_UNSIGNED_BYTE, imgcpy);
       delete [] imgcpy;

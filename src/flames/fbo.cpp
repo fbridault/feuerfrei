@@ -11,18 +11,13 @@ void FBO::Initialize(unsigned int width, unsigned int height)
   //
   // Create a frame-buffer object and a render-buffer object...  
   glGenFramebuffersEXT( 1, &m_frameBuffer );
-  //glGenRenderbuffersEXT( 1, &m_depthRenderBuffer );
-  
- //  glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
-//   glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height );
-//   glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
-  
+  glGenRenderbuffersEXT( 1, &m_depthRenderBuffer );
 }
 
 void FBO::Attach(GLuint tex, unsigned int colorAttachment)
 {
   GLenum l_colorAttachment;
-    
+  
   /* A compléter par la suite, sachant que le nombre d'attachements possibles */
   /* est dépendant du driver */
   switch(colorAttachment){
@@ -38,6 +33,10 @@ void FBO::Attach(GLuint tex, unsigned int colorAttachment)
     
   glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
   glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, l_colorAttachment, GL_TEXTURE_RECTANGLE_NV, tex, 0 );
+
+  glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
+  glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, m_width, m_height );
+  glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
   
   GLenum status = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
   switch( status )
@@ -87,6 +86,6 @@ void FBO::Attach(GLuint tex, unsigned int colorAttachment)
 FBO::~FBO( void )
 {
   glDeleteFramebuffersEXT( 1, &m_frameBuffer );
-  //   glDeleteRenderbuffersEXT( 1, &m_depthRenderBuffer );
+  glDeleteRenderbuffersEXT( 1, &m_depthRenderBuffer );
 }
 

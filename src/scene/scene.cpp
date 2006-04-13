@@ -117,7 +117,7 @@ Scene::~Scene ()
 }
 
 
-void Scene::importOBJ(const char* fileName, Object* object, bool detached, const char* objName)
+bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const char* objName)
 {
   char lettre,drop;
   char buffer[255];
@@ -137,7 +137,7 @@ void Scene::importOBJ(const char* fileName, Object* object, bool detached, const
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
     throw (ios::failure ("Open error"));
-    return;
+    return false;
   }
   while (!objFile.eof())
     {
@@ -155,7 +155,7 @@ void Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	    if(alreadyOneObject){
 	      objFile.close ();
 	      chdir("..");
-	      return;
+	      return (currentObject != NULL);
 	    }else{
 	      if(lookForSpecificObject){
 		if(!strcmp(buffer,objName)){
@@ -335,7 +335,7 @@ void Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	    default:
 	      cout << "Erreur de chargement : Le fichier " << fileName <<
 		" contient des erreurs d'indexation de points.\n";
-	      return;
+	      return false;
 	      break;
 	    }
 	  break;
@@ -346,6 +346,11 @@ void Scene::importOBJ(const char* fileName, Object* object, bool detached, const
     }
   objFile.close ();
   chdir("..");
+	      
+  if(importSingleObject)
+    return (currentObject != NULL);
+  else
+    return true;  
 }
 
 void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList, const char* prefix)

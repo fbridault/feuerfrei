@@ -16,12 +16,13 @@ public:
   void Activate( void )
   {
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
+    //glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
   }
 
   void Deactivate( void )
   {
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
-    //   glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
+//     glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
   }
 
   unsigned int GetWidth()

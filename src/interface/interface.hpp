@@ -17,6 +17,7 @@
 #define CANDLE 0
 #define FIRMALAMPE 1
 #define TORCH 2
+#define CAMPFIRE 3
 
 /* Types de solveurs */
 #define GS_SOLVER 0

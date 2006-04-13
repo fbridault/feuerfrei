@@ -6,6 +6,7 @@ BEGIN_EVENT_TABLE(FlamePanel, wxPanel)
   EVT_BUTTON(IDBF_BrowseWick, FlamePanel::OnClickButtonBrowseWick)
 END_EVENT_TABLE();
 
+
 FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
@@ -15,10 +16,10 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
-
+  
   m_skeletonsNumberLabel = new wxStaticText(this, -1, _("Skeletons number"));
   m_skeletonsNumberCtrl = new LongTextCtrl(this, -1, 0, 100, _("4"));
-
+  
   m_solverLabel = new wxStaticText(this,-1,_("Use solver :"));
   m_solverComboBox = new wxComboBox(this,-1,_(""),wxDefaultPosition,wxDefaultSize,0,wxCB_READONLY);
   
@@ -27,18 +28,19 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
       itemName.Printf(_("Solver #%d"),i+1);
       m_solverComboBox->Append(itemName);
     }   
-
+  
   const wxString m_flameTypeRadioBoxChoices[] = {
     _("Candle"),
     _("Oil Lamp"),
-    _("Torch")
+    _("Torch"),
+    _("Camp Fire")
   };
   m_flameTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					3, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+					4, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
   m_wickLabel = new wxStaticText(this, -1, _("Wick"));
   m_wickTextCtrl = new wxTextCtrl(this, -1, _("meche2.obj"));
   m_wickBrowseButton = new wxButton(this, IDBF_BrowseWick, _("Browse..."));
-
+  
   setProperties();
   doLayout();
 }
@@ -85,6 +87,7 @@ void FlamePanel::doLayout()
   m_panelSizer->SetSizeHints(this);
 }
 
+
 void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
 {  
   m_posXTextCtrl->Clear();
@@ -110,6 +113,7 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
   }
 }
 
+
 bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
 {
   try
@@ -131,6 +135,7 @@ bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
   flameConfig->type = m_flameTypeRadioBox->GetSelection();
   return true;
 }
+
 
 void FlamePanel::OnSelectType(wxCommandEvent& event)
 {
@@ -244,10 +249,9 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   for(int i = 0; i < m_currentConfig->nbFlames; i++)
     {
       if( m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
-	if(m_currentConfig->flames[i].type == FIRMALAMPE){
+	if(m_currentConfig->flames[i].type != CANDLE){
 	  if(m_currentConfig->flames[i].wickName.IsEmpty()){
 	    wxMessageDialog *errorDialog = new wxMessageDialog(this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
-	    cerr << "onon " << m_currentConfig->flames[i].wickName << endl;
 	    errorDialog->ShowModal();
 	    errorDialog->Destroy();
 	    return;

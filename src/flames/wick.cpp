@@ -6,9 +6,10 @@
 Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point& offset, const char*wickName) : Object(scene, offset)
 {
   Point bounds[nb_lead_skeletons + 1];
-  Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MAX, DBL_MIN);
+  Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MIN, DBL_MIN);
   Point midDist, cellSpan;
   vector < Point * >pointsPartitionsArray[nb_lead_skeletons];
+  unsigned char max; /* 0 -> x, 1 -> y, 2 -> z */
   
   /* Chargement de la mèche */
   cerr << "Chargement de la mèche du fichier " << wickFileName << "...";
@@ -37,14 +38,26 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
   cellSpan = bounds[nb_lead_skeletons] - bounds[0];
   
   if(midDist.x > midDist.y)
-    if(midDist.x > midDist.z){
+    if(midDist.x > midDist.z)
       /* Découpage en x */
+      max=0;
+    else
+      max=2;
+  else
+    if(midDist.y > midDist.z)
+      /* Découpage en y */
+      max=1;
+    else
+      max=2;
+  
+  switch(max){
+  case 0 : 
       for (int i = 1; i < nb_lead_skeletons; i++){
 	bounds[i] = bounds[i-1];
 	bounds[i].x += midDist.x;
       }
       cellSpan.x=midDist.x;
-
+      
       for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
 	   vertexIterator != m_vertexArray.end (); vertexIterator++)
 	{
@@ -55,9 +68,30 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  if ((*vertexIterator)->x <= MinBound.x)
 	    MinBound = *(*vertexIterator);
 	}
-//       cerr << "Découpe en x" << endl;
-    }else{
-      /* Découpage en z */
+      //       cerr << "Découpe en x" << endl;
+      break;
+ case 1 :
+      /* Découpage en y */      
+      for (int i = 1; i < nb_lead_skeletons; i++){
+	bounds[i] = bounds[i-1];
+	bounds[i].y += midDist.y;
+      }
+      cellSpan.y=midDist.y;
+      
+      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
+	   vertexIterator != m_vertexArray.end (); vertexIterator++)
+	{
+	  /* Calcul du max */
+	  if ((*vertexIterator)->y >= MaxBound.y)
+	    MaxBound = *(*vertexIterator);
+	  /* Calcul du min */
+	  if ((*vertexIterator)->y <= MinBound.y)
+	    MinBound = *(*vertexIterator);
+	}
+      //       cerr << "Découpe en y" << endl;
+      break;
+  case 2 :
+      /* Découpage en z */      
       for (int i = 1; i < nb_lead_skeletons; i++){
 	bounds[i] = bounds[i-1];
 	bounds[i].z += midDist.z;
@@ -75,47 +109,8 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	    MinBound = *(*vertexIterator);
 	}
 //       cerr << "Découpe en z" << endl;
-    }
-  else
-    if(midDist.y > midDist.z){
-      /* Découpage en y */      
-      for (int i = 1; i < nb_lead_skeletons; i++){
-	bounds[i] = bounds[i-1];
-	bounds[i].y += midDist.y;
-      }
-      cellSpan.y=midDist.y;
-
-      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	   vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-	  /* Calcul du max */
-	  if ((*vertexIterator)->y >= MaxBound.y)
-	    MaxBound = *(*vertexIterator);
-	  /* Calcul du min */
-	  if ((*vertexIterator)->y <= MinBound.y)
-	    MinBound = *(*vertexIterator);
-	}
-//       cerr << "Découpe en y" << endl;
-    }else{
-      /* Découpage en z */      
-      for (int i = 1; i < nb_lead_skeletons; i++){
-	bounds[i] = bounds[i-1];
-	bounds[i].x += midDist.z;
-      }
-      cellSpan.z=midDist.z;
-
-      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	   vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-	  /* Calcul du max */
-	  if ((*vertexIterator)->z >= MaxBound.z)
-	    MaxBound = *(*vertexIterator);
-	  /* Calcul du min */
-	  if ((*vertexIterator)->z <= MinBound.z)
-	    MinBound = *(*vertexIterator);
-	}
-//       cerr << "Découpe en z" << endl;
-    }
+      break;
+  }
   
 //    cerr << nb_lead_skeletons << endl;
 //    for (int i = 0; i <= nb_lead_skeletons; i++)
@@ -124,7 +119,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
   
   m_boxesDisplayList=glGenLists(1);
   glNewList (m_boxesDisplayList, GL_COMPILE);
-  // glColor3f(1.0,0.0,0.0);
+  glColor3f(1.0,1.0,1.0);
 //   glBegin(GL_LINE_LOOP);
 //   glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
 //   glVertex3f(bounds[0].x,bounds[0].y,bounds[nb_lead_skeletons].z);
@@ -147,8 +142,8 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 //   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
 //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
 //   glEnd();
-  glColor3f(1.0,1.0,1.0);
   for (int i = 0; i < nb_lead_skeletons; i++){
+    glColor3f(0.0,i*1.0/(double)nb_lead_skeletons,1.0);
     Point bounds2 = bounds[i]+cellSpan;
     glBegin(GL_LINE_LOOP);
     glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);

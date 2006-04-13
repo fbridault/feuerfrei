@@ -93,11 +93,13 @@ FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, do
   }
   
   m_luminary = new Object(scene);
-  scene->importOBJ(filename, m_luminary, true, objName);
-  m_luminaryDL=glGenLists(1);
-  glNewList(m_luminaryDL,GL_COMPILE);
-  m_luminary->draw();
-  glEndList();
+  hasLuminary = scene->importOBJ(filename, m_luminary, true, objName);
+  if(hasLuminary){
+    m_luminaryDL=glGenLists(1);
+    glNewList(m_luminaryDL,GL_COMPILE);
+    m_luminary->draw();
+    glEndList();
+  }
   
   m_position=posRel;
 }
@@ -109,7 +111,8 @@ FireSource::~FireSource()
   delete[]m_flames;
   /* On efface le luminaire, il n'appartient pas à la scène */
   delete m_luminary;
-  glDeleteLists(m_luminaryDL,1);
+  
+  if(hasLuminary) glDeleteLists(m_luminaryDL,1);
 }
 
 void FireSource::build()

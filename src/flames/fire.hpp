@@ -153,11 +153,13 @@ public:
    */
   void drawLuminary()
   {
-    Point position(getPosition());
-    glPushMatrix();
-    glTranslatef (position.x, position.y, position.z);
-    glCallList(m_luminaryDL);
-    glPopMatrix();
+    if(hasLuminary){
+      Point position(getPosition());
+      glPushMatrix();
+      glTranslatef (position.x, position.y, position.z);
+      glCallList(m_luminaryDL);
+      glPopMatrix();
+    }
   }
     
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
@@ -167,12 +169,14 @@ public:
    */
   void drawLuminary(CgBasicVertexShader& shader)
   {
-    Point position(getPosition());
-    glPushMatrix();
-    glTranslatef (position.x, position.y, position.z);
-    shader.setModelViewProjectionMatrix();
-    glCallList(m_luminaryDL);
-    glPopMatrix();
+    if(hasLuminary){
+      Point position(getPosition());
+      glPushMatrix();
+      glTranslatef (position.x, position.y, position.z);
+      shader.setModelViewProjectionMatrix();
+      glCallList(m_luminaryDL);
+      glPopMatrix();
+    }
   }
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -219,6 +223,9 @@ protected:
 
   /** Position relative de la source dans le solveur auquel elle appartient */
   Point m_position;
+
+  /** Est-ce que la source possède un luminaire */
+  bool hasLuminary;
 };
 
 #endif

@@ -65,8 +65,10 @@ public:
    * @param fileName nom du fichier OBJ &agrave; importer
    * @param object optionnel, objet dans lequel importer le fichier
    * @param detached optionnel, permet de spécifier si l'objet object doit appartenir à la scène ou non
+   *
+   * @return false si l'import a échoué
    */
-  void importOBJ(const char* fileName, Object* object=NULL, bool detached=false, const char* objName=NULL);
+  bool importOBJ(const char* fileName, Object* object=NULL, bool detached=false, const char* objName=NULL);
   
   /** Lit un fichier OBJ pass&eacute; en param&egrave;tres et importe les objets correspondant
    * au préfixe prefix. La liste des objets est retournée dans objectsList, ceux-ci ne sont en effet

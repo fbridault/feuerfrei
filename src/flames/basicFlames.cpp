@@ -781,13 +781,6 @@ void PointFlame::drawFlame (bool displayParticle)
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
       
-      angle3 = (angle2 < PI / 2.0) ? -angle : angle;
-      /****************************************************************************************/
-      glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, **texpts);
-      glEnable (GL_MAP2_TEXTURE_COORD_2);
-      glMapGrid2d (20, 0.0, 1.0, 20, 0.0, 1.0);
-      glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
-      
 //       cgCandleVertexShader.setModelViewProjectionMatrix();
 //       cgCandleVertexShader.setTexTranslation(angle / (double) (PI));
 //       cgCandleVertexShader.setInverseModelViewMatrix();
@@ -796,31 +789,73 @@ void PointFlame::drawFlame (bool displayParticle)
 //       cgCandleFragmentShader.enableShader();
       
       glEnable (GL_TEXTURE_2D);
+      /****************************************************************************************/
+      /* Génération du halo */      
+      angle3 = (angle2 < PI / 2.0) ? -angle : angle;
+      angle3 *= 180 / (double) (PI);
       
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_halo.getTexture ());
       
       glPushMatrix ();
       
-      double height = 20*m_lead->getLastParticle()->distance(*(m_lead->getRoot()));
-      Particle *tmp = m_lead->getMiddleParticle();
-      glTranslatef (tmp->x,0,tmp->z);
-      glScalef(height,height,height);
-      glRotatef ( angle3 * 180 / (double) (PI), 0.0, 1.0, 0.0);      
+      double h = m_lead->getParticle(0)->distance(*(m_lead->getRoot()));
+      Particle *top = m_lead->getParticle(0);
+      Point *bottom = m_lead->getRoot();
+//       glTranslatef (tmp->x,0,tmp->z);
+      glRotatef ( angle3 , 0.0, 1.0, 0.0);    
 
+      double x1, x2, x3, x4;
+      if(angle3 > 0)
+	if(angle3 < 90){
+	  x1 = ((bottom->x - h) * (90 - angle3) - (bottom->z + h) * angle3)/180;
+	  x2 = ((bottom->x + h) * (90 - angle3) - (bottom->z - h) * angle3)/180;
+	  x3 = ((top->x + h) * (90 - angle3) - (top->z - h) * angle3)/180;
+	  x4 = ((top->x - h) * (90 - angle3) - (top->z + h) * angle3)/180;
+	}else{
+	  x1 = ((bottom->x + h) * (90 - angle3) - (bottom->z + h) * (180-angle3))/180;
+	  x2 = ((bottom->x - h) * (90 - angle3)  - (bottom->z - h) * (180-angle3))/180;
+	  x3 = ((top->x - h) * (90 - angle3) - (top->z - h) * (180-angle3))/180;
+	  x4 = ((top->x + h) * (90 - angle3) - (top->z + h) * (180-angle3))/180;
+	}
+      else
+	if(angle3 > -90){
+	  x1 = ((bottom->x - h) * (90 + angle3) + (bottom->z - h) * -angle3)/180;
+	  x2 = ((bottom->x + h) * (90 + angle3) + (bottom->z + h) * -angle3)/180;
+	  x3 = ((top->x + h) * (90 + angle3) + (top->z + h) * -angle3)/180;
+	  x4 = ((top->x - h) * (90 + angle3) + (top->z - h) * -angle3)/180;
+	  
+	}else{
+	  x1 = ((bottom->x + h) * (90 + angle3) + (bottom->z - h) * (180+angle3))/180;
+	  x2 = ((bottom->x - h) * (90 + angle3) + (bottom->z + h) * (180+angle3))/180;
+	  x3 = ((top->x - h) * (90 + angle3) + (top->z + h) * (180+angle3))/180;
+	  x4 = ((top->x + h) * (90 + angle3) + (top->z - h) * (180+angle3))/180;
+	}
+      
       glBegin(GL_QUADS);
+      
       glTexCoord2f(0.0,0.0);
-      glVertex3f(-0.25,0.0,0.0);
+      glVertex3f(x1,bottom->y,0.0);
+      
       glTexCoord2f(1.0,0.0);
-      glVertex3f(0.25,0.0,0.0);
+      glVertex3f(x2,bottom->y,0.0);
+      
       glTexCoord2f(1.0,1.0);
-      glVertex3f(0.25,0.5,0.0);
+      glVertex3f(x3,top->y+h/3,0.0);
+      
       glTexCoord2f(0.0,1.0);
-      glVertex3f(-0.25,0.5,0.0);
+      glVertex3f(x4,top->y+h/3,0.0);
+      
       glEnd();
 
       glPopMatrix();
-
+      
+      /****************************************************************************************/
+      /* Affichage de la flamme */
+      glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, **texpts);
+      glEnable (GL_MAP2_TEXTURE_COORD_2);
+      glMapGrid2d (20, 0.0, 1.0, 20, 0.0, 1.0);
+      glEvalMesh2 (GL_POINT, 0, 20, 0, 20);
       angle3 = (angle2 < PI / 2.0) ? PI-angle : angle;
       
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);

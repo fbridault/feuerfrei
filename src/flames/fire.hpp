@@ -92,10 +92,14 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    * @param objname nom du luminaire à charger dans le fichier filename
    */
-  FireSource (Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-	      int index, CgSVShader * shader, const char *objName=NULL);
+  FireSource (Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
+	      const char *filename, int index, CgSVShader * shader, const char *objName=NULL);
   virtual ~FireSource ();
 
+  virtual void setSamplingTolerance(double value){ 
+    for (int i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setSamplingTolerance(value);
+  };
   /** Retourne la position absolue dans le repère du monde .
    * @return position absolue dans le repère du monde
    */

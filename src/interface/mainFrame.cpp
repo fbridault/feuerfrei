@@ -244,6 +244,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
       }
       m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
+      m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
       tabName.Printf(_("Flame #%d"),i+1);
       
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
@@ -495,6 +496,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
       m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
       m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
+      m_config->Write(groupName + _("SamplingTolerance"), m_currentConfig.flames[i].samplingTolerance);
     }
 
   wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );

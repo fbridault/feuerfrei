@@ -51,8 +51,8 @@ public:
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  BasicFlame (Solver * s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, Scene *scene, 
-	      const wxString& texname, GLint wrap_s, GLint wrap_t);
+  BasicFlame (Solver * s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, double samplingTolerance, 
+	      Scene *scene, const wxString& texname, GLint wrap_s, GLint wrap_t);
   virtual ~BasicFlame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -84,6 +84,8 @@ public:
   virtual void addForces (char perturbate, char fdf=0) = 0;
   
   virtual void setForces(double value){  m_innerForce=value; };
+  
+  virtual void setSamplingTolerance(double value){ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
   
   virtual void toggleSmoothShading ();
   
@@ -208,7 +210,8 @@ public:
    * @param scene Pointeur sur la scène
    * @param wickName Chaîne de caractère contenant le nom du fichier contenant la mèche
    */
-  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char*wickName=NULL);
+  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance, 
+	    Scene *scene, const wxString& textureName, const char *wickFileName, const char*wickName=NULL);
   virtual ~LineFlame();
 
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -272,7 +275,8 @@ public:
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  PointFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, double rayon);
+  PointFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
+	     Scene *scene, double rayon);
   virtual ~PointFlame();
   
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -310,6 +314,8 @@ public:
 private:
   /** Pointeur vers le squelette guide. */
   LeadSkeleton *m_lead;
+
+  Texture m_halo;
 };
 
 #endif

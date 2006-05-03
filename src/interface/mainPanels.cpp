@@ -227,14 +227,23 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_index = index;
   m_glBuffer = glBuffer;
   
-  m_innerForceSlider = new wxSlider(this,-1,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
+  m_innerForceSlider = new wxSlider(this,IDSL_FF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
 				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_innerForceLabel = new wxStaticText(this,IDSL_FF,_("Force"));
+  m_innerForceLabel = new wxStaticText(this,-1,_("Force"));
   
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
   
   m_forcesSizer->Add(m_innerForceLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_innerForceSlider, 2, wxEXPAND, 0);
+  
+  m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,0,SLIDER_RANGE, wxDefaultPosition,
+				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_samplingToleranceLabel = new wxStaticText(this,-1,_("Sampling"));
+  
+  m_samplingToleranceSizer = new wxBoxSizer(wxHORIZONTAL);
+  
+  m_samplingToleranceSizer->Add(m_samplingToleranceLabel, 1, wxTOP|wxLEFT, 4);
+  m_samplingToleranceSizer->Add(m_samplingToleranceSlider, 2, wxEXPAND, 0);
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
@@ -245,21 +254,32 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
   m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
+  m_panelSizer->Add(m_samplingToleranceSizer, 1, wxEXPAND, 0);
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
   m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
+  m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
   
   SetSizer(m_panelSizer);
 }
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
-  double valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
-  
-  m_glBuffer->setFlameForces(m_index, valInner);
-  
-  m_flameConfig->innerForce = valInner;
+  if(event.GetId() == IDSL_FF)
+    {
+      double valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
+      
+      m_glBuffer->setFlameForces(m_index, valInner);
+      
+      m_flameConfig->innerForce = valInner;
+    }
+  else
+    {
+      m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
+      
+      m_flameConfig->samplingTolerance = m_samplingToleranceSlider->GetValue();
+    }
 }
 
 void FlameMainPanel::OnSelectType(wxCommandEvent& event)

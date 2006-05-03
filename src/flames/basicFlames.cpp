@@ -7,8 +7,8 @@
 /************************************** IMPLEMENTATION DE LA CLASSE BASICFLAME ****************************************/
 /**********************************************************************************************************************/
 
-BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, Scene *scene, 
-		       const wxString& texname, GLint wrap_s, GLint wrap_t) :
+BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, double samplingTolerance,
+		       Scene *scene, const wxString& texname, GLint wrap_s, GLint wrap_t) :
   m_tex (texname, wrap_s, wrap_t)
 {  
   m_solver = s;
@@ -33,7 +33,7 @@ BasicFlame::BasicFlame(Solver *s, int nbSkeletons, int nbFixedPoints, Point& pos
   m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
   
   m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 10000.0);
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, samplingTolerance);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
   /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
@@ -86,8 +86,9 @@ void BasicFlame::toggleSmoothShading()
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
-  BasicFlame (s, (nbSkeletons+2)*2 + 2, 2, posRel, innerForce, scene, textureName, GL_CLAMP, GL_REPEAT),
+LineFlame::LineFlame (Solver *s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
+		      Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
+  BasicFlame (s, (nbSkeletons+2)*2 + 2, 2, posRel, innerForce, samplingTolerance, scene, textureName, GL_CLAMP, GL_REPEAT),
   m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
 {
   Point pt;
@@ -467,8 +468,10 @@ Vector LineFlame::getMainDirection()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (Solver * s, int nbSkeletons, Point& posRel, double innerForce, Scene *scene, double rayon):
-  BasicFlame (s, nbSkeletons, 3, posRel, innerForce, scene, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
+PointFlame::PointFlame (Solver * s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
+			Scene *scene, double rayon):
+  BasicFlame (s, nbSkeletons, 3, posRel, innerForce, samplingTolerance, scene, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT),
+  m_halo(_("textures/halo.png"), GL_CLAMP, GL_CLAMP)
 //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
 //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
 {
@@ -754,7 +757,7 @@ void PointFlame::drawFlame (bool displayParticle)
       double vtex = 1.0 / (double) (m_maxParticles);
 
       GLdouble texpts[2][2][2] = { {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };      
-      double angle, angle2;
+      double angle, angle2, angle3;
       
       /* D�placement de la texture de manière à ce qu'elle reste "en face" de l'observateur */
       GLdouble m[4][4];
@@ -777,9 +780,8 @@ void PointFlame::drawFlame (bool displayParticle)
       
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
-            
-      if (angle2 < PI / 2.0) angle = PI - angle;
       
+      angle3 = (angle2 < PI / 2.0) ? -angle : angle;
       /****************************************************************************************/
       glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4, 2, **texpts);
       glEnable (GL_MAP2_TEXTURE_COORD_2);
@@ -794,7 +796,33 @@ void PointFlame::drawFlame (bool displayParticle)
 //       cgCandleFragmentShader.enableShader();
       
       glEnable (GL_TEXTURE_2D);
+      
+      glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+      glBindTexture (GL_TEXTURE_2D, m_halo.getTexture ());
+      
+      glPushMatrix ();
+      
+      double height = 20*m_lead->getLastParticle()->distance(*(m_lead->getRoot()));
+      Particle *tmp = m_lead->getMiddleParticle();
+      glTranslatef (tmp->x,0,tmp->z);
+      glScalef(height,height,height);
+      glRotatef ( angle3 * 180 / (double) (PI), 0.0, 1.0, 0.0);      
 
+      glBegin(GL_QUADS);
+      glTexCoord2f(0.0,0.0);
+      glVertex3f(-0.25,0.0,0.0);
+      glTexCoord2f(1.0,0.0);
+      glVertex3f(0.25,0.0,0.0);
+      glTexCoord2f(1.0,1.0);
+      glVertex3f(0.25,0.5,0.0);
+      glTexCoord2f(0.0,1.0);
+      glVertex3f(-0.25,0.5,0.0);
+      glEnd();
+
+      glPopMatrix();
+
+      angle3 = (angle2 < PI / 2.0) ? PI-angle : angle;
+      
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_tex.getTexture ());
 
@@ -802,20 +830,19 @@ void PointFlame::drawFlame (bool displayParticle)
       glPushMatrix ();
       glLoadIdentity ();
 
-      glTranslatef (0.0, angle / (double) (PI), 0.0);
+      glTranslatef (0.0, angle3 / (double) (PI), 0.0);
 
       gluBeginSurface (m_nurbs);
-      gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount,
-		       m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
-		       3, m_ctrlPoints, m_uorder, m_vorder,
-		       GL_MAP2_VERTEX_3);
+      gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
+		       3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
       
       gluEndSurface (m_nurbs);
       
       glPopMatrix();
-      glDisable (GL_TEXTURE_2D);
-
+      
       glMatrixMode (GL_MODELVIEW);
+
+      glDisable (GL_TEXTURE_2D);
  //      cgCandleVertexShader.disableProfile();
 //       cgCandleFragmentShader.disableProfile();
     }

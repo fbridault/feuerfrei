@@ -78,9 +78,11 @@ public:
   void moveSolver(int selectedSolver, Point& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
-  
+  void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
+
   void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
   void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
+  
 private:
   void WriteFPS ();
   void DrawVelocity (void);

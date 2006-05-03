@@ -59,6 +59,7 @@ public:
   /* O non, 1 vertical, 2 vers la gauche */
   char flickering;
   int fdf;
+  double samplingTolerance;
 };
 
 class FlameAppConfig{

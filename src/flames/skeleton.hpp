@@ -48,8 +48,8 @@ class Solver;
 /** La classe Skeleton est une file de particules gérée avec un vecteur, mais elle 
  * transgresse néanmoins la règle en permettant notamment un accès direct à tous les membres de la file
  * sans les supprimer.
- * L'entrée et la removeParticle d'éléments dans la file se gèrent à l'aide des fonctions addParticle() et sortie().
- * Si l'entrée est systématiquement en queue de file, la removeParticle peut s'effectuer au-delà de la tête de file.
+ * L'entrée et la sortie d'éléments dans la file se gèrent à l'aide des fonctions addParticle() et sortie().
+ * Si l'entrée est systématiquement en queue de file, la sortie peut s'effectuer au-delà de la tête de file.
  * Il est également utile de préciser que la queue de la file est mobile. Son indice prend donc 
  * des valeurs comprises dans [0;NB_PARTICULES]. La tête de la file est donc immobile et fixée à 0.
  * L'élément en queue de file est généralement le plus près de l'origine du squelette, et l'élément

@@ -76,8 +76,8 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce,  const char *filename, 
-		       int index, CgSVShader * shader,  const char *objName) : FlameLight(scene, index, shader)
+FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
+		       const char *filename, int index, CgSVShader * shader,  const char *objName) : FlameLight(scene, index, shader)
 {  
   char mtlName[255];
   m_solver = s;

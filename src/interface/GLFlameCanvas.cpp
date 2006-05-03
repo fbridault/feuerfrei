@@ -108,24 +108,25 @@ void GLFlameCanvas::InitFlames(void)
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
       m_flames[i] = new Candle (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].position, 
-				m_scene, m_currentConfig->flames[i].innerForce, "bougie.obj", i, m_SVShader,
-				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
+				m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance, 
+				"bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
 				m_currentConfig->flames[i].skeletonsNumber);
       break;
     case FIRMALAMPE :
       m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-				   m_scene, m_currentConfig->flames[i].innerForce,"firmalampe.obj", i, m_SVShader, 
-				   m_currentConfig->flames[i].skeletonsNumber, m_currentConfig->flames[i].wickName.fn_str());
+				   m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
+				   "firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber,
+				   m_currentConfig->flames[i].wickName.fn_str());
       break;
     case TORCH :
       m_flames[i] = new Torch(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-			      m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].wickName.fn_str(),
-			      i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
+			      m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
+			      m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
       break;
     case CAMPFIRE :
       m_flames[i] = new CampFire(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-				 m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].wickName.fn_str(),
-				 i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
+				 m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
+				 m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -197,9 +198,9 @@ void GLFlameCanvas::InitSolvers(void)
 
 void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
-  int glowScales[2] = { 1, 14 };
+  int glowScales[2] = { 1, 4 };
   InitSolvers();
-
+  
   m_flames = new FireSource *[m_currentConfig->nbFlames];
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
@@ -343,14 +344,15 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /* On module la largeur de la gaussienne */    
     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
-    Vector direction(m[3][0], m[3][1], m[3][2]);
-    
-    dist = direction.length();
+    //Point position(m[3][0], m[3][1], m[3][2]);
+    // Vector direction = position:
+    //dist = direction.length();
 
     /* Définition de la largeur de la gaussienne en fonction de la distance */
     /* A définir de manière plus précise par la suite */
-    sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
-    
+//     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
+    //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
+    sigma = 1.2;
     m_glowEngine->activate();
     m_glowEngine->setGaussSigma(sigma);
     

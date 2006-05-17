@@ -21,23 +21,23 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  LogResAvgSolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy, double nbTimeSteps,
-		   double omegaDiff, double omegaProj, double epsilon);
-  LogResAvgSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
+		   uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   virtual ~LogResAvgSolver ();
 
 protected:
   virtual void vel_step ();
   
-  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
   virtual void project (double *const p, double *const div);
   
-  virtual void GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps);
-  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter);
+  virtual void GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps);
+  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
   
-  virtual void computeAverage ( int iter, double value );
+  virtual void computeAverage ( uint iter, double value );
   
-  int m_nbAverages;
+  uint m_nbAverages;
   /** Tableau contenant les moyennes. Il est organisé comme ceci :<br>
    *    - de O à m_nbSteps : diffusion en u avec GS
    *    - de m_nbSteps à 2*m_nbSteps : diffusion en v avec GS

@@ -9,7 +9,7 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
   Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MIN, DBL_MIN);
   Point midDist, cellSpan;
   vector < Point * >pointsPartitionsArray[nb_lead_skeletons];
-  unsigned char max; /* 0 -> x, 1 -> y, 2 -> z */
+  u_char max; /* 0 -> x, 1 -> y, 2 -> z */
   
   /* Chargement de la mèche */
   cerr << "Chargement de la mèche du fichier " << wickFileName << "...";

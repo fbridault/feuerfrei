@@ -7,7 +7,7 @@ Solver::Solver ()
 {
 }
 
-Solver::Solver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : m_position(position)
+Solver::Solver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy) : m_position(position)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -115,9 +115,9 @@ Solver::~Solver ()
   glDeleteLists(m_gridDisplayList,1);
 }
 
-void Solver::set_bnd (int b, double *const x)
+void Solver::set_bnd (unsigned char b, double *const x)
 {
-  int i, j;
+  uint i, j;
 
   /* Attention cela ne prend pas en compte les coins et les arêtes entre les coins */
   for (i = 1; i <= m_nbVoxelsY; i++)
@@ -152,18 +152,18 @@ void Solver::set_bnd (int b, double *const x)
 /* Ajout des forces externes */
 void Solver::add_source (double *const x, double *const src)
 {
-  int i;
+  uint i;
 
   for (i = 0; i < m_nbVoxels; i++)
     x[i] += m_dt * src[i];
 }
 
 /* Pas d'advection => dÃƒÂ©placement du fluide sur lui-même */
-void Solver::advect (int b, double *const d, const double *const d0,
+void Solver::advect (unsigned char b, double *const d, const double *const d0,
 		     const double *const u, const double *const v,
 		     const double *const w)
 {
-  int i, j, k, i0, j0, k0, i1, j1, k1;
+  uint i, j, k, i0, j0, k0, i1, j1, k1;
   double x, y, z, r0, s0, t0, r1, s1, t1, dt0_x, dt0_y, dt0_z;
 
   dt0_x = m_dt * m_nbVoxelsX;
@@ -180,15 +180,15 @@ void Solver::advect (int b, double *const d, const double *const d0,
 	  
 	  if (x < 0.5) x = 0.5;
 	  if (x > m_nbVoxelsX + 0.5) x = m_nbVoxelsX + 0.5;
-	  i0 = (int) x; i1 = i0 + 1;
+	  i0 = (uint) x; i1 = i0 + 1;
 	  
 	  if (y < 0.5) y = 0.5;
 	  if (y > m_nbVoxelsY + 0.5) y = m_nbVoxelsY + 0.5;
-	  j0 = (int) y; j1 = j0 + 1;
+	  j0 = (uint) y; j1 = j0 + 1;
 	  
 	  if (z < 0.5) z = 0.5;
 	  if (z > m_nbVoxelsZ + 0.5) z = m_nbVoxelsZ + 0.5;
-	  k0 = (int) z; k1 = k0 + 1;
+	  k0 = (uint) z; k1 = k0 + 1;
 
 	  r1 = x - i0;
 	  r0 = 1 - r1;
@@ -237,9 +237,9 @@ void Solver::vel_step ()
 void Solver::iterate ()
 { 
   /* Cellule(s) génératrice(s) */
-  for (int i = 1; i < m_nbVoxelsX + 1; i++)
-    for (int j = 1; j < m_nbVoxelsY + 1; j++)
-      for (int k = 1; k < m_nbVoxelsZ + 1; k++)
+  for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+    for (uint j = 1; j < m_nbVoxelsY + 1; j++)
+      for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
 	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
   
   vel_step ();
@@ -329,11 +329,11 @@ void Solver::displayVelocityField (void)
   double inc_y = m_dimY / (double) m_nbVoxelsY;
   double inc_z = m_dimZ / (double) m_nbVoxelsZ;
   
-  for (int i = 1; i <= m_nbVoxelsX; i++)
+  for (uint i = 1; i <= m_nbVoxelsX; i++)
     {
-      for (int j = 1; j <= m_nbVoxelsY; j++)
+      for (uint j = 1; j <= m_nbVoxelsY; j++)
 	{
-	  for (int k = 1; k <= m_nbVoxelsZ; k++)
+	  for (uint k = 1; k <= m_nbVoxelsZ; k++)
 	    {
 	      Vector vect;
 	      /* Affichage du champ de vélocité */
@@ -397,41 +397,41 @@ void Solver::moveTo(Point& position)
   /* Ajouter des forces externes */
   if(move.x)
     if( move.x > 0)
-      for (i = -m_nbVoxelsZ / 4 - 1; i <= m_nbVoxelsZ / 4 + 1; i++)
-	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 + 1; j++)
+      for (i = -(int)m_nbVoxelsZ / 4 - 1; i <= (int)m_nbVoxelsZ / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 + 1; j++)
 	  addUsrc (m_nbVoxelsX - 1,
-		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + i, -strength);
+		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + i, -strength);
     else
-      for (i = -m_nbVoxelsZ / 4 - 1; i <= m_nbVoxelsZ / 4 + 1; i++)
-	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 + 1; j++)
+      for (i = -(int)m_nbVoxelsZ / 4 - 1; i <= (int)m_nbVoxelsZ / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 + 1; j++)
 	  addUsrc (2,
-		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + i, strength);  
+		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
+		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + i, strength);  
   if(move.y)
     if( move.y > 0)
-      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
-	for (j = -m_nbVoxelsZ / 4 - 1; j < m_nbVoxelsZ / 4 + 1; j++)
-	  addVsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
+      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsZ / 4 - 1; j < (int)m_nbVoxelsZ / 4 + 1; j++)
+	  addVsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
 		   m_nbVoxelsY - 1,
-		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + j, -strength);
+		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + j, -strength);
     else
-      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
-	for (j = -m_nbVoxelsZ / 4 - 1; j <= m_nbVoxelsZ / 4 + 1; j++)
-	  addVsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i, 
+      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsZ / 4 - 1; j <= (int)m_nbVoxelsZ / 4 + 1; j++)
+	  addVsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i, 
 		   2,
-		   ((int) (ceil (m_nbVoxelsZ / 2.0))) + j, strength/10.0);
+		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + j, strength/10.0);
   if(move.z)
     if( move.z > 0)
-      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
-	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 - 1; j++)
-	  addWsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
-		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 - 1; j++)
+	  addWsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
+		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
 		   m_nbVoxelsZ - 1, -strength);
     else
-      for (i = -m_nbVoxelsX / 4 - 1; i <= m_nbVoxelsX / 4 + 1; i++)
-	for (j = -m_nbVoxelsY / 4 - 1; j <= m_nbVoxelsY / 4 - 1; j++)
-	  addWsrc (((int) (ceil (m_nbVoxelsX / 2.0))) + i,
-		   ((int) (ceil (m_nbVoxelsY / 2.0))) + j,
+      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
+	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 - 1; j++)
+	  addWsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
+		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
 		   2, strength);
 }

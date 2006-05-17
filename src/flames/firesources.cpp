@@ -15,7 +15,7 @@ Candle::Candle (Solver * s, Point& posRel, Scene *scene, double innerForce, doub
 	       //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
 //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
 {
-  m_flames[0] = new PointFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, scene, rayon);
+  m_flames[0] = new PointFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, rayon);
 }
 
 Firmalampe::Firmalampe(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,

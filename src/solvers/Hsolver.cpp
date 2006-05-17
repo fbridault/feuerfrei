@@ -1,6 +1,6 @@
 #include "Hsolver.hpp"
 
-Hsolver::Hsolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep) : 
+Hsolver::Hsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep) : 
   GSsolver(position, n_x, n_y, n_z, dim, timeStep)
 {
   m_uResidu = new double[m_nbVoxels];
@@ -28,7 +28,7 @@ Hsolver::~Hsolver ()
 }
 
 /* Pas de diffusion */
-void Hsolver::diffuse (int b, double *const x, const double *const x0,
+void Hsolver::diffuse (unsigned char b, double *const x, const double *const x0,
 		      double *const residu, double *const residu0,
 		      double diff_visc)
 {
@@ -63,8 +63,7 @@ void Hsolver::diffuse (int b, double *const x, const double *const x0,
 	for (j = 1; j <= m_nbVoxelsY; j++)
 	  for (k = 1; k <= m_nbVoxelsZ; k++)
 	    {
-	      diff = residu0[IX (i, j, k)] -
-		residu[IX (i, j, k)];
+	      diff = residu0[IX (i, j, k)] - residu[IX (i, j, k)];
 	      //cout << residu[IX(i,j,k)] << " " << residu0[IX(i,j,k)] << " " << diff << endl;
 	      //      getchar();
 	      num += (residu[IX (i, j, k)] * diff);

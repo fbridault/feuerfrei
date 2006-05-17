@@ -12,6 +12,7 @@ bin_PROGRAMS = rtflames
 rtflames_SOURCES = \
 	main.cpp  \
 	flames/basicFlames.cpp  \
+	flames/cloneFlames.cpp  \
 	flames/fbo.cpp  \
 	flames/fire.cpp  \
 	flames/firesources.cpp \

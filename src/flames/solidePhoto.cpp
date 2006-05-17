@@ -33,9 +33,9 @@ SolidePhotometrique::~SolidePhotometrique()
 }
 
 void 
-SolidePhotometrique::draw(unsigned char color, unsigned char interpolation)
+SolidePhotometrique::draw(u_char color, u_char interpolation)
 {
-  unsigned char fragmentShaderIndex = color+interpolation;
+  u_char fragmentShaderIndex = color+interpolation;
   
   glMatrixMode(GL_TEXTURE);
   glPushMatrix();

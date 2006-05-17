@@ -91,8 +91,8 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
     cout << "OK" << endl;
     
     if( m_wxtex->HasAlpha() ){
-      unsigned char *imgcpy,*tmp;
-      tmp = imgcpy = new unsigned char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];
+      u_char *imgcpy,*tmp;
+      tmp = imgcpy = new u_char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];
             
       for(int j=0; j < m_wxtex->GetHeight(); j++)
 	for(int i=0; i < m_wxtex->GetWidth(); i++){
@@ -119,16 +119,16 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
 Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
 {  
   m_wxtex = NULL;
-  m_type = GL_TEXTURE_RECTANGLE_NV;
+  m_type = GL_TEXTURE_RECTANGLE_ARB;
   
   glGenTextures(1, &m_texName);
   
-  glBindTexture(GL_TEXTURE_RECTANGLE_NV, m_texName);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_NV, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_NV, 0, GL_FLOAT_R32_NV, w, h, 0, GL_LUMINANCE, GL_FLOAT, texels);
+  glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texName);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_FLOAT_R32_NV, w, h, 0, GL_LUMINANCE, GL_FLOAT, texels);
 }
 
 Texture::~Texture()

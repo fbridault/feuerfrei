@@ -191,7 +191,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_nbSolversMax = m_currentConfig.nbSolvers;
 
   wxString groupName,tabName;  
-  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
       
@@ -225,7 +225,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
   m_nbFlamesMax = m_currentConfig.nbFlames;
 
-  for(int i=0; i < m_currentConfig.nbFlames; i++)
+  for(uint i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
       
@@ -288,7 +288,7 @@ void MainFrame::InitSolversPanels()
   
   m_solversNotebook->DeleteAllPages();
   
-  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+  for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
     {
       m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);	
       tabName.Printf(_("Solver #%d"),i+1);
@@ -303,7 +303,7 @@ void MainFrame::InitFlamesPanels()
   
   m_flamesNotebook->DeleteAllPages();
   
-  for(int i=0; i < m_currentConfig.nbFlames; i++)
+  for(int unsigned i=0; i < m_currentConfig.nbFlames; i++)
     {
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);     
       tabName.Printf(_("Flame #%d"),i+1);       
@@ -419,8 +419,8 @@ void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
 
 void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
-  m_config->Write(_("/Display/Width"), m_currentConfig.width);
-  m_config->Write(_("/Display/Height"), m_currentConfig.height);
+  m_config->Write(_("/Display/Width"), (int)m_currentConfig.width);
+  m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
   m_config->Write(_("/Display/LightingMode"), m_currentConfig.lightingMode);
   m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
@@ -436,29 +436,29 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Shadows/ExtrudeDist.y"), m_currentConfig.extrudeDist[1]);
   m_config->Write(_("/Shadows/ExtrudeDist.z"), m_currentConfig.extrudeDist[2]);
   
-  m_config->Write(_("/Solvers/Number"), m_currentConfig.nbSolvers);
+  m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
   
   wxString groupName;
-  for(int i=0; i < m_nbSolversMax; i++)
+  for(uint i=0; i < m_nbSolversMax; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
 
       m_config->DeleteGroup(groupName);
     }
  
-  for(int i=0; i < m_currentConfig.nbSolvers; i++)
+  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
       
-      m_config->Write(groupName + _("Type"), (int )m_currentConfig.solvers[i].type);
+      m_config->Write(groupName + _("Type"), (int)m_currentConfig.solvers[i].type);
       
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.solvers[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.solvers[i].position.z);
       
-      m_config->Write(groupName + _("X_res"),m_currentConfig.solvers[i].resx);
-      m_config->Write(groupName + _("Y_res"),m_currentConfig.solvers[i].resy);
-      m_config->Write(groupName + _("Z_res"),m_currentConfig.solvers[i].resz);
+      m_config->Write(groupName + _("X_res"),(int)m_currentConfig.solvers[i].resx);
+      m_config->Write(groupName + _("Y_res"),(int)m_currentConfig.solvers[i].resy);
+      m_config->Write(groupName + _("Z_res"),(int)m_currentConfig.solvers[i].resz);
       
       m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
       m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
@@ -469,19 +469,19 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
       m_config->Write(groupName + _("epsilon"),m_currentConfig.solvers[i].epsilon);
       
-      m_config->Write(groupName + _("nbMaxIter"),m_currentConfig.solvers[i].nbMaxIter);
+      m_config->Write(groupName + _("nbMaxIter"),(int)m_currentConfig.solvers[i].nbMaxIter);
     }
   
-  m_config->Write(_("/Flames/Number"), m_currentConfig.nbFlames);
+  m_config->Write(_("/Flames/Number"), (int)m_currentConfig.nbFlames);
 
-  for(int i=0; i < m_nbFlamesMax; i++)
+  for(uint i=0; i < m_nbFlamesMax; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
 
       m_config->DeleteGroup(groupName);
     }
  
-  for(int i=0; i < m_currentConfig.nbFlames; i++)
+  for(uint i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
       

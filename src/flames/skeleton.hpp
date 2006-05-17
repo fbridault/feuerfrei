@@ -16,7 +16,7 @@ class Particle : public Point
 {
 public:
   /** Durée de vie de la particule */
-  int lifespan;
+  uint lifespan;
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */
@@ -35,7 +35,7 @@ public:
   /** Naissance d'une particule, on affecte sa durée de vie à la valeur passée en paramètre
    * @param l durée de vie en terme d'itérations
    */
-  void birth(int l){lifespan=l;};
+  void birth(uint l){lifespan=l;};
   
   virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; lifespan=P.lifespan; return *this;};
   virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
@@ -67,7 +67,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, int pls);
+  Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls);
   virtual ~Skeleton();
   
   /** Donne l'élément en tête de file.
@@ -81,7 +81,7 @@ public:
    * @param i indice
    * @return particule à l'indice i
    */
-  Particle *getParticle(int i) const{
+  Particle *getParticle(uint i) const{
     return &m_queue[i];
   };
   
@@ -102,7 +102,7 @@ public:
   /** Donne la taille du squelette.
    * @return nombre de particules contenues dans la file du squelette
    */
-  int getSize() const{
+  uint getSize() const{
     return m_headIndex+1;
   };
 
@@ -113,7 +113,7 @@ protected:
    * @param i indice de la première particule
    * @param j indice de la seconde particule
    */
-  void swap(int i, int j);
+  void swap(uint i, uint j);
 
   /** Insère une particule en queue de file.
    * @param pt position de la particule
@@ -123,20 +123,20 @@ protected:
   /** Supprime la particule à une position donnée.
    * @param n indice
    */
-  void removeParticle(int n);
+  void removeParticle(uint n);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param u vecteur de vélocité en u
    * @param v vecteur de vélocité en v
    * @param w vecteur de vélocité en w
    */
-  virtual int moveRoot()=0;
+  virtual uint moveRoot()=0;
 
   /** Affectation de la position d'une particule dans l'espace 
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
-  void updateParticle(int i, const Point* const pt);
+  void updateParticle(uint i, const Point* const pt);
 
   virtual void drawRoot ();
 
@@ -163,8 +163,7 @@ private:
   int m_headIndex;
   
   /** Durée de vie initiale d'une particule */
-  int m_particleLifespan;
-
+  uint m_particleLifespan;
 };
 
 #endif

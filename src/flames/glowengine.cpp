@@ -1,7 +1,7 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(unsigned int w, unsigned int h, int scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext) : 
+GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext) : 
   m_blurVertexShaderX(_("glowShaders.cg"),_("vertGlowX"),  cgcontext, recompileShaders),
   m_blurVertexShaderY(_("glowShaders.cg"),_("vertGlowY"),  cgcontext, recompileShaders),
   m_blurFragmentShader(_("glowShaders.cg"),_("fragGlow"),  cgcontext, recompileShaders)
@@ -16,8 +16,8 @@ GlowEngine::GlowEngine(unsigned int w, unsigned int h, int scaleFactor[GLOW_LEVE
     
     m_firstPassFBOs[i].Initialize(m_width[i], m_height[i]);
     m_secondPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_NV, m_width[i], m_height[i]);
-    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_NV, m_width[i], m_height[i]);
+    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
+    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
     m_firstPassFBOs[i].Attach(m_firstPassTex[i]->getTexture(), 0);
     m_secondPassFBOs[i].Attach(m_secondPassTex[i]->getTexture(), 0);
   }
@@ -144,7 +144,7 @@ void GlowEngine::drawBlur(double alpha)
   glPushMatrix();
   glLoadIdentity();
   
-  glEnable(GL_TEXTURE_RECTANGLE_NV);
+  glEnable(GL_TEXTURE_RECTANGLE_ARB);
   
   for(int i=0; i < GLOW_LEVELS; i++){
     m_firstPassTex[i]->bind();
@@ -166,7 +166,7 @@ void GlowEngine::drawBlur(double alpha)
     
     glEnd();    
   }
-  glDisable(GL_TEXTURE_RECTANGLE_NV);
+  glDisable(GL_TEXTURE_RECTANGLE_ARB);
   
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();

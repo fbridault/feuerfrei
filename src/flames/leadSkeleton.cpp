@@ -6,7 +6,7 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
-LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  int pls) :
+LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  uint pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
 }
@@ -15,10 +15,9 @@ LeadSkeleton::~LeadSkeleton ()
 {
 }
 
-int
-LeadSkeleton::moveRoot ()
+uint LeadSkeleton::moveRoot ()
 {
-  int i, j, k;
+  uint i, j, k;
   Point tmp;
   double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes();
   double distz = m_solver->getDimZ() / (double) m_solver->getZRes();
@@ -49,10 +48,9 @@ LeadSkeleton::moveRoot ()
   return 1;
 }
 
-int
-LeadSkeleton::moveParticle (Particle * const pos)
+uint LeadSkeleton::moveParticle (Particle * const pos)
 {
-  int i, j, k;
+  uint i, j, k;
   //  int light;
 
   if (pos->isDead ())
@@ -82,12 +80,11 @@ LeadSkeleton::moveParticle (Particle * const pos)
 }
 
 /* Gère la création et la destruction des particules */
-void
-LeadSkeleton::move ()
+void LeadSkeleton::move ()
 {
   Particle *tmp;/* *tmp2;*/
   double dist;
-  int i;
+  uint i;
 
   if (getSize () < NB_PARTICULES - 1)
     {

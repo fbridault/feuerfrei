@@ -1,6 +1,7 @@
-#if !defined(BASICFLAMES_H)
+#ifndef BASICFLAMES_H
 #define BASICFLAMES_H
 
+class MetaFlame;
 class BasicFlame;
 class LineFlame;
 class PointFlame;
@@ -20,8 +21,6 @@ class PointFlame;
 class PeriSkeleton;
 class LeadSkeleton;
 class Solver;
-class Scene;
-
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE BASICFLAME ****************************************/
 /**********************************************************************************************************************/
@@ -38,29 +37,30 @@ class Scene;
  *
  * @author	Flavien Bridault
  */
-class BasicFlame
+class MetaFlame
 {
 public:
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
-   * @param s pointeur sur le solveur de fluides
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param posRel position du centre de la flamme
-   * @param innerForce force intérieure de la flamme
-   * @param scene pointeur sur la scène
    * @param texname Nom du fichier image à charger
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  BasicFlame (Solver * s, int nbSkeletons, int nbFixedPoints, Point& posRel, double innerForce, double samplingTolerance, 
-	      Scene *scene, const wxString& texname, GLint wrap_s, GLint wrap_t);
-  virtual ~BasicFlame ();
+  MetaFlame (uint nbSkeletons, unsigned short nbFixedPoints, Point& posRel, double samplingTolerance, 
+	      const wxString& texname, GLint wrap_s, GLint wrap_t);
+  virtual ~MetaFlame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
-   */
+g   */
   virtual void build() = 0;
   
+  void drawPointFlame();
+  
+  void drawLineFlame();  
+
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture. 
    */
@@ -79,12 +79,6 @@ public:
     drawFlame(displayParticle);
   };
   
-  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   */
-  virtual void addForces (char perturbate, char fdf=0) = 0;
-  
-  virtual void setForces(double value){  m_innerForce=value; };
-  
   virtual void setSamplingTolerance(double value){ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
   
   virtual void toggleSmoothShading ();
@@ -95,6 +89,26 @@ public:
   virtual Vector getMainDirection() = 0;
 
   virtual Point getCenter () = 0;
+  
+  void cloneNURBSPropertiesFrom(MetaFlame& source)
+  {
+    m_ctrlPoints = source.m_ctrlPoints;
+    m_uknots = source.m_uknots; 
+    m_vknots = source.m_vknots;
+    m_uknotsCount = source.m_uknotsCount;
+    m_vknotsCount = source.m_vknotsCount;
+  
+    m_uorder = source.m_uorder;
+    m_vorder = source.m_vorder;
+    m_maxParticles = source.m_maxParticles;
+    m_nbFixedPoints = source.m_nbFixedPoints;
+  }
+  uint getNbSkeletons(){ return m_nbSkeletons; };
+  
+  unsigned short getNbFixedPoints(){ return m_nbFixedPoints; };
+  
+  virtual Point* getTop() = 0;
+  virtual Point* getBottom() = 0;
   
 protected:
   /** Fonction simplifiant l'affectation d'un point de contrôle.
@@ -126,17 +140,15 @@ protected:
   
   static void CALLBACK nurbsError (GLenum errorCode);
   
-  /** Nombre de squelettes de la flamme. */
-  int m_nbSkeletons;
   /** Position en indices de la base de la flamme dans la grille de voxels du solveur. */
-  int m_x, m_y, m_z;
+  uint m_x, m_y, m_z;
   
   /** Ordre de la NURBS en u (égal au degré en u + 1). */
-  int m_uorder;
+  u_char m_uorder;
   /** Ordre de la NURBS en v (égal au degré en v + 1). */
-  int m_vorder;
-  /** Tableau contenant les pointeurs vers les squelettes périphériques. */
-  PeriSkeleton **m_skeletons;
+  u_char m_vorder;
+  /** Nombre de squelettes de la flamme. */
+  uint m_nbSkeletons;
   /** Matrice de points de contrôle */
   GLfloat *m_ctrlPoints;
   /** Vecteur de noeuds en u */
@@ -147,8 +159,8 @@ protected:
    * squelette. Alloué une seule fois en début de programme à la taille maximale pour des raisons
    * évidentes d'optimisation du temps d'exécution.
    */
-  int m_uknotsCount, m_vknotsCount;
-  int m_maxParticles;
+  uint m_uknotsCount, m_vknotsCount;
+  uint m_maxParticles;
   
   double *m_distances;
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
@@ -161,38 +173,87 @@ protected:
   /** Objet OpenGL permettant de définir la NURBS */
   GLUnurbsObj *m_nurbs;
   
-  /** Pointeur sur le solveur de fluides */
-  Solver *m_solver;
-  
-  int m_size;
+  uint m_size;
   bool m_toggle;
   
-  int m_perturbateCount;
+  /** Durée de vie donnée à une particule lors de sa création */
+  unsigned short m_lifeSpanAtBirth;
   
-  short m_lifeSpanAtBirth;
   /** Nombre de points fixes pour chaque direction v = origine du squelette périphérique + sommet du guide */
-  short m_nbFixedPoints;
+  unsigned short m_nbFixedPoints;
   
-  double m_innerForce;
-  
-  Scene *m_scene;
-  
-  /** Identifiant de la texture. */
+  /** Texture de la flamme */
   Texture m_tex;
+  
+  /* Texture pour le halo */
+  Texture m_halo;
   
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;
 };
 
-
-
 /**********************************************************************************************************************/
-/****************************************** DEFINITION DE LA CLASSE LINEFLAME *****************************************/
+/********************************************* DEFINITION DE LA CLASSE BASICFLAME *************************************/
 /**********************************************************************************************************************/
 
-/** La classe LineFlame implémente une flamme qui provient d'une mèche "linéaire".<br>
- * Elle génère ses squelettes à partir du maillage de la mèche dont le nom est fourni au
- * constructeur.
+/** La classe FlameSolverInterface 
+ *
+ * @author	Flavien Bridault
+ */
+class BasicFlame : public MetaFlame
+{
+public:
+  /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
+   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
+   * @param posRel position du centre de la flamme
+   * @param texname Nom du fichier image à charger
+   * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
+   * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
+   */
+  BasicFlame (Solver * s, uint nbSkeletons, uint nbFixedPoints, Point& posRel, double innerForce, 
+	      double samplingTolerance, const wxString& texname, GLint wrap_s, GLint wrap_t);
+  virtual ~BasicFlame ();
+  
+  virtual void addForces (u_char perturbate, u_char fdf=0) = 0;
+  
+  virtual void setForces(double value){  m_innerForce=value; };
+  
+  void drawParticles(bool displayParticle)
+  {
+    /* Affichage des particules */
+    if(displayParticle){
+      uint i;
+      /* Déplacement et détermination du maximum */
+      for (i = 0; i < m_nbSkeletons; i++)
+	m_skeletons[i]->draw();
+      for (i = 0; i < m_nbLeadSkeletons; i++)
+	m_leads[i]->draw();
+    }
+  };
+  
+  virtual Point* getTop() = 0;
+  virtual Point* getBottom() = 0;
+  
+protected:
+  /** Pointeur vers les squelettes guide. */
+  LeadSkeleton **m_leads;
+  /** Nombres de squelettes guides */
+  uint m_nbLeadSkeletons;
+  /** Tableau contenant les pointeurs vers les squelettes périphériques. */
+  PeriSkeleton **m_skeletons;
+  /** Pointeur sur le solveur de fluides */
+  Solver *m_solver;  
+  
+  double m_innerForce;
+  
+  uint m_perturbateCount;
+};
+
+/**********************************************************************************************************************/
+/**************************************** DEFINITION DE LA CLASSE LINEFLAME **************************************/
+/**********************************************************************************************************************/
+
+/** La classe BasicLineFlame implémente une flamme qui provient d'une mèche "linéaire".<br>
  * L'objet Wick appartient à la classe LineFlame, il est donc précisé dans le constructeur
  * de Wick que l'objet doit être importé dans la scène dans l'état "detached", de sorte que 
  * le constructeur de la scène ne cherche pas à le référencer ni à le détruire.
@@ -203,15 +264,13 @@ class LineFlame : public BasicFlame
 {
 public:
   /** Constructeur.
-   * @param s pointeur sur le solveur de fluides
    * @param nbSkeletons Nombre de squelettes guides
    * @param posRel Position relative du centre de la flamme
    * @param innerForce Force intérieure de la flamme
-   * @param scene Pointeur sur la scène
    * @param wickName Chaîne de caractère contenant le nom du fichier contenant la mèche
    */
-  LineFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance, 
-	    Scene *scene, const wxString& textureName, const char *wickFileName, const char*wickName=NULL);
+  LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
+	     Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName=NULL);
   virtual ~LineFlame();
 
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -223,17 +282,13 @@ public:
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture
    */
-  virtual void drawFlame(bool displayParticle);
+  virtual void drawFlame(bool displayParticle) { drawParticles(displayParticle); drawLineFlame(); };
   
   /** Dessine la mèche de la flamme 
    * @param displayBoxes affiche ou non le partitionnement de la mèche
    */
   virtual void drawWick(bool displayBoxes);
-  
-  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   */
-  void addForces(char perturbate, char fdf);
-  
+    
   /** Retroune la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
@@ -241,21 +296,19 @@ public:
   
   virtual Point getCenter ();
   
+  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
+   */
+  void addForces(u_char perturbate, u_char fdf);
+  
+  Point* getTop();
+  Point* getBottom();
 private:
   /** Mèche de la flamme */
   Wick m_wick;
-
-  /** Pointeur vers les squelettes guide. */
-  LeadSkeleton **m_leads;
-  
-  /** Nombres de squelettes guides */
-  int m_nbLeadSkeletons;
 };
 
-
-
 /**********************************************************************************************************************/
-/****************************************** DEFINITION DE LA CLASSE POINTFLAME ****************************************/
+/*************************************** DEFINITION DE LA CLASSE POINTFLAME **************************************/
 /**********************************************************************************************************************/
 
 /** La classe PointFlame implémente une flamme qui provient d'une mèche verticale droite.<br>
@@ -268,15 +321,13 @@ class PointFlame : public BasicFlame
 {
 public:
   /** Constructeur.
-   * @param s pointeur sur le solveur de fluides
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage. A VERIFIER
    * @param posRel Position relative du centre de la flamme
    * @param innerForce Force intérieure de la flamme
-   * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  PointFlame(Solver *s, int nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
-	     Scene *scene, double rayon);
+  PointFlame (Solver * s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
+	      double rayon);
   virtual ~PointFlame();
   
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -288,34 +339,31 @@ public:
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture
    */
-  virtual void drawFlame(bool displayParticle);
+  virtual void drawFlame(bool displayParticle){ drawParticles(displayParticle); drawPointFlame(); };
   
   /** Dessine la mèche de la flamme 
    * @param displayBoxes affiche ou non le partitionnement de la mèche. Ce paramètre
    * est ignoré pour ce type de flamme puisque la mèche n'est pas découpé. 
    */
   virtual void drawWick(bool displayBoxes);
-  
-  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   */
-  void addForces(char perturbate, char fdf=0);
-  
+    
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
   Vector getMainDirection(){
-    return(*(m_lead->getMiddleParticle()));
+    return(*(m_leads[0]->getMiddleParticle()));
   };
   
   virtual Point getCenter (){    
-    return (*m_lead->getMiddleParticle () + m_position);
-  };
-  
-private:
-  /** Pointeur vers le squelette guide. */
-  LeadSkeleton *m_lead;
+    return (*m_leads[0]->getMiddleParticle () + m_position);
+  }; 
 
-  Texture m_halo;
+  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
+   */
+  void addForces(u_char perturbate, u_char fdf=0);
+  
+  Point* getTop(){ return m_leads[0]->getParticle(0); };
+  Point* getBottom() { return m_leads[0]->getRoot(); };
 };
 
 #endif

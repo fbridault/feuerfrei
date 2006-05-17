@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  Hsolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps);
+  Hsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps);
   virtual ~Hsolver ();
   
 protected:  
@@ -33,7 +33,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  void diffuse (int b, double *const x, const double *const x0,
+  void diffuse (unsigned char b, double *const x, const double *const x0,
 			double *const residu, double *const residu0,
 			double diff_visc);
     

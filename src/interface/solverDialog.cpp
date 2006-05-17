@@ -142,9 +142,9 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   (*m_posYTextCtrl) << solverConfig->position.y;
   (*m_posZTextCtrl) << solverConfig->position.z;
   (*m_dimTextCtrl) << solverConfig->dim;
-  (*m_resXTextCtrl) << solverConfig->resx;
-  (*m_resYTextCtrl) << solverConfig->resy;
-  (*m_resZTextCtrl) << solverConfig->resz;
+  (*m_resXTextCtrl) << (int)solverConfig->resx;
+  (*m_resYTextCtrl) << (int)solverConfig->resy;
+  (*m_resZTextCtrl) << (int)solverConfig->resz;
   tmp.Printf(_("%.4lf"), solverConfig->timeStep);
   (*m_timeStepTextCtrl) << tmp;
   m_solverTypeRadioBox->SetSelection(solverConfig->type);
@@ -154,7 +154,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   (*m_omegaProjTextCtrl) << tmp;
   tmp.Printf(_("%.10lf"), solverConfig->epsilon);
   (*m_epsilonTextCtrl) << tmp;
-  (*m_nbMaxIterTextCtrl) << solverConfig->nbMaxIter;
+  (*m_nbMaxIterTextCtrl) << (int)solverConfig->nbMaxIter;
 
   if(solverConfig->type == GS_SOLVER)
     {
@@ -248,7 +248,7 @@ SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  Fla
   m_solverNotebook = new wxNotebook(this, IDNB_Solvers, wxDefaultPosition, wxDefaultSize, 0);
   m_currentConfig = config;
   m_nbPanels = m_currentConfig->nbSolvers;
-  for(int i = 0; i < m_currentConfig->nbSolvers; i++)
+  for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
       m_solverPanels[i] = new SolverPanel(m_solverNotebook, -1);
       m_solverPanels[i]->setCtrlValues(&m_currentConfig->solvers[i]);
@@ -266,7 +266,7 @@ SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  Fla
 void SolverDialog::doLayout()
 {
   wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-  for(int i = 0; i < m_currentConfig->nbSolvers; i++)
+  for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
       wxString tabName(_("Solver #")); tabName << i+1;
       m_solverNotebook->AddPage(m_solverPanels[i], tabName);
@@ -306,7 +306,7 @@ void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
     for(int i=sel; i < m_nbPanels; i++)
       m_solverPanels[i] = m_solverPanels[i+1];
     /* Réindexage des index des solveurs des flammes en conséquence */
-    for(int i = 0; i < m_currentConfig->nbFlames; i++)
+    for(uint i = 0; i < m_currentConfig->nbFlames; i++)
       if( m_currentConfig->flames[i].solverIndex > sel)
 	m_currentConfig->flames[i].solverIndex--;
   }
@@ -320,7 +320,7 @@ void SolverDialog::OnOK(wxCommandEvent& event)
   
   m_currentConfig->solvers = new SolverConfig[m_currentConfig->nbSolvers];
   
-  for(int i = 0; i < m_currentConfig->nbSolvers; i++)
+  for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
       if(!m_solverPanels[i]->getCtrlValues(&m_currentConfig->solvers[i]))
 	return;
@@ -335,7 +335,7 @@ void SolverDialog::OnPageChanging(wxNotebookEvent& event)
 
 void SolverDialog::checkSolverUsage(int solverIndex)
 {
-  for(int i = 0; i < m_currentConfig->nbFlames; i++)
+  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       if(m_currentConfig->flames[i].solverIndex == solverIndex){
 	m_deleteSolverButton->Disable();

@@ -28,7 +28,7 @@ public:
    * @param interpolation 0 ou 1 pour utiliser l'interpolation
    * @param color 0 ou 2 pour mélanger la luminance du solide avec la couleur des matériaux
    */
-  void draw(unsigned char color, unsigned char interpolation);
+  void draw(u_char color, u_char interpolation);
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique
    * @param o Orientation du solide

@@ -17,7 +17,7 @@ class Texture
 {
 public:
   /** Construit une texture vide.
-   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_NV,...
+   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
    * @param width largeur de la texture
    * @param height hauteur de la texture
    */

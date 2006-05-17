@@ -34,7 +34,7 @@ else
         CXXFLAGS="-g -Wall -DDEBUG"
         AC_MSG_RESULT([enabled])
     else
-       CXXFLAGS="-O3 -Wall"
+       CXXFLAGS="-O2 -Wall"
        AC_MSG_RESULT([disabled])
     fi
 fi

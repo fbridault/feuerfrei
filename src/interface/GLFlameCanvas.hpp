@@ -29,7 +29,7 @@ class GLFlameCanvas : public wxGLCanvas
 {
 public:
   GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
-	     long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
+		long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
   
   ~GLFlameCanvas();
   
@@ -70,7 +70,7 @@ public:
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
   void ToggleSmoothShading(void) { 
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (uint f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->toggleSmoothShading ();
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
@@ -101,17 +101,17 @@ private:
   bool m_init;
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
-  int m_width, m_height;
-  int prevNbSolvers, prevNbFlames;
+  uint m_width, m_height;
+  uint prevNbSolvers, prevNbFlames;
   
   CGcontext m_context;
   Camera *m_camera;
   /* Pour le compte des frames */
-  int m_framesCount, m_globalFramesCount;
+  uint m_framesCount, m_globalFramesCount;
   int m_t;
   
   /* Tableau de pixels pour la sauvegarde des images */
-  unsigned char *m_pixels;
+  u_char *m_pixels;
 
   /********* Variables relatives aux solides photométriques **************/
   SolidePhotometrique *m_photoSolid;

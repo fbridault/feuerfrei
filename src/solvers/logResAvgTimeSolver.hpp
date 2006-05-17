@@ -22,17 +22,17 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  LogResAvgTimeSolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double nbTimeSteps,
-		       double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgTimeSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+		       double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   virtual ~LogResAvgTimeSolver ();
   
 private:
   void vel_step ();
   
-  void GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps);
-  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter);
+  void GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps);
+  void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
   
-  void computeAverage ( int iter, double value, double time );
+  void computeAverage ( uint iter, double value, double time );
   
   /** Tableau contenant les moyennes des temps. Il est organisé comme ceci :<br>
    *    - de O à m_nbSteps : diffusion en u avec GS

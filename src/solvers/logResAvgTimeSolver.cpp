@@ -7,8 +7,9 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgTimeSolver::LogResAvgTimeSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
-					  double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+LogResAvgTimeSolver::LogResAvgTimeSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim,
+					  double pas_de_temps, uint nbTimeSteps, double buoyancy, double omegaDiff, 
+					  double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
   LogResAvgSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
@@ -49,22 +50,22 @@ void LogResAvgTimeSolver::vel_step ()
   project (m_uPrev, m_vPrev);
   
   if(m_nbIter == m_nbMaxIter)
-    for(int i=0; i < m_nbSteps; i++){
+    for(uint i=0; i < m_nbSteps; i++){
       m_file << i << " ";
       
-      for(int j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
+      for(uint j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
 	m_file << m_times[j*m_nbSteps + i] << " " << m_averages[j*m_nbSteps + i] << " ";
       
       m_file << endl;
     } 
 }
 
-void LogResAvgTimeSolver::GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps)
+void LogResAvgTimeSolver::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
 {  
   double t=0;
   ::wxStartTimer();
 
-  int i, j, k, l;
+  uint i, j, k, l;
   double diagonal = 1/div;
   double norm2;
   
@@ -99,7 +100,7 @@ void LogResAvgTimeSolver::GS_solve(int b, double *const x, double *const x0, dou
   //set_bnd (b, x);
 }
 
-void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
+void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double t=0;
   ::wxStartTimer();
@@ -107,7 +108,7 @@ void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
-  int i,j,k;
+  uint i,j,k;
   
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
@@ -156,7 +157,7 @@ void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double
 	rho0+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
   
   // début des itérations
-  for( int numiter=0;numiter<maxiter;numiter++){
+  for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -246,9 +247,9 @@ void LogResAvgTimeSolver::GCSSOR(double *const x0, const double *const b, double
   return;
 }//GCSSOR
 
-void LogResAvgTimeSolver::computeAverage (int iter, double value, double time)
+void LogResAvgTimeSolver::computeAverage (uint iter, double value, double time)
 {
-  int i = m_index*m_nbSteps + iter;
+  uint i = m_index*m_nbSteps + iter;
   
   m_averages[i] = (m_averages[i] * m_nbIter + sqrt(value))/(double)(m_nbIter+1);
   m_times[i] = (m_times[i] * m_nbIter + time)/(double)(m_nbIter+1);

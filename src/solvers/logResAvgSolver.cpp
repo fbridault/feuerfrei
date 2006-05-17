@@ -1,8 +1,9 @@
 #include "logResAvgSolver.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgSolver::LogResAvgSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, double buoyancy, 
-				  double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+				  double pas_de_temps, uint nbTimeSteps, double buoyancy, 
+				  double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
@@ -15,7 +16,7 @@ LogResAvgSolver::LogResAvgSolver (Point& position, int n_x, int n_y, int n_z, do
 }
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgSolver::LogResAvgSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+LogResAvgSolver::LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("solvers/residualsAverage.log", ios::out | ios::trunc);
@@ -59,10 +60,10 @@ void LogResAvgSolver::vel_step ()
   project (m_uPrev, m_vPrev);
 
   if(m_nbIter == m_nbMaxIter)
-    for(int i=0; i < m_nbSteps; i++){
+    for(uint i=0; i < m_nbSteps; i++){
       m_file << i << " ";
       
-      for(int j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
+      for(uint j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
 	m_file << m_averages[j*m_nbSteps + i] << " ";
 
       m_file << endl;
@@ -70,7 +71,7 @@ void LogResAvgSolver::vel_step ()
 }
 
 /* Pas de diffusion */
-void LogResAvgSolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
+void LogResAvgSolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   m_index = b-1;
   saveState(x, x0);
@@ -85,7 +86,7 @@ void LogResAvgSolver::diffuse (int b, double *const x, double *const x0, double 
 void LogResAvgSolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
+  uint i, j, k;
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)
@@ -120,9 +121,9 @@ void LogResAvgSolver::project (double *const p, double *const div)
 }
 
 
-void LogResAvgSolver::GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps)
+void LogResAvgSolver::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
 {
-  int i, j, k, l;
+  uint i, j, k, l;
   double diagonal = 1/div;
   double norm2;
   
@@ -155,12 +156,12 @@ void LogResAvgSolver::GS_solve(int b, double *const x, double *const x0, double 
   //set_bnd (b, x);
 }
 
-void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
+void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
-  int i,j,k;
+  uint i,j,k;
   
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
@@ -209,7 +210,7 @@ void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, 
 	rho0+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
   
   // début des itérations
-  for( int numiter=0;numiter<maxiter;numiter++){
+  for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -296,7 +297,7 @@ void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, 
   return;
 }//GCSSOR
 
-void LogResAvgSolver::computeAverage (int iter, double value)
+void LogResAvgSolver::computeAverage (uint iter, double value)
 {
   int i = m_index*m_nbSteps + iter;
   

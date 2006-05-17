@@ -21,7 +21,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GSsolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, double buoyancy);
+  GSsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps, double buoyancy);
   virtual ~GSsolver ();
   
 protected:
@@ -35,7 +35,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  virtual void GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps);
+  virtual void GS_solve(unsigned char b, double *const x, const double *const x0, double a, double div, uint nb_steps);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -45,7 +45,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc);
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection

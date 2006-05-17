@@ -1,6 +1,6 @@
 #include "GSsolver.hpp"
 
-GSsolver::GSsolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy) : 
+GSsolver::GSsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy) : 
   Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
 }
@@ -13,9 +13,9 @@ GSsolver::~GSsolver ()
 {
 }
 
-void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a, double div, double nb_steps)
+void GSsolver::GS_solve(unsigned char b, double *const x, const double *const x0, double a, double div, uint nb_steps)
 {
-  int i, j, k, l;
+  uint i, j, k, l;
   
   for (l = 0; l < nb_steps; l++){
     t=t1;
@@ -34,15 +34,15 @@ void GSsolver::GS_solve(int b, double *const x, const double *const x0, double a
 }//GS_solve
 
 /* Pas de diffusion */
-void GSsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
+void GSsolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
-  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 20);
+  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }
 
 void GSsolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
+  uint i, j, k;
   
   t=t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){

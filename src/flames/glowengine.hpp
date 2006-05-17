@@ -41,7 +41,7 @@ public:
    * @param recompileShaders indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  GlowEngine(unsigned int w, unsigned int h, int scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext );
+  GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext );
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -62,11 +62,11 @@ public:
 
 private: 
   /** Dimensions de la texture */
-  unsigned int m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
-  unsigned int m_initialWidth, m_initialHeight;
+  uint m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
+  uint m_initialWidth, m_initialHeight;
   
   /** Rapport d'échelle entre la taille du viewport et de la texture du blur */
-  unsigned int m_scaleFactor[GLOW_LEVELS];
+  uint m_scaleFactor[GLOW_LEVELS];
   
   /** Pbuffer */
   //  PBuffer m_pbuffer;

@@ -9,9 +9,9 @@ public:
   FBO();
   ~FBO();
 
-  void Initialize(unsigned int width, unsigned int height);
+  void Initialize(uint width, uint height);
   
-  void Attach(GLuint tex, unsigned int colorAttachment);
+  void Attach(GLuint tex, uint colorAttachment);
 
   void Activate( void )
   {
@@ -25,18 +25,18 @@ public:
 //     glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
   }
 
-  unsigned int GetWidth()
+  uint GetWidth()
   { return m_width; }
   
-  unsigned int GetHeight()
+  uint GetHeight()
   { return m_height; }
   
 private:
   GLuint m_frameBuffer;
   GLuint m_depthRenderBuffer;
   
-  unsigned int m_width;
-  unsigned int m_height;
+  uint m_width;
+  uint m_height;
 };
 
 #endif

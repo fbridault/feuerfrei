@@ -113,7 +113,7 @@ private:
   /** Vecteur contenant les fichiers IES */
   vector < IES *>m_IESArray;
   /** Indice du fichier actuellement sélectionné */
-  unsigned int m_currentIndex;
+  uint m_currentIndex;
 };
 
 #endif

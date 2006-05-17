@@ -1,8 +1,8 @@
 #include "logResSolver.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResSolver::LogResSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
-			    double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+LogResSolver::LogResSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+			    uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
@@ -54,7 +54,7 @@ void LogResSolver::vel_step ()
 }
 
 /* Pas de diffusion */
-void LogResSolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
+void LogResSolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   m_file = &m_fileDiff[b-1];
   
@@ -71,7 +71,7 @@ void LogResSolver::diffuse (int b, double *const x, double *const x0, double a, 
 void LogResSolver::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
+  uint i, j, k;
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)
@@ -109,9 +109,9 @@ void LogResSolver::project (double *const p, double *const div)
 }
 
 
-void LogResSolver::GS_solve(int b, double *const x, double *const x0, double a, double div, double nb_steps)
+void LogResSolver::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
 {
-  int i, j, k, l;
+  uint i, j, k, l;
   double diagonal = 1/div;
   double norm2;
   
@@ -145,12 +145,12 @@ void LogResSolver::GS_solve(int b, double *const x, double *const x0, double a, 
   //set_bnd (b, x);
 }
 
-void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
+void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
-  int i,j,k;
+  uint i,j,k;
   
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
@@ -199,7 +199,7 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
 	rho0+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
   
   // début des itérations
-  for( int numiter=0;numiter<maxiter;numiter++){
+  for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -288,7 +288,7 @@ void LogResSolver::GCSSOR(double *const x0, const double *const b, double a, dou
   return;
 }//GCSSOR
 
-void LogResSolver::logResidu (int iter, double value)
+void LogResSolver::logResidu (uint iter, double value)
 {
   *m_file << m_nbIter << " " << iter << " " << sqrt(value) << " " << endl;
 }

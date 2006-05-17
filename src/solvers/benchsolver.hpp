@@ -29,9 +29,9 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  BenchSolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy, 
-	       double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
-  BenchSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy, 
+	       uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   virtual ~ BenchSolver ();
   
 protected:
@@ -43,7 +43,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc) = 0;
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc) = 0;
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
@@ -56,9 +56,9 @@ protected:
   void setPreviousState (double *const x, double *const x2);
   
   /* Nombre maximum de pas de temps à simuler */
-  int m_nbMaxIter;
+  uint m_nbMaxIter;
   
-  short m_index;
+  unsigned short m_index;
 
 private:
   double *m_save, *m_save2;

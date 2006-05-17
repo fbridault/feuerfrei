@@ -1,7 +1,7 @@
 #include "benchsolver.hpp"
 
-BenchSolver::BenchSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
-			  double buoyancy, double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+BenchSolver::BenchSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+			  double buoyancy, uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
   m_save = new double[m_nbVoxels];
@@ -15,7 +15,7 @@ BenchSolver::BenchSolver (Point& position, int n_x, int n_y, int n_z, double dim
 }
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-BenchSolver::BenchSolver (double nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+BenchSolver::BenchSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
   m_save = new double[m_nbVoxels];

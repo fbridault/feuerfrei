@@ -17,8 +17,8 @@ GCSSORsolver::GCSSORsolver (double omegaDiff, double omegaProj, double epsilon)
   m_epsilon = epsilon;
 }
 
-GCSSORsolver::GCSSORsolver (Point& position, int n_x, int n_y, int n_z, double dim, double timeStep, double buoyancy,
-			    double omegaDiff, double omegaProj, double epsilon) : 
+GCSSORsolver::GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+			    double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
   Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
   m_r=new double[m_nbVoxels];
@@ -44,12 +44,12 @@ GCSSORsolver::~GCSSORsolver ()
   delete[]m_q;
 }
 
-void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter)
+void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
   double e=2.0-omega;
-  int i,j,k;
+  uint i,j,k;
   
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
@@ -134,7 +134,7 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
   }//for k
   
   // début des itérations
-  for( int numiter=0;numiter<maxiter;numiter++){
+  for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     t = t1;
     for ( k = 1; k <= m_nbVoxelsZ; k++){
@@ -284,7 +284,7 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
 
 /* Pas de diffusion */
 void
-GCSSORsolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
+GCSSORsolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
 }
@@ -295,7 +295,7 @@ GCSSORsolver::project (double *const p, double *const div)
   double h_x = 1.0 / m_nbVoxelsX, 
 		h_y = 1.0 / m_nbVoxelsY, 
 		h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
+  uint i, j, k;
   
   t = t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){

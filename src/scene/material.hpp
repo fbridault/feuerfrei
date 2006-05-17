@@ -80,4 +80,4 @@ public:
   { return (m_diffuseTexture->getTexture());};
 };//Material
 
-#endif 
+#endif

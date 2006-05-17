@@ -21,7 +21,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  LeadSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, int pls);
+  LeadSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls);
 
   virtual ~LeadSkeleton();
   
@@ -35,12 +35,12 @@ private:
    * @param pos position de la particule
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int moveParticle(Particle* const pos);
+  uint moveParticle(Particle* const pos);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int moveRoot();
+  uint moveRoot();
 
   void drawParticle (Particle * const particle);
 };

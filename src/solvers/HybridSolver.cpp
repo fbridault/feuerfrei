@@ -7,7 +7,7 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver::HybridSolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps,
+HybridSolver::HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
   Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
@@ -19,7 +19,7 @@ HybridSolver::~HybridSolver ()
 }
 
 /* Pas de diffusion */
-void HybridSolver::diffuse (int b, double *const x, double *const x0, double a, double diff_visc)
+void HybridSolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }
@@ -29,7 +29,7 @@ void HybridSolver::project (double *const p, double *const div)
   double h_x = 1.0 / m_nbVoxelsX, 
     h_y = 1.0 / m_nbVoxelsY,
     h_z = 1.0 / m_nbVoxelsZ;
-  int i, j, k;
+  uint i, j, k;
     
   t = t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){

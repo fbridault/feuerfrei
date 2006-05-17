@@ -19,7 +19,7 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  GCSSORsolver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, 
+  GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps, 
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple */
@@ -37,7 +37,7 @@ protected:
   * et 1/6 pour la projection
   * @param nb_steps nombre d'itérations à effectuer
   */
-  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, int maxiter);
+  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -47,7 +47,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, double *const x0,	double a, double diff_visc);
+  virtual void diffuse (unsigned char b, double *const x, double *const x0,	double a, double diff_visc);
 
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection

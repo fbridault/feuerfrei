@@ -4,17 +4,16 @@ FBO::FBO()
 {
 }
 
-void FBO::Initialize(unsigned int width, unsigned int height)
+void FBO::Initialize(uint width, uint height)
 {
   m_width = width;
   m_height = height;
-  //
-  // Create a frame-buffer object and a render-buffer object...  
+  
   glGenFramebuffersEXT( 1, &m_frameBuffer );
   glGenRenderbuffersEXT( 1, &m_depthRenderBuffer );
 }
 
-void FBO::Attach(GLuint tex, unsigned int colorAttachment)
+void FBO::Attach(GLuint tex, uint colorAttachment)
 {
   GLenum l_colorAttachment;
   
@@ -30,9 +29,9 @@ void FBO::Attach(GLuint tex, unsigned int colorAttachment)
   case 6 : l_colorAttachment = GL_COLOR_ATTACHMENT6_EXT; break;
   case 7 : l_colorAttachment = GL_COLOR_ATTACHMENT7_EXT; break;
   }
-    
+  
   glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
-  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, l_colorAttachment, GL_TEXTURE_RECTANGLE_NV, tex, 0 );
+  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, l_colorAttachment, GL_TEXTURE_RECTANGLE_ARB, tex, 0 );
 
   glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
   glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, m_width, m_height );

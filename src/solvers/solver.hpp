@@ -31,48 +31,49 @@ public:
    * @param n : taille de la grille
    * @param pas_de_temps : pas de temps utilisé pour la simulation
    */
-  Solver (Point& position, int n_x, int n_y, int n_z, double dim, double pas_de_temps, double buoyancy);
+  Solver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+	  double pas_de_temps, double buoyancy);
   virtual ~Solver ();
-
+  
   /** Lance une itération du solveur. */
   virtual void iterate ();
 
-  double getU (int i, int j, int k)
+  double getU (uint i, uint j, uint k)
   {
     return m_u[IX (i, j, k)];
   };
-  double getV (int i, int j, int k)
+  double getV (uint i, uint j, uint k)
   {
     return m_v[IX (i, j, k)];
   };
-  double getW (int i, int j, int k)
+  double getW (uint i, uint j, uint k)
   {
     return m_w[IX (i, j, k)];
   };
 
   /** Ajout d'une force externe pour la composante U */
-  void addUsrc (int i, int j, int k, double value)
+  void addUsrc (uint i, uint j, uint k, double value)
   {
     m_uSrc[IX (i, j, k)] += value;
   };
   /** Ajout d'une force externe pour la composante V */
-  void addVsrc (int i, int j, int k, double value)
+  void addVsrc (uint i, uint j, uint k, double value)
   {
     m_vSrc[IX (i, j, k)] += value;
   };
   /** Ajout d'une force externe pour la composante W */
-  void addWsrc (int i, int j, int k, double value)
+  void addWsrc (uint i, uint j, uint k, double value)
   {
     m_wSrc[IX (i, j, k)] += value;
   };
 
   /** Affectation d'une force externe pour la composante V */
-  void setUsrc (int i, int j, int k, double value)
+  void setUsrc (uint i, uint j, uint k, double value)
   {
     m_uSrc[IX (i, j, k)] = value;
   };
   /** Affectation d'une force externe pour la composante V */
-  void setVsrc (int i, int j, int k, double value)
+  void setVsrc (uint i, uint j, uint k, double value)
   {
     m_vSrc[IX (i, j, k)] = value;
   };
@@ -85,17 +86,17 @@ public:
   void cleanSources ();
 
   /** Retourne le nombre de voxels en X */
-  int getXRes()
+  uint getXRes()
   {
     return m_nbVoxelsX;
   };
   /** Retourne le nombre de voxels en Y */
-  int getYRes()
+  uint getYRes()
   {
     return m_nbVoxelsY;
   };
   /** Retourne le nombre de voxels en Z */
-  int getZRes()
+  uint getZRes()
   {
     return m_nbVoxelsZ;
   };
@@ -146,11 +147,11 @@ public:
   void displayArrow (Vector * const direction);
 
   /* Retrouver la cellule où est située la particule */
-  void findPointPosition(Point& p, int& i, int& j, int& k)
+  void findPointPosition(Point& p, uint& i, uint& j, uint& k)
   {
-    i = (int) (p.x * m_dimXTimesNbVoxelsX) + 1 + m_halfNbVoxelsX;
-    j = (int) (p.y * m_dimXTimesNbVoxelsY) + 1;
-    k = (int) (p.z * m_dimXTimesNbVoxelsZ) + 1 + m_halfNbVoxelsZ;
+    i = (uint) (p.x * m_dimXTimesNbVoxelsX) + 1 + m_halfNbVoxelsX;
+    j = (uint) (p.y * m_dimXTimesNbVoxelsY) + 1;
+    k = (uint) (p.z * m_dimXTimesNbVoxelsZ) + 1 + m_halfNbVoxelsZ;
   };
   
   Point& getPosition ()
@@ -163,7 +164,7 @@ public:
   virtual void setBuoyancy(double value){ m_buoyancy=value; };
   
 protected:
-  int IX (int i, int j, int k)
+  uint IX (uint i, uint j, uint k)
   {  
     return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
   };
@@ -172,7 +173,7 @@ protected:
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
    * @param x composante à traiter
    */
-  void set_bnd (int b, double *const x);
+  void set_bnd (unsigned char b, double *const x);
   
   /** Pas de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -182,7 +183,7 @@ protected:
    * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
    * du pas de vélocité
    */
-  virtual void diffuse (int b, double *const x, double *const x0, double a, double diff_visc) = 0;
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc) = 0;
   
   /** Pas d'advection => déplacement du fluide sur lui-mÃªme.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -192,7 +193,7 @@ protected:
    * @param v vecteur de vélocité en v
    * @param w vecteur de vélocité en w
    */
-  virtual void advect (int b, double *const d, const double *const d0,
+  virtual void advect (unsigned char b, double *const d, const double *const d0,
 		       const double *const u, const double *const v,
 		       const double *const w);
 
@@ -208,26 +209,26 @@ protected:
   virtual void vel_step ();
 
   /** Nombre de voxels sur un côté du cube de résolution. */
-  int m_nbVoxelsX, m_nbVoxelsY, m_nbVoxelsZ;
+  uint m_nbVoxelsX, m_nbVoxelsY, m_nbVoxelsZ;
   
   /** Dimensions du solveur */
   double m_dimX, m_dimY, m_dimZ;
 
   double m_dimXTimesNbVoxelsX,  m_dimXTimesNbVoxelsY,  m_dimXTimesNbVoxelsZ;
-  int m_halfNbVoxelsX,  m_halfNbVoxelsZ;
+  uint m_halfNbVoxelsX,  m_halfNbVoxelsZ;
 
   /** Position du solveur dans l'espace */
   Point m_position;
 
   /** Taille totale du cube en nombre de voxels, égal à (N+2)^3. */
-  int m_nbVoxels;
+  uint m_nbVoxels;
   double *m_u, *m_v, *m_w, *m_uPrev, *m_vPrev, *m_wPrev, *m_uSrc, *m_vSrc, *m_wSrc;
   double *m_dens, *m_densPrev, *m_densSrc;
 
   double m_buoyancy;
 
   /** Nombre d'itérations */
-  int m_nbIter;
+  uint m_nbIter;
   /** Viscosité cinématique de l'air 15*10E-6. */
   double m_visc;
   /** Diffusion. */
@@ -240,9 +241,9 @@ protected:
   GLuint m_gridDisplayList,  m_baseDisplayList;
 
   /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
-  int m_nbSteps;
+  uint m_nbSteps;
   
-  int t, n2, nx, t1, t2nx;
+  uint t, n2, nx, t1, t2nx;
 };
 
 #endif

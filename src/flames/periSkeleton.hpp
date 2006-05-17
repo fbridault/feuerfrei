@@ -25,7 +25,7 @@ public:
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
   PeriSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, 
-	       LeadSkeleton *guide, int pls);
+	       LeadSkeleton *guide, uint pls);
   virtual ~PeriSkeleton();
   
   
@@ -39,12 +39,12 @@ private:
    * @param n indice de la particule dans le squelette
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int moveParticle(Particle* const pos, int n);
+  uint moveParticle(Particle* const pos, uint n);
 
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
    */
-  int moveRoot();
+  uint moveRoot();
   
   /** Pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)

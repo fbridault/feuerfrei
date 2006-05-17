@@ -1,0 +1,22 @@
+#!/bin/bash
+
+if [ -n $1 -o -n $1 ]; then
+	echo "Script allowing to modify an expression in the whole C++ source code"
+	echo "Usage : sed-all <prev-expr> <new-expr>"
+	exit 1
+fi
+
+SED="sed -i"
+
+$SED "s/$1/$2/g" flames/*.cpp
+$SED "s/$1/$2/g" interface/*.cpp
+$SED "s/$1/$2/g" scene/*.cpp
+$SED "s/$1/$2/g" shaders/*.cpp
+$SED "s/$1/$2/g" solvers/*.cpp
+$SED "s/$1/$2/g" flames/*.hpp
+$SED "s/$1/$2/g" interface/*.hpp
+$SED "s/$1/$2/g" scene/*.hpp
+$SED "s/$1/$2/g" shaders/*.hpp
+$SED "s/$1/$2/g" solvers/*.hpp
+
+exit 0

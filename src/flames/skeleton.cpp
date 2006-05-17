@@ -6,7 +6,7 @@
 #include "../scene/graphicsFn.hpp"
 
 
-Skeleton::Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, int pls) : 
+Skeleton::Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls) : 
   m_rootMoveFactor(rootMoveFactor)
 {
   m_solver = s;
@@ -35,7 +35,7 @@ void Skeleton::addParticle(const Point* const pt)
   m_queue[m_headIndex].birth(m_particleLifespan);
 }
 
-void Skeleton::removeParticle(int n)
+void Skeleton::removeParticle(uint n)
 {
   int i;
   
@@ -50,13 +50,13 @@ void Skeleton::removeParticle(int n)
   }
 }
 
-void Skeleton::updateParticle(int i, const Point* const pt)
+void Skeleton::updateParticle(uint i, const Point* const pt)
 {
   m_queue[i] = *pt;
   m_queue[i].decreaseLife();
 }
 
-void Skeleton::swap(int i, int j)
+void Skeleton::swap(uint i, uint j)
 {
   Particle tmp(m_queue[i]);
   
@@ -70,7 +70,7 @@ void Skeleton::draw ()
   glDisable (GL_LIGHTING);
 
   drawRoot();
-  for (int i = 0; i < getSize (); i++)
+  for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
 
   glEnable (GL_LIGHTING);

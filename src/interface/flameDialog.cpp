@@ -182,7 +182,7 @@ FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  Flame
   m_flameNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_currentConfig = config;
   m_nbPanels = m_currentConfig->nbFlames;
-  for(int i = 0; i < m_currentConfig->nbFlames; i++)
+  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       m_flamePanels[i] = new FlamePanel(m_flameNotebook, -1, m_currentConfig->nbSolvers);
       m_flamePanels[i]->setCtrlValues(&m_currentConfig->flames[i]);
@@ -197,7 +197,7 @@ FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  Flame
 void FlameDialog::doLayout()
 {
   wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
-  for(int i = 0; i < m_currentConfig->nbFlames; i++)
+  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       wxString tabName(_("Flame #")); tabName << i+1;
       m_flameNotebook->AddPage(m_flamePanels[i], tabName);
@@ -246,7 +246,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   
   m_currentConfig->flames = new FlameConfig[m_currentConfig->nbFlames];
   
-  for(int i = 0; i < m_currentConfig->nbFlames; i++)
+  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       if( m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
 	if(m_currentConfig->flames[i].type != CANDLE){
@@ -260,6 +260,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	}else{
 	  m_currentConfig->flames[i].innerForce = 0.04;
 	}
+	m_currentConfig->flames[i].samplingTolerance = 100;
       }else
 	return;      
     }

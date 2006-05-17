@@ -37,12 +37,12 @@ class SolverConfig{
 public:
   char type;
   Point position;
-  int resx, resy, resz;
+  uint resx, resy, resz;
   double dim;
   double timeStep;
   double omegaDiff, omegaProj;
   double epsilon;
-  int nbMaxIter;
+  uint nbMaxIter;
   double buoyancy;
 };
 class FlameConfig{
@@ -64,7 +64,7 @@ public:
 
 class FlameAppConfig{
 public:
-  int width, height;
+  uint width, height;
   double clipping;
   wxString sceneName;
   /* LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
@@ -73,9 +73,9 @@ public:
   bool glowEnabled;
   /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
-  int nbSolvers;
+  uint nbSolvers;
   SolverConfig *solvers;
-  int nbFlames;
+  uint nbFlames;
   FlameConfig *flames;
   double fatness[4];
   double extrudeDist[4];

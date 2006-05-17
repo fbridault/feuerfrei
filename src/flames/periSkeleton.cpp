@@ -6,8 +6,8 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
-PeriSkeleton::PeriSkeleton (Solver * const s, const Point& position,
-			    const Point& rootMoveFactor, LeadSkeleton * guide, int pls) :
+PeriSkeleton::PeriSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor, 
+			    LeadSkeleton * guide, uint pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
   this->guide = guide;
@@ -17,10 +17,9 @@ PeriSkeleton::~PeriSkeleton ()
 {
 }
 
-int
-PeriSkeleton::moveRoot ()
+uint PeriSkeleton::moveRoot ()
 {
-  int i, j, k;
+  uint i, j, k;
   Point tmp;
   double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes ();
   double distz = m_solver->getDimZ() / (double) m_solver->getZRes ();
@@ -52,10 +51,9 @@ PeriSkeleton::moveRoot ()
   return 1;
 }
 
-int
-PeriSkeleton::moveParticle (Particle * const pos, int n)
+uint PeriSkeleton::moveParticle (Particle * const pos, uint n)
 {
-  int i, j, k;
+  uint i, j, k;
   //  int light;
 
   if (pos->isDead ())
@@ -85,12 +83,11 @@ PeriSkeleton::moveParticle (Particle * const pos, int n)
 }
 
 /* Gère la création et la destruction des particules */
-void
-PeriSkeleton::move ()
+void PeriSkeleton::move ()
 {
   Particle *tmp, *tmp2;
   double dist;
-  int i;
+  uint i;
 
   moveRoot ();
 

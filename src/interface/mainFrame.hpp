@@ -137,10 +137,10 @@ private:
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
-  int m_nbSolversMax;
+  uint m_nbSolversMax;
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
-  int m_nbFlamesMax;
+  uint m_nbFlamesMax;
   
   DECLARE_EVENT_TABLE()
 };

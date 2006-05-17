@@ -48,16 +48,16 @@ am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_rtflames_OBJECTS = main.$(OBJEXT) basicFlames.$(OBJEXT) \
-	fbo.$(OBJEXT) fire.$(OBJEXT) firesources.$(OBJEXT) \
-	glowengine.$(OBJEXT) ies.$(OBJEXT) leadSkeleton.$(OBJEXT) \
-	periSkeleton.$(OBJEXT) skeleton.$(OBJEXT) \
-	solidePhoto.$(OBJEXT) wick.$(OBJEXT) shadowsDialog.$(OBJEXT) \
-	solverDialog.$(OBJEXT) flameDialog.$(OBJEXT) \
-	GLFlameCanvas.$(OBJEXT) mainFrame.$(OBJEXT) \
-	mainPanels.$(OBJEXT) numTextCtrl.$(OBJEXT) camera.$(OBJEXT) \
-	graphicsFn.$(OBJEXT) material.$(OBJEXT) object.$(OBJEXT) \
-	scene.$(OBJEXT) source.$(OBJEXT) texture.$(OBJEXT) \
-	CgShader.$(OBJEXT) CgSVShader.$(OBJEXT) \
+	cloneFlames.$(OBJEXT) fbo.$(OBJEXT) fire.$(OBJEXT) \
+	firesources.$(OBJEXT) glowengine.$(OBJEXT) ies.$(OBJEXT) \
+	leadSkeleton.$(OBJEXT) periSkeleton.$(OBJEXT) \
+	skeleton.$(OBJEXT) solidePhoto.$(OBJEXT) wick.$(OBJEXT) \
+	shadowsDialog.$(OBJEXT) solverDialog.$(OBJEXT) \
+	flameDialog.$(OBJEXT) GLFlameCanvas.$(OBJEXT) \
+	mainFrame.$(OBJEXT) mainPanels.$(OBJEXT) numTextCtrl.$(OBJEXT) \
+	camera.$(OBJEXT) graphicsFn.$(OBJEXT) material.$(OBJEXT) \
+	object.$(OBJEXT) scene.$(OBJEXT) source.$(OBJEXT) \
+	texture.$(OBJEXT) CgShader.$(OBJEXT) CgSVShader.$(OBJEXT) \
 	CgSPFragmentShader.$(OBJEXT) CgCandleShaders.$(OBJEXT) \
 	CgBlurShaders.$(OBJEXT) solver.$(OBJEXT) GSsolver.$(OBJEXT) \
 	GCSSORsolver.$(OBJEXT) HybridSolver.$(OBJEXT) \
@@ -176,6 +176,7 @@ AM_CXXFLAGS =
 rtflames_SOURCES = \
 	main.cpp  \
 	flames/basicFlames.cpp  \
+	flames/cloneFlames.cpp  \
 	flames/fbo.cpp  \
 	flames/fire.cpp  \
 	flames/firesources.cpp \
@@ -294,6 +295,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/basicFlames.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/benchsolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/camera.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cloneFlames.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fbo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fire.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/firesources.Po@am__quote@
@@ -349,6 +351,20 @@ basicFlames.obj: flames/basicFlames.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='flames/basicFlames.cpp' object='basicFlames.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o basicFlames.obj `if test -f 'flames/basicFlames.cpp'; then $(CYGPATH_W) 'flames/basicFlames.cpp'; else $(CYGPATH_W) '$(srcdir)/flames/basicFlames.cpp'; fi`
+
+cloneFlames.o: flames/cloneFlames.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cloneFlames.o -MD -MP -MF "$(DEPDIR)/cloneFlames.Tpo" -c -o cloneFlames.o `test -f 'flames/cloneFlames.cpp' || echo '$(srcdir)/'`flames/cloneFlames.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/cloneFlames.Tpo" "$(DEPDIR)/cloneFlames.Po"; else rm -f "$(DEPDIR)/cloneFlames.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='flames/cloneFlames.cpp' object='cloneFlames.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cloneFlames.o `test -f 'flames/cloneFlames.cpp' || echo '$(srcdir)/'`flames/cloneFlames.cpp
+
+cloneFlames.obj: flames/cloneFlames.cpp
+@am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT cloneFlames.obj -MD -MP -MF "$(DEPDIR)/cloneFlames.Tpo" -c -o cloneFlames.obj `if test -f 'flames/cloneFlames.cpp'; then $(CYGPATH_W) 'flames/cloneFlames.cpp'; else $(CYGPATH_W) '$(srcdir)/flames/cloneFlames.cpp'; fi`; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/cloneFlames.Tpo" "$(DEPDIR)/cloneFlames.Po"; else rm -f "$(DEPDIR)/cloneFlames.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='flames/cloneFlames.cpp' object='cloneFlames.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o cloneFlames.obj `if test -f 'flames/cloneFlames.cpp'; then $(CYGPATH_W) 'flames/cloneFlames.cpp'; else $(CYGPATH_W) '$(srcdir)/flames/cloneFlames.cpp'; fi`
 
 fbo.o: flames/fbo.cpp
 @am__fastdepCXX_TRUE@	if $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT fbo.o -MD -MP -MF "$(DEPDIR)/fbo.Tpo" -c -o fbo.o `test -f 'flames/fbo.cpp' || echo '$(srcdir)/'`flames/fbo.cpp; \

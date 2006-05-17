@@ -38,7 +38,7 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 {
   m_init = false;
   m_run = 0;
-  m_pixels = new unsigned char[size.GetWidth()*size.GetHeight()*3];
+  m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
   m_framesCount = 0;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
@@ -105,7 +105,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
 
 void GLFlameCanvas::InitFlames(void)
 {    
-  for(int i=0 ; i < m_currentConfig->nbFlames; i++){
+  for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
       m_flames[i] = new Candle (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].position, 
@@ -143,7 +143,7 @@ void GLFlameCanvas::InitFlames(void)
 void GLFlameCanvas::InitSolvers(void)
 {
   m_solvers = new Solver *[m_currentConfig->nbSolvers];
-  for(int i=0 ; i < m_currentConfig->nbSolvers; i++){
+  for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
       m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
@@ -169,7 +169,7 @@ void GLFlameCanvas::InitSolvers(void)
       m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+				      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy, 
 				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
 				      m_currentConfig->solvers[i].epsilon);
       break;
@@ -177,7 +177,7 @@ void GLFlameCanvas::InitSolvers(void)
       m_solvers[i] = new LogResAvgSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+					  m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
 					 m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
 					 m_currentConfig->solvers[i].epsilon);
       break;
@@ -185,7 +185,7 @@ void GLFlameCanvas::InitSolvers(void)
       m_solvers[i] = new LogResAvgTimeSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					     m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].nbMaxIter, 
+					      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
 					     m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
 					     m_currentConfig->solvers[i].epsilon);
       break;
@@ -199,7 +199,7 @@ void GLFlameCanvas::InitSolvers(void)
 
 void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
-  int glowScales[2] = { 1, 4 };
+  uint glowScales[2] = { 1, 4 };
   InitSolvers();
   
   m_flames = new FireSource *[m_currentConfig->nbFlames];
@@ -257,10 +257,10 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
-  for (int f = 0; f < prevNbFlames; f++)
+  for (uint f = 0; f < prevNbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
-   for (int s = 0; s < prevNbSolvers; s++)
+   for (uint s = 0; s < prevNbSolvers; s++)
     delete m_solvers[s];
   delete[]m_solvers;
 }
@@ -268,10 +268,10 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
-    for (int i = 0; i < m_currentConfig->nbFlames; i++)
+    for (uint i = 0; i < m_currentConfig->nbFlames; i++)
       m_flames[i]->addForces (m_currentConfig->flames[i].flickering, m_currentConfig->flames[i].fdf);
     
-    for(int i=0 ; i < m_currentConfig->nbSolvers; i++)
+    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->iterate ();
   }
   
@@ -314,6 +314,8 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 /** Fonction de dessin global */
 void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
+  uint f,s;
+  
   if(!m_init)
     return;
   
@@ -324,6 +326,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   SetCurrent();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
   /* Déplacement du camera */
   m_camera->setView();
   
@@ -332,7 +337,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
   if(m_run)
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();
   // SDL_mutexV (lock);
   
@@ -353,19 +358,16 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /* A définir de manière plus précise par la suite */
 //     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
-    sigma = 1.2;
+    sigma = 1.5;
     m_glowEngine->activate();
     m_glowEngine->setGaussSigma(sigma);
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
-    
+        
     m_scene->draw_scene ();
-    
     /* Dessin de la flamme */
     if(m_displayFlame)
-      for (int f = 0; f < m_currentConfig->nbFlames; f++)
+      for (f = 0; f < m_currentConfig->nbFlames; f++)
 	m_flames[f]->drawFlame (m_displayParticles);
     
     m_glowEngine->blur();
@@ -378,7 +380,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     glBlendFunc (GL_ONE, GL_ZERO);
     
     /******************* AFFICHAGE DE LA SCENE *******************************/
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->drawWick (m_displayWickBoxes);
     
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
@@ -392,7 +394,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     glEnable (GL_LIGHTING);
     
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
       {
 	/* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
 	intensities[f] = m_flames[f]->getMainDirection().length() * 1.5;
@@ -417,7 +419,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-    for (int s = 0; s < m_currentConfig->nbSolvers; s++)
+    for (s = 0; s < m_currentConfig->nbSolvers; s++)
       {
 	Point position(m_solvers[s]->getPosition ());
 	
@@ -435,7 +437,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /********************* Dessin de la flamme **********************************/
     if(!m_currentConfig->glowEnabled)
       if(m_displayFlame)
-	for (int f = 0; f < m_currentConfig->nbFlames; f++)
+	for (f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayParticles);
   }
   /********************* PLACAGE DU GLOW ****************************************/
@@ -557,15 +559,17 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void
 GLFlameCanvas::cast_shadows_double ()
 {
+  uint f;
+  
   Point pos(m_flames[0]->getPosition());
   m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
 
-  for (int f = 0; f < m_currentConfig->nbFlames; f++)
+  for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->switchOff ();
   m_scene->draw_sceneWT ();
 
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
-    for (int f = 0; f < m_currentConfig->nbFlames; f++){
+    for (f = 0; f < m_currentConfig->nbFlames; f++){
       m_flames[f]->switchOn (intensities[f]);
     }
   
@@ -593,7 +597,7 @@ GLFlameCanvas::cast_shadows_double ()
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
   
-  for (int f = 0; f < m_currentConfig->nbFlames; f++)
+  for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->drawShadowVolume ();
 
   glPopAttrib ();
@@ -623,10 +627,10 @@ GLFlameCanvas::cast_shadows_double ()
 
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->resetDiffuseLight ();
     
-    for (int f = 0; f < m_currentConfig->nbFlames; f++)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->switchOn (intensities[f]);
     
     m_scene->draw_scene ();

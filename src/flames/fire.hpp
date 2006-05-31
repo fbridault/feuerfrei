@@ -34,7 +34,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    */
-  FlameLight (Scene *scene, int index, CgSVShader* shader);
+  FlameLight (Scene *scene, uint index, CgSVShader* shader);
   virtual ~FlameLight();
   
   void setLightPosition (Point& pos)
@@ -92,12 +92,12 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    * @param objname nom du luminaire à charger dans le fichier filename
    */
-  FireSource (Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-	      const char *filename, int index, CgSVShader * shader, const char *objName=NULL);
+  FireSource (Solver * s, uint nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
+	      const char *filename, uint index, CgSVShader * shader, const char *objName=NULL);
   virtual ~FireSource ();
 
   virtual void setSamplingTolerance(double value){ 
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
   };
   /** Retourne la position absolue dans le repère du monde .
@@ -121,7 +121,7 @@ public:
     Point pt(getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawWick(displayBoxes);
     glPopMatrix();
   }
@@ -137,7 +137,7 @@ public:
     Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(displayParticle);  
     glPopMatrix();
   }  
@@ -190,30 +190,35 @@ public:
    */
   virtual void addForces (char perturbate, char fdf=0)
   {
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->addForces(perturbate,fdf);
   }
   
   virtual void setForces(double value)
   {
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setForces(value);
   }
   
   virtual void toggleSmoothShading ()
   {
-    for (int i = 0; i < m_nbFlames; i++)
+    for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->toggleSmoothShading();
   }
   
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    * pour orienter le solide photométrique.
    */
-  virtual Vector getMainDirection(); 
+  virtual Vector getMainDirection();
+  
+  virtual void locateInSolver(){
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->locateInSolver();
+  }
   
 protected:
   /** Nombre de flammes */
-  int m_nbFlames;
+  uint m_nbFlames;
   /** Tableau contenant les flammes */
   BasicFlame **m_flames;
   

@@ -275,6 +275,7 @@ BasicFlame::BasicFlame(Solver *s, uint nbSkeletons, uint nbFixedPoints, Point& p
   m_innerForce = innerForce;
   m_perturbateCount=0;
   
+  locateInSolver();
 }
 
 BasicFlame::~BasicFlame()
@@ -338,8 +339,6 @@ LineFlame::LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerFo
   pt = m_wick.getLeadPoint (m_nbLeadSkeletons - 1)->m_pt;
   pt.x += (largeur / 2.0);
   m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
-  
-  m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 }
 
 LineFlame::~LineFlame ()
@@ -653,8 +652,6 @@ PointFlame::PointFlame (Solver * s, uint nbSkeletons, Point& posRel, double inne
 					 m_leads[0], m_lifeSpanAtBirth);
       angle += 2 * PI / m_nbSkeletons;
     }
-  
-  m_solver->findPointPosition(posRel, m_x, m_y, m_z);
 }
 
 PointFlame::~PointFlame ()

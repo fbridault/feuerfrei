@@ -13,6 +13,8 @@ class BenchSolver;
 
 class GSsolver;
 class GCSSORsolver;
+class HybridSolver;
+class LODHybridSolver;
 
 /** La classe HybridSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
  * des solveurs à base
@@ -31,6 +33,11 @@ public:
    */
   HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  /** Constructeur du solveur.
+   * @param n : taille de la grille
+   * @param pas_de_temps : pas de temps utilisé pour la simulation
+   */
+  HybridSolver (double omegaDiff, double omegaProj, double epsilon);
   virtual ~ HybridSolver ();
   
 protected:
@@ -52,6 +59,27 @@ protected:
   virtual void project (double *const p, double *const div);
 
   double m_time;
+};
+
+class LODHybridSolver: public HybridSolver
+{
+public:
+    /** Constructeur du solveur.
+   * @param n : taille de la grille la plus grande
+   * @param pas_de_temps : pas de temps utilisé pour la simulation
+   */
+  LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
+		   double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  virtual ~LODHybridSolver ();
+
+  virtual void divideRes ();
+
+  virtual void multiplyRes ();
+
+private:
+  double *m_uTmp, *m_vTmp, *m_wTmp;
+
+  uint initialNbVoxelsX, initialNbVoxelsY, initialNbVoxelsZ;
 };
 
 #endif

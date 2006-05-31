@@ -13,6 +13,12 @@ HybridSolver::HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, doubl
 {
   m_time = 0.0;
 }
+/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
+HybridSolver::HybridSolver (double omegaDiff, double omegaProj, double epsilon) : 
+  GCSSORsolver(omegaDiff, omegaProj, epsilon)
+{
+  m_time = 0.0;
+}
 
 HybridSolver::~HybridSolver ()
 {  
@@ -84,3 +90,115 @@ void HybridSolver::project (double *const p, double *const div)
   
 //   cout << m_time << "      \r"; cout.flush();
 // }
+
+LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), 
+  HybridSolver (omegaDiff, omegaProj, epsilon)
+{
+  /* Attention n_x, n_y et n_z doivent être impairs */
+  initialNbVoxelsX = n_x;
+  initialNbVoxelsY = n_y;
+  initialNbVoxelsZ = n_z;
+
+  m_uTmp = new double[m_nbVoxels];
+  m_vTmp = new double[m_nbVoxels];
+  m_wTmp = new double[m_nbVoxels];
+  
+  memset (m_uTmp, 0, m_nbVoxels * sizeof (double));
+  memset (m_vTmp, 0, m_nbVoxels * sizeof (double));
+  memset (m_wTmp, 0, m_nbVoxels * sizeof (double));
+}
+
+LODHybridSolver::~LODHybridSolver ()
+{
+  delete[]m_uTmp;
+  delete[]m_vTmp;
+  delete[]m_wTmp;
+}
+
+void LODHybridSolver::divideRes ()
+{
+  if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
+    cerr << "Minimum grid resolution already reached !" << endl;
+    return;
+  }
+  
+  restreindre(m_u,m_uTmp);
+  restreindre(m_v,m_vTmp);
+  restreindre(m_w,m_wTmp);
+  
+  SWAP(m_u,m_uTmp);
+  SWAP(m_v,m_vTmp);
+  SWAP(m_w,m_wTmp);
+  
+  m_nbVoxelsX = m_nbVoxelsX/2;
+  m_nbVoxelsY = m_nbVoxelsY/2;
+  m_nbVoxelsZ = m_nbVoxelsZ/2;
+  
+  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
+  
+  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+    
+  /* Reconstruction des display lists */
+  glDeleteLists(m_baseDisplayList,1);
+  glDeleteLists(m_gridDisplayList,1);
+  buildDLBase ();
+  buildDLGrid ();
+  
+  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
+  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+
+  m_halfNbVoxelsX = m_nbVoxelsX/2;
+  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
+  
+  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  nx = m_nbVoxelsX+2;
+  t1=n2 + nx +1;
+  t2nx=2*nx;
+}
+
+void LODHybridSolver::multiplyRes ()
+{  
+  if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
+    cerr << "Maximum grid resolution already reached !" << endl;
+    return;
+  }
+  
+  prolonger(m_u,m_uTmp);
+  prolonger(m_v,m_vTmp);
+  prolonger(m_w,m_wTmp);
+  
+  SWAP(m_u,m_uTmp);
+  SWAP(m_v,m_vTmp);
+  SWAP(m_w,m_wTmp);
+
+  m_nbVoxelsX = m_nbVoxelsX*2+1;
+  m_nbVoxelsY = m_nbVoxelsY*2+1;
+  m_nbVoxelsZ = m_nbVoxelsZ*2+1;
+  
+  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
+  
+  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+    
+  /* Reconstruction des display lists */
+  glDeleteLists(m_baseDisplayList,1);
+  glDeleteLists(m_gridDisplayList,1);
+  buildDLBase ();
+  buildDLGrid ();
+  
+  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
+  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+
+  m_halfNbVoxelsX = m_nbVoxelsX/2;
+  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
+  
+  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  nx = m_nbVoxelsX+2;
+  t1=n2 + nx +1;
+  t2nx=2*nx;
+}

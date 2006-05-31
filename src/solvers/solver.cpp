@@ -385,7 +385,6 @@ void Solver::displayArrow (Vector * const direction)
   GraphicsFn::SolidCone (taille / 4, taille, 3, 3);
 }
 
-
 void Solver::moveTo(Point& position)
 {
   int i,j;
@@ -434,4 +433,202 @@ void Solver::moveTo(Point& position)
 	  addWsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
 		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
 		   2, strength);
+}
+
+void Solver::prolonger(double  *const v2h, double *const vh)
+{
+  // on utilise une interpolation bilinéaire
+  // récupérer la taille du solveur 
+
+  int nx=getXRes();
+  int ny=getYRes();
+  int nz=getZRes();
+
+  int I,ir,J,jr,K,kr,code;
+  K=0;
+  kr=1;
+  for(int k = 1 ; k <= nz ; k++) {
+    //déterminer l'indice K du gros voxel
+    // k = 2*K + kr
+    //	K=k/2;
+    //	kr=k%2;
+    J=0;
+    jr=1;
+    for(int j = 1 ; j <= ny ; j++){
+      I=0;
+      ir=1;
+      //déterminer l'indice J du gros voxel
+      // j = 2*J + jr
+      //J=j/2;
+      //jr=j%2;
+      for(int i = 1 ; i <= nx ; i++){
+	//déterminer l'indice I du gros voxel
+	// i = 2*I + ir
+	//	I=i/2;
+	//  ir=i%2;
+			
+			
+	// il y a 8 possibilités
+	// i = 2*I ou i = 2*I +1
+	// j = 2*J ou j = 2*J +1
+	// k = 2*K ou k = 2*K +1
+	// Chacune des possibilités est codée en positionnant les 3 bits de 
+	// poids faible de l'entier code : bit2 = ir, bit1 = jr, bit0 = kr
+	// Le point (i,j,k) de la grille fine est l'un des sommets du "petit"
+	// voxel ayant en commun le point (2I,2J,2K) avec le "gros" voxel 
+	// Le point (i,j,k) est soit le milieu d'une arête du "gros" voxel,
+	// soit le centre de l'une de ses faces, soit son centre,  
+	// soit le point commun des deux voxels
+				 
+
+	code=4*ir+2*jr+kr;
+	switch(code){
+	case 0: // point commun
+	  vh[IX(i,j,k)] = v2h[IX2h(I,J,K)];
+	  break;
+	case 1: // milieu d'une arête
+	  vh[IX(i,j,k)] = 0.5*
+	    (v2h[IX2h(I,J,K)] +
+	     v2h[IX2h(I,J,K+1)]);
+	  break;
+	case 2: // milieu d'une arête
+	  vh[IX(i,j,k)] =  0.5*
+	    (v2h[IX2h(I,J,K)] +
+	     v2h[IX2h(I,J+1,K)]);
+	  break;
+	case 3: // centre d'une face
+	  vh[IX(i,j,k)] = 0.25*
+	    (v2h[IX2h(I,J,K)]+
+	     v2h[IX2h(I,J+1,K)]+
+	     v2h[IX2h(I,J+1,K+1)]+
+	     v2h[IX2h(I,J,K+1)]);
+	  break;
+	case 4: // milieu d'une arête
+	  vh[IX(i,j,k)] = 0.5*
+	    (v2h[IX2h(I,J,K)] + 
+	     v2h[IX2h(I+1,J,K)]);
+	  break;
+
+	case 5: // centre d'une face
+	  vh[IX(i,j,k)] = 0.25*
+	    (v2h[IX2h(I,J,K)]+ 
+	     v2h[IX2h(I+1,J,K)]+
+	     v2h[IX2h(I+1,J,K+1)]+
+	     v2h[IX2h(I,J,K+1)]);
+	  break;
+	case 6: // centre d'une face
+	  vh[IX(i,j,k)] = 0.25*
+	    (v2h[IX2h(I,J,K)]+
+	     v2h[IX2h(I+1,J,K)]+
+	     v2h[IX2h(I+1,J+1,K)]+
+	     v2h[IX2h(I,J+1,K)]);
+	  break;
+	case 7: // centre du cube
+	  vh[IX(i,j,k)] = 0.125*
+	    (v2h[IX2h(I,J,K)]+ 
+	     v2h[IX2h(I+1,J,K)]+
+	     v2h[IX2h(I+1,J,K+1)]+
+	     v2h[IX2h(I,J,K+1)] +
+	     v2h[IX2h(I,J+1,K)]+ 
+	     v2h[IX2h(I+1,J+1,K)]+
+	     v2h[IX2h(I+1,J+1,K+1)]+
+	     v2h[IX2h(I,J+1,K+1)]);
+	}//switch
+	// préparer l'itération suivante
+	// i = 2*I + ir => i+1 = 2*(I+ir) + (1-ir)
+	I=I+ir;
+	ir=1-ir;
+      }//for i
+      J=J+jr;
+      jr=1-jr;
+    }// for j
+    K=K+kr;
+    kr=1-kr;
+  }//for k
+}//prolonger
+
+void  Solver::restreindre(double *const vh, double *const v2h){
+
+  // schéma en 27 points
+  int nx=getXRes()/2;
+  int ny=getYRes()/2;
+  int nz=getZRes()/2;
+  int ii,jj,kk,iiO,iiE,jjN,jjS,kkU,kkD;
+  for(int k = 1 ; k <= nz ; k++) {
+    for(int j = 1 ; j <= ny ; j++){
+      for(int i = 1 ; i <= nx ; i++){
+	//				v2h[IX2h(i,j,k)] = vh[IX(2*i,2*j,2*k)];
+
+	// Un point de la grille grossière reçoit la somme pondérée des
+	// valeurs des points voisins de la grille grossière.
+	// Un point de la grille grossière a 27 voisins.
+	// Les points de la grille fine situés dans le plan du point courant
+	// de la grille grossière ont respectivement pour poids 1/8, 1/16, 1/32
+	// en fonction de leur distance à ce point.
+	// Les points de la grille fine situés dans les plans immédiatement 
+	// parallèles au plan contenant le point courant de la grille grossière
+	// ont respectivement pour poids 1/16, 1/32, 1/64
+	// en fonction de leur distance à ce point.
+	// La somme des poids est égale à 1 :
+	// (1/8 + 1/16*4 + 1/32*4) *(1 + 2* 1/2) = 1
+	ii=2*i;
+	jj=2*j;
+	kk=2*k;
+	iiE = ii+1;
+	iiO = ii-1;
+	jjN = jj+1;
+	jjS = jj-1;
+	kkU = kk+1;
+	kkD = kk-1;
+	// multiplication par 4 car le problème n'est pas un problème de Poisson              
+	//                                 |
+	//                                 v
+
+	v2h[IX2h(i,j,k)] = (
+			    0.125*(
+				   vh[IX( ii ,jj , kk)]+// coïncident
+				   (vh[IX(iiE,jjS,kk)]+// point  SE
+				    vh[IX(iiE,jjN,kk)]+// point  NE
+				    vh[IX(iiO,jjS,kk)]+// point  SO
+				    vh[IX(iiO,jjN,kk)])*0.25+// point NO
+				   (vh[IX(iiE,jj ,kk)]+ // point E
+				    vh[IX(ii ,jjS,kk)]+ // point S
+				    vh[IX(ii ,jjN,kk)]+ // point N
+				    vh[IX(iiO,jj ,kk)])*0.5 // point O
+				   )+
+			    0.0625*(// idem mais pour le plan au-dessus
+				    vh[IX( ii ,jj ,kkU)]+
+				    (vh[IX(iiE,jjS,kkU)]+
+				     vh[IX(iiE,jjN,kkU)]+
+				     vh[IX(iiO,jjS,kkU)]+
+				     vh[IX(iiO,jjN,kkU)])*0.25+
+				    (vh[IX(iiE,jj ,kkU)]+
+				     vh[IX(ii ,jjS,kkU)]+
+				     vh[IX(ii ,jjN,kkU)]+
+				     vh[IX(iiO,jj ,kkU)])*0.5
+				    )+
+			    0.0625*(// idem mais pour le plan au-dessous
+				    vh[IX( ii ,jj ,kkD)]+
+				    (vh[IX(iiE,jjS,kkD)]+
+				     vh[IX(iiE,jjN,kkD)]+
+				     vh[IX(iiO,jjS,kkD)]+
+				     vh[IX(iiO,jjN,kkD)])*0.25+
+				    (vh[IX(iiE,jj ,kkD)]+
+				     vh[IX(ii ,jjS,kkD)]+
+				     vh[IX(ii ,jjN,kkD)]+
+				     vh[IX(iiO,jj ,kkD)])*0.5
+				    )
+			    );
+
+      }//for i
+    }// for j
+  }//for k
+}//restreindre
+
+void Solver::divideRes ()
+{
+}
+
+void Solver::multiplyRes ()
+{
 }

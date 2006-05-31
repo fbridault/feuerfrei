@@ -108,8 +108,8 @@ g   */
   unsigned short getNbFixedPoints(){ return m_nbFixedPoints; };
   
   virtual Point* getTop() = 0;
-  virtual Point* getBottom() = 0;
-  
+  virtual Point* getBottom() = 0;  
+
 protected:
   /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
@@ -233,6 +233,10 @@ public:
   
   virtual Point* getTop() = 0;
   virtual Point* getBottom() = 0;
+  
+  /** Méthode permettant d'informer à la flamme de se localiser dans le solveur */
+  /* Elle doit être appelée dès qu'un changement de résolution de la grille intervient */
+  virtual void locateInSolver(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
   
 protected:
   /** Pointeur vers les squelettes guide. */

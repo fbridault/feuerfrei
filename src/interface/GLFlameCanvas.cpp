@@ -165,6 +165,13 @@ void GLFlameCanvas::InitSolvers(void)
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      break; 
+    case LOD_HYBRID_SOLVER :
+      m_solvers[i] = new LODHybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
+					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRES_SOLVER :
       m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
@@ -311,6 +318,19 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'z': m_depthPeelingEngine->addLayer(); break;
     case 'Z': m_depthPeelingEngine->removeLayer(); break;
+    case 'l': 
+      for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
+	m_solvers[i]->divideRes ();
+      for (uint i = 0; i < m_currentConfig->nbFlames; i++)
+	m_flames[i]->locateInSolver(); 
+      break;
+
+    case 'L': 
+      for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
+	m_solvers[i]->multiplyRes ();
+      for (uint i = 0; i < m_currentConfig->nbFlames; i++)
+	m_flames[i]->locateInSolver(); 
+      break;
     }
   event.Skip();
 }

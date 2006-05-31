@@ -12,6 +12,7 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
     _("Hybrid"),
+    _("LOD Hybrid"),
     _("Both - log residuals"),
     _("Both - log residuals averages"),
     _("Both - log residuals averages + time")
@@ -31,7 +32,7 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
 
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					6, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					7, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));

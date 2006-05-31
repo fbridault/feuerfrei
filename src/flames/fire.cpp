@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(Scene *scene, int index, CgSVShader * shader)
+FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader)
 {  
   m_scene = scene;
   
@@ -76,8 +76,8 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-		       const char *filename, int index, CgSVShader * shader,  const char *objName) : FlameLight(scene, index, shader)
+FireSource::FireSource(Solver * s, uint nbFlames, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
+		       const char *filename, uint index, CgSVShader * shader,  const char *objName) : FlameLight(scene, index, shader)
 {  
   char mtlName[255];
   m_solver = s;
@@ -106,7 +106,7 @@ FireSource::FireSource(Solver * s, int nbFlames, Point& posRel, Scene *scene, do
 
 FireSource::~FireSource()
 {
-  for (int i = 0; i < m_nbFlames; i++)
+  for (uint i = 0; i < m_nbFlames; i++)
     delete m_flames[i];
   delete[]m_flames;
   /* On efface le luminaire, il n'appartient pas à la scène */
@@ -119,7 +119,7 @@ void FireSource::build()
 {
   Point averagePos, tmp;
   
-  for (int i = 0; i < m_nbFlames; i++){
+  for (uint i = 0; i < m_nbFlames; i++){
     averagePos = (averagePos*i + m_flames[i]->getCenter ())/(i+1);
     m_flames[i]->build();
   }
@@ -131,7 +131,7 @@ Vector FireSource::getMainDirection()
 {
   Vector averageVec, tmp;
   
-  for (int i = 0; i < m_nbFlames; i++)
+  for (uint i = 0; i < m_nbFlames; i++)
     averageVec = (averageVec*i + m_flames[i]->getMainDirection ())/(i+1);
   
   return(averageVec);

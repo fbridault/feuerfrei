@@ -163,12 +163,20 @@ public:
   
   virtual void setBuoyancy(double value){ m_buoyancy=value; };
   
+  virtual void divideRes ();
+
+  virtual void multiplyRes ();
+  
 protected:
   uint IX (uint i, uint j, uint k)
   {  
     return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
   };
 
+  uint IX2h (int i, int j, int k)
+  {  
+    return( (i) + (m_nbVoxelsX/2 + 2) * (j) + (m_nbVoxelsX/2 + 2) * (m_nbVoxelsY/2 + 2) * (k) );
+  }; 
   /** Traitement de valeurs aux bords du solveur.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
    * @param x composante à traiter
@@ -207,6 +215,22 @@ protected:
 
   /** Pas de résolution de la vélocité. */
   virtual void vel_step ();
+
+  /** Prolonger sur une grille fine un vecteur défini sur une grille grossière 
+   * On utilise une interpolation bilinéaire
+   * La grille fine est de taille nx*ny*nz
+   * @param vgros vecteur connu de taille (nx/2)*(ny/2)*(nz/2)
+   * @param vfin vecteur résultat de la prolongation de taille nx*ny*nz
+   */
+  void prolonger(double *const vgros, double *const vfin);
+
+  /** Restreindre sur une grille grossière un vecteur défini sur une grille fine
+   * On utilise une moyenne pondérée : schèma en 27 points
+   * La grille fine est de taille nx*ny*nz
+   * @param vfin vecteur connu de taille nx*ny*nz
+   * @param vgros vecteur résultat de la restriction de taille (nx/2)*(ny/2)*(nz/2)
+   */
+  void restreindre(double *const vfin, double *const vgros);
 
   /** Nombre de voxels sur un côté du cube de résolution. */
   uint m_nbVoxelsX, m_nbVoxelsY, m_nbVoxelsZ;

@@ -17,6 +17,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_SaveSettingsAs, MainFrame::OnSaveSettingsAsMenu)
   EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
   EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
+  EVT_MENU(IDM_GlowOnly, MainFrame::OnGlowOnlyMenu)
   EVT_MENU(IDM_Grid, MainFrame::OnGridMenu)
   EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
@@ -33,6 +34,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Shadows, MainFrame::OnCheckShadows)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
+  EVT_CHECKBOX(IDCHK_DP, MainFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, MainFrame::OnCheckSaveImages)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
@@ -71,6 +73,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
+  m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
@@ -93,9 +96,12 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_topSizer->Add(m_solidSizer, 2, wxEXPAND, 0);
   
   /* Réglages du glow */
-  m_glowSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
-  m_glowSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
-  m_glowSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
+  m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
+  m_multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_multiTopSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
+  m_multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 1, 0, 0);
+  m_multiSizer->Add(m_multiTopSizer, 1, 0, 0);
+  m_multiSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
@@ -107,7 +113,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_glowSizer, 0, wxEXPAND, 0);
+  m_rightSizer->Add(m_multiSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);
   
@@ -141,7 +147,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("&Particles"));
   m_menuDisplay->AppendCheckItem( IDM_WickBoxes, _("&Wick Boxes"));
   m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
-  m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));
+  m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));  
+  m_menuDisplay->AppendCheckItem( IDM_GlowOnly, _("&Glow only"));
+
   
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
@@ -366,7 +374,6 @@ void MainFrame::OnSelectLighting(wxCommandEvent& event)
     }
 }
 
-
 void MainFrame::OnCheckShadows(wxCommandEvent& event)
 {
   m_currentConfig.shadowsEnabled = !m_currentConfig.shadowsEnabled;
@@ -375,6 +382,12 @@ void MainFrame::OnCheckShadows(wxCommandEvent& event)
 void MainFrame::OnCheckGlow(wxCommandEvent& event)
 {
   m_currentConfig.glowEnabled = !m_currentConfig.glowEnabled;
+  m_menuDisplayFlames->Enable(IDM_GlowOnly,m_currentConfig.glowEnabled);
+}
+
+void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleDepthPeeling();
 }
 
 void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
@@ -535,6 +548,11 @@ void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 {
   wxMessageBox(_("Real-time simulation of small flames\nOasis Team"),
 	       _("About flames"), wxOK | wxICON_INFORMATION, this);
+}
+
+void MainFrame::OnGlowOnlyMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleGlowOnlyDisplay();
 }
 
 void MainFrame::OnGridMenu(wxCommandEvent& event)

@@ -61,6 +61,7 @@ Object::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 {
   if(currentMaterialIndex != m_lastMaterialIndex){
     if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
+      glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable(GL_TEXTURE_2D);
       glBindTexture(GL_TEXTURE_2D, m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture());
       glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);

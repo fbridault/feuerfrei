@@ -15,11 +15,16 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
     m_height[i] = h/m_scaleFactor[i];
     
     m_firstPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_secondPassFBOs[i].Initialize(m_width[i], m_height[i]);
     m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
+    m_firstPassFBOs[i].Activate();
+    m_firstPassFBOs[i].ColorAttach(m_firstPassTex[i]->getTexture(), 0);
+    m_firstPassFBOs[i].RenderBufferAttach();
+    
+    m_secondPassFBOs[i].Initialize(m_width[i], m_height[i]);
     m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
-    m_firstPassFBOs[i].Attach(m_firstPassTex[i]->getTexture(), 0);
-    m_secondPassFBOs[i].Attach(m_secondPassTex[i]->getTexture(), 0);
+    m_secondPassFBOs[i].Activate();
+    m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
+    m_secondPassFBOs[i].RenderBufferAttach();
   }
 }
 
@@ -29,14 +34,14 @@ GlowEngine::~GlowEngine()
 
 void GlowEngine::activate()
 {
-   m_firstPassFBOs[0].Activate();
+  m_firstPassFBOs[0].Activate();
   /* On prend la résolution la plus grande */
   glViewport (0, 0, m_width[0], m_height[0]);
 }
 
 void GlowEngine::blur()
 {
-//   glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   
   // Parametre de visualisation
   glMatrixMode(GL_PROJECTION);
@@ -86,31 +91,30 @@ void GlowEngine::blur()
   m_blurVertexShaderY.setModelViewProjectionMatrix();
   m_blurVertexShaderY.enableShader();
  
-  for(int i=0; i < GLOW_LEVELS; i++){
-   
+  for(int i=0; i < GLOW_LEVELS; i++){    
     /* Deuxième blur */
     m_firstPassFBOs[i].Activate();
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glViewport (0, 0, m_width[i], m_height[i]);
-   
+    
     m_blurFragmentShader.setTexture(m_secondPassTex[i]->getTexture());
- 
+    
     glColor3f(1.0,1.0,1.0);
-   
+    
     glBegin(GL_QUADS);
-   
+    
     glTexCoord2f(0,0);
     glVertex3d(-1.0,1.0,0.0);
-   
+    
     glTexCoord2f(0,m_height[i]);
     glVertex3d(-1.0,-1.0,0.0);
-   
+    
     glTexCoord2f(m_width[i],m_height[i]);
     glVertex3d(1.0,-1.0,0.0);
-   
+    
     glTexCoord2f(m_width[i],0);
     glVertex3d(1.0,1.0,0.0);
-   
+    
     glEnd();
   }
   m_blurVertexShaderY.disableProfile();
@@ -121,7 +125,7 @@ void GlowEngine::blur()
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
   
-//   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void GlowEngine::deactivate()

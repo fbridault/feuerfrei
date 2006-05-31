@@ -16,6 +16,7 @@ rtflames_SOURCES = \
 	flames/fbo.cpp  \
 	flames/fire.cpp  \
 	flames/firesources.cpp \
+	flames/DPengine.cpp  \
 	flames/glowengine.cpp  \
 	flames/ies.cpp  \
 	flames/leadSkeleton.cpp  \

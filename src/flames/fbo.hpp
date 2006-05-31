@@ -11,18 +11,31 @@ public:
 
   void Initialize(uint width, uint height);
   
-  void Attach(GLuint tex, uint colorAttachment);
+  void DepthAttach(GLuint tex);
+  void ColorAttach(GLuint tex, int colorAttachment);
+
+  void RenderBufferAttach(void);
+
+  void CheckStatus(void);
 
   void Activate( void )
   {
+//     const GLenum buffers[] =
+// 	{
+// 	  GL_COLOR_ATTACHMENT0_EXT,
+// 	  GL_COLOR_ATTACHMENT1_EXT
+// 	};
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
+    //glDrawBuffers( 2, buffers );
     //glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
+    //     CheckStatus();
   }
 
   void Deactivate( void )
   {
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
-//     glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
+    //glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
+//     CheckStatus();
   }
 
   uint GetWidth()

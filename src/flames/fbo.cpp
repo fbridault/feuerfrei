@@ -13,35 +13,46 @@ void FBO::Initialize(uint width, uint height)
   glGenRenderbuffersEXT( 1, &m_depthRenderBuffer );
 }
 
-void FBO::Attach(GLuint tex, uint colorAttachment)
+void FBO::DepthAttach(GLuint tex)
 {
-  GLenum l_colorAttachment;
-  
+  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_RECTANGLE_ARB, tex, 0 );
+}
+
+void FBO::ColorAttach(GLuint tex, int attachment)
+{
+  GLenum l_attachment;
+    
   /* A compléter par la suite, sachant que le nombre d'attachements possibles */
   /* est dépendant du driver */
-  switch(colorAttachment){
-  case 0 : l_colorAttachment = GL_COLOR_ATTACHMENT0_EXT; break;
-  case 1 : l_colorAttachment = GL_COLOR_ATTACHMENT1_EXT; break;
-  case 2 : l_colorAttachment = GL_COLOR_ATTACHMENT2_EXT; break;
-  case 3 : l_colorAttachment = GL_COLOR_ATTACHMENT3_EXT; break;
-  case 4 : l_colorAttachment = GL_COLOR_ATTACHMENT4_EXT; break;
-  case 5 : l_colorAttachment = GL_COLOR_ATTACHMENT5_EXT; break;
-  case 6 : l_colorAttachment = GL_COLOR_ATTACHMENT6_EXT; break;
-  case 7 : l_colorAttachment = GL_COLOR_ATTACHMENT7_EXT; break;
+  switch(attachment){
+  case 0 : l_attachment = GL_COLOR_ATTACHMENT0_EXT; break;
+  case 1 : l_attachment = GL_COLOR_ATTACHMENT1_EXT; break;
+  case 2 : l_attachment = GL_COLOR_ATTACHMENT2_EXT; break;
+  case 3 : l_attachment = GL_COLOR_ATTACHMENT3_EXT; break;
+  case 4 : l_attachment = GL_COLOR_ATTACHMENT4_EXT; break;
+  case 5 : l_attachment = GL_COLOR_ATTACHMENT5_EXT; break;
+  case 6 : l_attachment = GL_COLOR_ATTACHMENT6_EXT; break;
+  case 7 : l_attachment = GL_COLOR_ATTACHMENT7_EXT; break;
+  default : cerr << "Wrong attachment number" << endl; l_attachment = GL_COLOR_ATTACHMENT0_EXT;
   }
   
-  glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
-  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, l_colorAttachment, GL_TEXTURE_RECTANGLE_ARB, tex, 0 );
+  glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, l_attachment, GL_TEXTURE_RECTANGLE_ARB, tex, 0 );
+}
 
+void FBO::RenderBufferAttach()
+{
   glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
   glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, m_width, m_height );
   glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
-  
+  CheckStatus();
+}
+
+void FBO::CheckStatus(void)
+{
   GLenum status = glCheckFramebufferStatusEXT( GL_FRAMEBUFFER_EXT );
   switch( status )
     {      
     case GL_FRAMEBUFFER_COMPLETE_EXT:
-      //MessageBox(NULL,"GL_FRAMEBUFFER_COMPLETE_EXT!","SUCCESS",MB_OK|MB_ICONEXCLAMATION);
       break;
     case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
       cerr << "Error initializing frame buffer object : FRAMEBUFFER_UNSUPPORTED_EXT" << endl;
@@ -76,7 +87,7 @@ void FBO::Attach(GLuint tex, uint colorAttachment)
       exit(0);
       break; 
     default:
-      cerr << "Error initializing frame buffer object : " << endl;
+      cerr << "Error initializing frame buffer object : " << status << endl;
       exit(0);
     }
 }

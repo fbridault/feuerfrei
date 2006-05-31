@@ -76,7 +76,7 @@ public:
   Particle *getLastParticle() const{
     return &m_queue[m_headIndex];
   };
-
+  
   /** Donne l'élément à l'indice passé en paramètre.
    * @param i indice
    * @return particule à l'indice i
@@ -98,55 +98,55 @@ public:
   Point *getRoot(){
     return &m_root;
   };
-
+  
   /** Donne la taille du squelette.
    * @return nombre de particules contenues dans la file du squelette
    */
   uint getSize() const{
     return m_headIndex+1;
   };
-
+  
   void draw ();
-
+  
 protected:
   /** Echange deux particules dans la file .
    * @param i indice de la première particule
    * @param j indice de la seconde particule
    */
   void swap(uint i, uint j);
-
+  
   /** Insère une particule en queue de file.
    * @param pt position de la particule
    */
   void addParticle(const Point* const pt);
-
+  
   /** Supprime la particule à une position donnée.
    * @param n indice
    */
   void removeParticle(uint n);
-
+  
   /** Déplace l'origine du squelette dans le champ de vélocité.
    * @param u vecteur de vélocité en u
    * @param v vecteur de vélocité en v
    * @param w vecteur de vélocité en w
    */
   virtual uint moveRoot()=0;
-
+  
   /** Affectation de la position d'une particule dans l'espace 
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
   void updateParticle(uint i, const Point* const pt);
-
+  
   virtual void drawRoot ();
-
+  
   virtual void drawParticle (Particle * const particle);
-
+  
   /** Origine actuelle du squelette. */
   Point m_root;
   /** Origine initiale du squelette. */
   Point m_rootSave;
-
+  
   /** Pointeur sur le solveur de fluides. */
   Solver *m_solver;
 

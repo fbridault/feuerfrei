@@ -27,9 +27,13 @@ public:
    * @param type : 1 ou 0 selon qu'il y ait interpolation ou non
    */
   CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, 
-		     IESList *ieslist, bool type, bool recompile=false);
+		     IESList *ieslist, uint type, bool recompile=false);
   virtual ~CgSPFragmentShader();
     
+  void setIsTextured(int value){
+    cgSetParameter1i(paramIsTextured, value);
+  };
+
   void setTexture(){
     cgGLSetTextureParameter(paramTextureSP, iesList->getCurrentIESfile()->getTexture()->getTexture());
     cgGLEnableTextureParameter(paramTextureSP);
@@ -78,6 +82,7 @@ private:
   CGparameter TextureSPMatrix;
   CGparameter paramCentreSP;
   CGparameter paramFluctuationIntensite;
+  CGparameter paramIsTextured;
 };
 
 #endif

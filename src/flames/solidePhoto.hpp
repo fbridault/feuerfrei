@@ -40,7 +40,7 @@ public:
   void swap()
   {
     m_ieslist.swap();
-    for(int i=0; i < m_NBSHADER; i++)
+    for(ushort i=0; i < m_NBSHADER; i++)
       m_SPFragmentShader[i]->setTexture();
   };
   
@@ -56,14 +56,12 @@ private:
   /** Valeur de l'intensité du solide */
   double m_fluctuationIntensite;
   /** Nombre de fragments shaders dans le tableau SPFragmentShader */
-  const static int m_NBSHADER=6;
+  const static int m_NBSHADER=4;
   /** Liste des fichiers IES */
   IESList m_ieslist;
   
   /** Vertex Shader pour les objets texturés */
   CgBasicVertexShader m_SPVertexShaderTex;
-  /** Vertex Shader pour les objets non texturés */
-  CgBasicVertexShader m_SPVertexShaderWTex;
   
   /** 
    * [0] : SP non interpolé sans couleur des objets fpSPSeul<br>

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Texture::Texture(GLenum type, int width, int height)
+Texture::Texture(GLenum type, uint width, uint height)
 {  
   m_type = type;
   
@@ -15,9 +15,29 @@ Texture::Texture(GLenum type, int width, int height)
   glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
   glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-  //  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
   
-  glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  m_wxtex = NULL;
+}
+
+
+Texture::Texture(uint width, uint height, GLenum func, bool dummy)
+{
+  m_type = GL_TEXTURE_RECTANGLE_ARB;
+  
+  glGenTextures(1, &m_texName);
+  glBindTexture(m_type, m_texName);
+  
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
+  glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC_ARB, func);
+//   glTexParameteri(m_type, GL_DEPTH_TEXTURE_MODE_ARB, GL_ALPHA);
+
+  glTexImage2D(m_type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
+  m_wxtex = NULL;
 }
 
 Texture::Texture(const wxString& filename)
@@ -133,6 +153,7 @@ Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
 
 Texture::~Texture()
 {
+  glDeleteTextures(1, &m_texName);
   if(m_wxtex)
     delete m_wxtex;
 }

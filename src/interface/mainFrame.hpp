@@ -24,6 +24,7 @@ enum
     IDCHK_BS,
     IDCHK_Shadows,
     IDCHK_Glow,
+    IDCHK_DP,
     IDCHK_SaveImages,
   };
 
@@ -43,6 +44,7 @@ enum
     IDM_SaveSettingsAs,
     IDM_Quit,
     IDM_About,
+    IDM_GlowOnly,
     IDM_Grid,
     IDM_Base,
     IDM_Velocity,
@@ -83,6 +85,7 @@ public:
   void OnSaveSettingsAsMenu(wxCommandEvent& event);
   void OnQuitMenu(wxCommandEvent& event);
   void OnAboutMenu(wxCommandEvent& event);
+  void OnGlowOnlyMenu(wxCommandEvent &event);
   void OnGridMenu(wxCommandEvent& event);
   void OnBaseMenu(wxCommandEvent& event);
   void OnVelocityMenu(wxCommandEvent& event);
@@ -101,6 +104,7 @@ public:
   void OnCheckIS(wxCommandEvent& event);
   void OnCheckShadows(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
+  void OnCheckDepthPeeling(wxCommandEvent& event);
   void OnCheckSaveImages(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
@@ -123,10 +127,10 @@ private:
 
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
-  wxCheckBox *m_saveImagesCheckBox;
+  wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox;
   
-  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_solidSizer,*m_glowSizer,*m_solversSizer, *m_flamesSizer;  
-  wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer;
+  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_solidSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer;  
+  wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer, *m_multiTopSizer;
   
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
   FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];

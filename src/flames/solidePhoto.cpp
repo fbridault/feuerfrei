@@ -1,8 +1,7 @@
 #include "solidePhoto.hpp"
 
 SolidePhotometrique::SolidePhotometrique(Scene *s, CGcontext *context, bool recompileShaders) :
-  m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders),
-  m_SPVertexShaderWTex(_("SolidePhotometriqueVP.cg"),_("vpSPWTEX"),context,recompileShaders)
+  m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders)
 {
   m_scene = s;
   m_orientationSPtheta = 0.0;
@@ -17,23 +16,18 @@ SolidePhotometrique::SolidePhotometrique(Scene *s, CGcontext *context, bool reco
   m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeulInterpole"),
 						 context,&m_ieslist,1,recompileShaders);
   m_SPFragmentShader[2] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"),
-						 context,&m_ieslist,0,recompileShaders);
+						 context,&m_ieslist,2,recompileShaders);
   m_SPFragmentShader[3] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestTEX"),
-						 context,&m_ieslist,1,recompileShaders);
-  m_SPFragmentShader[4] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPWTEX"),
-						 context,&m_ieslist,0,recompileShaders);
-  m_SPFragmentShader[5] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTestWTEX"),
-						 context,&m_ieslist,1,recompileShaders);
+						 context,&m_ieslist,3,recompileShaders);
 }
 
 SolidePhotometrique::~SolidePhotometrique()
 {
-  for(int i=0; i < m_NBSHADER; i++)
+  for(ushort i=0; i < m_NBSHADER; i++)
     delete m_SPFragmentShader[i];
 }
 
-void 
-SolidePhotometrique::draw(u_char color, u_char interpolation)
+void SolidePhotometrique::draw(u_char color, u_char interpolation)
 {
   u_char fragmentShaderIndex = color+interpolation;
   
@@ -44,36 +38,32 @@ SolidePhotometrique::draw(u_char color, u_char interpolation)
   glMatrixMode(GL_MODELVIEW);
   /* Affichage des objets sans couleur */
   if(fragmentShaderIndex < 2){
-    m_SPVertexShaderWTex.setModelViewProjectionMatrix();
-    m_SPVertexShaderWTex.enableShader();
+    m_SPVertexShaderTex.setModelViewProjectionMatrix();
+    m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[fragmentShaderIndex]->enableShader(&m_centreSP,m_fluctuationIntensite);
-    m_scene->draw_scene(m_SPVertexShaderWTex);
-    m_SPVertexShaderWTex.disableProfile();
+    m_scene->draw_scene(m_SPVertexShaderTex);
+    m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[fragmentShaderIndex]->disableProfile();
   }else{
     /* Affichage des objets avec textures */
     m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[fragmentShaderIndex]->enableShader(&m_centreSP,m_fluctuationIntensite);
+    m_SPFragmentShader[fragmentShaderIndex]->setIsTextured(1);
     m_scene->draw_sceneTEX();
+    m_SPFragmentShader[fragmentShaderIndex]->disableProfile();
+    m_SPFragmentShader[fragmentShaderIndex]->enableShader(&m_centreSP,m_fluctuationIntensite);
+    m_SPFragmentShader[fragmentShaderIndex]->setIsTextured(0);
+    m_scene->draw_sceneWTEX(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[fragmentShaderIndex]->disableProfile();
-    
-    /* Affichage des objets sans texture */
-    m_SPVertexShaderWTex.setModelViewProjectionMatrix();
-    m_SPVertexShaderWTex.enableShader();
-    m_SPFragmentShader[fragmentShaderIndex+2]->enableShader(&m_centreSP,m_fluctuationIntensite);
-    m_scene->draw_sceneWTEX(m_SPVertexShaderWTex);
-    m_SPVertexShaderWTex.disableProfile();
-    m_SPFragmentShader[fragmentShaderIndex+2]->disableProfile();
   }
   glMatrixMode(GL_TEXTURE);
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
 }
 
-void 
-SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector o, Point& p, double dim_y)
+void SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector o, Point& p, double dim_y)
 {
   double r,y;
 

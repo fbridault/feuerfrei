@@ -12,7 +12,7 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_RIGHT_DOWN(GLFlameCanvas::OnMouseClick)
   EVT_RIGHT_UP(GLFlameCanvas::OnMouseClick)
   EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
-  EVT_KEY_DOWN(GLFlameCanvas::OnKeyPressed)
+  EVT_CHAR(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
 CGcontext *contextCopy;
@@ -40,6 +40,7 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   m_run = 0;
   m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
   m_framesCount = 0;
+  m_depthPeeling = false;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
@@ -217,6 +218,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, 5, m_scene, m_flames, m_currentConfig->nbFlames, &m_context);
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
@@ -232,7 +234,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
   ::wxStartTimer();
   
   m_init = true;
-  
+  int val;
   cerr << "Initialisation terminée" << endl;
 }
 
@@ -252,8 +254,8 @@ void GLFlameCanvas::Restart (void)
 
 void GLFlameCanvas::DestroyScene(void)
 { 
+  delete m_depthPeelingEngine;
   delete m_glowEngine;
-  delete m_glowEngine2;
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
@@ -307,6 +309,8 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
+    case 'z': m_depthPeelingEngine->addLayer(); break;
+    case 'Z': m_depthPeelingEngine->removeLayer(); break;
     }
   event.Skip();
 }
@@ -314,7 +318,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 /** Fonction de dessin global */
 void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
-  uint f,s;
+  uint f;
   
   if(!m_init)
     return;
@@ -325,6 +329,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     return;
   
   SetCurrent();
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -342,7 +347,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   // SDL_mutexV (lock);
   
   /********** RENDU DES ZONES DE GLOW + BLUR *******************************/
-  if(m_currentConfig->glowEnabled){
+  if(m_currentConfig->glowEnabled && m_displayFlame){
     GLdouble m[4][4];
     double dist, sigma;
     
@@ -356,108 +361,61 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
     /* Définition de la largeur de la gaussienne en fonction de la distance */
     /* A définir de manière plus précise par la suite */
-//     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
+    //     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
     sigma = 1.5;
-    m_glowEngine->activate();
-    m_glowEngine->setGaussSigma(sigma);
-    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-    m_scene->draw_scene ();
-    /* Dessin de la flamme */
-    if(m_displayFlame)
+    if(m_depthPeeling){
+      m_depthPeelingEngine->makePeels(m_displayParticles);
+      
+      m_glowEngine->activate();
+      m_glowEngine->setGaussSigma(sigma);
+      
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      
+      m_depthPeelingEngine->render();
+    }else{
+      m_glowEngine->activate();
+      m_glowEngine->setGaussSigma(sigma);
+      
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      int val;
+      /* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
+      glDrawBuffer(GL_NONE);
+      glReadBuffer(GL_NONE);
+      m_scene->draw_sceneWT ();
+      glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+      glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+      /* Dessin de la flamme */
       for (f = 0; f < m_currentConfig->nbFlames; f++)
 	m_flames[f]->drawFlame (m_displayParticles);
-    
+    }
     m_glowEngine->blur();
     
     m_glowEngine->deactivate();
   }
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   
-  if(!m_glowOnly){    
-    glBlendFunc (GL_ONE, GL_ZERO);
-    
-    /******************* AFFICHAGE DE LA SCENE *******************************/
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->drawWick (m_displayWickBoxes);
-    
-    if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
-      /* Le 3e paramètre doit être la hauteur du solveur de la flamme */
-      Point pos(m_flames[0]->getPosition());
-      m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
-    }
-
-    /**** Affichage de la scène ****/
-    glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
-    glEnable (GL_LIGHTING);
-    
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      {
-	/* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
-	intensities[f] = m_flames[f]->getMainDirection().length() * 1.5;
-	if (m_drawShadowVolumes)
-	  m_flames[f]->drawShadowVolume ();
-	if (!m_currentConfig->shadowsEnabled)
-	  m_flames[f]->switchOn (intensities[f]);
-      }
-    
-    if (m_currentConfig->shadowsEnabled)
-      cast_shadows_double();
-    else
-      if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
-	m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
-      else
-	m_scene->draw_scene ();
-    
-    glPopAttrib ();
-    
-    glDisable (GL_LIGHTING);      
-    
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-    for (s = 0; s < m_currentConfig->nbSolvers; s++)
-      {
-	Point position(m_solvers[s]->getPosition ());
-	
-	glPushMatrix ();
-	glTranslatef (position.x, position.y, position.z);
-	if (m_displayBase)
-	  m_solvers[s]->displayBase();
-	if (m_displayGrid)
-	  m_solvers[s]->displayGrid();
-	if (m_displayVelocity)
-	  m_solvers[s]->displayVelocityField();
-	
-	glPopMatrix ();
-      }
+  if(!m_glowOnly){
+    drawScene();
     /********************* Dessin de la flamme **********************************/
-    if(!m_currentConfig->glowEnabled)
-      if(m_displayFlame)
+    if(!m_currentConfig->glowEnabled && m_displayFlame)
+      if(m_depthPeeling)
+	{
+	  m_depthPeelingEngine->makePeels(m_displayParticles);	  	  
+	  m_depthPeelingEngine->render();
+	}
+      else{
 	for (f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayParticles);
+      }
   }
   /********************* PLACAGE DU GLOW ****************************************/
-  if(m_currentConfig->glowEnabled){
-    //    glBlendColor(0.0,0.0,0.0,1.0);
-    //glBlendFunc (GL_ONE, GL_CONSTANT_ALPHA);
-    //     glBlendFunc (GL_ZERO,  GL_ONE_MINUS_SRC_COLOR);
-    //     //m_glowEngine2->drawBlur(0.5);
-    
-    //     m_glowEngine->drawBlur(1.0);
-    
-    //     glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-    //     m_glowEngine2->drawBlur(0.5);
-    //     glBlendFunc (GL_ONE, GL_ONE);
-    //     m_glowEngine->drawBlur(1.0);
-    
+  if(m_currentConfig->glowEnabled)
     m_glowEngine->drawBlur(1.0);
-  }
+  
   /******** A VERIFIER *******/
-  glFlush();
+  //   glFlush();
   //glFinish();
   /***************************/
   SwapBuffers ();
@@ -491,6 +449,68 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   }
 }
 
+void GLFlameCanvas::drawScene()
+{
+  uint f,s;
+
+  glBlendFunc (GL_ONE, GL_ZERO);
+    
+  /******************* AFFICHAGE DE LA SCENE *******************************/
+  for (f = 0; f < m_currentConfig->nbFlames; f++)
+    m_flames[f]->drawWick (m_displayWickBoxes);
+    
+  if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
+    /* Le 3e paramètre doit être la hauteur du solveur de la flamme */
+    Point pos(m_flames[0]->getPosition());
+    m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
+  }
+
+  /**** Affichage de la scène ****/
+  glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    
+  glEnable (GL_LIGHTING);
+    
+  for (f = 0; f < m_currentConfig->nbFlames; f++)
+    {
+      /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
+      intensities[f] = m_flames[f]->getMainDirection().length() * 1.5;
+      if (m_drawShadowVolumes)
+	m_flames[f]->drawShadowVolume ();
+      if (!m_currentConfig->shadowsEnabled)
+	m_flames[f]->switchOn (intensities[f]);
+    }
+    
+  if (m_currentConfig->shadowsEnabled)
+    cast_shadows_double();
+  else
+    if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
+      m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
+    else
+      m_scene->draw_scene();
+    
+  glPopAttrib ();
+    
+  glDisable (GL_LIGHTING);
+    
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+  /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
+  for (s = 0; s < m_currentConfig->nbSolvers; s++)
+    {
+      Point position(m_solvers[s]->getPosition ());
+	
+      glPushMatrix ();
+      glTranslatef (position.x, position.y, position.z);
+      if (m_displayBase)
+	m_solvers[s]->displayBase();
+      if (m_displayGrid)
+	m_solvers[s]->displayGrid();
+      if (m_displayVelocity)
+	m_solvers[s]->displayVelocityField();
+	
+      glPopMatrix ();
+    }
+}
 // void
 // GLFlameCanvas::cast_shadows_double_multiple ()
 // {

@@ -46,6 +46,10 @@ public:
   void disableProfile(){
     cgGLDisableProfile(profile);
   };
+  /** Désactivation du profil */
+  void disableShader(){
+    cgGLDisableProfile(profile);
+  };
   
 protected:
   /** Programme Cg pour le shader */

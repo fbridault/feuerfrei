@@ -21,7 +21,14 @@ public:
    * @param width largeur de la texture
    * @param height hauteur de la texture
    */
-  Texture(GLenum type, int width, int height);
+  Texture(GLenum type, uint width, uint height);
+  
+  /** Construit une texture vide.
+   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
+   * @param width largeur de la texture
+   * @param height hauteur de la texture
+   */
+  Texture(uint width, uint height, GLenum func, bool dummy);
 
   /** Construit une texture à partir d'un fichier image.
    * @param filename Nom du fichier image à charger

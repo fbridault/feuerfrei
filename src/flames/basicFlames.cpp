@@ -93,6 +93,7 @@ void MetaFlame::drawLineFlame ()
       GLdouble texpts[2][2][2] =
 	{ {{0.0, 0}, {0.0, 0.25}}, {{vtex, 0}, {vtex, 0.25}} };
       
+      glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable (GL_TEXTURE_2D);
       glMap2d (GL_MAP2_TEXTURE_COORD_2, 0, 1, 2, 2, 0, 1, 4,
 	       2, &texpts[0][0][0]);
@@ -160,6 +161,7 @@ void MetaFlame::drawPointFlame ()
 //       cgCandleVertexShader.enableShader();
 //       cgCandleFragmentShader.enableShader();
       
+      glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable (GL_TEXTURE_2D);
       /****************************************************************************************/
       /* Génération du halo */      

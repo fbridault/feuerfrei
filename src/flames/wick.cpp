@@ -52,96 +52,96 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
   
   switch(max){
   case 0 : 
-      for (int i = 1; i < nb_lead_skeletons; i++){
-	bounds[i] = bounds[i-1];
-	bounds[i].x += midDist.x;
-      }
-      cellSpan.x=midDist.x;
+    for (int i = 1; i < nb_lead_skeletons; i++){
+      bounds[i] = bounds[i-1];
+      bounds[i].x += midDist.x;
+    }
+    cellSpan.x=midDist.x;
       
-      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	   vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-	  /* Calcul du max */
-	  if ((*vertexIterator)->x >= MaxBound.x)
-	    MaxBound = *(*vertexIterator);
-	  /* Calcul du min */
-	  if ((*vertexIterator)->x <= MinBound.x)
-	    MinBound = *(*vertexIterator);
-	}
-      //       cerr << "Découpe en x" << endl;
-      break;
- case 1 :
-      /* Découpage en y */      
-      for (int i = 1; i < nb_lead_skeletons; i++){
-	bounds[i] = bounds[i-1];
-	bounds[i].y += midDist.y;
+    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if ((*vertexIterator)->x >= MaxBound.x)
+	  MaxBound = *(*vertexIterator);
+	/* Calcul du min */
+	if ((*vertexIterator)->x <= MinBound.x)
+	  MinBound = *(*vertexIterator);
       }
-      cellSpan.y=midDist.y;
+    //       cerr << "Découpe en x" << endl;
+    break;
+  case 1 :
+    /* Découpage en y */      
+    for (int i = 1; i < nb_lead_skeletons; i++){
+      bounds[i] = bounds[i-1];
+      bounds[i].y += midDist.y;
+    }
+    cellSpan.y=midDist.y;
       
-      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	   vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-	  /* Calcul du max */
-	  if ((*vertexIterator)->y >= MaxBound.y)
-	    MaxBound = *(*vertexIterator);
-	  /* Calcul du min */
-	  if ((*vertexIterator)->y <= MinBound.y)
-	    MinBound = *(*vertexIterator);
-	}
-      //       cerr << "Découpe en y" << endl;
-      break;
+    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if ((*vertexIterator)->y >= MaxBound.y)
+	  MaxBound = *(*vertexIterator);
+	/* Calcul du min */
+	if ((*vertexIterator)->y <= MinBound.y)
+	  MinBound = *(*vertexIterator);
+      }
+    //       cerr << "Découpe en y" << endl;
+    break;
   case 2 :
-      /* Découpage en z */      
-      for (int i = 1; i < nb_lead_skeletons; i++){
-	bounds[i] = bounds[i-1];
-	bounds[i].z += midDist.z;
-      }
-      cellSpan.z=midDist.z;
+    /* Découpage en z */      
+    for (int i = 1; i < nb_lead_skeletons; i++){
+      bounds[i] = bounds[i-1];
+      bounds[i].z += midDist.z;
+    }
+    cellSpan.z=midDist.z;
 
-      for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	   vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-	  /* Calcul du max */
-	  if ((*vertexIterator)->z >= MaxBound.z)
-	    MaxBound = *(*vertexIterator);
-	  /* Calcul du min */
-	  if ((*vertexIterator)->z <= MinBound.z)
-	    MinBound = *(*vertexIterator);
-	}
-//       cerr << "Découpe en z" << endl;
-      break;
+    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if ((*vertexIterator)->z >= MaxBound.z)
+	  MaxBound = *(*vertexIterator);
+	/* Calcul du min */
+	if ((*vertexIterator)->z <= MinBound.z)
+	  MinBound = *(*vertexIterator);
+      }
+    //       cerr << "Découpe en z" << endl;
+    break;
   }
   
-//    cerr << nb_lead_skeletons << endl;
-//    for (int i = 0; i <= nb_lead_skeletons; i++)
-//      cerr << bounds[i] << endl;
-//    cerr << "CellSpan " << cellSpan << endl;
+  //    cerr << nb_lead_skeletons << endl;
+  //    for (int i = 0; i <= nb_lead_skeletons; i++)
+  //      cerr << bounds[i] << endl;
+  //    cerr << "CellSpan " << cellSpan << endl;
   
   m_boxesDisplayList=glGenLists(1);
   glNewList (m_boxesDisplayList, GL_COMPILE);
   glColor3f(1.0,1.0,1.0);
-//   glBegin(GL_LINE_LOOP);
-//   glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
-//   glVertex3f(bounds[0].x,bounds[0].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[0].z);
-//   glEnd();
-//   glBegin(GL_LINE_LOOP);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[0].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[0].z);
-//   glEnd();
-//   glBegin(GL_LINES);
-//   glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[0].z);
-//   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[0].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[0].z);
-//   glVertex3f(bounds[0].x,bounds[0].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
-//   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
-//   glEnd();
+  //   glBegin(GL_LINE_LOOP);
+  //   glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
+  //   glVertex3f(bounds[0].x,bounds[0].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[0].z);
+  //   glEnd();
+  //   glBegin(GL_LINE_LOOP);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[0].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[0].z);
+  //   glEnd();
+  //   glBegin(GL_LINES);
+  //   glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[0].z);
+  //   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[0].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[0].z);
+  //   glVertex3f(bounds[0].x,bounds[0].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[0].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[0].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
+  //   glVertex3f(bounds[nb_lead_skeletons].x,bounds[nb_lead_skeletons].y,bounds[nb_lead_skeletons].z);
+  //   glEnd();
   for (int i = 0; i < nb_lead_skeletons; i++){
     glColor3f(0.0,i*1.0/(double)nb_lead_skeletons,1.0);
     Point bounds2 = bounds[i]+cellSpan;

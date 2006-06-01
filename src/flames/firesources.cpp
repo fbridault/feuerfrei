@@ -9,25 +9,24 @@
 #define WICK_NAME_PREFIX "Wick"
 #define TORCH_NAME "Torch"
 
-Candle::Candle (Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-		const char *filename, int index, CgSVShader * shader, double rayon, int nbSkeletons):
-  FireSource (s, 1, posRel, scene, innerForce, samplingTolerance, filename, index, shader)
+Candle::Candle (FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+		CgSVShader * shader, double rayon):
+  FireSource (flameConfig, s, 1, scene, filename, index, shader)
 	       //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
-//   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
+	       //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
 {
-  m_flames[0] = new PointFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, rayon);
+  m_flames[0] = new PointFlame(flameConfig, s, rayon);
 }
 
-Firmalampe::Firmalampe(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-		       const char *filename, int index, CgSVShader * shader, int nbSkeletons, const char *wickFileName):
-  FireSource (s, 1, posRel, scene, innerForce, samplingTolerance, filename, index, shader)
+Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index,
+		       CgSVShader * shader, const char *wickFileName):
+  FireSource (flameConfig, s, 1, scene, filename, index, shader)
 {
-  m_flames[0] = new LineFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, scene, _("textures/firmalampe.png"), wickFileName);
+  m_flames[0] = new LineFlame( flameConfig, scene, _("textures/firmalampe.png"), s, wickFileName);
 }
 
-Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance, 
-	     const char *torchName, int index, CgSVShader * shader, int nbSkeletons):
-  FireSource (s, 0, posRel, scene, innerForce, samplingTolerance, torchName, index, shader, TORCH_NAME)
+Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, CgSVShader * shader):
+  FireSource (flameConfig, s, 0, scene, torchName, index, shader, TORCH_NAME)
 {
   vector<string> objList;
   int i=0;
@@ -40,14 +39,12 @@ Torch::Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, double 
   for (vector < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, scene, _("textures/torch2.png"), 
-				  torchName, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame( flameConfig, scene, _("textures/torch2.png"), s, torchName, (*objListIterator).c_str());
     }
 }
 
-CampFire::CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-		   const char *fireName, int index, CgSVShader * shader, int nbSkeletons):
-  FireSource (s, 0, posRel, scene, innerForce, samplingTolerance, fireName, index, shader, TORCH_NAME)
+CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, CgSVShader * shader ):
+  FireSource (flameConfig, s, 0, scene, fireName, index, shader, TORCH_NAME)
 {
   vector<string> objList;
   int i=0;
@@ -60,7 +57,6 @@ CampFire::CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, d
   for (vector < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(s, nbSkeletons, posRel, innerForce, samplingTolerance, scene, _("textures/torch2.png"), 
-				  fireName, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame(flameConfig, scene, _("textures/torch2.png"), s, fireName, (*objListIterator).c_str());
     }
 }

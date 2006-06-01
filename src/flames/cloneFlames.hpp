@@ -28,8 +28,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  CloneFlame(BasicFlame *source, Point& posRel, double samplingTolerance, const wxString& texname, 
-	     GLint wrap_s, GLint wrap_t);
+  CloneFlame(FlameConfig* flameConfig, BasicFlame *source, const wxString& texname, GLint wrap_s, GLint wrap_t);
   virtual ~CloneFlame();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -61,7 +60,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  CloneLineFlame(LineFlame *source, Point& posRel, double samplingTolerance);
+  CloneLineFlame(FlameConfig* flameConfig, LineFlame *source);
   virtual ~CloneLineFlame();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -88,7 +87,7 @@ public:
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  ClonePointFlame(PointFlame *source, Point& posRel, double samplingTolerance);
+  ClonePointFlame(FlameConfig* flameConfig, PointFlame *source);
   virtual ~ClonePointFlame();
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 

@@ -389,7 +389,7 @@ void Solver::moveTo(Point& position)
 {
   int i,j;
   Point move = position - m_position;
-  double strength=1.5;
+  double strength=.005*m_nbVoxelsX;
   
   m_position=position;
 

@@ -11,7 +11,6 @@
 #include <math.h>
 
 #include "../common.hpp"
-#include "../vector.hpp"
 
 class Solver;
 
@@ -54,7 +53,7 @@ public:
   /** Ajout d'une force externe pour la composante U */
   void addUsrc (uint i, uint j, uint k, double value)
   {
-    m_uSrc[IX (i, j, k)] += value;
+    m_uSrc[IX (i, j, k)] += value*m_nbVoxelsX;
   };
   /** Ajout d'une force externe pour la composante V */
   void addVsrc (uint i, uint j, uint k, double value)
@@ -64,18 +63,18 @@ public:
   /** Ajout d'une force externe pour la composante W */
   void addWsrc (uint i, uint j, uint k, double value)
   {
-    m_wSrc[IX (i, j, k)] += value;
+    m_wSrc[IX (i, j, k)] += value*m_nbVoxelsX;
   };
 
   /** Affectation d'une force externe pour la composante V */
   void setUsrc (uint i, uint j, uint k, double value)
   {
-    m_uSrc[IX (i, j, k)] = value;
+    m_uSrc[IX (i, j, k)] = value*m_nbVoxelsX;
   };
   /** Affectation d'une force externe pour la composante V */
   void setVsrc (uint i, uint j, uint k, double value)
   {
-    m_vSrc[IX (i, j, k)] = value;
+    m_vSrc[IX (i, j, k)] = value*m_nbVoxelsX;
   };
   /** Ajout des forces externes.
    * @param x composante à traiter

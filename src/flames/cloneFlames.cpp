@@ -4,9 +4,8 @@
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE CLONEFLAME ***************************************/
 /**********************************************************************************************************************/
-CloneFlame::CloneFlame(BasicFlame *source, Point& posRel, double samplingTolerance, const wxString& texname, 
-		       GLint wrap_s, GLint wrap_t) :
-  MetaFlame (source->getNbSkeletons(), source->getNbFixedPoints(), posRel, samplingTolerance, texname, wrap_s, wrap_t)
+CloneFlame::CloneFlame(FlameConfig* flameConfig, BasicFlame *source, const wxString& texname, GLint wrap_s, GLint wrap_t) :
+  MetaFlame (flameConfig, source->getNbSkeletons(), source->getNbFixedPoints(), texname, wrap_s, wrap_t)
 {
   m_source = source;
 }
@@ -25,8 +24,8 @@ void CloneFlame::build()
 }
 
 
-CloneLineFlame::CloneLineFlame(LineFlame *source, Point& posRel, double samplingTolerance) :
-  CloneFlame (source, posRel, samplingTolerance, _("textures/firmalampe.png"), GL_CLAMP, GL_REPEAT)
+CloneLineFlame::CloneLineFlame(FlameConfig* flameConfig, LineFlame *source) :
+  CloneFlame (flameConfig, source, _("textures/firmalampe.png"), GL_CLAMP, GL_REPEAT)
 {
 }
 
@@ -35,8 +34,8 @@ CloneLineFlame::~CloneLineFlame()
 }
 
 
-ClonePointFlame::ClonePointFlame(PointFlame *source, Point& posRel, double samplingTolerance) :
-  CloneFlame (source, posRel, samplingTolerance, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
+ClonePointFlame::ClonePointFlame(FlameConfig* flameConfig, PointFlame *source) :
+  CloneFlame (flameConfig, source, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
 {
 }
 

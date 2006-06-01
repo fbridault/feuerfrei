@@ -7,7 +7,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE METAFLAME ****************************************/
 /**********************************************************************************************************************/
 
-MetaFlame::MetaFlame(uint nbSkeletons, unsigned short nbFixedPoints, Point& posRel, double samplingTolerance,
+MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints,
 		     const wxString& texname, GLint wrap_s, GLint wrap_t) :
   m_tex (texname, wrap_s, wrap_t),
   m_halo(_("textures/halo.png"), GL_CLAMP, GL_CLAMP)
@@ -20,14 +20,14 @@ MetaFlame::MetaFlame(uint nbSkeletons, unsigned short nbFixedPoints, Point& posR
   
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
-  m_ctrlPoints =  new GLfloat[(NB_PARTICULES + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3];
+  m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3];
   m_uknots = new GLfloat[m_uorder + m_nbSkeletons + m_uorder - 1];
-  m_vknots = new GLfloat[m_vorder + NB_PARTICULES + m_nbFixedPoints];
-  m_distances = new double[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
-  m_maxDistancesIndexes = new int[NB_PARTICULES - 1 + m_nbFixedPoints + m_vorder];
+  m_vknots = new GLfloat[m_vorder + NB_PARTICLES_MAX + m_nbFixedPoints];
+  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
+  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
   
   m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, samplingTolerance);
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, flameConfig->samplingTolerance);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
   /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
@@ -35,7 +35,7 @@ MetaFlame::MetaFlame(uint nbSkeletons, unsigned short nbFixedPoints, Point& posR
   
   m_toggle=false;
   
-  m_position=posRel;
+  m_position=flameConfig->position;
 
   m_nbFixedPoints = nbFixedPoints;
 }
@@ -263,16 +263,16 @@ void MetaFlame::drawPointFlame ()
 /*************************************** IMPLEMENTATION DE LA CLASSE BASICFLAME ***************************************/
 /**********************************************************************************************************************/
 
-BasicFlame::BasicFlame(Solver *s, uint nbSkeletons, uint nbFixedPoints, Point& posRel, double innerForce, 
-		       double samplingTolerance, const wxString& texname, GLint wrap_s, GLint wrap_t) :
-  MetaFlame (nbSkeletons, nbFixedPoints, posRel, samplingTolerance, texname, wrap_s, wrap_t)
+BasicFlame::BasicFlame(FlameConfig* flameConfig, uint nbSkeletons, uint nbFixedPoints, const wxString& texname, 
+		       GLint wrap_s, GLint wrap_t, Solver *s) :
+  MetaFlame (flameConfig, nbSkeletons, nbFixedPoints, texname, wrap_s, wrap_t)
 {  
   m_skeletons = new PeriSkeleton* [m_nbSkeletons];
   for (uint i = 0; i < m_nbSkeletons; i++)
     m_skeletons[i]=NULL;
   
   m_solver = s;  
-  m_innerForce = innerForce;
+  m_innerForce = flameConfig->innerForce;
   m_perturbateCount=0;
   
   locateInSolver();
@@ -293,16 +293,15 @@ BasicFlame::~BasicFlame()
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
-		      Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName) :
-  BasicFlame (s, (nbSkeletons+2)*2 + 2, 2, posRel, innerForce, samplingTolerance, textureName, GL_CLAMP, GL_REPEAT),
-  m_wick (wickFileName, nbSkeletons, scene, posRel, wickName)
+LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, const wxString& textureName, Solver *s, 
+		      const char *wickFileName, const char *wickName) :
+  BasicFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 2, textureName, GL_CLAMP, GL_REPEAT, s),
+  m_wick (wickFileName, flameConfig->skeletonsNumber, scene, flameConfig->position, wickName)
 {
   Point pt;
   double largeur = .03;
   uint i,j;
   
-  m_lifeSpanAtBirth = 6;
   Point rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
   
   m_nbLeadSkeletons = m_wick.getLeadPointsArraySize ();
@@ -318,9 +317,9 @@ LineFlame::LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerFo
   for (i = 1; i <= m_nbLeadSkeletons; i++)
     {
       pt = m_wick.getLeadPoint (i - 1)->m_pt;
-      m_leads[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL,m_lifeSpanAtBirth);
+      m_leads[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL, &flameConfig->leadLifeSpan);
       pt.z += (-largeur / 2.0);
-      m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[i - 1], m_lifeSpanAtBirth - 2);
+      m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[i - 1], &flameConfig->periLifeSpan);
     }
   
   /* Génération de l'autre côté des squelettes périphériques */
@@ -328,17 +327,18 @@ LineFlame::LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerFo
   {
 	pt = m_wick.getLeadPoint (j - 1)->m_pt;
 	pt.z += (largeur / 2.0);
-	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[j - 1], m_lifeSpanAtBirth - 2);
+	m_skeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[j - 1], &flameConfig->periLifeSpan);
   }
   
   /* Ajout des extrémités */
   pt = m_wick.getLeadPoint (0)->m_pt;
   pt.x += (-largeur / 2.0);
-  m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[0], m_lifeSpanAtBirth - 2);
+  m_skeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leads[0], &flameConfig->leadLifeSpan);
   
   pt = m_wick.getLeadPoint (m_nbLeadSkeletons - 1)->m_pt;
   pt.x += (largeur / 2.0);
-  m_skeletons[m_nbLeadSkeletons + 1] = new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leads[m_nbLeadSkeletons - 1], m_lifeSpanAtBirth - 2);
+  m_skeletons[m_nbLeadSkeletons + 1] = 
+    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leads[m_nbLeadSkeletons - 1], &flameConfig->leadLifeSpan);
 }
 
 LineFlame::~LineFlame ()
@@ -627,29 +627,27 @@ Point* LineFlame::getBottom()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (Solver * s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
-			double rayon):
-  BasicFlame (s, nbSkeletons, 3, posRel, innerForce, samplingTolerance, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT)
+PointFlame::PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon):
+  BasicFlame ( flameConfig, flameConfig->skeletonsNumber, 3, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT, s)
 //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
 //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
 {
   uint i;
   double angle;
   
-  m_lifeSpanAtBirth = 6;
   m_nbLeadSkeletons = 1;
   m_leads = new LeadSkeleton *[m_nbLeadSkeletons];
   
-  m_leads[0] = new LeadSkeleton (m_solver, posRel, Point(4,.75,4),m_lifeSpanAtBirth);
+  m_leads[0] = new LeadSkeleton (m_solver, m_position, Point(4,.75,4), &flameConfig->leadLifeSpan);
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      m_skeletons[i] = new PeriSkeleton (m_solver, Point (cos (angle) * rayon + posRel.x, 
-							   posRel.y, 
-							   sin (angle) * rayon + posRel.z),
+      m_skeletons[i] = new PeriSkeleton (m_solver, Point (cos (angle) * rayon + m_position.x, 
+							   m_position.y, 
+							   sin (angle) * rayon + m_position.z),
 					 Point(4,.75,4),
-					 m_leads[0], m_lifeSpanAtBirth);
+					 m_leads[0], &flameConfig->periLifeSpan);
       angle += 2 * PI / m_nbSkeletons;
     }
 }
@@ -665,7 +663,7 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if(m_perturbateCount>=2){
-      m_solver->setVsrc(m_x, 1, m_z, 0.2);
+      m_solver->setVsrc(m_x, 1, m_z, 0.0002);
       m_perturbateCount = 0;
     }else
       m_perturbateCount++;
@@ -679,7 +677,7 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
 	  for (uint j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
 	    m_solver->setUsrc (m_solver->getXRes(), 
 			       ((uint) (ceil (m_solver->getYRes() / 2.0))) + j, 
-			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -1);
+			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -.1);
       }
       m_perturbateCount++;
     }

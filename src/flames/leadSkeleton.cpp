@@ -6,7 +6,7 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
-LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  uint pls) :
+LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  uint *pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
 }
@@ -86,7 +86,7 @@ void LeadSkeleton::move ()
   double dist;
   uint i;
 
-  if (getSize () < NB_PARTICULES - 1)
+  if (getSize () < NB_PARTICLES_MAX - 1)
     {
       /* On détermine s'il faut lâcher une nouvelle particule */
       /* On calcule la distance entre la dernière particule lâchée et l'm_root */

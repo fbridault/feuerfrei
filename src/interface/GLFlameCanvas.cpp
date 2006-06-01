@@ -40,7 +40,6 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   m_run = 0;
   m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
   m_framesCount = 0;
-  m_depthPeeling = false;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
@@ -109,26 +108,20 @@ void GLFlameCanvas::InitFlames(void)
   for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
-      m_flames[i] = new Candle (m_solvers[m_currentConfig->flames[i].solverIndex], m_currentConfig->flames[i].position, 
-				m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance, 
-				"bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0,
-				m_currentConfig->flames[i].skeletonsNumber);
+      m_flames[i] = new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				m_scene, "bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
       break;
     case FIRMALAMPE :
-      m_flames[i] = new Firmalampe(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-				   m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
-				   "firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber,
-				   m_currentConfig->flames[i].wickName.fn_str());
+      m_flames[i] = new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				   m_scene, "firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].wickName.fn_str());
       break;
     case TORCH :
-      m_flames[i] = new Torch(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-			      m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
-			      m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
+      m_flames[i] = new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
+			      m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader);
       break;
     case CAMPFIRE :
-      m_flames[i] = new CampFire(m_solvers[m_currentConfig->flames[i].solverIndex],m_currentConfig->flames[i].position,
-				 m_scene, m_currentConfig->flames[i].innerForce, m_currentConfig->flames[i].samplingTolerance,
-				 m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader, m_currentConfig->flames[i].skeletonsNumber);
+      m_flames[i] = new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				 m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -385,7 +378,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
     sigma = 1.5;
         
-    if(m_depthPeeling){
+    if(m_currentConfig->depthPeelingEnabled){
       m_depthPeelingEngine->makePeels(m_displayParticles);
       
       m_glowEngine->activate();
@@ -420,7 +413,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     drawScene();
     /********************* Dessin de la flamme **********************************/
     if(!m_currentConfig->glowEnabled && m_displayFlame)
-      if(m_depthPeeling)
+      if(m_currentConfig->depthPeelingEnabled)
 	{
 	  m_depthPeelingEngine->makePeels(m_displayParticles);	  	  
 	  m_depthPeelingEngine->render();

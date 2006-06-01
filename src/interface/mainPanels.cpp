@@ -1,4 +1,5 @@
 #include "mainPanels.hpp"
+#include <wx/gbsizer.h>
 
 BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_SCROLL(SolverMainPanel::OnScrollPosition)
@@ -45,10 +46,10 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
 						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,SLIDER_RANGE/10, wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
-  m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*SLIDER_SENSIBILITY*10));
+  m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*SLIDER_SENSIBILITY));
   
   (*m_solverXAxisPositionSliderMin) << -SLIDER_RANGE;
   (*m_solverXAxisPositionSliderMax) << SLIDER_RANGE;
@@ -106,7 +107,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_SF)
     {
-      double value = m_buoyancySlider->GetValue()/(SLIDER_SENSIBILITY*10);
+      double value = m_buoyancySlider->GetValue()/(SLIDER_SENSIBILITY);
       
       m_glBuffer->setBuoyancy(m_index, value);
       
@@ -220,8 +221,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("Random")
   };
   
-  SLIDER_SENSIBILITY=1000.0;
-  SLIDER_RANGE=500;
+  SLIDER_SENSIBILITY=100.0;
+  SLIDER_RANGE=50;
   
   m_flameConfig = flameConfig;
   m_index = index;
@@ -230,33 +231,41 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_innerForceSlider = new wxSlider(this,IDSL_FF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
 				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_innerForceLabel = new wxStaticText(this,-1,_("Force"));
-  
-  m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
-  
-  m_forcesSizer->Add(m_innerForceLabel, 1, wxTOP|wxLEFT, 4);
-  m_forcesSizer->Add(m_innerForceSlider, 2, wxEXPAND, 0);
-  
-  m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,0,SLIDER_RANGE, wxDefaultPosition,
-				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+    
+  m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,0,2000, wxDefaultPosition,
+					   wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_samplingToleranceLabel = new wxStaticText(this,-1,_("Sampling"));
+  m_leadLifeSlider = new wxSlider(this,IDSL_NLP,0,0,NB_PARTICLES_MAX, wxDefaultPosition,
+				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_leadLifeLabel = new wxStaticText(this,-1,_("Lead life span"));
+  m_periLifeSlider = new wxSlider(this,IDSL_NPP,0,0,NB_PARTICLES_MAX, wxDefaultPosition,
+				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_periLifeLabel = new wxStaticText(this,-1,_("Peri life span"));
   
-  m_samplingToleranceSizer = new wxBoxSizer(wxHORIZONTAL);
-  
-  m_samplingToleranceSizer->Add(m_samplingToleranceLabel, 1, wxTOP|wxLEFT, 4);
-  m_samplingToleranceSizer->Add(m_samplingToleranceSlider, 2, wxEXPAND, 0);
-  
+  m_slidersSizer = new wxFlexGridSizer(2);
+  m_slidersSizer->AddGrowableCol(1,0);
+  m_slidersSizer->Add(m_innerForceLabel, 1, wxADJUST_MINSIZE, 0);
+  m_slidersSizer->Add(m_innerForceSlider, 6, wxEXPAND, 0);
+  m_slidersSizer->Add(m_leadLifeLabel, 1, wxADJUST_MINSIZE, 0);
+  m_slidersSizer->Add(m_leadLifeSlider, 6, wxEXPAND, 0);
+  m_slidersSizer->Add(m_periLifeLabel, 1, wxADJUST_MINSIZE, 0);
+  m_slidersSizer->Add(m_periLifeSlider, 6, wxEXPAND, 0);
+  m_slidersSizer->Add(m_samplingToleranceLabel, 1, wxADJUST_MINSIZE, 0);
+  m_slidersSizer->Add(m_samplingToleranceSlider, 6, wxEXPAND, 0);
+
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
 					4, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
 
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
-  m_panelSizer->Add(m_forcesSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
   m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
-  m_panelSizer->Add(m_samplingToleranceSizer, 1, wxEXPAND, 0);
+  m_panelSizer->Add(m_slidersSizer, 1, wxEXPAND, 0);
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
+  m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));
+  m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
   m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
@@ -266,20 +275,25 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
-  if(event.GetId() == IDSL_FF)
-    {
-      double valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
-      
-      m_glBuffer->setFlameForces(m_index, valInner);
-      
-      m_flameConfig->innerForce = valInner;
-    }
-  else
-    {
-      m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
-      
-      m_flameConfig->samplingTolerance = m_samplingToleranceSlider->GetValue();
-    }
+  double valInner;
+  
+  switch(event.GetId()){
+  case IDSL_FF :
+    valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
+    m_glBuffer->setFlameForces(m_index, valInner);
+    m_flameConfig->innerForce = valInner;
+    break;
+  case IDSL_SPTOL:
+    m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
+    m_flameConfig->samplingTolerance = m_samplingToleranceSlider->GetValue();
+    break;
+  case IDSL_NLP:
+    m_flameConfig->leadLifeSpan = m_leadLifeSlider->GetValue();
+    break;
+  case IDSL_NPP:
+    m_flameConfig->periLifeSpan = m_periLifeSlider->GetValue();
+    break;
+  }
 }
 
 void FlameMainPanel::OnSelectType(wxCommandEvent& event)

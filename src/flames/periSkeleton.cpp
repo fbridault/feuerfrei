@@ -7,7 +7,7 @@
 #include "../solvers/solver.hpp"
 
 PeriSkeleton::PeriSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor, 
-			    LeadSkeleton * guide, uint pls) :
+			    LeadSkeleton * guide, uint *pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
   this->guide = guide;
@@ -91,7 +91,7 @@ void PeriSkeleton::move ()
 
   moveRoot ();
 
-  if (getSize () < NB_PARTICULES - 1)
+  if (getSize () < NB_PARTICLES_MAX - 1)
     {
       /* On détermine s'il faut lâcher une nouvelle particule */
       /* On calcule la distance entre la dernière particule lâchée et l'm_root */

@@ -21,7 +21,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  LeadSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls);
+  LeadSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
 
   virtual ~LeadSkeleton();
   

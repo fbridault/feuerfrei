@@ -5,7 +5,9 @@ class NumTextCtrl;
 class LongTextCtrl;
 class DoubleTextCtrl;
 
+
 #include "interface.hpp"
+#include "../common.hpp"
 
 /** Super classe pour les classes spécialisées LongTextCtrl et DoubleTextCtrl,
  * elle permet de factoriser les fonctions de retour d'erreur.<hr>

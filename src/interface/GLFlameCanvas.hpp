@@ -64,7 +64,6 @@ public:
   /** Lance/arrête l'animation */
   void ToggleRun(void) { m_run=!m_run; };
 
-  void ToggleDepthPeeling(void) { m_depthPeeling=!m_depthPeeling; };
   /** Active/Désactive le glow seul */
   void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
@@ -101,7 +100,7 @@ private:
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
-  bool m_drawShadowVolumes, m_glowOnly, m_depthPeeling;
+  bool m_drawShadowVolumes, m_glowOnly;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 

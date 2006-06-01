@@ -47,8 +47,7 @@ public:
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  MetaFlame (uint nbSkeletons, unsigned short nbFixedPoints, Point& posRel, double samplingTolerance, 
-	      const wxString& texname, GLint wrap_s, GLint wrap_t);
+  MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, const wxString& texname, GLint wrap_s, GLint wrap_t);
   virtual ~MetaFlame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -176,9 +175,6 @@ protected:
   uint m_size;
   bool m_toggle;
   
-  /** Durée de vie donnée à une particule lors de sa création */
-  unsigned short m_lifeSpanAtBirth;
-  
   /** Nombre de points fixes pour chaque direction v = origine du squelette périphérique + sommet du guide */
   unsigned short m_nbFixedPoints;
   
@@ -210,8 +206,8 @@ public:
    * @param wrap_s paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}
    * @param wrap_t paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}
    */
-  BasicFlame (Solver * s, uint nbSkeletons, uint nbFixedPoints, Point& posRel, double innerForce, 
-	      double samplingTolerance, const wxString& texname, GLint wrap_s, GLint wrap_t);
+  BasicFlame(FlameConfig* flameConfig, uint nbSkeletons, uint nbFixedPoints, const wxString& texname, 
+	     GLint wrap_s, GLint wrap_t, Solver *s);
   virtual ~BasicFlame ();
   
   virtual void addForces (u_char perturbate, u_char fdf=0) = 0;
@@ -273,8 +269,8 @@ public:
    * @param innerForce Force intérieure de la flamme
    * @param wickName Chaîne de caractère contenant le nom du fichier contenant la mèche
    */
-  LineFlame (Solver *s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
-	     Scene *scene, const wxString& textureName, const char *wickFileName, const char *wickName=NULL);
+  LineFlame (FlameConfig* flameConfig, Scene *scene, const wxString& textureName, Solver *s, 
+	     const char *wickFileName, const char *wickName=NULL);
   virtual ~LineFlame();
 
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -330,8 +326,7 @@ public:
    * @param innerForce Force intérieure de la flamme
    * @param rayon rayon de la flamme
    */
-  PointFlame (Solver * s, uint nbSkeletons, Point& posRel, double innerForce, double samplingTolerance,
-	      double rayon);
+  PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon);
   virtual ~PointFlame();
   
       /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 

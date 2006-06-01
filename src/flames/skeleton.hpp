@@ -51,7 +51,7 @@ class Solver;
  * L'entrée et la sortie d'éléments dans la file se gèrent à l'aide des fonctions addParticle() et sortie().
  * Si l'entrée est systématiquement en queue de file, la sortie peut s'effectuer au-delà de la tête de file.
  * Il est également utile de préciser que la queue de la file est mobile. Son indice prend donc 
- * des valeurs comprises dans [0;NB_PARTICULES]. La tête de la file est donc immobile et fixée à 0.
+ * des valeurs comprises dans [0;NB_PARTICLES_MAX]. La tête de la file est donc immobile et fixée à 0.
  * L'élément en queue de file est généralement le plus près de l'origine du squelette, et l'élément
  * en tête est donc le plus éloigné de l'origine. Chaque particule possède une durée de vie qui est
  * décrementée dès qu'un nouvel élément est inséré.
@@ -67,7 +67,7 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls);
+  Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
   virtual ~Skeleton();
   
   /** Donne l'élément en tête de file.
@@ -106,6 +106,7 @@ public:
     return m_headIndex+1;
   };
   
+  /** Dessine la particule à l'écran */
   void draw ();
   
 protected:
@@ -163,7 +164,7 @@ private:
   int m_headIndex;
   
   /** Durée de vie initiale d'une particule */
-  uint m_particleLifespan;
+  uint *m_particleLifespan;
 };
 
 #endif

@@ -1,7 +1,6 @@
 #ifndef FLAMEDIALOG_H
 #define FLAMEDIALOG_H
 
-#include "interface.hpp"
 #include "numTextCtrl.hpp"
 #include <wx/notebook.h>
 

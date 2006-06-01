@@ -12,6 +12,8 @@ enum
     IDSL_FZAP,
     IDSL_SF,
     IDSL_FF,
+    IDSL_NLP,
+    IDSL_NPP,
     IDSL_SPTOL,
     IDRB_Flickering,
     IDRB_FDF,
@@ -86,10 +88,11 @@ private:
   void OnSelectType(wxCommandEvent& event);
   void OnSelectFDF(wxCommandEvent& event);
   
-  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider;
-  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel;
+  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider;
+  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel;
   
-  wxBoxSizer *m_panelSizer, *m_forcesSizer, *m_samplingToleranceSizer;
+  wxBoxSizer *m_panelSizer;
+  wxFlexGridSizer *m_slidersSizer;
   wxRadioBox *m_flickeringRadioBox, *m_FDFRadioBox;
 
   FlameConfig *m_flameConfig;

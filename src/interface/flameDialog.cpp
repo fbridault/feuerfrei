@@ -104,7 +104,7 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
   m_solverComboBox->SetSelection(flameConfig->solverIndex);
   m_flameTypeRadioBox->SetSelection(flameConfig->type);
 
-  (*m_skeletonsNumberCtrl) << flameConfig->skeletonsNumber;
+  (*m_skeletonsNumberCtrl) << (int)flameConfig->skeletonsNumber;
   
   if(flameConfig->type == CANDLE){
     m_wickLabel->Disable();

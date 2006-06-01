@@ -1,4 +1,4 @@
-/* Vector.hpp: interface des classes Vector & Point.*/
+// /* Vector.hpp: interface des classes Vector & Point.*/
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -6,10 +6,11 @@ class Point;
 class Vector;
 
 /* Parametres globaux */
-#include "common.hpp"
+#define EPSILON                 1.0e-8
 
 #include <GL/gl.h>
 #include <math.h>
+#include <iostream>
 
 using namespace std;
 
@@ -107,7 +108,7 @@ public:
   /** Afficher les coordonnées d'un point */
   friend ostream& operator << (ostream& os,const Point& pt)
   {
-    os <<"("<< pt.x <<", "<< pt.y <<", "<< pt.z <<")";;
+    os << "(" << pt.x << ", " << pt.y << ", " << pt.z << ")";
     return os ;
   }
   /** Aditionner deux points */

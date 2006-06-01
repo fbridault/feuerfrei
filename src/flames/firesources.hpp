@@ -28,8 +28,8 @@ public:
    * @param rayon rayon de la flamme
    * @param nbSkeletons nombre de squelettes périphériques
    */
-  Candle(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-	 const char *filename, int index, CgSVShader * shader, double rayon, int nbSkeletons);
+  Candle(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+	 CgSVShader * shader, double rayon );
   virtual ~Candle(){};
 };
 
@@ -53,8 +53,8 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la mèche
    */
-  Firmalampe(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance, 
-	     const char *filename, int index, CgSVShader * shader, int nbSkeletons, const char *wickFileName);
+  Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+	     CgSVShader * shader, const char *wickFileName);
   virtual ~Firmalampe(){};
 };
 
@@ -79,8 +79,7 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  Torch(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-	const char *torchName, int index, CgSVShader * shader, int nbSkeletons);
+  Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, CgSVShader * shader);
   virtual ~Torch(){}; 
 
   /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
@@ -110,8 +109,7 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  CampFire(Solver * s, Point& posRel, Scene *scene, double innerForce, double samplingTolerance,
-	   const char *fireName, int index, CgSVShader * shader, int nbSkeletons);
+  CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, CgSVShader * shader);
   virtual ~CampFire(){}; 
 };
 

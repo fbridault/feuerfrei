@@ -6,11 +6,11 @@
 #include "../scene/graphicsFn.hpp"
 
 
-Skeleton::Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint pls) : 
+Skeleton::Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls) : 
   m_rootMoveFactor(rootMoveFactor)
 {
   m_solver = s;
-  m_queue = new Particle[NB_PARTICULES];
+  m_queue = new Particle[NB_PARTICLES_MAX];
   m_headIndex = -1;
   
   m_root = m_rootSave = position;
@@ -25,14 +25,14 @@ Skeleton::~Skeleton()
 
 void Skeleton::addParticle(const Point* const pt)
 {
-  if(m_headIndex >= NB_PARTICULES-1){
+  if(m_headIndex >= NB_PARTICLES_MAX-1){
     puts("Erreur : trop de particules");
     return;
   }
   m_headIndex++;
   
   m_queue[m_headIndex] = *pt;
-  m_queue[m_headIndex].birth(m_particleLifespan);
+  m_queue[m_headIndex].birth(*m_particleLifespan);
 }
 
 void Skeleton::removeParticle(uint n)

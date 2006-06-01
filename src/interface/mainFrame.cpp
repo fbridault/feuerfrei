@@ -183,6 +183,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
   m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
+  m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
   
   m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
@@ -244,15 +245,18 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
       if(m_currentConfig.flames[i].type != CANDLE){
 	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
-	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 5);
+	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 5);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
       }else{
-	m_config->Read(groupName + _("SkeletonsNumber"), &m_currentConfig.flames[i].skeletonsNumber, 4);
+	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 4);
 	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
       }
       m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
       m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
+      m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
+      m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
+
       tabName.Printf(_("Flame #%d"),i+1);
       
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
@@ -264,6 +268,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
+  m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
   
   switch(m_currentConfig.lightingMode)
     {
@@ -387,7 +392,7 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 
 void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleDepthPeeling();
+  m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
 }
 
 void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
@@ -439,6 +444,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
   m_config->Write(_("/Display/Shadows"), m_currentConfig.shadowsEnabled);
+  m_config->Write(_("/Display/DepthPeeling"), m_currentConfig.depthPeelingEnabled);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   
@@ -503,13 +509,15 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
-      m_config->Write(groupName + _("SkeletonsNumber"),m_currentConfig.flames[i].skeletonsNumber);
+      m_config->Write(groupName + _("SkeletonsNumber"),(int )m_currentConfig.flames[i].skeletonsNumber);
       m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
       if(m_currentConfig.flames[i].type != CANDLE)
 	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
       m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
       m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
       m_config->Write(groupName + _("SamplingTolerance"), m_currentConfig.flames[i].samplingTolerance);
+      m_config->Write(groupName + _("nbLeadParticles"), (int )m_currentConfig.flames[i].leadLifeSpan);
+      m_config->Write(groupName + _("nbPeriParticles"), (int )m_currentConfig.flames[i].periLifeSpan);
     }
 
   wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );

@@ -25,7 +25,7 @@ public:
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
   PeriSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, 
-	       LeadSkeleton *guide, uint pls);
+	       LeadSkeleton *guide, uint *pls);
   virtual ~PeriSkeleton();
   
   

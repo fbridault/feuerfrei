@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -n $1 -o -n $1 ]; then
+if [ -z $1 -o -z $2 ]; then
 	echo "Script allowing to modify an expression in the whole C++ source code"
 	echo "Usage : sed-all <prev-expr> <new-expr>"
 	exit 1

@@ -120,9 +120,10 @@ void FireSource::build()
   Point averagePos, tmp;
   
   for (uint i = 0; i < m_nbFlames; i++){
-    averagePos = (averagePos*i + m_flames[i]->getCenter ())/(i+1);
+    averagePos +=  m_flames[i]->getCenter ();
     m_flames[i]->build();
   }
+  averagePos = averagePos/m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
 }

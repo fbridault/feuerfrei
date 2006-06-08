@@ -33,10 +33,11 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
     _("Candle"),
     _("Oil Lamp"),
     _("Torch"),
-    _("Camp Fire")
+    _("Camp Fire"),
+    _("Candlestick")
   };
   m_flameTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					4, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+					5, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
   m_wickLabel = new wxStaticText(this, -1, _("Wick"));
   m_wickTextCtrl = new wxTextCtrl(this, -1, _("meche2.obj"));
   m_wickBrowseButton = new wxButton(this, IDBF_BrowseWick, _("Browse..."));
@@ -249,7 +250,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       if( m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
-	if(m_currentConfig->flames[i].type != CANDLE){
+	if(m_currentConfig->flames[i].type != CANDLE && m_currentConfig->flames[i].type != CANDLESTICK){
 	  if(m_currentConfig->flames[i].wickName.IsEmpty()){
 	    wxMessageDialog *errorDialog = new wxMessageDialog(this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
 	    errorDialog->ShowModal();

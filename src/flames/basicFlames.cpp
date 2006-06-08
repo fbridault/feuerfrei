@@ -23,13 +23,11 @@ MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3];
   m_uknots = new GLfloat[m_uorder + m_nbSkeletons + m_uorder - 1];
   m_vknots = new GLfloat[m_vorder + NB_PARTICLES_MAX + m_nbFixedPoints];
-  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
-  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
   
   m_nurbs = gluNewNurbsRenderer();
   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, flameConfig->samplingTolerance);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  /* Important : ne fait pas la tesselation si la NURBS n'est pas dans le volume de vision */
+  /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
@@ -38,6 +36,8 @@ MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   m_position=flameConfig->position;
 
   m_nbFixedPoints = nbFixedPoints;
+  
+  m_ctrlPointsSave = m_ctrlPoints;
 }
 
 MetaFlame::~MetaFlame()
@@ -47,9 +47,6 @@ MetaFlame::~MetaFlame()
   delete[]m_ctrlPoints;
   delete[]m_uknots;
   delete[]m_vknots;
-  
-  delete[]m_distances;
-  delete[]m_maxDistancesIndexes;
 }
 
 void CALLBACK MetaFlame::nurbsError(GLenum errorCode)
@@ -129,7 +126,7 @@ void MetaFlame::drawPointFlame ()
       /* Correction "à la grosse" pour les UVs -> à voir par la suite */
       double vtex = 1.0 / (double) (m_maxParticles);
 
-      GLdouble texpts[2][2][2] = { {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };      
+      GLdouble texpts[2][2][2] = { {{0.0, 0}, {0.0, .5}}, {{vtex, 0}, {vtex, .5}} };
       double angle, angle2, angle3;
       
       /* Déplacement de la texture de maniÃ¨re Ã  ce qu'elle reste "en face" de l'observateur */
@@ -267,11 +264,14 @@ BasicFlame::BasicFlame(FlameConfig* flameConfig, uint nbSkeletons, uint nbFixedP
 		       GLint wrap_s, GLint wrap_t, Solver *s) :
   MetaFlame (flameConfig, nbSkeletons, nbFixedPoints, texname, wrap_s, wrap_t)
 {  
+  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
+  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
+  
   m_skeletons = new PeriSkeleton* [m_nbSkeletons];
   for (uint i = 0; i < m_nbSkeletons; i++)
     m_skeletons[i]=NULL;
   
-  m_solver = s;  
+  m_solver = s;
   m_innerForce = flameConfig->innerForce;
   m_perturbateCount=0;
   
@@ -287,6 +287,9 @@ BasicFlame::~BasicFlame()
   for (uint i = 0; i < m_nbLeadSkeletons; i++)
     delete m_leads[i];
   delete[]m_leads;
+  
+  delete[]m_distances;
+  delete[]m_maxDistancesIndexes;
 }
 
 /**********************************************************************************************************************/
@@ -416,7 +419,6 @@ Point LineFlame::getCenter ()
 void LineFlame::build ()
 {
   uint i, j, l;
-  uint count;
   m_maxParticles = 0;
   
   for (i = 0; i < m_nbLeadSkeletons  ; i++)
@@ -433,50 +435,39 @@ void LineFlame::build ()
     }
   
   //  cout << m_maxParticles << endl;
-  // m_ctrlPoints = new Matrix_HPoint3Df(m_nbSkeletons+m_uorder-1,m_maxParticles+m_nbFixedPoints);
-  //   m_uknots = new Vector_FLOAT(m_uorder+m_nbSkeletons+m_uorder-1);
-  //   m_vknots = new Vector_FLOAT(m_vorder+m_maxParticles+m_nbFixedPoints);
   m_size = m_maxParticles + m_nbFixedPoints;
   
   /* Direction des u */
-  for (i = 0; i < m_nbSkeletons + m_uorder - 1; i++)
+  for (i = 0; i < m_nbSkeletons; i++)
     {
-      /* Petit souci d'optimisation : vu que l'on doit boucler, on va réaliser la vérification */
-      /* et éventuellement l'ajout de points de contrôles alors qu'on les a déjà faits */
-      /* Voir plus tard si cela ne peut pas être amélioré */
-      uint k = i % m_nbSkeletons;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
-      if (m_skeletons[k]->getSize () < m_maxParticles)
+      if (m_skeletons[i]->getSize () < m_maxParticles)
 	{
-	  uint nb_pts_supp = m_maxParticles - m_skeletons[k]->getSize ();	// Nombre de points de contrÃ´le supplémentaires
+	  // Nombre de points de contrôle supplémentaires
+	  uint nb_pts_supp = m_maxParticles - m_skeletons[i]->getSize ();
 	  Point pt;
 	  
-	  //cout << "cas à la con" << endl;
 	  /* On calcule les distances entre les particules successives */
 	  /* On prend également en compte l'origine du squelette ET les extrémités du guide */
-	  /* On laisse les distances au carré pour des raisons évidentes de cot de calcul */
-	  
+	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */	  
 	  m_distances[0] = 
-	    m_skeletons[k]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (m_skeletons[k]->getParticle (0));
+	    m_skeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (m_skeletons[i]->getParticle (0));
 	  
-	  for (j = 0; j < m_skeletons[k]->getSize () - 1; j++)
+	  for (j = 0; j < m_skeletons[i]->getSize () - 1; j++)
 	    m_distances[j + 1] = 
-	      m_skeletons[k]->getParticle (j)->squaredDistanceFrom(m_skeletons[k]->getParticle (j + 1));
+	      m_skeletons[i]->getParticle (j)->squaredDistanceFrom(m_skeletons[i]->getParticle (j + 1));
 	  
-	  m_distances[m_skeletons[k]->getSize ()] = 
-	    m_skeletons[k]->getLastParticle ()->squaredDistanceFrom (m_skeletons[k]->getRoot ());
+	  m_distances[m_skeletons[i]->getSize ()] = 
+	    m_skeletons[i]->getLastParticle ()->squaredDistanceFrom (m_skeletons[i]->getRoot ());
 	  
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
-			
-	  //cout << nb_pts_supp << " points supp. et " << squelettes[k]->getSize() << " particules dans le squelette" << endl;
-	  //cout << "Distances : " << endl;
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
 	      double dist_max = FLT_MIN;
 	      
-	      for (j = 0; j < m_skeletons[k]->getSize () + 2; j++)
+	      for (j = 0; j < m_skeletons[i]->getSize () + 2; j++)
 		{
 		  if (m_distances[j] > dist_max)
 		    {
@@ -489,91 +480,93 @@ void LineFlame::build ()
 	      if (dist_max == FLT_MIN)
 		m_maxDistancesIndexes[l] = -1;
 	      else
-		/* On met Ã¯Â¿Å“0 la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
+		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
 		m_distances[m_maxDistancesIndexes[l]] = 0;
 	      
-	      //cout << FLT_MIN << endl << "dist max :" << dist_max << endl << m_maxDistancesIndexes[l] << endl;
 	    }
-	  //cout << "prout" << endl;
-	  /* Les particules les plus Ã¯Â¿Å“artÃ¯Â¿Å“s sont maintenant connues, on peut passer Ã¯Â¿Å“l'affichage */
-	  count = 0;
-	  
+	  /* Les particules les plus Ã¯Â¿Å“artÃ¯Â¿Å“s sont maintenant connues, on peut passer à l'affichage */
 	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLeadSkeleton ()->getParticle (0), 1.0);
+	  setCtrlPoint (m_skeletons[i]->getLeadSkeleton ()->getParticle (0));
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
-		pt = Point::pointBetween(m_skeletons[k]->getLeadSkeleton ()->getParticle (0), m_skeletons[k]->getParticle (0));
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween(m_skeletons[i]->getLeadSkeleton ()->getParticle (0), m_skeletons[i]->getParticle (0));
+		setCtrlPoint (&pt);
 	      }
 	  
-	  for (j = 0; j < m_skeletons[k]->getSize () - 1; j++)
+	  for (j = 0; j < m_skeletons[i]->getSize () - 1; j++)
 	    {
 	      /* On regarde s'il ne faut pas ajouter un point */
 	      for (l = 0; l < nb_pts_supp; l++)
 		{
 		  if (m_maxDistancesIndexes[l] == (int)j + 1)
 		    {
-		      /* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[k]->getSize()-1 */
-		      pt = Point::pointBetween(m_skeletons[k]->getParticle (j), m_skeletons[k]->getParticle (j + 1));
-		      setCtrlPoint (i, count++, &pt);
+		      /* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[i]->getSize()-1 */
+		      pt = Point::pointBetween(m_skeletons[i]->getParticle (j), m_skeletons[i]->getParticle (j + 1));
+		      setCtrlPoint (&pt);
 		    }
 		}
-	      setCtrlPoint (i, count++, m_skeletons[k]->getParticle (j));
+	      setCtrlPoint (m_skeletons[i]->getParticle (j));
 	    }
 	  
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLastParticle ());
+	  setCtrlPoint (m_skeletons[i]->getLastParticle ());
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[k]->getSize ())
+	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[i]->getSize ())
 	      {
-		pt = Point::pointBetween(m_skeletons[k]->getRoot (), m_skeletons[k]-> getLastParticle ());
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween(m_skeletons[i]->getRoot (), m_skeletons[i]-> getLastParticle ());
+		setCtrlPoint (&pt);
 	      }
 	  
-	  setCtrlPoint (i, count++, m_skeletons[k]->getRoot ());
+	  setCtrlPoint (m_skeletons[i]->getRoot ());
 	  
 	  bool prec = false;
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[k]->getSize () + 1)
+	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[i]->getSize () + 1)
 	      {
-		pt = Point::pointBetween(m_skeletons[k]->getRoot (),
-					 m_skeletons[k]->getLeadSkeleton()->getRoot ());
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween(m_skeletons[i]->getRoot (),
+					 m_skeletons[i]->getLeadSkeleton()->getRoot ());
+		setCtrlPoint (&pt);
 		prec = true;
 	      }
 	  
-	  /* Points supplémentaires au cas oÃ¹ il n'y a "plus de place" ailleurs entre les particules */
+	  /* Points supplémentaires au cas où il n'y a "plus de place" ailleurs entre les particules */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == -1)
 	      {
 		if (!prec)
 		  {
-		    pt = *m_skeletons[k]-> getRoot ();
+		    pt = *m_skeletons[i]-> getRoot ();
 		  }
-		pt = Point::pointBetween (&pt, m_skeletons[k]->getLeadSkeleton()->getRoot ());
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween (&pt, m_skeletons[i]->getLeadSkeleton()->getRoot ());
+		setCtrlPoint (&pt);
 		prec = true;
 	      }
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLeadSkeleton ()->getRoot ());
+	  setCtrlPoint (m_skeletons[i]->getLeadSkeleton ()->getRoot ());
 	}
       else
 	{
-	  /* Cas sans problÃ¨me */
-	  count = 0;
-	  /* Remplissage des points de contrÃ´le */
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLeadSkeleton ()->getParticle (0), 1.0);
-	  for (j = 0; j < m_skeletons[k]->getSize (); j++)
+	  /* Cas sans problème */
+	  /* Remplissage des points de contrôle */
+	  setCtrlPoint (m_skeletons[i]->getLeadSkeleton ()->getParticle (0));
+	  for (j = 0; j < m_skeletons[i]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++, m_skeletons[k]->getParticle (j));
+	      setCtrlPoint (m_skeletons[i]->getParticle (j));
 	    }
-	  setCtrlPoint (i, count++, m_skeletons[k]->getRoot ());
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLeadSkeleton ()->getRoot ());
+	  setCtrlPoint (m_skeletons[i]->getRoot ());
+	  setCtrlPoint (m_skeletons[i]->getLeadSkeleton ()->getRoot ());
 	}
     }
-
+  
+  /* On recopie les m_uorder squelettes pour fermer la NURBS */
+  GLfloat *startCtrlPoints = m_ctrlPointsSave;
+  for (i = 0; i < (m_uorder*m_size)*3; i++)
+    *m_ctrlPoints++ = *startCtrlPoints++;
+  
+  m_ctrlPoints = m_ctrlPointsSave;
+  
   /* Affichage en NURBS */
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
   m_vknotsCount = m_maxParticles + m_vorder + m_nbFixedPoints;
@@ -653,7 +646,7 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon):
 }
 
 PointFlame::~PointFlame ()
-{
+{  
 }
 
 void PointFlame::addForces (u_char perturbate, u_char fdf)
@@ -695,12 +688,11 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
 void PointFlame::build ()
 {
   uint i, j, l;
-  uint count;
   m_maxParticles = 0;
-  
+    
   /* Déplacement du guide */
   m_leads[0]->move ();
-
+  
   /* Déplacement et détermination du maximum */
   for (i = 0; i < m_nbSkeletons; i++)
     {
@@ -710,51 +702,42 @@ void PointFlame::build ()
 	m_maxParticles = m_skeletons[i]->getSize ();
     }
   
-  //  cout << m_maxParticles << endl;
-  // m_ctrlPoints = new Matrix_HPoint3Df(m_nbSkeletons+m_uorder-1,m_maxParticles+m_nbFixedPoints);
-  //   m_uknots = new Vector_FLOAT(m_uorder+m_nbSkeletons+m_uorder-1);
-  //   m_vknots = new Vector_FLOAT(m_vorder+m_maxParticles+m_nbFixedPoints);
   m_size = m_maxParticles + m_nbFixedPoints;
-
+  
   /* Direction des u */
-  for (i = 0; i < m_nbSkeletons + m_uorder - 1; i++)
+  for (i = 0; i < m_nbSkeletons; i++)
     {
-      /* Petit souci d'optimisation : vu que l'on doit boucler, on va rÃ©aliser la vÃ©rification */
-      /* et Ã©ventuellement l'ajout de points de contrÃ´les alors qu'on les a dÃ©jÃ  faits */
-      /* Voir plus tard si cela ne peut pas Ãªtre amÃ©liorÃ© */
-      uint k = i % m_nbSkeletons;	// (m_nbSkeletons+m_uorder - i - 2) % m_nbSkeletons; // On prend "Ã  l'envers" pour que la gÃ©nÃ©ration des normales soit "Ã  l'extÃ©rieur"
       /* ProblÃ¨me pour la direction des v, le nombre de particules par skeletons n'est pas garanti */
       /* La solution retenue va ajouter des points de contrÃ´les lÃ  oÃ¹ les points de contrÃ´les sont le plus Ã©loignÃ©s */
-      if (m_skeletons[k]->getSize () < m_maxParticles)
+      if (m_skeletons[i]->getSize () < m_maxParticles)
 	{
-	  uint nb_pts_supp = m_maxParticles - m_skeletons[k]->getSize ();	// Nombre de points de contrÃ´e supplÃ©mentaires
+	  uint nb_pts_supp = m_maxParticles - m_skeletons[i]->getSize ();	// Nombre de points de contrÃ´e supplÃ©mentaires
 	  Point pt;
-
-	  //cout << "cas Ã  la con" << endl;
+	  
 	  /* On calcule les distances entre les particules successives */
 	  /* On prend Ã©galement en compte l'origine du squelette ET les extrÃ©mitÃ©s du guide */
 	  /* On laisse les distances au carrÃ© pour des raisons Ã©videntes de coÃ»t de calcul */
-
-	  m_distances[0] = m_leads[0]->getParticle(0)->squaredDistanceFrom(m_skeletons[k]->getParticle(0));
-
-	  for (j = 0; j < m_skeletons[k]->getSize () - 1; j++)
-	    m_distances[j + 1] = m_skeletons[k]->getParticle(j)->squaredDistanceFrom(m_skeletons[k]->getParticle(j + 1));
 	  
-	  m_distances[m_skeletons[k]->getSize ()] = 
-	    m_skeletons[k]->getLastParticle()->squaredDistanceFrom(m_skeletons[k]->getRoot ());
-	  m_distances[m_skeletons[k]->getSize () + 1] =
-	    m_skeletons[k]->getRoot()->squaredDistanceFrom(m_leads[0]->getRoot ());
-
+	  m_distances[0] = m_leads[0]->getParticle(0)->squaredDistanceFrom(m_skeletons[i]->getParticle(0));
+	  
+	  for (j = 0; j < m_skeletons[i]->getSize () - 1; j++)
+	    m_distances[j + 1] = m_skeletons[i]->getParticle(j)->squaredDistanceFrom(m_skeletons[i]->getParticle(j + 1));
+	  
+	  m_distances[m_skeletons[i]->getSize ()] = 
+	    m_skeletons[i]->getLastParticle()->squaredDistanceFrom(m_skeletons[i]->getRoot ());
+	  m_distances[m_skeletons[i]->getSize () + 1] =
+	    m_skeletons[i]->getRoot()->squaredDistanceFrom(m_leads[0]->getRoot ());
+	  
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaÃ®tre les premiers */
-
-	  //cout << nb_pts_supp << " points supp. et " << m_skeletons[k]->getSize() << " particules dans le squelette" << endl;
+	  
+	  //cout << nb_pts_supp << " points supp. et " << m_skeletons[i]->getSize() << " particules dans le squelette" << endl;
 	  //cout << "Distances : " << endl;
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
 	      double dist_max = FLT_MIN;
-
-	      for (j = 0; j < m_skeletons[k]->getSize () + 2; j++){
+	      
+	      for (j = 0; j < m_skeletons[i]->getSize () + 2; j++){
 		if (m_distances[j] > dist_max)
 		  {
 		  m_maxDistancesIndexes[l] = j;
@@ -768,102 +751,107 @@ void PointFlame::build ()
 	      else
 		/* On met Ã  la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
 		m_distances[m_maxDistancesIndexes[l]] = 0;
-
+	      
 	      //cout << FLT_MIN << endl << "dist max :" << dist_max << endl << m_maxDistancesIndexes[l] << endl;
 	    }
 	  //cout << "prout" << endl;
 	  /* Les particules les plus Ã¯Â¿=artÃ¯Â¿=s sont maintenant connues, on peut passer Ã¯Â¿=l'affichage */
-	  count = 0;
 	  
 	  /* Remplissage des points de contrle */
-	  setCtrlPoint (i, count++, m_leads[0]->getParticle (0), 1.0);
-
+	  setCtrlPoint (m_leads[0]->getParticle (0));
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
-		pt = Point::pointBetween (m_leads[0]->getParticle (0), m_skeletons[k]->getParticle(0));
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween (m_leads[0]->getParticle (0), m_skeletons[i]->getParticle(0));
+		setCtrlPoint (&pt);
 	      }
 	  
-	  for (j = 0; j < m_skeletons[k]->getSize () - 1; j++)
+	  for (j = 0; j < m_skeletons[i]->getSize () - 1; j++)
 	    {
 	      /* On regarde s'il ne faut pas ajouter un point */
 	      for (l = 0; l < nb_pts_supp; l++)
 		{
 		  if (m_maxDistancesIndexes[l] == (int)j + 1)
 		    {
-		      /* On peut rÃ©fÃ©rencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[k]->getSize()-1 */
-		      pt = Point::pointBetween(m_skeletons[k]->getParticle(j), m_skeletons[k]->getParticle(j + 1));
-		      setCtrlPoint (i, count++, &pt);
+		      /* On peut rÃ©fÃ©rencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_skeletons[i]->getSize()-1 */
+		      pt = Point::pointBetween(m_skeletons[i]->getParticle(j), m_skeletons[i]->getParticle(j + 1));
+		      setCtrlPoint (&pt);
 		    }
 		}
-	      setCtrlPoint (i, count++, m_skeletons[k]->getParticle (j));
+	      setCtrlPoint (m_skeletons[i]->getParticle (j));
 	    }
-
-	  setCtrlPoint (i, count++, m_skeletons[k]->getLastParticle ());
-
+	  
+	  setCtrlPoint (m_skeletons[i]->getLastParticle ());
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[k]->getSize ())
+	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[i]->getSize ())
 	      {
-		pt = Point::pointBetween (m_skeletons[k]->getRoot (), m_skeletons[k]->getLastParticle());
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween (m_skeletons[i]->getRoot (), m_skeletons[i]->getLastParticle());
+		setCtrlPoint (&pt);
 	      }
 
-	  setCtrlPoint (i, count++, m_skeletons[k]->getRoot ());
-
+	  setCtrlPoint (m_skeletons[i]->getRoot ());
+	  
 	  bool prec = false;
-
+	  
 	  for (l = 0; l < nb_pts_supp; l++)
-	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[k]->getSize () + 1)
+	    if (m_maxDistancesIndexes[l] == (int)m_skeletons[i]->getSize () + 1)
 	      {
-		pt = Point::pointBetween (m_skeletons[k]->getRoot (), m_leads[0]->getRoot ());
-		setCtrlPoint (i, count++, &pt);
+		pt = Point::pointBetween (m_skeletons[i]->getRoot (), m_leads[0]->getRoot ());
+		setCtrlPoint (&pt);
 		prec = true;
 	      }
-
+	  
 	  /* Points supplÃ©mentaires au cas oÃ¹ il n'y a "plus de place" ailleurs entre les particules */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == -1)
 	      {
 		if (!prec)
-		  pt = *m_skeletons[k]-> getRoot ();
+		  pt = *m_skeletons[i]-> getRoot ();
 		
 		pt = Point::pointBetween (&pt, m_leads[0]->getRoot());
-		setCtrlPoint (i, count++, &pt);
+		setCtrlPoint (&pt);
 		prec = true;
 	      }
-	  setCtrlPoint (i, count++, m_leads[0]->getRoot ());
+	  setCtrlPoint (m_leads[0]->getRoot ());
 	}
       else
 	{
 	  /* Cas sans problÃ¨me */
-	  count = 0;
 	  /* Remplissage des points de contrÃ´le */
-	  setCtrlPoint (i, count++, m_leads[0]->getParticle (0), 1.0);
-	  for (j = 0; j < m_skeletons[k]->getSize (); j++)
+	  setCtrlPoint (m_leads[0]->getParticle (0) );
+	  for (j = 0; j < m_skeletons[i]->getSize (); j++)
 	    {
-	      setCtrlPoint (i, count++, m_skeletons[k]->getParticle (j));
+	      setCtrlPoint ( m_skeletons[i]->getParticle (j));
 	    }
-	  setCtrlPoint (i, count++, m_skeletons[k]->getRoot ());
-	  setCtrlPoint (i, count++, m_leads[0]->getRoot ());
+	  setCtrlPoint ( m_skeletons[i]->getRoot ());
+	  setCtrlPoint ( m_leads[0]->getRoot ());
 	}
     }
-
+  
+  /* On recopie les m_uorder squelettes pour fermer la NURBS */
+  GLfloat *startCtrlPoints = m_ctrlPointsSave;
+  for (i = 0; i < (m_uorder*m_size)*3; i++)
+    *m_ctrlPoints++ = *startCtrlPoints++;
+  
+  m_ctrlPoints = m_ctrlPointsSave;
+  
   /* Affichage en NURBS */
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
   m_vknotsCount = m_maxParticles + m_vorder + m_nbFixedPoints;
-
+  
   for (i = 0; i < m_uknotsCount; i++)
     m_uknots[i] = i;
-
+  
   for (j = 0; j < m_vknotsCount; j++)
     m_vknots[j] = (j < m_vorder) ? 0 : (j - m_vorder + 1);
-
+  
   for (j = m_vknotsCount - m_vorder; j < m_vknotsCount; j++)
     m_vknots[j] = m_vknots[m_vknotsCount - m_vorder];
-
+  
   m_vknots[m_vorder] += 0.9;
-
+  
   if (m_vknots[m_vorder] > m_vknots[m_vorder + 1])
     for (j = m_vorder + 1; j < m_vknotsCount; j++)
       m_vknots[j] += 1;

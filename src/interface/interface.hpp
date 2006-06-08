@@ -6,6 +6,7 @@
 #define FIRMALAMPE 1
 #define TORCH 2
 #define CAMPFIRE 3
+#define CANDLESTICK 4
 
 /* Types de solveurs */
 #define GS_SOLVER 0

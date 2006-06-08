@@ -110,7 +110,7 @@ public:
   /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
    * de déterminer la position de la source de lumière.
    */
-  void build();
+  virtual void build();
   
   /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
@@ -131,7 +131,7 @@ public:
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  void drawFlame(bool displayParticle)
+  virtual void drawFlame(bool displayParticle)
   {
     Point pt(m_solver->getPosition());
     glPushMatrix();

@@ -60,3 +60,51 @@ CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const cha
       m_flames[i] = new LineFlame(flameConfig, scene, _("textures/torch2.png"), s, fireName, (*objListIterator).c_str());
     }
 }
+
+CandleStick::CandleStick (FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+			  CgSVShader * shader, double rayon):
+  FireSource (flameConfig, s, 1, scene, filename, index, shader)
+{
+  m_flames[0] = new PointFlame(flameConfig, s, rayon);
+
+  m_nbCloneFlames = 4;
+  m_cloneFlames = new ClonePointFlame* [m_nbCloneFlames];
+  
+  m_cloneFlames[0] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(.5,0,0));
+  m_cloneFlames[1] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-.5,0,0));
+  m_cloneFlames[2] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0,0,0.5));
+  m_cloneFlames[3] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0,0,-0.5));
+}
+
+CandleStick::~CandleStick()
+{
+  for (uint i = 0; i < m_nbCloneFlames; i++)
+    delete m_cloneFlames[i];
+  delete[]m_cloneFlames;
+}
+
+void CandleStick::build()
+{
+  Point averagePos, tmp;
+  
+  for (uint i = 0; i < m_nbFlames; i++){
+    averagePos +=  m_flames[i]->getCenter ();
+    m_flames[i]->build();
+  }
+  
+  for (uint i = 0; i < m_nbCloneFlames; i++){
+    averagePos += m_cloneFlames[i]->getCenter ();
+    m_cloneFlames[i]->build();
+  }
+  
+  averagePos = averagePos/(m_nbFlames+m_nbCloneFlames);
+  averagePos += getPosition();
+  setLightPosition(averagePos);
+}
+
+void CandleStick::toggleSmoothShading(void)
+{
+  FireSource::toggleSmoothShading();
+  for (uint i = 0; i < m_nbCloneFlames; i++)
+    m_cloneFlames[i]->toggleSmoothShading();
+}

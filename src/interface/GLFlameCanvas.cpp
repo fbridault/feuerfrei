@@ -123,6 +123,10 @@ void GLFlameCanvas::InitFlames(void)
       m_flames[i] = new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
 				 m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader);
       break;
+    case CANDLESTICK :
+      m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				     m_scene, "bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
+      break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
       ::wxExit();

@@ -53,13 +53,13 @@ public:
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
-g   */
+   */
   virtual void build() = 0;
   
   void drawPointFlame();
   
   void drawLineFlame();  
-
+  
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture. 
    */
@@ -68,8 +68,8 @@ g   */
   /** Dessine la mèche de la flamme 
    * @param displayBoxes affiche ou non le partitionnement de la mèche
    */
-  virtual void drawWick(bool displayBoxes) = 0; 
-
+  virtual void drawWick(bool displayBoxes) = 0;
+  
   /** Dessine la flamme et sa mèche 
    * @param displayBoxes affiche ou non le partitionnement de la mèche
    */
@@ -86,57 +86,53 @@ g   */
    * pour orienter le solide photométrique.
    */
   virtual Vector getMainDirection() = 0;
-
+  
   virtual Point getCenter () = 0;
   
   void cloneNURBSPropertiesFrom(MetaFlame& source)
   {
-    m_ctrlPoints = source.m_ctrlPoints;
-    m_uknots = source.m_uknots; 
-    m_vknots = source.m_vknots;
+    m_maxParticles = source.m_maxParticles;
+    memcpy(m_ctrlPoints, source.m_ctrlPoints,(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3 * sizeof(GLfloat));
     m_uknotsCount = source.m_uknotsCount;
     m_vknotsCount = source.m_vknotsCount;
-  
-    m_uorder = source.m_uorder;
-    m_vorder = source.m_vorder;
-    m_maxParticles = source.m_maxParticles;
-    m_nbFixedPoints = source.m_nbFixedPoints;
+    memcpy(m_uknots, source.m_uknots, m_uknotsCount * sizeof(GLfloat));
+    memcpy(m_vknots, source.m_vknots, m_vknotsCount * sizeof(GLfloat));    
   }
+  Point getPosition(){ return m_position; };
+  
   uint getNbSkeletons(){ return m_nbSkeletons; };
   
   unsigned short getNbFixedPoints(){ return m_nbFixedPoints; };
   
   virtual Point* getTop() = 0;
   virtual Point* getBottom() = 0;  
-
-protected:
+  
+protected:  
   /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
    * @param v indice v du point de contrôle
    * @param pt position du point de contrôle dans l'espace
    */
-  void setCtrlPoint (int u, int v, const Point * const pt)
+  void setCtrlPoint (const Point * const pt)
   {
-    m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
-    m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
-    m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
-    //    m_ctrlPoints[(u*m_size+v)*4+3] = 1.0;
+    *m_ctrlPoints++ = pt->x;
+    *m_ctrlPoints++ = pt->y;
+    *m_ctrlPoints++ = pt->z;
   }
   
-  /** Fonction simplifiant l'affectation d'un point de contrôle. 
+  /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
    * @param v indice v du point de contrôle
    * @param pt position du point de contrôle dans l'espace
-   * @param w coordonnée homogène du point de contrôle, équivalente au poids du point de contrôle
    */
-  void setCtrlPoint (int u, int v, const Point * const pt, double w)
-  {
-    m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
-    m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
-    m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
-    //    m_ctrlPoints[(u*m_size+v)*3+3] = w;
-  }
-  
+//   void setCtrlPoint (int u, int v, const Point * const pt)
+//   {
+//     m_ctrlPoints[(u * m_size + v) * 3] = pt->x;
+//     m_ctrlPoints[(u * m_size + v) * 3 + 1] = pt->y;
+//     m_ctrlPoints[(u * m_size + v) * 3 + 2] = pt->z;
+//     //    m_ctrlPoints[(u*m_size+v)*4+3] = 1.0;
+//   }
+    
   static void CALLBACK nurbsError (GLenum errorCode);
   
   /** Position en indices de la base de la flamme dans la grille de voxels du solveur. */
@@ -150,6 +146,8 @@ protected:
   uint m_nbSkeletons;
   /** Matrice de points de contrôle */
   GLfloat *m_ctrlPoints;
+  /** Copie du pointeur vers le tableau de points de contrôle */
+  GLfloat  *m_ctrlPointsSave;
   /** Vecteur de noeuds en u */
   GLfloat *m_uknots;
   /** Vecteur de noeuds en v */
@@ -160,15 +158,7 @@ protected:
    */
   uint m_uknotsCount, m_vknotsCount;
   uint m_maxParticles;
-  
-  double *m_distances;
-  /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
-   * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 
-   * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps 
-   * d'exécution.
-   */
-  int *m_maxDistancesIndexes;
-  
+    
   /** Objet OpenGL permettant de définir la NURBS */
   GLUnurbsObj *m_nurbs;
   
@@ -243,6 +233,15 @@ protected:
   PeriSkeleton **m_skeletons;
   /** Pointeur sur le solveur de fluides */
   Solver *m_solver;  
+  
+  double *m_distances;
+  /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
+   * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 
+   * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps 
+   * d'exécution.
+   */
+  int *m_maxDistancesIndexes;
+
   
   double m_innerForce;
   

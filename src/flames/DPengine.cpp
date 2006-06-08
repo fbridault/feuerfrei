@@ -27,10 +27,10 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
     "KIL R1.x;\n"
     "ADD R2.x, R2.x, -0.5;\n"
     "KIL R2.x;\n"
-// Pose problème si dessin de la scène
-//     "MUL R1, R1, fragment.color;\n"
+    // Pose problème si dessin de la scène
+    //     "MUL R1, R1, fragment.color;\n"
     "MOV result.color, R0;\n"
-//     "MOV result.color, fragment.color;\n"
+    //     "MOV result.color, fragment.color;\n"
     "END\n";
   
   m_peelProgram.load(_fp_peel);
@@ -44,7 +44,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
     
   //  m_fbo.Activate();
   //  m_fbo.ColorAttach(m_colorTex[0]->getTexture(),0);
-//   m_fbo.RenderBufferAttach();
+  //   m_fbo.RenderBufferAttach();
   //m_fbo.Deactivate();
   
   m_flamesDisplayList = glGenLists(NB_DISPLAY_LISTS);
@@ -57,6 +57,7 @@ DepthPeelingEngine::~DepthPeelingEngine()
   delete [] m_colorTex;
   delete m_depthTex[0];
   delete m_depthTex[1];
+  delete m_depthTex[2];
   delete m_sceneDepthTex;
 }
   
@@ -87,7 +88,7 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
     // On effectue le rendu dans le FBO
     m_fbo.ColorAttach(m_colorTex[l]->getTexture(),0);
     m_fbo.DepthAttach(m_depthTex[m_curDepthTex]->getTexture());
-    //     }
+    
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     glActiveTextureARB(GL_TEXTURE2_ARB);
@@ -99,7 +100,7 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
     if(l == 0){
       glActiveTextureARB(GL_TEXTURE1_ARB);
       m_depthTex[2]->bind();
-//       Dessin de la flamme
+      /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
       for (f = 0; f < m_nbFlames; f++)
 	m_flames[f]->drawFlame (displayParticles);
@@ -116,6 +117,8 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
     m_curDepthTex = 1 - m_curDepthTex;
   }
   m_fbo.Deactivate();
+  
+  glDeleteLists(m_flamesDisplayList,1);
 }
 
 void DepthPeelingEngine::render()

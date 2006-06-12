@@ -30,6 +30,11 @@ enum
 
 enum
   {
+    IDSL_DP = 1,
+  };
+
+enum
+  {
     IDB_Run = 1,
     IDB_Restart,
     IDB_Swap,
@@ -108,6 +113,8 @@ public:
   void OnCheckSaveImages(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
+  void OnScrollPosition(wxScrollEvent& event);
+  void OnSize(wxSizeEvent& event);
   void SetFPS(int fps);
 
 private:
@@ -122,7 +129,7 @@ private:
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
   wxMenuBar *m_menuBar;
-
+  
   wxRadioBox *m_lightingRadioBox;
 
   wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
@@ -131,7 +138,8 @@ private:
   
   wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_solidSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer;  
   wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer, *m_multiTopSizer;
-  
+  wxSlider *m_depthPeelingSlider;
+
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
   FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];
   

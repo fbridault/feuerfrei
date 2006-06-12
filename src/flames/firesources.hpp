@@ -182,6 +182,17 @@ public:
     for (uint i = 0; i < m_nbCloneFlames; i++)
       m_cloneFlames[i]->setSamplingTolerance(value);
   };
+  void setRenderMode() {  
+    FireSource::setRenderMode();
+      for (uint i = 0; i < m_nbCloneFlames; i++)
+      m_cloneFlames[i]->setRenderMode();
+  };
+
+  void setTesselateMode() { 
+    FireSource::setTesselateMode();
+    for (uint i = 0; i < m_nbCloneFlames; i++)
+      m_cloneFlames[i]->setTesselateMode();
+  };
 private:  
   /** Nombre de flammes */
   uint m_nbCloneFlames;

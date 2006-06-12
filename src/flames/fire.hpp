@@ -99,6 +99,17 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
   };
+  
+  virtual void setRenderMode() {  
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setRenderMode();
+  };
+
+  virtual void setTesselateMode() { 
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setTesselateMode();
+  };
+
   /** Retourne la position absolue dans le repère du monde .
    * @return position absolue dans le repère du monde
    */
@@ -140,7 +151,16 @@ public:
       m_flames[i]->drawFlame(displayParticle);  
     glPopMatrix();
   }  
-  
+
+  virtual void drawCachedFlame()
+  {
+    Point pt(m_solver->getPosition());
+    glPushMatrix();
+    glTranslatef (pt.x, pt.y, pt.z);
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->drawCachedFlame();  
+    glPopMatrix();
+  } 
   /** Dessine la flamme et sa mèche
    *
    * @param displayParticle affiche ou non les particules des squelettes

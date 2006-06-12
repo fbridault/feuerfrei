@@ -258,10 +258,16 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    return;
 	  }
 	  m_currentConfig->flames[i].innerForce = 0.005;
+	  m_currentConfig->flames[i].leadLifeSpan = 8;
+	  m_currentConfig->flames[i].periLifeSpan = 6;
 	}else{
 	  m_currentConfig->flames[i].innerForce = 0.04;
+	  m_currentConfig->flames[i].leadLifeSpan = 6;
+	  m_currentConfig->flames[i].periLifeSpan = 4;
 	}
 	m_currentConfig->flames[i].samplingTolerance = 100;
+	m_currentConfig->flames[i].flickering = 0;
+	m_currentConfig->flames[i].fdf = 0;
       }else
 	return;      
     }

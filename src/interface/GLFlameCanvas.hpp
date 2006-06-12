@@ -44,7 +44,8 @@ public:
   void OnMouseClick(wxMouseEvent& event);
   void OnMouseWheel(wxMouseEvent& event);
   void OnKeyPressed(wxKeyEvent& event);
-
+  void OnSize(wxSizeEvent& event);
+  
   /** Initialisations relatives à l'environnement OpenGL */
   void InitGL(bool recompileShaders);
   /** Initialisations relatives aux flammes */
@@ -59,11 +60,11 @@ public:
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(FlameAppConfig *config, bool recompileShaders);
-
+  
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
   void ToggleRun(void) { m_run=!m_run; };
-
+  
   /** Active/Désactive le glow seul */
   void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
@@ -76,6 +77,14 @@ public:
   void ToggleSmoothShading(void) { 
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->toggleSmoothShading ();
+  };  
+  void ToggleDepthPeeling(void) { 
+    if(m_currentConfig->depthPeelingEnabled)
+      for (uint f = 0; f < m_currentConfig->nbFlames; f++)
+	m_flames[f]-> setTesselateMode();
+    else
+      for (uint f = 0; f < m_currentConfig->nbFlames; f++)
+	m_flames[f]-> setRenderMode();
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void Swap(void) { m_photoSolid->swap(); };
@@ -83,7 +92,7 @@ public:
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
   void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
-
+  void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
   void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
   

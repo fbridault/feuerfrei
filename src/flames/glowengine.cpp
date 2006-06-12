@@ -131,7 +131,7 @@ void GlowEngine::blur()
 void GlowEngine::deactivate()
 {
   m_firstPassFBOs[GLOW_LEVELS-1].Deactivate();
-   glViewport (0, 0, m_initialWidth, m_initialHeight);
+  glViewport (0, 0, m_initialWidth, m_initialHeight);
 }
 
 void GlowEngine::drawBlur(double alpha)

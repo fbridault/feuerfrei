@@ -4,6 +4,7 @@
 #include <iostream>
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
+  EVT_SIZE(GLFlameCanvas::OnSize)
   EVT_PAINT(GLFlameCanvas::OnPaint)
   EVT_IDLE(GLFlameCanvas::OnIdle)
   EVT_MOTION(GLFlameCanvas::OnMouseMotion)
@@ -136,6 +137,7 @@ void GLFlameCanvas::InitFlames(void)
   
   if( intensities ) delete intensities;
   intensities = new double[m_currentConfig->nbFlames];
+  ToggleDepthPeeling();
 }
 
 void GLFlameCanvas::InitSolvers(void)
@@ -222,7 +224,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
-  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, 5, m_scene, m_flames, m_currentConfig->nbFlames, &m_context);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, m_flames, m_currentConfig->nbFlames, &m_context);
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
@@ -247,6 +249,10 @@ void GLFlameCanvas::Restart (void)
   Disable();
   m_init = false;
   DestroyScene();
+
+  m_width = m_currentConfig->width; m_height = m_currentConfig->height;
+  glViewport (0, 0, m_width, m_height);
+  
   InitUISettings();
   InitScene(false);
   ::wxStartTimer();
@@ -313,8 +319,6 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
-    case 'z': m_depthPeelingEngine->addLayer(); break;
-    case 'Z': m_depthPeelingEngine->removeLayer(); break;
     case 'l': 
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->divideRes ();
@@ -346,11 +350,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     return;
   
   SetCurrent();
-
+  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+  
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+  
   /* Déplacement du camera */
   m_camera->setView();
   
@@ -375,14 +379,15 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     //Point position(m[3][0], m[3][1], m[3][2]);
     // Vector direction = position:
     //dist = direction.length();
-
+    
     /* Définition de la largeur de la gaussienne en fonction de la distance */
     /* A définir de manière plus précise par la suite */
     //     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
     sigma = 1.5;
-        
+    
     if(m_currentConfig->depthPeelingEnabled){
+      /* On décortique dans les calques */
       m_depthPeelingEngine->makePeels(m_displayParticles);
       
       m_glowEngine->activate();
@@ -390,6 +395,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
+      /* On affiche la superposition des calques que l'on vient de décortiquer */
       m_depthPeelingEngine->render();
     }else{
       m_glowEngine->activate();
@@ -419,7 +425,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(!m_currentConfig->glowEnabled && m_displayFlame)
       if(m_currentConfig->depthPeelingEnabled)
 	{
-	  m_depthPeelingEngine->makePeels(m_displayParticles);	  	  
+	  m_depthPeelingEngine->makePeels(m_displayParticles);  	  
 	  m_depthPeelingEngine->render();
 	}
       else{
@@ -449,7 +455,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     ::wxStartTimer();
     m_framesCount = 0;
   }
-
+  
   if(m_saveImages){
     wxString filename;
     wxString zeros;
@@ -592,6 +598,23 @@ void GLFlameCanvas::drawScene()
 //   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
 //   m_scene->draw_scene ();
 // }
+
+void GLFlameCanvas::OnSize(wxSizeEvent& event)
+{
+    // this is also necessary to update the context on some platforms
+    wxGLCanvas::OnSize(event);
+    
+    // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
+    int w, h;
+    GetClientSize(&w, &h);
+#ifndef __WXMOTIF__
+    if (GetContext())
+#endif
+    {
+        SetCurrent();
+        glViewport(0, 0, (GLint) w, (GLint) h);
+    }
+}
 
 void
 GLFlameCanvas::cast_shadows_double ()

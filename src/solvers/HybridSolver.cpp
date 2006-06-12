@@ -36,7 +36,7 @@ void HybridSolver::project (double *const p, double *const div)
     h_y = 1.0 / m_nbVoxelsY,
     h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
-    
+  
   t = t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
@@ -100,7 +100,7 @@ LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z,
   initialNbVoxelsX = n_x;
   initialNbVoxelsY = n_y;
   initialNbVoxelsZ = n_z;
-
+  
   m_uTmp = new double[m_nbVoxels];
   m_vTmp = new double[m_nbVoxels];
   m_wTmp = new double[m_nbVoxels];

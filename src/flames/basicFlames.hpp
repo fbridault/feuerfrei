@@ -56,6 +56,11 @@ public:
    */
   virtual void build() = 0;
   
+  void drawCachedFlame ()
+  {
+    glCallList(m_displayList);
+  }
+  
   void drawPointFlame();
   
   void drawLineFlame();  
@@ -96,7 +101,9 @@ public:
     m_uknotsCount = source.m_uknotsCount;
     m_vknotsCount = source.m_vknotsCount;
     memcpy(m_uknots, source.m_uknots, m_uknotsCount * sizeof(GLfloat));
-    memcpy(m_vknots, source.m_vknots, m_vknotsCount * sizeof(GLfloat));    
+    memcpy(m_vknots, source.m_vknots, m_vknotsCount * sizeof(GLfloat));
+    memcpy(m_texPoints, source.m_texPoints, (m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2 * sizeof(GLfloat));
+    memcpy(m_texTmp, source.m_texTmp, (m_maxParticles + m_nbFixedPoints) * sizeof(GLfloat));   
   }
   Point getPosition(){ return m_position; };
   
@@ -107,19 +114,23 @@ public:
   virtual Point* getTop() = 0;
   virtual Point* getBottom() = 0;  
   
+  void setRenderMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_RENDERER); };
+  void setTesselateMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
+  
 protected:  
   /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
    * @param v indice v du point de contrôle
    * @param pt position du point de contrôle dans l'espace
    */
-  void setCtrlPoint (const Point * const pt)
+  void setCtrlPoint (const Point * const pt, GLfloat v)
   {
     *m_ctrlPoints++ = pt->x;
     *m_ctrlPoints++ = pt->y;
     *m_ctrlPoints++ = pt->z;
+    *m_texPoints++ = *m_texTmp++;
+    *m_texPoints++ = v;
   }
-  
   /** Fonction simplifiant l'affectation d'un point de contrôle.
    * @param u indice u du point de contrôle
    * @param v indice v du point de contrôle
@@ -133,8 +144,40 @@ protected:
 //     //    m_ctrlPoints[(u*m_size+v)*4+3] = 1.0;
 //   }
     
-  static void CALLBACK nurbsError (GLenum errorCode);
+  static void CALLBACK nurbsError(GLenum errorCode)
+  {
+    const GLubyte *estring;
   
+    estring = gluErrorString(errorCode);
+    fprintf(stderr, "Erreur Nurbs : %s\n", estring);
+    exit(0);
+  }
+
+  static void CALLBACK NurbsBegin(GLenum type, void *displayList)
+  {
+    glBegin(type);
+  }
+
+  static void CALLBACK NurbsEnd()
+  {
+    glEnd();
+  }
+
+  static void CALLBACK NurbsVertex ( GLfloat *vertex )
+  {
+    glVertex3fv(vertex);
+  }
+
+  static void CALLBACK NurbsNormal ( GLfloat *normal )
+  {
+    glNormal3fv(normal);
+  }
+
+  static void CALLBACK NurbsTexCoord ( GLfloat *texCoord )
+  {
+    glTexCoord2fv(texCoord);
+  }
+
   /** Position en indices de la base de la flamme dans la grille de voxels du solveur. */
   uint m_x, m_y, m_z;
   
@@ -148,6 +191,10 @@ protected:
   GLfloat *m_ctrlPoints;
   /** Copie du pointeur vers le tableau de points de contrôle */
   GLfloat  *m_ctrlPointsSave;
+
+  GLfloat *m_texPoints, *m_texPointsSave;
+  GLfloat *m_texTmp, *m_texTmpSave;
+  
   /** Vecteur de noeuds en u */
   GLfloat *m_uknots;
   /** Vecteur de noeuds en v */
@@ -176,6 +223,8 @@ protected:
   
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;
+  
+  GLuint m_displayList;
 };
 
 /**********************************************************************************************************************/

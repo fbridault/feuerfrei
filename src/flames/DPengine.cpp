@@ -41,13 +41,8 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
   m_depthTex[1] = new Texture(m_width,m_height,GL_GREATER,true);
   m_depthTex[2] = new Texture(m_width,m_height,GL_ALWAYS,true);
   m_sceneDepthTex = new Texture(m_width,m_height,GL_LESS,true);
-    
-  //  m_fbo.Activate();
-  //  m_fbo.ColorAttach(m_colorTex[0]->getTexture(),0);
-  //   m_fbo.RenderBufferAttach();
-  //m_fbo.Deactivate();
   
-  m_flamesDisplayList = glGenLists(NB_DISPLAY_LISTS);
+  m_flamesDisplayList = glGenLists(1);
 }
 
 DepthPeelingEngine::~DepthPeelingEngine()
@@ -97,8 +92,8 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
     
     /* Pour le premier layer, on construit la displayt list */
     /* et le premier test de profondeur est toujours vrai */
-    if(l == 0){
       glActiveTextureARB(GL_TEXTURE1_ARB);
+    if(l == 0){
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
@@ -108,9 +103,10 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */
       /* la profondeur de la passe précédente */
-      glActiveTextureARB(GL_TEXTURE1_ARB);
       m_depthTex[1-m_curDepthTex]->bind();
       glCallList(m_flamesDisplayList);
+      //  for (f = 0; f < m_nbFlames; f++)
+      //    m_flames[f]->drawCachedFlame ();
     }
     m_peelProgram.disableShader();
     

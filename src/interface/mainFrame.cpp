@@ -7,6 +7,7 @@
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
 BEGIN_EVENT_TABLE(MainFrame, wxFrame)
+  EVT_SIZE(MainFrame::OnSize)
   EVT_RADIOBOX(IDRB_Lighting, MainFrame::OnSelectLighting)
   EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
@@ -36,6 +37,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_DP, MainFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, MainFrame::OnCheckSaveImages)
+  EVT_SCROLL(MainFrame::OnScrollPosition)
   EVT_CLOSE(MainFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -55,12 +57,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
     _("Photometric Solid")
   };
   /*********************************** Création des contrôles *************************************************/
-  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
-  
   // Création d'un bouton. Ce bouton est associé à l'identifiant 
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
+  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
    
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Lighting"), wxDefaultPosition, wxDefaultSize, 
 				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
@@ -74,6 +75,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
   m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
+  m_depthPeelingSlider = new wxSlider(this,IDSL_DP,0,0,DEPTH_PEELING_LAYERS_MAX, wxDefaultPosition, 
+				      wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
@@ -99,10 +102,11 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
   m_multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
   m_multiTopSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
-  m_multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 1, 0, 0);
+  m_multiTopSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   m_multiSizer->Add(m_multiTopSizer, 1, 0, 0);
-  m_multiSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
-  
+  m_multiSizer->Add(m_depthPeelingEnabledCheckBox, 1, 0, 0);
+  m_multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
+    
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
 
@@ -115,13 +119,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_multiSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);
-  
-  m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_mainSizer->Add(m_glBuffer, 0, 0, 0);
-  m_mainSizer->Add(m_rightSizer, 1, wxEXPAND, 0);
-  
-  SetSizer(m_mainSizer);
+  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);  
   
   /* Création des menus */
   m_menuFile = new wxMenu;
@@ -149,7 +147,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
   m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));  
   m_menuDisplay->AppendCheckItem( IDM_GlowOnly, _("&Glow only"));
-
   
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
@@ -163,11 +160,26 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   SetMenuBar( m_menuBar );
   
+  m_configFileName = configFileName;
+  GetSettingsFromConfigFile();
+
+  m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_mainSizer->Add(m_glBuffer, 0, wxEXPAND, 0);
+  m_mainSizer->Add(m_rightSizer, 1, wxEXPAND, 0);
+  
+  SetSizerAndFit(m_mainSizer);
+  
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
 
-  m_configFileName = configFileName;
-  GetSettingsFromConfigFile();
+}
+
+void MainFrame::OnSize(wxSizeEvent& event)
+{
+    // this is also necessary to update the context on some platforms
+    wxFrame::OnSize(event);
+    Layout();
+    
 }
 
 void MainFrame::GetSettingsFromConfigFile (void)
@@ -184,6 +196,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
+  m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
   
   m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
@@ -198,7 +211,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
   m_nbSolversMax = m_currentConfig.nbSolvers;
-
+  
   wxString groupName,tabName;  
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
@@ -229,11 +242,11 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);      
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
-
+  
   m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
   m_nbFlamesMax = m_currentConfig.nbFlames;
-
+  
   for(uint i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
@@ -256,7 +269,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
       m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
       m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
-
+      
       tabName.Printf(_("Flame #%d"),i+1);
       
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
@@ -269,6 +282,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
+  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
   
   switch(m_currentConfig.lightingMode)
     {
@@ -293,6 +307,10 @@ void MainFrame::InitGLBuffer(bool recompileShaders)
 {
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig,recompileShaders);
+  m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
+  m_mainSizer->Fit(this);
+  m_mainSizer->SetSizeHints(this);
+  Layout();
 }
 
 void MainFrame::InitSolversPanels()
@@ -393,6 +411,13 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
   m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
+  m_glBuffer->ToggleDepthPeeling();
+}
+
+void MainFrame::OnScrollPosition(wxScrollEvent& event)
+{
+  if(event.GetId() == IDSL_DP)
+    m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
 }
 
 void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
@@ -431,6 +456,10 @@ void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_flamesNotebook->DeleteAllPages();
       GetSettingsFromConfigFile();
       m_glBuffer->Restart();
+      m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
+      m_mainSizer->Fit(this);
+      m_mainSizer->SetSizeHints(this);
+      Layout();
     }
   }
 }
@@ -445,6 +474,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
   m_config->Write(_("/Display/Shadows"), m_currentConfig.shadowsEnabled);
   m_config->Write(_("/Display/DepthPeeling"), m_currentConfig.depthPeelingEnabled);
+  m_config->Write(_("/Display/NbDepthPeelingLayers"), (int)m_currentConfig.nbDepthPeelingLayers);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   

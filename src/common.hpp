@@ -70,12 +70,16 @@ public:
   uint width, height;
   double clipping;
   wxString sceneName;
-  /* LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
+  /** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
   int lightingMode;
   bool shadowsEnabled;
+  /** Activation du glow */
   bool glowEnabled;
+  /** Activation du Depth Peeling */
   bool depthPeelingEnabled;
-  /* IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
+  /** Nombre de calques pour le Depth Peeling, compris entre 0 et DEPTH_PEELING_LAYERS_MAX */
+  uint nbDepthPeelingLayers;
+  /** IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
   uint nbSolvers;
   SolverConfig *solvers;

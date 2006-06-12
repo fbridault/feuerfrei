@@ -8,8 +8,6 @@ class DepthPeelingEngine;
 #include "fbo.hpp"
 #include "../scene/scene.hpp"
 #include "../scene/camera.hpp"
-#include "../interface/GLFlameCanvas.hpp"
-
 
 class ARBFragmentShader
 {
@@ -80,6 +78,12 @@ public:
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};
   void removeLayer() { m_nbLayers = (m_nbLayers > 0) ? m_nbLayers-1 : m_nbLayers;};
 
+  /** Met à jour le nombre de layers utilisés pour le rendu.
+   * On ne vérifie pas si ce nombre est correct pour le moment puisque
+   * la fonction est appelée par le slider de l'interface qui est borné
+   */
+  void setNbLayers(uint value) { m_nbLayers=value; };
+  
 private: 
   /** Dimensions de la texture */
   uint m_width, m_height;

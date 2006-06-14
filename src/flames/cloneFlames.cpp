@@ -22,10 +22,17 @@ CloneFlame::~CloneFlame()
 void CloneFlame::build()
 {
   cloneNURBSPropertiesFrom(*m_source);
-//   for(uint i=0; i < (m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3; i++)
-//     {
-//       m_ctrlPoints[i] += rand()/(100*(double)RAND_MAX) - .005;
-//     }
+  
+  m_ctrlPointsSave = m_ctrlPoints;
+  for(uint i=0; i < (m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons ) * 3; i++)
+    {
+      *m_ctrlPoints++ += rand()/(50*(double)RAND_MAX) - .025;
+    }
+  /* On recopie les m_uorder squelettes pour fermer la NURBS */
+  GLfloat *startCtrlPoints = m_ctrlPointsSave;
+  for (uint i = 0; i < ((m_uorder-1)*m_size)*3; i++)
+    *m_ctrlPoints++ = *startCtrlPoints++;
+  m_ctrlPoints = m_ctrlPointsSave;
 }
 
 CloneLineFlame::CloneLineFlame(FlameConfig* flameConfig, LineFlame *source, Point offset) :

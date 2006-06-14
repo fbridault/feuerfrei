@@ -32,32 +32,32 @@ public:
     
   void setIsTextured(int value){
     cgSetParameter1i(paramIsTextured, value);
-  };
-
+  }
+  
   void setTexture(){
     cgGLSetTextureParameter(paramTextureSP, iesList->getCurrentIESfile()->getTexture()->getTexture());
     cgGLEnableTextureParameter(paramTextureSP);
-  };
+  }
   
   void setAZD(){
     cgGLSetParameter3d(lazimut_lzenith_denom,iesList->getCurrentIESfile()->getLazimut(),iesList->getCurrentIESfile()->getLzenith(),iesList->getCurrentIESfile()->getDenom());
-  };
+  }
   
   void setLAzimutLZenith(){
     cgGLSetParameter2d(lazimut_lzenith,iesList->getCurrentIESfile()->getLazimutTEX(),iesList->getCurrentIESfile()->getLzenithTEX());
-  };
+  }
   
   void setTextureSPMatrix(){
     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX,CG_GL_MATRIX_IDENTITY);
-  };
+  }
   
   void setparamCentreSP(Point *centreSP){
     cgGLSetParameter3d(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
-  };
+  }
   
   void setparamFluctuationIntensite(GLdouble fluctuationIntensite){
     cgGLSetParameter1d(paramFluctuationIntensite,fluctuationIntensite);
-  };
+  }
   
   void enableShader(Point *centreSP, GLdouble fluctuationIntensite){
     setTextureSPMatrix();

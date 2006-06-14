@@ -20,8 +20,8 @@ MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
-  m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3];
-  m_texPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2];
+  m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 3];
+  m_texPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 2];
   m_uknots = new GLfloat[m_uorder + m_nbSkeletons + m_uorder - 1];
   m_vknots = new GLfloat[m_vorder + NB_PARTICLES_MAX + m_nbFixedPoints];
   m_texTmp = new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints)];
@@ -118,7 +118,7 @@ void MetaFlame::drawPointFlame ()
     }
   else
     {
-      double angle, angle2, angle3;
+      double angle, angle2, angle3, angle4;
       
       /* Déplacement de la texture de maniÃ¨re Ã  ce qu'elle reste "en face" de l'observateur */
       GLdouble m[4][4];
@@ -145,9 +145,9 @@ void MetaFlame::drawPointFlame ()
       glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable (GL_TEXTURE_2D);
       /****************************************************************************************/
-      /* Génération du halo */      
-      angle3 = (angle2 < PI / 2.0) ? -angle : angle;
-      angle3 *= 180 / (double) (PI);
+      /* Génération du halo */
+      angle4 = (angle2 < PI / 2.0) ? -angle : angle;
+      angle3 = angle4 * 180 / (double) (PI);
       
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_halo.getTexture ());
@@ -158,7 +158,7 @@ void MetaFlame::drawPointFlame ()
       Point *top = getTop();
       Point *bottom = getBottom();
       
-      glRotatef ( angle3 , 0.0, 1.0, 0.0);    
+      glRotatef (angle3 , 0.0, 1.0, 0.0);    
 
       /* On effectue une interpolation du mouvement en x et en z */
       double x1, x2, x3, x4;
@@ -207,9 +207,7 @@ void MetaFlame::drawPointFlame ()
       glPopMatrix();
       
       /****************************************************************************************/
-      /* Affichage de la flamme */
-      angle3 = (angle2 < PI / 2.0) ? PI-angle : angle;
-      
+      /* Affichage de la flamme */      
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_tex.getTexture ());
       
@@ -217,7 +215,7 @@ void MetaFlame::drawPointFlame ()
       glPushMatrix ();
       glLoadIdentity ();
       
-      glTranslatef (0.0, angle3 / (double) (PI), 0.0);
+      glTranslatef (0.0, angle4 / (double) (PI), 0.0);
             
       gluBeginSurface (m_nurbs);
       gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 2,
@@ -422,7 +420,7 @@ void LineFlame::build ()
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .5;
+      vtex += .25;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_skeletons[i]->getSize () < m_maxParticles)
@@ -543,12 +541,12 @@ void LineFlame::build ()
   
   /* On recopie les m_uorder squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (i = 0; i < (m_uorder*m_size)*3; i++)
+  for (i = 0; i < ((m_uorder-1)*m_size)*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   
   GLfloat *startTexPoints = m_texPointsSave;
-  for (i = 0; i < (m_uorder*m_size)*2; i++)
+  for (i = 0; i < ((m_uorder-1)*m_size)*2; i++)
     *m_texPoints++ = *startTexPoints++;  
   m_texPoints = m_texPointsSave;
   
@@ -822,12 +820,12 @@ void PointFlame::build ()
   
   /* On recopie les m_uorder squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (i = 0; i < (m_uorder*m_size)*3; i++)
+  for (i = 0; i < ((m_uorder-1)*m_size)*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   
   GLfloat *startTexPoints = m_texPointsSave;
-  for (i = 0; i < (m_uorder*m_size)*2; i++)
+  for (i = 0; i < ((m_uorder-1)*m_size)*2; i++)
     *m_texPoints++ = *startTexPoints++;  
   m_texPoints = m_texPointsSave;
 

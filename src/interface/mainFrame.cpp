@@ -383,7 +383,7 @@ void MainFrame::OnCheckIS(wxCommandEvent& event)
 void MainFrame::OnSelectLighting(wxCommandEvent& event)
 {
   m_currentConfig.lightingMode = event.GetSelection();
-
+  
   switch(m_currentConfig.lightingMode)
     {
     case LIGHTING_STANDARD : 
@@ -416,8 +416,10 @@ void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)
 {
-  if(event.GetId() == IDSL_DP)
+  if(event.GetId() == IDSL_DP){
     m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
+    m_currentConfig.nbDepthPeelingLayers = m_depthPeelingSlider->GetValue();
+  }
 }
 
 void MainFrame::OnCheckSaveImages(wxCommandEvent& event)

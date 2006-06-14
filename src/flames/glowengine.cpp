@@ -51,21 +51,21 @@ void GlowEngine::blur()
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
-      
+  
   m_blurVertexShaderX.enableShader();
-    
+  
   m_blurVertexShaderX.setOffsetsArray();
   m_blurVertexShaderX.setModelViewProjectionMatrix();
   m_blurFragmentShader.enableShader();
   m_blurFragmentShader.setWeightsArray();
-    
+  
   m_blurFragmentShader.setTexture(m_firstPassTex[0]->getTexture());
-    
+  
   for(int i=0; i < GLOW_LEVELS; i++){
     /* Premier blur */
     m_secondPassFBOs[i].Activate();
     glViewport (0, 0, m_width[i], m_height[i]);
-
+    
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     glColor3f(1.0,1.0,1.0);
@@ -90,7 +90,7 @@ void GlowEngine::blur()
   m_blurVertexShaderY.setOffsetsArray();
   m_blurVertexShaderY.setModelViewProjectionMatrix();
   m_blurVertexShaderY.enableShader();
- 
+  
   for(int i=0; i < GLOW_LEVELS; i++){    
     /* Deuxième blur */
     m_firstPassFBOs[i].Activate();
@@ -137,7 +137,7 @@ void GlowEngine::deactivate()
 void GlowEngine::drawBlur(double alpha)
 {
   glDisable (GL_DEPTH_TEST);
-
+  
   glBlendFunc (GL_ONE, GL_ONE);
   
   glMatrixMode(GL_PROJECTION);

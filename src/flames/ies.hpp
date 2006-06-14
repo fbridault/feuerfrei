@@ -19,30 +19,29 @@ public:
   virtual ~IES();
   /** Affiche les valeurs de luminances du solide */
   void test();
-
+  
   /** Retourne le nombre de valeurs en zénithal */
   const int getNbzenith() const {return m_nbzenith;};
-
+  
   /** Retourne le nombre de valeurs en azimuthal */
   const int getNbazimut() const {return m_nbazimut;};
-
+  
   /** Retourne le nombre d'intensités total (zénithal*azimuthal) */
   const float* getIntensites() const {return m_intensites;};
   
-  
   const double getLazimut() const {return m_lazimut;};
-
+  
   const double getLzenith() const {return m_lzenith;};
-
+  
   const double getLazimutTEX() const {return m_lazimutTEX;};
-
+  
   const double getLzenithTEX() const {return m_lzenithTEX;};
-
+  
   const double getDenom() const {return m_denom;};
-
+  
   /** Retourne une texture correspondant au fichier IES */
   Texture* getTexture() const {return m_texture;};
-
+  
 private:
   /** Nombre de valeurs en zénithal et en azimuthal */
   int m_nbzenith,m_nbazimut;

@@ -103,7 +103,8 @@ public:
     memcpy(m_uknots, source.m_uknots, m_uknotsCount * sizeof(GLfloat));
     memcpy(m_vknots, source.m_vknots, m_vknotsCount * sizeof(GLfloat));
     memcpy(m_texPoints, source.m_texPoints, (m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2 * sizeof(GLfloat));
-    memcpy(m_texTmp, source.m_texTmp, (m_maxParticles + m_nbFixedPoints) * sizeof(GLfloat));   
+    memcpy(m_texTmp, source.m_texTmp, (m_maxParticles + m_nbFixedPoints) * sizeof(GLfloat));
+    m_size = source.m_size;
   }
   Point getPosition(){ return m_position; };
   

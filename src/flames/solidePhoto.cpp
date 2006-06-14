@@ -7,6 +7,7 @@ SolidePhotometrique::SolidePhotometrique(Scene *s, CGcontext *context, bool reco
   m_orientationSPtheta = 0.0;
   
   m_ieslist.addIESFile("IES/test.ies");
+  m_ieslist.addIESFile("IES/test4.ies");
   m_ieslist.addIESFile("IES/out111621PN.IES");
   m_ieslist.addIESFile("IES/out2518T1EF.IES");
   m_ieslist.addIESFile("IES/out8013H1EN.IES");
@@ -86,15 +87,4 @@ void SolidePhotometrique::calculerFluctuationIntensiteCentreEtOrientation(Vector
     m_orientationSPtheta = 0.0;
   else
     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
-  
-//   printf("theta : %g ",orientationSPtheta);
-//  printf("fluctint : %g ",fluctuationIntensite);
-//   p->afficher();
-//   cout << " ";
-//   o.afficher();
-//   cout << " ";
-//   centreSP->afficher();
-//  cout << "\r";
-//   axeRotation->afficher();
-//  fflush(stdout);
 }

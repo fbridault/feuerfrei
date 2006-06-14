@@ -63,13 +63,11 @@ private:
   /** Vertex Shader pour les objets texturés */
   CgBasicVertexShader m_SPVertexShaderTex;
   
-  /** 
-   * [0] : SP non interpolé sans couleur des objets fpSPSeul<br>
-   * [1] : SP interpolé sans couleur des objets fpSPSeulInterpole<br>
-   * [2] : SP non interpolé avec couleur pour les objets texturés fpSPTEX<br>
-   * [3] : SP interpolé avec couleur pour les objets texturés fpSPTestTEX<br>
-   * [4] : SP non interpolé avec couleur pour les objets non texturés fpSPWTEX<br>
-   * [5] : SP interpolé avec couleur pour les objets non texturés fpSPTestWTEX
+  /** Tableau contenan les fragment programs
+   * [0] : SP non interpolé sans couleur des objets - fpSPSeul<br>
+   * [1] : SP interpolé sans couleur des objets - fpSPSeulInterpole<br>
+   * [2] : SP non interpolé avec couleur des objets - fpSPTEX<br>
+   * [3] : SP interpolé avec couleur des objets - fpSPTestTEX<br>
    */
   CgSPFragmentShader *m_SPFragmentShader[m_NBSHADER];  
 };

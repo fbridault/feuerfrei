@@ -12,7 +12,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
   
   m_fbo.Initialize(m_width,m_height);
   
-  char _fp_peel[] =  
+  char _fp_peel[] = 
     "!!ARBfp1.0\n"
     "OPTION ARB_fragment_program_shadow;\n"
     "TEMP R0;\n"

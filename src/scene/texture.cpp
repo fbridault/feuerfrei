@@ -1,5 +1,5 @@
 #include "texture.hpp"
-
+#include "GL/glu.h"
 #include <iostream>
 
 using namespace std;
@@ -136,19 +136,22 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
   m_wxtex->Destroy();
 }
 
-Texture::Texture(GLsizei w, GLsizei h, const GLfloat *texels)
+Texture::Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat *texels)
 {  
   m_wxtex = NULL;
-  m_type = GL_TEXTURE_RECTANGLE_ARB;
+  m_type = GL_TEXTURE_3D;
   
   glGenTextures(1, &m_texName);
+  glBindTexture(GL_TEXTURE_3D, m_texName);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
+  glTexImage3D(GL_TEXTURE_3D, 0, GL_LUMINANCE, x, y, z, 0, GL_LUMINANCE, GL_FLOAT, texels);
   
-  glBindTexture(GL_TEXTURE_RECTANGLE_ARB, m_texName);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_RECTANGLE_ARB, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexImage2D(GL_TEXTURE_RECTANGLE_ARB, 0, GL_FLOAT_R32_NV, w, h, 0, GL_LUMINANCE, GL_FLOAT, texels);
+//   GLenum err=glGetError();
+//   cerr << "gl : " << gluErrorString(err) << endl;
 }
 
 Texture::~Texture()

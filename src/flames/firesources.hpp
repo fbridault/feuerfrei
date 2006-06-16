@@ -31,7 +31,7 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    */
   Candle(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
-	 CgSVShader * shader, double rayon );
+	 CgSVShader * shader, double rayon);
   virtual ~Candle(){};
 };
 
@@ -81,7 +81,8 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, CgSVShader * shader);
+  Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, 
+	CgSVShader * shader);
   virtual ~Torch(){}; 
 
   /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
@@ -111,7 +112,8 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    * @param wickFileName nom du fichier contenant la torche
    */
-  CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, CgSVShader * shader);
+  CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
+	   CgSVShader * shader);
   virtual ~CampFire(){}; 
 };
 
@@ -134,7 +136,7 @@ public:
    * @param nbSkeletons nombre de squelettes périphériques
    */
   CandleStick(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
-	      CgSVShader * shader, double rayon );
+	      CgSVShader * shader, double rayon);
   virtual ~CandleStick();
   
   /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 

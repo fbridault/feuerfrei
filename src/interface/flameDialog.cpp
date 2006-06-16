@@ -157,8 +157,10 @@ void FlamePanel::OnSelectType(wxCommandEvent& event)
 void FlamePanel::OnClickButtonBrowseWick(wxCommandEvent& event)
 {
   wxString filename;
+  wxString pwd=wxGetWorkingDirectory();
+  pwd << _("/scenes");
   
-  wxFileDialog fileDialog(this, _("Choose a OBJ file for the wick"), _("scenes"), _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a OBJ file for the wick"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetFilename();
     

@@ -54,6 +54,7 @@ public:
    *  il s'agit d'une fraction de la dimension du solveur 
    */
   Point position;
+  /** Nom du fichier représentant la ou les mèches */
   wxString wickName;
   uint skeletonsNumber;
   double innerForce;
@@ -63,6 +64,8 @@ public:
   double samplingTolerance;
   /** Durée de vie des squelettes */
   uint leadLifeSpan, periLifeSpan;
+  /** Chemin vers le fichier IES utilsé pour le soldie photométrique */
+  wxString IESFileName;
 };
 
 class FlameAppConfig{

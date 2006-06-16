@@ -23,57 +23,41 @@ public:
    * @param sourceName Nom du fichier source
    * @param shaderName Nom du programme Cg
    * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
-   * @param ieslist Liste des fichiers IES
    * @param type : 1 ou 0 selon qu'il y ait interpolation ou non
    */
-  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, 
-		     IESList *ieslist, uint type, bool recompile=false);
+  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, uint nbFlames, CGcontext *context, 
+		     uint type, const wxString& extraParameters, bool recompile=true);
   virtual ~CgSPFragmentShader();
-    
+  
   void setIsTextured(int value){
     cgSetParameter1i(paramIsTextured, value);
   }
   
-  void setTexture(){
-    cgGLSetTextureParameter(paramTextureSP, iesList->getCurrentIESfile()->getTexture()->getTexture());
+  void SetTexture(GLuint texture, uint tex2DSize[2]){
+    m_tex = texture;
+    m_tex2DSize[0] = tex2DSize[0];
+    m_tex2DSize[1] = tex2DSize[1];
+  };
+  
+  void enableShader(GLdouble *centreSP, GLdouble *fluctuationIntensite, GLdouble *AZValues)
+  {
+//     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX, CG_GL_MATRIX_IDENTITY);
+    cgGLSetTextureParameter(paramTextureSP, m_tex);
     cgGLEnableTextureParameter(paramTextureSP);
-  }
-  
-  void setAZD(){
-    cgGLSetParameter3d(lazimut_lzenith_denom,iesList->getCurrentIESfile()->getLazimut(),iesList->getCurrentIESfile()->getLzenith(),iesList->getCurrentIESfile()->getDenom());
-  }
-  
-  void setLAzimutLZenith(){
-    cgGLSetParameter2d(lazimut_lzenith,iesList->getCurrentIESfile()->getLazimutTEX(),iesList->getCurrentIESfile()->getLzenithTEX());
-  }
-  
-  void setTextureSPMatrix(){
-    cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX,CG_GL_MATRIX_IDENTITY);
-  }
-  
-  void setparamCentreSP(Point *centreSP){
-    cgGLSetParameter3d(paramCentreSP,centreSP->x,centreSP->y,centreSP->z);
-  }
-  
-  void setparamFluctuationIntensite(GLdouble fluctuationIntensite){
-    cgGLSetParameter1d(paramFluctuationIntensite,fluctuationIntensite);
-  }
-  
-  void enableShader(Point *centreSP, GLdouble fluctuationIntensite){
-    setTextureSPMatrix();
-    setTexture();
-    setparamCentreSP(centreSP);
-    setparamFluctuationIntensite(fluctuationIntensite);
+    
+    cgGLSetParameterArray3d(paramCentreSP, 0, m_nbFlames, centreSP);
+    cgGLSetParameterArray1d(paramFluctuationIntensite, 0, m_nbFlames, fluctuationIntensite);
+    
+    cgGLSetParameter2d(paramTex2DSize, m_tex2DSize[0], m_tex2DSize[1]);
     if(interp)
-      setAZD();
+      cgGLSetParameterArray3d(lazimut_lzenith_denom, 0, m_nbFlames, AZValues);
     else
-      setLAzimutLZenith();
+      cgGLSetParameterArray2d(lazimut_lzenith, 0, m_nbFlames, AZValues);
     enableProfile();
     bindProgram();
   }
   
 private:
-  IESList *iesList;
   bool interp;
   
   CGparameter paramTextureSP;
@@ -83,6 +67,9 @@ private:
   CGparameter paramCentreSP;
   CGparameter paramFluctuationIntensite;
   CGparameter paramIsTextured;
+  CGparameter paramTex2DSize;
+  
+  GLuint m_tex, m_nbFlames, m_tex2DSize[2];
 };
 
 #endif

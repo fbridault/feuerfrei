@@ -105,7 +105,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
 }
 
 void GLFlameCanvas::InitFlames(void)
-{    
+{
   for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
@@ -126,7 +126,8 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case CANDLESTICK :
       m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				     m_scene, "bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
+				     m_scene, "bougie.obj", i, m_SVShader, 
+				     m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -213,11 +214,11 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
   
+  InitFlames();
   /* Changement de répertoire pour les textures */
   //AS_ERROR(chdir("textures"),"chdir textures");
-  m_photoSolid = new SolidePhotometrique(m_scene, &m_context, recompileShaders);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, m_flames, m_currentConfig->nbFlames, &m_context, recompileShaders);
   
-  InitFlames();
   //AS_ERROR(chdir(".."),"chdir ..");
   m_scene->createDisplayLists();
   
@@ -261,6 +262,13 @@ void GLFlameCanvas::Restart (void)
   Enable();
 }
 
+
+void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
+{
+  m_flames[flameIndex]->useNewIESFile(IESFileName.ToAscii());
+  m_photoSolid->deleteTexture();
+  m_photoSolid->generateTexture();
+}
 
 void GLFlameCanvas::DestroyScene(void)
 { 
@@ -482,12 +490,6 @@ void GLFlameCanvas::drawScene()
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->drawWick (m_displayWickBoxes);
     
-  if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC){
-    /* Le 3e paramètre doit être la hauteur du solveur de la flamme */
-    Point pos(m_flames[0]->getPosition());
-    m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
-  }
-
   /**** Affichage de la scène ****/
   glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
@@ -507,7 +509,7 @@ void GLFlameCanvas::drawScene()
     cast_shadows_double();
   else
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
-      m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
+      m_photoSolid->draw(m_currentConfig->BPSEnabled);
     else
       m_scene->draw_scene();
     
@@ -621,9 +623,6 @@ GLFlameCanvas::cast_shadows_double ()
 {
   uint f;
   
-  Point pos(m_flames[0]->getPosition());
-  m_photoSolid->calculerFluctuationIntensiteCentreEtOrientation(m_flames[0]->getMainDirection(), pos, 1.0);
-
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->switchOff ();
   m_scene->draw_sceneWT ();
@@ -695,6 +694,6 @@ GLFlameCanvas::cast_shadows_double ()
     
     m_scene->draw_scene ();
   }else
-    m_photoSolid->draw(m_currentConfig->BPSEnabled,m_currentConfig->IPSEnabled);
+    m_photoSolid->draw(m_currentConfig->BPSEnabled);
   
 }

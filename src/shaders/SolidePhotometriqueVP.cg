@@ -28,30 +28,32 @@ struct vertexOutputsTEX
 };
 
 vertexOutputsTEX vpSPTEX(vertexInputsTEX IN,
-	uniform float4x4 ModelViewProj
-	//cas 2
-	//,uniform float4x4 ModelView
-	)
+			 uniform float4x4 ModelViewProj,
+			 uniform int tailleTexture,
+			 uniform int tailleMax
+			 //cas 2
+			 //,uniform float4x4 ModelView
+			 )
 {
-	vertexOutputsTEX OUT;		
-
-	// transformation des coordonnees 3D dans le repere de la camera
-	OUT.HPos = mul(ModelViewProj, IN.position);
-
-	// passage de la couleur en sortie
-	OUT.Col0.xyz = IN.color.xyz;
-
-	// passage des coordonnees de texture
-	OUT.texcoords = IN.texcoords;
-
-	// passage des coordonnées du point 3D pour interpolation
-	// cas 1 : simple recopie
-	OUT.PT3D = IN.position;
-	// cas 2 : transformation vers le repere global avant passage
-	//OUT.PT3D = mul(ModelView, IN.position);
-	
-	// passage de la normale pour interpolation
-	OUT.normale = IN.normale;
-
-	return OUT;
+  vertexOutputsTEX OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.HPos = mul(ModelViewProj, IN.position);
+  
+  // passage de la couleur en sortie
+  OUT.Col0.xyz = IN.color.xyz;
+  
+  // passage des coordonnees de texture
+  OUT.texcoords = IN.texcoords;
+  
+  // passage des coordonnées du point 3D pour interpolation
+  // cas 1 : simple recopie
+  OUT.PT3D = IN.position;
+  // cas 2 : transformation vers le repere global avant passage
+  //OUT.PT3D = mul(ModelView, IN.position);
+  
+  // passage de la normale pour interpolation
+  OUT.normale = IN.normale;
+  
+  return OUT;
 }

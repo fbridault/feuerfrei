@@ -11,7 +11,6 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_RADIOBOX(IDRB_Lighting, MainFrame::OnSelectLighting)
   EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
   EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
-  EVT_BUTTON(IDB_Swap, MainFrame::OnClickButtonSwap)
   EVT_MENU(IDM_LoadParam, MainFrame::OnLoadParamMenu)
   EVT_MENU(IDM_OpenScene, MainFrame::OnOpenSceneMenu)
   EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
@@ -31,7 +30,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_SolversSettings, MainFrame::OnSolversMenu)
   EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
   EVT_MENU(IDM_ShadowVolumesSettings, MainFrame::OnShadowVolumesSettingsMenu)  
-  EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
+//   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Shadows, MainFrame::OnCheckShadows)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
@@ -68,9 +67,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
-  m_buttonSwap = new wxButton(this,IDB_Swap,_("Next IES file"));
   
-  m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
+//   m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
@@ -81,7 +79,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
-  		       
+  
   /* Réglages globaux */
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_buttonRun, 0, 0, 0);
@@ -90,7 +88,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   /* Réglages du solide photométrique */
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
-  m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
+//   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
   
@@ -191,7 +189,6 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
   m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
-  m_config->Read(_("/Display/IPSEnabled"), &m_currentConfig.IPSEnabled, 0);
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
   m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
@@ -212,7 +209,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
   m_nbSolversMax = m_currentConfig.nbSolvers;
   
-  wxString groupName,tabName;  
+  wxString groupName,tabName;
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
@@ -269,6 +266,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
       m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
       m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
+      m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
       
       tabName.Printf(_("Flame #%d"),i+1);
       
@@ -276,7 +274,6 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
   
-  m_interpolatedSolidCheckBox->SetValue(m_currentConfig.IPSEnabled);
   m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
@@ -288,12 +285,10 @@ void MainFrame::GetSettingsFromConfigFile (void)
     {
     case LIGHTING_STANDARD : 
       m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
-      m_interpolatedSolidCheckBox->Disable();
       m_blendedSolidCheckBox->Disable();
       break;
     case LIGHTING_PHOTOMETRIC :
       m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
-      m_interpolatedSolidCheckBox->Enable();
       m_blendedSolidCheckBox->Enable();
       break;
     }
@@ -365,19 +360,9 @@ void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
   m_glBuffer->Restart();
 }
 
-void MainFrame::OnClickButtonSwap(wxCommandEvent& event)
-{
-  m_glBuffer->Swap();
-}
-
 void MainFrame::OnCheckBS(wxCommandEvent& event)
 {
-  m_currentConfig.BPSEnabled = 2-m_currentConfig.BPSEnabled;
-}
-
-void MainFrame::OnCheckIS(wxCommandEvent& event)
-{
-  m_currentConfig.IPSEnabled = 1-m_currentConfig.IPSEnabled;
+  m_currentConfig.BPSEnabled = 1-m_currentConfig.BPSEnabled;
 }
 
 void MainFrame::OnSelectLighting(wxCommandEvent& event)
@@ -386,12 +371,10 @@ void MainFrame::OnSelectLighting(wxCommandEvent& event)
   
   switch(m_currentConfig.lightingMode)
     {
-    case LIGHTING_STANDARD : 
-      m_interpolatedSolidCheckBox->Disable();
+    case LIGHTING_STANDARD :
       m_blendedSolidCheckBox->Disable();
       break;
     case LIGHTING_PHOTOMETRIC :
-      m_interpolatedSolidCheckBox->Enable();
       m_blendedSolidCheckBox->Enable();
       break;
     }
@@ -430,8 +413,10 @@ void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
 void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
+  wxString pwd=wxGetWorkingDirectory();
+  pwd << _("/scenes");
   
-  wxFileDialog fileDialog(this, _("Choose a scene file"), _("scenes"), _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetFilename();
     
@@ -446,7 +431,7 @@ void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
   
-  wxFileDialog fileDialog(this, _("Choose a simulation file"), _("."), _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a simulation file"), _(""), _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetFilename();
     
@@ -472,7 +457,6 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
   m_config->Write(_("/Display/LightingMode"), m_currentConfig.lightingMode);
-  m_config->Write(_("/Display/IPSEnabled"), m_currentConfig.IPSEnabled);
   m_config->Write(_("/Display/BPSEnabled"), m_currentConfig.BPSEnabled);
   m_config->Write(_("/Display/Shadows"), m_currentConfig.shadowsEnabled);
   m_config->Write(_("/Display/DepthPeeling"), m_currentConfig.depthPeelingEnabled);
@@ -550,6 +534,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("SamplingTolerance"), m_currentConfig.flames[i].samplingTolerance);
       m_config->Write(groupName + _("nbLeadParticles"), (int )m_currentConfig.flames[i].leadLifeSpan);
       m_config->Write(groupName + _("nbPeriParticles"), (int )m_currentConfig.flames[i].periLifeSpan);
+      m_config->Write(groupName + _("IESFileName"),m_currentConfig.flames[i].IESFileName);
     }
 
   wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );

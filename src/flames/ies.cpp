@@ -5,7 +5,7 @@
 IES::IES(const char* const filename)
 {
   char extension[4],chaine[255];
-  int lg,z,a;
+  uint lg,z,a;
   //  int test;
   float *pintensite,tmp;
 
@@ -18,13 +18,14 @@ IES::IES(const char* const filename)
       ifstream iesFile(filename, ios::in);
       cout << "Chargement fichier IES : " << filename << " ... ";
       if (!iesFile.is_open ()){
+	cerr << "Erreur !! " << endl;
 	throw (ios::failure ("Open error"));
 	return;
       }
       iesFile >> chaine;
       if(!strcmp(chaine,"SPV1.0")){
 	iesFile >> chaine >> m_nbzenith >> chaine >> m_nbazimut;
-	m_nbazimut--;// la derniere colonne n'est pas lue
+	//m_nbazimut--;// la derniere colonne n'est pas lue
 	if((m_nbzenith>0) && (m_nbazimut>0)){
 	  if((m_intensites=new float[m_nbzenith*m_nbazimut])){
 	    pintensite=m_intensites;
@@ -34,7 +35,8 @@ IES::IES(const char* const filename)
 		iesFile >> *(pintensite++);
 		//printf("z=%d a=%d lu : %lf\n",z,a,*(pintensite-1));
 	      }
-	      iesFile >> tmp;// la derniere colonne n'est pas lue
+	      // iesFile >> tmp;
+	      // la derniere colonne n'est pas lue
 	      // 		if(*(pintensite-nbazimut)!=*(pintensite-1))
 	      // 		  test=false;
 	    }
@@ -64,13 +66,11 @@ IES::IES(const char* const filename)
   }
   else
     cout << "Nom de fichier IES non reconnu" << endl;
-  
-  m_texture = new Texture(m_nbazimut,m_nbzenith,m_intensites);
 }
 
 void IES::test()
 {
-  int z,a;
+  uint z,a;
   float *pintensite;  
 
   cout << "nbazimut : " << m_nbazimut << " nbzenith : " << m_nbzenith << endl;
@@ -87,14 +87,4 @@ void IES::test()
 IES::~IES()
 {
   delete [] m_intensites;
-  delete m_texture;
-}
-
-IESList::~IESList()
-{
-  for (vector < IES * >::iterator IESArrayIterator = m_IESArray.begin (); 
-       IESArrayIterator != m_IESArray.end ();
-       IESArrayIterator++)
-    delete (*IESArrayIterator);
-  m_IESArray.clear ();
 }

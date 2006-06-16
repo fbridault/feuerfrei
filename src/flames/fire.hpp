@@ -11,11 +11,13 @@ class FireSource;
 #include "../scene/texture.hpp"
 #include "../scene/object.hpp"
 #include "../shaders/CgSVShader.hpp"
+#include "ies.hpp"
 
 class BasicFlame;
 class Solver;
 class Object;
 class Scene;
+class IES;
 
 
 /**********************************************************************************************************************/
@@ -34,7 +36,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    */
-  FlameLight (Scene *scene, uint index, CgSVShader* shader);
+  FlameLight (Scene *scene, uint index, CgSVShader* shader, const char* const IESFilename);
   virtual ~FlameLight();
   
   void setLightPosition (Point& pos)
@@ -51,14 +53,54 @@ public:
   void switchOff ();
   
   void resetDiffuseLight ();
+    
+  float *getIntensities(void) const { return m_iesFile->getIntensities(); };
   
+  const double getIntensity(void) const { return m_intensity; };
+  
+  const void getCenterSP(double& x, double& y, double& z) const { x = m_centreSP.x; y = m_centreSP.y; z = m_centreSP.z; };
+
+  const double getLazimut() const {return m_iesFile->getLazimut();};
+  
+  const double getLzenith() const {return m_iesFile->getLzenith();};
+  
+  const double getLazimutTEX() const {return m_iesFile->getLazimutTEX();};
+  
+  const double getLzenithTEX() const {return m_iesFile->getLzenithTEX();};
+  
+  /** Retourne le nombre de valeurs en zénithal */
+  const uint getIESZenithSize() const {return m_iesFile->getNbzenith();};
+  
+  /** Retourne le nombre de valeurs en azimuthal */
+  const uint getIESAzimuthSize() const {return m_iesFile->getNbazimut();};
+  
+  /** Supprime le fichier IES courant et en utilise un autre */
+  void useNewIESFile(const char* const IESFilename) { delete m_iesFile; m_iesFile = new IES(IESFilename); };
+  
+protected:
+  /** Centre du solide photométrique dans l'espace */
+  Point m_centreSP;
+  /** Orientation du solide photométrique, utilisée pour la rotation */
+  double m_orientationSPtheta;
+  /** Axe de rotation */
+  Vector m_axeRotation;
+  /** Valeur de l'intensité du solide */
+  double m_intensity;   
+
 private:
   short m_light;
   
+  /** Pointeur sur la scène */
   Scene *m_scene;
+
+  /** Pointeur sur le shader générateur de volumes d'ombres */
   CgSVShader *m_cgShader;
   
-  GLfloat m_lightPosition[4];  
+  /** Position de la lumière ponctuelle OpenGL dans l'espace */
+  GLfloat m_lightPosition[4];
+  
+  /** Fichier IES utilisé pour le solide photométrique de la source */
+  IES *m_iesFile;
 };
 
 
@@ -234,6 +276,10 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->locateInSolver();
   }
+  
+  /** Calcul de l'intensité du centre et de l'orientation du solide photométrique
+   */
+  void computeIntensityPositionAndDirection(void);
   
 protected:
   /** Nombre de flammes */

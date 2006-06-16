@@ -20,8 +20,7 @@ class MainFrame;
 
 enum
   {
-    IDCHK_IS = 1,
-    IDCHK_BS,
+    IDCHK_BS = 1,
     IDCHK_Shadows,
     IDCHK_Glow,
     IDCHK_DP,
@@ -37,7 +36,6 @@ enum
   {
     IDB_Run = 1,
     IDB_Restart,
-    IDB_Swap,
     IDRB_Lighting,
   };
 
@@ -106,7 +104,6 @@ public:
   void OnShadowVolumesSettingsMenu(wxCommandEvent& event);
   /** Actions des checkboxes et autres */
   void OnCheckBS(wxCommandEvent& event);
-  void OnCheckIS(wxCommandEvent& event);
   void OnCheckShadows(wxCommandEvent& event);
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckDepthPeeling(wxCommandEvent& event);
@@ -132,7 +129,7 @@ private:
   
   wxRadioBox *m_lightingRadioBox;
 
-  wxCheckBox *m_interpolatedSolidCheckBox, *m_blendedSolidCheckBox;
+  wxCheckBox *m_blendedSolidCheckBox;
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox;
   

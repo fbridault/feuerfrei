@@ -15,8 +15,9 @@ enum
     IDSL_NLP,
     IDSL_NPP,
     IDSL_SPTOL,
-    IDRB_Flickering,
+    IDRB_FLICK,
     IDRB_FDF,
+    IDB_BROWSE,
   };
 
 enum
@@ -34,6 +35,7 @@ enum
     IDT_FYAPMAX,
     IDT_FZAPMIN,
     IDT_FZAPMAX,
+    IDT_PHOTO
   };
 
 /** Panneau pour les onglets des solveurs dans la fenêtre principale */
@@ -87,11 +89,17 @@ private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);
   void OnSelectFDF(wxCommandEvent& event);
+
+  void OnClickButtonBrowse(wxCommandEvent& event);
+  void OnPhotoSolidEnter(wxCommandEvent& event);
   
   wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider;
-  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel;
+  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel, *m_photoSolidLabel;
   
-  wxBoxSizer *m_panelSizer;
+  wxButton *m_photoSolidBrowseButton;
+  wxTextCtrl *m_photoSolidTextCtrl;
+  
+  wxBoxSizer *m_panelSizer, *m_photoSolidSizer;
   wxFlexGridSizer *m_slidersSizer;
   wxRadioBox *m_flickeringRadioBox, *m_FDFRadioBox;
 

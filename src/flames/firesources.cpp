@@ -25,7 +25,8 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const
   m_flames[0] = new LineFlame( flameConfig, scene, _("textures/firmalampe.png"), s, wickFileName);
 }
 
-Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, CgSVShader * shader):
+Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index,
+	     CgSVShader * shader):
   FireSource (flameConfig, s, 0, scene, torchName, index, shader, TORCH_NAME)
 {
   vector<string> objList;
@@ -43,7 +44,8 @@ Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *tor
     }
 }
 
-CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, CgSVShader * shader ):
+CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
+		   CgSVShader * shader):
   FireSource (flameConfig, s, 0, scene, fireName, index, shader, TORCH_NAME)
 {
   vector<string> objList;

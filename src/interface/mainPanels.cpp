@@ -1,5 +1,6 @@
 #include "mainPanels.hpp"
 #include <wx/gbsizer.h>
+#include <wx/file.h>
 
 BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_SCROLL(SolverMainPanel::OnScrollPosition)
@@ -199,8 +200,10 @@ void SolverMainPanel::ComputeSlidersValues(void)
 
 BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
   EVT_SCROLL(FlameMainPanel::OnScrollPosition)
-  EVT_RADIOBOX(IDRB_Flickering, FlameMainPanel::OnSelectType)
+  EVT_RADIOBOX(IDRB_FLICK, FlameMainPanel::OnSelectType)
   EVT_RADIOBOX(IDRB_FDF, FlameMainPanel::OnSelectFDF)
+  EVT_TEXT_ENTER(IDT_PHOTO, FlameMainPanel::OnPhotoSolidEnter)
+  EVT_BUTTON(IDB_BROWSE, FlameMainPanel::OnClickButtonBrowse)
 END_EVENT_TABLE();
 
 
@@ -253,15 +256,26 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_slidersSizer->Add(m_samplingToleranceLabel, 1, wxADJUST_MINSIZE, 0);
   m_slidersSizer->Add(m_samplingToleranceSlider, 6, wxEXPAND, 0);
 
-  m_flickeringRadioBox = new wxRadioBox(this, IDRB_Flickering, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
+  m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
 					4, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
 
+  m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
+  m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,
+					wxDefaultPosition, wxSize(100,22), wxTE_PROCESS_ENTER);
+  m_photoSolidBrowseButton = new wxButton(this, IDB_BROWSE, _("Browse..."));
+  
+  m_photoSolidSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_photoSolidSizer->Add(m_photoSolidLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 5);
+  m_photoSolidSizer->Add(m_photoSolidTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 10);
+  m_photoSolidSizer->Add(m_photoSolidBrowseButton, 0, wxADJUST_MINSIZE, 0);  
+  
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
   m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
   m_panelSizer->Add(m_slidersSizer, 1, wxEXPAND, 0);
+  m_panelSizer->Add(m_photoSolidSizer, 1, wxEXPAND, 0);
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));
@@ -304,4 +318,45 @@ void FlameMainPanel::OnSelectType(wxCommandEvent& event)
 void FlameMainPanel::OnSelectFDF(wxCommandEvent& event)
 {
   m_flameConfig->fdf = event.GetSelection();
+}
+
+void FlameMainPanel::OnClickButtonBrowse(wxCommandEvent& event)
+{
+  wxString filename;
+  wxString pwd=wxGetWorkingDirectory();
+  pwd <<_("/IES");
+  
+  wxFileDialog fileDialog(this, _("Choose a IES file for this flame"), pwd, _(""), _("*.ies"), wxOPEN|wxFILE_MUST_EXIST);
+  if(fileDialog.ShowModal() == wxID_OK){
+    filename = fileDialog.GetFilename();
+    
+    filename = _("IES/") + filename;
+    m_photoSolidTextCtrl->SetValue(filename);
+  }
+  OnPhotoSolidEnter(event);
+}
+
+void FlameMainPanel::OnPhotoSolidEnter(wxCommandEvent& event)
+{
+  bool restart = false;
+  wxString filename = m_photoSolidTextCtrl->GetValue();
+  wxString pwd=wxGetWorkingDirectory();
+  
+  filename.Replace(pwd,_(""),false);
+  if(!wxFile::Exists(filename)){
+    wxString message;
+    message <<  _("File ") << filename << _(" doesn't exist !");
+    wxMessageDialog *errorDialog = new wxMessageDialog(this,message, _("Error"),wxOK|wxICON_ERROR);
+    errorDialog->ShowModal();
+    errorDialog->Destroy();
+    return;
+  }
+  if(m_glBuffer->IsRunning()){
+    restart = true;
+    m_glBuffer->ToggleRun();
+  }
+  m_flameConfig->IESFileName = filename;
+  m_glBuffer->RegeneratePhotometricSolids(m_index,filename);
+  if(restart)
+    m_glBuffer->ToggleRun();
 }

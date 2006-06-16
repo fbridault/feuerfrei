@@ -17,14 +17,14 @@ class Texture
 {
 public:
   /** Construit une texture vide.
-   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
+   * @param type type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
    * @param width largeur de la texture
    * @param height hauteur de la texture
    */
   Texture(GLenum type, uint width, uint height);
   
   /** Construit une texture vide.
-   * @param type type de la texture parmi GL_tEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
+   * @param type type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
    * @param width largeur de la texture
    * @param height hauteur de la texture
    */
@@ -45,13 +45,15 @@ public:
    */
   Texture(const wxString& filename, GLint wrap_s, GLint wrap_t);
 
-  /** Construit une texture GL_LUMINANCE a partir d'un tableau de reels, de la largeur
-    et de la hauteur de la texture.
-   * @param w : largeur de la texture
-   * @param h : hauteur de la texture
-   * @param texels : pointeur vers le tableau de reels
+  /** Construit une texture 3D en GL_LUMINANCE à partir d'un tableau de réels, de la largeur
+    et de la hauteur de la texture. Utilisé seulement pour construire la texture des
+    solides photmétriques.
+   * @param x : largeur de la texture
+   * @param y : hauteur de la texture
+   * @param z : profondeur de la texture
+   * @param texels : pointeur vers le tableau de réels
    */
-  Texture(GLsizei w, GLsizei h, const GLfloat *texels);
+  Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat *texels);
   
   /** Donne l'identifiant de la texture à utiliser avec glBindTexture(). */
   const GLuint getTexture() const {return m_texName;};

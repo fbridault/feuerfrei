@@ -87,7 +87,6 @@ public:
 	m_flames[f]-> setRenderMode();
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void Swap(void) { m_photoSolid->swap(); };
   void moveSolver(int selectedSolver, Point& pt){ m_solvers[selectedSolver]->moveTo(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
@@ -95,6 +94,7 @@ public:
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
   void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
+  void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   
 private:
   void WriteFPS ();
@@ -127,7 +127,7 @@ private:
   u_char *m_pixels;
 
   /********* Variables relatives aux solides photométriques **************/
-  SolidePhotometrique *m_photoSolid;
+  PhotometricSolidsRenderer *m_photoSolid;
 
   /********* Variables relatives au glow *********************************/
   GlowEngine *m_glowEngine;

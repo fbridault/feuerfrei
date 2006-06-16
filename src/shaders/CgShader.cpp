@@ -5,7 +5,7 @@
 using namespace std;
 
 
-CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile)
+CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile, const wxString& extraParameters)
 {
   wxString sourcePath = _("shaders/") + sourceName;
   wxString shaderPath = _("shaders/") + shaderName;
@@ -34,21 +34,22 @@ CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGco
   //system(cmd.ToAscii());
   //    int code = wxExecute( cmd, wxEXEC_SYNC|wxEXEC_RELATIVE_PATH );
   
- 
   if(type == CG_GL_VERTEX){
-    profile = CG_PROFILE_ARBVP1;
+    profile = CG_PROFILE_VP40;
     if(recompile) {
       cerr << "Compiling Cg shader : " << shaderPath.ToAscii() << endl;
-      sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile arbvp1 %s",
-	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourcePath.ToAscii());
+      sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile vp40 %s %s",
+	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)extraParameters.ToAscii(),
+	      (const char*)sourcePath.ToAscii());
       system(buffer);
     }
   }else{
-    profile = CG_PROFILE_ARBFP1;
+    profile = CG_PROFILE_FP40;
     if(recompile) {
       cerr << "Compiling Cg shader : " << shaderPath.ToAscii() << endl;
-      sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile arbfp1 %s",
-	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)sourcePath.ToAscii());
+      sprintf(buffer,"cgc -q -fastmath -fastprecision -o %s -entry %s -profile fp40 %s %s",
+	      (const char*)compiledName.ToAscii(),(const char*)shaderName.ToAscii(),(const char*)extraParameters.ToAscii(),
+	      (const char*)sourcePath.ToAscii());
       system(buffer);
     }
   }

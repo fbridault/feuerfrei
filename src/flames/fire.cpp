@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader)
+FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader, const char* const IESFilename)
 {  
   m_scene = scene;
   
@@ -24,10 +24,15 @@ FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader)
   m_lightPosition[3] = 1.0;
   
   m_cgShader = shader;
+  
+  m_orientationSPtheta = 0.0;
+
+  m_iesFile = new IES(IESFilename);
 }
 
 FlameLight::~FlameLight()
 {
+  delete m_iesFile;
 }
 
 void FlameLight::switchOff()
@@ -77,7 +82,8 @@ void FlameLight::drawShadowVolume ()
 /**********************************************************************************************************************/
 
 FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scene *scene, const char *filename, uint index, 
-		       CgSVShader *shader, const char *objName) : FlameLight(scene, index, shader)
+		       CgSVShader *shader, const char *objName) : 
+  FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii())
 {  
   char mtlName[255];
   m_solver = s;
@@ -136,4 +142,34 @@ Vector FireSource::getMainDirection()
     averageVec = (averageVec*i + m_flames[i]->getMainDirection ())/(i+1);
   
   return(averageVec);
+}
+
+void FireSource::computeIntensityPositionAndDirection()
+{
+  double r,y;
+  
+  Vector o = getMainDirection();
+  
+  // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
+  // et de la taille en y de la grille fois un coeff correcteur
+  m_intensity=o.length()/(m_solver->getDimY());
+//   m_intensity = log(m_intensity)/6.0+1;
+//   m_intensity = sin(m_intensity * PI/2.0);
+  /* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
+  m_intensity = sqrt(m_intensity);
+  // le centre du SP est la position de la flamme + la moitié du vecteur orientation
+  // (orientation = vecteur position vers dernière particule)
+  m_centreSP= getPosition()+(o/2.0);
+  
+  // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
+  // de o projeté perpendiculairement dans ce plan
+//   m_axeRotation.set(-o.z,0.0,o.x);
+  
+//   // l'angle de rotation theta est la coordonnée sphérique correspondante
+//   y=o.y;
+//   r = (double)o.length();
+//   if(r - fabs(y) < EPSILON)
+//     m_orientationSPtheta = 0.0;
+//   else
+//     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }

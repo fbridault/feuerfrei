@@ -1,0 +1,1203 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  3.5.7.1088
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl DRAPIERroul39
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau6.1024x1024.png
+
+newmtl DRAPIERroul36
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau22.2048x2048.png
+
+newmtl DRAPIERroul37
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau8.1024x1024.png
+
+newmtl DRAPIERroul38
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau2.1024x2048.png
+
+newmtl DRAPIERroul12
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau7.512x1024.png
+
+newmtl DRAPIERroul2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau5.1024x512.png
+
+newmtl DRAPIERroul4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau2.1024x2048.png
+
+newmtl DRAPIERroul6
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau6.1024x1024.png
+
+newmtl DRAPIERroul1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau3.1024x1024.png
+
+newmtl DRAPIERroul3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau15.512x1024.png
+
+newmtl DRAPIERroul13
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau2.1024x2048.png
+
+newmtl DRAPIERroul8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau17.2048x1024.png
+
+newmtl DRAPIERroul10
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau19.1024x1024.png
+
+newmtl DRAPIERroul18
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau16.512x512.png
+
+newmtl DRAPIERroul15
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau15.512x1024.png
+
+newmtl DRAPIERroul11
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau4.512x512.png
+
+newmtl DRAPIERroul7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau9.512x1024.png
+
+newmtl DRAPIERroul9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau8.1024x1024.png
+
+newmtl DRAPIERroul17
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau13.512x512.png
+
+newmtl DRAPIERroul16
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul14
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau1.1024x1024.png
+
+newmtl DRAPIERcoussin
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd toilerome2.512x512.png
+
+newmtl DRAPIERfrangeCoussin
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd BLENDfranche1.2048x512.png
+
+newmtl DRAPIERtissus2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd toileorange.1024x1024.png
+
+newmtl DRAPIERcucullus
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cuculus2.1024x512.png
+
+newmtl SOLTEST
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd solmaison1.2048x1024.png
+
+newmtl Mur
+Ka 0 0 0
+Kd 0.956863 0.905882 0.733333
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl DRAPIERmurBlanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl DRAPIERmur1g
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3sMot4.128x1024.png
+
+newmtl DRAPIERmur2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl DRAPIERmur1h
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3sMot4.128x1024.png
+
+newmtl DRAPIERmur1a
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl DRAPIERmur1b
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl DRAPIERmur1c
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl DRAPIERmur1d
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl DRAPIERmur1f
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3sMot4.128x1024.png
+
+newmtl DRAPIERmur1e
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BOUTIQUEcrepis
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd crepislisse3.1024x1024.png
+
+newmtl Poutre12
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre11
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre10
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl PoutreBoutique1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre6
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre19
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre20
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre16
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl BoisEscaliers
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisfonce2.1024x2048.png
+
+newmtl DRAPIERescaliers3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERescaliers1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERescaliers2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl Poutre17
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre18
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre15
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl Poutre13
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl Poutre14
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl DRAPIERpoutreplaf2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl DRAPIERpoutreplaf
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre2.2048x128.png
+
+newmtl DRAPIERsommetmeuble
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERmeubleF
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERmeubleD
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire4.1024x2048.png
+
+newmtl DRAPIERmeubleE
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire4.1024x2048.png
+
+newmtl DRAPIERmeubleG
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire4.1024x2048.png
+
+newmtl DRAPIERmeubleL
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERmeubleM
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERmeubleH
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire2.1024x512.png
+
+newmtl DRAPIERmeubleI
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire.1024x2048.png
+
+newmtl DRAPIERmeubleK
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire.1024x2048.png
+
+newmtl DRAPIEmobilier1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl DRAPIERmeubleJ
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERcoffre1clientBas
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERcoffreclientCotebas
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERcoffre1clientassise
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERcoffre1clientBordure
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERcoffre1client
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl BoisSuspension
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisfonce2.1024x2048.png
+
+newmtl BarreSuspension
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein.2048x1024.png
+
+newmtl DRAPIERcoffre2clientBas
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERcoffre2client
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERcomptoirB
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERcomptoirA
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire.1024x2048.png
+
+newmtl DRAPIERcoteComptoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERetagerPieds
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERetagereA
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERetagereB
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERbas1Banc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERbas2Banc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERassiseBanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERRebordBanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERdossierBanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl DRAPIERaccoudoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisplein3.1024x1024.png
+
+newmtl DRAPIERpanierOsier1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote2.1024x2048.png
+
+newmtl DRAPIERfondpanierOsier2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd fondpanier2.1024x1024.png
+
+newmtl DRAPIERpanierOsier2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote5.2048x1024.png
+
+newmtl DRAPIERfondpanierOsier5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd fondpanier2.1024x1024.png
+
+newmtl DRAPIERpanierOsier5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote7.2048x1024.png
+
+newmtl DRAPIERpanierOsier4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote6.2048x1024.png
+
+newmtl DRAPIERfondpanierOsier3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd fondpanier9.2048x1024.png
+
+newmtl DRAPIERpanierOsier3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote4.2048x1024.png
+
+newmtl DRAPIERpoignee1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poignepannier.128x512.png
+
+newmtl DRAPIERtissusPanier4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau4.512x512.png
+
+newmtl DRAPIERfondpanierOsier4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd fondpanier2.1024x1024.png
+
+newmtl DRAPIERtissusPanier
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau21.512x1024.png
+
+newmtl DRAPIERtissusPanier2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau7.512x1024.png
+
+newmtl DRAPIERtissusPanier3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau16.512x512.png
+
+newmtl DRAPIERcouverture1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau1.2048x2048.png
+
+newmtl DRAPIERcouverture3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau1.2048x2048.png
+
+newmtl DRAPIERcouverture2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau1.2048x2048.png
+
+newmtl DRAPIERrouleau
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERRouleau0
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERFRINGUE1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd vetromain3_rgba.1024x1024.png
+
+newmtl DRAPIERFRINGUE2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd vetromain4_rgba.2048x2048.png
+
+newmtl DRAPIERvoilageHaut2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau16.512x512.png
+
+newmtl DRAPIERvoilageHaut
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau6.1024x1024.png
+
+newmtl DRAPIERdraperieSuspendue1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau13.512x512.png
+
+newmtl cote11
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd paniercote11.1024x1024.png
+
+newmtl poigne
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poignepannier.128x512.png
+
+newmtl DRAPIERpanierplein1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau9.512x1024.png
+
+newmtl DRAPIERpanierplein3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau6.1024x1024.png
+
+newmtl DRAPIERpanierplein2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul25
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau1.1024x1024.png
+
+newmtl DRAPIERroul24
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau17.2048x1024.png
+
+newmtl DRAPIERroul21
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul23
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau19.1024x1024.png
+
+newmtl DRAPIERroul19
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau21.512x1024.png
+
+newmtl DRAPIERroul20
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau22.2048x2048.png
+
+newmtl DRAPIERroul22
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau8.1024x1024.png
+
+newmtl VANNIERnewPannier
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd basfauteuil.1024x1024.png
+
+newmtl VANNIERnewPannierpoignee
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd basfauteuil.1024x1024.png
+
+newmtl DRAPIERroul26
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau7.512x1024.png
+
+newmtl DRAPIERroul27
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau18.1024x1024.png
+
+newmtl DRAPIERroul28
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau2.1024x2048.png
+
+newmtl DRAPIERroul29
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau3.1024x1024.png
+
+newmtl DRAPIERroul31
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul30
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau14.1024x2048.png
+
+newmtl DRAPIERroul32
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau5.1024x512.png
+
+newmtl DRAPIERroul34
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau7.512x1024.png
+
+newmtl DRAPIERroul33
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau4.512x512.png
+
+newmtl DRAPIERroul35
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau9.512x1024.png
+
+newmtl DRAPIERtubeTissusdebout
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl DRAPIERroul40
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau20.1024x1024.png
+
+newmtl DRAPIERroul41
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tissucarreau21.512x1024.png

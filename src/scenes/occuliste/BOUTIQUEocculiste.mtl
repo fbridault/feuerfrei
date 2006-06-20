@@ -1,0 +1,569 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  3.5.7.1088
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl OCCULISTEcrepisPlaf
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.jpg
+
+newmtl Mur
+Ka 0 0 0
+Kd 0.956863 0.905882 0.733333
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl OCCULISTEStuckBlanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne11
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne12
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl SolBoutiqueNEW
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd solmaison1.2048x1024.jpg
+
+newmtl OCCULISTEmurOrne2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne10
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTEmurOrne3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.jpg
+
+newmtl OCCULISTElaraire
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd larere.1024x1024.jpg
+
+newmtl OCCULISTEetagere2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEetagereAcolyres
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte2.1024x2048.jpg
+
+newmtl OCCULISTEclaustra2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEclaustra1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEcomptoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEbanc
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl DRAPIERcoussin
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd toilerome2.512x512.jpg
+
+newmtl OCCULISTEetablis
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEmeubeFlacon
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte2.1024x2048.jpg
+
+newmtl OCCULISTEtabouret
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte2.1024x2048.jpg
+
+newmtl OCCULISTEbronzeBrasero
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl OCCULISTECharbon
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charbon.2048x1024.jpg
+
+newmtl onguents
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie2.1024x1024.jpg
+
+newmtl cendrier
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cendrierrome.1024x256.jpg
+
+newmtl OCCULISTEbouteille4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl verre
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl OCCULISTEoutils4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEbouteille2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl poterie1
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie6.1024x1024.jpg
+
+newmtl OCULISTEcouvercleBois
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCULISTEpotAongantARMOIRE2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.jpg
+
+newmtl bouket8
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd bouket8_rgba.512x512.jpg
+map_opacity bouket8_rgba.512x512.jpg
+map_d bouket8_rgba.512x512.jpg
+
+newmtl OCULISTEpotAongantARMOIRE1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd crepislisse3.1024x1024.jpg
+
+newmtl OCULISTEpotAongant2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie9.1024x512.jpg
+
+newmtl OCULISTEpotAongant
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie9.1024x512.jpg
+
+newmtl OCCULISTEverroterie7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl OCULISTEpotAongantARMOIRE3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd sigiceram3.1024x512.jpg
+
+newmtl OCULISTEmarmitte
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cotechaudron.2048x1024.jpg
+
+newmtl metal
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd metal.1024x1024.jpg
+
+newmtl OCCULISTEpotence
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd metaldark.1024x1024.jpg
+
+newmtl POTIERrideau
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd toileOcculiste.512x512.jpg
+
+newmtl OCCULISTEverroterie8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl OCCULISTEverroterie9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome2.512x1024.jpg
+
+newmtl OCCULISTEescliers
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCULISTEpotAongantARMOIRE4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie9.1024x512.jpg
+
+newmtl bois
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisescalier.2048x1024.jpg
+
+newmtl OCCULISTEverroterie
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl leave
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd LeafBrown.jpg
+map_opacity LeafBrown.jpg
+map_d LeafBrown.jpg
+
+newmtl bouket3
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd bouket3_rgba.1024x1024.jpg
+
+newmtl pot2
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cendrierrome.1024x256.jpg
+
+newmtl corne
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd osrome.2048x512.jpg
+
+newmtl TABLETIERos2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd osrome.2048x512.jpg
+
+newmtl OCCULISTEoutils8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEoutils6
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd flaconrome3.512x1024.jpg
+
+newmtl OCCULISTEamphore
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.jpg
+
+newmtl OCCULISTEtonneau
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEtonneauFerforge
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cotecrucherome1.1024x512.jpg
+
+newmtl OCCULISTEtonneau3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg
+
+newmtl OCCULISTEtonneau2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.jpg

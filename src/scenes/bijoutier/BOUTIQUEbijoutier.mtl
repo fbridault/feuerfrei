@@ -1,0 +1,401 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  3.5.7.1088
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl BIJOUTIERclaustra1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BancBijoutier
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERMeubleBasTiroirs
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERMeublepresentoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl BancOcculiste
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl BIJOUTIERpetitcomptoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERtable
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERtable2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERetagere2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERforgeSocle
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd betonsale.1024x2048.png
+
+newmtl BIJOUTIERforgeSocle2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd betonsale.1024x2048.png
+
+newmtl BIJOUTIERforgeSocle3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd betonsale.2048x1024.png
+
+newmtl ComptoirOcculiste
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl BIJOUTIERforgeSocle4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl BIJOUTIERMeubleHautTiroirs
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BIJOUTIERpetitMeubleBalance
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl BIJOUTIIERpoignees
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd metalrome1.1024x1024.png
+
+newmtl BIJOUTIERpetitMeubleBalance2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire5.1024x2048.png
+
+newmtl BIJOUTIEpetiteBalance
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd barreaurome.1024x128.png
+
+newmtl BIJOUTIEpetiteBalanceCORDE2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl BIJOUTIEpetiteBalanceCORDE
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl BIJOUTIEREetagere1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl SolBoutiqueNEW
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd solmaison1.2048x1024.png
+
+newmtl BIJOUTIERmurOrne5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BIJOUTIERmurOrne4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BIJOUTIERmurOrne1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3sMot4.128x1024.png
+
+newmtl BIJOUTIERmurOrne2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BIJOUTIERmurOrne3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3sMot4.128x1024.png
+
+newmtl BIJOUTIERmurOrne6
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BIJOUTIERmurOrne8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl SeuilBoutique
+Ka 0 0 0
+Kd 0.717647 0.717647 0.717647
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd dalle5.2048x512.png
+
+newmtl BIJOUTIERmurOrne7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl BOUTIQUEcrepis
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd crepislisse3.1024x1024.png
+
+newmtl BIJOUTIERmurOrne9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik3e.1024x1024.png
+
+newmtl PORTIQUEboutique1revetementHaut
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl ToitHautBoutique
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd tuileromfond2.2048x1024.png
+
+newmtl BIJOUTIERplafond
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl BIJOUTIERpoutre2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre3.4096x512.png
+
+newmtl BIJOUTIERpoutre4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre3.4096x512.png
+
+newmtl BIJOUTIERpoutre
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre3.4096x512.png
+
+newmtl BIJOUTIERpoutre3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre3.4096x512.png
+
+newmtl PoutrePlancher
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre4.2048x128.png
+
+newmtl BIJOUTIIERescaliersBeton
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl VANNIERescalierEpaisseur
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisfonce2.1024x2048.png
+
+newmtl BoisEscaliers
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisfonce2.1024x2048.png
+
+newmtl BoisEscaliers2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisescalier.2048x1024.png
+
+newmtl VANNIERescalierMontant
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd boisfonce2.1024x2048.png
+
+newmtl TABLETTIERecorce
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd ecorce.1024x2048.png
+
+newmtl TABLETTIERbuche
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd noeud.2048x1024.png
+
+newmtl TABLETTIERecorce2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd ecorce.1024x2048.png

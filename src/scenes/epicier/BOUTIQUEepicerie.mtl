@@ -1,0 +1,536 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  3.5.7.1088
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl EPICERIEtraiteaux
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICERIEetagere
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICIERIEtabouret
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICERIEcasier
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICIERmurBLANCcrepis
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl SOLTEST
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd solmaison1.2048x1024.png
+
+newmtl Mur
+Ka 0 0 0
+Kd 0.956863 0.905882 0.733333
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl LesPoutresBoutiques3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poutre5.2048x128.png
+
+newmtl EPICERIEseuil3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd dalle5.2048x512.png
+
+newmtl EPICIERmur1a
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICIERmur1b
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICIERmur1c
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICIERmur1d
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICIERmur1e
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICERIEmurboutique
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd freskboutik1b.1024x1024.png
+
+newmtl EPICIERlaraire
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd larere.1024x1024.png
+
+newmtl EPICERIEescaliers
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICERIEpoutrePlafond
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl PlancherTapi11
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi10
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi9
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi8
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi7
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi6
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi5
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi4
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl PlancherTapi1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd charpente.1024x512.png
+
+newmtl POTIERcomptoir
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl POTIERcomptoirCOLONNE
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl BUREAUmurMarbre
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl OCCULISTEetablis
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICERIEdoliatop3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl DECORamphore3
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl EPICERIEdoliatopcouvercleBOIS1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte2.1024x2048.png
+
+newmtl EPICERIEdoliatop
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd solbasilic.2048x2048.png
+
+newmtl EPICERIEdoliatop2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl EPICERIEetagerePierre
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platrebase2.1024x1024.png
+
+newmtl EPICERIEcruche3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl EPICERIEcruche1
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl EPICERIEcruche2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl marbre
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl GOBELET
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie6.1024x1024.png
+
+newmtl OCCULISTEtonneau
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl OCCULISTEtonneauFerforge
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd cotecrucherome1.1024x512.png
+
+newmtl OCCULISTEtonneau3
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl OCCULISTEamphore
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl OCCULISTEtonneau2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd porte3.1024x2048.png
+
+newmtl EPICERIEsacdeJute
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl EPICERIEamphoreHuile
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl poterie15
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl bassit
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd basfauteuil.1024x1024.png
+
+newmtl fond2
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd BLENDfondpanier2.1024x1024.png
+
+newmtl EPICERIElentilles
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd lentilles.png
+
+newmtl bois
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd portearmoire3.2048x1024.png
+
+newmtl DECORamphore
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl citron
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd lemon.png
+
+newmtl EPICERIEpoterieCitron
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl citron2
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd citron.png
+
+newmtl EPICERIEpoteriefigues
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd poterie8.2048x1024.png
+
+newmtl grenade
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd grenade.png
+
+newmtl grenade_int
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd grenade_int.png
+
+newmtl EPICERIEBalanceCuivre
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platcuivre.1024x1024.png
+
+newmtl EPICERIEBalanceplateau
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd platcuivre.1024x1024.png
+
+newmtl EPICERIEBalanceCorde
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd Corde.png
+
+newmtl EPICERIEBalanceCorde2
+Ka 0 0 0
+Kd 1 1 1
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd Corde.png

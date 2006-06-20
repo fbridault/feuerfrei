@@ -418,8 +418,13 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
   
   wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
-    filename = fileDialog.GetFilename();
+    filename = fileDialog.GetPath();
     
+    /* Récupération le chemin absolu vers la scène */
+    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    /* Suppression du premier slash */
+    filename=filename.Mid(1);
+    cerr << filename << endl;
     if(!filename.IsEmpty()){
       m_currentConfig.sceneName = filename;
       m_glBuffer->Restart();

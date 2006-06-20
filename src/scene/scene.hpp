@@ -47,6 +47,10 @@ private:
   GLuint m_displayLists[8];
   int m_nbFlames;
   FireSource **m_flames;
+
+  char m_currentDir[255];
+
+  void getSceneAbsolutePath(const char* const fileName);
   
 public:
   /**

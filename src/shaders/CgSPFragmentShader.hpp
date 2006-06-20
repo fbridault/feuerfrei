@@ -33,26 +33,28 @@ public:
     cgSetParameter1i(paramIsTextured, value);
   }
   
-  void SetTexture(GLuint texture, uint tex2DSize[2]){
+  void SetTexture(GLuint texture){
     m_tex = texture;
-    m_tex2DSize[0] = tex2DSize[0];
-    m_tex2DSize[1] = tex2DSize[1];
   };
   
-  void enableShader(GLdouble *centreSP, GLdouble *fluctuationIntensite, GLdouble *AZValues)
-  {
-//     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX, CG_GL_MATRIX_IDENTITY);
+  void SetInitialParameters(GLdouble *AZValues){
+    
     cgGLSetTextureParameter(paramTextureSP, m_tex);
     cgGLEnableTextureParameter(paramTextureSP);
     
-    cgGLSetParameterArray3d(paramCentreSP, 0, m_nbFlames, centreSP);
-    cgGLSetParameterArray1d(paramFluctuationIntensite, 0, m_nbFlames, fluctuationIntensite);
-    
-    cgGLSetParameter2d(paramTex2DSize, m_tex2DSize[0], m_tex2DSize[1]);
+    cgSetParameter1i(paramIncR, m_nbFlames > 1 ? 1/(m_nbFlames-1) : 0);
     if(interp)
       cgGLSetParameterArray3d(lazimut_lzenith_denom, 0, m_nbFlames, AZValues);
     else
       cgGLSetParameterArray2d(lazimut_lzenith, 0, m_nbFlames, AZValues);
+  }
+  
+  void enableShader(GLdouble *centreSP, GLdouble *fluctuationIntensite)
+  {
+//     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX, CG_GL_MATRIX_IDENTITY);
+    cgGLSetParameterArray3d(paramCentreSP, 0, m_nbFlames, centreSP);
+    cgGLSetParameterArray1d(paramFluctuationIntensite, 0, m_nbFlames, fluctuationIntensite);
+    
     enableProfile();
     bindProgram();
   }
@@ -63,13 +65,13 @@ private:
   CGparameter paramTextureSP;
   CGparameter lazimut_lzenith_denom;
   CGparameter lazimut_lzenith;
+  CGparameter paramIncR;
   CGparameter TextureSPMatrix;
   CGparameter paramCentreSP;
   CGparameter paramFluctuationIntensite;
   CGparameter paramIsTextured;
-  CGparameter paramTex2DSize;
   
-  GLuint m_tex, m_nbFlames, m_tex2DSize[2];
+  GLuint m_tex, m_nbFlames;
 };
 
 #endif

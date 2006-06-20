@@ -25,17 +25,16 @@ float4 fpSPSeul(in vertexOutputsTEX IN,
 		uniform float fluctuationIntensite[NB_SOURCES],
 		uniform float2 lazimut_lzenith[NB_SOURCES],
 /* 		uniform float4x4 TextureSPMatrix, */
-		uniform float2 tailleTex2D) : COLOR
+		uniform float incr) : COLOR
 {
   // calcul de l'intensite d'eclairage stockee dans la texture du solide photometrique
   
   // application de la rotation du SP selon l'inclinaison de la flamme
 /*   IN.PT3D = mul(TextureSPMatrix, IN.PT3D); */
   
-  float3 point;
-  float color, r, theta, phi, rtex, ColorSP, attenuation;
-  float3 texcoordsSP;
-  rtex=0;
+  float3 point,texcoordsSP;
+  float color, r, theta, phi, ColorSP, attenuation;
+  float rtex=0;
   for (int i = 0; i < NB_SOURCES; i++) {
     // translation inverse du centre du SP
     point = IN.PT3D.xyz - centreSP[i];
@@ -47,12 +46,8 @@ float4 fpSPSeul(in vertexOutputsTEX IN,
     
     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
     // On divise par la taille max de la texture en 2D (xy) pour avoir entre 0 et 1
-
-    if(NB_SOURCES > 1)
-      rtex = i / (NB_SOURCES-1);
-    texcoordsSP = float3(phi / lazimut_lzenith[i].x / tailleTex2D.x, theta / lazimut_lzenith[i].y / tailleTex2D.y, rtex);
+    texcoordsSP = float3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex);
     
-/*     float3 texcoordsSP = float3(1,1,1); */
     // recuperation de l'intensite du fragment
     ColorSP = tex3D(textureSP, texcoordsSP).x;
     
@@ -64,6 +59,7 @@ float4 fpSPSeul(in vertexOutputsTEX IN,
     ColorSP *= fluctuationIntensite[i];
     
     color += ColorSP;
+    rtex += incr;
   }
   color = color / NB_SOURCES;
   return float4(color.rrr,1.0);
@@ -77,10 +73,12 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
 	       uniform float3 centreSP[NB_SOURCES],
 	       uniform float fluctuationIntensite[NB_SOURCES],
 	       uniform float2 lazimut_lzenith[NB_SOURCES],
-	       uniform float2 tailleTex2D,
+	       uniform float incr,
 /* 	       uniform float4x4 TextureSPMatrix, */
 	       uniform int isTextured) : COLOR
 {
+/*   if(dot(IN.normale,IN.PT3D.xyz) > 0.15) */
+/*     discard; */
   // Couleur de la flamme (en dur pour l'instant)
   float4 CouleurFlamme = float4(R,G,B,1.0);
   
@@ -96,29 +94,29 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     colorTex = float4(1.0,1.0,1.0,1.0);
   
   float3 point,texcoordsSP,direction;
-  float result, color, r, theta, phi, rtex, ColorSP, attenuation, cosSN;
-  rtex=0;
+  float result, color, r, theta, phi, ColorSP, attenuation, cosSN;
+  /* Les normales sont normalisées dans le programme grâce à glEnable (GL_NORMALIZE) */
+  /*   float3 normale = normalize(IN.normale); */
   
+  float rtex=0;
+
   for (int i = 0; i < NB_SOURCES; i++) {
     // Calcul de la direction du point3D vers le centre du SP
     direction = centreSP[i] - IN.PT3D.xyz;
     
     // - cos de l'angle entre la direction de la source et la normale au point
-    cosSN = dot(normalize(direction),normalize(IN.normale));
+    cosSN = dot(normalize(direction),IN.normale);
     
     // translation inverse du centre du SP
-    point = IN.PT3D.xyz - centreSP[i];
+    point = -direction;
     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
     // attention y est suppose etre la hauteur et z la profondeur
     r = length(point.xyz);
     theta=acos(point.y / r);
     phi=atan2(point.z,point.x);
     
-    rtex=0;
-    if(NB_SOURCES > 1)
-      rtex = i / (NB_SOURCES-1);
-    // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture 
-    texcoordsSP = float3(phi / lazimut_lzenith[i].x / tailleTex2D.x, theta / lazimut_lzenith[i].y / tailleTex2D.y, rtex);
+    // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
+    texcoordsSP = float3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex);
     
     // recuperation de l'intensite du fragment
     ColorSP = tex3D(textureSP, texcoordsSP).x;
@@ -133,48 +131,9 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     ColorSP *= fluctuationIntensite[i];
     
     color += ColorSP;
+    rtex += incr;
   }
   color = color / NB_SOURCES;
   // melange de la couleur de l'objet, de sa texture et de l'intensite
   return colorTex * float4(color.rrr,1.0) * CouleurFlamme * IN.Col0;
-}
-
-
-/********************************************************************************/
-
-/********************************************************************************/
-
-float4 fpSPSeulBFCTEX(in vertexOutputsTEX IN,
-		      uniform sampler2D textureFichierOBJ,
-		      uniform samplerRECT textureSP,
-		      uniform float3 centreSP,
-		      uniform float fluctuationIntensite,
-		      uniform float2 lazimut_lzenith,
-		      uniform float4x4 TextureSPMatrix) : COLOR
-{
-  // calcul de l'intensite d'eclairage stockee dans la texture du solide photometrique
-
-  // application de la rotation du SP selon l'inclinaison de la flamme
-  IN.PT3D = mul(TextureSPMatrix, IN.PT3D);
-  // translation inverse du centre du SP
-  IN.PT3D.xyz -= centreSP;
-  // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
-  // attention y est suppose etre la hauteur et z la profondeur
-  float r = length(IN.PT3D.xyz);
-  float theta=acos(IN.PT3D.y / r);
-  float phi=atan2(IN.PT3D.z,IN.PT3D.x);
-
-  // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
-  float2 texcoordsSP = float2(phi / lazimut_lzenith.x ,theta / lazimut_lzenith.y);
-  // recuperation de l'intensite du fragment
-  float ColorSP = texRECT(textureSP, texcoordsSP).x;
-        
-  // attenuation de l'intensite en fonction de la flamme
-  ColorSP *= fluctuationIntensite;
-
-  //if(dot(normalize(IN.normale),normalize(IN.PT3D.xyz)) < 0.15)
-  if(dot(IN.normale,IN.PT3D.xyz) < 0.15)
-    return float4(ColorSP.rrr,1.0);
-  else
-    return float4(0.0,0.0,0.0,1.0);
 }

@@ -19,7 +19,7 @@ CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxStrin
   if(type & 2)
     paramIsTextured = cgGetNamedParameter(program, "isTextured");
 
-  paramTex2DSize = cgGetNamedParameter(program, "tailleTex2D");
+  paramIncR = cgGetNamedParameter(program, "incr");
 }
 
 CgSPFragmentShader::~CgSPFragmentShader()

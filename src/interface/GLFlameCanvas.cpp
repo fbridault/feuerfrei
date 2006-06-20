@@ -110,11 +110,12 @@ void GLFlameCanvas::InitFlames(void)
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
       m_flames[i] = new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				m_scene, "bougie.obj", i, m_SVShader, m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
+				m_scene, "scenes/bougie.obj", i, m_SVShader, 
+				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
       break;
     case FIRMALAMPE :
       m_flames[i] = new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				   m_scene, "firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].wickName.fn_str());
+				   m_scene, "scenes/firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].wickName.fn_str());
       break;
     case TORCH :
       m_flames[i] = new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
@@ -126,7 +127,7 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case CANDLESTICK :
       m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				     m_scene, "bougie.obj", i, m_SVShader, 
+				     m_scene, "scenes/bougie.obj", i, m_SVShader, 
 				     m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
       break;
     default :
@@ -215,11 +216,9 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
   
   InitFlames();
-  /* Changement de répertoire pour les textures */
-  //AS_ERROR(chdir("textures"),"chdir textures");
+  
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, m_flames, m_currentConfig->nbFlames, &m_context, recompileShaders);
   
-  //AS_ERROR(chdir(".."),"chdir ..");
   m_scene->createDisplayLists();
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
@@ -256,12 +255,12 @@ void GLFlameCanvas::Restart (void)
   
   InitUISettings();
   InitScene(false);
+  setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
   ::wxStartTimer();
   m_init = true;
   cerr << "Réinitialisation terminée" << endl;
   Enable();
 }
-
 
 void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
 {
@@ -504,7 +503,7 @@ void GLFlameCanvas::drawScene()
       if (!m_currentConfig->shadowsEnabled)
 	m_flames[f]->switchOn (intensities[f]);
     }
-    
+  
   if (m_currentConfig->shadowsEnabled)
     cast_shadows_double();
   else
@@ -662,7 +661,7 @@ GLFlameCanvas::cast_shadows_double ()
   glPopAttrib ();
 
   /* On teste ensuite Ã  l'endroit où il faut dessiner */
-  glDepthFunc (GL_EQUAL);
+  glDepthFunc (GL_LEQUAL);
 
   glEnable (GL_STENCIL_TEST);
   glStencilFunc (GL_EQUAL, 0, ~0);
@@ -695,5 +694,4 @@ GLFlameCanvas::cast_shadows_double ()
     m_scene->draw_scene ();
   }else
     m_photoSolid->draw(m_currentConfig->BPSEnabled);
-  
 }

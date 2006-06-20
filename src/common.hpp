@@ -29,9 +29,10 @@ using namespace std;
 #define FLICKERING_RANDOM 3
 
 #define FDF_LINEAR 0
-#define FDF_EXPONENTIAL 1
-#define FDF_GAUSS 2
-#define FDF_RANDOM 3
+#define FDF_BILINEAR 1
+#define FDF_EXPONENTIAL 2
+#define FDF_GAUSS 3
+#define FDF_RANDOM 4
 
 class SolverConfig{
 public:

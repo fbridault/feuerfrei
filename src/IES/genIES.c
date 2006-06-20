@@ -31,12 +31,12 @@ int main(int argc, char **argv)
   }
   
   fprintf(f,"SPV1.0\n#NBZENITH %d\n#NBAZIMUTH %d\n",sizex,sizey);
-  nbValIntermediaires = sizex / nbVal;
+  nbValIntermediaires = sizex / (nbVal-1);
   for( v=4; v < argc-1; v++ )
     {
-      incx = (atof(argv[v+1]) - atof(argv[v])) / (double)(nbValIntermediaires+1);
+      incx = (atof(argv[v+1]) - atof(argv[v])) / (double)(nbValIntermediaires);
       valx = atof(argv[v]);
-      for( i=0 ; i < nbValIntermediaires+1 ; i++){
+      for( i=0 ; i < nbValIntermediaires ; i++){
 	for( j=0 ; j < sizey ; j++)
 	  fprintf(f,"%f ",valx);
 	valx+=incx;

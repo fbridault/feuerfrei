@@ -116,6 +116,26 @@ Scene::~Scene ()
   glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
 }
 
+void Scene::getSceneAbsolutePath(const char* const fileName)
+{
+  bool found=false;
+  
+  cerr << fileName << endl;
+  if(strlen(fileName) > 255)
+    cerr << "Dir string too long" << endl;
+  
+  for( int i=strlen(fileName)-1 ; i >= 0 ; i--)
+    {
+      if(found)
+	m_currentDir[i]=fileName[i];
+      else
+	if(fileName[i] == '/'){
+	  found=true;
+	  m_currentDir[i+1]='\0';
+	  m_currentDir[i]=fileName[i];
+	}
+    }
+}
 
 bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const char* objName)
 {
@@ -133,16 +153,18 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
   bool importSingleObject = (object != NULL);
   bool lookForSpecificObject = (objName != NULL);
   
-  AS_ERROR(chdir("./scenes"),"chdir scenes dans importOBJ");
+  getSceneAbsolutePath(fileName);
+  
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
-    throw (ios::failure ("Open error"));
+    throw (ios::failure ("Open scene error"));
     return false;
   }
+  
   while (!objFile.eof())
     {
       objFile >> lettre;
-            
+      
       switch (lettre)
 	{
 	default:
@@ -154,7 +176,6 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	    /* Nouvel objet */
 	    if(alreadyOneObject){
 	      objFile.close ();
-	      chdir("..");
 	      return (currentObject != NULL);
 	    }else{
 	      if(lookForSpecificObject){
@@ -345,7 +366,6 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	}
     }
   objFile.close ();
-  chdir("..");
 	      
   if(importSingleObject)
     return (currentObject != NULL);
@@ -361,7 +381,6 @@ void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsL
   
   int len = strlen(prefix);
   
-  AS_ERROR(chdir("./scenes"),"chdir scenes dans getObjectsNameFromOBJ");
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
     throw (ios::failure ("Open error"));
@@ -386,7 +405,6 @@ void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsL
 	}
     }
   objFile.close ();
-  chdir("..");
 }
 
 bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
@@ -394,11 +412,10 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
   char lettre;
   char buffer[255];
   
-  AS_ERROR(chdir("./scenes"),"chdir scenes dans getMTLFileNameFromOBJ");
+  getSceneAbsolutePath(fileName);
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
     throw (ios::failure ("Open error"));
-    chdir("..");
     return false;
   }
   while (!objFile.eof())
@@ -409,9 +426,9 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
 	case 'm':
 	  /* On évite la définition des matériaux, elle doit être faite au prélable */
 	  objFile >> buffer >> buffer;
-	  strcpy(mtlName, buffer);
+	  
+	  strcpy(mtlName,buffer);
 	  objFile.close ();
-	  chdir("..");
 	  return true;
 	  break;
 	default:
@@ -420,7 +437,7 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
 	}
     }
   objFile.close ();
-  chdir("..");
+  
   return false;
 }
 
@@ -428,10 +445,13 @@ void Scene::importMTL(const char* fileName)
 {
   char lettre, lettre2;
   char buffer[255];
+  char texturePath[512];
   Texture *nouvelle_texture = NULL;
   string name_nouvelle_matiere;
   
-  ifstream matFile(fileName, ios::in);
+  strcpy(buffer,m_currentDir);
+  strcat(buffer,fileName);
+  ifstream matFile(buffer, ios::in);
   if (!matFile.is_open ()){
     throw (ios::failure ("Open error"));
     return;
@@ -512,7 +532,9 @@ void Scene::importMTL(const char* fileName)
 	case 'm':		//map_K?
 	  matFile >> buffer >> buffer;
 	  //nouvelle_texture = new Texture (buffer);
-	  nouvelle_texture = new Texture (wxString(buffer, wxConvUTF8));
+	  strcpy(texturePath, m_currentDir);
+	  strcat(texturePath,buffer);
+	  nouvelle_texture = new Texture (wxString(texturePath, wxConvUTF8));
 	  break;
 	default:
 	  matFile.getline(buffer, sizeof (buffer));

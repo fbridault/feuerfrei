@@ -26,6 +26,7 @@ PhotometricSolidsRenderer::~PhotometricSolidsRenderer()
   delete [] m_centers;
   delete [] m_intensities;
   delete [] m_lazimuth_lzenith;
+  delete m_photometricSolidsTex;
 }
 
 void PhotometricSolidsRenderer::generateTexture(void)
@@ -33,12 +34,6 @@ void PhotometricSolidsRenderer::generateTexture(void)
   uint tmp, sav, p;
   uint sizex, sizey;
   float *tex3DValues, *ptrTex;
-  
-  for(uint k=0; k < m_nbFlames; k++){
-    m_lazimuth_lzenith[k*2] = m_flames[k]->getLazimut();
-    m_lazimuth_lzenith[k*2+1] = m_flames[k]->getLzenith();
-    cerr << m_lazimuth_lzenith[k*2] << " " << m_lazimuth_lzenith[k*2+1] << endl;
-  }
   
   m_tex2DSize[0] = m_tex2DSize[1] = 0;
   /* Calcul de la taille maximale */
@@ -80,18 +75,18 @@ void PhotometricSolidsRenderer::generateTexture(void)
     sizey = m_flames[k]->getIESZenithSize();
     
     /* On crée la texture 3D en remplissant de 0 là où on n'a pas de valeur */
-    for(uint j=0; j < m_tex2DSize[1]; j++){
-      if(j < sizey)
-	for(uint i=0; i < m_tex2DSize[0]; i++){
-	  if(i < sizex)
-	    *ptrTex++ = *values++;
-	  else
-	    *ptrTex++ = 0;
-	}
-      else
-	for(uint i=0; i < m_tex2DSize[0]; i++)
-	  *ptrTex++ = 0;
+    for(uint j=0; j < sizey; j++){
+      
+      for(uint i=0; i < sizex; i++)
+	*ptrTex++ = *values++;
+      for(uint i=sizex; i < m_tex2DSize[0]; i++)
+	*ptrTex++ = 0;
+      
     }
+    
+    for(uint j=sizey; j < m_tex2DSize[1]; j++)
+      for(uint i=0; i < m_tex2DSize[0]; i++)
+	*ptrTex++ = 0;      
   }
   
 //   ptrTex = tex3DValues;
@@ -107,8 +102,23 @@ void PhotometricSolidsRenderer::generateTexture(void)
   
   m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_nbFlames, tex3DValues);
 
-  m_SPFragmentShader[0]->SetTexture(m_photometricSolidsTex->getTexture(), m_tex2DSize);
-  m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture(), m_tex2DSize);
+  m_SPFragmentShader[0]->SetTexture(m_photometricSolidsTex->getTexture());
+  m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture());
+  
+  for(uint k=0; k < m_nbFlames; k++){
+    /* On prend l'inverse pour éviter une division et on divise par la taille */
+    /* pour avoir sur l'intervalle [O:1] dans l'espace de la texture */
+    /* Le calcul final d'un uv dans le shader est le suivant : */
+    /* phi / m_lazimuth_lzenith[i].x / m_tex2Dsize[0] */
+    /* Ce qui est simplifié grâce au traitement effectué ici en : */
+    /* phi * m_lazimuth_lzenith[i].x */
+    m_lazimuth_lzenith[k*2] = (1/m_flames[k]->getLazimut())/m_tex2DSize[0];
+    m_lazimuth_lzenith[k*2+1] = (1/m_flames[k]->getLzenith())/m_tex2DSize[1];
+//     cerr << m_lazimuth_lzenith[k*2] << " " << m_lazimuth_lzenith[k*2+1] << endl;
+  }
+  
+  m_SPFragmentShader[0]->SetInitialParameters(m_lazimuth_lzenith);
+  m_SPFragmentShader[1]->SetInitialParameters(m_lazimuth_lzenith);
 
   delete [] tex3DValues;
 }
@@ -121,7 +131,6 @@ void PhotometricSolidsRenderer::draw(u_char color)
     
     m_intensities[k] = m_flames[k]->getIntensity();
     m_flames[k]->getCenterSP(m_centers[k*3], m_centers[k*3+1], m_centers[k*3+2]);
-//     cerr << m_intensities[k] << " " << m_centers[k*3] << " " << m_centers[k*3+1] << " " << m_centers[k*3+2] << endl;
   }
   
   /* Affichage des objets sans couleur */
@@ -129,7 +138,7 @@ void PhotometricSolidsRenderer::draw(u_char color)
   if(color == 0){
     m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
-    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities,m_lazimuth_lzenith);
+    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
     m_scene->draw_scene(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[color]->disableProfile();
@@ -137,11 +146,9 @@ void PhotometricSolidsRenderer::draw(u_char color)
     /* Affichage des objets avec textures */
     m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
-    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities,m_lazimuth_lzenith);
+    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
     m_SPFragmentShader[color]->setIsTextured(1);
     m_scene->draw_sceneTEX();
-    m_SPFragmentShader[color]->disableProfile();
-    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities,m_lazimuth_lzenith);
     m_SPFragmentShader[color]->setIsTextured(0);
     m_scene->draw_sceneWTEX(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();

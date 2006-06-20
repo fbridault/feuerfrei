@@ -54,8 +54,6 @@ void FlamePanel::setProperties()
   m_posZTextCtrl->SetMinSize(wxSize(50, 22));
   m_wickTextCtrl->SetMinSize(wxSize(120, 22));
   m_flameTypeRadioBox->SetSelection(0);
-  m_wickLabel->Disable();
-  m_wickTextCtrl->Disable();
 }
 
 
@@ -162,7 +160,11 @@ void FlamePanel::OnClickButtonBrowseWick(wxCommandEvent& event)
   
   wxFileDialog fileDialog(this, _("Choose a OBJ file for the wick"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
-    filename = fileDialog.GetFilename();
+    filename = fileDialog.GetPath();
+    
+    /* On récupère le chemin absolu vers la scène */
+    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    filename=filename.Mid(1);
     
     if(!filename.IsEmpty())
       m_wickTextCtrl->SetValue(filename);    
@@ -270,6 +272,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	m_currentConfig->flames[i].samplingTolerance = 100;
 	m_currentConfig->flames[i].flickering = 0;
 	m_currentConfig->flames[i].fdf = 0;
+	m_currentConfig->flames[i].IESFileName = _("IES/test.ies");
       }else
 	return;      
     }

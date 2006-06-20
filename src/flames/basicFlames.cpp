@@ -340,7 +340,10 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	
 	switch(fdf){
 	case FDF_LINEAR :
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u);
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * ((*pointsIterator)->m_u + 1));
+	  break;
+	case FDF_BILINEAR :
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u );
 	  break;
 	case FDF_EXPONENTIAL :
 	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
@@ -356,9 +359,9 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	
 	switch(perturbate){
 	case FLICKERING_VERTICAL :
-	  if (m_perturbateCount == 2)
+	  if (m_perturbateCount == 5)
 	    {
-	      m_solver->addVsrc (ptx, pty, ptz, m_innerForce);
+	      m_solver->addVsrc (ptx, pty, ptz, m_innerForce*5);
 	      m_perturbateCount = 0;
 	    }
 	  else
@@ -410,7 +413,7 @@ void LineFlame::build ()
   
   m_size = m_maxParticles + m_nbFixedPoints;
   
-  vinc = 1.2 / (double)(m_size-1);
+  vinc = 1.0 / (double)(m_size-1);
   vtmp = 0;
   for (i = 0; i < m_size; i++){
     m_texTmp[i] = vtmp;
@@ -420,7 +423,7 @@ void LineFlame::build ()
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .25;
+      vtex += .15;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_skeletons[i]->getSize () < m_maxParticles)

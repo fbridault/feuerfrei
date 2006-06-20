@@ -51,6 +51,7 @@ void FlameLight::switchOn(double coef)
   glLightfv(m_light,GL_DIFFUSE,val_diffuse);
   glLightfv(m_light,GL_SPECULAR,val_specular);
   glLightfv(m_light,GL_AMBIENT,val_null);
+  glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.005);
   glEnable(m_light);
 }
 
@@ -93,11 +94,8 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
   
   if(objName != NULL && scene->getMTLFileNameFromOBJ(filename, mtlName)){
     cerr << filename << " utilise le fichier MTL " << mtlName << endl;
-    AS_ERROR(chdir("./scenes"),"chdir scenes dans getMTLFileNameFromOBJ");
     scene->importMTL(mtlName);
-    chdir("..");
   }
-  
   m_luminary = new Object(scene);
   hasLuminary = scene->importOBJ(filename, m_luminary, true, objName);
   if(hasLuminary){

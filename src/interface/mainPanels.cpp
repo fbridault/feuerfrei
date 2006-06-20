@@ -219,8 +219,9 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   };
   const wxString m_FDFRadioBoxChoices[] = {
     _("Linear"),
-    _("Exponential"),
     _("Bilinear"),
+    _("Exponential"),
+    _("Gauss"),
     _("Random")
   };
   
@@ -259,7 +260,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
-					4, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
+					5, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
 
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
   m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,

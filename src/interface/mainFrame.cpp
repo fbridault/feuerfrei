@@ -90,7 +90,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
 //   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
   m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
-  m_solidSizer->Add(m_buttonSwap, 1, 0, 0);
   
   m_topSizer = new wxBoxSizer(wxHORIZONTAL);
   m_topSizer->Add(m_globalSizer, 2, wxEXPAND, 0);

@@ -1,0 +1,19 @@
+#Produced by Art of Illusion 2.3, Tue Jun 20 18:15:55 CEST 2006
+newmtl Sol
+Kd 1 1 1
+map_Kd scene_bonfire1.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Pierre
+Kd 1 1 1
+map_Kd scene_bonfire3.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Herbe
+Kd 1 1 1
+map_Kd scene_bonfire2.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1

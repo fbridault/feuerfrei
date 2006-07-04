@@ -18,6 +18,7 @@ enum
     IDRB_FLICK,
     IDRB_FDF,
     IDB_BROWSE,
+    IDCHK_MOVE,
   };
 
 enum
@@ -66,6 +67,7 @@ private:
   wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
   wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
   wxBoxSizer *m_forcesSizer;
+  wxCheckBox *m_moveCheckBox;
   
   SolverConfig *m_solverConfig;
   /* Index du solveur */

@@ -240,7 +240,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
   ::wxStartTimer();
   
   m_init = true;
-  int val;
+  
   cerr << "Initialisation terminée" << endl;
 }
 
@@ -383,9 +383,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /* On module la largeur de la gaussienne */    
     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
     
-    //Point position(m[3][0], m[3][1], m[3][2]);
-    // Vector direction = position:
-    //dist = direction.length();
+    Point position(m[3][0], m[3][1], m[3][2]);
+    Vector direction = position;
+    dist = direction.length();
     
     /* Définition de la largeur de la gaussienne en fonction de la distance */
     /* A définir de manière plus précise par la suite */
@@ -409,7 +409,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       m_glowEngine->setGaussSigma(sigma);
       
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      int val;
+      
       /* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);

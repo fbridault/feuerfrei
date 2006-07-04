@@ -16,28 +16,33 @@ class Particle : public Point
 {
 public:
   /** Durée de vie de la particule */
-  uint lifespan;
+  uint m_lifespan;
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */
-  Particle():Point(){lifespan=0;};
+  Particle():Point(){m_lifespan=0;};
+  
+  Particle(const Point& P, uint lifespan):Point(P)
+  {
+    m_lifespan=lifespan;
+  };
   
   /** Constructeur par recopie */
   Particle(const Particle& P):Point(P)
   {
-    lifespan=P.lifespan;
+    m_lifespan=P.m_lifespan;
   };
   
   /** Décrémente la durée de vie de la particule */
-  void decreaseLife(){lifespan--;};
+  void decreaseLife(){m_lifespan--;};
   /** Test pour déterminer si la particule est encore vivante */
-  bool isDead(){return (lifespan < 1);};
+  bool isDead(){return (m_lifespan < 1);};
   /** Naissance d'une particule, on affecte sa durée de vie à la valeur passée en paramètre
    * @param l durée de vie en terme d'itérations
    */
-  void birth(uint l){lifespan=l;};
+  void birth(uint l){m_lifespan=l;};
   
-  virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; lifespan=P.lifespan; return *this;};
+  virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; m_lifespan=P.m_lifespan; return *this;};
   virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
 	
 private:

@@ -121,7 +121,7 @@ void DepthPeelingEngine::render()
 {   
   glDisable (GL_DEPTH_TEST);
   
-  glBlendFunc (GL_ONE, GL_ONE);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE);
   
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -132,11 +132,16 @@ void DepthPeelingEngine::render()
   glLoadIdentity();
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
+  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   for(uint l=0; l <= m_nbLayers; l++){
     
     m_colorTex[l]->bind();
     
-    glColor4f(1.0,1.0,1.0,1.0);
+    if(l==0)
+      glColor4f(1.0,1.0,1.0,1.0);
+    else      
+      glColor4f(1.0,1.0,1.0,0.6);
+    
     glBegin(GL_QUADS);
 	
     glTexCoord2f(0,m_height);

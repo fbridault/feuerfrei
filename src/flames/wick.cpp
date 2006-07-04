@@ -209,7 +209,6 @@ Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point
 	  barycentre = barycentre / (double)n;
 	  
 	  m_leadPointsArray.push_back (new WickPoint (barycentre, 2*(i+1)/(double)(nb_lead_skeletons+1)-1));
- 	  cerr << 2*(i+1)/(double)(nb_lead_skeletons+1)-1 << endl;
  	}
       else
 	 cerr << "Partition " << i << " vide" << endl;

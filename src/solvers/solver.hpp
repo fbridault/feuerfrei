@@ -144,7 +144,7 @@ public:
   void displayVelocityField (void);
   /** Fonction de dessin de la vélocité d'une cellule */
   void displayArrow (Vector * const direction);
-
+  
   /* Retrouver la cellule où est située la particule */
   void findPointPosition(Point& p, uint& i, uint& j, uint& k)
   {

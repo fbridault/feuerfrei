@@ -86,11 +86,14 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
   
+  m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
+  
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
   m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
+  m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);  
   m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversXAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
@@ -120,9 +123,10 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 		m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 		m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       
-      m_glBuffer->moveSolver(m_index, pt);
+      m_glBuffer->moveSolver(m_index, pt); //, m_moveCheckBox->IsChecked());
       
-      m_solverConfig->position = pt;
+      if(m_moveCheckBox->IsChecked())
+	m_solverConfig->position = pt;
     }
 }
 
@@ -259,8 +263,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
 
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
-  m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
-					5, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
 
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
   m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,
@@ -274,7 +276,17 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   m_panelSizer->Add(m_flickeringRadioBox,  0, wxADJUST_MINSIZE, 0);
+  
+  switch(flameConfig->type){
+  case FIRMALAMPE :
+  case TORCH :
+  case CAMPFIRE :
+    m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
+				   5, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
+  m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
+  }
+  
   m_panelSizer->Add(m_slidersSizer, 1, wxEXPAND, 0);
   m_panelSizer->Add(m_photoSolidSizer, 1, wxEXPAND, 0);
   
@@ -282,7 +294,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));
   m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
-  m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
   
   SetSizer(m_panelSizer);

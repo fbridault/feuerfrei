@@ -2,8 +2,8 @@
 
 #define PI 3.14159265358979323846
 #define DEUX_PI 6.283185307179586
-#define R 4.0
-#define G 2.0
+#define R 1.0
+#define G 0.5
 #define B 0
 
 /* NB_SOURCES doit être défini sur la commande de compilation */
@@ -103,23 +103,21 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
   for (int i = 0; i < NB_SOURCES; i++) {
     // Calcul de la direction du point3D vers le centre du SP
     direction = centreSP[i] - IN.PT3D.xyz;
-    
+    direction = normalize(direction);
     // - cos de l'angle entre la direction de la source et la normale au point
-    cosSN = dot(normalize(direction),IN.normale);
+    cosSN = dot(direction,IN.normale);
     
-    // translation inverse du centre du SP
-    point = -direction;
-    // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
-    // attention y est suppose etre la hauteur et z la profondeur
-    r = length(point.xyz);
-    theta=acos(point.y / r);
-    phi=atan2(point.z,point.x);
+/*     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi) */
+/*     // attention y est suppose etre la hauteur et z la profondeur */
+    theta=acos(-direction.y )*.6+.4;
+/*     phi=atan2(point.z,point.x); */
     
-    // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
-    texcoordsSP = float3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex);
+/*     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture */
+/*     texcoordsSP = float3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex); */
     
-    // recuperation de l'intensite du fragment
-    ColorSP = tex3D(textureSP, texcoordsSP).x;
+/*     // recuperation de l'intensite du fragment */
+/*     ColorSP = tex3D(textureSP, texcoordsSP).x; */
+    ColorSP = theta;
     
     // attenuation de l'intensite en fonction de l'angle d'eclairage
     ColorSP *= cosSN;

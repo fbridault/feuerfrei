@@ -114,7 +114,19 @@ public:
    */
   CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
 	   CgSVShader * shader);
-  virtual ~CampFire(){}; 
+  virtual ~CampFire(){};
+  
+/** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+   * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
+   * donc seule une translation correspondant à la position du solveur est effectuée.
+   *
+   * @param displayParticle affiche ou non les particules des squelettes
+   */
+  virtual void drawFlame(bool displayParticle);
+  
+private:
+  /* Texture pour le halo */
+  Texture m_halo;
 };
 
 /** La classe CandleStick permet la définition d'un chandelier.
@@ -159,7 +171,7 @@ public:
     glPopMatrix();
   }
   
-    /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *

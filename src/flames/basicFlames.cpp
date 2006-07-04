@@ -349,8 +349,8 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
 	  break;
 	case FDF_GAUSS:
-	  m_solver->addVsrc (ptx, pty, ptz, -m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u+m_innerForce);
-	  //m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
+// 	  m_solver->addVsrc (ptx, pty, ptz, -m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u+m_innerForce);
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
 	  break;
 	case FDF_RANDOM:
 	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * rand()/((double)RAND_MAX));
@@ -581,6 +581,53 @@ void LineFlame::drawWick(bool displayBoxes)
   glPopMatrix();
 }
 
+void LineFlame::generateAndDrawSparks()
+{
+  uint i, j, k;
+  /* Ajout de particules */
+  if( (rand()/((double)RAND_MAX)) < .05){
+    Point pos;
+    double r = (rand()/((double)RAND_MAX));
+    pos = (m_wick.getLeadPoint(m_wick.getLeadPointsArraySize()-1)->m_pt);
+    pos = pos * r + m_wick.getLeadPoint(0)->m_pt ;
+    Particle *spark = new Particle(pos, 15);
+    m_sparksList.push_back(spark);
+  }
+  
+  /* Déplacement et affichage des particules */
+  for (list < Particle *>::iterator sparksListIterator = m_sparksList.begin (); 
+       sparksListIterator != m_sparksList.end ();
+       sparksListIterator++){
+    Particle *par = *sparksListIterator;
+    m_solver->findPointPosition(*par, i, j, k);
+
+    (*sparksListIterator)->decreaseLife();
+    
+    if ((*sparksListIterator)->isDead ())
+      {
+	sparksListIterator =  m_sparksList.erase(sparksListIterator); 
+	continue;
+      }
+        
+    if ( i >= m_solver->getXRes()  )
+      i = m_solver->getXRes()-1;
+    if ( j >= m_solver->getXRes()  )
+      j = m_solver->getYRes()-1;
+    if ( k >= m_solver->getXRes()  )
+      k = m_solver->getZRes()-1;
+    
+    (*sparksListIterator)->x += m_solver->getU (i, j, k);
+    (*sparksListIterator)->y += m_solver->getV (i, j, k);
+    (*sparksListIterator)->z += m_solver->getW (i, j, k);
+    
+    glColor4f (1.0, 1.0, 0.45, 1);
+    glPushMatrix ();
+    glTranslatef ((*sparksListIterator)->x, (*sparksListIterator)->y, (*sparksListIterator)->z);
+    GraphicsFn::SolidSphere (0.01, 4, 4);
+    glPopMatrix ();
+  }
+}
+
 Vector LineFlame::getMainDirection()
 {
   Vector direction;
@@ -608,8 +655,6 @@ Point* LineFlame::getBottom()
 
 PointFlame::PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon):
   BasicFlame ( flameConfig, flameConfig->skeletonsNumber, 3, _("textures/bougie2.png"), GL_CLAMP, GL_REPEAT, s)
-//   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
-//   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
 {
   uint i;
   double angle;
@@ -618,6 +663,7 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon):
   m_leads = new LeadSkeleton *[m_nbLeadSkeletons];
   
   m_leads[0] = new LeadSkeleton (m_solver, m_position, Point(4,.75,4), &flameConfig->leadLifeSpan);
+  
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)

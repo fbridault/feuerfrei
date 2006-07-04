@@ -12,6 +12,8 @@ class PointFlame;
 #include "../solvers/solver.hpp"
 #include "../scene/texture.hpp"
 
+#include <list>
+
 #include "wick.hpp"
 
 #ifndef CALLBACK
@@ -343,6 +345,8 @@ public:
    */
   Vector getMainDirection();
   
+  virtual void generateAndDrawSparks();
+  
   virtual Point getCenter ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -354,6 +358,8 @@ public:
 private:
   /** Mèche de la flamme */
   Wick m_wick;
+
+  list<Particle *> m_sparksList;
 };
 
 /**********************************************************************************************************************/

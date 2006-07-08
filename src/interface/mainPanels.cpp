@@ -10,6 +10,7 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_TEXT_ENTER(IDT_FYAPMAX, SolverMainPanel::OnFYAPMAXEnter)
   EVT_TEXT_ENTER(IDT_FZAPMIN, SolverMainPanel::OnFZAPMINEnter)
   EVT_TEXT_ENTER(IDT_FZAPMAX, SolverMainPanel::OnFZAPMAXEnter)
+  EVT_CHECKBOX(IDCHK_MOVE, SolverMainPanel::OnCheckMove)
 END_EVENT_TABLE();
 
 
@@ -101,10 +102,61 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
+
+  m_moveCheckBox->SetValue(true);
   
   SetSizer(m_panelSizer);
   
   ComputeSlidersValues();
+}
+
+
+void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
+{
+  Point oldValues(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+		  m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+		  m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+
+  m_solverXAxisPositionSlider->SetValue((int)(saveSliderValues.x*SLIDER_SENSIBILITY));
+  m_solverYAxisPositionSlider->SetValue((int)(saveSliderValues.y*SLIDER_SENSIBILITY));
+  m_solverZAxisPositionSlider->SetValue((int)(saveSliderValues.z*SLIDER_SENSIBILITY));
+  
+  saveSliderValues = oldValues;
+  
+  if(m_moveCheckBox->IsChecked())
+    {
+      long min, max;
+            
+      m_solverXAxisPositionSliderMin->GetValue().ToLong(&min);
+      m_solverXAxisPositionSliderMax->GetValue().ToLong(&max);
+      m_solverXAxisPositionSlider->SetRange(min, max);
+      m_solverYAxisPositionSliderMin->GetValue().ToLong(&min);
+      m_solverYAxisPositionSliderMax->GetValue().ToLong(&max);
+      m_solverYAxisPositionSlider->SetRange(min, max);
+      m_solverZAxisPositionSliderMin->GetValue().ToLong(&min);
+      m_solverZAxisPositionSliderMax->GetValue().ToLong(&max);
+      m_solverZAxisPositionSlider->SetRange(min, max);
+      
+      m_solverXAxisPositionSliderMin->Enable();
+      m_solverXAxisPositionSliderMax->Enable();
+      m_solverYAxisPositionSliderMin->Enable();
+      m_solverYAxisPositionSliderMax->Enable();
+      m_solverZAxisPositionSliderMin->Enable();
+      m_solverZAxisPositionSliderMax->Enable();
+    }
+  else
+    {      
+      m_solverXAxisPositionSliderMin->Disable();
+      m_solverXAxisPositionSliderMax->Disable();
+      m_solverYAxisPositionSliderMin->Disable();
+      m_solverYAxisPositionSliderMax->Disable();
+      m_solverZAxisPositionSliderMin->Disable();
+      m_solverZAxisPositionSliderMax->Disable();
+      
+      m_solverXAxisPositionSlider->SetRange(-100, 100);
+      m_solverYAxisPositionSlider->SetRange(-100, 100);
+      m_solverZAxisPositionSlider->SetRange(-100, 100);
+    }
 }
 
 void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
@@ -123,10 +175,11 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 		m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 		m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       
-      m_glBuffer->moveSolver(m_index, pt); //, m_moveCheckBox->IsChecked());
-      
-      if(m_moveCheckBox->IsChecked())
+      if(m_moveCheckBox->IsChecked()){
+	m_glBuffer->moveSolver(m_index, pt, true);
 	m_solverConfig->position = pt;
+      }else
+	m_glBuffer->addPermanentExternalForcesToSolver(m_index,pt);
     }
 }
 
@@ -287,8 +340,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
   }
   
-  m_panelSizer->Add(m_slidersSizer, 1, wxEXPAND, 0);
-  m_panelSizer->Add(m_photoSolidSizer, 1, wxEXPAND, 0);
+  m_panelSizer->Add(m_slidersSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_photoSolidSizer, 0, wxEXPAND, 0);
   
   m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
   m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));

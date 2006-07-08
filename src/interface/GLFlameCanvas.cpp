@@ -111,7 +111,7 @@ void GLFlameCanvas::InitFlames(void)
     case CANDLE :
       m_flames[i] = new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
 				m_scene, "scenes/bougie.obj", i, m_SVShader, 
-				m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
+				1/ 7.0);
       break;
     case FIRMALAMPE :
       m_flames[i] = new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
@@ -128,7 +128,7 @@ void GLFlameCanvas::InitFlames(void)
     case CANDLESTICK :
       m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
 				     m_scene, "scenes/bougie.obj", i, m_SVShader, 
-				     m_solvers[m_currentConfig->flames[i].solverIndex]->getDimX()/ 7.0);
+				     1/ 7.0);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;

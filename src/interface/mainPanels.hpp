@@ -54,6 +54,7 @@ private:
   void OnFZAPMINEnter(wxCommandEvent& event);
   void OnFZAPMAXEnter(wxCommandEvent& event);
   void ComputeSlidersValues(void);
+  void OnCheckMove(wxCommandEvent& event);
   
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
   wxSlider *m_buoyancySlider;
@@ -73,6 +74,7 @@ private:
   /* Index du solveur */
   int m_index;
   GLFlameCanvas *m_glBuffer;
+  Point saveSliderValues;
   
   double SLIDER_SENSIBILITY;
   int SLIDER_RANGE;

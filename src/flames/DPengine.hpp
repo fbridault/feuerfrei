@@ -51,7 +51,11 @@ public:
 	fprintf(stderr, "\n");
       }
     disableShader();
-  }  
+  }
+
+  void setParameter4d(double a){
+    glProgramLocalParameter4dARB(GL_FRAGMENT_PROGRAM_ARB, 1, a, a, a, a);
+  }
 private:  
   GLuint program;
   
@@ -90,7 +94,7 @@ private:
   
   uint m_nbLayersMax, m_nbLayers;
   FBO m_fbo;
-  Texture **m_colorTex;
+  Texture *m_colorTex;
   Texture *m_depthTex[3], *m_sceneDepthTex;
   GLuint m_curDepthTex;
 

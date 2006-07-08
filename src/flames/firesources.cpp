@@ -72,6 +72,7 @@ void CampFire::drawFlame(bool displayParticle)
   glPushMatrix();
   glTranslatef (pt.x, pt.y, pt.z);
 
+  glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
 
 //       double angle, angle2, angle3, angle4;
       

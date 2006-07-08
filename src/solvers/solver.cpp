@@ -91,6 +91,8 @@ Solver::Solver (Point& position, uint n_x, uint n_y, uint n_z, double dim, doubl
   nx = m_nbVoxelsX+2;
   t1=n2 + nx +1;
   t2nx=2*nx;
+
+  arePermanentExternalForces = false;
 }
 
 Solver::~Solver ()
@@ -242,6 +244,9 @@ void Solver::iterate ()
       for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
 	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
   
+  if(arePermanentExternalForces)
+    addExternalForces(permanentExternalForces,false);
+  
   vel_step ();
   //  dens_step();
 
@@ -385,54 +390,60 @@ void Solver::displayArrow (Vector * const direction)
   GraphicsFn::SolidCone (taille / 4, taille, 3, 3);
 }
 
-void Solver::moveTo(Point& position)
+void Solver::addExternalForces(Point& position, bool move)
 {
-  int i,j;
-  Point move = position - m_position;
-  double strength=.005*m_nbVoxelsX;
+  uint i,j;
+  Point strength;
+  Point force;
   
-  m_position=position;
-
+  if(move){
+    force = position - m_position;
+    strength.x = strength.y = strength.z = .005*m_nbVoxelsX;  
+    m_position=position;
+  }else{
+    force = position;
+    strength = position * (.01*m_nbVoxelsX);
+    strength.x = fabs(strength.x);
+    strength.y = fabs(strength.y);
+    strength.z = fabs(strength.z);  
+  }
+  
+  uint widthx = m_nbVoxelsX - 1;
+  uint widthy = m_nbVoxelsY - 1;
+  uint widthz = m_nbVoxelsZ - 1;
+  
+  uint ceilx = 1;
+  uint ceily = 1;
+  uint ceilz = 1;
+  
   /* Ajouter des forces externes */
-  if(move.x)
-    if( move.x > 0)
-      for (i = -(int)m_nbVoxelsZ / 4 - 1; i <= (int)m_nbVoxelsZ / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 + 1; j++)
-	  addUsrc (m_nbVoxelsX - 1,
-		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + i, -strength);
+  if(force.x)
+    if( force.x > 0)
+      for (i = ceilz; i <= widthz; i++)
+	for (j = ceily; j <= widthy; j++)
+	  addUsrc (m_nbVoxelsX - 1, j, i, -strength.x);
     else
-      for (i = -(int)m_nbVoxelsZ / 4 - 1; i <= (int)m_nbVoxelsZ / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 + 1; j++)
-	  addUsrc (2,
-		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + i, strength);  
-  if(move.y)
-    if( move.y > 0)
-      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsZ / 4 - 1; j < (int)m_nbVoxelsZ / 4 + 1; j++)
-	  addVsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
-		   m_nbVoxelsY - 1,
-		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + j, -strength);
+      for (i = ceilz; i <= widthz; i++)
+	for (j = ceily; j <= widthy; j++)
+	  addUsrc (2, j, i, strength.x); 
+  if(force.y)
+    if( force.y > 0)
+      for (i = ceilx; i <= widthx; i++)
+	for (j = ceilz; j < widthz; j++)
+	  addVsrc (i, m_nbVoxelsY - 1, j, -strength.y/10.0);
     else
-      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsZ / 4 - 1; j <= (int)m_nbVoxelsZ / 4 + 1; j++)
-	  addVsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i, 
-		   2,
-		   ((uint) (ceil (m_nbVoxelsZ / 2.0))) + j, strength/10.0);
-  if(move.z)
-    if( move.z > 0)
-      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 - 1; j++)
-	  addWsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
-		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   m_nbVoxelsZ - 1, -strength);
+      for (i = ceilx; i <= widthx; i++)
+	for (j = ceilz; j <= widthz; j++)
+	  addVsrc (i, 2, j, strength.y/10.0);
+  if(force.z)
+    if( force.z > 0)
+      for (i = ceilx; i <= widthx; i++)
+	for (j = ceily; j <= widthy; j++)
+	  addWsrc (i, j, m_nbVoxelsZ - 1, -strength.z);
     else
-      for (i = -(int)m_nbVoxelsX / 4 - 1; i <= (int)m_nbVoxelsX / 4 + 1; i++)
-	for (j = -(int)m_nbVoxelsY / 4 - 1; j <= (int)m_nbVoxelsY / 4 - 1; j++)
-	  addWsrc (((uint) (ceil (m_nbVoxelsX / 2.0))) + i,
-		   ((uint) (ceil (m_nbVoxelsY / 2.0))) + j,
-		   2, strength);
+      for (i = ceilx; i <= widthx; i++)
+	for (j = ceily; j <= widthy; j++)
+	  addWsrc (i, j, 2, strength.z);
 }
 
 void Solver::prolonger(double  *const v2h, double *const vh)

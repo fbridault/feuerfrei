@@ -148,9 +148,9 @@ public:
   /* Retrouver la cellule où est située la particule */
   void findPointPosition(Point& p, uint& i, uint& j, uint& k)
   {
-    i = (uint) (p.x * m_dimXTimesNbVoxelsX) + 1 + m_halfNbVoxelsX;
-    j = (uint) (p.y * m_dimXTimesNbVoxelsY) + 1;
-    k = (uint) (p.z * m_dimXTimesNbVoxelsZ) + 1 + m_halfNbVoxelsZ;
+    i = (uint) (p.x * m_nbVoxelsX) + 1 + m_halfNbVoxelsX;
+    j = (uint) (p.y * m_nbVoxelsY) + 1;
+    k = (uint) (p.z * m_nbVoxelsZ) + 1 + m_halfNbVoxelsZ;
   };
   
   Point& getPosition ()
@@ -158,7 +158,16 @@ public:
     return (m_position);
   };
   
-  void moveTo(Point& position);
+  void addExternalForces(Point& position, bool move);
+  
+  void addPermanentExternalForces(Point& forces)
+  {
+    permanentExternalForces = forces;
+    if(!forces.x && !forces.y && !forces.z)
+      arePermanentExternalForces = false;
+    else
+      arePermanentExternalForces = true;
+  }
   
   virtual void setBuoyancy(double value){ m_buoyancy=value; };
   
@@ -267,6 +276,9 @@ protected:
   uint m_nbSteps;
   
   uint t, n2, nx, t1, t2nx;
+
+  Point permanentExternalForces;
+  bool arePermanentExternalForces;
 };
 
 #endif

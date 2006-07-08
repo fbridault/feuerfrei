@@ -87,7 +87,8 @@ public:
 	m_flames[f]-> setRenderMode();
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void moveSolver(int selectedSolver, Point& pt){ m_solvers[selectedSolver]->moveTo(pt); };
+  void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
+  void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
   void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };

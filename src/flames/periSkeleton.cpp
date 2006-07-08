@@ -21,8 +21,8 @@ uint PeriSkeleton::moveRoot ()
 {
   uint i, j, k;
   Point tmp;
-  double distx = 10 * m_solver->getDimX() / (double) m_solver->getXRes ();
-  double distz = m_solver->getDimZ() / (double) m_solver->getZRes ();
+  double distx = 10 / (double) m_solver->getXRes ();
+  double distz = 1 / (double) m_solver->getZRes ();
   
   m_solver->findPointPosition(m_root, i, j, k);
 
@@ -74,9 +74,9 @@ uint PeriSkeleton::moveParticle (Particle * const pos, uint n)
   pos->y += m_solver->getV (i, j, k);
   pos->z += m_solver->getW (i, j, k);
 
-  if (pos->x < -m_solver->getDimX() / 2.0 || pos->x > m_solver->getDimX() / 2.0 || 
-      pos->y < 0 || pos->y > m_solver->getDimY() ||
-      pos->z < -m_solver->getDimZ() / 2.0 || pos->z > m_solver->getDimZ() / 2.0)
+  if (pos->x < -.5 || pos->x > .5
+      || pos->y < 0 || pos->y > 1
+      || pos->z < -.5 || pos->z > .5)
     return 0;
   
   return 1;

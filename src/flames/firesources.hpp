@@ -164,6 +164,7 @@ public:
     Point pt(getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawWick(displayBoxes);
     for (uint i = 0; i < m_nbCloneFlames; i++)
@@ -182,6 +183,7 @@ public:
     Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(displayParticle);
     for (uint i = 0; i < m_nbCloneFlames; i++)

@@ -29,8 +29,7 @@ BEGIN_EVENT_TABLE(MainFrame, wxFrame)
   EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
   EVT_MENU(IDM_SolversSettings, MainFrame::OnSolversMenu)
   EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
-  EVT_MENU(IDM_ShadowVolumesSettings, MainFrame::OnShadowVolumesSettingsMenu)  
-//   EVT_CHECKBOX(IDCHK_IS, MainFrame::OnCheckIS)
+  EVT_MENU(IDM_ShadowVolumesSettings, MainFrame::OnShadowVolumesSettingsMenu)
   EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Shadows, MainFrame::OnCheckShadows)
   EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
@@ -161,8 +160,8 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   GetSettingsFromConfigFile();
 
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_mainSizer->Add(m_glBuffer, 0, wxEXPAND, 0);
-  m_mainSizer->Add(m_rightSizer, 1, wxEXPAND, 0);
+  m_mainSizer->Add(m_glBuffer, 0, 0, 0);
+  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
   
   SetSizerAndFit(m_mainSizer);
   
@@ -173,10 +172,9 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 void MainFrame::OnSize(wxSizeEvent& event)
 {
-    // this is also necessary to update the context on some platforms
-    wxFrame::OnSize(event);
-    Layout();
-    
+  // this is also necessary to update the context on some platforms
+  wxFrame::OnSize(event);
+  Layout();
 }
 
 void MainFrame::GetSettingsFromConfigFile (void)

@@ -15,6 +15,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
   char _fp_peel[] = 
     "!!ARBfp1.0\n"
     "OPTION ARB_fragment_program_shadow;\n"
+    "PARAM c[5] = { program.local[0..4] };\n"
     "TEMP R0;\n"
     "TEMP R1;\n"
     "TEMP R2;\n"
@@ -28,15 +29,13 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
     "ADD R2.x, R2.x, -0.5;\n"
     "KIL R2.x;\n"
     // Pose problème si dessin de la scène
-    //     "MUL R1, R1, fragment.color;\n"
-    "MOV result.color, R0;\n"
+    //     "MUL R0, R0, fragment.color;\n"
+    "MUL result.color, R0, c[1];\n"
     //     "MOV result.color, fragment.color;\n"
     "END\n";
   
   m_peelProgram.load(_fp_peel);
-  m_colorTex = new Texture*[m_nbLayers+1];
-  for(uint i=0; i <= m_nbLayers; i++)
-    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB,m_width,m_height);
+  m_colorTex = new Texture(GL_TEXTURE_RECTANGLE_ARB,m_width,m_height);
   m_depthTex[0] = new Texture(m_width,m_height,GL_GREATER,true);
   m_depthTex[1] = new Texture(m_width,m_height,GL_GREATER,true);
   m_depthTex[2] = new Texture(m_width,m_height,GL_ALWAYS,true);
@@ -47,9 +46,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
 
 DepthPeelingEngine::~DepthPeelingEngine()
 {
-  for(uint i=0; i <= m_nbLayers; i++)
-    delete m_colorTex[i];
-  delete [] m_colorTex;
+  delete m_colorTex;
   delete m_depthTex[0];
   delete m_depthTex[1];
   delete m_depthTex[2];
@@ -79,46 +76,51 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
   
   m_curDepthTex = 0;
   
+  glBlendFunc (GL_ONE, GL_ZERO);
+
+  m_fbo.ColorAttach(m_colorTex->getTexture(),0);
+  
+  glActiveTextureARB(GL_TEXTURE2_ARB);
+  m_sceneDepthTex->bind();
+  m_peelProgram.enableShader();
+  
   for(l=0; l <= m_nbLayers; l++){
     // On effectue le rendu dans le FBO
-    m_fbo.ColorAttach(m_colorTex[l]->getTexture(),0);
     m_fbo.DepthAttach(m_depthTex[m_curDepthTex]->getTexture());
     
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     
-    glActiveTextureARB(GL_TEXTURE2_ARB);
-    m_sceneDepthTex->bind();
-    m_peelProgram.enableShader();
-    
-    /* Pour le premier layer, on construit la displayt list */
+    /* Pour le premier layer, on construit la display list */
     /* et le premier test de profondeur est toujours vrai */
-      glActiveTextureARB(GL_TEXTURE1_ARB);
-    if(l == 0){
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    if(!l){
+      glClear(GL_COLOR_BUFFER_BIT);
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
+      m_peelProgram.setParameter4d(.9);
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
       for (f = 0; f < m_nbFlames; f++)
 	m_flames[f]->drawFlame (displayParticles);
       glEndList();
     }else{
+      glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+      m_peelProgram.setParameter4d(0.5);
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */
       /* la profondeur de la passe précédente */
       m_depthTex[1-m_curDepthTex]->bind();
       glCallList(m_flamesDisplayList);
-      //  for (f = 0; f < m_nbFlames; f++)
-      //    m_flames[f]->drawCachedFlame ();
     }
-    m_peelProgram.disableShader();
-    
     m_curDepthTex = 1 - m_curDepthTex;
   }
+  m_peelProgram.disableShader();
   m_fbo.Deactivate();
   
   glDeleteLists(m_flamesDisplayList,1);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void DepthPeelingEngine::render()
-{   
+{
   glDisable (GL_DEPTH_TEST);
   
   glBlendFunc (GL_SRC_ALPHA, GL_ONE);
@@ -131,34 +133,25 @@ void DepthPeelingEngine::render()
   glPushMatrix();
   glLoadIdentity();
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
-
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  for(uint l=0; l <= m_nbLayers; l++){
     
-    m_colorTex[l]->bind();
-    
-    if(l==0)
-      glColor4f(1.0,1.0,1.0,1.0);
-    else      
-      glColor4f(1.0,1.0,1.0,0.6);
-    
-    glBegin(GL_QUADS);
-	
-    glTexCoord2f(0,m_height);
-    glVertex3d(-1.0,1.0,0.0);
-	
-    glTexCoord2f(0,0);
-    glVertex3d(-1.0,-1.0,0.0);
-	
-    glTexCoord2f(m_width,0);
-    glVertex3d(1.0,-1.0,0.0);
-	
-    glTexCoord2f(m_width,m_height);
-    glVertex3d(1.0,1.0,0.0);
-	
-    glEnd();
-
-  }
+  m_colorTex->bind();
+  
+  glBegin(GL_QUADS);
+  
+  glTexCoord2f(0,m_height);
+  glVertex3d(-1.0,1.0,0.0);
+  
+  glTexCoord2f(0,0);
+  glVertex3d(-1.0,-1.0,0.0);
+  
+  glTexCoord2f(m_width,0);
+  glVertex3d(1.0,-1.0,0.0);
+  
+  glTexCoord2f(m_width,m_height);
+  glVertex3d(1.0,1.0,0.0);
+  
+  glEnd();
+  
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   
   glMatrixMode(GL_PROJECTION);

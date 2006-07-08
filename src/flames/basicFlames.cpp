@@ -207,7 +207,7 @@ void MetaFlame::drawPointFlame ()
       glPopMatrix();
       
       /****************************************************************************************/
-      /* Affichage de la flamme */      
+      /* Affichage de la flamme */
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       glBindTexture (GL_TEXTURE_2D, m_tex.getTexture ());
       
@@ -584,13 +584,15 @@ void LineFlame::drawWick(bool displayBoxes)
 void LineFlame::generateAndDrawSparks()
 {
   uint i, j, k;
+  uint life=30;
+  
   /* Ajout de particules */
   if( (rand()/((double)RAND_MAX)) < .05){
     Point pos;
     double r = (rand()/((double)RAND_MAX));
     pos = (m_wick.getLeadPoint(m_wick.getLeadPointsArraySize()-1)->m_pt);
     pos = pos * r + m_wick.getLeadPoint(0)->m_pt ;
-    Particle *spark = new Particle(pos, 15);
+    Particle *spark = new Particle(pos, life);
     m_sparksList.push_back(spark);
   }
   
@@ -616,11 +618,12 @@ void LineFlame::generateAndDrawSparks()
     if ( k >= m_solver->getXRes()  )
       k = m_solver->getZRes()-1;
     
-    (*sparksListIterator)->x += m_solver->getU (i, j, k);
-    (*sparksListIterator)->y += m_solver->getV (i, j, k);
-    (*sparksListIterator)->z += m_solver->getW (i, j, k);
+    double div = 1/(double)life;
+    (*sparksListIterator)->x += m_solver->getU (i, j, k) * (*sparksListIterator)->m_lifespan*div;
+    (*sparksListIterator)->y += m_solver->getV (i, j, k) * (*sparksListIterator)->m_lifespan*div;
+    (*sparksListIterator)->z += m_solver->getW (i, j, k) * (*sparksListIterator)->m_lifespan*div;
     
-    glColor4f (1.0, 1.0, 0.45, 1);
+    glColor4f (1.0, 1.0, 0.45, 1.0);
     glPushMatrix ();
     glTranslatef ((*sparksListIterator)->x, (*sparksListIterator)->y, (*sparksListIterator)->z);
     GraphicsFn::SolidSphere (0.01, 4, 4);
@@ -900,8 +903,8 @@ void PointFlame::build ()
 
 void PointFlame::drawWick (bool displayBoxes)
 {
-  double hauteur = m_solver->getDimY() / 6.0;
-  double largeur = m_solver->getDimX() / 60.0;
+  double hauteur = 1 / 6.0;
+  double largeur = 1 / 60.0;
   /* Affichage de la mèche */
   glPushMatrix ();
   glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);

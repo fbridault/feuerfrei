@@ -173,6 +173,7 @@ public:
     Point pt(getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawWick(displayBoxes);
     glPopMatrix();
@@ -189,6 +190,7 @@ public:
     Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(displayParticle);  
     glPopMatrix();
@@ -199,6 +201,7 @@ public:
     Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawCachedFlame();  
     glPopMatrix();
@@ -209,6 +212,7 @@ public:
    */
   void draw(bool displayParticle, bool displayBoxes)
   {
+    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     drawWick(displayBoxes);
     drawFlame(displayParticle);
   }
@@ -222,6 +226,7 @@ public:
       Point position(getPosition());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
+      glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
       glCallList(m_luminaryDL);
       glPopMatrix();
     }
@@ -238,6 +243,7 @@ public:
       Point position(getPosition());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
+      glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
       shader.setModelViewProjectionMatrix();
       glCallList(m_luminaryDL);
       glPopMatrix();

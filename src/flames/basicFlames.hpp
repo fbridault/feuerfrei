@@ -117,8 +117,8 @@ public:
   virtual Point* getTop() = 0;
   virtual Point* getBottom() = 0;  
   
-  void setRenderMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_RENDERER); };
-  void setTesselateMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
+//   void setRenderMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
+//   void setTesselateMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
   
 protected:  
   /** Fonction simplifiant l'affectation d'un point de contrôle.

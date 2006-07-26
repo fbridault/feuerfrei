@@ -1,6 +1,30 @@
-#Produced by Art of Illusion 2.2, Thu Apr 13 17:21:22 CEST 2006
-newmtl Meche
-Kd 0.23 0.14462 0.0828
+#Produced by Art of Illusion 2.3, Tue Jul 11 00:32:19 CEST 2006
+newmtl Sol
+Kd 1 1 1
+map_Kd bonfire11.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Herbe
+Kd 1 1 1
+map_Kd bonfire12.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Pierre
+Kd 1 1 1
+map_Kd bonfire13.jpg
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl vert
+Kd 0.28 0.76 0.13
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Bois
+Kd 1 1 1
+map_Kd bonfire14.jpg
 Ks 0 0 0
 Ka 0 0 0
 illum 1

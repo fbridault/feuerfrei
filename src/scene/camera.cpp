@@ -8,7 +8,7 @@ Camera::Camera (int width, int height, double clipping) : m_position(0.0,0.0,-2.
   m_buttonPressed = 0;
   m_move = false;
   m_currentRotationX = 0;
-  m_mouseSensitivity = 300;
+  m_mouseSensitivity = 800;
   m_maxAngleX = 1.2;
   
   m_clipping_value = clipping;
@@ -18,7 +18,7 @@ Camera::Camera (int width, int height, double clipping) : m_position(0.0,0.0,-2.
   
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluPerspective (m_ouverture, 1.0, 0.1, m_clipping_value);
+  gluPerspective (m_ouverture, 4/3.0, 0.1, m_clipping_value);
 
   /* initialisation du deplacement trackball */
   glMatrixMode (GL_MODELVIEW);

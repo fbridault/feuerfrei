@@ -59,7 +59,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(800,800),attributelist, wxSUNKEN_BORDER );
+  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
    
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Lighting"), wxDefaultPosition, wxDefaultSize, 
 				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
@@ -182,8 +182,8 @@ void MainFrame::GetSettingsFromConfigFile (void)
   wxFileInputStream* file = new wxFileInputStream( m_configFileName );
   m_config = new wxFileConfig( *file );
   
-  m_currentConfig.width = m_config->Read(_("/Display/Width"), 800);
-  m_currentConfig.height = m_config->Read(_("/Display/Height"), 800);
+  m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
+  m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
   m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
   m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
@@ -391,7 +391,7 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
   m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
-  m_glBuffer->ToggleDepthPeeling();
+//   m_glBuffer->ToggleDepthPeeling();
 }
 
 void MainFrame::OnScrollPosition(wxScrollEvent& event)

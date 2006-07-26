@@ -78,14 +78,14 @@ public:
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->toggleSmoothShading ();
   };  
-  void ToggleDepthPeeling(void) { 
-    if(m_currentConfig->depthPeelingEnabled)
-      for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]-> setTesselateMode();
-    else
-      for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]-> setRenderMode();
-  };
+//   void ToggleDepthPeeling(void) { 
+//     if(m_currentConfig->depthPeelingEnabled)
+//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
+// 	m_flames[f]-> setTesselateMode();
+//     else
+//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
+// 	m_flames[f]-> setRenderMode();
+//   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };

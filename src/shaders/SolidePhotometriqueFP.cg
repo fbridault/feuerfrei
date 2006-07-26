@@ -109,6 +109,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     
 /*     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi) */
 /*     // attention y est suppose etre la hauteur et z la profondeur */
+    r = length(direction.xyz);
     theta=acos(-direction.y )*.6+.4;
 /*     phi=atan2(point.z,point.x); */
     
@@ -122,8 +123,8 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     // attenuation de l'intensite en fonction de l'angle d'eclairage
     ColorSP *= cosSN;
     // attenuation de l'intensite en fonction de la distance
-    attenuation = 3.0/r;
-    if(attenuation < 1.0)
+    attenuation = 1.0/r;
+    //    if(attenuation < 1.0)
       ColorSP *= attenuation;
     // attenuation de l'intensite en fonction de la flamme
     ColorSP *= fluctuationIntensite[i];

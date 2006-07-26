@@ -176,7 +176,7 @@ void CampFire::drawFlame(bool displayParticle)
 
   for (uint i = 0; i < m_nbFlames; i++){
     m_flames[i]->drawFlame(displayParticle);
-    ((LineFlame *)m_flames[i])->generateAndDrawSparks();
+//     ((LineFlame *)m_flames[i])->generateAndDrawSparks();
   }
   glPopMatrix();
 }

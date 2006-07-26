@@ -86,26 +86,62 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
 		       CgSVShader *shader, const char *objName) : 
   FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii())
 {  
+  vector<string> objList;
   char mtlName[255];
+  /** Luminaire */
+  Object **m_luminary;
+  uint i;
+  uint nbObj;
+  
   m_solver = s;
   
   m_nbFlames=nbFlames;
   if(m_nbFlames) m_flames = new BasicFlame* [m_nbFlames];
   
-  if(objName != NULL && scene->getMTLFileNameFromOBJ(filename, mtlName)){
-    cerr << filename << " utilise le fichier MTL " << mtlName << endl;
-    scene->importMTL(mtlName);
-  }
-  m_luminary = new Object(scene);
-  hasLuminary = scene->importOBJ(filename, m_luminary, true, objName);
-  if(hasLuminary){
+  
+  if(objName != NULL){
+    if(scene->getMTLFileNameFromOBJ(filename, mtlName)){
+    
+      cerr << filename << " utilise le fichier MTL " << mtlName << endl;
+      scene->importMTL(mtlName);
+    }  
+    scene->getObjectsNameFromOBJ(filename, objList, objName);
+    m_luminary = new Object* [objList.size()];
+    nbObj=objList.size();
+    
+    i=0;
+    for (vector < string >::iterator objListIterator = objList.begin ();
+	 objListIterator != objList.end (); objListIterator++, i++)
+      {      
+	m_luminary[i] = new Object(scene);
+	scene->importOBJ(filename, m_luminary[i], true, (*objListIterator).c_str());
+      }
+    
     m_luminaryDL=glGenLists(1);
     glNewList(m_luminaryDL,GL_COMPILE);
-    m_luminary->draw();
+    for (i=0; i < objList.size(); i++)
+      m_luminary[i]->draw();
     glEndList();
+    hasLuminary=true;
   }
-  
+  else{
+    nbObj=1;
+    m_luminary = new Object* [1];
+    m_luminary[0] = new Object(scene);
+    hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
+    if(hasLuminary){
+      m_luminaryDL=glGenLists(1);
+      glNewList(m_luminaryDL,GL_COMPILE);
+      m_luminary[0]->draw();
+      glEndList();
+    }
+  }
   m_position=flameConfig->position;
+  
+  /* On efface le luminaire, il n'appartient pas à la scène */
+  for (uint i = 0; i < nbObj; i++)
+    delete m_luminary[i];
+  delete []m_luminary;  
 }
 
 FireSource::~FireSource()
@@ -113,8 +149,6 @@ FireSource::~FireSource()
   for (uint i = 0; i < m_nbFlames; i++)
     delete m_flames[i];
   delete[]m_flames;
-  /* On efface le luminaire, il n'appartient pas à la scène */
-  delete m_luminary;
   
   if(hasLuminary) glDeleteLists(m_luminaryDL,1);
 }
@@ -150,8 +184,9 @@ void FireSource::computeIntensityPositionAndDirection()
   
   // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
-  m_intensity=o.length()/(m_solver->getDimY());
-//   m_intensity = log(m_intensity)/6.0+1;
+   m_intensity=o.length()/(m_solver->getDimY());
+  
+   //  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
   /* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
   m_intensity = sqrt(m_intensity);

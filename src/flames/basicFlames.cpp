@@ -29,7 +29,7 @@ MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   m_nurbs = gluNewNurbsRenderer();
   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, flameConfig->samplingTolerance);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  gluNurbsProperty(m_nurbs, GLU_NURBS_MODE,GLU_NURBS_RENDERER);
+  gluNurbsProperty(m_nurbs, GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR);
   /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);

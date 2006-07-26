@@ -102,8 +102,7 @@ public:
   void setView(void){
     glPopMatrix ();
     glPushMatrix ();
-    gluLookAt(0.0,0.0,0.0,
-	      m_view.x, m_view.y, m_view.z, m_up.x, m_up.y, m_up.z);
+    gluLookAt(0.0,0.0,0.0, m_view.x, m_view.y, m_view.z, m_up.x, m_up.y, m_up.z);
     glTranslatef(m_position.x, m_position.y, m_position.z);
   };  
 

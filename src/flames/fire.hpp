@@ -142,15 +142,15 @@ public:
       m_flames[i]->setSamplingTolerance(value);
   };
   
-  virtual void setRenderMode() {  
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setRenderMode();
-  };
+//   virtual void setRenderMode() {  
+//     for (uint i = 0; i < m_nbFlames; i++)
+//       m_flames[i]->setRenderMode();
+//   };
 
-  virtual void setTesselateMode() { 
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setTesselateMode();
-  };
+//   virtual void setTesselateMode() { 
+//     for (uint i = 0; i < m_nbFlames; i++)
+//       m_flames[i]->setTesselateMode();
+//   };
 
   /** Retourne la position absolue dans le repère du monde .
    * @return position absolue dans le repère du monde
@@ -293,8 +293,6 @@ protected:
   /** Tableau contenant les flammes */
   BasicFlame **m_flames;
   
-  /** Luminaire */
-  Object *m_luminary;
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;
   

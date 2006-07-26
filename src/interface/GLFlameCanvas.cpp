@@ -46,7 +46,7 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   m_globalFramesCount = 1000000;
   intensities = NULL;
 
-  srand(45542);
+  srand(clock());
 }
 
 GLFlameCanvas::~GLFlameCanvas()
@@ -139,7 +139,7 @@ void GLFlameCanvas::InitFlames(void)
   
   if( intensities ) delete intensities;
   intensities = new double[m_currentConfig->nbFlames];
-  ToggleDepthPeeling();
+  //  ToggleDepthPeeling();
 }
 
 void GLFlameCanvas::InitSolvers(void)
@@ -312,7 +312,7 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 
 void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 {
-  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/100);
+  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/500.0);
 }
 
 void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
@@ -436,8 +436,10 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	  m_depthPeelingEngine->render();
 	}
       else{
+	glBlendFunc (GL_ONE,GL_ZERO);
 	for (f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayParticles);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
   }
   /********************* PLACAGE DU GLOW ****************************************/
@@ -467,12 +469,12 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     wxString filename;
     wxString zeros;
     
-    glReadPixels (0, 0, m_width-4, m_height-4, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
+    glReadPixels (0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
     
     filename << _("captures/capture") << m_globalFramesCount << _(".png");
     /* Création d'une image, le dernier paramètre précise que wxImage ne doit pas détruire */
     /* le tableau de données dans son destructeur */
-    wxImage image(m_width-4,m_height-4,m_pixels,true),image2;
+    wxImage image(m_width,m_height,m_pixels,true),image2;
     image2 = image.Mirror(false);
     if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
       cerr << "Image saving error !!" << endl;

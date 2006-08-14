@@ -340,7 +340,7 @@ public:
    */
   virtual void drawWick(bool displayBoxes);
     
-  /** Retroune la direction de la base de la flamme vers la derniere particule
+  /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
    */
   Vector getMainDirection();

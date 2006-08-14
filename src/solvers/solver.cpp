@@ -636,10 +636,3 @@ void  Solver::restreindre(double *const vh, double *const v2h){
   }//for k
 }//restreindre
 
-void Solver::divideRes ()
-{
-}
-
-void Solver::multiplyRes ()
-{
-}

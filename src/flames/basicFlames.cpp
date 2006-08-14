@@ -43,7 +43,7 @@ MetaFlame::MetaFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   m_toggle=false;
   
   m_position=flameConfig->position;
-    
+  
   m_ctrlPointsSave = m_ctrlPoints;
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;

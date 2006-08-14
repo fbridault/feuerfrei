@@ -160,6 +160,41 @@ void LODHybridSolver::divideRes ()
   t2nx=2*nx;
 }
 
+void LODHybridSolver::decreaseRes ()
+{
+  if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
+    cerr << "Minimum grid resolution already reached !" << endl;
+    return;
+  }
+  
+  m_nbVoxelsX-=2;
+  m_nbVoxelsY-=2;
+  m_nbVoxelsZ-=2;
+  
+  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
+  
+  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+    
+  /* Reconstruction des display lists */
+  glDeleteLists(m_baseDisplayList,1);
+  glDeleteLists(m_gridDisplayList,1);
+  buildDLBase ();
+  buildDLGrid ();
+  
+  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
+  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+
+  m_halfNbVoxelsX = m_nbVoxelsX/2;
+  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
+  
+  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  nx = m_nbVoxelsX+2;
+  t1=n2 + nx +1;
+  t2nx=2*nx;
+}
+
 void LODHybridSolver::multiplyRes ()
 {  
   if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
@@ -178,6 +213,41 @@ void LODHybridSolver::multiplyRes ()
   m_nbVoxelsX = m_nbVoxelsX*2+1;
   m_nbVoxelsY = m_nbVoxelsY*2+1;
   m_nbVoxelsZ = m_nbVoxelsZ*2+1;
+  
+  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
+  
+  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+    
+  /* Reconstruction des display lists */
+  glDeleteLists(m_baseDisplayList,1);
+  glDeleteLists(m_gridDisplayList,1);
+  buildDLBase ();
+  buildDLGrid ();
+  
+  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
+  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+
+  m_halfNbVoxelsX = m_nbVoxelsX/2;
+  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
+  
+  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  nx = m_nbVoxelsX+2;
+  t1=n2 + nx +1;
+  t2nx=2*nx;
+}
+
+void LODHybridSolver::increaseRes ()
+{  
+  if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
+    cerr << "Maximum grid resolution already reached !" << endl;
+    return;
+  }
+  
+  m_nbVoxelsX+=2;
+  m_nbVoxelsY+=2;
+  m_nbVoxelsZ+=2;
   
   m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
   

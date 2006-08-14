@@ -76,6 +76,10 @@ public:
 
   virtual void multiplyRes ();
 
+  virtual void decreaseRes ();
+  
+  virtual void increaseRes ();
+  
 private:
   double *m_uTmp, *m_vTmp, *m_wTmp;
 

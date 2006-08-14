@@ -125,7 +125,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 
 void PhotometricSolidsRenderer::draw(u_char color)
 {
-  /** Récupération des propriétés des flammes */
+  /* Récupération des propriétés des flammes */
   for(uint k=0; k < m_nbFlames; k++){
     m_flames[k]->computeIntensityPositionAndDirection();
     
@@ -134,7 +134,6 @@ void PhotometricSolidsRenderer::draw(u_char color)
   }
   
   /* Affichage des objets sans couleur */
-
   if(color == 0){
     m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();

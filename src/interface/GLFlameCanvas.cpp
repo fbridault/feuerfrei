@@ -45,7 +45,8 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
   intensities = NULL;
-
+  m_switch = false;
+  
   srand(clock());
 }
 
@@ -326,16 +327,20 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
-    case 'l': 
+    case 'l':
+      m_framesCountForSwitch = 1;
+      m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-	m_solvers[i]->divideRes ();
+	m_solvers[i]->decreaseRes ();
       for (uint i = 0; i < m_currentConfig->nbFlames; i++)
 	m_flames[i]->locateInSolver(); 
       break;
 
     case 'L': 
+      m_framesCountForSwitch = 1;
+      m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-	m_solvers[i]->multiplyRes ();
+	m_solvers[i]->increaseRes ();
       for (uint i = 0; i < m_currentConfig->nbFlames; i++)
 	m_flames[i]->locateInSolver(); 
       break;
@@ -369,7 +374,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
-  if(m_run)
+  if(m_framesCountForSwitch){
+    if(m_framesCountForSwitch == 6){
+      m_switch = false;
+      m_framesCountForSwitch = 0;
+    }else
+      m_framesCountForSwitch++;
+  }
+  if(m_run && !m_switch)
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();
   // SDL_mutexV (lock);

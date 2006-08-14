@@ -122,6 +122,9 @@ private:
   Camera *m_camera;
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;
+
+  uint m_framesCountForSwitch;
+  bool m_switch;
   int m_t;
   
   /* Tableau de pixels pour la sauvegarde des images */

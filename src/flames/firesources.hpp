@@ -116,7 +116,7 @@ public:
 	   CgSVShader * shader);
   virtual ~CampFire(){};
   
-/** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *

@@ -171,9 +171,13 @@ public:
   
   virtual void setBuoyancy(double value){ m_buoyancy=value; };
   
-  virtual void divideRes ();
+  virtual void divideRes () {} ;
 
-  virtual void multiplyRes ();
+  virtual void multiplyRes () {} ;
+  
+  virtual void decreaseRes () {} ;
+  
+  virtual void increaseRes () {} ;
   
 protected:
   uint IX (uint i, uint j, uint k)

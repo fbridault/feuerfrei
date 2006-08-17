@@ -9,7 +9,8 @@ class LeadSkeleton;
 class Skeleton;
 
 /** Classe représentant les squelettes périphériques, voir la classe Skeleton pour plus de
- * détails.
+ * détails. Un squelette périphérique se réfère à un squelette guide relatif pour la
+ * construction des surfaces NURBS.
  *
  * @author	Flavien Bridault
  */
@@ -28,24 +29,10 @@ public:
 	       LeadSkeleton *guide, uint *pls);
   virtual ~PeriSkeleton();
   
-  
-  void move();
-
+  /** Retourne un pointeur sur le squelette guide relatif */
   LeadSkeleton* getLeadSkeleton(){return guide;};
 
-private:
-  /** Déplace une particule dans le champ de vélocité.
-   * @param pos position de la particule
-   * @param n indice de la particule dans le squelette
-   * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
-   */
-  uint moveParticle(Particle* const pos, uint n);
-
-  /** Déplace l'origine du squelette dans le champ de vélocité.
-   * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
-   */
-  uint moveRoot();
-  
+private:  
   /** Pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */

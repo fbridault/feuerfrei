@@ -665,7 +665,7 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Solver * s, double rayon):
   m_nbLeadSkeletons = 1;
   m_leads = new LeadSkeleton *[m_nbLeadSkeletons];
   
-  m_leads[0] = new LeadSkeleton (m_solver, m_position, Point(4,.75,4), &flameConfig->leadLifeSpan);
+  m_leads[0] = new LeadSkeleton (m_solver, m_position, Point(4,0,4), &flameConfig->leadLifeSpan);
   
   /* On créé les squelettes en cercle */
   angle = 0;

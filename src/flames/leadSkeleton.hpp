@@ -25,23 +25,11 @@ public:
 
   virtual ~LeadSkeleton();
   
-  /** Déplacement d'une particule
-   * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
-  */
-  void move();
-
 private:
-  /** Déplace une particule dans le champ de vélocité.
-   * @param pos position de la particule
-   * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
-   */
-  uint moveParticle(Particle* const pos);
 
-  /** Déplace l'origine du squelette dans le champ de vélocité.
-   * @param displayParticle booléen indiquant si les particules doivent être affichées à l'écran
+  /** Dessine une particule d'un squelette guide
+   * @param particle particule à dessiner
    */
-  uint moveRoot();
-
   void drawParticle (Particle * const particle);
 };
 

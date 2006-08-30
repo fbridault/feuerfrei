@@ -3,6 +3,8 @@
 
 class PeriSkeleton;
 class LeadSkeleton;
+class FreePeriSkeleton;
+class FreeLeadSkeleton;
 
 #include "skeleton.hpp"
 
@@ -26,17 +28,51 @@ public:
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
   PeriSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, 
-	       LeadSkeleton *guide, uint *pls);
+	       LeadSkeleton *leadSkeleton, uint *pls);
   virtual ~PeriSkeleton();
   
+  /** Méthode de séparation d'un squelette
+   * @param splitHeight hauteur de la découpe
+   * @param leadSkeleton squelette guide relatif
+   */
+  FreePeriSkeleton* split (uint splitHeight, FreeLeadSkeleton* leadSkeleton);
+  
   /** Retourne un pointeur sur le squelette guide relatif */
-  LeadSkeleton* getLeadSkeleton(){return guide;};
+  LeadSkeleton* getLeadSkeleton() const {return m_lead;};
 
 private:  
   /** Pointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
-  LeadSkeleton *guide;
+  LeadSkeleton *m_lead;
+};
+
+/** Classe représentant les squelettes périphériques libres.
+ *
+ * @author	Flavien Bridault
+ */
+class FreePeriSkeleton : public FreeSkeleton
+{
+public:
+  /** Constructeur de squelette périphérique
+   * @param src pointeur sur le squelette périphérique initial
+   * @param leadSkeleton pointeur sur le squelette guide relatif
+   * @param splitHeight hauteur de découpe
+   *
+   */
+  FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkeleton* const leadSkeleton, uint splitHeight);
+  FreePeriSkeleton(uint size, Solver* s, FreeLeadSkeleton* const leadSkeleton);
+  virtual ~FreePeriSkeleton();
+  
+  /** Retourne un pointeur sur le squelette guide relatif */
+  FreeLeadSkeleton* getLeadSkeleton() const {return m_lead;};
+  
+  friend class FreeLeadSkeleton;
+private:  
+  /** Pointeur sur le squelette guide associé (généralement le plus proche,
+   * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
+   */
+  FreeLeadSkeleton *m_lead;
 };
 
 #endif

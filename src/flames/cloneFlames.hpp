@@ -5,7 +5,7 @@ class CloneFlame;
 class CloneLineFlame;
 class ClonePointFlame;
 
-#include "basicFlames.hpp"
+#include "realFlames.hpp"
 
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE CLONEFLAME ****************************************/
@@ -17,18 +17,18 @@ class ClonePointFlame;
  *
  * @author	Flavien Bridault
  */
-class CloneFlame : public MetaFlame
+class CloneFlame : public FixedFlame
 {
 public:
   /** Constructeur.
    * @param s pointeur sur le solveur de fluides
-   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage. A VERIFIER
+   * @param nbSkeletons nombre de squelettes.
    * @param posRel Position relative du centre de la flamme
    * @param innerForce Force intérieure de la flamme
    * @param scene Pointeur sur la scène
    * @param rayon rayon de la flamme
    */
-  CloneFlame(FlameConfig* flameConfig, BasicFlame *source, Point offset, const wxString& texname, GLint wrap_s, GLint wrap_t);
+  CloneFlame(FlameConfig* flameConfig, RealFlame *source, Point offset);
   virtual ~CloneFlame();
   
   /** Dessine la mèche de la flamme 
@@ -58,13 +58,14 @@ public:
   /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
+   * @return false si un problème dans la contruction est survenu (pas assez de particules par exemple)
    */
-  virtual void build();
+  virtual bool build();
   
   Point* getTop(){ return m_source->getTop(); };
   Point* getBottom() { return m_source->getBottom(); };
 protected:
-  BasicFlame *m_source;
+  RealFlame *m_source;
 };
 
 /** La classe PointFlame implémente une flamme qui provient d'une mèche verticale droite.<br>

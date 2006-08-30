@@ -5,7 +5,7 @@ class Scene;
 
 class FireSource;
 
-#include "../flames/fire.hpp"
+#include "../flames/abstractFires.hpp"
 #include "material.hpp"
 #include "source.hpp"
 #include "object.hpp"
@@ -82,7 +82,7 @@ public:
    * @param objectsList liste des noms des objets retournés
    * @param prefix préfixe servant de filtre pour les noms des objets
    */  
-  void getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList, const char* prefix);
+  void getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix);
   
   /** Lit un fichier OBJ pass&eacute; en param&egrave;tre et cherche le nom du fichier MTL.
    *

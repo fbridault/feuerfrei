@@ -67,6 +67,8 @@ public:
   uint leadLifeSpan, periLifeSpan;
   /** Chemin vers le fichier IES utilsé pour le soldie photométrique */
   wxString IESFileName;
+  /** Indique si le feu peut générer des flammes détachées */
+  bool breakable;
 };
 
 class FlameAppConfig{

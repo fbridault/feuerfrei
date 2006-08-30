@@ -71,7 +71,8 @@ public:
    * @param pt position de l'origine du squelette
    * @param pls durée de vie initiale d'une particule
    */
-  FreeSkeleton(Solver* const s);
+  FreeSkeleton(uint size, Solver* const s);
+  FreeSkeleton(const FreeSkeleton * const src, uint splitHeight);
   virtual ~FreeSkeleton();
   
   /** Donne l'élément en tête de file.
@@ -97,26 +98,31 @@ public:
     return &m_queue[m_headIndex/2];
   };
   
-  /** Donne la taille du squelette.
+  /** Donne la taille du squelette, sans tenir compte éventuellement de l'origine.
    * @return nombre de particules contenues dans la file du squelette
    */
   virtual uint getSize() const{
-    return m_headIndex;
+    return m_headIndex+1;
   };
   
+  /** Retourne true si le squelette ne contient plus de particules.
+   * @return true sur le squelette est mort
+   */
+  virtual bool isDead() const{
+    return (m_headIndex < 0);
+  };
+    
   /** Dessine le squelette à l'écran */
   virtual void draw ();
   
-  /** Déplacement des particules du squelette, génération d'une nouvelle particule et 
-   * suppression des particules mortes
-   */
+  /** Déplacement des particules du squelette et suppression des particules mortes */
   virtual void move();
   
   /** Déplace une particule dans le champ de vélocité.
    * @param pos position de la particule
    */
   virtual uint moveParticle(Particle* const pos);
-    
+
 protected:
   /** Echange deux particules dans la file .
    * @param i indice de la première particule
@@ -175,7 +181,8 @@ public:
   Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
   virtual ~Skeleton(){};
   
-  /** Déplacement des particules du squelette */
+  /** Déplacement des particules du squelette,  génération d'une nouvelle particule et
+   * suppression des particules mortes */
   void move();
   
   /** Donne l'origine du squelette.
@@ -185,17 +192,15 @@ public:
     return &m_root;
   };
   
-  /** Donne la taille du squelette.
-   * @return nombre de particules contenues dans la file du squelette
-   */
-  uint getSize() const{
-    return m_headIndex+1;
-  };
-  
+  /** Dessine le squelette à l'écran */
   void draw ();
   
   uint moveRoot ();
 
+  /** Déplace une particule dans le champ de vélocité.
+   * @param pos position de la particule
+   */
+  virtual uint moveParticle(Particle* const pos);
 protected:
   /** Insère une particule en queue de file.
    * @param pt position de la particule

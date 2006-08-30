@@ -6,14 +6,14 @@ class FireSource;
 
 #include "flames.hpp"
 
-#include "basicFlames.hpp"
+#include "realFlames.hpp"
 #include "../solvers/solver.hpp"
 #include "../scene/texture.hpp"
 #include "../scene/object.hpp"
 #include "../shaders/CgSVShader.hpp"
 #include "ies.hpp"
 
-class BasicFlame;
+class RealFlame;
 class Solver;
 class Object;
 class Scene;
@@ -109,7 +109,7 @@ private:
 /**********************************************************************************************************************/
 
 /** La classe FireSource désigne un objet qui produit du feu. Il se compose d'un luminaire (classe Object), de
- * flammes (classe BasicFlame) et d'une source de lumière (classe FlameLight). Cette classe est abstraite.<br>
+ * flammes (classe RealFlame) et d'une source de lumière (classe FlameLight). Cette classe est abstraite.<br>
  * La position de la flamme stockée dans m_position est une position relative par rapport au solveur à laquelle
  * elle appartient. Pour obtenir la position absolue dans le repère du monde, il faut passer par la méthode
  * getPosition() qui additionne la position relative de la flamme à la position absolue du solveur dans le monde.
@@ -129,12 +129,13 @@ public:
    * @param scene pointeur sur la scène
    * @param innerForce force intérieure de la flamme
    * @param filename nom du fichier contenant le luminaire
+   * @param texname nom du fichier contenant le luminaire
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes
    * @param objname nom du luminaire à charger dans le fichier filename
    */
-  FireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename, uint index, 
-	      CgSVShader * shader, const char *objName=NULL);
+  FireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
+	      const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   virtual ~FireSource ();
 
   virtual void setSamplingTolerance(double value){ 
@@ -165,7 +166,7 @@ public:
    */
   virtual void build();
   
-  /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
+  /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
   virtual void drawWick(bool displayBoxes)
@@ -180,7 +181,7 @@ public:
   }
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
+   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *
    * @param displayParticle affiche ou non les particules des squelettes
@@ -222,7 +223,7 @@ public:
    */
   void drawLuminary()
   {
-    if(hasLuminary){
+    if(m_hasLuminary){
       Point position(getPosition());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
@@ -239,7 +240,7 @@ public:
    */
   void drawLuminary(CgBasicVertexShader& shader)
   {
-    if(hasLuminary){
+    if(m_hasLuminary){
       Point position(getPosition());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
@@ -291,7 +292,7 @@ protected:
   /** Nombre de flammes */
   uint m_nbFlames;
   /** Tableau contenant les flammes */
-  BasicFlame **m_flames;
+  RealFlame **m_flames;
   
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;
@@ -303,7 +304,61 @@ protected:
   Point m_position;
 
   /** Est-ce que la source possède un luminaire */
-  bool hasLuminary;
+  bool m_hasLuminary;
+
+  /** Indique si la source produit des flammes détachées */
+  bool m_breakable;
+
+  /** Texture utilisée pour les flammes */
+  Texture m_texture;
+};
+
+/** La classe Firesource ajoute la notion de flammes détachées.
+ *
+ * @author	Flavien Bridault
+ */
+class DetachableFireSource : public FireSource
+{
+public:
+  /** Constructeur.
+   * @param posRel position du centre de la flamme dans le solveur.
+   * @param scene pointeur sur la scène
+   * @param s pointeur sur le solveur de fluides
+   * @param filename nom du fichier contenant le luminaire
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
+   * @param wickFileName nom du fichier contenant la mèche
+   */
+  DetachableFireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
+			const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
+  virtual ~DetachableFireSource();
+  
+  /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
+   * de déterminer la position de la source de lumière.
+   */
+  virtual void build();
+  
+  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
+   * donc seule une translation correspondant à la position du solveur est effectuée.
+   *
+   * @param displayParticle affiche ou non les particules des squelettes
+   */
+  virtual void drawFlame(bool displayParticle);
+  
+  virtual void addDetachedFlame(DetachedFlame* detachedFlame)
+  {
+    m_detachedFlamesList.push_back(detachedFlame);
+  }
+  
+  virtual void removeDetachedFlame(DetachedFlame* detachedFlame)
+  {
+    m_detachedFlamesList.remove(detachedFlame);
+  }
+  
+private:
+  /** Liste des flammes détachées */
+  list<DetachedFlame *> m_detachedFlamesList;
 };
 
 #endif

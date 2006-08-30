@@ -373,7 +373,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
     return true;  
 }
 
-void Scene::getObjectsNameFromOBJ(const char* fileName, vector<string> &objectsList, const char* prefix)
+void Scene::getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix)
 {
   char lettre;
   char buffer[255];

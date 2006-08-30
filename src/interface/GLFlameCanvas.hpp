@@ -14,7 +14,7 @@ class GLFlameCanvas;
 #include "../scene/scene.hpp"
 #include "../scene/graphicsFn.hpp"
 
-#include "../flames/firesources.hpp"
+#include "../flames/realFires.hpp"
 #include "../flames/glowengine.hpp"
 #include "../flames/DPengine.hpp"
 #include "../flames/solidePhoto.hpp"

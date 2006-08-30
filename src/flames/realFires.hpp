@@ -4,7 +4,7 @@
 class Candle;
 class Firmalampe;
 
-#include "fire.hpp"
+#include "abstractFires.hpp"
 #include "cloneFlames.hpp"
 
 class PointFlame;
@@ -40,7 +40,7 @@ public:
  *
  * @author	Flavien Bridault
  */
-class Firmalampe : public FireSource
+class Firmalampe : public DetachableFireSource
 {
 public:
   /** Constructeur d'une bougie.
@@ -66,7 +66,7 @@ public:
  *
  * @author	Flavien Bridault
  */
-class Torch : public FireSource
+class Torch : public DetachableFireSource
 {
 public:
   /** Constructeur d'une bougie.
@@ -85,10 +85,11 @@ public:
 	CgSVShader * shader);
   virtual ~Torch(){}; 
 
-  /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
+  /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
   virtual void drawWick(bool displayBoxes) {};
+
 };
 
 /** La classe CampFire permet la définition d'un feu de camp.
@@ -97,7 +98,7 @@ public:
  *
  * @author	Flavien Bridault
  */
-class CampFire : public FireSource
+class CampFire : public DetachableFireSource
 {
 public:
   /** Constructeur d'une bougie.
@@ -117,12 +118,12 @@ public:
   virtual ~CampFire(){};
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
+   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  virtual void drawFlame(bool displayParticle);
+//   virtual void drawFlame(bool displayParticle);
   
 private:
   /* Texture pour le halo */
@@ -156,7 +157,7 @@ public:
    */
   virtual void build();
   
-    /** Dessine la mèche de la flamme. Les mèches des BasicFlame sont définies en (0,0,0), une translation
+    /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
   virtual void drawWick(bool displayBoxes)
@@ -173,7 +174,7 @@ public:
   }
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une BasicFlame est définie dans le repère du solveur,
+   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *
    * @param displayParticle affiche ou non les particules des squelettes

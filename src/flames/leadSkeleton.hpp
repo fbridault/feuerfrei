@@ -2,6 +2,8 @@
 #define LEADSKELETON_H
 
 class LeadSkeleton;
+class FreeLeadSkeleton;
+class FreePeriSkeleton;
 
 #include "skeleton.hpp"
 
@@ -25,8 +27,38 @@ public:
 
   virtual ~LeadSkeleton();
   
+  /** Méthode de séparation d'un squelette
+   * @param splitHeight hauteur de la découpe
+   */
+  FreeLeadSkeleton* split (uint splitHeight);
+  
 private:
+  /** Dessine une particule d'un squelette guide
+   * @param particle particule à dessiner
+   */
+  void drawParticle (Particle * const particle);
+};
 
+/** Classe représentant les squelettes guides libres.
+ *
+ * @author	Flavien Bridault
+ */
+class FreeLeadSkeleton : public FreeSkeleton
+{
+public:
+  /** Constructeur de squelette périphérique
+   * @param src pointeur sur le squelette périphérique initial
+   * @param splitHeight hauteur de découpe
+   *
+   */
+  FreeLeadSkeleton(const LeadSkeleton* const src, uint splitHeight);
+  virtual ~FreeLeadSkeleton();
+
+  /** Duplique un squelette
+   * @param offset valeur du décalage dans l'espace du squelette
+   */
+  virtual FreePeriSkeleton* dup(Point& offset);
+private:  
   /** Dessine une particule d'un squelette guide
    * @param particle particule à dessiner
    */

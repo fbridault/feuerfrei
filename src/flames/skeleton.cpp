@@ -9,11 +9,26 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREESKELETON **************************************/
 /**********************************************************************************************************************/
-FreeSkeleton::FreeSkeleton(Solver* const s)
+FreeSkeleton::FreeSkeleton(uint size, Solver* const s)
 {
   m_solver = s;
-  m_queue = new Particle[NB_PARTICLES_MAX];
+  m_queue = new Particle[size];
   m_headIndex = -1;
+}
+
+FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
+{
+  uint i;
+  
+  m_solver = src->m_solver;
+  m_queue = new Particle[splitHeight+1];
+  
+  /* Recopie des particules en fonction de la hauteur de coupe */
+  for( i=0; i <= splitHeight; i++){
+    m_queue[i] = src->m_queue[i];
+    m_queue[i].m_lifespan +=5;
+  }
+  m_headIndex = splitHeight;
 }
 
 FreeSkeleton::~FreeSkeleton()
@@ -84,16 +99,18 @@ uint FreeSkeleton::moveParticle (Particle * const pos)
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   m_solver->findPointPosition(*pos, i, j, k);
   
+  if ( i >= m_solver->getXRes()  )
+    i = m_solver->getXRes()-1;
+  if ( j >= m_solver->getXRes()  )
+    j = m_solver->getYRes()-1;
+  if ( k >= m_solver->getXRes()  )
+    k = m_solver->getZRes()-1;
+  
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
   pos->x += m_solver->getU (i, j, k);
   pos->y += m_solver->getV (i, j, k);
   pos->z += m_solver->getW (i, j, k);
-
-  if (pos->x < -.5 || pos->x > .5
-      || pos->y < 0 || pos->y > 1
-      || pos->z < -.5 || pos->z > .5)
-    return 0;
   
   return 1;
 }
@@ -123,7 +140,7 @@ void FreeSkeleton::drawParticle (Particle * const particle)
 /**********************************************************************************************************************/
 
 Skeleton::Skeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls) : 
-  FreeSkeleton(s),
+  FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
 {  
   m_root = m_rootSave = position;
@@ -214,5 +231,29 @@ void Skeleton::move ()
 	    i--;
 	}
     }	/* for */
+}
+
+
+uint Skeleton::moveParticle (Particle * const pos)
+{
+  uint i, j, k;
+
+  if (pos->isDead ())
+    return 0;
+
+  /* Retrouver les quatres cellules adjacentes autour de la particule */
+  m_solver->findPointPosition(*pos, i, j, k);
   
+  /* Calculer la nouvelle position */
+  /* Intégration d'Euler */
+  pos->x += m_solver->getU (i, j, k);
+  pos->y += m_solver->getV (i, j, k);
+  pos->z += m_solver->getW (i, j, k);
+
+  if (pos->x < -.5 || pos->x > .5
+      || pos->y < 0 || pos->y > 1
+      || pos->z < -.5 || pos->z > .5)
+    return 0;
+  
+  return 1;
 }

@@ -6,13 +6,44 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver.hpp"
 
+/**********************************************************************************************************************/
+/************************************** IMPLEMENTATION DE LA CLASSE PERISKELETON **************************************/
+/**********************************************************************************************************************/
 PeriSkeleton::PeriSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor, 
-			    LeadSkeleton * guide, uint *pls) :
+			    LeadSkeleton *leadSkeleton, uint *pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
-  this->guide = guide;
+  this->m_lead = leadSkeleton;
 }
 
 PeriSkeleton::~PeriSkeleton ()
+{
+}
+
+FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadSkeleton)
+{
+  FreePeriSkeleton *skel = new FreePeriSkeleton(this, leadSkeleton, splitHeight);
+  
+  m_headIndex = splitHeight;
+  
+  return( skel );
+}
+
+/**********************************************************************************************************************/
+/************************************** IMPLEMENTATION DE LA CLASSE FREEPERISKELETON **********************************/
+/**********************************************************************************************************************/
+FreePeriSkeleton::FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkeleton* const leadSkeleton, uint splitHeight) :
+  FreeSkeleton(src, splitHeight)
+{
+  m_lead = leadSkeleton;
+}
+
+FreePeriSkeleton::FreePeriSkeleton(uint size, Solver* s, FreeLeadSkeleton* const leadSkeleton) :
+  FreeSkeleton(size, s)
+{
+  m_lead = leadSkeleton;
+}
+
+FreePeriSkeleton::~FreePeriSkeleton ()
 {
 }

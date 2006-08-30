@@ -11,16 +11,17 @@ bin_PROGRAMS = rtflames
 
 rtflames_SOURCES = \
 	main.cpp  \
-	flames/basicFlames.cpp  \
+	flames/abstractFires.cpp  \
+	flames/abstractFlames.cpp  \
 	flames/cloneFlames.cpp  \
 	flames/fbo.cpp  \
-	flames/fire.cpp  \
-	flames/firesources.cpp \
 	flames/DPengine.cpp  \
 	flames/glowengine.cpp  \
 	flames/ies.cpp  \
 	flames/leadSkeleton.cpp  \
 	flames/periSkeleton.cpp  \
+	flames/realFires.cpp \
+	flames/realFlames.cpp  \
 	flames/skeleton.cpp  \
 	flames/solidePhoto.cpp  \
 	flames/wick.cpp  \

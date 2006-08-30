@@ -1,4 +1,4 @@
-#include "fire.hpp"
+#include "abstractFires.hpp"
 
 #include "../scene/scene.hpp"
 
@@ -82,11 +82,12 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scene *scene, const char *filename, uint index, 
-		       CgSVShader *shader, const char *objName) : 
-  FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii())
+FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scene *scene, const char *filename, 
+		       const wxString &texname,  uint index, CgSVShader *shader, const char *objName) : 
+  FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii()),
+  m_texture(texname, GL_CLAMP, GL_REPEAT)
 {  
-  vector<string> objList;
+  list<string> objList;
   char mtlName[255];
   /** Luminaire */
   Object **m_luminary;
@@ -96,7 +97,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
   m_solver = s;
   
   m_nbFlames=nbFlames;
-  if(m_nbFlames) m_flames = new BasicFlame* [m_nbFlames];
+  if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
   
   
   if(objName != NULL){
@@ -110,7 +111,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
     nbObj=objList.size();
     
     i=0;
-    for (vector < string >::iterator objListIterator = objList.begin ();
+    for (list < string >::iterator objListIterator = objList.begin ();
 	 objListIterator != objList.end (); objListIterator++, i++)
       {      
 	m_luminary[i] = new Object(scene);
@@ -122,14 +123,14 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
     for (i=0; i < objList.size(); i++)
       m_luminary[i]->draw();
     glEndList();
-    hasLuminary=true;
+    m_hasLuminary=true;
   }
   else{
     nbObj=1;
     m_luminary = new Object* [1];
     m_luminary[0] = new Object(scene);
-    hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
-    if(hasLuminary){
+    m_hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
+    if(m_hasLuminary){
       m_luminaryDL=glGenLists(1);
       glNewList(m_luminaryDL,GL_COMPILE);
       m_luminary[0]->draw();
@@ -137,6 +138,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
     }
   }
   m_position=flameConfig->position;
+  m_breakable=flameConfig->breakable;
   
   /* On efface le luminaire, il n'appartient pas à la scène */
   for (uint i = 0; i < nbObj; i++)
@@ -150,7 +152,7 @@ FireSource::~FireSource()
     delete m_flames[i];
   delete[]m_flames;
   
-  if(hasLuminary) glDeleteLists(m_luminaryDL,1);
+  if(m_hasLuminary) glDeleteLists(m_luminaryDL,1);
 }
 
 void FireSource::build()
@@ -205,4 +207,57 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta = 0.0;
 //   else
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
+}
+
+DetachableFireSource::DetachableFireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames, 
+					   Scene *scene, const char *filename, const wxString &texname, 
+					   uint index, CgSVShader *shader, const char *objName) : 
+  FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, shader, objName)
+{
+}
+
+DetachableFireSource::~DetachableFireSource()
+{
+  for (list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
+       flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+    delete (*flamesIterator);
+  m_detachedFlamesList.clear ();
+}
+
+void DetachableFireSource::drawFlame(bool displayParticle)
+{
+  Point pt(m_solver->getPosition());
+  glPushMatrix();
+  glTranslatef (pt.x, pt.y, pt.z);
+  glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+  for (uint i = 0; i < m_nbFlames; i++)
+    m_flames[i]->drawFlame(displayParticle);
+  for (list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
+       flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+    (*flamesIterator)->drawFlame(displayParticle);
+  glPopMatrix();
+}
+
+void DetachableFireSource::build()
+{
+  Point averagePos, tmp;
+  DetachedFlame* flame;
+  
+  for (uint i = 0; i < m_nbFlames; i++){
+    averagePos += m_flames[i]->getCenter ();
+    m_flames[i]->breakCheck();
+    m_flames[i]->build();
+  }
+  list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
+  while( flamesIterator != m_detachedFlamesList.end()){
+    if(!(*flamesIterator)->build()){
+      flame = *flamesIterator;
+      flamesIterator = m_detachedFlamesList.erase(flamesIterator);
+      delete flame;
+    }else
+      flamesIterator++;
+  }
+  averagePos = averagePos/m_nbFlames;
+  averagePos += getPosition();
+  setLightPosition(averagePos);
 }

@@ -38,13 +38,14 @@ public:
    * des points de contrôle. L'allocation doit donc être effectuée par la classe fille, ce que fait par exemple
    * la classe FixedFlame.
    * @param flameConfig Pointeur sur le configuration de la flamme.
+   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
   NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex);
   
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
+   * @param source Pointeur sur la flamme qui a généré la flamme courante.
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
@@ -67,12 +68,14 @@ public:
   virtual void drawLineFlame();  
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. 
+   * build() avec le placage de texture.
+   * @param displayParticle Affiche ou non les particules.
    */
   virtual void drawFlame(bool displayParticle) = 0;
   
-  /** Dessine la flamme et sa mèche 
-   * @param displayBoxes affiche ou non le partitionnement de la mèche
+  /** Dessine la flamme et sa mèche.
+   * @param displayParticle Affiche ou non les particules.
+   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
   void draw(bool displayParticle, bool displayBoxes){
     drawFlame(displayParticle);
@@ -83,6 +86,7 @@ public:
    */
   virtual void setSamplingTolerance(double value){ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
   
+  /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void toggleSmoothShading ();
   
   Point getPosition(){ return m_position; };
@@ -244,33 +248,47 @@ public:
   
   virtual ~FixedFlame ();
   
-  /** Dessine la mèche de la flamme 
-   * @param displayBoxes affiche ou non le partitionnement de la mèche
+  /** Dessine la mèche de la flamme.
+   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
   virtual void drawWick(bool displayBoxes) = 0;
   
-  /** Dessine la flamme et sa mèche 
-   * @param displayBoxes affiche ou non le partitionnement de la mèche
-   */
   void draw(bool displayParticle, bool displayBoxes){
     drawWick(displayBoxes);
     drawFlame(displayParticle);
   };
   
+  /** Affiche le halo.
+   * @param angle Angle de rotation pour le quad texturé.
+   */
   virtual void drawHalo (double angle);
-
+  
+  /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
+   * pour rester en face de l'observateur.
+   */
   virtual void drawPointFlame();
+  
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
+   * @return Direction.
    */
   virtual Vector getMainDirection() = 0;
   
-  /** Retourne le centre de la flamme */
+  /** Retourne le centre de la flamme.
+   * @return Centre de la flamme.
+   */
   virtual Point getCenter () = 0;
   
+  /** Renvoie un pointeur vers le sommet de la flamme.
+   * @return Pointeur vers le sommet.
+   */
   virtual Point* getTop() = 0;
+  
+  /** Renvoie un pointeur vers le bas de la flamme.
+   * @return Pointeur vers le bas.
+   */
   virtual Point* getBottom() = 0;
-    
+  
 protected:
   /* Texture pour le halo */
   Texture m_halo;
@@ -298,19 +316,30 @@ class RealFlame : public FixedFlame
 {
 public:
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
-   * @param flameConfig Pointeur sur le configuration de la flamme
-   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
+   * @param flameConfig Pointeur sur le configuration de la flamme.
+   * @param nbSkeletons Nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
-   * @param s Pointeur vers le solveur
+   * @param s Pointeur vers le solveur.
    */
   RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Solver *s);
   virtual ~RealFlame ();
   
+  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
+   * @param perturbate Type de perturbation parmi FLICKERING_VERTICAL, FLICKERING_RANDOM, etc...
+   * @param fdf Type de fonction de distribution de carburant parmi FDF_LINEAR, FDF_BILINEAR, 
+   * FDF_EXPONENTIAL, FDF_GAUSS, FDF_RANDOM.
+   */
   virtual void addForces (u_char perturbate, u_char fdf=0) = 0;
   
+  /** Affectation de la vélocité induite par la flamme.
+   * @param value Vélocité de la flamme.
+   */
   virtual void setForces(double value){  m_innerForce=value; };
   
+  /** Affiche les particules de tous les squelettes composants la flamme.
+   * @param displayParticle Affiche ou non les particules.
+   */
   void drawParticles(bool displayParticle)
   {
     /* Affichage des particules */
@@ -324,19 +353,9 @@ public:
     }
   };
   
-    /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
-   * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
-   * des vecteurs de noeuds.
-   * @return false si un problème dans la contruction est survenu (pas assez de particules par exemple)
-   */
   virtual bool build();
   
-  /** Retourne la direction de la base de la flamme vers la derniere particule
-   * pour orienter le solide photométrique.
-   */
-  virtual Vector getMainDirection() = 0;
-  
-  /** Retourne le centre de la flamme */
+  virtual Vector getMainDirection() = 0;  
   virtual Point getCenter () = 0;
   
   virtual Point* getTop() = 0;
@@ -346,9 +365,7 @@ public:
   /* Elle doit être appelée dès qu'un changement de résolution de la grille intervient */
   virtual void locateInSolver(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
   
-  /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division.
-   * @param 
-   */
+  /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
 protected:
   /** Pointeur vers les squelettes guide. */

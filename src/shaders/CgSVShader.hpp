@@ -18,11 +18,15 @@ class CgSVShader : public CgBasicVertexShader
 {
 public:
     /** Constructeur par défaut
-   * @param sourceName Nom du fichier source
-   * @param shaderName Nom du programme Cg
-   * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
+   * @param sourceName Nom du fichier source.
+   * @param shaderName Nom du programme Cg.
+   * @param context Pointeur vers le contexte Cg (il doit être déjà créé).
+   * @param fatness Largeur du shadow volume.
+   * @param extrudeDist Profondeur du shadow volume.
+   * @param recompile Indique s'il faut recompiler le shader à partir du fichier .cg ou si le .o est déjà compilé.
    */
   CgSVShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, double *fatness, double *extrudeDist, bool recompile=false );
+  /** Desctructeur. */
   virtual ~CgSVShader();
   
   /** Réglage de l'épaisseur des shadow volumes */
@@ -48,6 +52,7 @@ public:
 private:
   /** Position de la lumière */
   CGparameter m_lightPos;
+  /** Matrice de la vue du modèle. */
   CGparameter m_modelViewMatrix;
   /** Epaisseur des shadow volumes */
   CGparameter m_fatness;

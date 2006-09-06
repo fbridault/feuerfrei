@@ -20,18 +20,17 @@ class Candle : public FireSource
 {
 public:
   /** Constructeur d'une bougie.
-   * @param s pointeur sur le solveur de fluides
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param rayon rayon de la flamme
-   * @param nbSkeletons nombre de squelettes périphériques
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param filename Nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param rayon Rayon de la flamme.
    */
   Candle(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
 	 CgSVShader * shader, double rayon);
+  /** Destructeur */
   virtual ~Candle(){};
 };
 
@@ -43,46 +42,42 @@ public:
 class Firmalampe : public DetachableFireSource
 {
 public:
-  /** Constructeur d'une bougie.
-   * @param s pointeur sur le solveur de fluides
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param rayon rayon de la flamme
-   * @param nbSkeletons nombre de squelettes périphériques
+  /** Constructeur d'une torche.
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param filename nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param wickFileName nom du fichier contenant la mèche
    */
   Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
 	     CgSVShader * shader, const char *wickFileName);
+  /** Destructeur */
   virtual ~Firmalampe(){};
 };
 
 /** La classe Torche permet la définition d'une flamme de type torche.
  * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
- * en Wick*. Le luminaire en tant que tel doit s'appeler Torch.
+ * en Wick*. Celle-ci ne sont pas affichées à l'écran. Les objets composant le luminaire 
+ * doivent s'appeler Torch.*
  *
  * @author	Flavien Bridault
  */
 class Torch : public DetachableFireSource
 {
 public:
-  /** Constructeur d'une bougie.
-   * @param s pointeur sur le solveur de fluides
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param rayon rayon de la flamme
-   * @param nbSkeletons nombre de squelettes périphériques
-   * @param wickFileName nom du fichier contenant la torche
+  /** Constructeur d'une torche.
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param torchName nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    */
   Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, 
 	CgSVShader * shader);
+  /** Destructeur */
   virtual ~Torch(){}; 
 
   /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
@@ -94,72 +89,52 @@ public:
 
 /** La classe CampFire permet la définition d'un feu de camp.
  * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
- * en Wick*. Le luminaire en tant que tel doit s'appeler Torch.
+ * en Wick*. A la différence de la classe Torch, les mèches sont affichées. En revanche,
+ * il n'existe pas de luminaire.
  *
  * @author	Flavien Bridault
  */
 class CampFire : public DetachableFireSource
 {
 public:
-  /** Constructeur d'une bougie.
-   * @param s pointeur sur le solveur de fluides
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param rayon rayon de la flamme
-   * @param nbSkeletons nombre de squelettes périphériques
-   * @param wickFileName nom du fichier contenant la torche
+  /** Constructeur d'une torche.
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param fireName nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    */
   CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
 	   CgSVShader * shader);
+  /** Destructeur */
   virtual ~CampFire(){};
-  
-  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
-   * donc seule une translation correspondant à la position du solveur est effectuée.
-   *
-   * @param displayParticle affiche ou non les particules des squelettes
-   */
-//   virtual void drawFlame(bool displayParticle);
-  
-private:
-  /* Texture pour le halo */
-  Texture m_halo;
 };
 
-/** La classe CandleStick permet la définition d'un chandelier.
+/** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
+ * clones.
  *
  * @author	Flavien Bridault
  */
 class CandleStick : public FireSource
 {
 public:
-  /** Constructeur d'une bougie.
-   * @param s pointeur sur le solveur de fluides
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param rayon rayon de la flamme
-   * @param nbSkeletons nombre de squelettes périphériques
+  /** Constructeur d'un chandelier.
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param filename Nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param rayon Rayon de la flamme.
    */
   CandleStick(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
 	      CgSVShader * shader, double rayon);
+  /** Destructeur */
   virtual ~CandleStick();
   
-  /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
-   * de déterminer la position de la source de lumière.
-   */
   virtual void build();
   
-    /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
-   * est donc effectuée pour tenir compte du placement du feu dans le monde.
-   */
   virtual void drawWick(bool displayBoxes)
   {      
     Point pt(getPosition());
@@ -173,12 +148,6 @@ public:
     glPopMatrix();
   }
   
-  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
-   * donc seule une translation correspondant à la position du solveur est effectuée.
-   *
-   * @param displayParticle affiche ou non les particules des squelettes
-   */
   virtual void drawFlame(bool displayParticle)
   {
     Point pt(m_solver->getPosition());
@@ -192,25 +161,13 @@ public:
     glPopMatrix();
   }
   
-  virtual void toggleSmoothShading ();
-
+  virtual void toggleSmoothShading ();  
   virtual void setSamplingTolerance(double value){
     FireSource::setSamplingTolerance(value);
     for (uint i = 0; i < m_nbCloneFlames; i++)
       m_cloneFlames[i]->setSamplingTolerance(value);
   };
   
-//   void setRenderMode() {  
-//     FireSource::setRenderMode();
-//       for (uint i = 0; i < m_nbCloneFlames; i++)
-//       m_cloneFlames[i]->setRenderMode();
-//   };
-
-//   void setTesselateMode() { 
-//     FireSource::setTesselateMode();
-//     for (uint i = 0; i < m_nbCloneFlames; i++)
-//       m_cloneFlames[i]->setTesselateMode();
-//   };
 private:  
   /** Nombre de flammes */
   uint m_nbCloneFlames;

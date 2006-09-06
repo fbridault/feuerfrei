@@ -2,9 +2,9 @@
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
-				  double pas_de_temps, uint nbTimeSteps, double buoyancy, 
+				  double timeStep, uint nbTimeSteps, double buoyancy, 
 				  double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("solvers/residualsAverage.log", ios::out | ios::trunc);

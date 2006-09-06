@@ -19,11 +19,22 @@ class LogResAvgTimeSolver: public LogResAvgSolver
 {
 public:
   /** Constructeur du solveur.
-   * @param n : taille de la grille
-   * @param pas_de_temps : pas de temps utilisé pour la simulation
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param nbTimeSteps Nombre de pas de temps de la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LogResAvgTimeSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
-		       double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+		       double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
+		       double omegaProj, double epsilon);
+  /** Destructeur. */
   virtual ~LogResAvgTimeSolver ();
   
 private:

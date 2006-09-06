@@ -10,11 +10,11 @@ class Intensity;
 #define BLUE                    2
 
 /** 
- * Classe pour la repr&eacute;sentation d'une intensit&eacute; lumineuse. 
- * Une intensit&eacute; est d&eacute;finie par un ensemble de valeurs 
- * d'intensit&eacute;s pour certaines longueurs d'ondes particuli&egrave;res.
+ * Classe pour la représentation d'une intensité lumineuse. 
+ * Une intensité est définie par un ensemble de valeurs 
+ * d'intensités pour certaines longueurs d'ondes particulières.
  *
- * @author	Christophe Cassagnab&egrave;re
+ * @author	Christophe Cassagnabère
  * @version	%I%, %G%
  * @since	1.0
  */
@@ -22,15 +22,15 @@ class Intensity
 {
 private:
   double color[COMPOSANTES];
-  /**< Tableaux d'intensit&eacute;. Chaque longueur d'onde
-   * a une intensit&eacute; lumineuse propre de type r&eacute;elle.
-   * Une intensit&eacute; lumineuse est la combinaison de ces 
-   * longueur d'ondes. Le syst&egrave;me se base pour l'instant
+  /**< Tableaux d'intensité. Chaque longueur d'onde
+   * a une intensité lumineuse propre de type réelle.
+   * Une intensité lumineuse est la combinaison de ces 
+   * longueur d'ondes. Le système se base pour l'instant
    * sur le code RVB.*/  
 
 public:
   /**
-   * Constructeur par d&eacute;faut. Cr&eacute;e une intensit&eacute;
+   * Constructeur par défaut. Crée une intensité
    * lumineuse nulle.
    */
   Intensity (){
@@ -45,26 +45,26 @@ public:
       color[i]=I.color[i];
   }
   /**
-   * Constructeur param&eacute;trique. 
+   * Constructeur paramétrique. 
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
-   * &eacute;l&eacute;ments de type <CODE>double</CODE>
+   * éléments de type <CODE>double</CODE>
    */
   Intensity (double* c){
     for(int i=0; i<COMPOSANTES; i++) 
       color[i]=c[i];
   }
   /**
-   * Destructeur par d&eacute;faut.
+   * Destructeur par défaut.
    */
   ~Intensity(){
     
   };
 
   /**
-   * Op&eacute;rateur d'addition d'intensit&eacute; lumineuses.
-   * Chacunes des composantes de chaque intensit&eacute; sont
-   * additionn&eacute;es une &agrave; une.
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 
+   * Opérateur d'addition d'intensité lumineuses.
+   * Chacunes des composantes de chaque intensité sont
+   * additionnées une à une.
+   * Seules les intensités supérieures à 0 
    * sont prises en compte.
    */
   Intensity operator+(const Intensity& I) const
@@ -77,9 +77,9 @@ public:
     return intensity;
   }
   /**
-   * Op&eacute;rateur de quotient par un scalaire. Chacune des composantes 
-   * de l'intensit&eacute; est divis&eacute;e upar un m&ecric;me scalaire. 
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
+   * Opérateur de quotient par un scalaire. Chacune des composantes 
+   * de l'intensité est divisée upar un même scalaire. 
+   * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
   Intensity operator/(const double& K) const
@@ -91,9 +91,9 @@ public:
     return intensity;
   }
   /**
-   * Op&eacute;rateur de produit par un scalaire. Chacune des composantes 
-   * de l'intensit&eacute; est multipli&eacute;e upar un m&ecric;me scalaire. 
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
+   * Opérateur de produit par un scalaire. Chacune des composantes 
+   * de l'intensité est multipliée upar un même scalaire. 
+   * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
   Intensity operator*(const double& K) const
@@ -106,10 +106,10 @@ public:
   }
 
   /**
-   * Op&eacute;rateur de produit combinatoire d'intensit&eacute;s lumineuses.
-   * Chacunes des composantes de chaque intensit&eacute; sont
-   * multipli&eacute;es une &agrave; une. 
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
+   * Opérateur de produit combinatoire d'intensités lumineuses.
+   * Chacunes des composantes de chaque intensité sont
+   * multipliées une à une. 
+   * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
   Intensity operator*(const Intensity& I) const
@@ -122,7 +122,7 @@ public:
     return intensity;
   }	
   /**
-   * Op&eacute;rateur d'&eacute;galit&eacute;.
+   * Opérateur d'égalité.
    */
   bool operator==(const Intensity& I) const
   {
@@ -132,12 +132,12 @@ public:
     return true;
   }
   /**
-   * Op&eacute;rateur d'addition d'intensit&eacute; lumineuses.
-   * Chacunes des composantes de chaque intensit&eacute; sont
-   * additionn&eacute;es une &agrave; une.
-   * Cette fonction <B>modifie</B> l'op&eacute;rande de gauche
+   * Opérateur d'addition d'intensité lumineuses.
+   * Chacunes des composantes de chaque intensité sont
+   * additionnées une à une.
+   * Cette fonction <B>modifie</B> l'opérande de gauche
    * par affectation.
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 
+   * Seules les intensités supérieures à 0 
    *sont prises en compte.
    */
   Intensity& operator+=(const Intensity& I){
@@ -147,10 +147,10 @@ public:
     return *this;
   }
   /**
-   * Op&eacute;rateur de quotient par un scalaire. Chacune des composantes 
-   * de l'intensit&eacute; est divis&eacute;e upar un m&ecric;me scalaire.
-   * Cette fonction <B>modifie</B> l'op&eacute;rande de gauche par affectation.
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises en
+   * Opérateur de quotient par un scalaire. Chacune des composantes 
+   * de l'intensité est divisée upar un même scalaire.
+   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
+   * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
   Intensity& operator/=(const double& K){
@@ -159,10 +159,10 @@ public:
     return *this;
   }
   /**
-   * Op&eacute;rateur de produit par un scalaire. Chacune des composantes 
-   * de l'intensit&eacute; est multipli&eacute;e upar un m&ecric;me scalaire.
-   * Cette fonction <B>modifie</B> l'op&eacute;rande de gauche par affectation.
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises en
+   * Opérateur de produit par un scalaire. Chacune des composantes 
+   * de l'intensité est multipliée upar un même scalaire.
+   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
+   * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
   Intensity& operator*=(const double& K){
@@ -171,11 +171,11 @@ public:
     return *this;
   }
   /**
-   * Op&eacute;rateur de produit combinatoire d'intensit&eacute;s lumineuses. 
-   * Chacunes des composantes de chaque intensit&eacute; sont
-   * multipli&eacute;es une &agrave; une.
-   * Cette fonction <B>modifie</B> l'op&eacute;rande de gauche par affectation.
-   * Seules les intensit&eacute;s sup&eacute;rieures &agrave; 0 sont prises
+   * Opérateur de produit combinatoire d'intensités lumineuses. 
+   * Chacunes des composantes de chaque intensité sont
+   * multipliées une à une.
+   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
+   * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
   Intensity& operator*=(const Intensity& I){
@@ -185,7 +185,7 @@ public:
     return *this;
   }
   /**
-   * Op&eacute;rateur d'allocation.
+   * Opérateur d'allocation.
    */
   Intensity& operator=(const Intensity& I) {
     for (int i=0;i<COMPOSANTES;i++)
@@ -194,10 +194,10 @@ public:
   };
 
   /**
-   * Lecture d'une composante de l'intensit&eacute; lumineuse.
-   * @param waveLength indice de la longueur d'onde recherch&eacute;e.
-   * @return Constante de type <CODE>double</CODE> repr&eacute;sentant 
-   * la valeur d'intensit&eacute; lumineuse pour cette longueur
+   * Lecture d'une composante de l'intensité lumineuse.
+   * @param waveLength indice de la longueur d'onde recherchée.
+   * @return Constante de type <CODE>double</CODE> représentant 
+   * la valeur d'intensité lumineuse pour cette longueur
    * d'onde.
    */
   const double& getColor (const int& waveLength) const

@@ -293,8 +293,8 @@ void FixedFlame::drawPointFlame ()
 RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Solver *s) :
   FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex)
 {  
-  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
-  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints + m_vorder];
+  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
+  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   
   m_periSkeletons = new PeriSkeleton* [m_nbSkeletons];
   for (uint i = 0; i < m_nbSkeletons; i++)

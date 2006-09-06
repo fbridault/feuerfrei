@@ -1,9 +1,9 @@
 #include "logResSolver.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResSolver::LogResSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+LogResSolver::LogResSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			    uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_fileDiff[0].open ("solvers/GSsolverDiff.u.log", ios::out | ios::trunc);

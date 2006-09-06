@@ -425,7 +425,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       /* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
       glDrawBuffer(GL_NONE);
       glReadBuffer(GL_NONE);
-      m_scene->draw_sceneWT ();
+      m_scene->drawSceneWT ();
       glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
       glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
       /* Dessin de la flamme */
@@ -524,7 +524,7 @@ void GLFlameCanvas::drawScene()
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
     else
-      m_scene->draw_scene();
+      m_scene->drawScene();
     
   glPopAttrib ();
     
@@ -553,7 +553,7 @@ void GLFlameCanvas::drawScene()
 // GLFlameCanvas::cast_shadows_double_multiple ()
 // {
 //   switch_off_lights ();
-//   m_scene->draw_sceneWTEX ();
+//   m_scene->drawSceneWTEX ();
 
 //   glBlendFunc (GL_ONE, GL_ONE);
 //   for (int i = 0; i < 1 /*m_nbLights *//**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
@@ -595,7 +595,7 @@ void GLFlameCanvas::drawScene()
 //       glStencilFunc (GL_EQUAL, 0, ~0);
 //       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
 
-//       m_scene->draw_sceneWTEX ();
+//       m_scene->drawSceneWTEX ();
       
 //       reset_diffuse_light (i);
 //     }
@@ -604,14 +604,14 @@ void GLFlameCanvas::drawScene()
 //     {
 //       enable_only_ambient_light (i);
 //     }
-//   m_scene->draw_sceneWTEX ();
+//   m_scene->drawSceneWTEX ();
 //   for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
 //     {
 //       reset_diffuse_light (i);
 //     }
 //   switch_on_lights ();
 //   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-//   m_scene->draw_scene ();
+//   m_scene->drawScene ();
 // }
 
 void GLFlameCanvas::OnSize(wxSizeEvent& event)
@@ -638,7 +638,7 @@ GLFlameCanvas::cast_shadows_double ()
   
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->switchOff ();
-  m_scene->draw_sceneWT ();
+  m_scene->drawSceneWT ();
 
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
     for (f = 0; f < m_currentConfig->nbFlames; f++){
@@ -692,7 +692,7 @@ GLFlameCanvas::cast_shadows_double ()
    glEnable(GL_LIGHT0);
   
   /* Dessin des ombres en noir & blanc */
-  m_scene->draw_sceneWT ();
+  m_scene->drawSceneWT ();
   
   glDisable (GL_STENCIL_TEST);
   /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
@@ -700,12 +700,12 @@ GLFlameCanvas::cast_shadows_double ()
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
     for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->resetDiffuseLight ();
+      m_flames[f]->switchOff ();
     
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->switchOn (intensities[f]);
     
-    m_scene->draw_scene ();
+    m_scene->drawScene ();
   }else
     m_photoSolid->draw(m_currentConfig->BPSEnabled);
 }

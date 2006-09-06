@@ -17,14 +17,16 @@ class Skeleton;
 class LeadSkeleton : public Skeleton
 {
 public:
-  /** Constructeur de squelette guide
-   * @param s pointeur sur le solveur de fluides
-   * @param position position de la flamme dans l'espace
-   * @param pt position de l'origine du squelette
-   * @param pls durée de vie initiale d'une particule
+  /** Constructeur de squelette guide.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param position Position de la flamme dans l'espace.
+   * @param rootMoveFactor Amplitude du déplacement autorisé pour l'origine du squelette. Varie
+   * en fonction du type de flamme.
+   * @param pls Durée de vie initiale d'une particule.
    */
   LeadSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
 
+  /** Destructeur. */
   virtual ~LeadSkeleton();
   
   /** Méthode de séparation d'un squelette
@@ -33,9 +35,6 @@ public:
   FreeLeadSkeleton* split (uint splitHeight);
   
 private:
-  /** Dessine une particule d'un squelette guide
-   * @param particle particule à dessiner
-   */
   void drawParticle (Particle * const particle);
 };
 
@@ -54,13 +53,13 @@ public:
   FreeLeadSkeleton(const LeadSkeleton* const src, uint splitHeight);
   virtual ~FreeLeadSkeleton();
 
-  /** Duplique un squelette
-   * @param offset valeur du décalage dans l'espace du squelette
+  /** Duplique un squelette.
+   * @param offset Valeur du décalage dans l'espace du squelette par rapport au squelette courant.
    */
   virtual FreePeriSkeleton* dup(Point& offset);
 private:  
-  /** Dessine une particule d'un squelette guide
-   * @param particle particule à dessiner
+  /** Dessine une particule d'un squelette guide.
+   * @param particle Particule à dessiner.
    */
   void drawParticle (Particle * const particle);
 };

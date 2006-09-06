@@ -22,9 +22,18 @@ class Scene;
 class PointIndices
 {
 public:
-  int v,vn,vt,vm;
+  /** Constructeur.
+   * @param nv Indice de la position du point.
+   * @param nvn Indice de la normale du point.
+   * @param nvt Indice de la coordonnée de texture du point.
+   * @param nvm Indice du matériau pour ce point.
+   */
+  PointIndices(uint nv, uint nvn, uint nvt, uint nvm){ v=nv; vn=nvn; vt=nvt; vm=nvm;};
   
-  PointIndices(int nv, int nvn, int nvt, int nvm){ v=nv; vn=nvn; vt=nvt; vm=nvm;};
+  uint v; /** Indice de la position du point. */
+  uint vn;  /** Indice de la normale du point. */
+  uint vt; /** Indice de la coordonnée de texture du point. */
+  uint vm; /** Indice du matériau pour ce point. */
 };
 
 /** 
@@ -33,8 +42,6 @@ public:
  * associ&eacute;s &agrave; ces polygones et ainsi qu'une liste des sources lumineuses.
  *
  * @author	Flavien Bridault
- * @version	%I%, %G%
- * @since	1.0
  */
 class Object
 {
@@ -48,23 +55,40 @@ protected:
   /**<Liste des indices des points des facettes */
   vector < PointIndices *>m_vertexIndexArray;
   
+  /** Indique le type de données disponibles pour l'objet. Ceci est fortement lié à l'implémentation
+   * de l'importateur de fichier OBJ.<br>
+   * 0 : coordonnées<br>
+   * 1 : coordonnées + normales<br>
+   * 2 : coordonnées + normales<br>
+   * 3 : coordonnées + normales + coordonnées de texture
+   */
   int m_attributes;
+  
+  /** Indice du matériau utilisé par le point précédent. Ceci permet de savoir lors de la phase de dessin
+   * si le point courant utilise un autre matériau qui nécessite un appel à glMaterial().
+   */
   int m_lastMaterialIndex;
+  
+  /** Décalage de l'objet dans la scène. */
   Point m_offset;
+  
+  /** Pointeur vers la scène. */
   Scene *m_scene;
   
 public:
   /**
    * Constructeur par d&eacute;faut.
+   * @param scene Pointeur vers la scene.
    */
   Object (Scene *scene)
   {
     m_scene = scene;
     m_attributes = 0;
   };
-  /**
-   * Constructeur permettant de donner une position absolue à l'objet
-   * @param pos Position à donner à l'objet
+  
+  /** Constructeur permettant de donner une position absolue à l'objet.
+   * @param scene Pointeur vers la scene.
+   * @param offset Décalage de l'objet dans la scène.
    */
   Object (Scene *scene, Point& offset)
   {
@@ -72,12 +96,11 @@ public:
     m_attributes = 0;
     m_offset = offset;
   };
-  /**
-   * Destructeur par d&eacute;faut.
-   */
+  
+  /** Destructeur par défaut. */
   virtual ~Object ();
   
-  /** Ajoute un point dans l'objet
+  /** Ajoute un point dans l'objet.
    * @param newVertex point à ajouter 
    */
   virtual void addVertex ( Point* const newVertex)
@@ -88,7 +111,7 @@ public:
     m_vertexArray.push_back(newVertex);
   };
   
-  /** Ajoute une normale dans l'objet
+  /** Ajoute une normale dans l'objet.
    * @param newNormal normale à ajouter 
    */
   virtual void addNormal (Vector* const newNormal)
@@ -96,7 +119,7 @@ public:
     m_normalsArray.push_back(newNormal);
   };
   
-  /** Ajoute une coordonnée de texture dans l'objet
+  /** Ajoute une coordonnée de texture dans l'objet.
    * @param newTexCoord coordonnée de texture à ajouter 
    */
   virtual void addTexCoord (Point* const newTexCoord)
@@ -104,8 +127,10 @@ public:
     m_texCoordsArray.push_back(newTexCoord);
   };
   
-  /** Ajoute une facette dans l'objet
-   * @param  à ajouter 
+  /** Ajoute une facette dans l'objet.
+   * @param vertexIndex1 Indices du premier point de la facette.
+   * @param vertexIndex2 Indices du deuxième point de la facette.
+   * @param vertexIndex3 Indices du troisième point de la facette.
    */
   virtual void addFacet (PointIndices* const vertexIndex1, PointIndices* const vertexIndex2, PointIndices* const vertexIndex3)
   {
@@ -113,44 +138,60 @@ public:
     m_vertexIndexArray.push_back(vertexIndex2);
     m_vertexIndexArray.push_back(vertexIndex3);
   };
-
+  
+  /** Vérifie si le matériau de la facette courante est différent de la précédente et applique
+   * le nouveau matériau le cas échéant.
+   * @param currentMaterialIndex Indice du matériau courant.
+   * @param tex Booléen indiquant si la facette est texturée ou non.
+   */
   void checkAndApplyMaterial(int currentMaterialIndex, bool tex);
   
-  /**
-   * Lecture du nombre de points contenus dans la sc&egrave;ne.
+  /** Lecture du nombre de points contenus dans l'objet.
+   * @return Nombre de points.
    */
   virtual int getVertexArraySize () const
   {
     return m_vertexArray.size ();
   };
   
+  /** Lecture du nombre de normales contenus dans l'objet.
+   * @return Nombre de normales.
+   */
   virtual int getNormalsArraySize () const
   {
     return m_normalsArray.size ();
   };
-
+  
+  /** Lecture du nombre de polygones contenus dans l'objet.
+   * @return Nombre de polygones.
+   */
   virtual int getPolygonsCount () const
   {
     return (m_vertexIndexArray.size () / 3);
   };
-  /**
-   * Lecture d'un point sp&eacute;cifique contenu dans la sc&egrave;ne.
-   * @param index indice du point &agrave; obtenir.
-   * @return Un pointeur vers le point recherch&eacute;.
+  
+  /** Lecture d'un point spécifique de l'objet.
+   * @param index indice du point à obtenir.
+   * @return Un pointeur vers le point recherché.
    */
   virtual Point *getPoint(int index) const
   {
     return (m_vertexArray[index]);
   };
   
+  /** Donne l'englobant de l'objet.
+   * @param max Retourne le coin supérieur de l'englobant.
+   * @param min Retourne le coin inférieur de l'englobant.
+   */
   void getBoundingBox (Point& max, Point& min);
-
+  
+  /** Met à jour les attributs de l'objet. */
   void setAttributes (int attr)
   {
     m_attributes = attr;
   };
   
-  /** Fonction de dessin de l'objet
+  /** Fonction de dessin de l'objet.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
    * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture

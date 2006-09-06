@@ -29,9 +29,7 @@ private:
   void OnClickButtonBrowseWick(wxCommandEvent& event);
   void OnSelectType(wxCommandEvent& event);
   
-  DECLARE_EVENT_TABLE()
-
-protected:
+  protected:
   wxStaticText* m_posLabel;
   DoubleTextCtrl* m_posXTextCtrl;
   DoubleTextCtrl* m_posYTextCtrl;
@@ -44,6 +42,8 @@ protected:
   wxRadioBox* m_flameTypeRadioBox;  
   wxStaticText* m_solverLabel;  
   wxComboBox* m_solverComboBox;
+  
+  DECLARE_EVENT_TABLE()
 };
 
 /** Boîte de dialogue pour les réglages des flammes */

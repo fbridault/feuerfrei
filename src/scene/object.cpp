@@ -63,7 +63,7 @@ Object::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
     if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
       glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable(GL_TEXTURE_2D);
-      glBindTexture(GL_TEXTURE_2D, m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture());
+      m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture()->bind();
       glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }else
       glDisable(GL_TEXTURE_2D);
@@ -84,41 +84,6 @@ Object::draw (char drawCode, bool tex)
     cerr << "Cas non pris en compte pour l'instant" << endl;
     break;
   case 1:
-    for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
-	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
-	 vertexIndexArrayIterator++){
-      index = *vertexIndexArrayIterator;
-      
-      if(drawCode == TEXTURED){
-	/* Ne dessiner que si il y a une texture */
-	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
-	  continue;
-      }else
-	if(drawCode == FLAT)
-	  /* Ne dessiner que si il n'y a pas de texture */
-	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
-	    continue;
-	  
-      if(!vertexCount){
-	if(drawCode == AMBIENT)
-	  checkAndApplyMaterial(0,tex);
-	else
-	  checkAndApplyMaterial(index->vm,tex);
-	  
-	glBegin (GL_POLYGON);
-      }
-      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
-		  m_normalsArray[index->vn]->z);
-      glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
-		  m_vertexArray[index->v]->z);
-      vertexCount++;
-      if(vertexCount==3){
-	glEnd ();
-	vertexCount=0;
-      }
-    }
-    
-    break;
   case 2:
     for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
 	 vertexIndexArrayIterator != m_vertexIndexArray.end ();

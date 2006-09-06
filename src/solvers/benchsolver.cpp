@@ -1,8 +1,8 @@
 #include "benchsolver.hpp"
 
-BenchSolver::BenchSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+BenchSolver::BenchSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			  double buoyancy, uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
   m_save = new double[m_nbVoxels];
   m_save2 = new double[m_nbVoxels];

@@ -11,73 +11,79 @@ class Material;
 using namespace std;
 
 /** 
- * Classe de base repr&eacute;sentant un mat&eacute;riau. 
- * Un mat&eacute;riau est d&eacute;finit par son comportement lumineux, c'est &agrave; dire la 
- * mani&egrave;re dont il r&eacute;fl&eacute;chi la lumi&egrave;re. 
+ * Classe de base représentant un matériau. 
+ * Un matériau est définit par son comportement lumineux, c'est à dire la 
+ * mani&egrave;re dont il réfléchi la lumière. 
  *
- * @author	Christophe Cassagnab&egrave;re modifi&eacute; par Flavien Bridault
- * @version	%I%, %G%
- * @since	1.0
+ * @author	Christophe Cassagnabère modifié par Flavien Bridault
  * @see Intensity
  */
 class Material 
 {
 private:
-  string m_name;
-  Intensity m_Kd;        /**<composante de r&eacute;flexion diffuse.*/
-  Intensity m_Ks;        /**<composante de r&eacute;flexion sp&eacute;culaire.*/
-  double m_Kss;       /**<indice de tache sp&eacute;culaire*/
-  Intensity m_Ka;        /**<composante de r&eacute;flexion ambiante.*/
-
-  Texture *m_diffuseTexture;
+  string m_name;   /** Nom du matériau. */
+  Intensity m_Kd;  /**Composante de réflexion diffuse.*/
+  Intensity m_Ks;  /**Composante de réflexion spéculaire.*/
+  double m_Kss;    /**Indice de tache spéculaire*/
+  Intensity m_Ka;  /**Composante de réflexion ambiante.*/
+  
+  Texture *m_diffuseTexture;  /** Pointeur sur la texture diffuse. NULL si le matériau n'est pas texturée. */
 public:
   /**
-   * Constructeur par d&eacute;faut. Cr&eacute;e un mat&eacute;riau blanc ambiant.
+   * Constructeur par défaut. Crée un matériau blanc ambiant.
    */
   Material();
   /**
-   * Constructeur param&eacute;trique.
-   * @param ambientCoefficients	composante de r&eacute;flexion ambiante.
-   * @param diffuseCoefficients	composante de r&eacute;flexion diffuse.
-   * @param specularCoefficients	composante de r&eacute;flexion sp&eacute;culaire.
-   * @param transmissiveCoefficients	composante de transparence.
-   * @param specularExponent	indice de tache sp&eacute;culaire.
-   * @param refractionIndex	indice de r&eacute;fraction.
+   * Constructeur.
+   * @param name Nom donné au matériau.
+   * @param ambientCoefficients	Composante de réflexion ambiante.
+   * @param diffuseCoefficients	Composante de réflexion diffuse.
+   * @param specularCoefficients Composante de réflexion spéculaire.
+   * @param specularExponent Indice de tache spéculaire.
+   * @param tex Pointeur optionel sur la texture.
    */
   Material( const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
-  /**
-   * Destructeur par d&eacute;faut.
-   */
+  /** Destructeur par défaut. */
   ~Material(){if(m_diffuseTexture!=NULL) delete m_diffuseTexture;};
-
+  
+  /** Retourne le nom du matériau.
+   * @return Nom du matériau.
+   */
   const string *getName() const
   { return &m_name;};
-  /*
-   * Lecture de la composante sp&eacute;culaire. 
+  
+  /* Lecture de la composante spéculaire. 
    * @return Une variable de type Intensity.
    */
   Intensity getSpecularCoefficients() const
   { return (m_Ks);};
-  /**
-   * Lecture de la composante diffuse. 
+  
+  /** Lecture de la composante diffuse. 
    * @return Une variable de type Intensity.
-   */ 
+   */  
   Intensity getDiffuseCoefficients() const
   { return (m_Kd);};
-  /**
-   * Lecture de la composante ambiante. 
+  
+  /** Lecture de la composante ambiante. 
    * @return Une variable de type Intensity.
    */ 
   const Intensity& getAmbientCoefficients() const
   { return (m_Ka); };
   
+  /** Applique le matériau avec glMaterial(). */ 
   void apply () const;
   
+  /** Indique si le matériau possède une texture.
+   * @return True si le matériau a une texture.
+   */
   const bool hasDiffuseTexture() const
   { return (m_diffuseTexture!=NULL);};
 
-  const GLuint getDiffuseTexture() const
-  { return (m_diffuseTexture->getTexture());};
-};//Material
+  /** Retourne un pointeur sur la texture du matériau.
+   * @return Pointeur sur la texture
+   */
+  const Texture* getDiffuseTexture() const
+  { return m_diffuseTexture;};
+};
 
 #endif

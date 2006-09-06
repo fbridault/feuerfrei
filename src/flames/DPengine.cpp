@@ -69,7 +69,7 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
   
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  m_scene->draw_sceneWT();
+  m_scene->drawSceneWT();
   
   glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
   glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);

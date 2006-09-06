@@ -3,8 +3,6 @@
 PhotometricSolidsRenderer::PhotometricSolidsRenderer(Scene *s, FireSource **flames, uint nbFlames, CGcontext *context, bool recompileShaders) :
   m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders)
 {
-  wxString constant = _("-DNB_SOURCES=");
-  constant << nbFlames;
   m_scene = s;
   m_flames = flames;
   m_nbFlames = nbFlames;
@@ -13,8 +11,8 @@ PhotometricSolidsRenderer::PhotometricSolidsRenderer(Scene *s, FireSource **flam
   m_intensities = new double[m_nbFlames];
   m_lazimuth_lzenith = new double[m_nbFlames*2];
   
-  m_SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"), m_nbFlames, context, 0, constant, true);
-  m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"), m_nbFlames, context, 2, constant, true);
+  m_SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"), m_nbFlames, context, 0, true);
+  m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"), m_nbFlames, context, 2, true);
   
   generateTexture();
 }
@@ -138,7 +136,7 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
-    m_scene->draw_scene(m_SPVertexShaderTex);
+    m_scene->drawScene(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[color]->disableProfile();
   }else{
@@ -147,9 +145,9 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
     m_SPFragmentShader[color]->setIsTextured(1);
-    m_scene->draw_sceneTEX();
+    m_scene->drawSceneTEX();
     m_SPFragmentShader[color]->setIsTextured(0);
-    m_scene->draw_sceneWTEX(m_SPVertexShaderTex);
+    m_scene->drawSceneWTEX(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[color]->disableProfile();
   }

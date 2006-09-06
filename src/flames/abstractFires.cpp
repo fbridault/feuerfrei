@@ -55,11 +55,6 @@ void FlameLight::switchOn(double coef)
   glEnable(m_light);
 }
 
-void FlameLight::resetDiffuseLight()
-{
-  glDisable(m_light);
-}
-
 void FlameLight::drawShadowVolume ()
 {
   m_cgShader->setLightPos (m_lightPosition);
@@ -73,7 +68,7 @@ void FlameLight::drawShadowVolume ()
   glPopMatrix ();
   m_cgShader->setModelViewProjectionMatrix ();
   
-  m_scene->draw_sceneWSV();
+  m_scene->drawSceneWSV();
   
   m_cgShader->disableProfile ();
 }
@@ -98,8 +93,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
   
   m_nbFlames=nbFlames;
   if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
-  
-  
+    
   if(objName != NULL){
     if(scene->getMTLFileNameFromOBJ(filename, mtlName)){
     
@@ -125,18 +119,19 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
     glEndList();
     m_hasLuminary=true;
   }
-  else{
-    nbObj=1;
-    m_luminary = new Object* [1];
-    m_luminary[0] = new Object(scene);
-    m_hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
-    if(m_hasLuminary){
-      m_luminaryDL=glGenLists(1);
-      glNewList(m_luminaryDL,GL_COMPILE);
-      m_luminary[0]->draw();
-      glEndList();
+  else
+    {
+      nbObj=1;
+      m_luminary = new Object* [1];
+      m_luminary[0] = new Object(scene);
+      m_hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
+      if(m_hasLuminary){
+	m_luminaryDL=glGenLists(1);
+	glNewList(m_luminaryDL,GL_COMPILE);
+	m_luminary[0]->draw();
+	glEndList();
+      }
     }
-  }
   m_position=flameConfig->position;
   m_breakable=flameConfig->breakable;
   

@@ -17,36 +17,41 @@ class CgShader;
 class CgShader
 {
 public:
-  /** Constructeur par défaut
-   * @param sourceName Nom du fichier source
-   * @param shaderName Nom du programme Cg
-   * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
-   * @param type Type du shader : CG_GL_VERTEX ou CG_GL_FRAGMENT
+  /** Constructeur par défaut.
+   * @param sourceName Nom du fichier source.
+   * @param shaderName Nom du programme Cg.
+   * @param context Pointeur vers le contexte Cg (il doit être déjà créé).
+   * @param type Type du shader : CG_GL_VERTEX ou CG_GL_FRAGMENT.
+   * @param recompile Indique s'il faut recompiler le shader à partir du fichier .cg ou si le .o est déjà compilé.
+   * @param extraParameters Paramètres supplémentaires optionels sur la ligne de compilation. Ceci est utilisé par
+   * exemple lors de la définition des solides photométriques multiples afin de définir une constante correspondant
+   * au nombre de solides.
    */
   CgShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile=false, const wxString& extraParameters=_(""));
   virtual ~CgShader();
   
-  /** Activation du profil */
+  /** Activation du profil. */
   void enableProfile(){
     cgGLEnableProfile(profile);
   };
   
-  /** Bind du program */
+  /** Bind du programme. */
   void bindProgram(){
     cgGLBindProgram(program);
   };
   
-    /** Activation du shader */
+    /** Activation du shader. */
   virtual void enableShader(){
     cgGLEnableProfile(profile);
     cgGLBindProgram(program);
   }
 
-  /** Désactivation du profil */
+  /** Désactivation du profil. */
   void disableProfile(){
     cgGLDisableProfile(profile);
   };
-  /** Désactivation du profil */
+  
+  /** Désactivation du shader. */
   void disableShader(){
     cgGLDisableProfile(profile);
   };
@@ -65,10 +70,11 @@ protected:
 class CgBasicVertexShader : public CgShader
 {
 public:
-  /** Constructeur par défaut
-   * @param sourceName Nom du fichier source
-   * @param shaderName Nom du programme Cg
-   * @param context Pointeur vers le contexte Cg (il doit être déjà créé)
+  /** Constructeur par défaut.
+   * @param sourceName Nom du fichier source.
+   * @param shaderName Nom du programme Cg.
+   * @param context Pointeur vers le contexte Cg (il doit être déjà créé).
+   * @param recompile Indique s'il faut recompiler le shader à partir du fichier .cg ou si le .o est déjà compilé.
    */
   CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
   virtual ~CgBasicVertexShader(){};
@@ -80,7 +86,8 @@ public:
   void setModelViewProjectionMatrix(){
     cgGLSetStateMatrixParameter(modelViewProjectionMatrix, CG_GL_MODELVIEW_PROJECTION_MATRIX,CG_GL_MATRIX_IDENTITY);
   };
-private:  
+private:
+  /** Concaténation de la matrice de la vue du modèle et de la matrice de projection. */
   CGparameter modelViewProjectionMatrix;
 };
 #endif

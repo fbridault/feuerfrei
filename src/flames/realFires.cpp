@@ -22,7 +22,7 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const
 		       CgSVShader * shader, const char *wickFileName):
   DetachableFireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
 {
-  m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, this);
+  m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, this, 0.01);
 }
 
 Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index,
@@ -40,14 +40,13 @@ Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *tor
   for (list < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, torchName, this, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, torchName, this, 0.1, (*objListIterator).c_str());
     }
 }
 
 CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
 		   CgSVShader * shader):
-  DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, shader, TORCH_NAME),
-  m_halo(_("textures/halo.png"), GL_CLAMP, GL_CLAMP)
+  DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, shader, TORCH_NAME)
 {
   list<string> objList;
   int i=0;
@@ -60,7 +59,7 @@ CampFire::CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const cha
   for (list < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, fireName, this, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, fireName, this, 0.04, (*objListIterator).c_str());
     }
 }
 

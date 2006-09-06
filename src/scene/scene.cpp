@@ -2,7 +2,6 @@
 
 #include <fstream>
 
-/* Construction/Destruction */
 Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
 {  
   m_flames = flames;

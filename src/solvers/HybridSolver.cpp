@@ -7,9 +7,9 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver::HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+HybridSolver::HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
 }
@@ -91,9 +91,9 @@ void HybridSolver::project (double *const p, double *const div)
 //   cout << m_time << "      \r"; cout.flush();
 // }
 
-LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps,
+LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy), 
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy), 
   HybridSolver (omegaDiff, omegaProj, epsilon)
 {
   /* Attention n_x, n_y et n_z doivent être impairs */

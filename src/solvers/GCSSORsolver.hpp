@@ -5,59 +5,62 @@ class GCSSORsolver;
 
 #include "solver.hpp"
 
-/** La classe Solver propose une implémentation 3D de la méthode stable implicite semi-lagrangienne de Stam.
- * A noter que dans le cadre de notre modèle de flamme, le champ de densité n'est pas utilisé, ce qui,
- * physiquement semble assez curieux (d'après Alexei). Néanmoins Stam présente bien les choses ainsi dans
- * son code initial, la densité dépend de la vélocité, la vélocité évolue indépendament.
+/** La classe GCSSSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
+ * méthode de resolution des systèmes linéaires.
  * 
- * @author	Flavien Bridault
+ * @author	Flavien Bridault et Michel Leblond
  */
 class GCSSORsolver : public virtual Solver
 {
 public:
   /** Constructeur du solveur.
-   * @param n : taille de la grille
-   * @param pas_de_temps : pas de temps utilisé pour la simulation
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double pas_de_temps, 
+  GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
-  /** Constructeur nécessaire pour l'héritage multiple */
+  /** Constructeur nécessaire pour l'héritage multiple.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
+   */
   GCSSORsolver (double omegaDiff, double omegaProj, double epsilon);
+  /** Destructeur. */
   virtual ~GCSSORsolver ();
   
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
   * et de la projection à l'aide de la méthode du Gradient Conjugué
+  * @param x0 Composante x au pas de temps précédent
   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-  * @param x composante à traiter
-  * @param x0 composante x au pas de temps précédent
-  * @param a valeur des coefficients dans la matrice A
-  * @param div fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
+  * @param a Valeur des coefficients dans la matrice A
+  * @param diagonal Valeur du coefficient sur la diagonale de la matrice A : ( 1/(1+6a) pour la diffusion
   * et 1/6 pour la projection
-  * @param nb_steps nombre d'itérations à effectuer
+  * @param omega Paramètre omega.
+  * @param maxiter Nombre d'itérations maximal à effectuer
   */
   virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
   
-  /** Pas de diffusion.
-   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
-   * @param x composante à traiter
-   * @param x0 composante x au pas de temps précédent
-   * @param diff_visc paramètre correspondant soit à la diffusion si la fonction est utilisée pour
-   * la résolution du pas de densité, soit à la viscosité si elle est employée pour la résolution
-   * du pas de vélocité
-   */
-  virtual void diffuse (unsigned char b, double *const x, double *const x0,	double a, double diff_visc);
-
-  /** Pas de projection pour garantir la conservation de la masse.
-   * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
-   */
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);  
   virtual void project (double *const p, double *const div);
   
   /** Résidu, pour SSOR, direction de descente et ? */
   double *m_r, *m_z, *m_p, *m_q;
   
-  double m_omegaDiff, m_omegaProj;
+  /** Paramètre omega pour la diffusion */
+  double m_omegaDiff;
+  /** Paramètre omega pour la projection */
+  double m_omegaProj;
+  /** Tolérance d'erreur pour GCSSOR. */
   double m_epsilon;
 };
 

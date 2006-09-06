@@ -13,8 +13,7 @@ Solver::Solver (Point& position, uint n_x, uint n_y, uint n_z, double dim, doubl
   m_nbVoxelsY = n_y;
   m_nbVoxelsZ = n_z;
   
-  /* Détermination de la taille du solveur de manière à ce que */
-  /*  le plus grand côté soit de dimension dim */
+  /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
   if (m_nbVoxelsX > m_nbVoxelsY){
     if (m_nbVoxelsX > m_nbVoxelsZ){
       m_dimX = dim;
@@ -151,7 +150,6 @@ void Solver::set_bnd (unsigned char b, double *const x)
     }
 }
 
-/* Ajout des forces externes */
 void Solver::add_source (double *const x, double *const src)
 {
   uint i;
@@ -160,7 +158,6 @@ void Solver::add_source (double *const x, double *const src)
     x[i] += m_dt * src[i];
 }
 
-/* Pas d'advection => dÃƒÂ©placement du fluide sur lui-même */
 void Solver::advect (unsigned char b, double *const d, const double *const d0,
 		     const double *const u, const double *const v,
 		     const double *const w)

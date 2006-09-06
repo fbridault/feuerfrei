@@ -31,14 +31,20 @@ class IES;
 class FlameLight
 {
 public:
-  /** Constructeur de flamme simple.
-   * @param scene pointeur sur la scène
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
+  /** Constructeur de source lumineuse de type flamme.
+   * @param scene pointeur sur la scène.
+   * @param index Indice de la lumière pour OpenGL. Compris entre [0;7].
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param IESFilename nom du fichier IES à utiliser
    */
   FlameLight (Scene *scene, uint index, CgSVShader* shader, const char* const IESFilename);
+  
+  /** Destructeur */
   virtual ~FlameLight();
   
+  /** Déplace la lumière à la position. Ceci déplace en réalité la lumière OpenGL.
+   * @param pos Position de la lumière.
+   */
   void setLightPosition (Point& pos)
   {
     m_lightPosition[0] = pos.x;
@@ -46,20 +52,34 @@ public:
     m_lightPosition[2] = pos.z;
   }
   
+  /** Dessine les shadow volumes à partir de la source. */
   void drawShadowVolume ();  
   
+  /** Active la source de lumière 
+   * @param coef coefficient pondérateur
+   */
   void switchOn (double coef);
   
+  /** Eteint la source */
   void switchOff ();
   
-  void resetDiffuseLight ();
-    
+  /** Récupération du tableau des intensités du solide photométrique.
+   * @return Pointeur sur les intensités.
+   */
   float *getIntensities(void) const { return m_iesFile->getIntensities(); };
   
+  /** Retourne l'intensité globale de la source.
+   * @return Coefficient de l'intensité.
+   */
   const double getIntensity(void) const { return m_intensity; };
   
+  /** Récupération du centre du solide photométrique.
+   * @param x Coordonnée x.
+   * @param y Coordonnée y.
+   * @param z Coordonnée z.
+   */
   const void getCenterSP(double& x, double& y, double& z) const { x = m_centreSP.x; y = m_centreSP.y; z = m_centreSP.z; };
-
+  
   const double getLazimut() const {return m_iesFile->getLazimut();};
   
   const double getLzenith() const {return m_iesFile->getLzenith();};
@@ -88,18 +108,19 @@ protected:
   double m_intensity;   
 
 private:
+  /** Indice de la lumière pour OpenGL. */
   short m_light;
   
-  /** Pointeur sur la scène */
+  /** Pointeur sur la scène. */
   Scene *m_scene;
 
-  /** Pointeur sur le shader générateur de volumes d'ombres */
+  /** Pointeur sur le shader générateur de volumes d'ombres. */
   CgSVShader *m_cgShader;
   
-  /** Position de la lumière ponctuelle OpenGL dans l'espace */
+  /** Position de la lumière ponctuelle OpenGL dans l'espace. */
   GLfloat m_lightPosition[4];
   
-  /** Fichier IES utilisé pour le solide photométrique de la source */
+  /** Fichier IES utilisé pour le solide photométrique de la source. */
   IES *m_iesFile;
 };
 
@@ -123,21 +144,25 @@ class FireSource : public FlameLight
 {
 public:
   /** Constructeur d'une source de flammes. La position de la source est donnée dans le repère du solveur.
-   * @param s pointeur sur le solveur de fluides
-   * @param nbFlames nombre de flammes, si = 0 alors le tableau contenant les flammes n'est pas alloué
-   * et ceci doit alors être réalisé par la classe fille
-   * @param scene pointeur sur la scène
-   * @param innerForce force intérieure de la flamme
-   * @param filename nom du fichier contenant le luminaire
-   * @param texname nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param objname nom du luminaire à charger dans le fichier filename
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param nbFlames Nombre de flammes, si = 0 alors le tableau contenant les flammes n'est pas alloué.
+   * et ceci doit alors être réalisé par la classe fille.
+   * @param scene Pointeur sur la scène.
+   * @param filename Nom du fichier contenant le luminaire.
+   * @param texname Nom du fichier contenant le luminaire.
+   * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   FireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
 	      const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
+  /** Destructeur */
   virtual ~FireSource ();
 
+  /** Ajuste la valeur d'échantillonnage de la NURBS.
+   * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
+   */
   virtual void setSamplingTolerance(double value){ 
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
@@ -153,8 +178,8 @@ public:
 //       m_flames[i]->setTesselateMode();
 //   };
 
-  /** Retourne la position absolue dans le repère du monde .
-   * @return position absolue dans le repère du monde
+  /** Retourne la position absolue dans le repère du monde.
+   * @return Position absolue dans le repère du monde.
    */
   Point getPosition ()
   {
@@ -196,7 +221,7 @@ public:
       m_flames[i]->drawFlame(displayParticle);  
     glPopMatrix();
   }  
-
+  
   virtual void drawCachedFlame()
   {
     Point pt(m_solver->getPosition());
@@ -207,9 +232,10 @@ public:
       m_flames[i]->drawCachedFlame();  
     glPopMatrix();
   } 
-  /** Dessine la flamme et sa mèche
-   *
-   * @param displayParticle affiche ou non les particules des squelettes
+  
+  /** Dessine la flamme et sa mèche.
+   * @param displayParticle affiche ou non les particules des squelettes.
+   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
   void draw(bool displayParticle, bool displayBoxes)
   {
@@ -252,9 +278,9 @@ public:
   }
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   * Elle demande à chacune des flammes composant le feu d'ajouter ses forces.
-   *
-   * @param perturbate type de perturbation dans l'élévation thermique
+   * @param perturbate Type de perturbation parmi FLICKERING_VERTICAL, FLICKERING_RANDOM, etc...
+   * @param fdf Type de fonction de distribution de carburant parmi FDF_LINEAR, FDF_BILINEAR, 
+   * FDF_EXPONENTIAL, FDF_GAUSS, FDF_RANDOM.
    */
   virtual void addForces (char perturbate, char fdf=0)
   {
@@ -262,12 +288,16 @@ public:
       m_flames[i]->addForces(perturbate,fdf);
   }
   
+  /** Affectation de la vélocité induite par la flamme.
+   * @param value Vélocité de la flamme.
+   */
   virtual void setForces(double value)
   {
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setForces(value);
   }
   
+  /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void toggleSmoothShading ()
   {
     for (uint i = 0; i < m_nbFlames; i++)
@@ -321,36 +351,34 @@ class DetachableFireSource : public FireSource
 {
 public:
   /** Constructeur.
-   * @param posRel position du centre de la flamme dans le solveur.
-   * @param scene pointeur sur la scène
-   * @param s pointeur sur le solveur de fluides
-   * @param filename nom du fichier contenant le luminaire
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL)
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes
-   * @param wickFileName nom du fichier contenant la mèche
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param filename Nom du fichier contenant le luminaire.
+   * @param nbFlames Nombre de flammes.
+   * @param scene Pointeur sur la scène.
+   * @param texname Nom du fichier image de la texture.
+   * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   DetachableFireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
 			const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   virtual ~DetachableFireSource();
   
-  /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
-   * de déterminer la position de la source de lumière.
-   */
   virtual void build();
-  
-  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
-   * donc seule une translation correspondant à la position du solveur est effectuée.
-   *
-   * @param displayParticle affiche ou non les particules des squelettes
-   */
   virtual void drawFlame(bool displayParticle);
   
+  /** Ajoute une flamme détachée à la source.
+   * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.
+   */
   virtual void addDetachedFlame(DetachedFlame* detachedFlame)
   {
     m_detachedFlamesList.push_back(detachedFlame);
   }
   
+  /** Supprime une flamme détachée à la source.
+   * @param detachedFlame Pointeur sur la flamme détachée à enlever.
+   */
   virtual void removeDetachedFlame(DetachedFlame* detachedFlame)
   {
     m_detachedFlamesList.remove(detachedFlame);

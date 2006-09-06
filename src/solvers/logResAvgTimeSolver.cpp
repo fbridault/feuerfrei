@@ -8,9 +8,9 @@
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 LogResAvgTimeSolver::LogResAvgTimeSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim,
-					  double pas_de_temps, uint nbTimeSteps, double buoyancy, double omegaDiff, 
+					  double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
 					  double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, pas_de_temps, buoyancy),
+  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
   LogResAvgSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_times = new double[m_nbAverages];

@@ -89,7 +89,7 @@ void FreeSkeleton::move ()
   
 }
 
-uint FreeSkeleton::moveParticle (Particle * const pos)
+bool FreeSkeleton::moveParticle (Particle * const pos)
 {
   uint i, j, k;
 
@@ -180,7 +180,7 @@ void Skeleton::drawRoot ()
   glPopMatrix ();
 }
 
-uint Skeleton::moveRoot ()
+void Skeleton::moveRoot ()
 {
   uint i, j, k;
   Point tmp;
@@ -194,16 +194,10 @@ uint Skeleton::moveRoot ()
   tmp.x = m_rootSave.x + m_rootMoveFactor.x * m_solver->getU (i, j, k);
   tmp.y = m_rootSave.y + m_rootMoveFactor.y * m_solver->getV (i, j, k);
   tmp.z = m_rootSave.z + m_rootMoveFactor.z * m_solver->getW (i, j, k);
-
-  if (tmp.x < (m_rootSave.x - distx)
-      || tmp.x > (m_rootSave.x + distx)
-      || tmp.z < (m_rootSave.z - distz)
-      || tmp.z > (m_rootSave.z + distz))
-    return 0;
-
+  
   m_root = tmp;
 
-  return 1;
+  return;
 }
 
 void Skeleton::move ()
@@ -234,12 +228,12 @@ void Skeleton::move ()
 }
 
 
-uint Skeleton::moveParticle (Particle * const pos)
+bool Skeleton::moveParticle (Particle * const pos)
 {
   uint i, j, k;
 
   if (pos->isDead ())
-    return 0;
+    return false;
 
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   m_solver->findPointPosition(*pos, i, j, k);
@@ -253,7 +247,7 @@ uint Skeleton::moveParticle (Particle * const pos)
   if (pos->x < -.5 || pos->x > .5
       || pos->y < 0 || pos->y > 1
       || pos->z < -.5 || pos->z > .5)
-    return 0;
+    return false;
   
-  return 1;
+  return true;
 }

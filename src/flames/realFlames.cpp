@@ -7,7 +7,8 @@
 /**********************************************************************************************************************/
 
 LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver *s, 
-		      const char *wickFileName, DetachableFireSource *parentFire, const char *wickName ) :
+		      const char *wickFileName, DetachableFireSource *parentFire, 
+		      double detachedFlamesWidth, const char *wickName ) :
   RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
   m_wick (wickFileName, flameConfig->skeletonsNumber, scene, flameConfig->position, wickName)
 {
@@ -20,7 +21,7 @@ LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex
   m_nbLeadSkeletons = m_wick.getLeadPointsArraySize ();
   m_leadSkeletons = new LeadSkeleton *[m_nbLeadSkeletons];
   
-  /* Allocation des squelettes périphériques = deux par squelette périphérique */
+  /** Allocation des squelettes périphériques = deux par squelette périphérique */
   /* plus 2 aux extrémités pour fermer la NURBS */
   /* FAIT DANS BASICFLAME DESORMAIS */
   
@@ -52,6 +53,8 @@ LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex
     new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], &flameConfig->periLifeSpan);
   
   m_parentFire = parentFire;
+
+  m_detachedFlamesWidth = detachedFlamesWidth;
 }
 
 LineFlame::~LineFlame ()
@@ -134,8 +137,9 @@ void LineFlame::breakCheck()
   double split,proba=.5;
   uint threshold=4;
   double detachThreshold=.99;
+  /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
-  uint i,j;
+  uint i;
   FreeLeadSkeleton **leadSkeletonsArray;
   FreePeriSkeleton **periSkeletonsArray;
   
@@ -149,23 +153,26 @@ void LineFlame::breakCheck()
     if( proba > detachThreshold){
       Point offset;
       
+      /* Tirage entre 0.5 et 1 pour la hauteur du squelette */
       split = (rand()/(2*(double)RAND_MAX))+.5;
       
       leadSkeletonsArray = new FreeLeadSkeleton* [1];
       
-      splitHeight = (uint)(split * m_leadSkeletons[i]->getSize()) - 1;
+      splitHeight = (uint)(split * (m_leadSkeletons[i]->getSize()-1) );
       leadSkeletonsArray[0] = m_leadSkeletons[i]->split(splitHeight);
       
       periSkeletonsArray = new FreePeriSkeleton* [4];
       
-      offset.x=-.1*split;
+      offset.x=-m_detachedFlamesWidth * split;
       periSkeletonsArray[0] = leadSkeletonsArray[0]->dup(offset);
-      splitHeight = (uint)(split * m_periSkeletons[i+1]->getSize()) - 1;
+      
+      splitHeight = (uint)(split * (m_periSkeletons[i+1]->getSize()-1));
       periSkeletonsArray[1] = m_periSkeletons[i+1]->split(splitHeight, leadSkeletonsArray[0]);
       
-      offset.x=.1*split;
+      offset.x=m_detachedFlamesWidth * split;
       periSkeletonsArray[2] = leadSkeletonsArray[0]->dup(offset);
-      splitHeight = (uint)(split * m_periSkeletons[m_nbSkeletons-i-1]->getSize()) - 1;
+      
+      splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getSize()-1));
       periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
       
       m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_solver));
@@ -393,8 +400,8 @@ DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSk
 			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver *solver) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {  
-  m_distances = new double[NB_PARTICLES_MAX - 1 + m_vorder];
-  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_vorder];
+  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
+  m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_nbLeadSkeletons = nbLeadSkeletons;
   m_leadSkeletons = leadSkeletons;
   m_periSkeletons = periSkeletons;
@@ -436,7 +443,7 @@ bool DetachedFlame::build()
       if (m_periSkeletons[i]->getSize () > m_maxParticles)
 	m_maxParticles = m_periSkeletons[i]->getSize ();
     }
-
+  
   m_size = m_maxParticles+m_nbFixedPoints;
   
   vinc = 1.0 / (double)(m_size-1);
@@ -476,7 +483,7 @@ bool DetachedFlame::build()
 	    {
 	      double dist_max = FLT_MIN;
 	      
-	      for (j = 0; j < m_periSkeletons[i]->getSize () + 2; j++)
+	      for (j = 0; j < m_periSkeletons[i]->getSize () - 1 + m_nbFixedPoints; j++)
 		{
 		  if (m_distances[j] > dist_max)
 		    {

@@ -18,35 +18,41 @@ class PhotometricSolidsRenderer
 {
 public:
   /** Constructeur par défaut.
-   * @param s Pointeur vers la scène 3D
-   * @param context Pointeur vers le contexte Cg
+   * @param s Pointeur vers la scène 3D.
+   * @param flames Tableau contenant les flammes.
+   * @param nbFlames Nombre de flammes dans le tableau.
+   * @param context Pointeur vers le contexte Cg.
+   * @param recompileShaders Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
   PhotometricSolidsRenderer(Scene *s, FireSource **flames, uint nbFlames, CGcontext *context, bool recompileShaders);
+  /** Destructeur. */
   virtual ~PhotometricSolidsRenderer();
   
-  /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique
-   * @param interpolation 0 ou 1 pour utiliser l'interpolation
-   * @param color 0 ou 2 pour mélanger la luminance du solide avec la couleur des matériaux
+  /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique.
+   * @param color 0 ou 2 pour mélanger la luminance du solide avec la couleur des matériaux.
    */
   void draw(u_char color);
   
+  /** Efface la texture. */
   void deleteTexture(void){ delete m_photometricSolidsTex; };
+  /** Générer une nouvelle texture pour le solide photométrique. */
   void generateTexture(void);
 
 private:  
-  /** Pointeur vers la scène 3D */
+  /** Pointeur vers la scène 3D. */
   Scene *m_scene;
-  /** Pointeur vers les flammes */
+  /** Pointeur vers les flammes. */
   FireSource **m_flames;
   
+  /** Nombre de flammes dans le tableau. */
   uint m_nbFlames;
-  /** Nombre de fragments shaders dans le tableau SPFragmentShader */
+  /** Nombre de fragments shaders dans le tableau SPFragmentShader. */
   const static int m_NBSHADER=2;
   
-  /** Vertex Shader pour les objets texturés */
+  /** Vertex Shader pour les objets texturés. */
   CgBasicVertexShader m_SPVertexShaderTex;
   
-  /** Tableau contenan les fragment programs
+  /** Tableau contenant les fragment programs
    * [0] : SP non interpolé sans couleur des objets - fpSPSeul<br>
    * [1] : SP interpolé sans couleur des objets - fpSPSeulInterpole<br>
    * [2] : SP non interpolé avec couleur des objets - fpSPTEX<br>
@@ -54,12 +60,16 @@ private:
    */
   CgSPFragmentShader *m_SPFragmentShader[m_NBSHADER];
 
-  /** Texture 3D contenant les valeurs de luminance de tous les flammes */
+  /** Texture 3D contenant les valeurs de luminance de tous les flammes. */
   Texture *m_photometricSolidsTex;
 
+  /** Tableau contenant les centres de tous les solides. */
   double *m_centers;
+  /** Tableau contenant les intensités de tous les solides. */
   double *m_intensities;
+  /** Tableau contenant les valeurs de tous les solides. */
   double *m_lazimuth_lzenith;
+  /** Tableau contenant la taille des textures 2D. */
   uint m_tex2DSize[2];
 };
 

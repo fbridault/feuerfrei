@@ -3,7 +3,7 @@
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
 
-Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point& offset, const char*wickName) : Object(scene, offset)
+Wick::Wick (const char *wickFileName, int nb_lead_skeletons, Scene *scene, Point& position, const char*wickName) : Object(scene, position)
 {
   Point bounds[nb_lead_skeletons + 1];
   Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MIN, DBL_MIN);

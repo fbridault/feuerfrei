@@ -125,17 +125,19 @@ public:
     x += P.x;
     y += P.y;
     z += P.z;
-  }//operator+	
-	/** Diviser toutes les composantes par un scalaire */
+  }//operator+
+  
+  /** Diviser toutes les composantes par un scalaire.
+   * @param div Scalaire.
+   */
   virtual Point operator/(GLdouble div){
     Point resultat(x/div,y/div,z/div);
     return resultat;
   }
 
-  /** Donne la distance au carrÃ© entre deux points de l'espace.
-   * @param pt1 position du premier point de contrÃ´le
-   * @param pt2 position du second point de contrÃ´le 
-   * @return la distance au carrÃ©
+  /** Donne la distance au carré entre deux points de l'espace.
+   * @param pt Position du point.
+   * @return La distance au carré entre le point courant et celui passé en paramètre.
    */
   double squaredDistanceFrom( const Point* const pt )
   {

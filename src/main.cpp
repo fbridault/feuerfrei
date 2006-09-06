@@ -1,8 +1,33 @@
 #include "interface/mainFrame.hpp"
 
+/** \mainpage Index page
+ *
+ * \section intro_sec Introduction
+ *
+ * This is the introduction.
+ *
+ * \section install_sec Installation
+ *
+ * \subsection step1 Step 1: Opening the box
+ *  
+ * etc...
+ */
+
+/** \todo commenter... */
+
+/** Classe Principale.
+ * Classe principale chargée de l'analyse des arguments de la ligne de commande et du lancement
+ * de la fenêtre principale de l'application.
+*/
 class FlamesApp : public wxApp
 {
+  /** Méthode d'initialisation de l'application 
+   */
   virtual bool OnInit();
+  
+  /** Détermine si les shaders Cg sont déjà compilés
+   * @return false si non
+   */
   bool areShadersCompiled();
 };
 
@@ -42,7 +67,7 @@ bool FlamesApp::OnInit()
   
   recompileShaders = areShadersCompiled();
   
-  /** Teste s'il est nécessaire de recompiler les shaders */
+  /* Teste s'il est nécessaire de recompiler les shaders */
   MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
  
   frame->Show(TRUE);

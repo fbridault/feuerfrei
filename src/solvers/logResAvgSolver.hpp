@@ -18,12 +18,29 @@ class LogResAvgSolver: public BenchSolver
 {
 public:
   /** Constructeur du solveur.
-   * @param n : taille de la grille
-   * @param pas_de_temps : pas de temps utilisé pour la simulation
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param nbTimeSteps Nombre de pas de temps de la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
 		   uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+ 
+  /** Constructeur nécessaire pour l'héritage multiple.
+   * @param nbTimeSteps Nombre de pas de temps de la simulation.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
+   */
   LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  /** Destructeur. */
   virtual ~LogResAvgSolver ();
 
 protected:
@@ -35,9 +52,15 @@ protected:
   virtual void GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps);
   virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
   
+  /** Calcul des moyennes pour une itération de la méthode de résolution de système linéaire.
+   * @param iter Numéro de l'itération de lé méthode de résolution.
+   * @param value Valeur à ajouter à la moyenne.
+   */
   virtual void computeAverage ( uint iter, double value );
   
+  /** Nombre de valeurs incluses dans la moyenne. */
   uint m_nbAverages;
+  
   /** Tableau contenant les moyennes. Il est organisé comme ceci :<br>
    *    - de O à m_nbSteps : diffusion en u avec GS
    *    - de m_nbSteps à 2*m_nbSteps : diffusion en v avec GS
@@ -52,9 +75,8 @@ protected:
    */
   double *m_averages;
   
-  ofstream m_file;
-  
-  
+  /** Fichier de log. */
+  ofstream m_file;  
 };
 
 #endif

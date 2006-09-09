@@ -9,15 +9,15 @@ make
 
 Lancement :
 cd src
-rtflames --recompile
+rtflames <fichier de simulation>
 
-L'option --recompile ordonne de recompiler les shaders Cg. Ceci n'est plus
-nécessaire ensuite de, rtflames peut donc être lancé sans argument après ceci. 
+L'option --recompile n'est plus nécessaire, le programme détermine lui-même si
+il faut recompiler ou non les shaders.
 
 
 Soumission des changements :
 make distclean
-tla commit -s "Description"
+tla commit
 
 NOTE : Le script autogen.sh standard a été modifié pour ne pas rentrer dans le
 sous-répertoire .{arch}, car ceci corrompait systématiquement les pristines Ã 

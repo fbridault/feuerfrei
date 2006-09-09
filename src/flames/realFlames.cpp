@@ -136,7 +136,7 @@ void LineFlame::breakCheck()
 {
   double split,proba=.5;
   uint threshold=4;
-  double detachThreshold=.99;
+  double detachThreshold=.95;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -179,56 +179,6 @@ void LineFlame::breakCheck()
     }
   }
 }
-
-// void LineFlame::breakCheck()
-// {
-//   double split,proba=.5;
-//   uint threshold=4;
-//   uint splitHeight;
-//   uint i,j;
-//   FreeLeadSkeleton **leadSkeletonsArray;
-//   FreePeriSkeleton **periSkeletonsArray;
-  
-//   for ( i = 0; i < m_nbLeadSkeletons; i++)
-//     /* La division ne peut avoir lieu qu'au dessus du seuil */
-//     if(m_leadSkeletons[i]->getSize() < threshold)
-//       return;
-  
-//   split = (rand()/((double)RAND_MAX));
-//   if( split > proba){
-//     leadSkeletonsArray = new FreeLeadSkeleton* [m_nbLeadSkeletons];
-//     for ( i = 0; i < m_nbLeadSkeletons; i++){
-//       /* Roulette russe : tirage aléatoire entre 0 et 1 */
-//       splitHeight = (uint)(split * m_leadSkeletons[i]->getSize()) - 1; 
-//       leadSkeletonsArray[i] = m_leadSkeletons[i]->split(splitHeight);
-//     }
-      
-//     periSkeletonsArray = new FreePeriSkeleton* [m_nbSkeletons];
-
-//     splitHeight = (uint)(split * m_periSkeletons[0]->getSize()) - 1;
-//     periSkeletonsArray[0] = m_periSkeletons[0]->split(splitHeight, leadSkeletonsArray[0]);
-    
-//     /* Génération d'un côté des squelettes périphériques */
-//     for (i = 1; i <= m_nbLeadSkeletons; i++)
-//       {
-// 	splitHeight = (uint)(split * m_periSkeletons[i]->getSize()) - 1;
-// 	periSkeletonsArray[i] = m_periSkeletons[i]->split(splitHeight, leadSkeletonsArray[i-1]);
-//       }
-    
-//     /* Génération de l'autre côté des squelettes périphériques */
-//     for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
-//       {
-// 	splitHeight = (uint)(split * m_periSkeletons[i]->getSize()) - 1;
-// 	periSkeletonsArray[i] = m_periSkeletons[i]->split(splitHeight, leadSkeletonsArray[j-1]);
-//       }
-    
-//     splitHeight = (uint)(split * m_periSkeletons[m_nbLeadSkeletons + 1]->getSize()) - 1;
-//     periSkeletonsArray[m_nbLeadSkeletons + 1] = 
-//       m_periSkeletons[m_nbLeadSkeletons + 1]->split(splitHeight, leadSkeletonsArray[m_nbLeadSkeletons-1]);
-    
-//     m_parentFire->addDetachedFlame(new DetachedFlame(this, m_nbLeadSkeletons, leadSkeletonsArray, m_nbSkeletons, periSkeletonsArray, m_tex, m_solver));
-//   }
-// }
 
 void LineFlame::drawWick(bool displayBoxes)
 {
@@ -596,3 +546,55 @@ bool DetachedFlame::build()
       m_vknots[j] += 1;
   return true;
 }
+
+
+
+// void LineFlame::breakCheck()
+// {
+//   double split,proba=.5;
+//   uint threshold=4;
+//   uint splitHeight;
+//   uint i,j;
+//   FreeLeadSkeleton **leadSkeletonsArray;
+//   FreePeriSkeleton **periSkeletonsArray;
+  
+//   for ( i = 0; i < m_nbLeadSkeletons; i++)
+//     /* La division ne peut avoir lieu qu'au dessus du seuil */
+//     if(m_leadSkeletons[i]->getSize() < threshold)
+//       return;
+  
+//   split = (rand()/((double)RAND_MAX));
+//   if( split > proba){
+//     leadSkeletonsArray = new FreeLeadSkeleton* [m_nbLeadSkeletons];
+//     for ( i = 0; i < m_nbLeadSkeletons; i++){
+//       /* Roulette russe : tirage aléatoire entre 0 et 1 */
+//       splitHeight = (uint)(split * m_leadSkeletons[i]->getSize()) - 1; 
+//       leadSkeletonsArray[i] = m_leadSkeletons[i]->split(splitHeight);
+//     }
+      
+//     periSkeletonsArray = new FreePeriSkeleton* [m_nbSkeletons];
+
+//     splitHeight = (uint)(split * m_periSkeletons[0]->getSize()) - 1;
+//     periSkeletonsArray[0] = m_periSkeletons[0]->split(splitHeight, leadSkeletonsArray[0]);
+    
+//     /* Génération d'un côté des squelettes périphériques */
+//     for (i = 1; i <= m_nbLeadSkeletons; i++)
+//       {
+// 	splitHeight = (uint)(split * m_periSkeletons[i]->getSize()) - 1;
+// 	periSkeletonsArray[i] = m_periSkeletons[i]->split(splitHeight, leadSkeletonsArray[i-1]);
+//       }
+    
+//     /* Génération de l'autre côté des squelettes périphériques */
+//     for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
+//       {
+// 	splitHeight = (uint)(split * m_periSkeletons[i]->getSize()) - 1;
+// 	periSkeletonsArray[i] = m_periSkeletons[i]->split(splitHeight, leadSkeletonsArray[j-1]);
+//       }
+    
+//     splitHeight = (uint)(split * m_periSkeletons[m_nbLeadSkeletons + 1]->getSize()) - 1;
+//     periSkeletonsArray[m_nbLeadSkeletons + 1] = 
+//       m_periSkeletons[m_nbLeadSkeletons + 1]->split(splitHeight, leadSkeletonsArray[m_nbLeadSkeletons-1]);
+    
+//     m_parentFire->addDetachedFlame(new DetachedFlame(this, m_nbLeadSkeletons, leadSkeletonsArray, m_nbSkeletons, periSkeletonsArray, m_tex, m_solver));
+//   }
+// }

@@ -9,6 +9,7 @@ class CgCandleFragmentShader;
 class CgShader;
 class CgSPVertexShader;
 
+/** @deprecated Classe utilisée pour habiller la flamme à l'aide d'un shader au lieu d'une texture. */
 class CgCandleVertexShader : public CgBasicVertexShader
 {
 public:
@@ -28,6 +29,7 @@ private:
   CGparameter paramModelViewInv;
 };
 
+/** @deprecated Classe utilisée pour habiller la flamme à l'aide d'un shader au lieu d'une texture. */
 class CgCandleFragmentShader : public CgShader
 {
 public:

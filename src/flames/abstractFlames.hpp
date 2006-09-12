@@ -119,7 +119,11 @@ public:
   Texture *getTexture() const { return m_tex; };
 
 protected:
+  /** Affiche la flamme sous forme de NURBS, à partir du tableau de points de contrôles et du tableau
+   * de coordonnées de texture construits au préalable.
+   */
   void drawNurbs ();
+  
   /** Fonction simplifiant l'affectation d'un point de contrôle. L'algorithme de construction
    * de la NURBS parcours de façon séquentielle les squelettes, aucun indice dans le tableau
    * de points de contrôles n'est donc passé. En lieu et place, un pointeur est utilisé et

@@ -43,6 +43,7 @@ void GlowEngine::blur()
 {
   glDisable(GL_DEPTH_TEST);
   
+  glBlendFunc (GL_ONE, GL_ZERO);
   // Parametre de visualisation
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
@@ -68,7 +69,7 @@ void GlowEngine::blur()
     
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
-    glColor3f(1.0,1.0,1.0);
+    glColor4f(1.0,1.0,1.0,1.0);
     glBegin(GL_QUADS);
     
     glTexCoord2f(0,0);
@@ -99,7 +100,7 @@ void GlowEngine::blur()
     
     m_blurFragmentShader.setTexture(m_secondPassTex[i]->getTexture());
     
-    glColor3f(1.0,1.0,1.0);
+    glColor4f(1.0,1.0,1.0,1.0);
     
     glBegin(GL_QUADS);
     
@@ -153,7 +154,7 @@ void GlowEngine::drawBlur(double alpha)
   for(int i=0; i < GLOW_LEVELS; i++){
     m_firstPassTex[i]->bind();
     
-    glColor4f(1.0,1.0,1.0,alpha);
+    glColor4f(1.0,1.0,1.0,1.0);
     glBegin(GL_QUADS);
     
     glTexCoord2f(0,m_height[i]);

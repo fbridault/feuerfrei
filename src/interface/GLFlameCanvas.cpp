@@ -74,7 +74,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
-  glClearColor (0.0, 0.0, 0.0, 1.0);
+  glClearColor (0.0, 0.0, 0.0, 0.0);
   /* Restriction de la zone d'affichage */
   glViewport (0, 0, m_width, m_height);
   
@@ -448,10 +448,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	  m_depthPeelingEngine->render();
 	}
       else{
-	glBlendFunc (GL_ONE,GL_ZERO);
+// 	glBlendFunc (GL_ONE,GL_ZERO);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	for (f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayParticles);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+// 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
       }
   }
   /********************* PLACAGE DU GLOW ****************************************/

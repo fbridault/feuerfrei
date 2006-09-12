@@ -16,7 +16,7 @@ Texture::Texture(GLenum type, uint width, uint height)
   glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
   
-  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   m_wxtex = NULL;
 }
 
@@ -111,6 +111,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t)
     cout << "OK" << endl;
     
     if( m_wxtex->HasAlpha() ){
+      cout << "Found alpha channel..." << endl;
       u_char *imgcpy,*tmp;
       tmp = imgcpy = new u_char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];
             

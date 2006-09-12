@@ -120,7 +120,7 @@ private:
   /** Frame Buffer Object utilisé pour le rendu off-screen. */
   FBO m_fbo;
   /** Texture dans laquelle on affiche le rendu au fur et à mesure du peeling. */
-  Texture *m_colorTex;
+  Texture *m_colorTexMain, *m_colorTexSec;
   /** Tableau de textures de profondeur utilisées pour l'extraction. */
   Texture *m_depthTex[3];
   /** Texture contenant la profondeur de la scène, elle est utilisée pour obtenir les occlusions des objets
@@ -140,7 +140,6 @@ private:
   uint m_nbFlames;
   /** Fragment program utilisé pour l'extraction de la profondeur d'un calque. */
   ARBFragmentShader m_peelProgram;
-  
   /** Identifiant de la display list contenant les flammes. */
   GLuint m_flamesDisplayList;
 };

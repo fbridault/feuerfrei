@@ -168,7 +168,8 @@ void FixedFlame::drawHalo (double angle)
   double h = getTop()->distance(*getBottom());
   Point *top = getTop();
   Point *bottom = getBottom();
-      
+  
+  glActiveTextureARB(GL_TEXTURE0_ARB);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   m_halo.bind ();
       
@@ -203,7 +204,8 @@ void FixedFlame::drawHalo (double angle)
       x3 = ((top->x - h) * (90 + angle) + (top->z + h) * (180+angle))/180;
       x4 = ((top->x + h) * (90 + angle) + (top->z - h) * (180+angle))/180;
     }
-      
+  
+  glColor4f(0.0,0.0,0.0,0.0);
   glBegin(GL_QUADS);
       
   glTexCoord2f(0.0,0.0);
@@ -256,17 +258,17 @@ void FixedFlame::drawPointFlame ()
   
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
-            
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-      glEnable (GL_TEXTURE_2D);
+      
       /****************************************************************************************/
       /* Génération du halo */
       angle4 = (angle2 < PI / 2.0) ? -angle : angle;
       angle3 = angle4 * 180 / (double) (PI);
   
+      glEnable (GL_TEXTURE_2D);
       drawHalo(angle3);
       /****************************************************************************************/
-      /* Affichage de la flamme */  
+      /* Affichage de la flamme */
+      glActiveTextureARB(GL_TEXTURE0_ARB);
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       m_tex->bind();
       

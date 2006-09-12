@@ -27,7 +27,7 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const
 
 Torch::Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index,
 	     CgSVShader * shader):
-  DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch5.png"), index, shader, TORCH_NAME)
+  DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, shader, TORCH_NAME)
 {
   list<string> objList;
   int i=0;

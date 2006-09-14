@@ -421,7 +421,7 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
     filename.Replace(wxGetWorkingDirectory(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
-    cerr << filename << endl;
+    
     if(!filename.IsEmpty()){
       m_currentConfig.sceneName = filename;
       m_glBuffer->Restart();
@@ -438,6 +438,11 @@ void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
     filename = fileDialog.GetFilename();
     
     if(!filename.IsEmpty()){
+      /* Récupération le chemin absolu vers la scène */
+      filename.Replace(wxGetWorkingDirectory(),_(""),false);
+      /* Suppression du premier slash */
+      filename=filename.Mid(1);
+      
       m_configFileName = filename;
       
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);

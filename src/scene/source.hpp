@@ -6,7 +6,7 @@
 class Source;
 
 #include "intensity.hpp"
-#include "vector.hpp"
+#include "../vector.hpp"
 
 #include <vector>
 

@@ -1,6 +1,6 @@
 #include "GLFlameCanvas.hpp"
 
-#include "interface/mainFrame.hpp"
+#include "mainFrame.hpp"
 #include <iostream>
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)

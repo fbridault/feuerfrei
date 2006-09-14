@@ -1,11 +1,18 @@
 Instructions pour gérer l'archive :
 
 Mise à jour de l'archive :
-<A COMPLETER>
+tla update
 
 Compilation :
-./autogen.sh <options>
 make
+
+Compilation d'une version de déboguage :
+make build
+ccmake build
+et remplir le champ CMAKE_BUILD_TYPE avec Debug
+ou
+cmake -i build
+et répondre Debug pour le type de build
 
 Lancement :
 cd src
@@ -16,24 +23,5 @@ il faut recompiler ou non les shaders.
 
 
 Soumission des changements :
-make distclean
+make clean 
 tla commit
-
-NOTE : Le script autogen.sh standard a été modifié pour ne pas rentrer dans le
-sous-répertoire .{arch}, car ceci corrompait systématiquement les pristines Ã 
-chaque exécution. Il considérait en effet chaque révision comme un nouvel arbre
-de sources...
-
-Voici les modifications qui ont été apportées :
-
---- orig/autogen.sh
-+++ mod/autogen.sh
-@@ -101,7 +101,7 @@
-   am_opt=--include-deps;;
- esac
-
--for coin in `find $srcdir -path $srcdir/CVS -prune -o -name configure.in -print`
-+for coin in `find $srcdir -path $srcdir/CVS -prune -o -name configure.in  -not -path "$srcdir/{arch}*" -print`
- do
-   dr=`dirname $coin`
-   if test -f $dr/NO-AUTO-GEN; then

@@ -26,7 +26,7 @@ class FlamesApp : public wxApp
   virtual bool OnInit();
   
   /** Détermine si les shaders Cg sont déjà compilés
-   * @return false si non
+   * @return false si les shaders sont compilés
    */
   bool areShadersCompiled();
 };
@@ -35,15 +35,14 @@ IMPLEMENT_APP(FlamesApp)
 
 bool FlamesApp::areShadersCompiled()
 {
-  bool ret=true;
-  
-  if(wxFile::Exists(_("vertGlowX.o")))
-    if(wxFile::Exists(_("vertGlowY.o")))
-      if(wxFile::Exists(_("fragGlow.o")))
-	if(wxFile::Exists(_("SVExtrude.o")))
-	  if(wxFile::Exists(_("vpSPTEX.o")))
-	    ret = false;
-  return ret;
+  if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowX.o"))))
+    if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowY.o"))))
+      if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("fragGlow.o"))))
+	if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("SVExtrude.o"))))
+	  if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vpSPTEX.o"))))
+	     return false;
+  cerr << "Cg shaders are not compiled yet, that will be done during this run." << endl;
+  return true;
 }
 
 bool FlamesApp::OnInit()
@@ -58,7 +57,7 @@ bool FlamesApp::OnInit()
   if(argc == 2){
     configFileName = wxString(argv[1]);
   }else
-    configFileName = _("param.ini");
+    configFileName = _("params/param.ini");
 
   if( !wxFile::Exists(configFileName) ){
     cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;

@@ -1,15 +1,16 @@
 #include "CgShader.hpp"
 
 #include <iostream>
+#include "../common.hpp"
 
 using namespace std;
 
 
 CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile, const wxString& extraParameters)
 {
-  wxString sourcePath = _("shaders/") + sourceName;
-  wxString shaderPath = _("shaders/") + shaderName;
-  wxString compiledName = shaderName + _(".o");
+  wxString sourcePath = _("src/shaders/") + sourceName;
+  wxString shaderPath = _("src/shaders/") + shaderName;
+  wxString compiledName = SHADERS_OBJECTS_PATH + shaderName + _(".o");
   
   char buffer[255];
   

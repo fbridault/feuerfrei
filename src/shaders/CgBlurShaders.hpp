@@ -5,7 +5,7 @@ class CgBlurVertexShader;
 class CgBlurFragmentShader;
 
 #include "CgShader.hpp"
-#include "scene/texture.hpp"
+#include "../scene/texture.hpp"
 	
 class CgShader;
 

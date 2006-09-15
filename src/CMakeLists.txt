@@ -45,6 +45,7 @@ IF(CMAKE_BUILD_TYPE STREQUAL Debug)
   MESSAGE(STATUS "Building a debug binary")
   # Hack pour virer le strip
   LIST(REMOVE_ITEM wxWidgets_LIBRARIES -s)
+  ADD_DEFINITIONS(-Wall)
 ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
 
 IF(CMAKE_BUILD_TYPE STREQUAL Release)

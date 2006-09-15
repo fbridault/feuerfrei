@@ -62,7 +62,7 @@ bool FlamesApp::OnInit()
   if( !wxFile::Exists(configFileName) ){
     cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;
     return false;
-  }    
+  }
   
   recompileShaders = areShadersCompiled();
   

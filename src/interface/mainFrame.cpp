@@ -101,7 +101,7 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_multiTopSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
   m_multiSizer->Add(m_multiTopSizer, 1, 0, 0);
   m_multiSizer->Add(m_depthPeelingEnabledCheckBox, 1, 0, 0);
-  m_multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
+  m_multiSizer->Add(m_depthPeelingSlider, 1, wxEXPAND, 0);
     
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
@@ -180,6 +180,8 @@ void MainFrame::OnSize(wxSizeEvent& event)
 void MainFrame::GetSettingsFromConfigFile (void)
 {
   wxFileInputStream* file = new wxFileInputStream( m_configFileName );
+  //if(!wxFileInputStream::Ok())
+    
   m_config = new wxFileConfig( *file );
   
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
@@ -276,8 +278,11 @@ void MainFrame::GetSettingsFromConfigFile (void)
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
+//   if(m_currentConfig.depthPeelingEnabled)
+//     m_depthPeelingSlider->Enable();
+//   else
+    m_depthPeelingSlider->Disable();
   m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
-  
   switch(m_currentConfig.lightingMode)
     {
     case LIGHTING_STANDARD : 
@@ -289,9 +294,9 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_blendedSolidCheckBox->Enable();
       break;
     }
-          
+  
   delete file;
-
+  
   return;
 }
 
@@ -391,6 +396,10 @@ void MainFrame::OnCheckGlow(wxCommandEvent& event)
 void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
   m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
+  if(m_currentConfig.depthPeelingEnabled)
+    m_depthPeelingSlider->Enable();
+  else
+    m_depthPeelingSlider->Disable();
 //   m_glBuffer->ToggleDepthPeeling();
 }
 
@@ -411,7 +420,7 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
   wxString pwd=wxGetWorkingDirectory();
-  pwd << _("/scenes");
+  pwd << SCENES_DIRECTORY;
   
   wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
@@ -432,17 +441,19 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
 void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
+  wxString pwd=wxGetWorkingDirectory();
+  pwd << PARAMS_DIRECTORY;
   
-  wxFileDialog fileDialog(this, _("Choose a simulation file"), _(""), _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
-    filename = fileDialog.GetFilename();
+    filename = fileDialog.GetPath();
     
     if(!filename.IsEmpty()){
       /* Récupération le chemin absolu vers la scène */
       filename.Replace(wxGetWorkingDirectory(),_(""),false);
       /* Suppression du premier slash */
       filename=filename.Mid(1);
-      
+
       m_configFileName = filename;
       
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
@@ -515,14 +526,14 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
     }
   
   m_config->Write(_("/Flames/Number"), (int)m_currentConfig.nbFlames);
-
+  
   for(uint i=0; i < m_nbFlamesMax; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
 
       m_config->DeleteGroup(groupName);
     }
- 
+  
   for(uint i=0; i < m_currentConfig.nbFlames; i++)
     {
       groupName.Printf(_("/Flame%d/"),i);
@@ -543,13 +554,13 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("nbPeriParticles"), (int )m_currentConfig.flames[i].periLifeSpan);
       m_config->Write(groupName + _("IESFileName"),m_currentConfig.flames[i].IESFileName);
     }
-
+  
   wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );
   
   if (m_config->Save(*file) )  
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
-
+  
   delete file;
 }
 
@@ -557,10 +568,16 @@ void MainFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
   
   wxString filename;
+  wxString pwd=wxGetWorkingDirectory();
+  pwd << PARAMS_DIRECTORY;
   
-  wxFileDialog fileDialog(this, _("Enter a simulation file"), _("."), _(""), _("*.ini"), wxSAVE|wxHIDE_READONLY|wxOVERWRITE_PROMPT);
+  wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxHIDE_READONLY|wxOVERWRITE_PROMPT);
   if(fileDialog.ShowModal() == wxID_OK){
-    filename = fileDialog.GetFilename();
+    filename = fileDialog.GetPath();
+    /* Récupération le chemin absolu vers la scène */
+    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    /* Suppression du premier slash */
+    filename=filename.Mid(1);
   
     if(!filename.IsEmpty()){
       m_configFileName = filename;

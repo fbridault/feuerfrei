@@ -1,7 +1,7 @@
 Instructions pour gérer l'archive :
 
 Mise à jour de l'archive :
-tla update
+cg-update
 
 Compilation :
 make
@@ -24,4 +24,4 @@ il faut recompiler ou non les shaders.
 
 Soumission des changements :
 make clean 
-tla commit
+cg-push

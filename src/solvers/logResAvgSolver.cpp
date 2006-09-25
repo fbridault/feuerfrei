@@ -7,7 +7,7 @@ LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z,
   Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_file.open ("solvers/residualsAverage.log", ios::out | ios::trunc);
+  m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
   
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*m_nbSteps;
   m_averages = new double[m_nbAverages];
@@ -19,7 +19,7 @@ LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z,
 LogResAvgSolver::LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_file.open ("solvers/residualsAverage.log", ios::out | ios::trunc);
+  m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
   
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*m_nbSteps;
   m_averages = new double[m_nbAverages];

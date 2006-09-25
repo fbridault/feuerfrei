@@ -6,17 +6,17 @@ LogResSolver::LogResSolver (Point& position, uint n_x, uint n_y, uint n_z, doubl
   Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
   BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_fileDiff[0].open ("solvers/GSsolverDiff.u.log", ios::out | ios::trunc);
-  m_fileDiff[3].open ("solvers/GCSSORsolverDiff.u.log", ios::out | ios::trunc);
-  m_fileDiff[1].open ("solvers/GSsolverDiff.v.log", ios::out | ios::trunc);
-  m_fileDiff[4].open ("solvers/GCSSORsolverDiff.v.log", ios::out | ios::trunc);
-  m_fileDiff[2].open ("solvers/GSsolverDiff.w.log", ios::out | ios::trunc);
-  m_fileDiff[5].open ("solvers/GCSSORsolverDiff.w.log", ios::out | ios::trunc);
+  m_fileDiff[0].open ("logs/GSsolverDiff.u.log", ios::out | ios::trunc);
+  m_fileDiff[3].open ("logs/GCSSORsolverDiff.u.log", ios::out | ios::trunc);
+  m_fileDiff[1].open ("logs/GSsolverDiff.v.log", ios::out | ios::trunc);
+  m_fileDiff[4].open ("logs/GCSSORsolverDiff.v.log", ios::out | ios::trunc);
+  m_fileDiff[2].open ("logs/GSsolverDiff.w.log", ios::out | ios::trunc);
+  m_fileDiff[5].open ("logs/GCSSORsolverDiff.w.log", ios::out | ios::trunc);
   
-  m_fileProj[0].open ("solvers/GSsolverProj1.log", ios::out | ios::trunc);
-  m_fileProj[2].open ("solvers/GCSSORsolverProj1.log", ios::out | ios::trunc);
-  m_fileProj[1].open ("solvers/GSsolverProj2.log", ios::out | ios::trunc);
-  m_fileProj[3].open ("solvers/GCSSORsolverProj2.log", ios::out | ios::trunc);
+  m_fileProj[0].open ("logs/GSsolverProj1.log", ios::out | ios::trunc);
+  m_fileProj[2].open ("logs/GCSSORsolverProj1.log", ios::out | ios::trunc);
+  m_fileProj[1].open ("logs/GSsolverProj2.log", ios::out | ios::trunc);
+  m_fileProj[3].open ("logs/GCSSORsolverProj2.log", ios::out | ios::trunc);
 }
 
 LogResSolver::~LogResSolver ()

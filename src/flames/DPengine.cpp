@@ -33,11 +33,11 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, S
   m_peelProgram.load(_fp_peel);
   m_colorTex = new Texture*[m_nbLayers+1];
   for(uint i=0; i <= m_nbLayers; i++)
-    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB,m_width,m_height);
-  m_depthTex[0] = new Texture(m_width,m_height,GL_GREATER,true);
-  m_depthTex[1] = new Texture(m_width,m_height,GL_GREATER,true);
-  m_depthTex[2] = new Texture(m_width,m_height,GL_ALWAYS,true);
-  m_sceneDepthTex = new Texture(m_width,m_height,GL_LESS,true);
+    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_NEAREST, m_width, m_height);
+  m_depthTex[0] = new Texture(m_width, m_height, GL_GREATER, true);
+  m_depthTex[1] = new Texture(m_width, m_height, GL_GREATER, true);
+  m_depthTex[2] = new Texture(m_width, m_height, GL_ALWAYS, true);
+  m_sceneDepthTex = new Texture(m_width, m_height, GL_LESS, true);
   
   m_flamesDisplayList = glGenLists(1);
 }
@@ -53,7 +53,7 @@ DepthPeelingEngine::~DepthPeelingEngine()
   delete m_sceneDepthTex;
 }
   
-void DepthPeelingEngine::makePeels(bool displayParticles)
+void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles)
 {
   uint f,l;
   
@@ -96,7 +96,7 @@ void DepthPeelingEngine::makePeels(bool displayParticles)
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
       for (f = 0; f < m_nbFlames; f++)
-	m_flames[f]->drawFlame (displayParticles);
+	m_flames[f]->drawFlame (displayFlames, displayParticles);
       glEndList();
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */

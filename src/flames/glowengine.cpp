@@ -15,13 +15,13 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
     m_height[i] = h/m_scaleFactor[i];
     
     m_firstPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
+    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
     m_firstPassFBOs[i].Activate();
     m_firstPassFBOs[i].ColorAttach(m_firstPassTex[i]->getTexture(), 0);
     m_firstPassFBOs[i].RenderBufferAttach();
     
     m_secondPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, m_width[i], m_height[i]);
+    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
     m_secondPassFBOs[i].Activate();
     m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
     m_secondPassFBOs[i].RenderBufferAttach();

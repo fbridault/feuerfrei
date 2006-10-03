@@ -39,6 +39,7 @@ using namespace std;
 #define FDF_GAUSS 3
 #define FDF_RANDOM 4
 
+/** Configuration d'un solveur de fluide */
 class SolverConfig{
 public:
   char type;
@@ -52,6 +53,7 @@ public:
   double buoyancy;
 };
 
+/** Configuration d'une source lumineuse de type flamme */
 class FlameConfig{
 public:
   char type;
@@ -74,6 +76,8 @@ public:
   wxString IESFileName;
   /** Indique si le feu peut générer des flammes détachées */
   bool breakable;
+  /** Coefficient pour l'intensité lumineuse de la source */
+  double intensityCoef;
 };
 
 class FlameAppConfig{

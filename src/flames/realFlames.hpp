@@ -41,7 +41,12 @@ public:
 	     const char *wickName=NULL);
   virtual ~LineFlame();
   
-  virtual void drawFlame(bool displayParticle) { drawParticles(displayParticle); drawLineFlame(); };
+  virtual void drawFlame(bool display, bool displayParticle) { 
+    /* Affichage des particules */
+    if(displayParticle) drawParticles();
+    if(display) drawLineFlame(); 
+  };
+  
   virtual void drawWick(bool displayBoxes);
   
   Vector getMainDirection();
@@ -96,7 +101,12 @@ public:
   /** Destructeur*/
   virtual ~PointFlame();
   
-  virtual void drawFlame(bool displayParticle){ drawParticles(displayParticle); drawPointFlame(); };
+  virtual void drawFlame(bool display, bool displayParticle) { 
+    /* Affichage des particules */
+    if(displayParticle) drawParticles();
+    if(display) drawPointFlame(); 
+  };
+  
   virtual void drawWick(bool displayBoxes);
   
   Vector getMainDirection(){
@@ -147,19 +157,20 @@ public:
   
   virtual bool build();
   
-  virtual void drawFlame(bool displayParticle) { drawParticles(displayParticle); drawLineFlame(); };
-  
-  void drawParticles(bool displayParticle)
-  {
+  virtual void drawFlame(bool display, bool displayParticle) { 
     /* Affichage des particules */
-    if(displayParticle){
+    if(displayParticle) drawParticles();
+    if(display) drawLineFlame(); 
+  };
+  
+  void drawParticles()
+  {
       uint i;
       /* Déplacement et détermination du maximum */
       for (i = 0; i < m_nbSkeletons; i++)
 	m_periSkeletons[i]->draw();
       for (i = 0; i < m_nbLeadSkeletons; i++)
 	m_leadSkeletons[i]->draw();
-    }
   };
   
   /** Méthode permettant d'informer à la flamme de se localiser dans le solveur

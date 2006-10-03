@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Texture::Texture(GLenum type, uint width, uint height)
+Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
 {  
   m_type = type;
   
@@ -13,8 +13,8 @@ Texture::Texture(GLenum type, uint width, uint height)
   
   glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
   glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
   
   glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   m_wxtex = NULL;

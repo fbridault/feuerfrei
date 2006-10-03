@@ -40,13 +40,16 @@ void FlameLight::switchOff()
   glDisable(m_light);
 }
 
-void FlameLight::switchOn(double coef)
+void FlameLight::switchOn()
 {  
+  double coef = 1.5*m_intensity;
+//   GLfloat val_diffuse[]={1,1,1,1.0};
   GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
   GLfloat val_null[]={0.0,0.0,0.0,1.0};
   GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
   
+  /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
   glLightfv(m_light,GL_POSITION,m_lightPosition);
   glLightfv(m_light,GL_DIFFUSE,val_diffuse);
   glLightfv(m_light,GL_SPECULAR,val_specular);
@@ -138,7 +141,9 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scen
   /* On efface le luminaire, il n'appartient pas à la scène */
   for (uint i = 0; i < nbObj; i++)
     delete m_luminary[i];
-  delete []m_luminary;  
+  delete []m_luminary;
+  
+  m_intensityCoef = flameConfig->intensityCoef;
 }
 
 FireSource::~FireSource()
@@ -181,7 +186,7 @@ void FireSource::computeIntensityPositionAndDirection()
   
   // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
-   m_intensity=o.length()/(m_solver->getDimY());
+  m_intensity=o.length()/(m_solver->getDimY())*m_intensityCoef;
   
    //  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -189,7 +194,7 @@ void FireSource::computeIntensityPositionAndDirection()
   m_intensity = sqrt(m_intensity);
   // le centre du SP est la position de la flamme + la moitié du vecteur orientation
   // (orientation = vecteur position vers dernière particule)
-  m_centreSP= getPosition()+(o/2.0);
+//   m_centreSP= getPosition()+(o/2.0);
   
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan
@@ -219,17 +224,17 @@ DetachableFireSource::~DetachableFireSource()
   m_detachedFlamesList.clear ();
 }
 
-void DetachableFireSource::drawFlame(bool displayParticle)
+void DetachableFireSource::drawFlame(bool display, bool displayParticle)
 {
   Point pt(m_solver->getPosition());
   glPushMatrix();
   glTranslatef (pt.x, pt.y, pt.z);
   glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
   for (uint i = 0; i < m_nbFlames; i++)
-    m_flames[i]->drawFlame(displayParticle);
+    m_flames[i]->drawFlame(display, displayParticle);
   for (list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-    (*flamesIterator)->drawFlame(displayParticle);
+    (*flamesIterator)->drawFlame(display, displayParticle);
   glPopMatrix();
 }
 

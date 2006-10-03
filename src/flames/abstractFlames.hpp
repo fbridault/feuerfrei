@@ -69,16 +69,18 @@ public:
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture.
+   * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    */
-  virtual void drawFlame(bool displayParticle) = 0;
+  virtual void drawFlame(bool display, bool displayParticle) = 0;
   
   /** Dessine la flamme et sa mèche.
+   * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  void draw(bool displayParticle, bool displayBoxes){
-    drawFlame(displayParticle);
+  void draw(bool display, bool displayParticle, bool displayBoxes){
+    drawFlame(display, displayParticle);
   };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
@@ -152,14 +154,18 @@ protected:
     exit(0);
   }
 
-  static void CALLBACK NurbsBegin(GLenum type, void *displayList)
+  static void CALLBACK NurbsBegin(GLenum type, GLvoid *toggle)
   {
+    if( * (bool *)toggle )
+      glPolygonMode(GL_FRONT,GL_LINE);
     glBegin(type);
   }
 
-  static void CALLBACK NurbsEnd()
+  static void CALLBACK NurbsEnd(GLvoid *toggle)
   {
     glEnd();
+    if( * (bool *)toggle )
+      glPolygonMode(GL_FRONT,GL_FILL);
   }
 
   static void CALLBACK NurbsVertex ( GLfloat *vertex )
@@ -257,9 +263,9 @@ public:
    */
   virtual void drawWick(bool displayBoxes) = 0;
   
-  void draw(bool displayParticle, bool displayBoxes){
+  void draw(bool display, bool displayParticle, bool displayBoxes){
     drawWick(displayBoxes);
-    drawFlame(displayParticle);
+    drawFlame(display, displayParticle);
   };
   
   /** Affiche le halo.
@@ -341,20 +347,15 @@ public:
    */
   virtual void setForces(double value){  m_innerForce=value; };
   
-  /** Affiche les particules de tous les squelettes composants la flamme.
-   * @param displayParticle Affiche ou non les particules.
-   */
-  void drawParticles(bool displayParticle)
+  /** Affiche les particules de tous les squelettes composants la flamme. */
+  void drawParticles()
   {
-    /* Affichage des particules */
-    if(displayParticle){
-      uint i;
-      /* Déplacement et détermination du maximum */
-      for (i = 0; i < m_nbSkeletons; i++)
-	m_periSkeletons[i]->draw();
-      for (i = 0; i < m_nbLeadSkeletons; i++)
-	m_leadSkeletons[i]->draw();
-    }
+    uint i;
+    /* Déplacement et détermination du maximum */
+    for (i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->draw();
+    for (i = 0; i < m_nbLeadSkeletons; i++)
+      m_leadSkeletons[i]->draw();
   };
   
   virtual bool build();

@@ -113,7 +113,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
     theta=acos(-direction.y )*.6+.4;
 /*     phi=atan2(point.z,point.x); */
     
-/*     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture */
+    // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
 /*     texcoordsSP = float3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex); */
     
 /*     // recuperation de l'intensite du fragment */

@@ -99,7 +99,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 //   }
   
   m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_nbFlames, tex3DValues);
-
+  
   m_SPFragmentShader[0]->SetTexture(m_photometricSolidsTex->getTexture());
   m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture());
   

@@ -12,6 +12,7 @@ enum
     IDSL_FZAP,
     IDSL_SF,
     IDSL_FF,
+    IDSL_IC,
     IDSL_NLP,
     IDSL_NPP,
     IDSL_SPTOL,
@@ -97,8 +98,9 @@ private:
   void OnClickButtonBrowse(wxCommandEvent& event);
   void OnPhotoSolidEnter(wxCommandEvent& event);
   
-  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider;
-  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel, *m_photoSolidLabel;
+  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider, *m_intensityCoefSlider;
+  wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel,
+    *m_photoSolidLabel, *m_intensityCoefLabel;
   
   wxButton *m_photoSolidBrowseButton;
   wxTextCtrl *m_photoSolidTextCtrl;

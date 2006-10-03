@@ -117,12 +117,8 @@ bool FreeSkeleton::moveParticle (Particle * const pos)
 
 void FreeSkeleton::draw ()
 {
-  glDisable (GL_LIGHTING);
-
   for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
-
-  glEnable (GL_LIGHTING);
 }
 
 void FreeSkeleton::drawParticle (Particle * const particle)
@@ -162,13 +158,9 @@ void Skeleton::addParticle(const Point* const pt)
 
 void Skeleton::draw ()
 {
-  glDisable (GL_LIGHTING);
-
   drawRoot();
   for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
-
-  glEnable (GL_LIGHTING);
 }
 
 void Skeleton::drawRoot ()

@@ -36,13 +36,14 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
-  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN, (void(*)())NurbsBegin);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN_DATA, (void(*)())NurbsBegin);
   gluNurbsCallback(m_nurbs, GLU_NURBS_VERTEX, (void(*)())NurbsVertex);
   gluNurbsCallback(m_nurbs, GLU_NURBS_NORMAL, (void(*)())NurbsNormal);
   gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_END, (void(*)())NurbsEnd);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
   
   m_toggle=false;
+  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
   
   m_position=flameConfig->position;
   
@@ -82,13 +83,14 @@ NurbsFlame::NurbsFlame(NurbsFlame* const source, uint nbSkeletons, ushort nbFixe
   gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
   gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
   
-  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN, (void(*)())NurbsBegin);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN_DATA, (void(*)())NurbsBegin);
   gluNurbsCallback(m_nurbs, GLU_NURBS_VERTEX, (void(*)())NurbsVertex);
   gluNurbsCallback(m_nurbs, GLU_NURBS_NORMAL, (void(*)())NurbsNormal);
   gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_END, (void(*)())NurbsEnd);
+  gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
   
   m_toggle=false;
+  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
   
   m_position=source->m_position;
   
@@ -112,10 +114,6 @@ NurbsFlame::~NurbsFlame()
 void NurbsFlame::toggleSmoothShading()
 {
   m_toggle = !m_toggle;
-  if(m_toggle)
-    gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_OUTLINE_POLYGON);
-  else
-    gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
 }
 
 void NurbsFlame::drawNurbs ()
@@ -132,8 +130,7 @@ void NurbsFlame::drawLineFlame ()
 {
   if (m_toggle)
     {
-      glColor3f (1.0, 1.0, 1.0);
-      
+      glColor4f (0.0, 0.0, 0.0, 1.0);      
       drawNurbs ();
     }
   else
@@ -229,8 +226,7 @@ void FixedFlame::drawPointFlame ()
 {
   if (m_toggle)
     {
-      glColor3f (1.0, 1.0, 1.0);
-      
+      glColor4f (1.0, 1.0, 1.0, 1.0);      
       drawNurbs ();
     }
   else

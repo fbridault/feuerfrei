@@ -77,10 +77,10 @@ public:
   CloneLineFlame(FlameConfig* flameConfig, LineFlame *source, Point offset);
   virtual ~CloneLineFlame();
   
-  virtual void drawFlame(bool displayParticle){ 
+  virtual void drawFlame(bool display, bool displayParticle){ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
-    drawLineFlame();
+    if( display) drawLineFlame();
     glPopMatrix();
   };
 };
@@ -101,10 +101,10 @@ public:
   ClonePointFlame(FlameConfig* flameConfig, PointFlame *source, Point offset);
   virtual ~ClonePointFlame();
   
-  virtual void drawFlame(bool displayParticle){ 
+  virtual void drawFlame(bool display, bool displayParticle){ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
-    drawPointFlame(); 
+    if( display) drawPointFlame(); 
     glPopMatrix();
   };
 };

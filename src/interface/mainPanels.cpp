@@ -292,7 +292,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_innerForceSlider = new wxSlider(this,IDSL_FF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
 				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_innerForceLabel = new wxStaticText(this,-1,_("Force"));
-    
+  
   m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,0,2000, wxDefaultPosition,
 					   wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_samplingToleranceLabel = new wxStaticText(this,-1,_("Sampling"));
@@ -302,6 +302,10 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_periLifeSlider = new wxSlider(this,IDSL_NPP,0,0,NB_PARTICLES_MAX, wxDefaultPosition,
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_periLifeLabel = new wxStaticText(this,-1,_("Peri life span"));
+  
+  m_intensityCoefSlider = new wxSlider(this,IDSL_IC,0,0,100, wxDefaultPosition,
+				       wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_intensityCoefLabel = new wxStaticText(this,-1,_("Intensity"));
   
   m_slidersSizer = new wxFlexGridSizer(2);
   m_slidersSizer->AddGrowableCol(1,0);
@@ -313,10 +317,12 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_slidersSizer->Add(m_periLifeSlider, 6, wxEXPAND, 0);
   m_slidersSizer->Add(m_samplingToleranceLabel, 1, wxADJUST_MINSIZE, 0);
   m_slidersSizer->Add(m_samplingToleranceSlider, 6, wxEXPAND, 0);
-
+  m_slidersSizer->Add(m_intensityCoefLabel, 1, wxADJUST_MINSIZE, 0);
+  m_slidersSizer->Add(m_intensityCoefSlider, 6, wxEXPAND, 0);
+  
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
-
+  
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
   m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,
 					wxDefaultPosition, wxSize(100,22), wxTE_PROCESS_ENTER);
@@ -348,19 +354,20 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
+  m_intensityCoefSlider->SetValue((int)(m_flameConfig->intensityCoef*10));
   
   SetSizer(m_panelSizer);
 }
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
-  double valInner;
+  double val;
   
   switch(event.GetId()){
   case IDSL_FF :
-    valInner = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
-    m_glBuffer->setFlameForces(m_index, valInner);
-    m_flameConfig->innerForce = valInner;
+    val = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
+    m_glBuffer->setFlameForces(m_index, val);
+    m_flameConfig->innerForce = val;
     break;
   case IDSL_SPTOL:
     m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
@@ -371,6 +378,10 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
     break;
   case IDSL_NPP:
     m_flameConfig->periLifeSpan = m_periLifeSlider->GetValue();
+    break;
+  case IDSL_IC:
+    m_flameConfig->intensityCoef = m_intensityCoefSlider->GetValue()/10.0;
+    m_glBuffer->setFlameIntensity(m_index, m_flameConfig->intensityCoef);
     break;
   }
 }

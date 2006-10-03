@@ -121,8 +121,8 @@ Point LineFlame::getCenter ()
   Point averagePos;
   Particle *tmp;
   
-  for (uint i = 0; i < m_nbLeadSkeletons  ; i++){
-    tmp = m_leadSkeletons[i]->getMiddleParticle ();
+  for (uint i = 0; i < m_nbLeadSkeletons-2  ; i++){
+    tmp = m_leadSkeletons[i+1]->getMiddleParticle ();
     
     averagePos = (averagePos + *tmp)/(i+1);
   }
@@ -134,7 +134,7 @@ Point LineFlame::getCenter ()
 
 void LineFlame::breakCheck()
 {
-  double split,proba=.5;
+  double split,proba;
   uint threshold=4;
   double detachThreshold=.95;
   /* Indice de la particule à laquelle un squelette est découpé */

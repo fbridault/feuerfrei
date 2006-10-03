@@ -91,6 +91,7 @@ public:
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
+  void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
   void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };

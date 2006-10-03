@@ -72,7 +72,7 @@ public:
   DepthPeelingEngine(uint width, uint height, uint nbLayers, Scene *scene, FireSource **flames, uint nbFlames, CGcontext *cgcontext );
   virtual ~DepthPeelingEngine();
   
-  void makePeels(bool displayParticles);
+  void makePeels(bool displayFlames, bool displayParticles);
   void render();
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};

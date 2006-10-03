@@ -50,15 +50,15 @@ public:
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
     m_lightPosition[2] = pos.z;
+
+    m_centreSP = pos;
   }
   
   /** Dessine les shadow volumes à partir de la source. */
   void drawShadowVolume ();  
   
-  /** Active la source de lumière 
-   * @param coef coefficient pondérateur
-   */
-  void switchOn (double coef);
+  /** Active la source de lumière. */
+  void switchOn ();
   
   /** Eteint la source */
   void switchOff ();
@@ -88,25 +88,32 @@ public:
   
   const double getLzenithTEX() const {return m_iesFile->getLzenithTEX();};
   
-  /** Retourne le nombre de valeurs en zénithal */
+  /** Retourne le nombre de valeurs en zénithal. */
   const uint getIESZenithSize() const {return m_iesFile->getNbzenith();};
   
-  /** Retourne le nombre de valeurs en azimuthal */
+  /** Retourne le nombre de valeurs en azimuthal. */
   const uint getIESAzimuthSize() const {return m_iesFile->getNbazimut();};
   
-  /** Supprime le fichier IES courant et en utilise un autre */
+  /** Supprime le fichier IES courant et en utilise un autre. */
   void useNewIESFile(const char* const IESFilename) { delete m_iesFile; m_iesFile = new IES(IESFilename); };
+
+  /** Calcul de l'intensité du centre et de l'orientation du solide photométrique. */
+  virtual void computeIntensityPositionAndDirection() = 0;
+  
+  /** Modifie le coefficient pondérateur de l'intensité. */
+  virtual void setIntensityCoef(double coef) { m_intensityCoef = coef; };
   
 protected:
-  /** Centre du solide photométrique dans l'espace */
+  /** Centre du solide photométrique dans l'espace. */
   Point m_centreSP;
-  /** Orientation du solide photométrique, utilisée pour la rotation */
+  /** Orientation du solide photométrique, utilisée pour la rotation. */
   double m_orientationSPtheta;
-  /** Axe de rotation */
+  /** Axe de rotation. */
   Vector m_axeRotation;
-  /** Valeur de l'intensité du solide */
-  double m_intensity;   
-
+  /** Valeur de l'intensité du solide. */
+  double m_intensity;
+  /** Coefficient pondérateur de l'intensité de la source. */
+  double m_intensityCoef;
 private:
   /** Indice de la lumière pour OpenGL. */
   short m_light;
@@ -211,14 +218,14 @@ public:
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  virtual void drawFlame(bool displayParticle)
+  virtual void drawFlame(bool display, bool displayParticle)
   {
     Point pt(m_solver->getPosition());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
     glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawFlame(displayParticle);  
+      m_flames[i]->drawFlame(display, displayParticle);  
     glPopMatrix();
   }  
   
@@ -237,11 +244,11 @@ public:
    * @param displayParticle affiche ou non les particules des squelettes.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  void draw(bool displayParticle, bool displayBoxes)
+  void draw(bool display, bool displayParticle, bool displayBoxes)
   {
     glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
     drawWick(displayBoxes);
-    drawFlame(displayParticle);
+    drawFlame(display, displayParticle);
   }
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
@@ -314,8 +321,7 @@ public:
       m_flames[i]->locateInSolver();
   }
   
-  /** Calcul de l'intensité du centre et de l'orientation du solide photométrique
-   */
+  /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
   
 protected:
@@ -366,7 +372,7 @@ public:
   virtual ~DetachableFireSource();
   
   virtual void build();
-  virtual void drawFlame(bool displayParticle);
+  virtual void drawFlame(bool display, bool displayParticle);
   
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.

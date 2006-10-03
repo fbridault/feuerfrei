@@ -22,7 +22,7 @@ public:
    * @param width Largeur de la texture.
    * @param height Hauteur de la texture.
    */
-  Texture(GLenum type, uint width, uint height);
+  Texture(GLenum type, GLenum filter, uint width, uint height);
   
   /** Construit une texture de profondeur vide. Cette texture pourra être utilisée ensuite
    * pour effectuer des tests de profondeur.

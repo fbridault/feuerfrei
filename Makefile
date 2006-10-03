@@ -9,6 +9,7 @@ all: build
 build:
 	@-mkdir build 2>/dev/null
 	@-mkdir build/shadersObjects 2>/dev/null
+	@-mkdir captures 2>/dev/null
 	cd build && cmake .. $(EXTRA_CMAKE_FLAGS)
 
 cmakepurge:

@@ -133,8 +133,8 @@ private:
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox;
   
-  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_solidSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer;  
-  wxBoxSizer *m_topSizer, *m_mainSizer, *m_rightSizer, *m_multiTopSizer;
+  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer;  
+  wxBoxSizer *m_leftSizer, *m_bottomSizer, *m_mainSizer, *m_rightSizer, *m_lightingBottomSizer, *m_multiTopSizer, *m_globalTopSizer;
   wxSlider *m_depthPeelingSlider;
 
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];

@@ -61,14 +61,13 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   // appelée lors d'un click sur ce bouton
   m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
    
-  m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Lighting"), wxDefaultPosition, wxDefaultSize, 
+  m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
 				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
   
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
   
-//   m_interpolatedSolidCheckBox = new wxCheckBox(this,IDCHK_IS,_("Interpolation"));
-  m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Blended"));
+  m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Show PS"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
   m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
@@ -80,27 +79,33 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
   /* Réglages globaux */
+  m_globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_globalTopSizer->Add(m_buttonRun, 0, 0, 0);
+  m_globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
+  
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
-  m_globalSizer->Add(m_buttonRun, 0, 0, 0);
-  m_globalSizer->Add(m_buttonRestart, 0, 0, 0);
+  m_globalSizer->Add(m_globalTopSizer, 0, 0, 0);
   m_globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
   
-  /* Réglages du solide photométrique */
-  m_solidSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Photometric solid"));
-//   m_solidSizer->Add(m_interpolatedSolidCheckBox, 1, 0, 0);
-  m_solidSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
+  /* Réglages de l'éclairage */
+  m_lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_lightingBottomSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
+  m_lightingBottomSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
   
-  m_topSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_topSizer->Add(m_globalSizer, 2, wxEXPAND, 0);
-  m_topSizer->Add(m_solidSizer, 2, wxEXPAND, 0);
+  m_lightingSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Lighting"));
+  m_lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
+  m_lightingSizer->Add(m_lightingBottomSizer, 1, 0, 0);
+  
+  m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_bottomSizer->Add(m_globalSizer, 1, wxEXPAND, 0);
+  m_bottomSizer->Add(m_lightingSizer, 1, wxEXPAND, 0);
   
   /* Réglages du glow */
-  m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
   m_multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_multiTopSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
-  m_multiTopSizer->Add(m_glowEnabledCheckBox, 1, 0, 0);
-  m_multiSizer->Add(m_multiTopSizer, 1, 0, 0);
-  m_multiSizer->Add(m_depthPeelingEnabledCheckBox, 1, 0, 0);
+  m_multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
+  m_multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
+  m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
+  m_multiSizer->Add(m_multiTopSizer, 0, 0, 0);
   m_multiSizer->Add(m_depthPeelingSlider, 1, wxEXPAND, 0);
     
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
@@ -111,11 +116,17 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
-  m_rightSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_topSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_multiSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);  
+  
+  m_leftSizer = new wxBoxSizer(wxVERTICAL);
+  m_leftSizer->Add(m_glBuffer, 0, 0, 0);
+  m_leftSizer->Add(m_bottomSizer, 1, 0, 0);
+
+  m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_mainSizer->Add(m_leftSizer, 0, 0, 0);
+  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
   
   /* Création des menus */
   m_menuFile = new wxMenu;
@@ -158,10 +169,6 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
   
   m_configFileName = configFileName;
   GetSettingsFromConfigFile();
-
-  m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_mainSizer->Add(m_glBuffer, 0, 0, 0);
-  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
   
   SetSizerAndFit(m_mainSizer);
   
@@ -274,14 +281,14 @@ void MainFrame::GetSettingsFromConfigFile (void)
       m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
   
-  m_blendedSolidCheckBox->SetValue(m_currentConfig.BPSEnabled);
+  m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
-//   if(m_currentConfig.depthPeelingEnabled)
-//     m_depthPeelingSlider->Enable();
-//   else
+  if(m_currentConfig.depthPeelingEnabled)
+    m_depthPeelingSlider->Enable();
+  else
     m_depthPeelingSlider->Disable();
   m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
   switch(m_currentConfig.lightingMode)

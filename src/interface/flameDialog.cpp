@@ -27,7 +27,7 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
     {
       itemName.Printf(_("Solver #%d"),i+1);
       m_solverComboBox->Append(itemName);
-    }   
+    }
   
   const wxString m_flameTypeRadioBoxChoices[] = {
     _("Candle"),

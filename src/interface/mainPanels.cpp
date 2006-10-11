@@ -13,9 +13,13 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_CHECKBOX(IDCHK_MOVE, SolverMainPanel::OnCheckMove)
 END_EVENT_TABLE();
 
-
+#ifdef RTFLAMES_BUILD
 SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, 
 				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+#else
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, 
+				 GLFluidsCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+#endif
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=100.0;
@@ -103,7 +107,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
 
-  m_moveCheckBox->SetValue(true);
+  m_moveCheckBox->SetValue(false);
   
   SetSizer(m_panelSizer);
   
@@ -253,6 +257,7 @@ void SolverMainPanel::ComputeSlidersValues(void)
   (*m_solverZAxisPositionSliderMax) << valz+SLIDER_RANGE;
 }
 
+#ifdef RTFLAMES_BUILD
 /************************ FlameMainPanel class definition *********************************************/
 
 BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
@@ -436,3 +441,5 @@ void FlameMainPanel::OnPhotoSolidEnter(wxCommandEvent& event)
   if(restart)
     m_glBuffer->ToggleRun();
 }
+
+#endif

@@ -1,4 +1,4 @@
-#include "mainFrame.hpp"
+#include "flamesFrame.hpp"
 
 #include "solverDialog.hpp"
 #include "flameDialog.hpp"
@@ -6,42 +6,42 @@
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
-BEGIN_EVENT_TABLE(MainFrame, wxFrame)
-  EVT_SIZE(MainFrame::OnSize)
-  EVT_RADIOBOX(IDRB_Lighting, MainFrame::OnSelectLighting)
-  EVT_BUTTON(IDB_Run, MainFrame::OnClickButtonRun)
-  EVT_BUTTON(IDB_Restart, MainFrame::OnClickButtonRestart)
-  EVT_MENU(IDM_LoadParam, MainFrame::OnLoadParamMenu)
-  EVT_MENU(IDM_OpenScene, MainFrame::OnOpenSceneMenu)
-  EVT_MENU(IDM_SaveSettings, MainFrame::OnSaveSettingsMenu)
-  EVT_MENU(IDM_SaveSettingsAs, MainFrame::OnSaveSettingsAsMenu)
-  EVT_MENU(IDM_Quit, MainFrame::OnQuitMenu)
-  EVT_MENU(IDM_About, MainFrame::OnAboutMenu)
-  EVT_MENU(IDM_GlowOnly, MainFrame::OnGlowOnlyMenu)
-  EVT_MENU(IDM_Grid, MainFrame::OnGridMenu)
-  EVT_MENU(IDM_Base, MainFrame::OnBaseMenu)
-  EVT_MENU(IDM_Velocity, MainFrame::OnVelocityMenu)
-  EVT_MENU(IDM_Particles, MainFrame::OnParticlesMenu)
-  EVT_MENU(IDM_WickBoxes, MainFrame::OnWickBoxesMenu)
-  EVT_MENU(IDM_ShadowVolumes, MainFrame::OnShadowVolumesMenu)
-  EVT_MENU(IDM_Hide, MainFrame::OnHideMenu)
-  EVT_MENU(IDM_Wired, MainFrame::OnWiredMenu)
-  EVT_MENU(IDM_Shaded, MainFrame::OnShadedMenu)
-  EVT_MENU(IDM_SolversSettings, MainFrame::OnSolversMenu)
-  EVT_MENU(IDM_FlamesSettings, MainFrame::OnFlamesMenu)
-  EVT_MENU(IDM_ShadowVolumesSettings, MainFrame::OnShadowVolumesSettingsMenu)
-  EVT_CHECKBOX(IDCHK_BS, MainFrame::OnCheckBS)
-  EVT_CHECKBOX(IDCHK_Shadows, MainFrame::OnCheckShadows)
-  EVT_CHECKBOX(IDCHK_Glow, MainFrame::OnCheckGlow)
-  EVT_CHECKBOX(IDCHK_DP, MainFrame::OnCheckDepthPeeling)
-  EVT_CHECKBOX(IDCHK_SaveImages, MainFrame::OnCheckSaveImages)
-  EVT_SCROLL(MainFrame::OnScrollPosition)
-  EVT_CLOSE(MainFrame::OnClose)
+BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
+  EVT_SIZE(FlamesFrame::OnSize)
+  EVT_RADIOBOX(IDRB_Lighting, FlamesFrame::OnSelectLighting)
+  EVT_BUTTON(IDB_Run, FlamesFrame::OnClickButtonRun)
+  EVT_BUTTON(IDB_Restart, FlamesFrame::OnClickButtonRestart)
+  EVT_MENU(IDM_LoadParam, FlamesFrame::OnLoadParamMenu)
+  EVT_MENU(IDM_OpenScene, FlamesFrame::OnOpenSceneMenu)
+  EVT_MENU(IDM_SaveSettings, FlamesFrame::OnSaveSettingsMenu)
+  EVT_MENU(IDM_SaveSettingsAs, FlamesFrame::OnSaveSettingsAsMenu)
+  EVT_MENU(IDM_Quit, FlamesFrame::OnQuitMenu)
+  EVT_MENU(IDM_About, FlamesFrame::OnAboutMenu)
+  EVT_MENU(IDM_GlowOnly, FlamesFrame::OnGlowOnlyMenu)
+  EVT_MENU(IDM_Grid, FlamesFrame::OnGridMenu)
+  EVT_MENU(IDM_Base, FlamesFrame::OnBaseMenu)
+  EVT_MENU(IDM_Velocity, FlamesFrame::OnVelocityMenu)
+  EVT_MENU(IDM_Particles, FlamesFrame::OnParticlesMenu)
+  EVT_MENU(IDM_WickBoxes, FlamesFrame::OnWickBoxesMenu)
+  EVT_MENU(IDM_ShadowVolumes, FlamesFrame::OnShadowVolumesMenu)
+  EVT_MENU(IDM_Hide, FlamesFrame::OnHideMenu)
+  EVT_MENU(IDM_Wired, FlamesFrame::OnWiredMenu)
+  EVT_MENU(IDM_Shaded, FlamesFrame::OnShadedMenu)
+  EVT_MENU(IDM_SolversSettings, FlamesFrame::OnSolversMenu)
+  EVT_MENU(IDM_FlamesSettings, FlamesFrame::OnFlamesMenu)
+  EVT_MENU(IDM_ShadowVolumesSettings, FlamesFrame::OnShadowVolumesSettingsMenu)
+  EVT_CHECKBOX(IDCHK_BS, FlamesFrame::OnCheckBS)
+  EVT_CHECKBOX(IDCHK_Shadows, FlamesFrame::OnCheckShadows)
+  EVT_CHECKBOX(IDCHK_Glow, FlamesFrame::OnCheckGlow)
+  EVT_CHECKBOX(IDCHK_DP, FlamesFrame::OnCheckDepthPeeling)
+  EVT_CHECKBOX(IDCHK_SaveImages, FlamesFrame::OnCheckSaveImages)
+  EVT_SCROLL(FlamesFrame::OnScrollPosition)
+  EVT_CLOSE(FlamesFrame::OnClose)
 END_EVENT_TABLE();
 
-/**************************************** MainFrame Class methods **************************************/
+/**************************************** FlamesFrame Class methods **************************************/
 
-MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName)
+FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName)
 : wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
   int attributelist[ 10 ] = { WX_GL_RGBA,
@@ -177,14 +177,14 @@ MainFrame::MainFrame(const wxString& title, const wxPoint& pos, const wxSize& si
 
 }
 
-void MainFrame::OnSize(wxSizeEvent& event)
+void FlamesFrame::OnSize(wxSizeEvent& event)
 {
   // this is also necessary to update the context on some platforms
   wxFrame::OnSize(event);
   Layout();
 }
 
-void MainFrame::GetSettingsFromConfigFile (void)
+void FlamesFrame::GetSettingsFromConfigFile (void)
 {
   wxFileInputStream* file = new wxFileInputStream( m_configFileName );
   //if(!wxFileInputStream::Ok())
@@ -308,7 +308,7 @@ void MainFrame::GetSettingsFromConfigFile (void)
   return;
 }
 
-void MainFrame::InitGLBuffer(bool recompileShaders)
+void FlamesFrame::InitGLBuffer(bool recompileShaders)
 {
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig,recompileShaders);
@@ -318,7 +318,7 @@ void MainFrame::InitGLBuffer(bool recompileShaders)
   Layout();
 }
 
-void MainFrame::InitSolversPanels()
+void FlamesFrame::InitSolversPanels()
 {
   wxString tabName;
   
@@ -333,7 +333,7 @@ void MainFrame::InitSolversPanels()
 }
 
 
-void MainFrame::InitFlamesPanels()
+void FlamesFrame::InitFlamesPanels()
 {
   wxString tabName;
   
@@ -347,7 +347,7 @@ void MainFrame::InitFlamesPanels()
     }
 }
 
-void MainFrame::OnClose(wxCloseEvent& event)
+void FlamesFrame::OnClose(wxCloseEvent& event)
 {
   delete m_config;
   
@@ -355,7 +355,7 @@ void MainFrame::OnClose(wxCloseEvent& event)
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.
-void MainFrame::OnClickButtonRun(wxCommandEvent& event)
+void FlamesFrame::OnClickButtonRun(wxCommandEvent& event)
 {
   if(m_glBuffer->IsRunning())
     m_buttonRun->SetLabel(_("Continue"));
@@ -365,17 +365,17 @@ void MainFrame::OnClickButtonRun(wxCommandEvent& event)
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.
-void MainFrame::OnClickButtonRestart(wxCommandEvent& event)
+void FlamesFrame::OnClickButtonRestart(wxCommandEvent& event)
 {
   m_glBuffer->Restart();
 }
 
-void MainFrame::OnCheckBS(wxCommandEvent& event)
+void FlamesFrame::OnCheckBS(wxCommandEvent& event)
 {
   m_currentConfig.BPSEnabled = 1-m_currentConfig.BPSEnabled;
 }
 
-void MainFrame::OnSelectLighting(wxCommandEvent& event)
+void FlamesFrame::OnSelectLighting(wxCommandEvent& event)
 {
   m_currentConfig.lightingMode = event.GetSelection();
   
@@ -390,18 +390,18 @@ void MainFrame::OnSelectLighting(wxCommandEvent& event)
     }
 }
 
-void MainFrame::OnCheckShadows(wxCommandEvent& event)
+void FlamesFrame::OnCheckShadows(wxCommandEvent& event)
 {
   m_currentConfig.shadowsEnabled = !m_currentConfig.shadowsEnabled;
 }
 
-void MainFrame::OnCheckGlow(wxCommandEvent& event)
+void FlamesFrame::OnCheckGlow(wxCommandEvent& event)
 {
   m_currentConfig.glowEnabled = !m_currentConfig.glowEnabled;
   m_menuDisplayFlames->Enable(IDM_GlowOnly,m_currentConfig.glowEnabled);
 }
 
-void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
+void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
   m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
   if(m_currentConfig.depthPeelingEnabled)
@@ -411,7 +411,7 @@ void MainFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 //   m_glBuffer->ToggleDepthPeeling();
 }
 
-void MainFrame::OnScrollPosition(wxScrollEvent& event)
+void FlamesFrame::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_DP){
     m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
@@ -419,12 +419,12 @@ void MainFrame::OnScrollPosition(wxScrollEvent& event)
   }
 }
 
-void MainFrame::OnCheckSaveImages(wxCommandEvent& event)
+void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
 {
   m_glBuffer->ToggleSaveImages();  
 }
 
-void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
+void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
   wxString pwd=wxGetWorkingDirectory();
@@ -446,7 +446,7 @@ void MainFrame::OnOpenSceneMenu(wxCommandEvent& event)
   }
 }
 
-void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
+void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
   wxString pwd=wxGetWorkingDirectory();
@@ -477,7 +477,7 @@ void MainFrame::OnLoadParamMenu(wxCommandEvent& event)
   }
 }
 
-void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
+void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
   m_config->Write(_("/Display/Width"), (int)m_currentConfig.width);
   m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
@@ -573,7 +573,7 @@ void MainFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   delete file;
 }
 
-void MainFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
+void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
   
   wxString filename;
@@ -597,65 +597,65 @@ void MainFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
   }
 }
 
-void MainFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
+void FlamesFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
 {
   Close(TRUE);
 }
 
-void MainFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
+void FlamesFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 {
   wxMessageBox(_("Real-time simulation of flames\nOasis Team"),
 	       _("About flames"), wxOK | wxICON_INFORMATION, this);
 }
 
-void MainFrame::OnGlowOnlyMenu(wxCommandEvent& event)
+void FlamesFrame::OnGlowOnlyMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleGlowOnlyDisplay();
 }
 
-void MainFrame::OnGridMenu(wxCommandEvent& event)
+void FlamesFrame::OnGridMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleGridDisplay();
 }
 
-void MainFrame::OnBaseMenu(wxCommandEvent& event)
+void FlamesFrame::OnBaseMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleBaseDisplay();
 }
 
-void MainFrame::OnVelocityMenu(wxCommandEvent& event)
+void FlamesFrame::OnVelocityMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleVelocityDisplay();
 }
 
-void MainFrame::OnParticlesMenu(wxCommandEvent& event)
+void FlamesFrame::OnParticlesMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleParticlesDisplay();
 }
 
-void MainFrame::OnWickBoxesMenu(wxCommandEvent& event)
+void FlamesFrame::OnWickBoxesMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleWickBoxesDisplay();
 }
 
-void MainFrame::OnHideMenu(wxCommandEvent& event)
+void FlamesFrame::OnHideMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleFlamesDisplay();
 }
 
-void MainFrame::OnShadowVolumesMenu(wxCommandEvent& event)
+void FlamesFrame::OnShadowVolumesMenu(wxCommandEvent& event)
 { 
   m_glBuffer->ToggleShadowVolumesDisplay();
 }
 
-void MainFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
+void FlamesFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
 {
   ShadowsDialog *shadowsDialog = new ShadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
   shadowsDialog->ShowModal();  
   shadowsDialog->Destroy();
 }
 
-void MainFrame::OnWiredMenu(wxCommandEvent& event)
+void FlamesFrame::OnWiredMenu(wxCommandEvent& event)
 {
   if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
     m_glBuffer->ToggleSmoothShading();
@@ -664,7 +664,7 @@ void MainFrame::OnWiredMenu(wxCommandEvent& event)
     m_menuDisplayFlames->Check(IDM_Wired,true);
 }
 
-void MainFrame::OnShadedMenu(wxCommandEvent& event)
+void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 {
   if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
     m_glBuffer->ToggleSmoothShading();
@@ -673,7 +673,7 @@ void MainFrame::OnShadedMenu(wxCommandEvent& event)
     m_menuDisplayFlames->Check(IDM_Shaded,true);
 }
 
-void MainFrame::OnSolversMenu(wxCommandEvent& event)
+void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
 {
   SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog->ShowModal() == wxID_OK){
@@ -683,7 +683,7 @@ void MainFrame::OnSolversMenu(wxCommandEvent& event)
   solverDialog->Destroy();
 }
 
-void MainFrame::OnFlamesMenu(wxCommandEvent& event)
+void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
 {
   FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog->ShowModal() == wxID_OK){
@@ -693,7 +693,7 @@ void MainFrame::OnFlamesMenu(wxCommandEvent& event)
   flameDialog->Destroy();
 }
 
-void MainFrame::SetFPS(int fps)
+void FlamesFrame::SetFPS(int fps)
 {
   wxString s;
   s += wxString::Format(_("%d FPS"), fps);

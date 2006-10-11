@@ -3,7 +3,11 @@
 
 #include "interface.hpp"
 #include <wx/spinctrl.h>
-#include "GLFlameCanvas.hpp"
+#ifdef RTFLAMES_BUILD
+  #include "GLFlameCanvas.hpp"
+#else
+  #include "GLFluidsCanvas.hpp"
+#endif
 
 enum
   {
@@ -44,8 +48,13 @@ enum
 class SolverMainPanel: public wxPanel 
 {
 public:
+#ifdef RTFLAMES_BUILD
   SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFlameCanvas *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+#else
+  SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFluidsCanvas *glBuffer, 
+		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+#endif
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnFXAPMINEnter(wxCommandEvent& event);
@@ -74,7 +83,11 @@ private:
   SolverConfig *m_solverConfig;
   /* Index du solveur */
   int m_index;
+#ifdef RTFLAMES_BUILD
   GLFlameCanvas *m_glBuffer;
+#else
+  GLFluidsCanvas *m_glBuffer;
+#endif
   Point saveSliderValues;
   
   double SLIDER_SENSIBILITY;
@@ -84,6 +97,7 @@ private:
 };
 
 
+#ifdef RTFLAMES_BUILD
 /** Panneau pour les onglets des solveurs dans la fenêtre principale */
 class FlameMainPanel: public wxPanel 
 {
@@ -119,6 +133,6 @@ private:
   
   DECLARE_EVENT_TABLE()
 };
-
+#endif
 
 #endif

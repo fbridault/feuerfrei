@@ -1,6 +1,6 @@
 #include "GLFlameCanvas.hpp"
 
-#include "mainFrame.hpp"
+#include "flamesFrame.hpp"
 #include <iostream>
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
@@ -470,7 +470,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   m_t = ::wxGetElapsedTime (false);
   if (m_t >= 2000){    
-    ((MainFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
+    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
     ::wxStartTimer();
     m_framesCount = 0;
   }

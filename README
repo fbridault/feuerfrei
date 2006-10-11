@@ -1,9 +1,17 @@
-Instructions pour gérer l'archive :
+################
+# Instructions #
+################
 
 Mise à jour de l'archive :
 cg-update
 
-Compilation :
+Compilation de rtflames:
+make flames
+
+Compilation de rtfluids:
+make fluids
+
+Compilation des deux cibles:
 make
 
 Compilation d'une version de déboguage :
@@ -15,12 +23,11 @@ cmake -i build
 et répondre Debug pour le type de build
 
 Lancement :
-cd src
-rtflames <fichier de simulation>
+rtflames <fichier de simulation> (par défaut params/param.ini)
+rtfluids <fichier de simulation> (par défaut params/solver.ini)
 
 L'option --recompile n'est plus nécessaire, le programme détermine lui-même si
 il faut recompiler ou non les shaders.
-
 
 Soumission des changements :
 make clean 

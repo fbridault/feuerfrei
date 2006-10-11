@@ -3,9 +3,16 @@ EXTRA_CMAKE_FLAGS += -DCMAKE_C_FLAGS="$(CFLAGS)"
 endif
 
 all: build
-	$(MAKE) -C build $(MAKE_FLAGS) all
-	mv build/src/rtflames .
+	$(MAKE) -C build $(MAKE_FLAGS)
+	mv build/src/rtflames build/src/rtfluids .
 
+flames: build
+	$(MAKE) -C build $(MAKE_FLAGS) rtflames
+	mv build/src/rtflames . 
+
+fluids: build 
+	$(MAKE) -C build $(MAKE_FLAGS) rtfluids
+	mv build/src/rtfluids .
 build:
 	@-mkdir build 2>/dev/null
 	@-mkdir build/shadersObjects 2>/dev/null
@@ -20,10 +27,10 @@ cmakepurge:
 
 clean:
 	rm -rf build
-	rm -f rtflames
+	rm -f rtflames rtfluids
 
-%: build
-	$(MAKE) -C build $(MAKE_FLAGS) $@
+#%: build
+#	$(MAKE) -C build $(MAKE_FLAGS) $@
 
 #ifneq ($(PREFIX),)
 #install: build/Makefile

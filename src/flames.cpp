@@ -1,4 +1,4 @@
-#include "interface/mainFrame.hpp"
+#include "interface/flamesFrame.hpp"
 
 /** \mainpage Index page
  *
@@ -67,7 +67,7 @@ bool FlamesApp::OnInit()
   recompileShaders = areShadersCompiled();
   
   /* Teste s'il est nécessaire de recompiler les shaders */
-  MainFrame *frame = new MainFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
+  FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
  
   frame->Show(TRUE);
 

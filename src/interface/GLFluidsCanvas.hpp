@@ -1,23 +1,17 @@
-#ifndef GLFLAMECANVAS_H
-#define GLFLAMECANVAS_H
+#ifndef GLFLUIDSCANVAS_H
+#define GLFLUIDSCANVAS_H
 
-class GLFlameCanvas;
+class GLFluidsCanvas;
 
 #include "../common.hpp"
 #include "interface.hpp"
 
 #include <wx/glcanvas.h>
-
-#include "../shaders/CgSVShader.hpp"
+#include <Cg/cg.h>
+#include <Cg/cgGL.h>
 
 #include "../scene/camera.hpp"
-#include "../scene/scene.hpp"
 #include "../scene/graphicsFn.hpp"
-
-#include "../flames/realFires.hpp"
-#include "../flames/glowengine.hpp"
-#include "../flames/DPengine.hpp"
-#include "../flames/solidePhoto.hpp"
 
 #include "../solvers/GSsolver.hpp"
 #include "../solvers/GCSSORsolver.hpp"
@@ -26,17 +20,16 @@ class GLFlameCanvas;
 #include "../solvers/logResAvgSolver.hpp"
 #include "../solvers/logResAvgTimeSolver.hpp"
 
-class GLFlameCanvas : public wxGLCanvas
+class GLFluidsCanvas : public wxGLCanvas
 {
 public:
-  GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
+  GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
 		long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
   
-  ~GLFlameCanvas();
+  ~GLFluidsCanvas();
   
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
-  void drawScene(void);
   
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
@@ -48,8 +41,6 @@ public:
   
   /** Initialisations relatives à l'environnement OpenGL */
   void InitGL(bool recompileShaders);
-  /** Initialisations relatives aux flammes */
-  void InitFlames(void);
   /** Initialisations relatives aux solveurs */
   void InitSolvers(void);
   /** Initialisations relatives à la scène */
@@ -65,59 +56,30 @@ public:
   /** Lance/arrête l'animation */
   void ToggleRun(void) { m_run=!m_run; };
   
-  /** Active/Désactive le glow seul */
-  void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
   void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };
   void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
-  void ToggleParticlesDisplay(void) { m_displayParticles=!m_displayParticles; };
-  void ToggleWickBoxesDisplay(void) { m_displayWickBoxes=!m_displayWickBoxes; };
-  void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
-  void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
-  void ToggleSmoothShading(void) { 
-    for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->toggleSmoothShading ();
-  };  
-//   void ToggleDepthPeeling(void) { 
-//     if(m_currentConfig->depthPeelingEnabled)
-//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-// 	m_flames[f]-> setTesselateMode();
-//     else
-//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-// 	m_flames[f]-> setRenderMode();
-//   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
-  void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
-  void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
-  void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
-  void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
-  void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
-  void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
-  void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   
 private:
   void WriteFPS ();
   void DrawVelocity (void);
-  
-  void cast_shadows_double_multiple();
-  void cast_shadows_double();
   
   /** Configuration de l'application */
   FlameAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
-  bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
-  bool m_drawShadowVolumes, m_glowOnly;
+  bool m_displayVelocity, m_displayBase, m_displayGrid;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
   uint m_width, m_height;
-  uint prevNbSolvers, prevNbFlames;
+  uint prevNbSolvers;
   
   CGcontext m_context;
   Camera *m_camera;
@@ -130,24 +92,10 @@ private:
   
   /* Tableau de pixels pour la sauvegarde des images */
   u_char *m_pixels;
-
-  /********* Variables relatives aux solides photométriques **************/
-  PhotometricSolidsRenderer *m_photoSolid;
-
-  /********* Variables relatives au glow *********************************/
-  GlowEngine *m_glowEngine;
   
-  DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
   Solver **m_solvers;
-    
-  /********* Variables relatives à la simulation *************************/
-  FireSource **m_flames;
-  Scene *m_scene;
-  CgSVShader *m_SVShader;
   
-  double *intensities;
-
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()
 };

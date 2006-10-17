@@ -6,7 +6,7 @@
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver *s, 
+LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver3D *s, 
 		      const char *wickFileName, DetachableFireSource *parentFire, 
 		      double detachedFlamesWidth, const char *wickName ) :
   RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
@@ -263,7 +263,7 @@ Point* LineFlame::getBottom()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Solver * s, double rayon):
+PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Solver3D * s, double rayon):
   RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -347,7 +347,7 @@ void PointFlame::drawWick (bool displayBoxes)
 /**********************************************************************************************************************/
 
 DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver *solver) :
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver3D *solver) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
@@ -357,7 +357,7 @@ DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSk
   m_periSkeletons = periSkeletons;
   
   m_solver = solver;
-  locateInSolver();
+  locateInSolver3D();
 }
 
 DetachedFlame::~DetachedFlame()

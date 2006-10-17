@@ -25,11 +25,7 @@ enum
     IDCHK_Glow,
     IDCHK_DP,
     IDCHK_SaveImages,
-  };
-
-enum
-  {
-    IDSL_DP = 1,
+    IDSL_DP,
   };
 
 enum
@@ -110,7 +106,7 @@ public:
   void OnCheckSaveImages(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
-  void OnScrollPosition(wxScrollEvent& event);
+  void OnScrollDP(wxScrollEvent& event);
   void OnSize(wxSizeEvent& event);
   void SetFPS(int fps);
 

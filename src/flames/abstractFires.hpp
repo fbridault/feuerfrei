@@ -7,14 +7,14 @@ class FireSource;
 #include "flames.hpp"
 
 #include "realFlames.hpp"
-#include "../solvers/solver.hpp"
+#include "../solvers/solver3D.hpp"
 #include "../scene/texture.hpp"
 #include "../scene/object.hpp"
 #include "../shaders/CgSVShader.hpp"
 #include "ies.hpp"
 
 class RealFlame;
-class Solver;
+class Solver3D;
 class Object;
 class Scene;
 class IES;
@@ -162,7 +162,7 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  FireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
+  FireSource (FlameConfig* flameConfig, Solver3D * s, uint nbFlames, Scene *scene, const char *filename,
 	      const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   /** Destructeur */
   virtual ~FireSource ();
@@ -334,7 +334,7 @@ protected:
   GLuint m_luminaryDL;
   
   /** Pointeur sur le solveur de fluides */
-  Solver *m_solver;
+  Solver3D *m_solver;
 
   /** Position relative de la source dans le solveur auquel elle appartient */
   Point m_position;
@@ -367,7 +367,7 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  DetachableFireSource (FlameConfig* flameConfig, Solver * s, uint nbFlames, Scene *scene, const char *filename,
+  DetachableFireSource (FlameConfig* flameConfig, Solver3D * s, uint nbFlames, Scene *scene, const char *filename,
 			const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   virtual ~DetachableFireSource();
   

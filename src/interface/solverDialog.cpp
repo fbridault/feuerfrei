@@ -8,16 +8,6 @@ END_EVENT_TABLE();
 SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 { 
-  const wxString m_solverTypeRadioBoxChoices[] = {
-    _("Gauss-Seidel"),
-    _("Preconditioned Conjugated Gradient"),
-    _("Hybrid"),
-    _("LOD Hybrid"),
-    _("Both - log residuals"),
-    _("Both - log residuals averages"),
-    _("Both - log residuals averages + time")
-  };
-  
   m_posLabel = new wxStaticText(this, -1, _("Position"));
   m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
@@ -31,9 +21,29 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
 
+#ifdef RTFLAMES_BUILD
+  const wxString m_solverTypeRadioBoxChoices[] = {
+    _("Gauss-Seidel"),
+    _("Preconditioned Conjugated Gradient"),
+    _("Hybrid"),
+    _("LOD Hybrid")
+  };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					7, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
-
+					4, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+#else
+  const wxString m_solverTypeRadioBoxChoices[] = {
+    _("Gauss-Seidel"),
+    _("Preconditioned Conjugated Gradient"),
+    _("Hybrid"),
+    _("LOD Hybrid"),
+    _("Both - log residuals"),
+    _("Both - log residuals averages"),
+    _("Both - log residuals averages + time"),
+    _("Gauss-Seidel 2D")
+  };
+  m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
+					8, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+#endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
@@ -46,7 +56,6 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   setProperties();
   doLayout();
 }
-
 
 void SolverPanel::setProperties()
 {
@@ -64,7 +73,6 @@ void SolverPanel::setProperties()
   m_epsilonTextCtrl->SetMinSize(wxSize(100, 22));
   m_nbMaxIterTextCtrl->SetMinSize(wxSize(50, 22));
 }
-
 
 void SolverPanel::doLayout()
 {
@@ -117,9 +125,7 @@ void SolverPanel::doLayout()
   m_panelSizer->Add(m_nbMaxIterSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
   
   SetAutoLayout(true);
-  SetSizer(m_panelSizer);
-  m_panelSizer->Fit(this);
-  m_panelSizer->SetSizeHints(this);
+  SetSizerAndFit(m_panelSizer);
 }
 
 void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
@@ -242,8 +248,13 @@ BEGIN_EVENT_TABLE(SolverDialog, wxDialog)
 END_EVENT_TABLE();
 
 
+#ifdef RTFLAMES_BUILD
 SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig *config, 
 			   const wxPoint& pos, const wxSize& size, long style):
+#else
+SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  FluidsAppConfig *config, 
+			   const wxPoint& pos, const wxSize& size, long style):
+#endif
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
   m_solverNotebook = new wxNotebook(this, IDNB_Solvers, wxDefaultPosition, wxDefaultSize, 0);
@@ -261,6 +272,7 @@ SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  Fla
   m_cancelButton = new wxButton(this, IDB_Cancel, _("Cancel"));
 
   checkSolverUsage(0);
+  
   doLayout();
 }
 
@@ -306,10 +318,12 @@ void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
     /* Décalage vers la gauche pour combler le trou dans le tableau */
     for(int i=sel; i < m_nbPanels; i++)
       m_solverPanels[i] = m_solverPanels[i+1];
+#ifdef RTFLAMES_BUILD
     /* Réindexage des index des solveurs des flammes en conséquence */
     for(uint i = 0; i < m_currentConfig->nbFlames; i++)
       if( m_currentConfig->flames[i].solverIndex > sel)
 	m_currentConfig->flames[i].solverIndex--;
+#endif
   }
 }
 
@@ -336,6 +350,7 @@ void SolverDialog::OnPageChanging(wxNotebookEvent& event)
 
 void SolverDialog::checkSolverUsage(int solverIndex)
 {
+#ifdef RTFLAMES_BUILD
   for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       if(m_currentConfig->flames[i].solverIndex == solverIndex){
@@ -343,5 +358,6 @@ void SolverDialog::checkSolverUsage(int solverIndex)
 	return;
       }
     }
+#endif
   m_deleteSolverButton->Enable();
 }

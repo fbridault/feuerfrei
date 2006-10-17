@@ -1,6 +1,6 @@
-#include "GCSSORsolver.hpp"
+#include "GCSSORSolver3D.hpp"
 
-GCSSORsolver::GCSSORsolver (double omegaDiff, double omegaProj, double epsilon)
+GCSSORSolver3D::GCSSORSolver3D (double omegaDiff, double omegaProj, double epsilon)
 {
   m_r=new double[m_nbVoxels];
   m_z=new double[m_nbVoxels];
@@ -17,9 +17,9 @@ GCSSORsolver::GCSSORsolver (double omegaDiff, double omegaProj, double epsilon)
   m_epsilon = epsilon;
 }
 
-GCSSORsolver::GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
-			    double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
+GCSSORSolver3D::GCSSORSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+  Solver3D(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
   m_r=new double[m_nbVoxels];
   m_z=new double[m_nbVoxels];
@@ -36,7 +36,7 @@ GCSSORsolver::GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, doubl
   m_epsilon = epsilon;
 }
 
-GCSSORsolver::~GCSSORsolver ()
+GCSSORSolver3D::~GCSSORSolver3D ()
 {
   delete[]m_r;
   delete[]m_z;
@@ -44,7 +44,7 @@ GCSSORsolver::~GCSSORsolver ()
   delete[]m_q;
 }
 
-void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
+void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
@@ -284,13 +284,13 @@ void GCSSORsolver::GCSSOR(double *const x0, const double *const b, double a, dou
 
 /* Pas de diffusion */
 void
-GCSSORsolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+GCSSORSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
 }
 
 void
-GCSSORsolver::project (double *const p, double *const div)
+GCSSORSolver3D::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, 
 		h_y = 1.0 / m_nbVoxelsY, 

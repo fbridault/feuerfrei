@@ -28,7 +28,7 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
-  Candle(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+  Candle(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index, 
 	 CgSVShader * shader, double rayon);
   /** Destructeur */
   virtual ~Candle(){};
@@ -51,7 +51,7 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param wickFileName nom du fichier contenant la mèche
    */
-  Firmalampe(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+  Firmalampe(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index, 
 	     CgSVShader * shader, const char *wickFileName);
   /** Destructeur */
   virtual ~Firmalampe(){};
@@ -75,7 +75,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    */
-  Torch(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *torchName, uint index, 
+  Torch(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *torchName, uint index, 
 	CgSVShader * shader);
   /** Destructeur */
   virtual ~Torch(){}; 
@@ -105,7 +105,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    */
-  CampFire(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *fireName, uint index, 
+  CampFire(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *fireName, uint index, 
 	   CgSVShader * shader);
   /** Destructeur */
   virtual ~CampFire(){};
@@ -128,7 +128,7 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
-  CandleStick(FlameConfig *flameConfig, Solver * s, Scene *scene, const char *filename, uint index, 
+  CandleStick(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index, 
 	      CgSVShader * shader, double rayon);
   /** Destructeur */
   virtual ~CandleStick();

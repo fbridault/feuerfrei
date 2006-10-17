@@ -1,29 +1,29 @@
 #if !defined(BENCHSOLVER_H)
 #define BENCHSOLVER_H
 
-class BenchSolver;
+class BenchSolver3D;
 
-#include "GSsolver.hpp"
-#include "GCSSORsolver.hpp"
+#include "GSSolver3D.hpp"
+#include "GCSSORSolver3D.hpp"
 
 #include <fstream>
 
 #define NB_DIFF_LOGS 6
 #define NB_PROJ_LOGS 4
 
-class GSsolver;
-class GCSSORsolver;
+class GSSolver3D;
+class GCSSORSolver3D;
 
-/** La classe BenchSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
+/** La classe BenchSolver3D sert d'interface pour les classes permettant de loguer les valeurs de résidus
  * des solveurs à base des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
- * Elle hérite de GSsolver et GCSSORsolver qui tous deux héritent <b>virtuellement</b> de Solver
- * de manière à n'avoir qu'une seule instance de Solver.
+ * Elle hérite de GSsolver et GCSSORSolver3D qui tous deux héritent <b>virtuellement</b> de Solver3D
+ * de manière à n'avoir qu'une seule instance de Solver3D.
  * La simulation est limitée dans le temps par l'attribut m_nbMaxIter afin de faciliter la génération
  * des graphiques.
  *
  * @author	Flavien Bridault
  */
-class BenchSolver: public GSsolver, public GCSSORsolver
+class BenchSolver3D: public GSSolver3D, public GCSSORSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -39,7 +39,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy, 
+  BenchSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy, 
 	       uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
@@ -48,9 +48,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver3D (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
-  virtual ~ BenchSolver ();
+  virtual ~ BenchSolver3D ();
   
 protected:
   virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc) = 0;

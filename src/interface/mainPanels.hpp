@@ -44,6 +44,16 @@ enum
     IDT_PHOTO
   };
 
+#ifdef RTFLUIDS_BUILD
+enum
+  {
+    IDB_LEFT = 1,
+    IDB_RIGHT,
+    IDB_TOP,
+    IDB_BOTTOM,
+  };
+#endif
+
 /** Panneau pour les onglets des solveurs dans la fenêtre principale */
 class SolverMainPanel: public wxPanel 
 {
@@ -55,6 +65,7 @@ public:
   SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFluidsCanvas *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #endif
+  virtual ~SolverMainPanel(){};
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnFXAPMINEnter(wxCommandEvent& event);
@@ -65,6 +76,9 @@ private:
   void OnFZAPMAXEnter(wxCommandEvent& event);
   void ComputeSlidersValues(void);
   void OnCheckMove(wxCommandEvent& event);
+#ifdef RTFLUIDS_BUILD
+  void OnClickDensities(wxCommandEvent& event);
+#endif
   
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
   wxSlider *m_buoyancySlider;
@@ -74,10 +88,9 @@ private:
     *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
   wxStaticText *m_solverXAxisPositionLabel, *m_solverYAxisPositionLabel, *m_solverZAxisPositionLabel;
   
-  wxBoxSizer *m_panelSizer;
+  wxBoxSizer *m_panelSizer, *m_forcesSizer;
   wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
   wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
-  wxBoxSizer *m_forcesSizer;
   wxCheckBox *m_moveCheckBox;
   
   SolverConfig *m_solverConfig;
@@ -87,8 +100,10 @@ private:
   GLFlameCanvas *m_glBuffer;
 #else
   GLFluidsCanvas *m_glBuffer;
+  wxStaticBoxSizer *m_densitiesSizer;
+  wxButton *m_densityLButton, *m_densityRButton, *m_densityTButton, *m_densityBButton;
 #endif
-  Point saveSliderValues;
+  Point m_saveSliderValues;
   
   double SLIDER_SENSIBILITY;
   int SLIDER_RANGE;
@@ -104,6 +119,7 @@ class FlameMainPanel: public wxPanel
 public:
   FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, GLFlameCanvas *glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+  virtual ~FlameMainPanel(){};
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);

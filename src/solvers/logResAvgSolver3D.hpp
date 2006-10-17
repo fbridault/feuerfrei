@@ -1,20 +1,20 @@
 #if !defined(LOGRESAVGSOLVER_H)
 #define LOGRESAVGSOLVER_H
 
-class LogResAvgSolver;
+class LogResAvgSolver3D;
 
-#include "benchsolver.hpp"
+#include "benchsolver3D.hpp"
 
 #include <fstream>
 
-class BenchSolver;
+class BenchSolver3D;
 
-/** La classe LogResAvgSolver permet de loguer les moyennes des valeurs de résidus des solveurs à base
+/** La classe LogResAvgSolver3D permet de loguer les moyennes des valeurs de résidus des solveurs à base
  * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
  *
  * @author	Flavien Bridault
  */
-class LogResAvgSolver: public BenchSolver
+class LogResAvgSolver3D: public BenchSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -30,7 +30,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
+  LogResAvgSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
 		   uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
  
   /** Constructeur nécessaire pour l'héritage multiple.
@@ -39,9 +39,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgSolver3D (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
-  virtual ~LogResAvgSolver ();
+  virtual ~LogResAvgSolver3D ();
 
 protected:
   virtual void vel_step ();

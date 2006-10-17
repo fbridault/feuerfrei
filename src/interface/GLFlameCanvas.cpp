@@ -145,59 +145,35 @@ void GLFlameCanvas::InitFlames(void)
 
 void GLFlameCanvas::InitSolvers(void)
 {
-  m_solvers = new Solver *[m_currentConfig->nbSolvers];
+  m_solvers = new Solver3D *[m_currentConfig->nbSolvers];
   for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
-      m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
 				  m_currentConfig->solvers[i].buoyancy);
       break;
     case GCSSOR_SOLVER :
-      m_solvers[i] = new GCSSORsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case HYBRID_SOLVER :
-      m_solvers[i] = new HybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
-      break; 
+      break;
     case LOD_HYBRID_SOLVER :
-      m_solvers[i] = new LODHybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
-      break;
-    case LOGRES_SOLVER :
-      m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy, 
-				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
-				      m_currentConfig->solvers[i].epsilon);
-      break;
-    case LOGRESAVG_SOLVER :
-      m_solvers[i] = new LogResAvgSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					  m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
-					 m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					 m_currentConfig->solvers[i].epsilon);
-      break;
-    case LOGRESAVGTIME_SOLVER :
-      m_solvers[i] = new LogResAvgTimeSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
-					     m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
-					     m_currentConfig->solvers[i].epsilon);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -344,6 +320,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       for (uint i = 0; i < m_currentConfig->nbFlames; i++)
 	m_flames[i]->locateInSolver(); 
       break;
+    case WXK_SPACE : m_run = !m_run; break;
     }
   event.Skip();
 }

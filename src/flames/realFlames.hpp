@@ -36,7 +36,7 @@ public:
    * @param detachedFlamesWidth Largeur des flammes détachées.
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver *s,
+  LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver3D *s,
 	     const char *wickFileName, DetachableFireSource *parentFire, double detachedFlamesWidth, 
 	     const char *wickName=NULL);
   virtual ~LineFlame();
@@ -96,7 +96,7 @@ public:
    * @param s Pointeur vers le solveur.
    * @param rayon Valeur du rayon du cercle formé par les racines des squelettes.
    */
-  PointFlame ( FlameConfig* flameConfig, Texture* const tex, Solver * s, double rayon);
+  PointFlame ( FlameConfig* flameConfig, Texture* const tex, Solver3D * s, double rayon);
   
   /** Destructeur*/
   virtual ~PointFlame();
@@ -150,7 +150,7 @@ public:
    * @param solver Pointeur vers le solveur.
    */
   DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver *solver);
+		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver3D *solver);
   
   /** Destructeur*/
   virtual ~DetachedFlame ();
@@ -176,7 +176,7 @@ public:
   /** Méthode permettant d'informer à la flamme de se localiser dans le solveur
    * Elle doit être appelée dès qu'un changement de résolution de la grille intervient.
    */  
-  virtual void locateInSolver(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
+  virtual void locateInSolver3D(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
   
 protected:
   /** Pointeur vers les squelettes guide. */
@@ -186,7 +186,7 @@ protected:
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
   FreePeriSkeleton **m_periSkeletons;
   /** Pointeur sur le solveur de fluides. */
-  Solver *m_solver;  
+  Solver3D *m_solver;  
   
   /** Tableau temporaire contenant les distances entre les particules d'un squelette. */
   double *m_distances;

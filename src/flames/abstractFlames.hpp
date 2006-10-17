@@ -8,7 +8,7 @@ class RealFlame;
 #include "GL/glu.h"
 #include "periSkeleton.hpp"
 #include "leadSkeleton.hpp"
-#include "../solvers/solver.hpp"
+#include "../solvers/solver3D.hpp"
 #include "../scene/texture.hpp"
 
 #include <list>
@@ -19,7 +19,7 @@ class RealFlame;
 
 class PeriSkeleton;
 class LeadSkeleton;
-class Solver;
+class Solver3D;
 
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE NURBSFLAME ****************************************/
@@ -332,7 +332,7 @@ public:
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Solver *s);
+  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Solver3D *s);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -380,7 +380,7 @@ protected:
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
   PeriSkeleton **m_periSkeletons;
   /** Pointeur sur le solveur de fluides */
-  Solver *m_solver;  
+  Solver3D *m_solver;  
   
   double *m_distances;
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle

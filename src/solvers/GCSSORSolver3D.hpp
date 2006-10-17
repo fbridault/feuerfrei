@@ -1,16 +1,16 @@
-#if !defined(GCSSORSOLVER_H)
-#define GCSSORSOLVER_H
+#if !defined(GCSSORSOLVER3D_H)
+#define GCSSORSOLVER3D_H
 
-class GCSSORsolver;
+class GCSSORSolver3D;
 
-#include "solver.hpp"
+#include "solver3D.hpp"
 
 /** La classe GCSSSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
  * méthode de resolution des systèmes linéaires.
  * 
  * @author	Flavien Bridault et Michel Leblond
  */
-class GCSSORsolver : public virtual Solver
+class GCSSORSolver3D : public virtual Solver3D
 {
 public:
   /** Constructeur du solveur.
@@ -25,7 +25,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
+  GCSSORSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
@@ -33,9 +33,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORsolver (double omegaDiff, double omegaProj, double epsilon);
+  GCSSORSolver3D (double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
-  virtual ~GCSSORsolver ();
+  virtual ~GCSSORSolver3D ();
   
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion

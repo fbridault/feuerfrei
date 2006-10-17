@@ -80,7 +80,7 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames,  Scene *scene, const char *filename, 
+FireSource::FireSource(FlameConfig *flameConfig, Solver3D *s, uint nbFlames,  Scene *scene, const char *filename, 
 		       const wxString &texname,  uint index, CgSVShader *shader, const char *objName) : 
   FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
@@ -180,7 +180,7 @@ Vector FireSource::getMainDirection()
 
 void FireSource::computeIntensityPositionAndDirection()
 {
-  double r,y;
+  //  double r,y;
   
   Vector o = getMainDirection();
   
@@ -209,7 +209,7 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
-DetachableFireSource::DetachableFireSource(FlameConfig *flameConfig, Solver *s, uint nbFlames, 
+DetachableFireSource::DetachableFireSource(FlameConfig *flameConfig, Solver3D *s, uint nbFlames, 
 					   Scene *scene, const char *filename, const wxString &texname, 
 					   uint index, CgSVShader *shader, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, shader, objName)

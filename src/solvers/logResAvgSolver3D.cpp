@@ -1,11 +1,11 @@
-#include "logResAvgSolver.hpp"
+#include "logResAvgSolver3D.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+LogResAvgSolver3D::LogResAvgSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
 				  double timeStep, uint nbTimeSteps, double buoyancy, 
 				  double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
-  BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
+  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
+  BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
   
@@ -16,8 +16,8 @@ LogResAvgSolver::LogResAvgSolver (Point& position, uint n_x, uint n_y, uint n_z,
 }
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgSolver::LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
-  BenchSolver (nbTimeSteps, omegaDiff, omegaProj, epsilon)
+LogResAvgSolver3D::LogResAvgSolver3D (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon) : 
+  BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
   
@@ -27,13 +27,13 @@ LogResAvgSolver::LogResAvgSolver (uint nbTimeSteps, double omegaDiff, double ome
   memset (m_averages, 0, m_nbAverages * sizeof (double));
 }
 
-LogResAvgSolver::~LogResAvgSolver ()
+LogResAvgSolver3D::~LogResAvgSolver3D ()
 {
   delete[]m_averages;
   m_file.close ();
 }
 
-void LogResAvgSolver::vel_step ()
+void LogResAvgSolver3D::vel_step ()
 {
   if(m_nbIter > m_nbMaxIter)
     return;
@@ -71,7 +71,7 @@ void LogResAvgSolver::vel_step ()
 }
 
 /* Pas de diffusion */
-void LogResAvgSolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+void LogResAvgSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   m_index = b-1;
   saveState(x, x0);
@@ -83,7 +83,7 @@ void LogResAvgSolver::diffuse (unsigned char b, double *const x, double *const x
 }
 
 
-void LogResAvgSolver::project (double *const p, double *const div)
+void LogResAvgSolver3D::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
@@ -121,7 +121,7 @@ void LogResAvgSolver::project (double *const p, double *const div)
 }
 
 
-void LogResAvgSolver::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
+void LogResAvgSolver3D::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
 {
   uint i, j, k, l;
   double diagonal = 1/div;
@@ -156,7 +156,7 @@ void LogResAvgSolver::GS_solve(unsigned char b, double *const x, double *const x
   //set_bnd (b, x);
 }
 
-void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
+void LogResAvgSolver3D::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
@@ -297,7 +297,7 @@ void LogResAvgSolver::GCSSOR(double *const x0, const double *const b, double a, 
   return;
 }//GCSSOR
 
-void LogResAvgSolver::computeAverage (uint iter, double value)
+void LogResAvgSolver3D::computeAverage (uint iter, double value)
 {
   int i = m_index*m_nbSteps + iter;
   

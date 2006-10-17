@@ -1,20 +1,20 @@
 #if !defined(LOGRESSOLVER_H)
 #define LOGRESSOLVER_H
 
-class LogResSolver;
+class LogResSolver3D;
 
-#include "benchsolver.hpp"
+#include "benchsolver3D.hpp"
 
 #include <fstream>
 
-class BenchSolver;
+class BenchSolver3D;
 
-/** La classe LogResSolver permet de loguer les valeurs de résidus des solveurs à base
+/** La classe LogResSolver3D permet de loguer les valeurs de résidus des solveurs à base
  * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
  *
  * @author	Flavien Bridault
  */
-class LogResSolver: public BenchSolver
+class LogResSolver3D: public BenchSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -30,10 +30,10 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
+  LogResSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
 		uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
-  virtual ~LogResSolver ();
+  virtual ~LogResSolver3D ();
   
 private:
   void vel_step ();

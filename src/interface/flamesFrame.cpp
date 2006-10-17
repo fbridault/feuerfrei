@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_Glow, FlamesFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_DP, FlamesFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, FlamesFrame::OnCheckSaveImages)
-  EVT_SCROLL(FlamesFrame::OnScrollPosition)
+  EVT_COMMAND_SCROLL(IDSL_DP, FlamesFrame::OnScrollDP)
   EVT_CLOSE(FlamesFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -60,7 +60,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
   m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
-   
+  
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
 				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
   
@@ -106,7 +106,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
   m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
   m_multiSizer->Add(m_multiTopSizer, 0, 0, 0);
-  m_multiSizer->Add(m_depthPeelingSlider, 1, wxEXPAND, 0);
+  m_multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
     
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
@@ -174,7 +174,6 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
-
 }
 
 void FlamesFrame::OnSize(wxSizeEvent& event)
@@ -186,10 +185,10 @@ void FlamesFrame::OnSize(wxSizeEvent& event)
 
 void FlamesFrame::GetSettingsFromConfigFile (void)
 {
-  wxFileInputStream* file = new wxFileInputStream( m_configFileName );
+  wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
     
-  m_config = new wxFileConfig( *file );
+  m_config = new wxFileConfig( file );
   
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
@@ -285,12 +284,13 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
+  
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
+  
   if(m_currentConfig.depthPeelingEnabled)
     m_depthPeelingSlider->Enable();
   else
     m_depthPeelingSlider->Disable();
-  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
   switch(m_currentConfig.lightingMode)
     {
     case LIGHTING_STANDARD : 
@@ -302,8 +302,6 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
       m_blendedSolidCheckBox->Enable();
       break;
     }
-  
-  delete file;
   
   return;
 }
@@ -408,10 +406,9 @@ void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
     m_depthPeelingSlider->Enable();
   else
     m_depthPeelingSlider->Disable();
-//   m_glBuffer->ToggleDepthPeeling();
 }
 
-void FlamesFrame::OnScrollPosition(wxScrollEvent& event)
+void FlamesFrame::OnScrollDP(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_DP){
     m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
@@ -465,14 +462,19 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_configFileName = filename;
       
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
-      m_solversNotebook->DeleteAllPages();
+
+      delete [] m_currentConfig.flames;
       m_flamesNotebook->DeleteAllPages();
+      
+      delete [] m_currentConfig.solvers;
+      m_solversNotebook->DeleteAllPages();
+
       GetSettingsFromConfigFile();
       m_glBuffer->Restart();
-      m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
       m_mainSizer->Fit(this);
       m_mainSizer->SetSizeHints(this);
       Layout();
+  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
     }
   }
 }
@@ -564,13 +566,11 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("IESFileName"),m_currentConfig.flames[i].IESFileName);
     }
   
-  wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );
+  wxFileOutputStream file( m_configFileName );
   
-  if (m_config->Save(*file) )
+  if (m_config->Save(file) )
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
-  
-  delete file;
 }
 
 void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
@@ -677,8 +677,8 @@ void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
 {
   SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog->ShowModal() == wxID_OK){
-    m_glBuffer->Restart();
     InitSolversPanels();
+    m_glBuffer->Restart();
   }
   solverDialog->Destroy();
 }
@@ -687,8 +687,8 @@ void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
 {
   FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog->ShowModal() == wxID_OK){
-    m_glBuffer->Restart();
     InitFlamesPanels();
+    m_glBuffer->Restart();
   }
   flameDialog->Destroy();
 }

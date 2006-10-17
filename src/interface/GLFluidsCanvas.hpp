@@ -13,12 +13,13 @@ class GLFluidsCanvas;
 #include "../scene/camera.hpp"
 #include "../scene/graphicsFn.hpp"
 
-#include "../solvers/GSsolver.hpp"
-#include "../solvers/GCSSORsolver.hpp"
-#include "../solvers/HybridSolver.hpp"
-#include "../solvers/logResSolver.hpp"
-#include "../solvers/logResAvgSolver.hpp"
-#include "../solvers/logResAvgTimeSolver.hpp"
+#include "../solvers/GSSolver2D.hpp"
+#include "../solvers/GSSolver3D.hpp"
+#include "../solvers/GCSSORSolver3D.hpp"
+#include "../solvers/HybridSolver3D.hpp"
+#include "../solvers/logResSolver3D.hpp"
+#include "../solvers/logResAvgSolver3D.hpp"
+#include "../solvers/logResAvgTimeSolver3D.hpp"
 
 class GLFluidsCanvas : public wxGLCanvas
 {
@@ -50,7 +51,7 @@ public:
   void Restart (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
-  void Init(FlameAppConfig *config, bool recompileShaders);
+  void Init(FluidsAppConfig *config, bool recompileShaders);
   
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
@@ -59,21 +60,23 @@ public:
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
   void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };
   void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
+  void ToggleDensityDisplay(void) { m_displayDensity=!m_displayDensity; };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
+  void addDensityInSolver(int index, int id){ m_solvers[index]->addDensity(id); };
   
 private:
   void WriteFPS ();
   void DrawVelocity (void);
   
   /** Configuration de l'application */
-  FlameAppConfig *m_currentConfig;
+  FluidsAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
-  bool m_displayVelocity, m_displayBase, m_displayGrid;
+  bool m_displayVelocity, m_displayDensity, m_displayBase, m_displayGrid;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 
@@ -88,6 +91,7 @@ private:
 
   uint m_framesCountForSwitch;
   bool m_switch;
+  bool m_2DDisplay;
   int m_t;
   
   /* Tableau de pixels pour la sauvegarde des images */

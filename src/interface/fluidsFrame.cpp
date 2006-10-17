@@ -16,6 +16,7 @@ BEGIN_EVENT_TABLE(FluidsFrame, wxFrame)
   EVT_MENU(IDM_Grid, FluidsFrame::OnGridMenu)
   EVT_MENU(IDM_Base, FluidsFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, FluidsFrame::OnVelocityMenu)
+  EVT_MENU(IDM_Density, FluidsFrame::OnDensityMenu)
   EVT_MENU(IDM_SolversSettings, FluidsFrame::OnSolversMenu)
   EVT_CHECKBOX(IDCHK_SaveImages, FluidsFrame::OnCheckSaveImages)
   EVT_CLOSE(FluidsFrame::OnClose)
@@ -81,9 +82,11 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_menuDisplay->AppendCheckItem( IDM_Grid, _("&Grid"));
   m_menuDisplay->AppendCheckItem( IDM_Base, _("&Base"));
   m_menuDisplay->AppendCheckItem( IDM_Velocity, _("&Velocity"));
+  m_menuDisplay->AppendCheckItem( IDM_Density, _("&Density"));
   
   m_menuDisplay->Check(IDM_Base,true);
   m_menuDisplay->Check(IDM_Velocity,true);
+  m_menuDisplay->Check(IDM_Density,true);
 
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
@@ -102,7 +105,6 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
   
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
-
 }
 
 void FluidsFrame::OnSize(wxSizeEvent& event)
@@ -114,10 +116,10 @@ void FluidsFrame::OnSize(wxSizeEvent& event)
 
 void FluidsFrame::GetSettingsFromConfigFile (void)
 {
-  wxFileInputStream* file = new wxFileInputStream( m_configFileName );
+  wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
   
-  m_config = new wxFileConfig( *file );
+  m_config = new wxFileConfig( file );
   
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
@@ -157,8 +159,6 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
       m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
-    
-  delete file;
   
   return;
 }
@@ -220,7 +220,7 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
   wxString pwd=wxGetWorkingDirectory();
   pwd << PARAMS_DIRECTORY;
   
-  wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
+  wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.slv"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
     
@@ -233,7 +233,10 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_configFileName = filename;
       
       SetTitle(_("Real-time Fluids - ") + m_configFileName);
+
+      delete [] m_currentConfig.solvers;
       m_solversNotebook->DeleteAllPages();
+      
       GetSettingsFromConfigFile();
       m_glBuffer->Restart();
       m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
@@ -286,18 +289,15 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("nbMaxIter"),(int)m_currentConfig.solvers[i].nbMaxIter);
     }
   
-  wxFileOutputStream* file = new wxFileOutputStream( m_configFileName );
+  wxFileOutputStream file ( m_configFileName );
   
-  if (m_config->Save(*file) )
+  if (m_config->Save(file) )
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
-  
-  delete file;
 }
 
 void FluidsFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
-  
   wxString filename;
   wxString pwd=wxGetWorkingDirectory();
   pwd << PARAMS_DIRECTORY;
@@ -345,12 +345,17 @@ void FluidsFrame::OnVelocityMenu(wxCommandEvent& event)
   m_glBuffer->ToggleVelocityDisplay();
 }
 
+void FluidsFrame::OnDensityMenu(wxCommandEvent& event)
+{
+  m_glBuffer->ToggleDensityDisplay();
+}
+
 void FluidsFrame::OnSolversMenu(wxCommandEvent& event)
 {
   SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog->ShowModal() == wxID_OK){
-    m_glBuffer->Restart();
     InitSolversPanels();
+    m_glBuffer->Restart();
   }
   solverDialog->Destroy();
 }

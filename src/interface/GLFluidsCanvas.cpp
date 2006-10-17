@@ -60,7 +60,7 @@ void GLFluidsCanvas::InitUISettings(void)
   m_run = true;
   m_saveImages = false;
   m_displayGrid = false;
-  m_displayBase = m_displayVelocity = true; 
+  m_displayBase = m_displayVelocity = m_displayDensity = true;
 }
 
 void GLFluidsCanvas::InitGL(bool recompileShaders)
@@ -101,34 +101,34 @@ void GLFluidsCanvas::InitSolvers(void)
   for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
-      m_solvers[i] = new GSsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
 				  m_currentConfig->solvers[i].buoyancy);
       break;
     case GCSSOR_SOLVER :
-      m_solvers[i] = new GCSSORsolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case HYBRID_SOLVER :
-      m_solvers[i] = new HybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break; 
     case LOD_HYBRID_SOLVER :
-      m_solvers[i] = new LODHybridSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRES_SOLVER :
-      m_solvers[i] = new LogResSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new LogResSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 				      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy, 
@@ -136,7 +136,7 @@ void GLFluidsCanvas::InitSolvers(void)
 				      m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRESAVG_SOLVER :
-      m_solvers[i] = new LogResAvgSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new LogResAvgSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 					  m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
@@ -144,12 +144,17 @@ void GLFluidsCanvas::InitSolvers(void)
 					 m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRESAVGTIME_SOLVER :
-      m_solvers[i] = new LogResAvgTimeSolver(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new LogResAvgTimeSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 					     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 					     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 					      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
 					     m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
 					     m_currentConfig->solvers[i].epsilon);
+      break;
+    case GS_SOLVER2D :
+      m_solvers[i] = new GSSolver2D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].dim,
+				  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -159,7 +164,7 @@ void GLFluidsCanvas::InitSolvers(void)
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
-void GLFluidsCanvas::Init (FlameAppConfig *config, bool recompileShaders)
+void GLFluidsCanvas::Init (FluidsAppConfig *config, bool recompileShaders)
 {  
   m_currentConfig = config;
 
@@ -211,7 +216,6 @@ void GLFluidsCanvas::OnIdle(wxIdleEvent& event)
   }
   
   this->Refresh();
-  
   /*  draw();*/
   //event.RequestMore();
 }
@@ -235,7 +239,7 @@ void GLFluidsCanvas::OnKeyPressed(wxKeyEvent& event)
 {
   double step=0.3;
   switch(event.GetKeyCode())
-    {      
+    {
     case WXK_LEFT: m_camera->moveOnSides(step); break;
     case WXK_RIGHT: m_camera->moveOnSides(-step); break;
     case WXK_UP: m_camera->moveOnFrontOrBehind(-step); break;
@@ -248,13 +252,13 @@ void GLFluidsCanvas::OnKeyPressed(wxKeyEvent& event)
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->decreaseRes ();
       break;
-
     case 'L': 
       m_framesCountForSwitch = 1;
       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->increaseRes ();
       break;
+    case WXK_SPACE : m_run = !m_run; break;
     }
   event.Skip();
 }
@@ -292,9 +296,10 @@ void GLFluidsCanvas::OnPaint (wxPaintEvent& event)
 	m_solvers[s]->displayBase();
       if (m_displayGrid)
 	m_solvers[s]->displayGrid();
+      if (m_displayDensity)
+	m_solvers[s]->displayDensityField();
       if (m_displayVelocity)
-	m_solvers[s]->displayVelocityField();
-	
+	m_solvers[s]->displayVelocityField();	
       glPopMatrix ();
     }
 

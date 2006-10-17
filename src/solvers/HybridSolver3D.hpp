@@ -1,29 +1,29 @@
-#if !defined(HYBRIDSOLVER_H)
-#define HYBRIDSOLVER_H
+#if !defined(HYBRIDSOLVER3D_H)
+#define HYBRIDSOLVER3D_H
 
-class BenchSolver;
+class BenchSolver3D;
 
-#include "GSsolver.hpp"
-#include "GCSSORsolver.hpp"
+#include "GSSolver3D.hpp"
+#include "GCSSORSolver3D.hpp"
 
 #include <fstream>
 
 #define NB_DIFF_LOGS 6
 #define NB_PROJ_LOGS 4
 
-class GSsolver;
-class GCSSORsolver;
-class HybridSolver;
-class LODHybridSolver;
+class GSSolver3D;
+class GCSSORSolver3D;
+class HybridSolver3D;
+class LODHybridSolver3D;
 
 /** La classe HybridSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
  * des solveurs à base des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
- * Elle hérite de GSsolver et GCSSORsolver qui tous deux héritent <b>virtuellement</b> de Solver
+ * Elle hérite de GSSolver3D et GCSSORSolver3D qui tous deux héritent <b>virtuellement</b> de Solver
  * de manière à n'avoir qu'une seule instance de Solver.
  *
  * @author	Flavien Bridault
  */
-class HybridSolver: public GSsolver, public GCSSORsolver
+class HybridSolver3D: public GSSolver3D, public GCSSORSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -38,7 +38,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
+  HybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
@@ -46,10 +46,10 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  HybridSolver (double omegaDiff, double omegaProj, double epsilon);
+  HybridSolver3D (double omegaDiff, double omegaProj, double epsilon);
   
   /** Desctructeur. */
-  virtual ~ HybridSolver ();
+  virtual ~ HybridSolver3D ();
   
 protected:
   virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
@@ -61,7 +61,7 @@ protected:
 /** @test La classe LODHybridSolver implémente un solveur de classe HybridSolver permettant d'utiliser une grille
  * adaptative. La résolution de la grille ne pourra jamais dépasser la résolution initiale passée au constructeur.
  */
-class LODHybridSolver: public HybridSolver
+class LODHybridSolver3D: public HybridSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -76,9 +76,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
+  LODHybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 		   double buoyancy, double omegaDiff, double omegaProj, double epsilon);
-  virtual ~LODHybridSolver ();
+  virtual ~LODHybridSolver3D ();
   
   virtual void divideRes ();  
   virtual void multiplyRes ();  

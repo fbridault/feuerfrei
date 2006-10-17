@@ -1,20 +1,20 @@
-#if !defined(GSSOLVER_H)
-#define GSSOLVER_H
+#if !defined(GSSOLVER3D_H)
+#define GSSOLVER3D_H
 
-class GSsolver;
+class GSSolver3D;
 
-#include "solver.hpp"
+#include "solver3D.hpp"
 
 /** La classe GCSSSolver propose d'utiliser la méthode de Gauss-Seidel comme
  * méthode de resolution des systèmes linéaires.
  * 
  * @author	Flavien Bridault et Michel Leblond
  */
-class GSsolver : public virtual Solver
+class GSSolver3D : public virtual Solver3D
 {
 public:
   /** Constructeur par défaut nécessaire pour l'héritage multiple */
-  GSsolver ();
+  GSSolver3D ();
   /** Constructeur du solveur.
    * @param position Position du solveur de la flamme.
    * @param n_x Résolution de la grille en x.
@@ -24,9 +24,9 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSsolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy);
+  GSSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy);
   /** Desctructeur. */
-  virtual ~GSsolver ();
+  virtual ~GSSolver3D ();
   
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion

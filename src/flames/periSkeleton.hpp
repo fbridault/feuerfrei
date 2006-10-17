@@ -28,7 +28,7 @@ public:
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    * @param pls Durée de vie initiale d'une particule.
    */
-  PeriSkeleton(Solver* const s, const Point& position, const Point& rootMoveFactor, 
+  PeriSkeleton(Solver3D* const s, const Point& position, const Point& rootMoveFactor, 
 	       LeadSkeleton *leadSkeleton, uint *pls);
   /** Destructeur. */
   virtual ~PeriSkeleton();
@@ -72,7 +72,7 @@ public:
    * @param s Pointeur sur le solveur de fluides.
    * @param leadSkeleton Pointeur sur le squelette guide relatif.
    */
-  FreePeriSkeleton(uint size, Solver* s, FreeLeadSkeleton* const leadSkeleton);
+  FreePeriSkeleton(uint size, Solver3D* s, FreeLeadSkeleton* const leadSkeleton);
   /** Destructeur */
   virtual ~FreePeriSkeleton();
   

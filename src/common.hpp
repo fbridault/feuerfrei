@@ -104,4 +104,12 @@ public:
   double extrudeDist[4];
 };
 
+class FluidsAppConfig{
+public:
+  uint width, height;
+  double clipping;
+  uint nbSolvers;
+  SolverConfig *solvers;
+};
+
 #endif

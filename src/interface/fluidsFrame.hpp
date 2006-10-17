@@ -39,7 +39,7 @@ enum
     IDM_Grid,
     IDM_Base,
     IDM_Velocity,
-    IDM_Particles,
+    IDM_Density,
     IDM_SolversSettings,
   };
 
@@ -71,6 +71,7 @@ public:
   void OnGridMenu(wxCommandEvent& event);
   void OnBaseMenu(wxCommandEvent& event);
   void OnVelocityMenu(wxCommandEvent& event);
+  void OnDensityMenu(wxCommandEvent& event);
   void OnSolversMenu(wxCommandEvent& event);
   /** Actions des checkboxes et autres */
   void OnCheckSaveImages(wxCommandEvent& event);
@@ -100,7 +101,7 @@ private:
   
   wxNotebook *m_solversNotebook;
   
-  FlameAppConfig m_currentConfig;
+  FluidsAppConfig m_currentConfig;
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */

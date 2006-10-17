@@ -19,12 +19,9 @@ class GLFlameCanvas;
 #include "../flames/DPengine.hpp"
 #include "../flames/solidePhoto.hpp"
 
-#include "../solvers/GSsolver.hpp"
-#include "../solvers/GCSSORsolver.hpp"
-#include "../solvers/HybridSolver.hpp"
-#include "../solvers/logResSolver.hpp"
-#include "../solvers/logResAvgSolver.hpp"
-#include "../solvers/logResAvgTimeSolver.hpp"
+#include "../solvers/GSSolver3D.hpp"
+#include "../solvers/GCSSORSolver3D.hpp"
+#include "../solvers/HybridSolver3D.hpp"
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -77,7 +74,7 @@ public:
   void ToggleSmoothShading(void) { 
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->toggleSmoothShading ();
-  };  
+  };
 //   void ToggleDepthPeeling(void) { 
 //     if(m_currentConfig->depthPeelingEnabled)
 //       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
@@ -139,7 +136,7 @@ private:
   
   DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
-  Solver **m_solvers;
+  Solver3D **m_solvers;
     
   /********* Variables relatives à la simulation *************************/
   FireSource **m_flames;

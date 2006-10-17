@@ -11,6 +11,12 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_TEXT_ENTER(IDT_FZAPMIN, SolverMainPanel::OnFZAPMINEnter)
   EVT_TEXT_ENTER(IDT_FZAPMAX, SolverMainPanel::OnFZAPMAXEnter)
   EVT_CHECKBOX(IDCHK_MOVE, SolverMainPanel::OnCheckMove)
+#ifdef RTFLUIDS_BUILD
+  EVT_BUTTON(IDB_LEFT, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_RIGHT, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_TOP, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_BOTTOM, SolverMainPanel::OnClickDensities)
+#endif
 END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
@@ -107,11 +113,24 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
 
+#ifdef RTFLUIDS_BUILD
+  m_densityLButton = new wxButton(this, IDB_LEFT, _("Left"));
+  m_densityRButton = new wxButton(this, IDB_RIGHT, _("Right"));
+  m_densityTButton = new wxButton(this, IDB_TOP, _("Top"));
+  m_densityBButton = new wxButton(this, IDB_BOTTOM, _("Bottom"));
+  
+  m_densitiesSizer = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Density"));
+  m_densitiesSizer->Add(m_densityLButton, 0, 0, 0);
+  m_densitiesSizer->Add(m_densityRButton, 0, 0, 0);
+  m_densitiesSizer->Add(m_densityTButton, 0, 0, 0);
+  m_densitiesSizer->Add(m_densityBButton, 0, 0, 0);
+  m_panelSizer->Add(m_densitiesSizer, 0, 0, 0);
+#endif
   m_moveCheckBox->SetValue(false);
   
-  SetSizer(m_panelSizer);
-  
   ComputeSlidersValues();
+  
+  SetSizerAndFit(m_panelSizer);
 }
 
 
@@ -121,11 +140,11 @@ void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
 		  m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 		  m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
 
-  m_solverXAxisPositionSlider->SetValue((int)(saveSliderValues.x*SLIDER_SENSIBILITY));
-  m_solverYAxisPositionSlider->SetValue((int)(saveSliderValues.y*SLIDER_SENSIBILITY));
-  m_solverZAxisPositionSlider->SetValue((int)(saveSliderValues.z*SLIDER_SENSIBILITY));
+  m_solverXAxisPositionSlider->SetValue((int)(m_saveSliderValues.x*SLIDER_SENSIBILITY));
+  m_solverYAxisPositionSlider->SetValue((int)(m_saveSliderValues.y*SLIDER_SENSIBILITY));
+  m_solverZAxisPositionSlider->SetValue((int)(m_saveSliderValues.z*SLIDER_SENSIBILITY));
   
-  saveSliderValues = oldValues;
+  m_saveSliderValues = oldValues;
   
   if(m_moveCheckBox->IsChecked())
     {
@@ -149,7 +168,7 @@ void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
       m_solverZAxisPositionSliderMax->Enable();
     }
   else
-    {      
+    {
       m_solverXAxisPositionSliderMin->Disable();
       m_solverXAxisPositionSliderMax->Disable();
       m_solverYAxisPositionSliderMin->Disable();
@@ -176,8 +195,8 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
   else
     {
       Point pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-		m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-		m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+	       m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	       m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       
       if(m_moveCheckBox->IsChecked()){
 	m_glBuffer->moveSolver(m_index, pt, true);
@@ -229,18 +248,18 @@ void SolverMainPanel::OnFZAPMAXEnter(wxCommandEvent& event)
   m_solverZAxisPositionSlider->SetRange(m_solverZAxisPositionSlider->GetMin(), val);
 }
 
+#ifdef RTFLUIDS_BUILD
+void SolverMainPanel::OnClickDensities(wxCommandEvent& event)
+{
+  m_glBuffer->addDensityInSolver(m_index, event.GetId());
+}
+#endif
+
 void SolverMainPanel::ComputeSlidersValues(void)
 {
-  int valx = (int)(m_solverConfig->position.x*SLIDER_SENSIBILITY);
-  int valy = (int)(m_solverConfig->position.y*SLIDER_SENSIBILITY);
-  int valz = (int)(m_solverConfig->position.z*SLIDER_SENSIBILITY);
-  
-  m_solverXAxisPositionSlider->SetValue(valx);
-  m_solverYAxisPositionSlider->SetValue(valy);
-  m_solverZAxisPositionSlider->SetValue(valz);
-  m_solverXAxisPositionSlider->SetRange(valx-SLIDER_RANGE,valx+SLIDER_RANGE);
-  m_solverYAxisPositionSlider->SetRange(valy-SLIDER_RANGE,valy+SLIDER_RANGE);
-  m_solverZAxisPositionSlider->SetRange(valz-SLIDER_RANGE,valz+SLIDER_RANGE);
+  m_saveSliderValues.x = m_solverConfig->position.x;
+  m_saveSliderValues.y = m_solverConfig->position.y;
+  m_saveSliderValues.z = m_solverConfig->position.z;
   
   m_solverXAxisPositionSliderMin->Clear();
   m_solverXAxisPositionSliderMax->Clear();
@@ -249,12 +268,19 @@ void SolverMainPanel::ComputeSlidersValues(void)
   m_solverZAxisPositionSliderMin->Clear();
   m_solverZAxisPositionSliderMax->Clear();
   
-  (*m_solverXAxisPositionSliderMin) << valx-SLIDER_RANGE;
-  (*m_solverXAxisPositionSliderMax) << valx+SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMin) << valy-SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMax) << valy+SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMin) << valz-SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMax) << valz+SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMin) << m_saveSliderValues.x-SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMax) << m_saveSliderValues.x+SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMin) << m_saveSliderValues.y-SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMax) << m_saveSliderValues.y+SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMin) << m_saveSliderValues.z-SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMax) << m_saveSliderValues.z+SLIDER_RANGE;
+
+  m_solverXAxisPositionSliderMin->Disable();
+  m_solverXAxisPositionSliderMax->Disable();
+  m_solverYAxisPositionSliderMin->Disable();
+  m_solverYAxisPositionSliderMax->Disable();
+  m_solverZAxisPositionSliderMin->Disable();
+  m_solverZAxisPositionSliderMax->Disable();
 }
 
 #ifdef RTFLAMES_BUILD
@@ -361,7 +387,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
   m_intensityCoefSlider->SetValue((int)(m_flameConfig->intensityCoef*10));
   
-  SetSizer(m_panelSizer);
+  SetSizerAndFit(m_panelSizer);
 }
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)

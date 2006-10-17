@@ -1,0 +1,47 @@
+#if !defined(GSSOLVER2D_H)
+#define GSSOLVER2D_H
+
+class GSsolver2D;
+
+#include "solver2D.hpp"
+
+/** La classe GSolver propose d'utiliser la méthode de Gauss-Seidel comme
+ * méthode de resolution des systèmes linéaires.
+ * 
+ * @author	Flavien Bridault et Michel Leblond
+ */
+class GSSolver2D : public virtual Solver2D
+{
+public:
+  /** Constructeur par défaut nécessaire pour l'héritage multiple */
+  GSSolver2D ();
+  /** Constructeur du solveur.
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   */
+  GSSolver2D (Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
+  /** Desctructeur. */
+  virtual ~GSSolver2D ();
+  
+protected:
+  /** Effectue une résolution des systèmes linéaires de la diffusion
+   * et de la projection à l'aide de la méthode itérative de Gauss-Seidel.
+   * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
+   * @param x Composante à traiter
+   * @param x0 Composante x au pas de temps précédent
+   * @param a Valeur des coefficients dans la matrice A
+   * @param div Fraction des coefficients sur la diagonale de la matrice A ( 1/(1+6a) pour la diffusion
+   * et 1/6 pour la projection
+   * @param nb_steps Nombre d'itérations à effectuer
+   */
+  virtual void GS_solve(unsigned char b, double *const x, const double *const x0, double a, double div, uint nb_steps);
+  
+  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
+  virtual void project (double *const p, double *const div);  
+};
+
+#endif

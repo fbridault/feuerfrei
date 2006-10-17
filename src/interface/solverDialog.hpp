@@ -59,7 +59,11 @@ protected:
 class SolverDialog: public wxDialog 
 {
 public:
+#ifdef RTFLAMES_BUILD
   SolverDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
+#else
+  SolverDialog(wxWindow* parent, int id, const wxString& title, FluidsAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
+#endif
 
 private:
   void doLayout();
@@ -77,7 +81,11 @@ private:
   SolverPanel *m_solverPanels[NB_MAXSOLVERS];
   wxNotebook *m_solverNotebook;
   wxButton *m_addSolverButton, *m_deleteSolverButton, *m_okButton, *m_cancelButton;
+#ifdef RTFLAMES_BUILD
   FlameAppConfig *m_currentConfig;
+#else
+  FluidsAppConfig *m_currentConfig;
+#endif
   DECLARE_EVENT_TABLE()
 };
 

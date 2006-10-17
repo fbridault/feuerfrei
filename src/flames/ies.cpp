@@ -7,7 +7,7 @@ IES::IES(const char* const filename)
   char extension[4],chaine[255];
   uint lg,z,a;
   //  int test;
-  float *pintensite,tmp;
+  float *pintensite;
 
   // Chargement de l'extension du fichier (3 derniers caracteres)
   lg=strlen(filename);

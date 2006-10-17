@@ -1,21 +1,21 @@
 #if !defined(LOGRESAVGTIMESOLVER_H)
 #define LOGRESAVGTIMESOLVER_H
 
-class LogResAvgTimeSolver;
+class LogResAvgTimeSolver3D;
 
-#include "logResAvgSolver.hpp"
+#include "logResAvgSolver3D.hpp"
 
 #include <fstream>
 
-class LogResAvgSolver;
+class LogResAvgSolver3D;
 
-/** La classe LogResAvgTimeSolver permet de loguer les moyennes des valeurs de résidus des solveurs à base
+/** La classe LogResAvgTimeSolver3D permet de loguer les moyennes des valeurs de résidus des solveurs à base
  * des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR. A la différence
- * de LogResAvgSolver, elle stocke les moyennes des valeurs de résidus en fonction du temps
+ * de LogResAvgSolver3D, elle stocke les moyennes des valeurs de résidus en fonction du temps
  *
  * @author	Flavien Bridault
  */
-class LogResAvgTimeSolver: public LogResAvgSolver
+class LogResAvgTimeSolver3D: public LogResAvgSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -31,11 +31,11 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgTimeSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+  LogResAvgTimeSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
 		       double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
 		       double omegaProj, double epsilon);
   /** Destructeur. */
-  virtual ~LogResAvgTimeSolver ();
+  virtual ~LogResAvgTimeSolver3D ();
   
 private:
   void vel_step ();

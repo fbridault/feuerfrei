@@ -1,4 +1,4 @@
-#include "HybridSolver.hpp"
+#include "HybridSolver3D.hpp"
 
 #include <wx/wxprec.h>
 
@@ -6,31 +6,31 @@
 #include <wx/wx.h>
 #endif
 
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver::HybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
+/* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
+HybridSolver3D::HybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy), GCSSORsolver(omegaDiff, omegaProj, epsilon)
+  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
 }
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver::HybridSolver (double omegaDiff, double omegaProj, double epsilon) : 
-  GCSSORsolver(omegaDiff, omegaProj, epsilon)
+/* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
+HybridSolver3D::HybridSolver3D (double omegaDiff, double omegaProj, double epsilon) : 
+  GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
 }
 
-HybridSolver::~HybridSolver ()
+HybridSolver3D::~HybridSolver3D ()
 {  
 }
 
 /* Pas de diffusion */
-void HybridSolver::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+void HybridSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }
 
-void HybridSolver::project (double *const p, double *const div)
+void HybridSolver3D::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, 
     h_y = 1.0 / m_nbVoxelsY,
@@ -76,7 +76,7 @@ void HybridSolver::project (double *const p, double *const div)
   //set_bnd (3, w);
 }
 
-// void HybridSolver::iterate ()
+// void HybridSolver3D::iterate ()
 // { 
 //   ::wxStartTimer();
 //   vel_step ();
@@ -91,10 +91,10 @@ void HybridSolver::project (double *const p, double *const div)
 //   cout << m_time << "      \r"; cout.flush();
 // }
 
-LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
+LODHybridSolver3D::LODHybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
 			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver (position, n_x, n_y, n_z, dim, timeStep, buoyancy), 
-  HybridSolver (omegaDiff, omegaProj, epsilon)
+  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy), 
+  HybridSolver3D (omegaDiff, omegaProj, epsilon)
 {
   /* Attention n_x, n_y et n_z doivent être impairs */
   initialNbVoxelsX = n_x;
@@ -110,14 +110,14 @@ LODHybridSolver::LODHybridSolver (Point& position, uint n_x, uint n_y, uint n_z,
   memset (m_wTmp, 0, m_nbVoxels * sizeof (double));
 }
 
-LODHybridSolver::~LODHybridSolver ()
+LODHybridSolver3D::~LODHybridSolver3D ()
 {
   delete[]m_uTmp;
   delete[]m_vTmp;
   delete[]m_wTmp;
 }
 
-void LODHybridSolver::divideRes ()
+void LODHybridSolver3D::divideRes ()
 {
   if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
     cerr << "Minimum grid resolution already reached !" << endl;
@@ -148,8 +148,8 @@ void LODHybridSolver::divideRes ()
   buildDLGrid ();
   
   m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
-  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimZTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   m_halfNbVoxelsZ = m_nbVoxelsZ/2;
@@ -160,7 +160,7 @@ void LODHybridSolver::divideRes ()
   t2nx=2*nx;
 }
 
-void LODHybridSolver::decreaseRes ()
+void LODHybridSolver3D::decreaseRes ()
 {
   if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
     cerr << "Minimum grid resolution already reached !" << endl;
@@ -183,8 +183,8 @@ void LODHybridSolver::decreaseRes ()
   buildDLGrid ();
   
   m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
-  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimZTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   m_halfNbVoxelsZ = m_nbVoxelsZ/2;
@@ -195,7 +195,7 @@ void LODHybridSolver::decreaseRes ()
   t2nx=2*nx;
 }
 
-void LODHybridSolver::multiplyRes ()
+void LODHybridSolver3D::multiplyRes ()
 {  
   if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
     cerr << "Maximum grid resolution already reached !" << endl;
@@ -226,8 +226,8 @@ void LODHybridSolver::multiplyRes ()
   buildDLGrid ();
   
   m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
-  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimZTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   m_halfNbVoxelsZ = m_nbVoxelsZ/2;
@@ -238,7 +238,7 @@ void LODHybridSolver::multiplyRes ()
   t2nx=2*nx;
 }
 
-void LODHybridSolver::increaseRes ()
+void LODHybridSolver3D::increaseRes ()
 {  
   if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
     cerr << "Maximum grid resolution already reached !" << endl;
@@ -261,8 +261,8 @@ void LODHybridSolver::increaseRes ()
   buildDLGrid ();
   
   m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimXTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
-  m_dimXTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_dimZTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   m_halfNbVoxelsZ = m_nbVoxelsZ/2;

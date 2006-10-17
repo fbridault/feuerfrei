@@ -57,7 +57,7 @@ bool FluidsApp::OnInit()
   if(argc == 2){
     configFileName = wxString(argv[1]);
   }else
-    configFileName = _("params/solver.ini");
+    configFileName = _("params/solver.slv");
 
   if( !wxFile::Exists(configFileName) ){
     cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;

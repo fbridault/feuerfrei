@@ -215,10 +215,7 @@ void FlameDialog::doLayout()
   buttonSizer->Add(m_cancelButton, 0, wxADJUST_MINSIZE, 0);
   sizer->Add(buttonSizer, 0, wxEXPAND, 0);
   SetAutoLayout(true);
-  SetSizer(sizer);
-  sizer->Fit(this);
-  sizer->SetSizeHints(this);
-  Layout();
+  SetSizerAndFit(sizer);
 }
 
 void FlameDialog::OnClickButtonAdd(wxCommandEvent& event)

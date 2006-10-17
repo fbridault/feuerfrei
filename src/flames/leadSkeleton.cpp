@@ -5,12 +5,12 @@
 
 #include "periSkeleton.hpp"
 #include "../scene/graphicsFn.hpp"
-#include "../solvers/solver.hpp"
+#include "../solvers/solver3D.hpp"
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
-LeadSkeleton::LeadSkeleton (Solver * const s, const Point& position, const Point& rootMoveFactor,  uint *pls) :
+LeadSkeleton::LeadSkeleton (Solver3D * const s, const Point& position, const Point& rootMoveFactor,  uint *pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
 }

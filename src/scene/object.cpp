@@ -61,6 +61,8 @@ Object::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 {
   if(currentMaterialIndex != m_lastMaterialIndex){
     if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
+//       if(!m_scene->getMaterial(currentMaterialIndex)->getName()->compare("OCCULISTElaraire"))
+// 	cerr << m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture()->getTexture() << endl;
       glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable(GL_TEXTURE_2D);
       m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture()->bind();

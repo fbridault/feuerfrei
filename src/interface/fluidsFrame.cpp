@@ -352,12 +352,11 @@ void FluidsFrame::OnDensityMenu(wxCommandEvent& event)
 
 void FluidsFrame::OnSolversMenu(wxCommandEvent& event)
 {
-  SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
-  if(solverDialog->ShowModal() == wxID_OK){
+  SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
+  if(solverDialog.ShowModal() == wxID_OK){
     InitSolversPanels();
     m_glBuffer->Restart();
   }
-  solverDialog->Destroy();
 }
 
 void FluidsFrame::SetFPS(int fps)

@@ -12,7 +12,7 @@ class FireSource;
 #include <vector>
 #include <list>
 
-class COBJReader;
+class Material;
 class Object;
 
 #define NB_DISPLAY_LISTS 8
@@ -107,12 +107,25 @@ public:
    */
   void addMaterial(Material *material)
   { m_materialArray.push_back(material); };
+  
+  /** Ajoute une texture dans la scène.
+   * @param texture Pointeur sur la nouvelle texture à référencer.
+   * @return Indice OpenGL de la texture.
+   */
+  GLuint addTexture(Texture *texture)
+  { m_texturesArray.push_back(texture); return m_texturesArray.size()-1; };
 
   /** Donne l'indice d'un matériau dans la liste des matériaux de la scène.
    * @param name Nom du matériau.
    * @return Index du matériau.
    */
   int getMaterialIndexByName(const char *name);
+  
+  /** Donne l'indice d'une texture dans la liste des textures de la scène.
+   * @param name Nom du fichier de la texture.
+   * @return Index de la texture, -1 si elle n'existe pas
+   */
+  int searchTextureIndexByName(const char *name);
   
   /** Ajoute une source lumineuse à la scène.
    * @param newSource pointeur vers la source lumineuse à ajouter.
@@ -163,6 +176,13 @@ public:
   Material* getMaterial(const int& index) const
   { return (m_materialArray[index]); };
 
+  /** Lecture d'une texture spécifique contenue dans la scène.
+   * @param index Indice de la texture à obtenir.
+   * @return Un pointeur vers la texture recherchée.
+   */
+  Texture* getTexture(const int& index) const
+  { return (m_texturesArray[index]); };
+  
   /** Dessin de la scène pour les objets texturés */
   void drawSceneTEX(void) const
   {
@@ -239,6 +259,7 @@ private:
   vector<Object*> m_objectsArrayWSV; /** Liste des objets de la scene projetant des ombres. */
   vector<Source*> m_lightSourcesArray; /** Liste des sources de lumière. */
   vector<Material*> m_materialArray; /** Liste des matériaux.*/
+  vector<Texture*> m_texturesArray; /** Liste des textures.*/
 
   /** Display lists de la scène
    * [0] Tous les objets de la scène ne projetant pas d'ombres

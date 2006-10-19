@@ -436,9 +436,9 @@ Kd 0.784314 0.784314 0.784314
 Ks 0 0 0
 illum 2
 Ns 8
-map_Kd LeafBrown.jpg
-map_opacity LeafBrown.jpg
-map_d LeafBrown.jpg
+map_Kd LeafBrown.png
+map_opacity LeafBrown.png
+map_d LeafBrown.png
 
 newmtl bouket3
 Ka 0 0 0

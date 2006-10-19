@@ -49,6 +49,7 @@ GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 GLFluidsCanvas::~GLFluidsCanvas()
 {
+  DestroyScene();
   delete [] m_pixels;
   if (m_context)
     cgDestroyContext (m_context);

@@ -69,12 +69,20 @@ public:
    * @return Identifiant de la texture.
    */
   const GLuint getTexture() const {return m_texName;};
+  
+  /** Donne le nom du fichier de la texture.
+   * @return Nom du fichier de la texture.
+   */
+  const wxString getName() const {return m_fileName;};
+
 
   /** Active la texture pour l'objet courant avec glBindTexture().
    */
   const void bind() const { glBindTexture(m_type, m_texName); };
   
 private:
+  void loadWithAlphaChannel();
+
   /** Identifiant OpenGL de la texture */
   GLuint m_texName;
 
@@ -83,6 +91,7 @@ private:
   
   /** Image */
   wxImage *m_wxtex;
+  wxString m_fileName;
 };
 
 #endif

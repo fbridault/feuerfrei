@@ -400,29 +400,29 @@ void Solver3D::addExternalForces(Point& position, bool move)
     if( force.x > 0)
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addUsrc (m_nbVoxelsX - 1, j, i, -strength.x);
+	  addUsrc (m_nbVoxelsX, j, i, -strength.x);
     else
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addUsrc (2, j, i, strength.x); 
+	  addUsrc (1, j, i, strength.x); 
   if(force.y)
     if( force.y > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j < widthz; j++)
-	  addVsrc (i, m_nbVoxelsY - 1, j, -strength.y/10.0);
+	  addVsrc (i, m_nbVoxelsY, j, -strength.y/10.0);
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j <= widthz; j++)
-	  addVsrc (i, 2, j, strength.y/10.0);
+	  addVsrc (i, 1, j, strength.y/10.0);
   if(force.z)
     if( force.z > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addWsrc (i, j, m_nbVoxelsZ - 1, -strength.z);
+	  addWsrc (i, j, m_nbVoxelsZ, -strength.z);
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addWsrc (i, j, 2, strength.z);
+	  addWsrc (i, j, 1, strength.z);
 }
 
 void Solver3D::prolonger(double  *const v2h, double *const vh)

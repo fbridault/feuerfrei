@@ -8,6 +8,9 @@ class Material;
 #include "intensity.hpp"
 #include "texture.hpp"
 
+class Texture;
+class Scene;
+
 using namespace std;
 
 /** 
@@ -27,12 +30,13 @@ private:
   double m_Kss;    /**Indice de tache spéculaire*/
   Intensity m_Ka;  /**Composante de réflexion ambiante.*/
   
-  Texture *m_diffuseTexture;  /** Pointeur sur la texture diffuse. NULL si le matériau n'est pas texturée. */
+  Scene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
+  int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
 public:
   /**
    * Constructeur par défaut. Crée un matériau blanc ambiant.
    */
-  Material();
+  Material( Scene * const scene );
   /**
    * Constructeur.
    * @param name Nom donné au matériau.
@@ -42,9 +46,9 @@ public:
    * @param specularExponent Indice de tache spéculaire.
    * @param tex Pointeur optionel sur la texture.
    */
-  Material( const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, Texture * const tex=NULL);
+  Material( Scene * const scene, const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, int tex=-1);
   /** Destructeur par défaut. */
-  ~Material(){if(m_diffuseTexture!=NULL) delete m_diffuseTexture;};
+  ~Material(){};
   
   /** Retourne le nom du matériau.
    * @return Nom du matériau.
@@ -77,13 +81,12 @@ public:
    * @return True si le matériau a une texture.
    */
   const bool hasDiffuseTexture() const
-  { return (m_diffuseTexture!=NULL);};
+  { return (m_diffuseTexture!=-1);};
 
   /** Retourne un pointeur sur la texture du matériau.
    * @return Pointeur sur la texture
    */
-  const Texture* getDiffuseTexture() const
-  { return m_diffuseTexture;};
+  const Texture* getDiffuseTexture() const;
 };
 
 #endif

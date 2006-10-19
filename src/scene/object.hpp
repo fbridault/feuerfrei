@@ -80,7 +80,7 @@ public:
    * Constructeur par d&eacute;faut.
    * @param scene Pointeur vers la scene.
    */
-  Object (Scene *scene)
+  Object (Scene * const scene)
   {
     m_scene = scene;
     m_attributes = 0;
@@ -90,7 +90,7 @@ public:
    * @param scene Pointeur vers la scene.
    * @param offset Décalage de l'objet dans la scène.
    */
-  Object (Scene *scene, Point& offset)
+  Object (Scene * const scene, Point& offset)
   {
     m_scene = scene;
     m_attributes = 0;

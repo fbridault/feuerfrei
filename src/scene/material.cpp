@@ -1,25 +1,30 @@
 /* Material.cpp: implementation of the Material class. */
 #include "material.hpp"
 
-Material::Material () : m_name("default")
+#include "scene.hpp"
+
+Material::Material (Scene * const scene) : m_name("default")
 {
   double coeff[3] = { 1.0, 1.0, 1.0 };
+ 
+  m_scene = scene;
   
   m_Kss = 0;
 
   m_Ka = Intensity (coeff);
   
-  m_diffuseTexture = NULL;
+  m_diffuseTexture = -1;
 }
 
-Material::Material ( const string& name, 
-		       double *const ambientCoefficients,
-		       double *const diffuseCoefficients,
-		       double *const specularCoefficients,
-		       double specularExponent, Texture *const tex) : m_name(name)
+Material::Material ( Scene * const scene, const string& name, 
+		     double *const ambientCoefficients,
+		     double *const diffuseCoefficients,
+		     double *const specularCoefficients,
+		     double specularExponent, int tex) : m_name(name)
 {
+  m_scene = scene;
   m_Kss = specularExponent;
-
+  
   if (ambientCoefficients != NULL)
     {
       m_Ka = Intensity (ambientCoefficients);
@@ -65,3 +70,8 @@ void Material::apply () const
   
   glColor4fv(matDiffuse);
 }
+
+const Texture* Material::getDiffuseTexture() const
+{ 
+  return m_scene->getTexture(m_diffuseTexture);
+};

@@ -7,7 +7,7 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
   m_flames = flames;
   m_nbFlames = nbFlames;
   
-  addMaterial(new Material());
+  addMaterial(new Material(this));
   cerr << "Chargement de la scène " << fileName << endl;
   importOBJ(fileName);
 }
@@ -111,6 +111,11 @@ Scene::~Scene ()
        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
     delete (*materialArrayIterator);
   m_materialArray.clear ();
+  
+  for (vector < Texture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
+       texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
+    delete (*texturesArrayIterator);
+  m_texturesArray.clear ();
   
   glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
 }
@@ -445,7 +450,7 @@ void Scene::importMTL(const char* fileName)
   char lettre, lettre2;
   char buffer[255];
   char texturePath[512];
-  Texture *nouvelle_texture = NULL;
+  int nouvelle_texture = -1;
   string name_nouvelle_matiere;
   
   strcpy(buffer,m_currentDir);
@@ -524,16 +529,19 @@ void Scene::importMTL(const char* fileName)
 	  //cout << name_nouvelle_matiere << endl;
 	  break;
 	case 'i':		// considéré comme le dernier, le matériau est créé
-	  addMaterial(new Material (name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
-	  cerr << "ajout matériau :" << name_nouvelle_matiere << endl;
-	  nouvelle_texture = NULL;
+	  addMaterial(new Material (this, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
+// 	  cerr << "ajout matériau :" << name_nouvelle_matiere << endl;
+	  nouvelle_texture = -1;
 	  break;
 	case 'm':		//map_K?
 	  matFile >> buffer >> buffer;
 	  //nouvelle_texture = new Texture (buffer);
 	  strcpy(texturePath, m_currentDir);
 	  strcat(texturePath,buffer);
-	  nouvelle_texture = new Texture (wxString(texturePath, wxConvUTF8));
+	  if( (nouvelle_texture = searchTextureIndexByName(texturePath)) == -1){
+	    nouvelle_texture = addTexture(new Texture (wxString(texturePath, wxConvUTF8)));
+	  }
+	  
 	  break;
 	default:
 	  matFile.getline(buffer, sizeof (buffer));
@@ -550,7 +558,7 @@ int Scene::getVertexCount()
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
     nb += (*objectsArrayIteratorWSV)->getVertexArraySize();
-
+  
   for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
@@ -566,7 +574,7 @@ int Scene::getPolygonsCount()
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
     nb += (*objectsArrayIteratorWSV)->getPolygonsCount();
-
+  
   for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
@@ -582,11 +590,26 @@ int Scene::getMaterialIndexByName(const char *name)
        materialArrayIterator != m_materialArray.end ();
        materialArrayIterator++)
     {
-      if (!strcmp (name, (*materialArrayIterator)->getName()->c_str ()))
+      if ( !(*materialArrayIterator)->getName()->compare (name) )
 	return index;
       
       index++;
     } 
   cerr << "Error loading unknown material " << name << endl;
   return getMaterialIndexByName("default");
+}
+
+int Scene::searchTextureIndexByName(const char *name)
+{ 
+  int index=0;
+  for (vector<Texture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
+       texturesArrayIterator != m_texturesArray.end ();
+       texturesArrayIterator++)
+    {
+      if ( !strcmp((*texturesArrayIterator)->getName().fn_str(), name) ) {
+	return index;
+      }
+      index++;
+    }
+  return -1;
 }

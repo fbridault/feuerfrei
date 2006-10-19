@@ -217,7 +217,7 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
   wxString groupName,tabName;
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
-      groupName.Printf(_("/Solver%d/"),i);
+      groupName.Printf(_("/Solver%d/"), i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
       
@@ -229,14 +229,14 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
       m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
       m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
       
-      m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
-      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);
+      m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim, 1.0);
+      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep, 0.4);
       
       m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
       
-      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.5);
-      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.5);
-      m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon,0.00001);
+      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff, 1.5);
+      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj, 1.5);
+      m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon, 0.00001);
       m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
       
       tabName.Printf(_("Solver #%d"),i+1);
@@ -286,6 +286,10 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
+  /* Crée un bug lors d'un restart si la valeur est différente de la précédente */
+  /* Cela survient dès que l'on a utilisé une méthode DeleteAllPages sur les Notebooks */
+  /* Je ne vois pas le rapport pour l'instant mais cela ne se produit pas avec GTK 2.8 */
+  //m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
   
   if(m_currentConfig.depthPeelingEnabled)
     m_depthPeelingSlider->Enable();
@@ -474,7 +478,6 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_mainSizer->Fit(this);
       m_mainSizer->SetSizeHints(this);
       Layout();
-  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
     }
   }
 }

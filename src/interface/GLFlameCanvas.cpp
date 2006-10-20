@@ -481,7 +481,7 @@ void GLFlameCanvas::drawScene()
   /**** Affichage de la scène ****/
   glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     
-//   glEnable (GL_LIGHTING);
+  glEnable (GL_LIGHTING);
     
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     {
@@ -656,20 +656,20 @@ GLFlameCanvas::cast_shadows_double ()
   glBlendFunc (GL_ONE, GL_ONE);
 
   /* Activation de l'éclairage ambiant uniquement */
-   GLfloat val_ambiant[]={1.0,1.0,1.0,1.0};
-   GLfloat null[]={0.0,0.0,0.0,1.0};
+  GLfloat val_ambiant[]={1.0,1.0,1.0,1.0};
+  GLfloat null[]={0.0,0.0,0.0,1.0};
   
-   glLightfv(GL_LIGHT0,GL_DIFFUSE,null);
-   glLightfv(GL_LIGHT0,GL_SPECULAR,null);
-   glLightfv(GL_LIGHT0,GL_AMBIENT,val_ambiant);
-   glEnable(GL_LIGHT0);
+  glLightfv(GL_LIGHT0,GL_DIFFUSE,null);
+  glLightfv(GL_LIGHT0,GL_SPECULAR,null);
+  glLightfv(GL_LIGHT0,GL_AMBIENT,val_ambiant);
+  glEnable(GL_LIGHT0);
   
   /* Dessin des ombres en noir & blanc */
   m_scene->drawSceneWT ();
-  
+   
   glDisable (GL_STENCIL_TEST);
   /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
-
+  
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
     for (f = 0; f < m_currentConfig->nbFlames; f++)

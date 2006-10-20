@@ -214,7 +214,8 @@ void LineFlame::generateAndDrawSparks()
     
     if ((*sparksListIterator)->isDead ())
       {
-	sparksListIterator =  m_sparksList.erase(sparksListIterator); 
+	sparksListIterator =  m_sparksList.erase(sparksListIterator);
+	delete par;
 	continue;
       }
         

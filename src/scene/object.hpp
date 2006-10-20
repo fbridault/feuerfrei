@@ -68,6 +68,7 @@ protected:
    * si le point courant utilise un autre matériau qui nécessite un appel à glMaterial().
    */
   int m_lastMaterialIndex;
+  bool m_previousTriangleWasTextured;
   
   /** Décalage de l'objet dans la scène. */
   Point m_offset;
@@ -160,6 +161,14 @@ public:
   virtual int getNormalsArraySize () const
   {
     return m_normalsArray.size ();
+  };
+  
+  /** Lecture du nombre de normales contenus dans l'objet.
+   * @return Nombre de normales.
+   */
+  virtual int getTexCoordsArraySize () const
+  {
+    return m_texCoordsArray.size ();
   };
   
   /** Lecture du nombre de polygones contenus dans l'objet.

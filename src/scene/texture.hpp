@@ -75,11 +75,12 @@ public:
    */
   const wxString getName() const {return m_fileName;};
 
-
   /** Active la texture pour l'objet courant avec glBindTexture().
    */
   const void bind() const { glBindTexture(m_type, m_texName); };
   
+  const bool hasAlpha() const { return m_hasAlpha; };
+
 private:
   void loadWithAlphaChannel();
 
@@ -92,6 +93,7 @@ private:
   /** Image */
   wxImage *m_wxtex;
   wxString m_fileName;
+  bool m_hasAlpha;
 };
 
 #endif

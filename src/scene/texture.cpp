@@ -7,6 +7,7 @@ using namespace std;
 Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
 {  
   m_type = type;
+  m_hasAlpha = true;
   
   glGenTextures(1, &m_texName);
   glBindTexture(m_type, m_texName); 
@@ -23,6 +24,7 @@ Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
 
 Texture::Texture(uint width, uint height, GLenum func, bool dummy)
 {
+  m_hasAlpha = false;
   m_type = GL_TEXTURE_RECTANGLE_ARB;
   
   glGenTextures(1, &m_texName);
@@ -63,9 +65,11 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
     cout << "OK" << endl;    
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
-    else
+    else{
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+      m_hasAlpha = false;
+    }
   }
   m_wxtex->Destroy();
 }
@@ -91,9 +95,11 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
     cout << "OK" << endl;
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
-    else
+    else{
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+      m_hasAlpha = false;
+    }
   }
   m_wxtex->Destroy();  
 }
@@ -118,9 +124,11 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
     cout << "OK" << endl;    
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
-    else
+    else{
+      m_hasAlpha = false;
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+    }
   }
   /* Semble nécessaire pour éviter un plantage lors de la libération de la wxImage  */
   /* Toutefois cette fonction plante si on la met dans le destructeur, je la laisse */
@@ -132,6 +140,7 @@ Texture::Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat *texels)
 {  
   m_wxtex = NULL;
   m_type = GL_TEXTURE_3D;
+  m_hasAlpha = false;
   
   glGenTextures(1, &m_texName);
   glBindTexture(GL_TEXTURE_3D, m_texName);
@@ -156,6 +165,7 @@ Texture::~Texture()
 void Texture::loadWithAlphaChannel()
 {
   cout << "Found alpha channel..." << endl;
+  m_hasAlpha = true;
   u_char *imgcpy,*tmp;
   tmp = imgcpy = new u_char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];
   

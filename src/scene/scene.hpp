@@ -159,28 +159,28 @@ public:
    * @param index Indice du polygone à obtenir.
    * @return Un pointeur vers le polygone recherché.
    */
-  Object* getObject(const int& index) const
+  Object* getObject(const int index) const
   { return (m_objectsArray[index]); };
-
+  
   /** Lecture d'une source lumineuse spécifique contenue dans la scène.
    * @param index Indice de la source à obtenir.
    * @return Un pointeur vers la source recherchée.
    */
-  Source* getSource(const int& index) const
+  Source* getSource(const int index) const
   { return (m_lightSourcesArray[index]); };
-
+  
   /** Lecture d'un matériau spécifique contenue dans la scène.
    * @param index Indice du matériau à obtenir.
    * @return Un pointeur vers le matériau recherché.
    */
-  Material* getMaterial(const int& index) const
+  Material* getMaterial(const int index) const
   { return (m_materialArray[index]); };
-
+  
   /** Lecture d'une texture spécifique contenue dans la scène.
    * @param index Indice de la texture à obtenir.
    * @return Un pointeur vers la texture recherchée.
    */
-  Texture* getTexture(const int& index) const
+  Texture* getTexture(const int index) const
   { return (m_texturesArray[index]); };
   
   /** Dessin de la scène pour les objets texturés */
@@ -199,7 +199,7 @@ public:
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
   };
-
+  
   /** Dessin de la scène pour les objets non texturés.
    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
    * scène éclairée avec des solides photométriques.
@@ -260,7 +260,7 @@ private:
   vector<Source*> m_lightSourcesArray; /** Liste des sources de lumière. */
   vector<Material*> m_materialArray; /** Liste des matériaux.*/
   vector<Texture*> m_texturesArray; /** Liste des textures.*/
-
+  
   /** Display lists de la scène
    * [0] Tous les objets de la scène ne projetant pas d'ombres
    * [1] Objets texturés ne projetant pas d'ombres

@@ -17,7 +17,7 @@ void Scene::createDisplayLists(void)
   m_displayLists[0] = glGenLists(NB_DISPLAY_LISTS);
   for(int i=1; i<8; i++)
     m_displayLists[i] = m_displayLists[0] + i;
-  
+
   glNewList(m_displayLists[0],GL_COMPILE);
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
@@ -168,7 +168,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
   while (!objFile.eof())
     {
       objFile >> lettre;
-      
+      if(objFile.eof()) break;
       switch (lettre)
 	{
 	default:
@@ -209,6 +209,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	  nbObjectTexCoords = nbTexCoords;
 	  break;
 	case '\n':
+	case ' ':
 	  break;
 	case 'm':
 	  /* Définition des matériaux */
@@ -225,26 +226,21 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	      break;
 	    case ' ':
 	      objFile >> x >> y >> z;
-	      if(!skip){
+	      if(!skip)
 		currentObject->addVertex(new Point(x, y, z));
-		normales = coord_textures = 0;
-	      }
 	      nbVertex++;
 	      break;
 	    case 'n':
-	      objFile >> x >> y >> z;	
-	      if(!skip){      
-		currentObject->addNormal (new Vector(x, y, z));
-		normales = 1;
-	      }
+	      objFile >> x >> y >> z;
+	      if(!skip)
+		currentObject->addNormal (new Vector(x, y, z));	      
 	      nbNormals++;
 	      break;
 	    case 't':
 	      objFile >> x >> y;
-	      if(!skip){	      
-		currentObject->addTexCoord (new Point(x, y, 0));
-		coord_textures = 2;
-	      }
+	      if(!skip)
+		/* On inverse la coordonnée y */
+		currentObject->addTexCoord (new Point(x, -y, 0));	      
 	      nbTexCoords++;
 	      break;
 	    }
@@ -256,13 +252,20 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	  }
 	  if(!objectsAttributesSet){
 	    objectsAttributesSet = true;
+	    if(currentObject->getNormalsArraySize())
+	      normales = 1;
+	    else
+	      normales = 0;
+	    if(currentObject->getTexCoordsArraySize())
+	      coord_textures = 2;
+	    else
+	      coord_textures = 0;
 	    currentObject->setAttributes(coord_textures + normales);
 	  }
 	  switch (coord_textures + normales)
 	    {
 	    case 0:
 	      objFile >> a >> b >> c;// >> d;
-	      
 	      // if (valeurLues < 3){
 // 		cout << "Erreur de chargement : Le fichier "
 // 		     << fileName
@@ -282,23 +285,15 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	      objFile >> b >> drop >> drop >> bn;
 	      objFile >> c >> drop >> drop >> cn;
 	      //	      objFile >> d >> drop >> drop >> dn;
-	     //  valeurLues = fscanf (pfichier_obj, " %d//%d %d//%d %d//%d %d//%d", &a,
-// 				   &an, &b, &bn, &c, &cn, &d, &dn);
 // 	      if (valeurLues < 6)
 // 		{
 // 		  cout << "Erreur de chargement : Le fichier " << fileName
 // 		       << " contient des erreurs d'indexation de points.\n";
 // 		  return;
 // 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1,
-						 an - nbObjectNormals - 1,
-						 UNDEFINED, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1,
-						 bn - nbObjectNormals - 1,
-						 UNDEFINED, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1,
-						 cn - nbObjectNormals - 1,
-						 UNDEFINED, matIndex));
+	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1, UNDEFINED, matIndex),
+				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1, UNDEFINED, matIndex),
+				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1, UNDEFINED, matIndex));
 	      
 	    //   if (valeurLues > 6)
 // 		  cout << "problème: facette non triangulaire !!!" << endl;	      
@@ -308,23 +303,15 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	      objFile >> b >> drop >> w;
 	      objFile >> c >> drop >> w;
 	      //	      objFile >> d >> drop >> w;
-//	      valeurLues = fscanf (pfichier_obj, " %d/%d %d/%d %d/%d %d/%d", &a, &w,
-// 				   &b, &w, &c, &w, &d, &w);
 // 	      if (valeurLues < 6)
 // 		{
 // 		  cout << "Erreur de chargement : Le fichier " << fileName
 // 		       << " contient des erreurs d'indexation de points.\n";
 // 		  return;
 // 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, 
-						 an - nbObjectNormals - 1,
-						 UNDEFINED, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1, 
-						 bn - nbObjectNormals - 1, 
-						 UNDEFINED, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1, 
-						 cn - nbObjectNormals - 1, 
-						 UNDEFINED, matIndex));
+	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1, UNDEFINED, matIndex),
+				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1, UNDEFINED, matIndex),
+				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1, UNDEFINED, matIndex));
 	      
 	      // if (valeurLues > 6)
 // 		cout << "problème: facette non triangulaire !!!" << endl;
@@ -334,32 +321,24 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	      objFile >> b >> drop >> bt >> drop >> bn;
 	      objFile >> c >> drop >> ct >> drop >> cn;
 	      //	      objFile >> d >> drop >> dt >> drop >> dn;
-	      // valeurLues = fscanf (pfichier_obj,
-// 				   " %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", &a, &at,
-// 				   &an, &b, &bt, &bn, &c, &ct, &cn, &d, &dt, &dn);
 	      // if (valeurLues < 9)
 // 		{
 // 		  cout << "Erreur de chargement : Le fichier " << fileName
 // 		       << " contient des erreurs d'indexation de points.\n";
 // 		  return;
 // 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1,
-						 an - nbObjectNormals - 1,
-						 at - nbObjectTexCoords - 1, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1,
-						 bn - nbObjectNormals - 1,
-						 bt - nbObjectTexCoords - 1, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1,
-						 cn - nbObjectNormals - 1,
-						 ct - nbObjectTexCoords - 1, matIndex));
-	      
+	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1,
+						       at - nbObjectTexCoords - 1, matIndex),
+				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1,
+						       bt - nbObjectTexCoords - 1, matIndex),
+				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1,
+						       ct - nbObjectTexCoords - 1, matIndex));
 	      // if (valeurLues > 9)
 // 		cout << "problème: facette non triangulaire !!!" << endl;
 	      break;
 	      
 	    default:
-	      cout << "Erreur de chargement : Le fichier " << fileName <<
-		" contient des erreurs d'indexation de points.\n";
+	      cout << "Erreur de chargement : Le fichier " << fileName << " contient des erreurs d'indexation de points.\n";
 	      return false;
 	      break;
 	    }
@@ -367,14 +346,15 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	case 'u':
 	  objFile >> buffer >> buffer;
 	  matIndex = getMaterialIndexByName(buffer);
+	  break;
 	}
     }
   objFile.close ();
-	      
+  
   if(importSingleObject)
     return (currentObject != NULL);
   else
-    return true;  
+    return true;
 }
 
 void Scene::getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix)
@@ -452,6 +432,7 @@ void Scene::importMTL(const char* fileName)
   char texturePath[512];
   int nouvelle_texture = -1;
   string name_nouvelle_matiere;
+  bool newMat=false;
   
   strcpy(buffer,m_currentDir);
   strcat(buffer,fileName);
@@ -463,6 +444,9 @@ void Scene::importMTL(const char* fileName)
   
   double Kd[3], Ka[3], Ks[3], alpha, shini;
   
+  /* Problème: selon l'exportateur, les champs ne sont pas écrits dans le même ordre */
+  /* On est donc sûr d'avoir lu tous les champs d'un matériau que lorsque l'on arrive */
+  /* au matériau suivant ou à la fin du fichier/ */
   while (!matFile.eof())
     {
       matFile >> lettre;
@@ -521,33 +505,41 @@ void Scene::importMTL(const char* fileName)
 	  matFile >> alpha;
 	  break;
 	case 'n':
+	  /* On ajoute donc d'abord le matériau précédemment trouvé */
+	  if(newMat){
+	    addMaterial(new Material (this, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
+	    nouvelle_texture = -1;
+	    newMat=false;
+	  }
 	  Ks[0] = Ks[1] = Ks[2] = Kd[0] = Kd[1] = Kd[2] = Ka[0] = Ka[1] = Ka[2] = 0.0;
 	  alpha = 1.0;
 	  shini = 0.0;
 	  matFile >> buffer >> buffer;
 	  name_nouvelle_matiere = buffer;
-	  //cout << name_nouvelle_matiere << endl;
+	  newMat = true;
 	  break;
-	case 'i':		// considéré comme le dernier, le matériau est créé
-	  addMaterial(new Material (this, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
-// 	  cerr << "ajout matériau :" << name_nouvelle_matiere << endl;
-	  nouvelle_texture = -1;
+	case 'i':		// ignoré pour le moment
 	  break;
 	case 'm':		//map_K?
 	  matFile >> buffer >> buffer;
 	  //nouvelle_texture = new Texture (buffer);
 	  strcpy(texturePath, m_currentDir);
 	  strcat(texturePath,buffer);
-	  if( (nouvelle_texture = searchTextureIndexByName(texturePath)) == -1){
+	  if( (nouvelle_texture = searchTextureIndexByName(texturePath)) == -1) {
 	    nouvelle_texture = addTexture(new Texture (wxString(texturePath, wxConvUTF8)));
 	  }
-	  
 	  break;
 	default:
 	  matFile.getline(buffer, sizeof (buffer));
 	  break;
 	}
     }
+  /* On ajoute enfin le dernier matériau trouvé */
+  if(newMat){
+    addMaterial(new Material (this, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
+    nouvelle_texture = -1;
+    newMat=false;
+  }
   matFile.close();
 }
 
@@ -590,8 +582,9 @@ int Scene::getMaterialIndexByName(const char *name)
        materialArrayIterator != m_materialArray.end ();
        materialArrayIterator++)
     {
-      if ( !(*materialArrayIterator)->getName()->compare (name) )
+      if ( !(*materialArrayIterator)->getName()->compare (name) ){
 	return index;
+      }
       
       index++;
     } 

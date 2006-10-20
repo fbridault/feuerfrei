@@ -61,14 +61,19 @@ Object::checkAndApplyMaterial(int currentMaterialIndex, bool tex)
 {
   if(currentMaterialIndex != m_lastMaterialIndex){
     if(m_scene->getMaterial(currentMaterialIndex)->hasDiffuseTexture() && tex){
-//       if(!m_scene->getMaterial(currentMaterialIndex)->getName()->compare("OCCULISTElaraire"))
-// 	cerr << m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture()->getTexture() << endl;
-      glActiveTextureARB(GL_TEXTURE0_ARB);
-      glEnable(GL_TEXTURE_2D);
+      if(!m_previousTriangleWasTextured){
+	glActiveTextureARB(GL_TEXTURE0_ARB);
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	m_previousTriangleWasTextured = true;
+      }
       m_scene->getMaterial(currentMaterialIndex)->getDiffuseTexture()->bind();
-      glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }else
-      glDisable(GL_TEXTURE_2D);
+      if(m_previousTriangleWasTextured){
+	glDisable(GL_TEXTURE_2D);
+	m_previousTriangleWasTextured = false;
+      }
+    
     m_scene->getMaterial(currentMaterialIndex)->apply();
     m_lastMaterialIndex = currentMaterialIndex;
   }
@@ -80,6 +85,7 @@ Object::draw (char drawCode, bool tex)
   PointIndices *index;
   int vertexCount=0;
   m_lastMaterialIndex=-1;
+  m_previousTriangleWasTextured=false;
   
   switch(m_attributes){
   case 0:
@@ -107,18 +113,19 @@ Object::draw (char drawCode, bool tex)
 	  checkAndApplyMaterial(0,tex);
 	else
 	  checkAndApplyMaterial(index->vm,tex);
-	glBegin (GL_POLYGON);
+	glBegin (GL_TRIANGLES);
       }
       
-      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
+      glNormal3d (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
       glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
 		  m_vertexArray[index->v]->z);
-      vertexCount++;
-      if(vertexCount==3){
+      
+      if(vertexCount==2){
 	glEnd ();
 	vertexCount=0;
-      }
+      }else
+	vertexCount++;
     }
     break;
   case 3:
@@ -126,8 +133,8 @@ Object::draw (char drawCode, bool tex)
 	 vertexIndexArrayIterator != m_vertexIndexArray.end ();
 	 vertexIndexArrayIterator++){
       index = *vertexIndexArrayIterator;
-
-     if(drawCode == TEXTURED){
+      
+      if(drawCode == TEXTURED){
 	/* Ne dessiner que si il y a une texture */
 	if(!m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	  continue;
@@ -136,26 +143,30 @@ Object::draw (char drawCode, bool tex)
 	  /* Ne dessiner que si il n'y a pas de texture */
 	  if(m_scene->getMaterial(index->vm)->hasDiffuseTexture())
 	    continue;
-
+      
       if(!vertexCount){
 	if(drawCode == AMBIENT)
 	  checkAndApplyMaterial(0,tex);
 	else
 	  checkAndApplyMaterial(index->vm,tex);
-	glBegin (GL_POLYGON);
+	glBegin (GL_TRIANGLES);
       }
       
-      glTexCoord2f ( m_texCoordsArray[index->vt]->x, m_texCoordsArray[index->vt]->y );
-      glNormal3f (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
+      glTexCoord2d ( m_texCoordsArray[index->vt]->x, m_texCoordsArray[index->vt]->y );
+      glNormal3d (m_normalsArray[index->vn]->x, m_normalsArray[index->vn]->y, 
 		  m_normalsArray[index->vn]->z);
       glVertex3d (m_vertexArray[index->v]->x, m_vertexArray[index->v]->y, 
 		  m_vertexArray[index->v]->z);
-      vertexCount++;
-      if(vertexCount==3){
+      
+      if(vertexCount==2){
 	glEnd ();
 	vertexCount=0;
-      }
+      }else
+	vertexCount++;
     }
     break;
+  }
+  if(m_previousTriangleWasTextured){
+    glDisable(GL_TEXTURE_2D);
   }
 }

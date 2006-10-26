@@ -6,6 +6,8 @@ class FireSource;
 
 #include "flames.hpp"
 
+#include "../scene/graphicsFn.hpp"
+
 #include "realFlames.hpp"
 #include "../solvers/solver3D.hpp"
 #include "../scene/texture.hpp"
@@ -50,7 +52,6 @@ public:
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
     m_lightPosition[2] = pos.z;
-
     m_centreSP = pos;
   }
   
@@ -58,8 +59,7 @@ public:
   void drawShadowVolume ();  
   
   /** Active la source de lumière. */
-  void switchOn ();
-  
+  void switchOn ();  
   /** Eteint la source */
   void switchOff ();
   
@@ -96,7 +96,7 @@ public:
   
   /** Supprime le fichier IES courant et en utilise un autre. */
   void useNewIESFile(const char* const IESFilename) { delete m_iesFile; m_iesFile = new IES(IESFilename); };
-
+  
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique. */
   virtual void computeIntensityPositionAndDirection() = 0;
   
@@ -120,7 +120,7 @@ private:
   
   /** Pointeur sur la scène. */
   Scene *m_scene;
-
+  
   /** Pointeur sur le shader générateur de volumes d'ombres. */
   CgSVShader *m_cgShader;
   
@@ -138,8 +138,7 @@ private:
 
 /** La classe FireSource désigne un objet qui produit du feu. Il se compose d'un luminaire (classe Object), de
  * flammes (classe RealFlame) et d'une source de lumière (classe FlameLight). Cette classe est abstraite.<br>
- * La position de la flamme stockée dans m_position est une position relative par rapport au solveur à laquelle
- * elle appartient. Pour obtenir la position absolue dans le repère du monde, il faut passer par la méthode
+ * Pour obtenir la position absolue dans le repère du monde, il faut passer par la méthode
  * getPosition() qui additionne la position relative de la flamme à la position absolue du solveur dans le monde.
  * Toute la construction de la flamme est faite dans le repère (0,0,0). Lors du dessin de la flamme dans la méthode
  * drawFlame(), une translation est effectuée en récupérant la position avec getPosition() pour placer la flamme
@@ -184,13 +183,13 @@ public:
 //     for (uint i = 0; i < m_nbFlames; i++)
 //       m_flames[i]->setTesselateMode();
 //   };
-
+  
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
   Point getPosition ()
   {
-    return Point(m_position+m_solver->getPosition());
+    return Point(m_solver->getPosition());
   }
   
   /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
@@ -229,17 +228,6 @@ public:
     glPopMatrix();
   }  
   
-  virtual void drawCachedFlame()
-  {
-    Point pt(m_solver->getPosition());
-    glPushMatrix();
-    glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawCachedFlame();  
-    glPopMatrix();
-  } 
-  
   /** Dessine la flamme et sa mèche.
    * @param displayParticle affiche ou non les particules des squelettes.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
@@ -265,7 +253,7 @@ public:
       glPopMatrix();
     }
   }
-    
+  
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    *
@@ -314,7 +302,16 @@ public:
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    * pour orienter le solide photométrique.
    */
-  virtual Vector getMainDirection();
+  virtual Vector getMainDirection()
+  {
+    Vector averageVec;
+    
+    for (uint i = 0; i < m_nbFlames; i++)
+      averageVec += m_flames[i]->getMainDirection ();
+    averageVec = averageVec/m_nbFlames;
+    
+    return(averageVec);
+  }
   
   virtual void locateInSolver(){
     for (uint i = 0; i < m_nbFlames; i++)
@@ -335,9 +332,6 @@ protected:
   
   /** Pointeur sur le solveur de fluides */
   Solver3D *m_solver;
-
-  /** Position relative de la source dans le solveur auquel elle appartient */
-  Point m_position;
 
   /** Est-ce que la source possède un luminaire */
   bool m_hasLuminary;

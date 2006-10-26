@@ -20,9 +20,9 @@ Candle::Candle (FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char
 
 Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index,
 		       CgSVShader * shader, const char *wickFileName):
-  DetachableFireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
+  FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
 {
-  m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, this, 0.01);
+  m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, 0.01);
 }
 
 Torch::Torch(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *torchName, uint index,
@@ -40,7 +40,7 @@ Torch::Torch(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *t
   for (list < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, torchName, this, 0.1, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, torchName, 0.1, (*objListIterator).c_str(), this);
     }
 }
 
@@ -59,7 +59,7 @@ CampFire::CampFire(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const c
   for (list < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, fireName, this, 0.04, (*objListIterator).c_str());
+      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, fireName, 0.04, (*objListIterator).c_str(), this);
     }
 }
 

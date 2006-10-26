@@ -133,17 +133,17 @@ void PhotometricSolidsRenderer::draw(u_char color)
   
   /* Affichage des objets sans couleur */
   if(color == 0){
-    m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
+    m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_scene->drawScene(m_SPVertexShaderTex);
     m_SPVertexShaderTex.disableProfile();
     m_SPFragmentShader[color]->disableProfile();
   }else{
     /* Affichage des objets avec textures */
-    m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPVertexShaderTex.enableShader();
     m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
+    m_SPVertexShaderTex.setModelViewProjectionMatrix();
     m_SPFragmentShader[color]->setIsTextured(1);
     m_scene->drawSceneTEX();
     m_SPFragmentShader[color]->setIsTextured(0);

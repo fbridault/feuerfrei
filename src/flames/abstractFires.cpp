@@ -71,7 +71,7 @@ void FlameLight::drawShadowVolume ()
   glPopMatrix ();
   m_cgShader->setModelViewProjectionMatrix ();
   
-  m_scene->drawSceneWSV();
+  m_scene->drawSceneWSV(*m_cgShader);
   
   m_cgShader->disableProfile ();
 }
@@ -98,11 +98,9 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver3D *s, uint nbFlames,  Sc
   if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
     
   if(objName != NULL){
-    if(scene->getMTLFileNameFromOBJ(filename, mtlName)){
-    
-      cerr << filename << " utilise le fichier MTL " << mtlName << endl;
+    if(scene->getMTLFileNameFromOBJ(filename, mtlName))
       scene->importMTL(mtlName);
-    }  
+    
     scene->getObjectsNameFromOBJ(filename, objList, objName);
     m_luminary = new Object* [objList.size()];
     nbObj=objList.size();
@@ -135,7 +133,6 @@ FireSource::FireSource(FlameConfig *flameConfig, Solver3D *s, uint nbFlames,  Sc
 	glEndList();
       }
     }
-  m_position=flameConfig->position;
   m_breakable=flameConfig->breakable;
   
   /* On efface le luminaire, il n'appartient pas à la scène */
@@ -157,25 +154,16 @@ FireSource::~FireSource()
 
 void FireSource::build()
 {
-  Point averagePos, tmp;
+  Point averagePos;
   
   for (uint i = 0; i < m_nbFlames; i++){
-    averagePos +=  m_flames[i]->getCenter ();
     m_flames[i]->build();
+    averagePos += m_flames[i]->getCenter ();
   }
-  averagePos = averagePos/m_nbFlames;
+  averagePos *= m_solver->getDim();
+  averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
-}
-
-Vector FireSource::getMainDirection()
-{
-  Vector averageVec, tmp;
-  
-  for (uint i = 0; i < m_nbFlames; i++)
-    averageVec = (averageVec*i + m_flames[i]->getMainDirection ())/(i+1);
-  
-  return(averageVec);
 }
 
 void FireSource::computeIntensityPositionAndDirection()
@@ -192,9 +180,6 @@ void FireSource::computeIntensityPositionAndDirection()
 //   m_intensity = sin(m_intensity * PI/2.0);
   /* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
   m_intensity = sqrt(m_intensity);
-  // le centre du SP est la position de la flamme + la moitié du vecteur orientation
-  // (orientation = vecteur position vers dernière particule)
-//   m_centreSP= getPosition()+(o/2.0);
   
   // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
   // de o projeté perpendiculairement dans ce plan
@@ -244,9 +229,9 @@ void DetachableFireSource::build()
   DetachedFlame* flame;
   
   for (uint i = 0; i < m_nbFlames; i++){
-    averagePos += m_flames[i]->getCenter ();
     m_flames[i]->breakCheck();
     m_flames[i]->build();
+    averagePos += m_flames[i]->getCenter ();
   }
   list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
   while( flamesIterator != m_detachedFlamesList.end()){
@@ -257,7 +242,8 @@ void DetachableFireSource::build()
     }else
       flamesIterator++;
   }
-  averagePos = averagePos/m_nbFlames;
+  averagePos *= m_solver->getDim();
+  averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
 }

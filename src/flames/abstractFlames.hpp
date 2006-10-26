@@ -59,12 +59,7 @@ public:
    * @return false si un problème dans la contruction est survenu (pas assez de particules par exemple)
    */
   virtual bool build() = 0;
-  
-  void drawCachedFlame ()
-  {
-    glCallList(m_displayList);
-  }
-    
+      
   virtual void drawLineFlame();  
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
@@ -226,8 +221,6 @@ protected:
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;
   
-  GLuint m_displayList;
-
   /** Configuration de la flamme */
   FlameConfig *m_flameConfig;
 };
@@ -282,22 +275,22 @@ public:
    * pour orienter le solide photométrique.
    * @return Direction.
    */
-  virtual Vector getMainDirection() = 0;
+  virtual Vector getMainDirection() const = 0;
   
   /** Retourne le centre de la flamme.
    * @return Centre de la flamme.
    */
-  virtual Point getCenter () = 0;
+  virtual Point getCenter () const = 0;
   
   /** Renvoie un pointeur vers le sommet de la flamme.
    * @return Pointeur vers le sommet.
    */
-  virtual Point* getTop() = 0;
+  virtual Point* getTop() const = 0;
   
   /** Renvoie un pointeur vers le bas de la flamme.
    * @return Pointeur vers le bas.
    */
-  virtual Point* getBottom() = 0;
+  virtual Point* getBottom() const = 0;
   
 protected:
   /* Texture pour le halo */
@@ -360,11 +353,11 @@ public:
   
   virtual bool build();
   
-  virtual Vector getMainDirection() = 0;  
-  virtual Point getCenter () = 0;
+  virtual Vector getMainDirection() const = 0;  
+  virtual Point getCenter () const = 0;
   
-  virtual Point* getTop() = 0;
-  virtual Point* getBottom() = 0;
+  virtual Point* getTop() const = 0;
+  virtual Point* getBottom() const = 0;
   
   /** Méthode permettant d'informer à la flamme de se localiser dans le solveur */
   /* Elle doit être appelée dès qu'un changement de résolution de la grille intervient */

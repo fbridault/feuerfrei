@@ -39,7 +39,7 @@ public:
  *
  * @author	Flavien Bridault
  */
-class Firmalampe : public DetachableFireSource
+class Firmalampe : public FireSource
 {
 public:
   /** Constructeur d'une torche.

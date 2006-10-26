@@ -37,8 +37,8 @@ public:
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
   LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver3D *s,
-	     const char *wickFileName, DetachableFireSource *parentFire, double detachedFlamesWidth, 
-	     const char *wickName=NULL);
+	     const char *wickFileName, double detachedFlamesWidth, 
+	     const char *wickName=NULL, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle) { 
@@ -49,14 +49,33 @@ public:
   
   virtual void drawWick(bool displayBoxes);
   
-  Vector getMainDirection();
-  virtual Point getCenter ();
-  
+  virtual Vector getMainDirection() const
+  {
+    Vector direction;
+    for(uint i = 0; i < m_nbLeadSkeletons; i++){
+      direction += *(m_leadSkeletons[i]->getParticle(0));
+    }
+    direction = direction / m_nbLeadSkeletons;
+    
+    return direction;
+  }
+
+  virtual Point getCenter () const
+  {
+    Point averagePos;    
+    for (uint i = 1; i < m_nbLeadSkeletons-1 ; i++)    
+      averagePos += *m_leadSkeletons[i]->getMiddleParticle ();
+    
+    averagePos = averagePos / (m_nbLeadSkeletons-2);
+    
+    return averagePos;
+  }
+
   void addForces(u_char perturbate, u_char fdf);
   
-  Point* getTop();  
-  Point* getBottom();
-  
+  Point* getTop() const { return m_leadSkeletons[m_nbLeadSkeletons/2]->getParticle(0); };  
+  Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };
+
   void breakCheck();
   
   /** Méthode permettant de générer des étincelles dans le feu.
@@ -109,17 +128,17 @@ public:
   
   virtual void drawWick(bool displayBoxes);
   
-  Vector getMainDirection(){
+  virtual Vector getMainDirection() const {
     return(*(m_leadSkeletons[0]->getMiddleParticle()));
   };
-  virtual Point getCenter (){    
-    return (*m_leadSkeletons[0]->getMiddleParticle () + m_position);
+  virtual Point getCenter () const {
+    return (*m_leadSkeletons[0]->getMiddleParticle ()+m_position);
   }; 
   
   void addForces(u_char perturbate, u_char fdf=0);
   
-  Point* getTop(){ return m_leadSkeletons[0]->getParticle(0); };
-  Point* getBottom() { return m_leadSkeletons[0]->getRoot(); };
+  Point* getTop() const { return m_leadSkeletons[0]->getParticle(0); };
+  Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };
   
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division.
    * Dans le cas d'une PointFlame, cette méthode ne fait rien du tout pour l'instant.

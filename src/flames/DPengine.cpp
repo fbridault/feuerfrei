@@ -103,8 +103,6 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles)
       /* la profondeur de la passe précédente */
       m_depthTex[1-m_curDepthTex]->bind();
       glCallList(m_flamesDisplayList);
-      //  for (f = 0; f < m_nbFlames; f++)
-      //    m_flames[f]->drawCachedFlame ();
     }
     m_peelProgram.disableShader();
     

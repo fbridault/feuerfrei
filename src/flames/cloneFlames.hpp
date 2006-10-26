@@ -44,18 +44,13 @@ public:
     glPopMatrix();
   };
   
-  Vector getMainDirection(){
-    return(m_source->getMainDirection());
-  };
-  
-  virtual Point getCenter (){    
-    return (m_source->getCenter() + m_position);
-  };
+  virtual Vector getMainDirection() const { return(m_source->getMainDirection()); };  
+  virtual Point getCenter() const { return (m_source->getCenter()); };
   
   virtual bool build();
   
-  Point* getTop(){ return m_source->getTop(); };
-  Point* getBottom() { return m_source->getBottom(); };
+  Point* getTop() const { return m_source->getTop(); };
+  Point* getBottom() const { return m_source->getBottom(); };
   
 protected:
   RealFlame *m_source;

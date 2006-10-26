@@ -7,8 +7,8 @@
 /**********************************************************************************************************************/
 
 LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver3D *s, 
-		      const char *wickFileName, DetachableFireSource *parentFire, 
-		      double detachedFlamesWidth, const char *wickName ) :
+		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
+		      DetachableFireSource *parentFire ) :
   RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
   m_wick (wickFileName, flameConfig->skeletonsNumber, scene, flameConfig->position, wickName)
 {
@@ -116,22 +116,6 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
     }
 }
 
-Point LineFlame::getCenter ()
-{
-  Point averagePos;
-  Particle *tmp;
-  
-  for (uint i = 0; i < m_nbLeadSkeletons-2  ; i++){
-    tmp = m_leadSkeletons[i+1]->getMiddleParticle ();
-    
-    averagePos = (averagePos + *tmp)/(i+1);
-  }
-  
-  averagePos += m_position;
-  
-  return averagePos;
-}
-
 void LineFlame::breakCheck()
 {
   double split,proba;
@@ -237,27 +221,6 @@ void LineFlame::generateAndDrawSparks()
     GraphicsFn::SolidSphere (0.01, 4, 4);
     glPopMatrix ();
   }
-}
-
-Vector LineFlame::getMainDirection()
-{
-  Vector direction;
-  for(uint i = 0; i < m_nbLeadSkeletons; i++){
-    direction = direction + *(m_leadSkeletons[i]->getParticle(0));
-  }
-  direction = direction / m_nbLeadSkeletons;
-
-  return direction;
-}
-
-Point* LineFlame::getTop()
-{ 
-  return m_leadSkeletons[0]->getParticle(0); 
-}
-
-Point* LineFlame::getBottom()
-{
- return m_leadSkeletons[0]->getRoot(); 
 }
 
 /**********************************************************************************************************************/

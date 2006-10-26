@@ -27,7 +27,6 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;
   
-  m_displayList = glGenLists(1);
   m_nurbs = gluNewNurbsRenderer();
   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, flameConfig->samplingTolerance);
   gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
@@ -46,9 +45,8 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
   
   m_position=flameConfig->position;
+  cerr << m_position << endl;
   
-  m_displayList = glGenLists(1);
-
   m_flameConfig = flameConfig;
 
   m_tex = tex;
@@ -93,8 +91,6 @@ NurbsFlame::NurbsFlame(NurbsFlame* const source, uint nbSkeletons, ushort nbFixe
   gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
   
   m_position=source->m_position;
-  
-  m_displayList = glGenLists(1);
 
   m_tex = tex;
 }
@@ -103,7 +99,6 @@ NurbsFlame::~NurbsFlame()
 {
   gluDeleteNurbsRenderer(m_nurbs);
   
-  glDeleteLists(m_displayList,1);
   delete[]m_ctrlPoints;
   delete[]m_uknots;
   delete[]m_vknots;
@@ -130,7 +125,7 @@ void NurbsFlame::drawLineFlame ()
 {
   if (m_toggle)
     {
-      glColor4f (0.0, 0.0, 0.0, 1.0);      
+      glColor4f (1.0, 1.0, 1.0, 1.0);      
       drawNurbs ();
     }
   else

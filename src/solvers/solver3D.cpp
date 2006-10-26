@@ -343,7 +343,7 @@ void Solver3D::displayArrow (Vector& direction)
   double norme_vel = sqrt (direction.x * direction.x +
 			   direction.y * direction.z +
 			   direction.z * direction.z);
-  double taille = m_dimX * m_dimY * m_dimZ * norme_vel / 2.5;
+  double taille = m_dimX * m_dimY * m_dimZ * norme_vel*4;
   double angle;
   Vector axeRot, axeCone (0.0, 0.0, 1.0);
 
@@ -377,11 +377,11 @@ void Solver3D::addExternalForces(Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = strength.z = .005*m_nbVoxelsX;  
+    strength.x = strength.y = strength.z = .001*m_nbVoxelsX;  
     m_position=position;
   }else{
     force = position;
-    strength = position * (.01*m_nbVoxelsX);
+    strength = position * (.0003*m_nbVoxelsX);
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
     strength.z = fabs(strength.z);  

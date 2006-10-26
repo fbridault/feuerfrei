@@ -52,6 +52,7 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
   uint i,j,k;
   
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
+  double *sav1, *sav2;
   
   // calcul du carré de la norme de b
 //   t = t1;
@@ -76,6 +77,7 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
   // calcul du premier résidu r
   //calcul de r = b - A*x0
   t = t1; 
+  
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j= 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
@@ -170,11 +172,13 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
     alpha=(alpha) ? rho0/alpha : 0;
 		
     // calcul de x = x + alpha.p
+    // calcul de r = r -alpha*q
     t = t1;
     for ( k = 1; k <= m_nbVoxelsZ; k++){
       for ( j = 1; j <= m_nbVoxelsY; j++){
 	for ( i = 1; i <= m_nbVoxelsX; i++){
 	  x0[t]+=alpha*m_p[t];
+	  m_r[t]-=alpha*m_q[t];
 	  t++;
 	}//for i
 	t+=2;
@@ -182,19 +186,6 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
       t+=2*nx;
     }//for k
     
-    // calcul de r = r -alpha*q
-    t = t1;
-    for ( k = 1; k <= m_nbVoxelsZ; k++){
-      for ( j = 1; j <= m_nbVoxelsY; j++){
-	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  m_r[t]-=alpha*m_q[t];
-	  t++;
-	}//for i
-	t+=2;
-      }//for j
-      t+=t2nx;
-    }//for k
-
     // calcul du carré de la norme du résidu
 //     norm2=0.0f;
 //     t = t1;

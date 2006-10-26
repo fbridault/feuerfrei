@@ -471,41 +471,42 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void GLFlameCanvas::drawScene()
 {
   uint f,s;
-
+  
   if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   else
     glBlendFunc (GL_ONE, GL_ZERO);
-    
+  
   /******************* AFFICHAGE DE LA SCENE *******************************/
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->drawWick (m_displayWickBoxes);
-    
+  
   /**** Affichage de la scène ****/
   glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    
-  glEnable (GL_LIGHTING);
-    
-  for (f = 0; f < m_currentConfig->nbFlames; f++)
-    {
-      if (m_drawShadowVolumes)
-	m_flames[f]->drawShadowVolume ();
-      if (!m_currentConfig->shadowsEnabled)
+  
+    glEnable (GL_LIGHTING);
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
+    if (!m_currentConfig->shadowsEnabled)
+      for (f = 0; f < m_currentConfig->nbFlames; f++)
 	m_flames[f]->switchOn ();
-    }
+  }
+  
+  if (m_drawShadowVolumes)
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
+      m_flames[f]->drawShadowVolume ();
   
   if (m_currentConfig->shadowsEnabled)
-    cast_shadows_double();
+    castShadows();  
   else
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
-    else
+    else{
       m_scene->drawScene();
-    
-  glPopAttrib ();
-    
-  glDisable (GL_LIGHTING);
-    
+      glDisable (GL_LIGHTING);
+    }
+  
+  glPopAttrib ();  
+  
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -513,7 +514,7 @@ void GLFlameCanvas::drawScene()
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
       Point position(m_solvers[s]->getPosition ());
-	
+      
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
       if (m_displayBase)
@@ -522,7 +523,7 @@ void GLFlameCanvas::drawScene()
 	m_solvers[s]->displayGrid();
       if (m_displayVelocity)
 	m_solvers[s]->displayVelocityField();
-	
+      
       glPopMatrix ();
     }
 }
@@ -608,8 +609,7 @@ void GLFlameCanvas::OnSize(wxSizeEvent& event)
     }
 }
 
-void
-GLFlameCanvas::cast_shadows_double ()
+void GLFlameCanvas::castShadows ()
 {
   uint f;
   
@@ -648,9 +648,9 @@ GLFlameCanvas::cast_shadows_double ()
   
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->drawShadowVolume ();
-
+  
   glPopAttrib ();
-
+  
   /* On teste ensuite Ã  l'endroit où il faut dessiner */
   glDepthFunc (GL_LEQUAL);
 
@@ -658,7 +658,7 @@ GLFlameCanvas::cast_shadows_double ()
   glStencilFunc (GL_EQUAL, 0, ~0);
   glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFunc (GL_ONE, GL_ONE);
-
+  
   /* Activation de l'éclairage ambiant uniquement */
   GLfloat val_ambiant[]={1.0,1.0,1.0,1.0};
   GLfloat null[]={0.0,0.0,0.0,1.0};
@@ -675,7 +675,7 @@ GLFlameCanvas::cast_shadows_double ()
   /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
   
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){    
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->switchOn ();
     

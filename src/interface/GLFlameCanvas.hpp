@@ -99,8 +99,8 @@ private:
   void WriteFPS ();
   void DrawVelocity (void);
   
-  void cast_shadows_double_multiple();
-  void cast_shadows_double();
+//   void cast_shadows_double_multiple();
+  void castShadows();
   
   /** Configuration de l'application */
   FlameAppConfig *m_currentConfig;

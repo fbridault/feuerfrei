@@ -63,6 +63,7 @@ private:
   wxNotebook* m_flameNotebook;
   wxButton *m_addFlameButton, *m_deleteFlameButton, *m_okButton, *m_cancelButton;
   FlameAppConfig *m_currentConfig;
+  wxBoxSizer* m_sizer;
   DECLARE_EVENT_TABLE()
 };
 

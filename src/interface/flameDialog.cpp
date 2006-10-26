@@ -201,21 +201,21 @@ FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  Flame
 
 void FlameDialog::doLayout()
 {
-  wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+  m_sizer = new wxBoxSizer(wxVERTICAL);
   for(uint i = 0; i < m_currentConfig->nbFlames; i++)
     {
       wxString tabName(_("Flame #")); tabName << i+1;
       m_flameNotebook->AddPage(m_flamePanels[i], tabName);
     }
-  sizer->Add(m_flameNotebook, 1, wxEXPAND, 0);
+  m_sizer->Add(m_flameNotebook, 1, wxEXPAND, 0);
   wxBoxSizer* buttonSizer = new wxBoxSizer(wxHORIZONTAL);
   buttonSizer->Add(m_addFlameButton, 0, wxADJUST_MINSIZE, 0);
   buttonSizer->Add(m_deleteFlameButton, 0, wxADJUST_MINSIZE, 0);
   buttonSizer->Add(m_okButton, 0, wxADJUST_MINSIZE|wxLEFT, 20);
   buttonSizer->Add(m_cancelButton, 0, wxADJUST_MINSIZE, 0);
-  sizer->Add(buttonSizer, 0, wxEXPAND, 0);
+  m_sizer->Add(buttonSizer, 0, wxEXPAND, 0);
   SetAutoLayout(true);
-  SetSizerAndFit(sizer);
+  SetSizerAndFit(m_sizer);
 }
 
 void FlameDialog::OnClickButtonAdd(wxCommandEvent& event)

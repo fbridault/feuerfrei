@@ -126,8 +126,6 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_densitiesSizer->Add(m_densityBButton, 0, 0, 0);
   m_panelSizer->Add(m_densitiesSizer, 0, 0, 0);
 #endif
-  m_moveCheckBox->SetValue(false);
-  
   ComputeSlidersValues();
   
   SetSizerAndFit(m_panelSizer);

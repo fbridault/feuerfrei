@@ -207,7 +207,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
 {  
   m_currentConfig = config;
-
+  
   InitUISettings();
   SetCurrent();
   InitGL(recompileShaders);
@@ -226,7 +226,7 @@ void GLFlameCanvas::Restart (void)
   Disable();
   m_init = false;
   DestroyScene();
-
+  
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   glViewport (0, 0, m_width, m_height);
   
@@ -289,12 +289,12 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 
 void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 {
-  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/500.0);
+  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/1000.0);
 }
 
 void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 {
-  double step=0.3;
+  double step=0.1;
   switch(event.GetKeyCode())
     {      
     case WXK_LEFT: m_camera->moveOnSides(step); break;
@@ -472,7 +472,10 @@ void GLFlameCanvas::drawScene()
 {
   uint f,s;
 
-  glBlendFunc (GL_ONE, GL_ZERO);
+  if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  else
+    glBlendFunc (GL_ONE, GL_ZERO);
     
   /******************* AFFICHAGE DE LA SCENE *******************************/
   for (f = 0; f < m_currentConfig->nbFlames; f++)
@@ -503,9 +506,10 @@ void GLFlameCanvas::drawScene()
     
   glDisable (GL_LIGHTING);
     
-  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
       Point position(m_solvers[s]->getPosition ());
@@ -671,10 +675,7 @@ GLFlameCanvas::cast_shadows_double ()
   /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
   
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->switchOff ();
-    
+  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){    
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->switchOn ();
     

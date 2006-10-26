@@ -93,9 +93,19 @@ public:
    * @param K	facteur multiplicateur.
    * @return	El&eacute;ment de type Cpoint.
    */
-  Point operator*(const GLdouble &K)
+  Point operator*(const GLdouble &K) const
   {
     return Point(x*K,y*K,z*K);
+  };
+  /** 
+   * Obtenir un point obtenu en multipliant le point courant
+   * par un r&eacute;el.(Ajout de Michel Leblond).
+   * @param K	facteur multiplicateur.
+   * @return	El&eacute;ment de type Cpoint.
+   */
+  void operator*=(const Point &op)
+  {
+    x*=op.x; y*=op.y; z*=op.z;
   };
   /**
    * Modification des attributs <CODE>X</CODE>, <CODE>Y</CODE> et <CODE>Z</CODE>.
@@ -112,11 +122,11 @@ public:
     return os ;
   }
   /** Aditionner deux points */
-  virtual Point operator+(const Point& P){
-    Point resultat(x+P.x,y+P.y,z+P.z);
-    return resultat;
+  virtual Point operator+(const Point& P) const{    
+    return Point (x+P.x,y+P.y,z+P.z);
   }//operator+
-  Point operator+(const GLdouble &K)
+  
+  Point operator+(const GLdouble &K) const
   {
     return Point(x+K,y+K,z+K);
   };
@@ -130,16 +140,36 @@ public:
   /** Diviser toutes les composantes par un scalaire.
    * @param div Scalaire.
    */
-  virtual Point operator/(GLdouble div){
-    Point resultat(x/div,y/div,z/div);
-    return resultat;
+  virtual Point operator/(GLdouble div) const{   
+    return Point(x/div,y/div,z/div);
+  }
+  
+  /** Diviser toutes les composantes par un scalaire.
+   * @param div Scalaire.
+   */
+  virtual void operator/=(GLdouble div){
+    x/=div; y/=div; z/=div;
+  }
+  
+  /** Diviser deux points composante par composante.
+   * @param div Scalaire.
+   */
+  virtual Point operator/(Point& div) const{
+    return Point(x/div.x,y/div.y,z/div.z);
+  }
+  
+  /** Diviser deux points composante par composante.
+   * @param div Scalaire.
+   */
+  virtual void operator/=(Point& div){
+    x/=div.x; y/=div.y; z/=div.z;
   }
 
   /** Donne la distance au carrÈ entre deux points de l'espace.
    * @param pt Position du point.
    * @return La distance au carrÈ entre le point courant et celui passÈ en paramËtre.
    */
-  double squaredDistanceFrom( const Point* const pt )
+  double squaredDistanceFrom( const Point* const pt ) const
   {
     return( (x - pt->x) * (x - pt->x)
 	    + (y - pt->y) * (y - pt->y)
@@ -289,9 +319,9 @@ public:
    * Normalisation d'un vecteur. Cette fonction <B>modifie</B> le vecteur courant.
    * @return Vecteur courant normalis&eacute;.
    */
-  Vector& normalize(){return ((*this)=(*this)*(1.0/this->length()));};
+  Vector& normalize() {return ((*this)=(*this)*(1.0/this->length()));};
 
-  bool colinearWith(const Vector* const v)
+  bool colinearWith(const Vector* const v) const
   {
     /* Si les 2 vecteurs sont colin√©aires alors l'aire du trap√®ze d√©crite par les 2 vecteurs est nulle */
     /* Aire du trap√®ze = norme du produit vectoriel des 2 vecteurs */

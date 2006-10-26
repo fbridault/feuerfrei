@@ -174,9 +174,9 @@ void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
       m_solverZAxisPositionSliderMin->Disable();
       m_solverZAxisPositionSliderMax->Disable();
       
-      m_solverXAxisPositionSlider->SetRange(-100, 100);
-      m_solverYAxisPositionSlider->SetRange(-100, 100);
-      m_solverZAxisPositionSlider->SetRange(-100, 100);
+      m_solverXAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
+      m_solverYAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
+      m_solverZAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
     }
 }
 
@@ -186,8 +186,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
     {
       double value = m_buoyancySlider->GetValue()/(SLIDER_SENSIBILITY);
       
-      m_glBuffer->setBuoyancy(m_index, value);
-      
+      m_glBuffer->setBuoyancy(m_index, value);      
       m_solverConfig->buoyancy = value;
     }
   else
@@ -272,7 +271,7 @@ void SolverMainPanel::ComputeSlidersValues(void)
   (*m_solverYAxisPositionSliderMax) << m_saveSliderValues.y+SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMin) << m_saveSliderValues.z-SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMax) << m_saveSliderValues.z+SLIDER_RANGE;
-
+  
   m_solverXAxisPositionSliderMin->Disable();
   m_solverXAxisPositionSliderMax->Disable();
   m_solverYAxisPositionSliderMin->Disable();

@@ -119,6 +119,10 @@ void FreeSkeleton::draw ()
 {
   for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
+  glBegin(GL_LINE_STRIP);
+  for (uint i = 0; i < getSize (); i++)
+    glVertex3f(m_queue[i].x, m_queue[i].y, m_queue[i].z);
+  glEnd();    
 }
 
 void FreeSkeleton::drawParticle (Particle * const particle)
@@ -161,6 +165,11 @@ void Skeleton::draw ()
   drawRoot();
   for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
+  glBegin(GL_LINE_STRIP);
+  for (uint i = 0; i < getSize (); i++)
+    glVertex3f(m_queue[i].x, m_queue[i].y, m_queue[i].z);
+  glVertex3f(m_root.x, m_root.y, m_root.z);
+  glEnd();
 }
 
 void Skeleton::drawRoot ()

@@ -17,23 +17,23 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
   /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
   if (m_nbVoxelsX > m_nbVoxelsY){
     if (m_nbVoxelsX > m_nbVoxelsZ){
-      m_dimX = dim;
-      m_dimY = m_dimX * m_nbVoxelsY / m_nbVoxelsX;
-      m_dimZ = m_dimX * m_nbVoxelsZ / m_nbVoxelsX;
+      m_dim.x = dim;
+      m_dim.y = m_dim.x * m_nbVoxelsY / m_nbVoxelsX;
+      m_dim.z = m_dim.x * m_nbVoxelsZ / m_nbVoxelsX;
     }else{
-      m_dimZ = dim;
-      m_dimX = m_dimZ * m_nbVoxelsX / m_nbVoxelsZ;
-      m_dimY = m_dimZ * m_nbVoxelsY / m_nbVoxelsZ;
+      m_dim.z = dim;
+      m_dim.x = m_dim.z * m_nbVoxelsX / m_nbVoxelsZ;
+      m_dim.y = m_dim.z * m_nbVoxelsY / m_nbVoxelsZ;
     }
   }else{
     if (m_nbVoxelsY > m_nbVoxelsZ){
-      m_dimY = dim;
-      m_dimX = m_dimY * m_nbVoxelsX / m_nbVoxelsY;
-      m_dimZ = m_dimY * m_nbVoxelsZ / m_nbVoxelsY;
+      m_dim.y = dim;
+      m_dim.x = m_dim.y * m_nbVoxelsX / m_nbVoxelsY;
+      m_dim.z = m_dim.y * m_nbVoxelsZ / m_nbVoxelsY;
     }else{
-      m_dimZ = dim;
-      m_dimX = m_dimZ * m_nbVoxelsX / m_nbVoxelsZ;
-      m_dimY = m_dimZ * m_nbVoxelsY / m_nbVoxelsZ;
+      m_dim.z = dim;
+      m_dim.x = m_dim.z * m_nbVoxelsX / m_nbVoxelsZ;
+      m_dim.y = m_dim.z * m_nbVoxelsY / m_nbVoxelsZ;
     }
   }
   
@@ -72,9 +72,9 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
   buildDLBase ();
   buildDLGrid ();
 
-  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dimZ * m_nbVoxelsZ;
+  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
+  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
+  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   m_halfNbVoxelsZ = m_nbVoxelsZ/2;
@@ -247,30 +247,30 @@ void Solver3D::cleanSources ()
 
 void Solver3D::buildDLGrid ()
 {
-  double interx = m_dimX / (double) m_nbVoxelsX;
-  double intery = m_dimY / (double) m_nbVoxelsY;
-  double interz = m_dimZ / (double) m_nbVoxelsZ;
+  double interx = m_dim.x / (double) m_nbVoxelsX;
+  double intery = m_dim.y / (double) m_nbVoxelsY;
+  double interz = m_dim.z / (double) m_nbVoxelsZ;
   double i, j;
   
   m_gridDisplayList=glGenLists(1);
   glNewList (m_gridDisplayList, GL_COMPILE);
   glPushMatrix ();
-  glTranslatef (-m_dimX / 2.0, 0, m_dimZ / 2.0);
+  glTranslatef (-m_dim.x / 2.0, 0, m_dim.z / 2.0);
   glBegin (GL_LINES);
 
   glColor4f (0.5, 0.5, 0.5, 0.5);
 
-  for (j = 0.0; j <= m_dimZ; j += interz)
+  for (j = 0.0; j <= m_dim.z; j += interz)
     {
-      for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
+      for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
 	{
 	  glVertex3d (i, 0.0, -j);
-	  glVertex3d (i, m_dimY, -j);
+	  glVertex3d (i, m_dim.y, -j);
 	}
-      for (i = 0.0; i <= m_dimY + intery / 2; i += intery)
+      for (i = 0.0; i <= m_dim.y + intery / 2; i += intery)
 	{
 	  glVertex3d (0.0, i, -j);
-	  glVertex3d (m_dimX, i, -j);
+	  glVertex3d (m_dim.x, i, -j);
 	}
     }
   glEnd ();
@@ -280,27 +280,27 @@ void Solver3D::buildDLGrid ()
 
 void Solver3D::buildDLBase ()
 {
-  double interx = m_dimX / (double) m_nbVoxelsX;
-  double interz = m_dimZ / (double) m_nbVoxelsZ;
+  double interx = m_dim.x / (double) m_nbVoxelsX;
+  double interz = m_dim.z / (double) m_nbVoxelsZ;
   double i;
 
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
   glPushMatrix ();
-  glTranslatef (-m_dimX / 2.0, 0.0, m_dimZ / 2.0);
+  glTranslatef (-m_dim.x / 2.0, 0.0, m_dim.z / 2.0);
   glBegin (GL_LINES);
 
   glLineWidth (1.0);
   glColor4f (0.5, 0.5, 0.5, 0.5);
-  for (i = 0.0; i <= m_dimX + interx / 2; i += interx)
+  for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
     {
-      glVertex3d (i, 0.0, -m_dimZ);
+      glVertex3d (i, 0.0, -m_dim.z);
       glVertex3d (i, 0.0, 0.0);
     }
-  for (i = 0.0; i <= m_dimZ + interz / 2; i += interz)
+  for (i = 0.0; i <= m_dim.z + interz / 2; i += interz)
     {
-      glVertex3d (0.0, 0.0, i - m_dimZ);
-      glVertex3d (m_dimX, 0.0, i - m_dimZ);
+      glVertex3d (0.0, 0.0, i - m_dim.z);
+      glVertex3d (m_dim.x, 0.0, i - m_dim.z);
     }
   glEnd ();
   glPopMatrix ();
@@ -309,9 +309,9 @@ void Solver3D::buildDLBase ()
 
 void Solver3D::displayVelocityField (void)
 {
-  double inc_x = m_dimX / (double) m_nbVoxelsX;
-  double inc_y = m_dimY / (double) m_nbVoxelsY;
-  double inc_z = m_dimZ / (double) m_nbVoxelsZ;
+  double inc_x = m_dim.x / (double) m_nbVoxelsX;
+  double inc_y = m_dim.y / (double) m_nbVoxelsY;
+  double inc_z = m_dim.z / (double) m_nbVoxelsZ;
   
   for (uint i = 1; i <= m_nbVoxelsX; i++)
     {
@@ -322,9 +322,9 @@ void Solver3D::displayVelocityField (void)
 	      Vector vect;
 	      /* Affichage du champ de vélocité */
 	      glPushMatrix ();
-	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dimX / 2.0,
+	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dim.x / 2.0,
 			    inc_y * j - inc_y / 2.0, 
-			    inc_z * k - inc_z / 2.0 - m_dimZ / 2.0);
+			    inc_z * k - inc_z / 2.0 - m_dim.z / 2.0);
 	      //    printf("vélocité %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
 	      //SDL_mutexP (lock);
 	      vect.x = getU (i, j, k);
@@ -343,7 +343,7 @@ void Solver3D::displayArrow (Vector& direction)
   double norme_vel = sqrt (direction.x * direction.x +
 			   direction.y * direction.z +
 			   direction.z * direction.z);
-  double taille = m_dimX * m_dimY * m_dimZ * norme_vel*4;
+  double taille = m_dim.x * m_dim.y * m_dim.z * norme_vel*4;
   double angle;
   Vector axeRot, axeCone (0.0, 0.0, 1.0);
 

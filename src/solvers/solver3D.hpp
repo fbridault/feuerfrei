@@ -40,7 +40,7 @@ public:
    * @param k Indice en profondeur (z).
    * @return Valeur de vélocité.
    */   
-  double getU (uint i, uint j, uint k)
+  double getU (uint i, uint j, uint k) const
   {
     return m_u[IX (i, j, k)];
   };
@@ -51,7 +51,7 @@ public:
    * @param k Indice en profondeur (z).
    * @return Valeur de vélocité.
    */   
-  double getV (uint i, uint j, uint k)
+  double getV (uint i, uint j, uint k) const
   {
     return m_v[IX (i, j, k)];
   };
@@ -62,7 +62,7 @@ public:
    * @param k Indice en profondeur (z).
    * @return Valeur de vélocité.
    */   
-  double getW (uint i, uint j, uint k)
+  double getW (uint i, uint j, uint k) const
   {
     return m_w[IX (i, j, k)];
   };
@@ -126,7 +126,7 @@ public:
   /** Retourne le nombre de voxels en X.
    * @return Nombre de voxels.
    */
-  uint getXRes()
+  uint getXRes() const
   {
     return m_nbVoxelsX;
   };
@@ -134,7 +134,7 @@ public:
   /** Retourne le nombre de voxels en Y.
    * @return Nombre de voxels.
    */
-  uint getYRes()
+  uint getYRes() const
   {
     return m_nbVoxelsY;
   };
@@ -142,31 +142,39 @@ public:
   /** Retourne le nombre de voxels en Z.
    * @return Nombre de voxels.
    */
-  uint getZRes()
+  uint getZRes() const
   {
     return m_nbVoxelsZ;
   };
 
+  /** Retourne la dimension sous forme d'un point.
+   * @return Dimension.
+   */
+  Point getDim() const
+  {
+    return m_dim;
+  };
+    
   /** Retourne la dimension en X.
    * @return Dimension.
    */
-  double getDimX ()
+  double getDimX () const
   {
-    return m_dimX;
+    return m_dim.x;
   };
   /** Retourne la dimension en Y.
    * @return Dimension.
    */
-  double getDimY ()
+  double getDimY () const
   {
-    return m_dimY;
+    return m_dim.y;
   };
   /** Retourne la dimension en Z.
    * @return Dimension.
    */
-  double getDimZ ()
+  double getDimZ () const
   {
-    return m_dimZ;
+    return m_dim.z;
   };
 
   /** Méthode permettant de retrouver les indices (i,j,k) de la cellule où est située la particule.
@@ -236,7 +244,7 @@ protected:
    * @param k Indice en profondeur (z).
    * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
    */
-  uint IX (uint i, uint j, uint k)
+  uint IX (uint i, uint j, uint k) const
   {  
     return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
   };
@@ -248,7 +256,7 @@ protected:
    * @param k Indice en profondeur (z).
    * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
    */
-  uint IX2h (int i, int j, int k)
+  uint IX2h (int i, int j, int k) const
   {  
     return( (i) + (m_nbVoxelsX/2 + 2) * (j) + (m_nbVoxelsX/2 + 2) * (m_nbVoxelsY/2 + 2) * (k) );
   }; 
@@ -301,12 +309,8 @@ protected:
   /** Nombre de voxels en Z sur un côté du cube. */
   uint m_nbVoxelsZ;
   
-  /** Dimension du solveur en X. */
-  double m_dimX;
-  /** Dimension du solveur en Y. */
-  double m_dimY;
-  /** Dimension du solveur en Z. */
-  double m_dimZ;
+  /** Dimension du solveur */
+  Point m_dim;
 
   double m_dimXTimesNbVoxelsX,  m_dimYTimesNbVoxelsY,  m_dimZTimesNbVoxelsZ;
   uint m_halfNbVoxelsX,  m_halfNbVoxelsZ;

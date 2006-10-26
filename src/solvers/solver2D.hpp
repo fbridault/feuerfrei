@@ -38,7 +38,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getU (uint i, uint j)
+  double getU (uint i, uint j) const
   {
     return m_u[IX (i, j)];
   };
@@ -48,7 +48,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getV (uint i, uint j)
+  double getV (uint i, uint j) const
   {
     return m_v[IX (i, j)];
   };
@@ -58,7 +58,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getDens (uint i, uint j)
+  double getDens (uint i, uint j) const
   {
     return m_dens[IX (i, j)];
   };
@@ -170,7 +170,7 @@ protected:
    * @param k Indice en profondeur (z).
    * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
    */
-  uint IX (uint i, uint j)
+  uint IX (uint i, uint j) const
   {  
     return( (i) + (m_nbVoxelsX + 2) * (j) );
   };
@@ -182,7 +182,7 @@ protected:
    * @param k Indice en profondeur (z).
    * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
    */
-  uint IX2h (int i, int j, int k)
+  uint IX2h (int i, int j, int k) const
   {  
     return( (i) + (m_nbVoxelsX/2 + 2) * (j) );
   }; 

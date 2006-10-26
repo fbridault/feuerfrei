@@ -21,9 +21,18 @@ LeadSkeleton::~LeadSkeleton ()
 
 void LeadSkeleton::drawParticle (Particle * const particle)
 {
-  glColor4f (0.1, 0.1, 0.1, 0.8);
+  glColor4f (0.1, 1.0, 0.1, 0.8);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
+  GraphicsFn::SolidSphere (0.01, 10, 10);
+  glPopMatrix ();
+}
+
+void LeadSkeleton::drawRoot ()
+{
+  glColor4f (0.0, 0.4, 0.0, 0.8);
+  glPushMatrix ();
+  glTranslatef (m_root.x, m_root.y, m_root.z);
   GraphicsFn::SolidSphere (0.01, 10, 10);
   glPopMatrix ();
 }
@@ -65,7 +74,7 @@ FreePeriSkeleton* FreeLeadSkeleton::dup(Point& offset)
 
 void FreeLeadSkeleton::drawParticle (Particle * const particle)
 {
-  glColor4f (0.1, 0.1, 0.1, 0.8);
+  glColor4f (0.1, 1.0, 0.1, 0.8);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
   GraphicsFn::SolidSphere (0.01, 10, 10);

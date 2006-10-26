@@ -34,6 +34,7 @@ public:
    */
   FreeLeadSkeleton* split (uint splitHeight);
   
+  virtual void drawRoot ();
 private:
   void drawParticle (Particle * const particle);
 };
@@ -57,6 +58,7 @@ public:
    * @param offset Valeur du décalage dans l'espace du squelette par rapport au squelette courant.
    */
   virtual FreePeriSkeleton* dup(Point& offset);
+  
 private:  
   /** Dessine une particule d'un squelette guide.
    * @param particle Particule à dessiner.

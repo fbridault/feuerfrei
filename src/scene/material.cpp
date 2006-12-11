@@ -75,3 +75,10 @@ const Texture* Material::getDiffuseTexture() const
 { 
   return m_scene->getTexture(m_diffuseTexture);
 };
+
+
+const bool Material::isTransparent() const
+{
+  if(m_scene->getTexture(m_diffuseTexture)->hasAlpha()) cerr << m_name << " is transparent" << endl;
+  return (m_scene->getTexture(m_diffuseTexture)->hasAlpha());
+}

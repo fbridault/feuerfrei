@@ -170,3 +170,14 @@ Object::draw (char drawCode, bool tex)
     glDisable(GL_TEXTURE_2D);
   }
 }
+
+const bool Object::isTransparent ()
+{ 
+  for (vector < PointIndices * >::iterator vertexIndexArrayIterator = m_vertexIndexArray.begin ();
+       vertexIndexArrayIterator != m_vertexIndexArray.end ();
+       vertexIndexArrayIterator++)
+    if(m_scene->getMaterial((*vertexIndexArrayIterator)->vm)->hasDiffuseTexture())
+      if( m_scene->getMaterial((*vertexIndexArrayIterator)->vm)->isTransparent())
+	return true;
+  return false;
+}

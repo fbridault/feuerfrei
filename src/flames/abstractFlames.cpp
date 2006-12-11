@@ -45,7 +45,6 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
   
   m_position=flameConfig->position;
-  cerr << m_position << endl;
   
   m_flameConfig = flameConfig;
 

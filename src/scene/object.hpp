@@ -209,6 +209,8 @@ public:
    * @param tex false si l'objet texturé doit être affiché sans sa texture
    */
   virtual void draw(char drawCode=ALL, bool tex=true);
+
+  virtual const bool isTransparent ();
 };
 
 #endif

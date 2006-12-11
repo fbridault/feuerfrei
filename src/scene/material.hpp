@@ -87,6 +87,11 @@ public:
    * @return Pointeur sur la texture
    */
   const Texture* getDiffuseTexture() const;
+
+  /** Indique si le matériau possède une texture.
+   * @return True si le matériau a une texture.
+   */
+  const bool isTransparent() const;
 };
 
 #endif

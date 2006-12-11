@@ -90,6 +90,8 @@ public:
    */
   void createDisplayLists(void);
 
+  void sortTransparentObjects();
+  
   /** Ajoute un objet dans la scène.
    * @param newObj Pointeur vers l'objet &agrave; ajouter.
    * @param objectWSV True si l'objet projette des ombres, false sinon.
@@ -210,7 +212,7 @@ public:
     glCallList(m_displayLists[4]);
     
     for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary(shader);  
+      m_flames[f]->drawLuminary(shader);
   };
   
   /** Dessin de tous les objets de la scène sans les textures */
@@ -252,6 +254,15 @@ public:
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
+  };
+  
+  /** Dessin de tous les objets qui projettent des ombres */
+  void drawSceneWSV (CgBasicVertexShader& shader) const
+  {
+    glCallList (m_displayLists[6]);
+    
+    for (int f = 0; f < m_nbFlames; f++)
+      m_flames[f]->drawLuminary(shader);
   };
   
 private:

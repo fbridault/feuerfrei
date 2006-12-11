@@ -10,6 +10,35 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
   addMaterial(new Material(this));
   cerr << "Chargement de la scène " << fileName << endl;
   importOBJ(fileName);
+  //sortTransparentObjects();
+}
+
+void Scene::sortTransparentObjects()
+{  
+  int i;
+  int size;
+  Object* object;
+  
+  size = m_objectsArray.size(); i=0;
+  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
+       i < size; i++,objectsArrayIterator++)
+    if ((*objectsArrayIterator)->isTransparent ())
+      {
+	cerr << "bite" << endl;
+	object = *objectsArrayIterator;
+	objectsArrayIterator =  m_objectsArray.erase(objectsArrayIterator); 
+	m_objectsArray.push_back(object);
+      }
+  
+  size = m_objectsArrayWSV.size(); i=0;
+  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+       i < size; i++,objectsArrayIteratorWSV++)
+    if ((*objectsArrayIteratorWSV)->isTransparent ())
+      {
+	object = *objectsArrayIteratorWSV;
+	objectsArrayIteratorWSV =  m_objectsArrayWSV.erase(objectsArrayIteratorWSV); 
+	m_objectsArrayWSV.push_back(object);
+      }  
 }
 
 void Scene::createDisplayLists(void)

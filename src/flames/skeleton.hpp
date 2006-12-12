@@ -63,7 +63,7 @@ public:
   virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
 };
 
-class Solver3D;
+class Field3D;
 
 /** La classe FreeSkeleton est une file de particules gérée avec un vecteur, mais elle ne permet que 
  * la sortie d'éléments. Seule la sous-classe Skeleton permet d'ajouter des particules. Le nombre, la durée de vie
@@ -84,7 +84,7 @@ public:
    * @param size Nombre de particules maximum du squelette.
    * @param s Pointeur sur le solveur de fluides.
    */
-  FreeSkeleton(uint size, Solver3D* const s);
+  FreeSkeleton(uint size, Field3D* const s);
   
   /** Constructeur de squelette libre. Permet de construire un squelette à partir
    * d'un autre, en découpant celui en deux à la hauteur passée en paramètre. Le squelette
@@ -170,7 +170,7 @@ protected:
   virtual void drawParticle (Particle * const particle);
   
   /** Pointeur sur le solveur de fluides. */
-  Solver3D *m_solver;
+  Field3D *m_solver;
 
   /** Indice de la tête de la file. */
   int m_headIndex;
@@ -202,7 +202,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  Skeleton(Solver3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
+  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
   /** Destructeur. */
   virtual ~Skeleton(){};
   

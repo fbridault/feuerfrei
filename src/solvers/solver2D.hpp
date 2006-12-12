@@ -3,7 +3,9 @@
 
 class Solver2D;
 
+#include "field.hpp"
 #include "solver.hpp"
+#include <math.h>
 
 class Solver;
 /** La classe Solver2D propose une implémentation 3D de la méthode stable implicite semi-lagrangienne de Stam.
@@ -12,7 +14,7 @@ class Solver;
  * 
  * @author	Flavien Bridault et Michel Lebond.
  */
-class Solver2D : public Solver
+class Solver2D : public Field, public Solver
 {
 public:
   /** Constructeur par défaut nécessaire pour l'héritage multiple */
@@ -99,7 +101,7 @@ public:
    */
   void setUsrc (uint i, uint j, double value)
   {
-    m_uSrc[IX (i, j)] = value*m_nbVoxelsX;
+    m_uSrc[IX (i, j)] = value;
   };
   
   /** Affectation d'une force externe pour la composante V.
@@ -109,7 +111,7 @@ public:
    */
   void setVsrc (uint i, uint j, double value)
   {
-    m_vSrc[IX (i, j)] = value*m_nbVoxelsX;
+    m_vSrc[IX (i, j)] = value;
   };
     
   /** Remet à zéro toutes les forces externes */

@@ -24,7 +24,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  LeadSkeleton(Solver3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
+  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
 
   /** Destructeur. */
   virtual ~LeadSkeleton();

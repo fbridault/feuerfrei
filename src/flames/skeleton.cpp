@@ -9,7 +9,7 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREESKELETON **************************************/
 /**********************************************************************************************************************/
-FreeSkeleton::FreeSkeleton(uint size, Solver3D* const s)
+FreeSkeleton::FreeSkeleton(uint size, Field3D* const s)
 {
   m_solver = s;
   m_queue = new Particle[size];
@@ -139,7 +139,7 @@ void FreeSkeleton::drawParticle (Particle * const particle)
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Solver3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls) : 
+Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls) : 
   FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
 {  

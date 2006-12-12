@@ -136,7 +136,7 @@ private:
   
   DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
-  Solver3D **m_solvers;
+  Field3D **m_solvers;
     
   /********* Variables relatives à la simulation *************************/
   FireSource **m_flames;

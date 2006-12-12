@@ -145,7 +145,7 @@ void GLFlameCanvas::InitFlames(void)
 
 void GLFlameCanvas::InitSolvers(void)
 {
-  m_solvers = new Solver3D *[m_currentConfig->nbSolvers];
+  m_solvers = new Field3D *[m_currentConfig->nbSolvers];
   for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
@@ -174,6 +174,12 @@ void GLFlameCanvas::InitSolvers(void)
 					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
 					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      break;
+    case SIMPLE_FIELD :
+      m_solvers[i] = new Field3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
+				  m_currentConfig->solvers[i].buoyancy);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -309,7 +315,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->decreaseRes ();
       for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-	m_flames[i]->locateInSolver(); 
+	m_flames[i]->locateInField(); 
       break;
 
     case 'L': 
@@ -318,7 +324,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->increaseRes ();
       for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-	m_flames[i]->locateInSolver(); 
+	m_flames[i]->locateInField(); 
       break;
     case WXK_SPACE : m_run = !m_run; break;
     }

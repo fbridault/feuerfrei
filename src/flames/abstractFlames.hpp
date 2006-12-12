@@ -19,7 +19,7 @@ class RealFlame;
 
 class PeriSkeleton;
 class LeadSkeleton;
-class Solver3D;
+class Field3D;
 
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE NURBSFLAME ****************************************/
@@ -325,7 +325,7 @@ public:
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Solver3D *s);
+  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -361,7 +361,7 @@ public:
   
   /** Méthode permettant d'informer à la flamme de se localiser dans le solveur */
   /* Elle doit être appelée dès qu'un changement de résolution de la grille intervient */
-  virtual void locateInSolver(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
+  virtual void locateInField(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
   
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
@@ -373,7 +373,7 @@ protected:
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
   PeriSkeleton **m_periSkeletons;
   /** Pointeur sur le solveur de fluides */
-  Solver3D *m_solver;  
+  Field3D *m_solver;  
   
   double *m_distances;
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle

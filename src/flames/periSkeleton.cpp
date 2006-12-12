@@ -9,7 +9,7 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE PERISKELETON **************************************/
 /**********************************************************************************************************************/
-PeriSkeleton::PeriSkeleton (Solver3D * const s, const Point& position, const Point& rootMoveFactor, 
+PeriSkeleton::PeriSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor, 
 			    LeadSkeleton *leadSkeleton, uint *pls) :
   Skeleton (s, position, rootMoveFactor, pls)
 {
@@ -38,7 +38,7 @@ FreePeriSkeleton::FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkelet
   m_lead = leadSkeleton;
 }
 
-FreePeriSkeleton::FreePeriSkeleton(uint size, Solver3D* s, FreeLeadSkeleton* const leadSkeleton) :
+FreePeriSkeleton::FreePeriSkeleton(uint size, Field3D* s, FreeLeadSkeleton* const leadSkeleton) :
   FreeSkeleton(size, s)
 {
   m_lead = leadSkeleton;

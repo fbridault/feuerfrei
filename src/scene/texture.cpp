@@ -55,14 +55,15 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_MODULATE );
  
-  cout << "Chargement texture : " << filename.fn_str() << "......";
+  cout << "Chargement texture scene : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
 
   if(!m_wxtex) {
     cout << "Error ";
   }else{
-    cout << "OK" << endl;    
+    cout << "OK" << endl;
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
     else{
@@ -85,7 +86,6 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
   glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
   glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-//  glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_REPLACE );
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
 

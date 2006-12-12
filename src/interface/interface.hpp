@@ -9,14 +9,19 @@
 #define CANDLESTICK 4
 
 /* Types de solveurs */
+/* Attention la valeur est importante car elle va correspondre à */
+/* l'index dans les boutons radios de SolverDialog */
+/* Communs à rtflames et rtfluids */
 #define GS_SOLVER 0
 #define GCSSOR_SOLVER 1
 #define HYBRID_SOLVER 2
 #define LOD_HYBRID_SOLVER 3
-#define LOGRES_SOLVER 4
-#define LOGRESAVG_SOLVER 5
-#define LOGRESAVGTIME_SOLVER 6
-#define GS_SOLVER2D 7
+#define SIMPLE_FIELD 4
+/* Spécifiques à rtfluids */
+#define LOGRES_SOLVER 5
+#define LOGRESAVG_SOLVER 6
+#define LOGRESAVGTIME_SOLVER 7
+#define GS_SOLVER2D 8
 
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 20

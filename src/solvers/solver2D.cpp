@@ -8,7 +8,7 @@ Solver2D::Solver2D ()
 }
 
 Solver2D::Solver2D (Point& position, uint n_x, uint n_y,double dim, double timeStep, double buoyancy) : 
-  Solver(position, timeStep, buoyancy)
+  Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -304,7 +304,7 @@ void Solver2D::addExternalForces(Point& position, bool move)
     m_position=position;
   }else{
     force = position;
-    strength = position * .00001 * m_nbVoxelsX;
+    strength = position * .001 * m_nbVoxelsX;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
   }

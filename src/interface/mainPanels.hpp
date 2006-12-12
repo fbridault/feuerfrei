@@ -106,6 +106,7 @@ private:
   Point m_saveSliderValues;
   
   double SLIDER_SENSIBILITY;
+  double FORCE_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()
@@ -144,7 +145,7 @@ private:
   int m_index;
   GLFlameCanvas *m_glBuffer;
   
-  double SLIDER_SENSIBILITY;
+  double FORCE_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()

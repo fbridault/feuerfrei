@@ -98,7 +98,7 @@ void GLFluidsCanvas::InitGL(bool recompileShaders)
 
 void GLFluidsCanvas::InitSolvers(void)
 {
-  m_solvers = new Solver *[m_currentConfig->nbSolvers];
+  m_solvers = new Field *[m_currentConfig->nbSolvers];
   for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
@@ -156,6 +156,12 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new GSSolver2D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].dim,
 				  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      break;
+    case SIMPLE_FIELD :
+      m_solvers[i] = new Field3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
+				  m_currentConfig->solvers[i].buoyancy);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;

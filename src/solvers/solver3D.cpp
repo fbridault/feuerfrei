@@ -8,76 +8,25 @@ Solver3D::Solver3D ()
 }
 
 Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy) : 
-  Solver(position, timeStep, buoyancy)
+  Field3D(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
-  m_nbVoxelsX = n_x;
-  m_nbVoxelsY = n_y;
-  m_nbVoxelsZ = n_z;
-  
-  /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
-  if (m_nbVoxelsX > m_nbVoxelsY){
-    if (m_nbVoxelsX > m_nbVoxelsZ){
-      m_dim.x = dim;
-      m_dim.y = m_dim.x * m_nbVoxelsY / m_nbVoxelsX;
-      m_dim.z = m_dim.x * m_nbVoxelsZ / m_nbVoxelsX;
-    }else{
-      m_dim.z = dim;
-      m_dim.x = m_dim.z * m_nbVoxelsX / m_nbVoxelsZ;
-      m_dim.y = m_dim.z * m_nbVoxelsY / m_nbVoxelsZ;
-    }
-  }else{
-    if (m_nbVoxelsY > m_nbVoxelsZ){
-      m_dim.y = dim;
-      m_dim.x = m_dim.y * m_nbVoxelsX / m_nbVoxelsY;
-      m_dim.z = m_dim.y * m_nbVoxelsZ / m_nbVoxelsY;
-    }else{
-      m_dim.z = dim;
-      m_dim.x = m_dim.z * m_nbVoxelsX / m_nbVoxelsZ;
-      m_dim.y = m_dim.z * m_nbVoxelsY / m_nbVoxelsZ;
-    }
-  }
-  
-  m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
-  
-  m_u = new double[m_nbVoxels];
-  m_v = new double[m_nbVoxels];
-  m_w = new double[m_nbVoxels];
   m_uPrev = new double[m_nbVoxels];
   m_vPrev = new double[m_nbVoxels];
   m_wPrev = new double[m_nbVoxels];
   m_dens = new double[m_nbVoxels];
   m_densPrev = new double[m_nbVoxels];
   m_densSrc = new double[m_nbVoxels];
-  m_uSrc = new double[m_nbVoxels];
-  m_vSrc = new double[m_nbVoxels];
-  m_wSrc = new double[m_nbVoxels];
   
-  memset (m_u, 0, m_nbVoxels * sizeof (double));
-  memset (m_v, 0, m_nbVoxels * sizeof (double));
-  memset (m_w, 0, m_nbVoxels * sizeof (double));
-  memset (m_dens, 0, m_nbVoxels * sizeof (double));
   memset (m_uPrev, 0, m_nbVoxels * sizeof (double));
   memset (m_vPrev, 0, m_nbVoxels * sizeof (double));
   memset (m_wPrev, 0, m_nbVoxels * sizeof (double));
+  memset (m_dens, 0, m_nbVoxels * sizeof (double));
   memset (m_densPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
   memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
   
-  m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
-  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
-    
-  /* Construction des display lists */
-  buildDLBase ();
-  buildDLGrid ();
-
   m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
   m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
   m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_visc = 0.00000015;
   m_diff = 0.001;
@@ -90,20 +39,21 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
 
 Solver3D::~Solver3D ()
 {
-  delete[]m_u;
-  delete[]m_v;
-  delete[]m_w;
-  delete[]m_dens;
-
   delete[]m_uPrev;
   delete[]m_vPrev;
   delete[]m_wPrev;
-  delete[]m_densPrev;
   
-  delete[]m_uSrc;
-  delete[]m_vSrc;
-  delete[]m_wSrc;
+  delete[]m_dens;
+  delete[]m_densPrev;
   delete[]m_densSrc;
+}
+
+void Solver3D::add_source (double *const x, double *const src)
+{
+  uint i;
+  
+  for (i = 0; i < m_nbVoxels; i++)
+    x[i] += m_dt * src[i];
 }
 
 void Solver3D::set_bnd (unsigned char b, double *const x)
@@ -221,152 +171,16 @@ void Solver3D::iterate ()
   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
     for (uint j = 1; j < m_nbVoxelsY + 1; j++)
       for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	m_vSrc[IX(i, j, k)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+	addVsrc(i, j, k, m_buoyancy / (double) (m_nbVoxelsY-j+1));
   
   if(arePermanentExternalForces)
     addExternalForces(permanentExternalForces,false);
   
   vel_step ();
-  //  dens_step();
 
   m_nbIter++;
 
   cleanSources ();
-//   set_bnd (0, m_u);
-//   set_bnd (0, m_v);
-//   set_bnd (0, m_w);
-  
-}
-
-void Solver3D::cleanSources ()
-{
-  m_uSrc = (double *) memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  m_vSrc = (double *) memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  m_wSrc = (double *) memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
-}
-
-void Solver3D::buildDLGrid ()
-{
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double intery = m_dim.y / (double) m_nbVoxelsY;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i, j;
-  
-  m_gridDisplayList=glGenLists(1);
-  glNewList (m_gridDisplayList, GL_COMPILE);
-  glPushMatrix ();
-  glTranslatef (-m_dim.x / 2.0, 0, m_dim.z / 2.0);
-  glBegin (GL_LINES);
-
-  glColor4f (0.5, 0.5, 0.5, 0.5);
-
-  for (j = 0.0; j <= m_dim.z; j += interz)
-    {
-      for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
-	{
-	  glVertex3d (i, 0.0, -j);
-	  glVertex3d (i, m_dim.y, -j);
-	}
-      for (i = 0.0; i <= m_dim.y + intery / 2; i += intery)
-	{
-	  glVertex3d (0.0, i, -j);
-	  glVertex3d (m_dim.x, i, -j);
-	}
-    }
-  glEnd ();
-  glPopMatrix ();
-  glEndList ();
-}
-
-void Solver3D::buildDLBase ()
-{
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i;
-
-  m_baseDisplayList=glGenLists(1);
-  glNewList (m_baseDisplayList, GL_COMPILE);
-  glPushMatrix ();
-  glTranslatef (-m_dim.x / 2.0, 0.0, m_dim.z / 2.0);
-  glBegin (GL_LINES);
-
-  glLineWidth (1.0);
-  glColor4f (0.5, 0.5, 0.5, 0.5);
-  for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
-    {
-      glVertex3d (i, 0.0, -m_dim.z);
-      glVertex3d (i, 0.0, 0.0);
-    }
-  for (i = 0.0; i <= m_dim.z + interz / 2; i += interz)
-    {
-      glVertex3d (0.0, 0.0, i - m_dim.z);
-      glVertex3d (m_dim.x, 0.0, i - m_dim.z);
-    }
-  glEnd ();
-  glPopMatrix ();
-  glEndList ();
-}
-
-void Solver3D::displayVelocityField (void)
-{
-  double inc_x = m_dim.x / (double) m_nbVoxelsX;
-  double inc_y = m_dim.y / (double) m_nbVoxelsY;
-  double inc_z = m_dim.z / (double) m_nbVoxelsZ;
-  
-  for (uint i = 1; i <= m_nbVoxelsX; i++)
-    {
-      for (uint j = 1; j <= m_nbVoxelsY; j++)
-	{
-	  for (uint k = 1; k <= m_nbVoxelsZ; k++)
-	    {
-	      Vector vect;
-	      /* Affichage du champ de vélocité */
-	      glPushMatrix ();
-	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dim.x / 2.0,
-			    inc_y * j - inc_y / 2.0, 
-			    inc_z * k - inc_z / 2.0 - m_dim.z / 2.0);
-	      //    printf("vélocité %d %d %d %f %f %f\n",i,j,k,getU(i,j,k)],getV(i,j,k),getW(i,j,k));
-	      //SDL_mutexP (lock);
-	      vect.x = getU (i, j, k);
-	      vect.y = getV (i, j, k);
-	      vect.z = getW (i, j, k);
-	      //SDL_mutexV (lock);
-	      displayArrow (vect);
-	      glPopMatrix ();
-	    }
-	}
-    }
-}
-
-void Solver3D::displayArrow (Vector& direction)
-{
-  double norme_vel = sqrt (direction.x * direction.x +
-			   direction.y * direction.z +
-			   direction.z * direction.z);
-  double taille = m_dim.x * m_dim.y * m_dim.z * norme_vel*4;
-  double angle;
-  Vector axeRot, axeCone (0.0, 0.0, 1.0);
-
-  direction.normalize ();
-
-  /* On obtient un vecteur perpendiculaire au plan dÃ©fini par l'axe du cÃ´ne et la direction souhaitÃ©e */
-  axeRot = axeCone ^ direction;
-
-  /* On rÃ©cupÃ¨re l'angle de rotation entre les deux vecteurs */
-  angle = acos (axeCone * direction);
-
-  glRotatef (angle * RAD_TO_DEG, axeRot.x, axeRot.y, axeRot.z);
-  /***********************************************************************************/
-
-  /* DÃ©gradÃ© de couleur bleu vers rouge */
-  /* ProblÃ¨me : on ne connaÃ®t pas l'Ã©chelle des valeurs */
-  /* On va donc tenter de prendre une valeur max suffisamment grande */
-  /* pour pouvoir discerner au mieux les variations de la vÃ©locitÃ© */
-
-//  printf("%f\n",norme_vel);
-  glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
-
-  GraphicsFn::SolidCone (taille / 4, taille, 3, 3);
 }
 
 void Solver3D::addExternalForces(Point& position, bool move)
@@ -381,7 +195,7 @@ void Solver3D::addExternalForces(Point& position, bool move)
     m_position=position;
   }else{
     force = position;
-    strength = position * (.0003*m_nbVoxelsX);
+    strength = position * m_nbVoxelsX;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
     strength.z = fabs(strength.z);  

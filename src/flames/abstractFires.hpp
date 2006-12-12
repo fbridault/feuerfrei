@@ -16,7 +16,7 @@ class FireSource;
 #include "ies.hpp"
 
 class RealFlame;
-class Solver3D;
+class Field3D;
 class Object;
 class Scene;
 class IES;
@@ -161,7 +161,7 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  FireSource (FlameConfig* flameConfig, Solver3D * s, uint nbFlames, Scene *scene, const char *filename,
+  FireSource (FlameConfig* flameConfig, Field3D * s, uint nbFlames, Scene *scene, const char *filename,
 	      const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   /** Destructeur */
   virtual ~FireSource ();
@@ -313,9 +313,9 @@ public:
     return(averageVec);
   }
   
-  virtual void locateInSolver(){
+  virtual void locateInField(){
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->locateInSolver();
+      m_flames[i]->locateInField();
   }
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
@@ -331,7 +331,7 @@ protected:
   GLuint m_luminaryDL;
   
   /** Pointeur sur le solveur de fluides */
-  Solver3D *m_solver;
+  Field3D *m_solver;
 
   /** Est-ce que la source possède un luminaire */
   bool m_hasLuminary;
@@ -361,7 +361,7 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  DetachableFireSource (FlameConfig* flameConfig, Solver3D * s, uint nbFlames, Scene *scene, const char *filename,
+  DetachableFireSource (FlameConfig* flameConfig, Field3D * s, uint nbFlames, Scene *scene, const char *filename,
 			const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
   virtual ~DetachableFireSource();
   

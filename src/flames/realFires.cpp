@@ -9,7 +9,7 @@
 #define WICK_NAME_PREFIX "Wick"
 #define TORCH_NAME "Torch"
 
-Candle::Candle (FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index, 
+Candle::Candle (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 		CgSVShader * shader, double rayon):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, shader)
 	       //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
@@ -18,14 +18,14 @@ Candle::Candle (FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
 }
 
-Firmalampe::Firmalampe(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index,
+Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
 		       CgSVShader * shader, const char *wickFileName):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
 {
   m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, 0.01);
 }
 
-Torch::Torch(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *torchName, uint index,
+Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
 	     CgSVShader * shader):
   DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, shader, TORCH_NAME)
 {
@@ -44,7 +44,7 @@ Torch::Torch(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *t
     }
 }
 
-CampFire::CampFire(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *fireName, uint index, 
+CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
 		   CgSVShader * shader):
   DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, shader, TORCH_NAME)
 {
@@ -63,7 +63,7 @@ CampFire::CampFire(FlameConfig *flameConfig, Solver3D * s, Scene *scene, const c
     }
 }
 
-CandleStick::CandleStick (FlameConfig *flameConfig, Solver3D * s, Scene *scene, const char *filename, uint index, 
+CandleStick::CandleStick (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  CgSVShader * shader, double rayon):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, shader)
 {

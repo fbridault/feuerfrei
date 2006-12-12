@@ -2,11 +2,12 @@
 
 #include "../scene/graphicsFn.hpp"
 #include "abstractFires.hpp"
+#include "noise.hpp"
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Solver3D *s, 
+LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Field3D *s, 
 		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
 		      DetachableFireSource *parentFire ) :
   RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
@@ -107,7 +108,11 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	    m_perturbateCount++;
 	  break;
 	case FLICKERING_RANDOM :
-	  m_solver->addVsrc (ptx, pty, ptz, 1*rand()/((double)RAND_MAX)-.5);
+	  m_solver->addVsrc (ptx, pty, ptz, rand()/((double)RAND_MAX)-.5);
+	  break;
+	case FLICKERING_NOISE :
+	  m_solver->addVsrc (ptx, pty, ptz, (Noise::PerlinNoise1D(m_perturbateCount))/2.0);
+	  m_perturbateCount++;
 	  break;
 	}
 	ptxPrev = ptx; ptyPrev = pty; ptzPrev = ptz;
@@ -227,7 +232,7 @@ void LineFlame::generateAndDrawSparks()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Solver3D * s, double rayon):
+PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D * s, double rayon):
   RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -288,6 +293,15 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
     m_solver->addVsrc(m_x, 1, m_z+1, rand()/(10*(double)RAND_MAX));
     m_solver->addVsrc(m_x, 1, m_z-1, rand()/(10*(double)RAND_MAX));
     break;
+  case FLICKERING_NOISE :
+    double value = (Noise::PerlinNoise1D(m_perturbateCount)+1)/20.0;
+    m_solver->addVsrc(m_x, 1, m_z, value);
+    m_solver->addVsrc(m_x+1, 1, m_z, value);
+    m_solver->addVsrc(m_x-1, 1, m_z, value);
+    m_solver->addVsrc(m_x, 1, m_z+1, value);
+    m_solver->addVsrc(m_x, 1, m_z-1, value);
+    m_perturbateCount++;
+    break;
   }
 }
 
@@ -311,7 +325,7 @@ void PointFlame::drawWick (bool displayBoxes)
 /**********************************************************************************************************************/
 
 DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Solver3D *solver) :
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Field3D *solver) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
@@ -321,7 +335,7 @@ DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSk
   m_periSkeletons = periSkeletons;
   
   m_solver = solver;
-  locateInSolver3D();
+  locateInField3D();
 }
 
 DetachedFlame::~DetachedFlame()

@@ -26,23 +26,25 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
     _("Hybrid"),
-    _("LOD Hybrid")
+    _("LOD Hybrid"),
+    _("Simple field")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					4, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					5, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #else
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
     _("Hybrid"),
     _("LOD Hybrid"),
+    _("Simple field"),
     _("Both - log residuals"),
     _("Both - log residuals averages"),
     _("Both - log residuals averages + time"),
     _("Gauss-Seidel 2D")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					8, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));

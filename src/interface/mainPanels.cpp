@@ -29,6 +29,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=100.0;
+  FORCE_SENSIBILITY=100.0;
   SLIDER_RANGE=500;
   
   m_solverConfig = solverConfig;
@@ -61,7 +62,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
   m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,SLIDER_RANGE/10, wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
-  m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*SLIDER_SENSIBILITY));
+  m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*FORCE_SENSIBILITY));
   
   (*m_solverXAxisPositionSliderMin) << -SLIDER_RANGE;
   (*m_solverXAxisPositionSliderMax) << SLIDER_RANGE;
@@ -184,7 +185,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_SF)
     {
-      double value = m_buoyancySlider->GetValue()/(SLIDER_SENSIBILITY);
+      double value = m_buoyancySlider->GetValue()/(FORCE_SENSIBILITY);
       
       m_glBuffer->setBuoyancy(m_index, value);      
       m_solverConfig->buoyancy = value;
@@ -300,7 +301,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("None"),
     _("Vertical"),
     _("From right"),
-    _("Random")
+    _("Random"),
+    _("Noise")
   };
   const wxString m_FDFRadioBoxChoices[] = {
     _("Linear"),
@@ -310,7 +312,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("Random")
   };
   
-  SLIDER_SENSIBILITY=100.0;
+  FORCE_SENSIBILITY=500.0;
   SLIDER_RANGE=50;
   
   m_flameConfig = flameConfig;
@@ -349,7 +351,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_slidersSizer->Add(m_intensityCoefSlider, 6, wxEXPAND, 0);
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
-					4, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
+					5, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
   m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,
@@ -377,7 +379,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_panelSizer->Add(m_slidersSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_photoSolidSizer, 0, wxEXPAND, 0);
   
-  m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*SLIDER_SENSIBILITY));
+  m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*FORCE_SENSIBILITY));
   m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));
   m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
@@ -393,7 +395,7 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
   
   switch(event.GetId()){
   case IDSL_FF :
-    val = m_innerForceSlider->GetValue()/SLIDER_SENSIBILITY;
+    val = m_innerForceSlider->GetValue()/FORCE_SENSIBILITY;
     m_glBuffer->setFlameForces(m_index, val);
     m_flameConfig->innerForce = val;
     break;

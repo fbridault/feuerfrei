@@ -32,6 +32,7 @@ using namespace std;
 #define FLICKERING_VERTICAL 1
 #define FLICKERING_RIGHT 2
 #define FLICKERING_RANDOM 3
+#define FLICKERING_NOISE 4
 
 #define FDF_LINEAR 0
 #define FDF_BILINEAR 1

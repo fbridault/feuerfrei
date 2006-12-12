@@ -98,7 +98,7 @@ private:
   u_char *m_pixels;
   
   /********* Variables relatives au solveur ******************************/
-  Solver **m_solvers;
+  Field **m_solvers;
   
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()

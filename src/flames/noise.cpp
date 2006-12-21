@@ -1,5 +1,6 @@
 #include "noise.hpp"
 #include <math.h>
+#include <stdlib.h>
 
 PerlinNoise1D::PerlinNoise1D(float increment, float min, float max)
 {
@@ -11,7 +12,9 @@ PerlinNoise1D::PerlinNoise1D(float increment, float min, float max)
 
   m_persistence = .5;
   m_nbOctaves = 8;
-  m_currentX = 0;
+  //  m_currentX = 0;
+  /* On donne un germe différent pour chaque générateur */
+  m_currentX = 100*rand()/((double)RAND_MAX);
 }
 
 float PerlinNoise1D::Noise1(int x)

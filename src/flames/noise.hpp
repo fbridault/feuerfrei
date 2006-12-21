@@ -1,14 +1,30 @@
-#ifndef NOISE_HPP
-#define NOISE_HPP
+#ifndef PERLINNOISE_HPP
+#define PERLINNOISE_HPP
 
-class Noise
+#include <sys/types.h>
+
+/** Classe de méthodes statiques permettant de générer un bruit de Perlin en une dimension. */
+class PerlinNoise1D
 {
 public:
-  static float Noise1(int x);
-  static float SmoothedNoise1(float x);
-  static float Cosine_Interpolate(float a, float b, float x);
-  static float InterpolatedNoise1(float x);
-  static float PerlinNoise1D(float x);
+  PerlinNoise1D(float increment, float min, float max);
+  /** Génération d'un bruit de Perlin pour une valeur x. */
+  float getNextValue();
+  float getNextValue(float offset);
+  
+private:
+  float Noise1(int x);
+  float SmoothedNoise1(float x);
+  float Cosine_Interpolate(float a, float b, float x);
+  float InterpolatedNoise1(float x);
+  
+  float m_currentX;
+  float m_increment;
+  float m_offset, m_coef;
+  
+  /** Compris entre 0 et 1. Plus elle est grande, plus le bruit est accidenté. */
+  float m_persistence;
+  uint m_nbOctaves;
 };
 
 #endif

@@ -302,6 +302,8 @@ class DetachedFlame;
 /********************************************* DEFINITION DE LA CLASSE REALFLAME **************************************/
 /**********************************************************************************************************************/
 
+#include "noise.hpp"
+
 /** La classe RealFlame, par rapport à la classe FixedFlame, ajoute la notion de squelettes de flamme ainsi que les
  * interactions avec un solveur de fluides.
  * Cette classe reste abstraite et est héritée par les classes LineFlame et PointFlame.
@@ -325,7 +327,8 @@ public:
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s);
+  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s,
+	    float noiseIncrement, float noiseMin, float noiseMax);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -386,6 +389,9 @@ protected:
   double m_innerForce;
   
   uint m_perturbateCount;
+
+  double m_seed;
+  PerlinNoise1D m_noiseGenerator;
 };
 
 #endif

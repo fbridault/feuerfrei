@@ -282,8 +282,10 @@ void FixedFlame::drawPointFlame ()
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s) :
-  FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex)
+RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s,
+		     float noiseIncrement, float noiseMin, float noiseMax) :
+  FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex),
+  m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];

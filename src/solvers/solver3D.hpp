@@ -32,13 +32,7 @@ public:
 	    double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Solver3D ();
-  
-  /** Ajout des forces externes.
-   * @param x Composante à traiter.
-   * @param src Composante contenant les forces engendrées par les sources externes.
-   */
-  virtual void add_source (double *const x, double *const src);
-  
+    
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () {} ;
 

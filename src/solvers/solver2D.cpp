@@ -61,6 +61,9 @@ Solver2D::Solver2D (Point& position, uint n_x, uint n_y,double dim, double timeS
   
   nx = m_nbVoxelsX+2;
   t1= nx +1;
+  
+  m_forceCoef = .01;
+  m_forceRatio = 1/m_forceCoef;
 }
 
 Solver2D::~Solver2D ()
@@ -236,7 +239,8 @@ void Solver2D::displayVelocityField (void)
 	  //      printf("%vélocité %d %d %f %f\n",i,j,u[IX(i,j)],v[IX(i,j)]);
 	  
 	  vect.x = getU (i, j);  vect.y = getV (i, j);
-	  displayArrow (vect);
+	  if (vect.x != 0 && vect.y != 0)
+	    displayArrow (vect);
 	  glPopMatrix();
 	  
 	  /* Affichage de la densité */
@@ -266,7 +270,7 @@ void Solver2D::displayDensityField (void)
 void Solver2D::displayArrow (Vector& direction)
 {
   double norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
-  double taille = m_dimX * m_dimY * norme_vel * 10;
+  double taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05;
   float angle;
   Vector ref;
   

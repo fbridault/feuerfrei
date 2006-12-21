@@ -2,7 +2,7 @@
 
 #include "../scene/graphicsFn.hpp"
 #include "abstractFires.hpp"
-#include "noise.hpp"
+
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
@@ -10,7 +10,7 @@
 LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Field3D *s, 
 		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
 		      DetachableFireSource *parentFire ) :
-  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
+  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s, .1, -.2, .2),
   m_wick (wickFileName, flameConfig->skeletonsNumber, scene, flameConfig->position, wickName)
 {
   Point pt;
@@ -56,6 +56,8 @@ LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex
   m_parentFire = parentFire;
 
   m_detachedFlamesWidth = detachedFlamesWidth;
+
+  m_seed = 10*rand()/((double)RAND_MAX);
 }
 
 LineFlame::~LineFlame ()
@@ -74,10 +76,6 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
       m_solver->findPointPosition((*pointsIterator)->m_pt, ptx, pty, ptz);
       
       if(ptxPrev != ptx || ptyPrev != pty || ptzPrev != ptz){
-	// m_solver->addVsrc (ptx, i, ptz, .0004* exp((*pointsIterator)->y)*exp((*pointsIterator)->getY ()) );
-	// m_solver->addVsrc (ptx, i, ptz, m_innerForce * exp(((double)pty+(*pointsIterator)->y) ));
-	// m_solver->addVsrc (ptx, pty, ptz, m_innerForce * exp(i));
-	
 	switch(fdf){
 	case FDF_LINEAR :
 	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * ((*pointsIterator)->m_u + 1));
@@ -89,8 +87,7 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
 	  break;
 	case FDF_GAUSS:
-// 	  m_solver->addVsrc (ptx, pty, ptz, -m_innerForce * (*pointsIterator)->m_u* (*pointsIterator)->m_u+m_innerForce);
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9));
+	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9.0));
 	  break;
 	case FDF_RANDOM:
 	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * rand()/((double)RAND_MAX));
@@ -111,7 +108,7 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	  m_solver->addVsrc (ptx, pty, ptz, rand()/((double)RAND_MAX)-.5);
 	  break;
 	case FLICKERING_NOISE :
-	  m_solver->addVsrc (ptx, pty, ptz, (Noise::PerlinNoise1D(m_perturbateCount))/2.0);
+	  m_solver->addVsrc (ptx, pty, ptz, m_noiseGenerator.getNextValue(i));
 	  m_perturbateCount++;
 	  break;
 	}
@@ -233,7 +230,7 @@ void LineFlame::generateAndDrawSparks()
 /**********************************************************************************************************************/
 
 PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D * s, double rayon):
-  RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
+  RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s, .1, 0, .1)
 {
   uint i;
   double angle;
@@ -247,13 +244,15 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D *
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, Point (cos (angle) * rayon + m_position.x, 
-							   m_position.y, 
-							   sin (angle) * rayon + m_position.z),
-					 Point(4,.75,4),
-					 m_leadSkeletons[0], &flameConfig->periLifeSpan);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, 
+					     Point (cos (angle) * rayon + m_position.x, 
+						    m_position.y, 
+						    sin (angle) * rayon + m_position.z),
+					     Point(4,.75,4),
+					     m_leadSkeletons[0], &flameConfig->periLifeSpan);
       angle += 2 * PI / m_nbSkeletons;
     }
+  m_seed = 10*rand()/((double)RAND_MAX);
 }
 
 PointFlame::~PointFlame ()
@@ -294,12 +293,12 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
     m_solver->addVsrc(m_x, 1, m_z-1, rand()/(10*(double)RAND_MAX));
     break;
   case FLICKERING_NOISE :
-    double value = (Noise::PerlinNoise1D(m_perturbateCount)+1)/20.0;
+    double value = m_noiseGenerator.getNextValue();
     m_solver->addVsrc(m_x, 1, m_z, value);
-    m_solver->addVsrc(m_x+1, 1, m_z, value);
-    m_solver->addVsrc(m_x-1, 1, m_z, value);
-    m_solver->addVsrc(m_x, 1, m_z+1, value);
-    m_solver->addVsrc(m_x, 1, m_z-1, value);
+//     m_solver->addVsrc(m_x+1, 1, m_z, value);
+//     m_solver->addVsrc(m_x-1, 1, m_z, value);
+//     m_solver->addVsrc(m_x, 1, m_z+1, value);
+//     m_solver->addVsrc(m_x, 1, m_z-1, value);
     m_perturbateCount++;
     break;
   }

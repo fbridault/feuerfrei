@@ -35,6 +35,9 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
   nx = m_nbVoxelsX+2;
   t1=n2 + nx +1;
   t2nx=2*nx;
+
+  m_forceCoef = 1;
+  m_forceRatio = 1;
 }
 
 Solver3D::~Solver3D ()
@@ -46,14 +49,6 @@ Solver3D::~Solver3D ()
   delete[]m_dens;
   delete[]m_densPrev;
   delete[]m_densSrc;
-}
-
-void Solver3D::add_source (double *const x, double *const src)
-{
-  uint i;
-  
-  for (i = 0; i < m_nbVoxels; i++)
-    x[i] += m_dt * src[i];
 }
 
 void Solver3D::set_bnd (unsigned char b, double *const x)
@@ -191,11 +186,11 @@ void Solver3D::addExternalForces(Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = strength.z = .001*m_nbVoxelsX;  
+    strength.x = strength.y = strength.z = .001;  
     m_position=position;
   }else{
     force = position;
-    strength = position * m_nbVoxelsX;
+    strength = position * .1;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
     strength.z = fabs(strength.z);  

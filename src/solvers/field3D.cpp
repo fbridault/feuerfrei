@@ -89,7 +89,7 @@ void Field3D::iterate ()
   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
     for (uint j = 1; j < m_nbVoxelsY + 1; j++)
       for (uint k = 1; k < m_nbVoxelsZ + 1; k++){
-	tmp = m_buoyancy / (double) (m_nbVoxelsY-j);
+	tmp = m_buoyancy * j/(double)m_nbVoxelsY;
 	addVsrc( i, j, k, tmp );
       }
   if(arePermanentExternalForces)
@@ -203,8 +203,8 @@ void Field3D::displayVelocityField (void)
 
 void Field3D::displayArrow (Vector& direction)
 {
-  double norme_vel = sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
-  double taille = m_dim.x * m_dim.y * m_dim.z * norme_vel * 4;
+  double norme_vel = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
+  double taille = m_dim.x * m_dim.y * m_dim.z * norme_vel * m_forceRatio;
   double angle;
   Vector axeRot, axeCone (0.0, 0.0, 1.0);
   
@@ -242,7 +242,7 @@ void Field3D::addExternalForces(Point& position, bool move)
     m_position=position;
   }else{
     force = position;
-    strength = position * .001;
+    strength = position * .1;
   }
   
   /* Ajouter des forces externes */
@@ -250,15 +250,44 @@ void Field3D::addExternalForces(Point& position, bool move)
       for (uint i = 1; i < m_nbVoxelsX + 1; i++)
 	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    addUsrc (i, j, k, strength.x);
+	    addUsrc (i, j, k, strength.x*j/(double)m_nbVoxelsY);
   if(force.y)
       for (uint i = 1; i < m_nbVoxelsX + 1; i++)
 	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    addVsrc (i, j, k, strength.y); 
+	    addVsrc (i, j, k, strength.y);
   if(force.z)
       for (uint i = 1; i < m_nbVoxelsX + 1; i++)
 	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    addWsrc (i, j, k, strength.z); 
+	    addWsrc (i, j, k, strength.z*j/(double)m_nbVoxelsY);
+
+//   /* Ajouter des forces externes */
+//   if(force.x)
+//     if( force.x > 0)
+//       for (i = ceilz; i <= widthz; i++)
+// 	for (j = ceily; j <= widthy; j++)
+// 	  addUsrc (m_nbVoxelsX, j, i, -strength.x);
+//     else
+//       for (i = ceilz; i <= widthz; i++)
+// 	for (j = ceily; j <= widthy; j++)
+// 	  addUsrc (1, j, i, strength.x); 
+//   if(force.y)
+//     if( force.y > 0)
+//       for (i = ceilx; i <= widthx; i++)
+// 	for (j = ceilz; j < widthz; j++)
+// 	  addVsrc (i, m_nbVoxelsY, j, -strength.y/10.0);
+//     else
+//       for (i = ceilx; i <= widthx; i++)
+// 	for (j = ceilz; j <= widthz; j++)
+// 	  addVsrc (i, 1, j, strength.y/10.0);
+//   if(force.z)
+//     if( force.z > 0)
+//       for (i = ceilx; i <= widthx; i++)
+// 	for (j = ceily; j <= widthy; j++)
+// 	  addWsrc (i, j, m_nbVoxelsZ, -strength.z);
+//     else
+//       for (i = ceilx; i <= widthx; i++)
+// 	for (j = ceily; j <= widthy; j++)
+// 	  addWsrc (i, j, 1, strength.z);
 }

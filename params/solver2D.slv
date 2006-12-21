@@ -5,7 +5,7 @@ Clipping=100
 [Solvers]
 Number=1
 [Solver0]
-Type=7
+Type=8
 Pos.x=-0,5
 Pos.y=-0,5
 Pos.z=1,08
@@ -19,18 +19,3 @@ omegaProj=1,5
 epsilon=0,0001
 nbMaxIter=50
 Buoyancy=2,20688e-312
-[Solver1]
-Type=0
-Pos.x=0
-Pos.y=0
-Pos.z=0
-X_res=15
-Y_res=15
-Z_res=15
-Dim=1
-TimeStep=0,4
-Buoyancy=1,43808e-266
-omegaDiff=1,5
-omegaProj=1,5
-epsilon=1e-05
-nbMaxIter=100

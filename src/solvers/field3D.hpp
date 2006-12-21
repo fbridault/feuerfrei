@@ -65,6 +65,18 @@ public:
   {
     return m_w[IX (i, j, k)];
   };
+
+  /** Récupération de la valeur des trois composantes de la vélocité dans la grille du solveur.
+   * @param i Indice à l'horizontale (x).
+   * @param j Indice à la verticale (y).
+   * @param k Indice en profondeur (z).
+   * @return Valeurs de vélocité.
+   */   
+  Point getUVW (uint i, uint j, uint k) const
+  {
+    uint n=IX (i, j, k);
+    return Point(m_u[n], m_v[n], m_w[n]);
+  };
   
   /** Ajout d'une force externe pour la composante U.
    * @param i Indice à l'horizontale (x).

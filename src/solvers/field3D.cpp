@@ -190,9 +190,7 @@ void Field3D::displayVelocityField (void)
 			    inc_y * j - inc_y / 2.0, 
 			    inc_z * k - inc_z / 2.0 - m_dim.z / 2.0);
 	      //SDL_mutexP (lock);
-	      vect.x = getU (i, j, k);
-	      vect.y = getV (i, j, k);
-	      vect.z = getW (i, j, k);
+	      vect = getUVW (i, j, k);
 	      //SDL_mutexV (lock);
 	      displayArrow (vect);
 	      glPopMatrix ();

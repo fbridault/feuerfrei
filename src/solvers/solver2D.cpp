@@ -59,8 +59,8 @@ Solver2D::Solver2D (Point& position, uint n_x, uint n_y,double dim, double timeS
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   
-  nx = m_nbVoxelsX+2;
-  t1= nx +1;
+  m_nx = m_nbVoxelsX+2;
+  m_t1= m_nx +1;
   
   m_forceCoef = .01;
   m_forceRatio = 1/m_forceCoef;

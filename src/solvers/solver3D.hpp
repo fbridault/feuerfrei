@@ -99,7 +99,7 @@ protected:
   double *m_uPrev, *m_vPrev, *m_wPrev;
   double *m_dens, *m_densPrev, *m_densSrc;
   
-  uint n2, t2nx;
+  uint m_n2, m_t2nx;
 };
 
 #endif

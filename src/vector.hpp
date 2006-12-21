@@ -99,6 +99,16 @@ public:
   };
   /** 
    * Obtenir un point obtenu en multipliant le point courant
+   * par un r&eacute;el.
+   * @param K	facteur multiplicateur.
+   * @return	El&eacute;ment de type Cpoint.
+   */
+  Point operator*(const Point &op) const
+  {
+    return Point(x*op.x, y*op.y, z*op.z);
+  };
+  /** 
+   * Obtenir un point obtenu en multipliant le point courant
    * par un r&eacute;el.(Ajout de Michel Leblond).
    * @param K	facteur multiplicateur.
    * @return	El&eacute;ment de type Cpoint.

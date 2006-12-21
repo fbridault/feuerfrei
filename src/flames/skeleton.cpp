@@ -99,18 +99,17 @@ bool FreeSkeleton::moveParticle (Particle * const pos)
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   m_solver->findPointPosition(*pos, i, j, k);
   
+  /* Si la particule sort de la grille, elle prend la vélocité du bord */
   if ( i >= m_solver->getXRes()  )
     i = m_solver->getXRes()-1;
-  if ( j >= m_solver->getXRes()  )
+  if ( j >= m_solver->getYRes()  )
     j = m_solver->getYRes()-1;
-  if ( k >= m_solver->getXRes()  )
+  if ( k >= m_solver->getZRes()  )
     k = m_solver->getZRes()-1;
   
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  pos->x += m_solver->getU (i, j, k);
-  pos->y += m_solver->getV (i, j, k);
-  pos->z += m_solver->getW (i, j, k);
+  *pos += m_solver->getUVW (i, j, k);
   
   return 1;
 }
@@ -184,7 +183,6 @@ void Skeleton::drawRoot ()
 void Skeleton::moveRoot ()
 {
   uint i, j, k;
-  Point tmp;
   double distx = 10 / (double) m_solver->getXRes ();
   double distz = 1 / (double) m_solver->getZRes ();
   
@@ -192,11 +190,7 @@ void Skeleton::moveRoot ()
 
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  tmp.x = m_rootSave.x + m_rootMoveFactor.x * m_solver->getU (i, j, k);
-  tmp.y = m_rootSave.y + m_rootMoveFactor.y * m_solver->getV (i, j, k);
-  tmp.z = m_rootSave.z + m_rootMoveFactor.z * m_solver->getW (i, j, k);
-  
-  m_root = tmp;
+  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (i, j, k);
 
   return;
 }
@@ -241,9 +235,7 @@ bool Skeleton::moveParticle (Particle * const pos)
   
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  pos->x += m_solver->getU (i, j, k);
-  pos->y += m_solver->getV (i, j, k);
-  pos->z += m_solver->getW (i, j, k);
+  *pos += m_solver->getUVW (i, j, k);
 
   if (pos->x < -.5 || pos->x > .5
       || pos->y < 0 || pos->y > 1

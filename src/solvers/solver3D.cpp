@@ -31,10 +31,10 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
   m_visc = 0.00000015;
   m_diff = 0.001;
   
-  n2= (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
-  nx = m_nbVoxelsX+2;
-  t1=n2 + nx +1;
-  t2nx=2*nx;
+  m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
+  m_nx = m_nbVoxelsX+2;
+  m_t1 = m_n2 + m_nx +1;
+  m_t2nx = 2*m_nx;
 
   m_forceCoef = 1;
   m_forceRatio = 1;
@@ -96,13 +96,14 @@ void Solver3D::advect (unsigned char b, double *const d, const double *const d0,
   dt0_y = m_dt * m_nbVoxelsY;
   dt0_z = m_dt * m_nbVoxelsZ;
   
-  for (i = 1; i <= m_nbVoxelsX; i++)
-    for (j = 1; j <= m_nbVoxelsY; j++)
-      for (k = 1; k <= m_nbVoxelsZ; k++)
-	{
-	  x = i - dt0_x * u[IX (i, j, k)];
-	  y = j - dt0_y * v[IX (i, j, k)];
-	  z = k - dt0_z * w[IX (i, j, k)];
+  m_t=m_t1;
+  for (uint k = 1; k <= m_nbVoxelsZ; k++){
+    for (uint j = 1; j <= m_nbVoxelsY; j++){
+      for (uint i = 1; i <= m_nbVoxelsX; i++){
+	
+	  x = i - dt0_x * u[m_t];
+	  y = j - dt0_y * v[m_t];
+	  z = k - dt0_z * w[m_t];
 	  
 	  if (x < 0.5) x = 0.5;
 	  if (x > m_nbVoxelsX + 0.5) x = m_nbVoxelsX + 0.5;
@@ -123,11 +124,17 @@ void Solver3D::advect (unsigned char b, double *const d, const double *const d0,
 	  t1 = z - k0;
 	  t0 = 1 - t1;
 	  
-	  d[IX (i, j, k)] = r0 * (s0 * (t0 * d0[IX (i0, j0, k0)] + t1 * d0[IX (i0, j0, k1)]) +
-				  s1 * (t0 * d0[IX (i0, j1, k0)] + t1 * d0[IX (i0, j1, k1)])) +
+	  d[m_t] = r0 * (s0 * (t0 * d0[IX (i0, j0, k0)] + t1 * d0[IX (i0, j0, k1)]) +
+			 s1 * (t0 * d0[IX (i0, j1, k0)] + t1 * d0[IX (i0, j1, k1)])) +
 	    r1 * (s0 * (t0 * d0[IX (i1, j0, k0)] + t1 * d0[IX (i1, j0, k1)]) +
 		  s1 * (t0 * d0[IX (i1, j1, k0)] + t1 * d0[IX (i1, j1, k1)]));
-	}
+	  
+	  m_t++;
+      }//for i
+      m_t+=2;
+    }//for j
+    m_t+=m_t2nx;
+  }//for k
   
   //set_bnd (b, d);
 }
@@ -163,11 +170,18 @@ void Solver3D::vel_step ()
 void Solver3D::iterate ()
 { 
   /* Cellule(s) génératrice(s) */
-  for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-    for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-      for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	addVsrc(i, j, k, m_buoyancy / (double) (m_nbVoxelsY-j+1));
-  
+  m_t=m_t1;
+  for (uint k = 1; k <= m_nbVoxelsZ; k++){
+    for (uint j = 1; j <= m_nbVoxelsY; j++){
+      for (uint i = 1; i <= m_nbVoxelsX; i++){
+	m_vSrc[m_t] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+	m_t++;
+      }//for i
+      m_t+=2;
+    }//for j
+    m_t+=m_t2nx;
+  }//for k
+    
   if(arePermanentExternalForces)
     addExternalForces(permanentExternalForces,false);
   

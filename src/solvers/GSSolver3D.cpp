@@ -18,17 +18,17 @@ void GSSolver3D::GS_solve(unsigned char b, double *const x, const double *const 
   uint i, j, k, l;
   
   for (l = 0; l < nb_steps; l++){
-    t=t1;
+    m_t=m_t1;
     for (k = 1; k <= m_nbVoxelsZ; k++){
       for (j = 1; j <= m_nbVoxelsY; j++){
-	for (i = 1; i <= m_nbVoxelsZ; i++){
-	  x[t] = ( x0[t] + a * (x[t-1] + x[t+1] + x[t-nx] + x[t+nx] + x[t-n2] +x[t+n2]) ) * div;
+	for (i = 1; i <= m_nbVoxelsX; i++){
+	  x[m_t] = ( x0[m_t] + a * (x[m_t-1] + x[m_t+1] + x[m_t-m_nx] + x[m_t+m_nx] + x[m_t-m_n2] +x[m_t+m_n2]) ) * div;
 	  //set_bnd (b, x);
-	  t++;
+	  m_t++;
 	}//for i
-	t+=2;
+	m_t+=2;
       }//for j
-      t+=t2nx;
+      m_t+=m_t2nx;
     }//for k
   }//for l
 }//GS_solve
@@ -44,20 +44,20 @@ void GSSolver3D::project (double *const p, double *const div)
   double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
   
-  t=t1;
+  m_t=m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
-	div[t] = -0.5 * (
-			 h_x * (m_u[t+1] - m_u[t-1]) +
-			 h_y * (m_v[t+nx] - m_v[t-nx]) +
-			 h_z * (m_w[t+n2] - m_w[t-n2])
+	div[m_t] = -0.5 * (
+			 h_x * (m_u[m_t+1] - m_u[m_t-1]) +
+			 h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) +
+			 h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2])
 			 );
-	t++;
+	m_t++;
       }//for i
-      t+=2;
+      m_t+=2;
     }//for j
-    t+=t2nx;
+    m_t+=m_t2nx;
     //p[IX (i, j, k)] = 0;
   }// for k
   
@@ -67,18 +67,18 @@ void GSSolver3D::project (double *const p, double *const div)
   
   GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 
   
-  t=t1;
+  m_t=m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
-	m_u[t] -= 0.5 * (p[t+1] - p[t-1]) / h_x;
-	m_v[t] -= 0.5 * (p[t+nx] - p[t-nx]) / h_y;
-	m_w[t] -= 0.5 * (p[t+n2] - p[t-n2]) / h_z;
-	t++;
+	m_u[m_t] -= 0.5 * (p[m_t+1] - p[m_t-1]) / h_x;
+	m_v[m_t] -= 0.5 * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
+	m_w[m_t] -= 0.5 * (p[m_t+m_n2] - p[m_t-m_n2]) / h_z;
+	m_t++;
       }//for i
-      t+=2;
+      m_t+=2;
     }//for j
-    t+=t2nx;
+    m_t+=m_t2nx;
   }//for k
   //set_bnd (1, u);
   //set_bnd (2, v);

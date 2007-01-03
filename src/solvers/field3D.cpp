@@ -38,9 +38,6 @@ Field3D::Field3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, dou
   }
   
   m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_u = new double[m_nbVoxels];
   m_v = new double[m_nbVoxels];
@@ -118,8 +115,6 @@ void Field3D::buildDLGrid ()
   
   m_gridDisplayList=glGenLists(1);
   glNewList (m_gridDisplayList, GL_COMPILE);
-  glPushMatrix ();
-  glTranslatef (-m_dim.x / 2.0, 0, m_dim.z / 2.0);
   glBegin (GL_LINES);
   
   glColor4f (0.5, 0.5, 0.5, 0.5);
@@ -128,17 +123,16 @@ void Field3D::buildDLGrid ()
     {
       for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
 	{
-	  glVertex3d (i, 0.0, -j);
-	  glVertex3d (i, m_dim.y, -j);
+	  glVertex3d (i, 0.0, j);
+	  glVertex3d (i, m_dim.y, j);
 	}
       for (i = 0.0; i <= m_dim.y + intery / 2; i += intery)
 	{
-	  glVertex3d (0.0, i, -j);
-	  glVertex3d (m_dim.x, i, -j);
+	  glVertex3d (0.0, i, j);
+	  glVertex3d (m_dim.x, i, j);
 	}
     }
   glEnd ();
-  glPopMatrix ();
   glEndList ();
 }
 
@@ -150,24 +144,21 @@ void Field3D::buildDLBase ()
   
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
-  glPushMatrix ();
-  glTranslatef (-m_dim.x / 2.0, 0.0, m_dim.z / 2.0);
   glBegin (GL_LINES);
   
   glLineWidth (1.0);
   glColor4f (0.5, 0.5, 0.5, 0.5);
   for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
     {
-      glVertex3d (i, 0.0, -m_dim.z);
       glVertex3d (i, 0.0, 0.0);
+      glVertex3d (i, 0.0, m_dim.z);
     }
   for (i = 0.0; i <= m_dim.z + interz / 2; i += interz)
     {
-      glVertex3d (0.0, 0.0, i - m_dim.z);
-      glVertex3d (m_dim.x, 0.0, i - m_dim.z);
+      glVertex3d (0.0, 0.0, i);
+      glVertex3d (m_dim.x, 0.0, i);
     }
   glEnd ();
-  glPopMatrix ();
   glEndList ();
 }
 
@@ -177,18 +168,16 @@ void Field3D::displayVelocityField (void)
   double inc_y = m_dim.y / (double) m_nbVoxelsY;
   double inc_z = m_dim.z / (double) m_nbVoxelsZ;
   
-  for (uint i = 1; i <= m_nbVoxelsX; i++)
+  for (uint i = 0; i <= m_nbVoxelsX; i++)
     {
-      for (uint j = 1; j <= m_nbVoxelsY; j++)
+      for (uint j = 0; j <= m_nbVoxelsY; j++)
 	{
-	  for (uint k = 1; k <= m_nbVoxelsZ; k++)
+	  for (uint k = 0; k <= m_nbVoxelsZ; k++)
 	    {
 	      Vector vect;
 	      /* Affichage du champ de vélocité */
 	      glPushMatrix ();
-	      glTranslatef (inc_x * i - inc_x / 2.0 - m_dim.x / 2.0,
-			    inc_y * j - inc_y / 2.0, 
-			    inc_z * k - inc_z / 2.0 - m_dim.z / 2.0);
+	      glTranslatef (inc_x * i - inc_x/2.0 , inc_y * j - inc_y/2.0, inc_z * k - inc_z/2.0);
 	      //SDL_mutexP (lock);
 	      vect = getUVW (i, j, k);
 	      //SDL_mutexV (lock);

@@ -224,7 +224,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
   
   m_init = true;
   
-  cerr << "Initialisation terminée" << endl;
+  cerr << "Initialization over" << endl;
 }
 
 void GLFlameCanvas::Restart (void)
@@ -241,7 +241,7 @@ void GLFlameCanvas::Restart (void)
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
   ::wxStartTimer();
   m_init = true;
-  cerr << "Réinitialisation terminée" << endl;
+  cerr << "Initialization over" << endl;
   Enable();
 }
 
@@ -622,7 +622,7 @@ void GLFlameCanvas::castShadows ()
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->switchOff ();
   m_scene->drawSceneWT ();
-
+  
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
     for (f = 0; f < m_currentConfig->nbFlames; f++){
       m_flames[f]->switchOn ();
@@ -630,21 +630,21 @@ void GLFlameCanvas::castShadows ()
   
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
 		GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
-
+  
   glColorMask (0, 0, 0, 0);
   glDepthMask (0);
-
+  
   glDisable (GL_CULL_FACE);
   glEnable (GL_STENCIL_TEST);
   glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
+  
   glActiveStencilFaceEXT (GL_BACK);
   glStencilOp (GL_KEEP,	// stencil test fail
 	       GL_DECR_WRAP_EXT,	// depth test fail
 	       GL_KEEP);	// depth test pass
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
-
+  
   glActiveStencilFaceEXT (GL_FRONT);
   glStencilOp (GL_KEEP,	// stencil test fail
 	       GL_INCR_WRAP_EXT,	// depth test fail

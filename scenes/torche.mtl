@@ -1,16 +1,16 @@
-#Produced by Art of Illusion 2.3, Mon Jul 10 17:41:52 CEST 2006
+#Produced by Art of Illusion 2.3, Wed Jan 03 18:05:08 CET 2007
 newmtl Material__1
 Kd 0.28 0.28 0.28
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Bois
-Kd 0.55 0.38731 0.2695
+newmtl Meche
+Kd 0.22 0.22 0.22
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Meche
-Kd 0.22 0.22 0.22
+newmtl Bois
+Kd 0.55 0.38731 0.2695
 Ks 0 0 0
 Ka 0 0 0
 illum 1

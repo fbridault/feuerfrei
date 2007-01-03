@@ -183,8 +183,6 @@ void Skeleton::drawRoot ()
 void Skeleton::moveRoot ()
 {
   uint i, j, k;
-  double distx = 10 / (double) m_solver->getXRes ();
-  double distz = 1 / (double) m_solver->getZRes ();
   
   m_solver->findPointPosition(m_root, i, j, k);
 
@@ -237,9 +235,9 @@ bool Skeleton::moveParticle (Particle * const pos)
   /* Intégration d'Euler */
   *pos += m_solver->getUVW (i, j, k);
 
-  if (pos->x < -.5 || pos->x > .5
+  if (pos->x < 0 || pos->x > 1
       || pos->y < 0 || pos->y > 1
-      || pos->z < -.5 || pos->z > .5)
+      || pos->z < 0 || pos->z > 1)
     return false;
   
   return true;

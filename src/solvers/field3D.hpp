@@ -196,9 +196,9 @@ public:
    */
   void findPointPosition(Point& p, uint& i, uint& j, uint& k)
   {
-    i = (uint) (p.x * m_nbVoxelsX) + 1 + m_halfNbVoxelsX;
+    i = (uint) (p.x * m_nbVoxelsX) + 1;
     j = (uint) (p.y * m_nbVoxelsY) + 1;
-    k = (uint) (p.z * m_nbVoxelsZ) + 1 + m_halfNbVoxelsZ;
+    k = (uint) (p.z * m_nbVoxelsZ) + 1;
   };
   
   /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur.
@@ -267,8 +267,6 @@ protected:
   uint m_nbVoxelsY;
   /** Nombre de voxels en Z sur un côté du cube. */
   uint m_nbVoxelsZ;
-  
-  uint m_halfNbVoxelsX,  m_halfNbVoxelsZ;
   
   /** Dimension du solveur */
   Point m_dim;

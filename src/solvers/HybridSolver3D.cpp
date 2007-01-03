@@ -150,9 +150,6 @@ void LODHybridSolver3D::divideRes ()
   m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
   m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
   m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -185,9 +182,6 @@ void LODHybridSolver3D::decreaseRes ()
   m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
   m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
   m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -228,9 +222,6 @@ void LODHybridSolver3D::multiplyRes ()
   m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
   m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
   m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -263,9 +254,6 @@ void LODHybridSolver3D::increaseRes ()
   m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
   m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
   m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
-
-  m_halfNbVoxelsX = m_nbVoxelsX/2;
-  m_halfNbVoxelsZ = m_nbVoxelsZ/2;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;

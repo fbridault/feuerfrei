@@ -2,31 +2,62 @@
 
 /** \mainpage Index page
  *
- * \section intro_sec Introduction
+ * Bienvenue sur la doc de rtflames et rtfluids !
  *
- * This is the introduction.
+ * \section Instructions
  *
- * \section install_sec Installation
+ * Mise à jour de l'archive :
+ * cg-update
  *
- * \subsection step1 Step 1: Opening the box
- *  
- * etc...
+ * Compilation de rtflames:
+ * make flames
+ * Compilation de rtfluids:
+ * make fluids
+ * 
+ * Compilation des deux cibles:
+ * make
+ *
+ * Compilation d'une version de déboguage :
+ * make build
+ * ccmake build
+ * et remplir le champ CMAKE_BUILD_TYPE avec Debug
+ * ou
+ * cmake -i build
+ * et répondre Debug pour le type de build
+ *
+ * Lancement :
+ * rtflames <fichier de simulation> (par défaut params/param.ini)
+ * rtfluids <fichier de simulation> (par défaut params/solver.ini)
+ *
+ * L'option --recompile n'est plus nécessaire, le programme détermine lui-même si
+ * il faut recompiler ou non les shaders.
+ *
+ * Soumission des changements :
+ * make clean 
+ * cg-push
+ *
+ * \section consignes Consignes
+ * 
+ * Lorsque vous ajoutez ou modifiez des classes, merci de préfixer toutes les variables membres
+ * par 'm_'. Ceci facilite grandement la lecture du code.
+ *
+ * Merci également d'essayer de faire des commits le plus petit possible de manière à faciliter les fusions.
  */
 
 /** \todo commenter... */
 
 /** Classe Principale.
- * Classe principale charg�e de l'analyse des arguments de la ligne de commande et du lancement
- * de la fen�tre principale de l'application.
+ * Classe principale chargée de l'analyse des arguments de la ligne de commande et du lancement
+ * de la fenêtre principale de l'application.
 */
 class FlamesApp : public wxApp
 {
-  /** M�thode d'initialisation de l'application 
+  /** Méthode d'initialisation de l'application 
    */
   virtual bool OnInit();
   
-  /** D�termine si les shaders Cg sont d�j� compil�s
-   * @return false si les shaders sont compil�s
+  /** Détermine si les shaders Cg sont déjà compilés
+   * @return false si les shaders sont compilés
    */
   bool areShadersCompiled();
 };
@@ -50,7 +81,7 @@ bool FlamesApp::OnInit()
   bool recompileShaders;
   wxString configFileName;
   
-  /* D�claration des handlers pour la gestion des formats d'image */
+  /* Déclaration des handlers pour la gestion des formats d'image */
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
@@ -66,7 +97,7 @@ bool FlamesApp::OnInit()
   
   recompileShaders = areShadersCompiled();
   
-  /* Teste s'il est n�cessaire de recompiler les shaders */
+  /* Teste s'il est nécessaire de recompiler les shaders */
   FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
  
   frame->Show(TRUE);

@@ -122,7 +122,7 @@ void LineFlame::breakCheck()
 {
   double split,proba;
   uint threshold=4;
-  double detachThreshold=.95;
+  double detachThreshold=.9;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -164,14 +164,6 @@ void LineFlame::breakCheck()
       m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_solver));
     }
   }
-}
-
-void LineFlame::drawWick(bool displayBoxes)
-{
-  glPushMatrix();
-  glTranslatef (m_position.x, m_position.y, m_position.z);
-  m_wick.drawWick(displayBoxes);
-  glPopMatrix();
 }
 
 void LineFlame::generateAndDrawSparks()

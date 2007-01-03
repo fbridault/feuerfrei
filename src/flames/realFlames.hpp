@@ -47,7 +47,7 @@ public:
     if(display) drawLineFlame(); 
   };
   
-  virtual void drawWick(bool displayBoxes);
+  virtual void drawWick(bool displayBoxes){ m_wick.drawWick(displayBoxes); };
   
   virtual Vector getMainDirection() const
   {

@@ -1,6 +1,6 @@
-#Produced by Art of Illusion 2.0, Wed Apr 20 16:09:24 CEST 2005
-newmtl Untitled_1
-Kd 0 0 0
+#Produced by Art of Illusion 2.3, Wed Jan 03 18:25:51 CET 2007
+newmtl Default_Texture
+Kd 1 1 1
 Ks 0 0 0
 Ka 0 0 0
 illum 1

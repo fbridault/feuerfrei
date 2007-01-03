@@ -47,7 +47,7 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   m_position=flameConfig->position;
   
   m_flameConfig = flameConfig;
-
+  
   m_tex = tex;
 }
 
@@ -166,9 +166,12 @@ void FixedFlame::drawHalo (double angle)
       
   glPushMatrix ();
   
-  glRotatef (angle , 0.0, 1.0, 0.0);    
+  /* Problème ici... */
+  glTranslatef (m_position.x/2.0,0,m_position.z/2.0);
+  glRotatef (angle , 0.0, 1.0, 0.0);
 
-  /* On effectue une interpolation du mouvement en x et en z */
+  /* \todo On effectue une interpolation du mouvement en x et en z pour dessiner le halo.*/
+  /* Ce n'est probablement pas la meilleure solution */
   double x1, x2, x3, x4;
   if(angle > 0)
     if(angle < 90){

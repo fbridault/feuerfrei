@@ -169,9 +169,9 @@ public:
   };
   
 private:  
-  /** Nombre de flammes */
+  /** Nombre de flammes clones */
   uint m_nbCloneFlames;
-  /** Tableau contenant les flammes */
+  /** Tableau contenant les flammes clones */
   ClonePointFlame **m_cloneFlames;
 };
 

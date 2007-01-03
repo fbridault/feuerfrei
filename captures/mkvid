@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mencoder "mf://*.png" -mf fps=30 -o output.avi -ovc lavc -lavcopts vbitrate=1600 -vf scale=696:-11

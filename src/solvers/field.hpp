@@ -31,7 +31,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Field (Point& position, double timeStep, double buoyancy);
+  Field (const Point& position, double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Field ();
   
@@ -43,6 +43,9 @@ public:
    * @param src Composante contenant les forces engendrées par les sources externes.
    */
   virtual void add_source (double *const x, double *const src);
+  
+  /** Remet à zéro toutes les forces externes */
+  virtual void cleanSources () = 0;
   
   /** Retourne le pas de temps.
    * @return Valeur du pas de temps en ms.
@@ -73,7 +76,7 @@ public:
    * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
-  virtual void addExternalForces(Point& position, bool move) = 0;
+  virtual void addExternalForces(const Point& position, bool move) = 0;
   
   /** Ajoute de façon permanente des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
@@ -124,7 +127,7 @@ public:
   virtual void displayDensityField (void) = 0;
   
   /** Fonction de dessin de la vélocité d'une cellule */
-  virtual void displayArrow (Vector& direction) = 0;
+  virtual void displayArrow (const Vector& direction) = 0;
   
 protected:
   /** Fonction de construction de la display list de la grille du solveur */
@@ -132,10 +135,7 @@ protected:
   
   /** Fonction de construction de la display list du repère du solveur */
   virtual void buildDLBase () = 0;
-  
-  /** Pas de résolution de la vélocité. */
-  virtual void vel_step () = 0;
-    
+      
   /** Position du solveur dans l'espace */
   Point m_position;
 

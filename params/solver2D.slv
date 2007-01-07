@@ -5,14 +5,14 @@ Clipping=100
 [Solvers]
 Number=1
 [Solver0]
-Type=8
+Type=9
 Pos.x=-0,5
 Pos.y=-0,5
 Pos.z=1,08
 X_res=50
 Y_res=50
 Z_res=15
-Dim=1
+Scale=1
 TimeStep=0,4
 omegaDiff=1,5
 omegaProj=1,5

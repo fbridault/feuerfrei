@@ -81,7 +81,7 @@ public:
   /** Méthode permettant de générer des étincelles dans le feu.
    * @todo Cette méthode n'est pas encore terminée.
    */
-  virtual void generateAndDrawSparks();
+//   virtual void generateAndDrawSparks();
 private:
   /** Mèche de la flamme */
   Wick m_wick;
@@ -191,11 +191,6 @@ public:
       for (i = 0; i < m_nbLeadSkeletons; i++)
 	m_leadSkeletons[i]->draw();
   };
-  
-  /** Méthode permettant d'informer à la flamme de se localiser dans le solveur
-   * Elle doit être appelée dès qu'un changement de résolution de la grille intervient.
-   */  
-  virtual void locateInField3D(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
   
 protected:
   /** Pointeur vers les squelettes guide. */

@@ -160,7 +160,7 @@ void FireSource::build()
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
   }
-  averagePos *= m_solver->getDim();
+  averagePos *= m_solver->getScale();
   averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
@@ -174,7 +174,7 @@ void FireSource::computeIntensityPositionAndDirection()
   
   // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
-  m_intensity=o.length()/(m_solver->getDimY())*m_intensityCoef;
+  m_intensity=o.length()/(m_solver->getScale().y)*m_intensityCoef;
   
    //  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -212,9 +212,10 @@ DetachableFireSource::~DetachableFireSource()
 void DetachableFireSource::drawFlame(bool display, bool displayParticle)
 {
   Point pt(m_solver->getPosition());
+  Point scale(m_solver->getScale());
   glPushMatrix();
   glTranslatef (pt.x, pt.y, pt.z);
-  glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+  glScalef (scale.x, scale.y, scale.z);
   for (uint i = 0; i < m_nbFlames; i++)
     m_flames[i]->drawFlame(display, displayParticle);
   for (list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
@@ -242,7 +243,7 @@ void DetachableFireSource::build()
     }else
       flamesIterator++;
   }
-  averagePos *= m_solver->getDim();
+  averagePos *= m_solver->getScale();
   averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);

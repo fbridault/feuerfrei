@@ -163,13 +163,13 @@ void FixedFlame::drawHalo (double angle)
   glActiveTextureARB(GL_TEXTURE0_ARB);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
   m_halo.bind ();
-      
+  
   glPushMatrix ();
   
   /* Problème ici... */
   glTranslatef (m_position.x/2.0,0,m_position.z/2.0);
   glRotatef (angle , 0.0, 1.0, 0.0);
-
+  
   /* \todo On effectue une interpolation du mouvement en x et en z pour dessiner le halo.*/
   /* Ce n'est probablement pas la meilleure solution */
   double x1, x2, x3, x4;
@@ -201,21 +201,21 @@ void FixedFlame::drawHalo (double angle)
   
   glColor4f(0.0,0.0,0.0,0.0);
   glBegin(GL_QUADS);
-      
+  
   glTexCoord2f(0.0,0.0);
   glVertex3f(x1,bottom->y,0.0);
-      
+  
   glTexCoord2f(1.0,0.0);
   glVertex3f(x2,bottom->y,0.0);
-      
+  
   glTexCoord2f(1.0,1.0);
   glVertex3f(x3,top->y+h/3,0.0);
-      
+  
   glTexCoord2f(0.0,1.0);
   glVertex3f(x4,top->y+h/3,0.0);
-      
+  
   glEnd();
-
+  
   glPopMatrix();
 }
 
@@ -229,26 +229,26 @@ void FixedFlame::drawPointFlame ()
   else
     {
       double angle, angle2, angle3, angle4;
-  
+      
       /* Déplacement de la texture de maniÃ¨re Ã  ce qu'elle reste "en face" de l'observateur */
       GLdouble m[4][4];
-  
+      
       glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
-  
+      
       /* Position de la bougie = translation dans la matrice courante */
       Vector bougiepos(m[3][0], m[3][1], m[3][2]);
-  
+      
       /* Position de l'axe de regard de bougie dans le repère du monde = axe initial * Matrice de rotation */
       /* Attention, ne pas prendre la translation en plus !!!! */
       Vector worldLookAt(m[2][0], m[2][1], m[2][2]);
       Vector worldLookX(m[0][0], m[0][1], m[0][2]);
       Vector direction(-bougiepos.x, 0.0, -bougiepos.z);
-  
+      
       direction.normalize ();
       /* Apparemment, pas besoin de le normaliser, on laisse pour le moment */
       worldLookAt.normalize ();
       worldLookX.normalize ();
-  
+      
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
       
@@ -256,7 +256,7 @@ void FixedFlame::drawPointFlame ()
       /* Génération du halo */
       angle4 = (angle2 < PI / 2.0) ? -angle : angle;
       angle3 = angle4 * 180 / (double) (PI);
-  
+      
       glEnable (GL_TEXTURE_2D);
       drawHalo(angle3);
       /****************************************************************************************/
@@ -270,13 +270,13 @@ void FixedFlame::drawPointFlame ()
       glLoadIdentity ();
       
       glTranslatef (0.0, angle4 / (double) (PI), 0.0);
-  
+      
       drawNurbs();
-  
+      
       glPopMatrix();
-  
+      
       glMatrixMode (GL_MODELVIEW);
-  
+      
       glDisable (GL_TEXTURE_2D);
     }
 }
@@ -300,8 +300,6 @@ RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   m_solver = s;
   m_innerForce = flameConfig->innerForce;
   m_perturbateCount=0;
-  
-  locateInField();
 }
 
 bool RealFlame::build ()

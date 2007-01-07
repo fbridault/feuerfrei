@@ -30,9 +30,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, 
-		   uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
- 
+  LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, 
+		     uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
    * @param omegaDiff Paramètre omega pour la diffusion.

@@ -103,54 +103,60 @@ void GLFluidsCanvas::InitSolvers(void)
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
       m_solvers[i] = new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
-				  m_currentConfig->solvers[i].buoyancy);
+				    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				    m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				    m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     case GCSSOR_SOLVER :
       m_solvers[i] = new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep,
+					m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case HYBRID_SOLVER :
       m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep,
+					m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break; 
     case LOD_HYBRID_SOLVER :
       m_solvers[i] = new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					   m_currentConfig->solvers[i].timeStep,
+					   m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					   m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRES_SOLVER :
       m_solvers[i] = new LogResSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy, 
-				      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
-				      m_currentConfig->solvers[i].epsilon);
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep,
+					m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy, 
+					m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
+					m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRESAVG_SOLVER :
       m_solvers[i] = new LogResAvgSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					  m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
-					 m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					 m_currentConfig->solvers[i].epsilon);
+					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					   m_currentConfig->solvers[i].timeStep,
+					   m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
+					   m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					   m_currentConfig->solvers[i].epsilon);
       break;
     case LOGRESAVGTIME_SOLVER :
       m_solvers[i] = new LogResAvgTimeSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					     m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					      m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
-					     m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
-					     m_currentConfig->solvers[i].epsilon);
+					       m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					       m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					       m_currentConfig->solvers[i].timeStep,
+					       m_currentConfig->solvers[i].nbMaxIter, m_currentConfig->solvers[i].buoyancy,
+					       m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj, 
+					       m_currentConfig->solvers[i].epsilon);
       break;
     case GS_SOLVER2D :
       m_solvers[i] = new GSSolver2D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
@@ -158,10 +164,16 @@ void GLFluidsCanvas::InitSolvers(void)
 				  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     case SIMPLE_FIELD :
-      m_solvers[i] = new Field3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+      m_solvers[i] = new RealField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
 				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
-				  m_currentConfig->solvers[i].buoyancy);
+				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				 m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      break;
+    case FAKE_FIELD :
+      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -217,10 +229,11 @@ void GLFluidsCanvas::DestroyScene(void)
 
 void GLFluidsCanvas::OnIdle(wxIdleEvent& event)
 {
-  if(m_run){    
-    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
+  if(m_run)
+    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
+      m_solvers[i]->cleanSources();
       m_solvers[i]->iterate ();
-  }
+    }
   
   this->Refresh();
   /*  draw();*/

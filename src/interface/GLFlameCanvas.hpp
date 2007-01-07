@@ -22,6 +22,7 @@ class GLFlameCanvas;
 #include "../solvers/GSSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D.hpp"
 #include "../solvers/HybridSolver3D.hpp"
+#include "../solvers/fakeField3D.hpp"
 
 class GLFlameCanvas : public wxGLCanvas
 {

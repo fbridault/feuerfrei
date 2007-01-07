@@ -1,10 +1,10 @@
 #include "logResAvgSolver3D.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgSolver3D::LogResAvgSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
-				  double timeStep, uint nbTimeSteps, double buoyancy, 
-				  double omegaDiff, double omegaProj, double epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy),
+LogResAvgSolver3D::LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
+				      double timeStep, uint nbTimeSteps, double buoyancy, 
+				      double omegaDiff, double omegaProj, double epsilon) : 
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);

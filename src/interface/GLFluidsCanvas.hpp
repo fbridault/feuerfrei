@@ -20,6 +20,7 @@ class GLFluidsCanvas;
 #include "../solvers/logResSolver3D.hpp"
 #include "../solvers/logResAvgSolver3D.hpp"
 #include "../solvers/logResAvgTimeSolver3D.hpp"
+#include "../solvers/fakeField3D.hpp"
 
 class GLFluidsCanvas : public wxGLCanvas
 {

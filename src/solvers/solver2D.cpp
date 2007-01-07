@@ -7,7 +7,7 @@ Solver2D::Solver2D ()
 {
 }
 
-Solver2D::Solver2D (Point& position, uint n_x, uint n_y,double dim, double timeStep, double buoyancy) : 
+Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,double dim, double timeStep, double buoyancy) : 
   Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
@@ -54,8 +54,8 @@ Solver2D::Solver2D (Point& position, uint n_x, uint n_y,double dim, double timeS
   m_visc = 0.00000015;
   m_diff = 0.01;
   
-  m_dimXTimesNbVoxelsX = m_dimX * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dimY * m_nbVoxelsY;
+  m_nbVoxelsXDivDimX = m_dimX * m_nbVoxelsX;
+  m_nbVoxelsYDivDimY = m_dimY * m_nbVoxelsY;
 
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   
@@ -267,18 +267,19 @@ void Solver2D::displayDensityField (void)
       }
 }
 
-void Solver2D::displayArrow (Vector& direction)
+void Solver2D::displayArrow (const Vector& direction)
 {
   double norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
   double taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05;
   float angle;
-  Vector ref;
+  Vector ref, dir(direction);
+  
+  dir.normalize ();
   
   ref.x = 1.0; ref.y=0.0; ref.z =0.0;
   
-  direction.normalize();
-  angle = acosf(direction.x*ref.x + direction.y*ref.y);
-  if(direction.y<0.0) angle = -angle;
+  angle = acosf(dir.x*ref.x + dir.y*ref.y);
+  if(dir.y<0.0) angle = -angle;
 
   glRotatef(angle*RAD_TO_DEG,0.0,0.0,1.0);
 
@@ -296,7 +297,7 @@ void Solver2D::displayArrow (Vector& direction)
   glEnd();
 }
 
-void Solver2D::addExternalForces(Point& position, bool move)
+void Solver2D::addExternalForces(const Point& position, bool move)
 {
   uint i;
   Point strength;

@@ -39,8 +39,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy, 
-	       uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
+		 double buoyancy, uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.

@@ -91,27 +91,24 @@ void FreeSkeleton::move ()
 
 bool FreeSkeleton::moveParticle (Particle * const pos)
 {
-  uint i, j, k;
-
+  Point tmp(*pos);
+  
   if (pos->isDead ())
-    return 0;
-
-  /* Retrouver les quatres cellules adjacentes autour de la particule */
-  m_solver->findPointPosition(*pos, i, j, k);
+    return false;
   
   /* Si la particule sort de la grille, elle prend la vélocité du bord */
-  if ( i >= m_solver->getXRes()  )
-    i = m_solver->getXRes()-1;
-  if ( j >= m_solver->getYRes()  )
-    j = m_solver->getYRes()-1;
-  if ( k >= m_solver->getZRes()  )
-    k = m_solver->getZRes()-1;
-  
+  if ( tmp.x >= m_solver->getDimX() )
+    tmp.x = m_solver->getDimX() - EPSILON;
+  if ( tmp.y >= m_solver->getDimY() )
+    tmp.y = m_solver->getDimY() - EPSILON;
+  if ( tmp.z >= m_solver->getDimZ() )
+    tmp.z = m_solver->getDimZ() - EPSILON;
+    
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  *pos += m_solver->getUVW (i, j, k);
+  *pos += m_solver->getUVW (tmp);
   
-  return 1;
+  return true;
 }
 
 void FreeSkeleton::draw ()
@@ -182,13 +179,9 @@ void Skeleton::drawRoot ()
 
 void Skeleton::moveRoot ()
 {
-  uint i, j, k;
-  
-  m_solver->findPointPosition(m_root, i, j, k);
-
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (i, j, k);
+  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_root);
 
   return;
 }
@@ -220,7 +213,6 @@ void Skeleton::move ()
     }	/* for */
 }
 
-
 bool Skeleton::moveParticle (Particle * const pos)
 {
   uint i, j, k;
@@ -229,15 +221,12 @@ bool Skeleton::moveParticle (Particle * const pos)
     return false;
 
   /* Retrouver les quatres cellules adjacentes autour de la particule */
-  m_solver->findPointPosition(*pos, i, j, k);
+  *pos += m_solver->getUVW(*pos);
   
-  /* Calculer la nouvelle position */
-  /* Intégration d'Euler */
-  *pos += m_solver->getUVW (i, j, k);
-
-  if (pos->x < 0 || pos->x > 1
-      || pos->y < 0 || pos->y > 1
-      || pos->z < 0 || pos->z > 1)
+  /* Si la particule sort de la grille, elle est éliminée */
+  if (pos->x < 0 || pos->x > m_solver->getDimX()
+      || pos->y < 0 || pos->y > m_solver->getDimY()
+      || pos->z < 0 || pos->z > m_solver->getDimZ())
     return false;
   
   return true;

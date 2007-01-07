@@ -31,9 +31,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgTimeSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
-		       double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
-		       double omegaProj, double epsilon);
+  LogResAvgTimeSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
+			 double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
+			 double omegaProj, double epsilon);
   /** Destructeur. */
   virtual ~LogResAvgTimeSolver3D ();
   

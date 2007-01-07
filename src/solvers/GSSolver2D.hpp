@@ -23,7 +23,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSSolver2D (Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
+  GSSolver2D (const Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
   /** Desctructeur. */
   virtual ~GSSolver2D ();
   

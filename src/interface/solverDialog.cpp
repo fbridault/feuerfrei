@@ -14,6 +14,10 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
   m_dimLabel = new wxStaticText(this, -1, _("Dimension"));
   m_dimTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
+  m_scaleLabel = new wxStaticText(this, -1, _("Scale"));
+  m_scaleXTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
+  m_scaleYTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
+  m_scaleZTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
   m_resLabel = new wxStaticText(this, -1, _("Resolution"));
   m_resXTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
   m_resYTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
@@ -27,10 +31,11 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("Preconditioned Conjugated Gradient"),
     _("Hybrid"),
     _("LOD Hybrid"),
-    _("Simple field")
+    _("Simple field"),
+    _("Fake field")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					5, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					6, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #else
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
@@ -38,13 +43,14 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("Hybrid"),
     _("LOD Hybrid"),
     _("Simple field"),
+    _("Fake field"),
     _("Both - log residuals"),
     _("Both - log residuals averages"),
     _("Both - log residuals averages + time"),
     _("Gauss-Seidel 2D")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					10, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
@@ -65,6 +71,9 @@ void SolverPanel::setProperties()
   m_posYTextCtrl->SetMinSize(wxSize(50, 22));
   m_posZTextCtrl->SetMinSize(wxSize(50, 22));
   m_dimTextCtrl->SetMinSize(wxSize(50, 22));
+  m_scaleXTextCtrl->SetMinSize(wxSize(50, 22));
+  m_scaleYTextCtrl->SetMinSize(wxSize(50, 22));
+  m_scaleZTextCtrl->SetMinSize(wxSize(50, 22));
   m_resXTextCtrl->SetMinSize(wxSize(50, 22));
   m_resYTextCtrl->SetMinSize(wxSize(50, 22));
   m_resZTextCtrl->SetMinSize(wxSize(50, 22));
@@ -82,6 +91,7 @@ void SolverPanel::doLayout()
   wxBoxSizer* m_timeStepSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_resSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_dimSizer = new wxBoxSizer(wxHORIZONTAL);
+  wxBoxSizer* m_scaleSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_posSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_omegaDiffSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_omegaProjSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -97,6 +107,12 @@ void SolverPanel::doLayout()
   m_dimSizer->Add(m_dimLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_dimSizer->Add(m_dimTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
   m_panelSizer->Add(m_dimSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
+  
+  m_scaleSizer->Add(m_scaleLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
+  m_scaleSizer->Add(m_scaleXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_scaleSizer->Add(m_scaleYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_scaleSizer->Add(m_scaleZTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
+  m_panelSizer->Add(m_scaleSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
 
   m_resSizer->Add(m_resLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_resSizer->Add(m_resXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
@@ -138,6 +154,9 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   m_posYTextCtrl->Clear();
   m_posZTextCtrl->Clear();
   m_dimTextCtrl->Clear();
+  m_scaleXTextCtrl->Clear();
+  m_scaleYTextCtrl->Clear();
+  m_scaleZTextCtrl->Clear();
   m_resXTextCtrl->Clear();
   m_resYTextCtrl->Clear();
   m_resZTextCtrl->Clear();
@@ -151,6 +170,9 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
   (*m_posYTextCtrl) << solverConfig->position.y;
   (*m_posZTextCtrl) << solverConfig->position.z;
   (*m_dimTextCtrl) << solverConfig->dim;
+  (*m_scaleXTextCtrl) << solverConfig->scale.x;
+  (*m_scaleYTextCtrl) << solverConfig->scale.y;
+  (*m_scaleZTextCtrl) << solverConfig->scale.z;
   (*m_resXTextCtrl) << (int)solverConfig->resx;
   (*m_resYTextCtrl) << (int)solverConfig->resy;
   (*m_resZTextCtrl) << (int)solverConfig->resz;
@@ -189,6 +211,9 @@ bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
       solverConfig->position.y = m_posYTextCtrl->GetSafelyValue();
       solverConfig->position.z = m_posZTextCtrl->GetSafelyValue();
       solverConfig->dim = m_dimTextCtrl->GetSafelyValue();
+      solverConfig->scale.x = m_scaleXTextCtrl->GetSafelyValue();
+      solverConfig->scale.y = m_scaleYTextCtrl->GetSafelyValue();
+      solverConfig->scale.z = m_scaleZTextCtrl->GetSafelyValue();
       solverConfig->resx = m_resXTextCtrl->GetSafelyValue();
       solverConfig->resy = m_resYTextCtrl->GetSafelyValue();
       solverConfig->resz = m_resZTextCtrl->GetSafelyValue();
@@ -210,7 +235,7 @@ bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
 
 void SolverPanel::OnSelectType(wxCommandEvent& event)
 {
-  if(event.GetSelection() != GS_SOLVER)
+  if(event.GetSelection() != GS_SOLVER && event.GetSelection() != GS_SOLVER2D && event.GetSelection() != SIMPLE_FIELD && event.GetSelection() != FAKE_FIELD)
     {
       m_omegaDiffLabel->Enable();
       m_omegaDiffTextCtrl->Enable();
@@ -219,7 +244,7 @@ void SolverPanel::OnSelectType(wxCommandEvent& event)
       m_epsilonLabel->Enable();
       m_epsilonTextCtrl->Enable();
     } 
-  else 
+  else
     {
       m_omegaDiffLabel->Disable();
       m_omegaDiffTextCtrl->Disable();

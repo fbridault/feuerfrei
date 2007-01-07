@@ -17,9 +17,9 @@ GCSSORSolver3D::GCSSORSolver3D (double omegaDiff, double omegaProj, double epsil
   m_epsilon = epsilon;
 }
 
-GCSSORSolver3D::GCSSORSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+GCSSORSolver3D::GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
 				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver3D(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
+  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_r=new double[m_nbVoxels];
   m_z=new double[m_nbVoxels];

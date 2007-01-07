@@ -46,7 +46,10 @@ public:
   char type;
   Point position;
   uint resx, resy, resz;
+  /* Dimension réelle du solveur, utilisée lors de la résolution */
   double dim;
+  /* Facteur d'échelle */
+  Point scale;
   double timeStep;
   double omegaDiff, omegaProj;
   double epsilon;

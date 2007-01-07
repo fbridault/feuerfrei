@@ -7,9 +7,9 @@
 #endif
 
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
-			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
+HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
+				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
 }
@@ -91,9 +91,9 @@ void HybridSolver3D::project (double *const p, double *const div)
 //   cout << m_time << "      \r"; cout.flush();
 // }
 
-LODHybridSolver3D::LODHybridSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep,
-			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, timeStep, buoyancy), 
+LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
+				      double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), 
   HybridSolver3D (omegaDiff, omegaProj, epsilon)
 {
   /* Attention n_x, n_y et n_z doivent être impairs */
@@ -147,9 +147,9 @@ void LODHybridSolver3D::divideRes ()
   buildDLBase ();
   buildDLGrid ();
   
-  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
+  m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
+  m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
+  m_nbVoxelsZDivDimZ = m_nbVoxelsZ / m_dim.z;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -179,9 +179,9 @@ void LODHybridSolver3D::decreaseRes ()
   buildDLBase ();
   buildDLGrid ();
   
-  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
+  m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
+  m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
+  m_nbVoxelsZDivDimZ = m_nbVoxelsZ / m_dim.z;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -219,9 +219,9 @@ void LODHybridSolver3D::multiplyRes ()
   buildDLBase ();
   buildDLGrid ();
   
-  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
+  m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
+  m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
+  m_nbVoxelsZDivDimZ = m_nbVoxelsZ / m_dim.z;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -251,9 +251,9 @@ void LODHybridSolver3D::increaseRes ()
   buildDLBase ();
   buildDLGrid ();
   
-  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
+  m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
+  m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
+  m_nbVoxelsZDivDimZ = m_nbVoxelsZ / m_dim.z;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;

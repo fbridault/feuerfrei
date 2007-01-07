@@ -36,6 +36,10 @@ protected:
   DoubleTextCtrl* m_posZTextCtrl;
   wxStaticText* m_dimLabel;
   DoubleTextCtrl* m_dimTextCtrl;
+  wxStaticText* m_scaleLabel;
+  DoubleTextCtrl* m_scaleXTextCtrl;
+  DoubleTextCtrl* m_scaleYTextCtrl;
+  DoubleTextCtrl* m_scaleZTextCtrl;
   wxStaticText* m_resLabel;
   LongTextCtrl* m_resXTextCtrl;
   LongTextCtrl* m_resYTextCtrl;

@@ -28,7 +28,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Solver2D (Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
+  Solver2D (const Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Solver2D ();
   
@@ -123,7 +123,7 @@ public:
    * @param j Indice à la verticale (y).
    * @param k Indice en profondeur (z).
    */
-  void findPointPosition(Point& p, uint& i, uint& j)
+  void findPointPosition(const Point& p, uint& i, uint& j)
   {
     i = (uint) (p.x * m_nbVoxelsX) + 1 + m_halfNbVoxelsX;
     j = (uint) (p.y * m_nbVoxelsY) + 1;
@@ -134,7 +134,7 @@ public:
    * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
-  void addExternalForces(Point& position, bool move);
+  void addExternalForces(const Point& position, bool move);
   
   void addDensity(int id);
   
@@ -157,7 +157,7 @@ public:
   void displayDensityField (void);
   
   /** Fonction de dessin de la vélocité d'une cellule */
-  void displayArrow (Vector& direction);
+  void displayArrow (const Vector& direction);
   
 protected:
   /** Fonction de construction de la display list de la grille du solveur */
@@ -240,7 +240,7 @@ protected:
   /** Dimension du solveur en Y. */
   double m_dimY;
 
-  double m_dimXTimesNbVoxelsX,  m_dimYTimesNbVoxelsY;
+  double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY;
   uint m_halfNbVoxelsX;
   
   double *m_u, *m_v, *m_uPrev, *m_vPrev, *m_uSrc, *m_vSrc;

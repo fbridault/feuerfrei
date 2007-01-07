@@ -97,6 +97,10 @@ public:
   {
     return Point(x*K,y*K,z*K);
   };
+  void operator*=(const GLdouble &K)
+  {
+    x*=K; y*=K; z*=K;
+  };
   /** 
    * Obtenir un point obtenu en multipliant le point courant
    * par un r&eacute;el.

@@ -17,11 +17,12 @@
 #define HYBRID_SOLVER 2
 #define LOD_HYBRID_SOLVER 3
 #define SIMPLE_FIELD 4
+#define FAKE_FIELD 5
 /* Spécifiques à rtfluids */
-#define LOGRES_SOLVER 5
-#define LOGRESAVG_SOLVER 6
-#define LOGRESAVGTIME_SOLVER 7
-#define GS_SOLVER2D 8
+#define LOGRES_SOLVER 6
+#define LOGRESAVG_SOLVER 7
+#define LOGRESAVGTIME_SOLVER 8
+#define GS_SOLVER2D 9
 
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 20

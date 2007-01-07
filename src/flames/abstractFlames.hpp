@@ -25,7 +25,7 @@ class Field3D;
 /****************************************** DEFINITION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
 
-/** La classe NurbsFlame est l'objet de plus bas niveau représentant une flamme. Elle défini les propriétés nécessaires
+/** La classe NurbsFlame est l'objet de plus bas niveau représentant une flamme. Elle définit les propriétés nécessaires
  * pour la construction d'une NURBS, ainsi que la localisation de la flamme dans l'espace. En revanche, la notion de 
  * squelette n'apparaît absolument pas ici.
  *
@@ -177,9 +177,6 @@ protected:
   {
     glTexCoord2fv(texCoord);
   }
-
-  /** Position en indices de la base de la flamme dans la grille de voxels du solveur. */
-  uint m_x, m_y, m_z;
   
   /** Ordre de la NURBS en u (égal au degré en u + 1). */
   u_char m_uorder;
@@ -361,11 +358,7 @@ public:
   
   virtual Point* getTop() const = 0;
   virtual Point* getBottom() const = 0;
-  
-  /** Méthode permettant d'informer à la flamme de se localiser dans le solveur */
-  /* Elle doit être appelée dès qu'un changement de résolution de la grille intervient */
-  virtual void locateInField(){ m_solver->findPointPosition(m_position, m_x, m_y, m_z); };
-  
+    
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
 protected:

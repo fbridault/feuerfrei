@@ -1,6 +1,6 @@
 #include "GSSolver2D.hpp"
 
-GSSolver2D::GSSolver2D (Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy) : 
+GSSolver2D::GSSolver2D (const Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy) : 
   Solver2D(position, n_x, n_y, dim, timeStep, buoyancy)
 {
 }

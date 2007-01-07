@@ -4,7 +4,7 @@ Field::Field()
 {
 }
 
-Field::Field (Point& position, double timeStep, double buoyancy) : m_position(position)
+Field::Field (const Point& position, double timeStep, double buoyancy) : m_position(position)
 {
   m_dt = timeStep;
   

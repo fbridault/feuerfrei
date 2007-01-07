@@ -73,24 +73,21 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
   for (vector < WickPoint * >::iterator pointsIterator = wickLeadPointsArray->begin ();
        pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
     {
-      m_solver->findPointPosition((*pointsIterator)->m_pt, ptx, pty, ptz);
-      
-      if(ptxPrev != ptx || ptyPrev != pty || ptzPrev != ptz){
 	switch(fdf){
 	case FDF_LINEAR :
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * ((*pointsIterator)->m_u + 1));
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * ((*pointsIterator)->m_u + 1));
 	  break;
 	case FDF_BILINEAR :
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u );
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u );
 	  break;
 	case FDF_EXPONENTIAL :
-	  m_solver->addVsrc (ptx, pty, ptz, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
 	  break;
 	case FDF_GAUSS:
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce*expf(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9.0));
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce*exp(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9.0));
 	  break;
 	case FDF_RANDOM:
-	  m_solver->addVsrc (ptx, pty, ptz, m_innerForce * rand()/((double)RAND_MAX));
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * rand()/((double)RAND_MAX));
 	  break;
 	}
 	
@@ -98,23 +95,21 @@ void LineFlame::addForces (u_char perturbate, u_char fdf)
 	case FLICKERING_VERTICAL :
 	  if (m_perturbateCount == 5)
 	    {
-	      m_solver->addVsrc (ptx, pty, ptz, m_innerForce*5);
+	      m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce*5);
 	      m_perturbateCount = 0;
 	    }
 	  else
 	    m_perturbateCount++;
 	  break;
 	case FLICKERING_RANDOM :
-	  m_solver->addVsrc (ptx, pty, ptz, rand()/((double)RAND_MAX)-.5);
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, rand()/((double)RAND_MAX)-.5);
 	  break;
 	case FLICKERING_NOISE :
-	  m_solver->addVsrc (ptx, pty, ptz, m_noiseGenerator.getNextValue(i));
+	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_noiseGenerator.getNextValue(i));
 	  m_perturbateCount++;
 	  break;
 	}
-	ptxPrev = ptx; ptyPrev = pty; ptzPrev = ptz;
 	i++;
-      }
     }
 }
 
@@ -166,56 +161,56 @@ void LineFlame::breakCheck()
   }
 }
 
-void LineFlame::generateAndDrawSparks()
-{
-  uint i, j, k;
-  uint life=30;
+// void LineFlame::generateAndDrawSparks()
+// {
+//   uint i, j, k;
+//   uint life=30;
   
-  /* Ajout de particules */
-  if( (rand()/((double)RAND_MAX)) < .05){
-    Point pos;
-    double r = (rand()/((double)RAND_MAX));
-    pos = (m_wick.getLeadPoint(m_wick.getLeadPointsArraySize()-1)->m_pt);
-    pos = pos * r + m_wick.getLeadPoint(0)->m_pt ;
-    Particle *spark = new Particle(pos, life);
-    m_sparksList.push_back(spark);
-  }
+//   /* Ajout de particules */
+//   if( (rand()/((double)RAND_MAX)) < .05){
+//     Point pos;
+//     double r = (rand()/((double)RAND_MAX));
+//     pos = (m_wick.getLeadPoint(m_wick.getLeadPointsArraySize()-1)->m_pt);
+//     pos = pos * r + m_wick.getLeadPoint(0)->m_pt ;
+//     Particle *spark = new Particle(pos, life);
+//     m_sparksList.push_back(spark);
+//   }
   
-  /* Déplacement et affichage des particules */
-  for (list < Particle *>::iterator sparksListIterator = m_sparksList.begin (); 
-       sparksListIterator != m_sparksList.end ();
-       sparksListIterator++){
-    Particle *par = *sparksListIterator;
-    m_solver->findPointPosition(*par, i, j, k);
+//   /* Déplacement et affichage des particules */
+//   for (list < Particle *>::iterator sparksListIterator = m_sparksList.begin (); 
+//        sparksListIterator != m_sparksList.end ();
+//        sparksListIterator++){
+//     Particle *par = *sparksListIterator;
+//     m_solver->findPointPosition(*par, i, j, k);
 
-    (*sparksListIterator)->decreaseLife();
+//     (*sparksListIterator)->decreaseLife();
     
-    if ((*sparksListIterator)->isDead ())
-      {
-	sparksListIterator =  m_sparksList.erase(sparksListIterator);
-	delete par;
-	continue;
-      }
+//     if ((*sparksListIterator)->isDead ())
+//       {
+// 	sparksListIterator =  m_sparksList.erase(sparksListIterator);
+// 	delete par;
+// 	continue;
+//       }
         
-    if ( i >= m_solver->getXRes()  )
-      i = m_solver->getXRes()-1;
-    if ( j >= m_solver->getXRes()  )
-      j = m_solver->getYRes()-1;
-    if ( k >= m_solver->getXRes()  )
-      k = m_solver->getZRes()-1;
+//     if ( i >= m_solver->getXRes()  )
+//       i = m_solver->getXRes()-1;
+//     if ( j >= m_solver->getXRes()  )
+//       j = m_solver->getYRes()-1;
+//     if ( k >= m_solver->getXRes()  )
+//       k = m_solver->getZRes()-1;
     
-    double div = 1/(double)life;
-    (*sparksListIterator)->x += m_solver->getU (i, j, k) * (*sparksListIterator)->m_lifespan*div;
-    (*sparksListIterator)->y += m_solver->getV (i, j, k) * (*sparksListIterator)->m_lifespan*div;
-    (*sparksListIterator)->z += m_solver->getW (i, j, k) * (*sparksListIterator)->m_lifespan*div;
+//     double div = 1/(double)life;
+//     (*sparksListIterator)->x += m_solver->getU (i, j, k) * (*sparksListIterator)->m_lifespan*div;
+//     (*sparksListIterator)->y += m_solver->getV (i, j, k) * (*sparksListIterator)->m_lifespan*div;
+//     (*sparksListIterator)->z += m_solver->getW (i, j, k) * (*sparksListIterator)->m_lifespan*div;
     
-    glColor4f (1.0, 1.0, 0.45, 1.0);
-    glPushMatrix ();
-    glTranslatef ((*sparksListIterator)->x, (*sparksListIterator)->y, (*sparksListIterator)->z);
-    GraphicsFn::SolidSphere (0.01, 4, 4);
-    glPopMatrix ();
-  }
-}
+//     glColor4f (1.0, 1.0, 0.45, 1.0);
+//     glPushMatrix ();
+//     glTranslatef ((*sparksListIterator)->x, (*sparksListIterator)->y, (*sparksListIterator)->z);
+//     GraphicsFn::SolidSphere (0.01, 4, 4);
+//     glPopMatrix ();
+//   }
+// }
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
@@ -253,44 +248,40 @@ PointFlame::~PointFlame ()
 
 void PointFlame::addForces (u_char perturbate, u_char fdf)
 {
-  m_solver->addVsrc (m_x, 1, m_z, m_innerForce);
+  m_solver->addVsrc (m_position, m_innerForce);
   
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if(m_perturbateCount>=2){
-      m_solver->setVsrc(m_x, 1, m_z, 0.0002);
+      m_solver->setVsrc(m_position, 0.0002);
       m_perturbateCount = 0;
     }else
       m_perturbateCount++;
     break;
   case FLICKERING_RIGHT :
-    if(m_perturbateCount>=24)
-      m_perturbateCount = 0;
-    else{
-      if(m_perturbateCount>=20){
-	for (uint i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes () / 4 + 1; i++)
-	  for (uint j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
-	    m_solver->setUsrc (m_solver->getXRes(), 
-			       ((uint) (ceil (m_solver->getYRes() / 2.0))) + j, 
-			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -.1);
-      }
-      m_perturbateCount++;
-    }
+//     if(m_perturbateCount>=24)
+//       m_perturbateCount = 0;
+//     else{
+//       if(m_perturbateCount>=20){
+// 	for (uint i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes () / 4 + 1; i++)
+// 	  for (uint j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
+// 	    m_solver->setUsrc (m_solver->getXRes(),
+// 			       ((uint) (ceil (m_solver->getYRes() / 2.0))) + j,
+// 			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -.1);
+//       }
+//       m_perturbateCount++;
+//    }
     break;
   case FLICKERING_RANDOM :
-    m_solver->addVsrc(m_x, 1, m_z, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_x+1, 1, m_z, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_x-1, 1, m_z, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_x, 1, m_z+1, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_x, 1, m_z-1, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position, rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(.1,0,0), rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(-.1,0,0), rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(0,0,.1), rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(0,0,-.1), rand()/(10*(double)RAND_MAX));
     break;
   case FLICKERING_NOISE :
     double value = m_noiseGenerator.getNextValue();
-    m_solver->addVsrc(m_x, 1, m_z, value);
-//     m_solver->addVsrc(m_x+1, 1, m_z, value);
-//     m_solver->addVsrc(m_x-1, 1, m_z, value);
-//     m_solver->addVsrc(m_x, 1, m_z+1, value);
-//     m_solver->addVsrc(m_x, 1, m_z-1, value);
+    m_solver->addVsrc(m_position, value);
     m_perturbateCount++;
     break;
   }
@@ -326,7 +317,6 @@ DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSk
   m_periSkeletons = periSkeletons;
   
   m_solver = solver;
-  locateInField3D();
 }
 
 DetachedFlame::~DetachedFlame()

@@ -1,7 +1,7 @@
 #if !defined(SOLVER3D_H)
 #define SOLVER3D_H
 
-#include "field3D.hpp"
+#include "realField3D.hpp"
 #include "solver.hpp"
 #include <math.h>
 
@@ -13,7 +13,7 @@ class Solver;
  * 
  * @author	Flavien Bridault et Michel Lebond.
  */
-class Solver3D : public Field3D, public Solver
+class Solver3D : public RealField3D, public Solver
 {
 public:
   /** Constructeur par défaut nécessaire pour l'héritage multiple */
@@ -28,7 +28,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, 
+  Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
 	    double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Solver3D ();
@@ -51,7 +51,7 @@ public:
    * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
-  void addExternalForces(Point& position, bool move);
+  void addExternalForces(const Point& position, bool move);
 protected:
   /** Traitement de valeurs aux bords du solveur.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.
@@ -93,8 +93,6 @@ protected:
    * @author Michel Leblond.
    */
   void restreindre(double *const vfin, double *const vgros);
-  
-  double m_dimXTimesNbVoxelsX,  m_dimYTimesNbVoxelsY,  m_dimZTimesNbVoxelsZ;
 
   double *m_uPrev, *m_vPrev, *m_wPrev;
   double *m_dens, *m_densPrev, *m_densSrc;

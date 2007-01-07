@@ -203,9 +203,10 @@ public:
   virtual void drawWick(bool displayBoxes)
   {      
     Point pt(getPosition());
+    Point scale(m_solver->getScale());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+    glScalef (scale.x, scale.y, scale.z);
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawWick(displayBoxes);
     glPopMatrix();
@@ -220,9 +221,10 @@ public:
   virtual void drawFlame(bool display, bool displayParticle)
   {
     Point pt(m_solver->getPosition());
+    Point scale(m_solver->getScale());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+    glScalef (scale.x, scale.y, scale.z);
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(display, displayParticle);  
     glPopMatrix();
@@ -233,8 +235,9 @@ public:
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
   void draw(bool display, bool displayParticle, bool displayBoxes)
-  {
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+  {    
+    Point scale(m_solver->getScale());
+    glScalef (scale.x, scale.y, scale.z);
     drawWick(displayBoxes);
     drawFlame(display, displayParticle);
   }
@@ -246,9 +249,10 @@ public:
   {
     if(m_hasLuminary){
       Point position(getPosition());
+      Point scale(m_solver->getScale());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
-      glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+      glScalef (scale.x, scale.y, scale.z);
       glCallList(m_luminaryDL);
       glPopMatrix();
     }
@@ -263,9 +267,10 @@ public:
   {
     if(m_hasLuminary){
       Point position(getPosition());
+      Point scale(m_solver->getScale());
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
-      glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+      glScalef (scale.x, scale.y, scale.z);
       shader.setModelViewProjectionMatrix();
       glCallList(m_luminaryDL);
       glPopMatrix();
@@ -311,11 +316,6 @@ public:
     averageVec = averageVec/m_nbFlames;
     
     return(averageVec);
-  }
-  
-  virtual void locateInField(){
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->locateInField();
   }
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */

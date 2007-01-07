@@ -7,8 +7,9 @@ Solver3D::Solver3D ()
 {
 }
 
-Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy) : 
-  Field3D(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
+Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
+		    double timeStep, double buoyancy) : 
+  RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_uPrev = new double[m_nbVoxels];
   m_vPrev = new double[m_nbVoxels];
@@ -23,10 +24,6 @@ Solver3D::Solver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, d
   memset (m_dens, 0, m_nbVoxels * sizeof (double));
   memset (m_densPrev, 0, m_nbVoxels * sizeof (double));
   memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
-  
-  m_dimXTimesNbVoxelsX = m_dim.x * m_nbVoxelsX;
-  m_dimYTimesNbVoxelsY = m_dim.y * m_nbVoxelsY;
-  m_dimZTimesNbVoxelsZ = m_dim.z * m_nbVoxelsZ;
   
   m_visc = 0.00000015;
   m_diff = 0.001;
@@ -188,13 +185,13 @@ void Solver3D::iterate ()
   vel_step ();
 
   m_nbIter++;
-
-  cleanSources ();
 }
 
-void Solver3D::addExternalForces(Point& position, bool move)
+void Solver3D::addExternalForces(const Point& position, bool move)
 {
   uint i,j;
+  uint widthx, widthy, widthz;
+  uint ceilx, ceily, ceilz;
   Point strength;
   Point force;
   
@@ -210,42 +207,37 @@ void Solver3D::addExternalForces(Point& position, bool move)
     strength.z = fabs(strength.z);  
   }
   
-  uint widthx = m_nbVoxelsX - 1;
-  uint widthy = m_nbVoxelsY - 1;
-  uint widthz = m_nbVoxelsZ - 1;
-  
-  uint ceilx = 1;
-  uint ceily = 1;
-  uint ceilz = 1;
+  findPointPosition(m_dim-Point(.1,.3,.1),widthx,widthy,widthz);
+  findPointPosition(Point(0,0,0),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */
   if(force.x)
     if( force.x > 0)
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addUsrc (m_nbVoxelsX, j, i, -strength.x);
+	  m_uSrc[IX(m_nbVoxelsX, j, i)] -= strength.x;
     else
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addUsrc (1, j, i, strength.x); 
+	  m_uSrc[IX(1, j, i)] += strength.x;
   if(force.y)
     if( force.y > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j < widthz; j++)
-	  addVsrc (i, m_nbVoxelsY, j, -strength.y/10.0);
+	  m_vSrc[IX(i, m_nbVoxelsY, j)] -= strength.y/10.0;
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j <= widthz; j++)
-	  addVsrc (i, 1, j, strength.y/10.0);
+	  m_vSrc[IX(i, 1, j)] += strength.y/10.0;
   if(force.z)
     if( force.z > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addWsrc (i, j, m_nbVoxelsZ, -strength.z);
+	  m_wSrc[IX(i, j, m_nbVoxelsZ)] -= strength.z;
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  addWsrc (i, j, 1, strength.z);
+	  m_wSrc[IX(i, j, 1)] += strength.z;
 }
 
 void Solver3D::prolonger(double  *const v2h, double *const vh)

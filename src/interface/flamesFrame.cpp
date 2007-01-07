@@ -230,8 +230,11 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
       m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
       
       m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim, 1.0);
-      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep, 0.4);
+      m_config->Read(groupName + _("Scale.x"),&m_currentConfig.solvers[i].scale.x,1.0);
+      m_config->Read(groupName + _("Scale.y"),&m_currentConfig.solvers[i].scale.y,1.0);
+      m_config->Read(groupName + _("Scale.z"),&m_currentConfig.solvers[i].scale.z,1.0);
       
+      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep, 0.4);      
       m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
       
       m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff, 1.5);
@@ -527,8 +530,11 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Z_res"),(int)m_currentConfig.solvers[i].resz);
       
       m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
-      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
-      
+      m_config->Write(groupName + _("Scale.x"),m_currentConfig.solvers[i].scale.x);
+      m_config->Write(groupName + _("Scale.y"),m_currentConfig.solvers[i].scale.y);
+      m_config->Write(groupName + _("Scale.z"),m_currentConfig.solvers[i].scale.z);
+
+      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);      
       m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
       
       m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);

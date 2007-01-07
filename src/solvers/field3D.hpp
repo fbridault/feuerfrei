@@ -5,274 +5,163 @@
 
 class Field;
 
-/** La classe Solver3D propose une impl√©mentation 3D de la m√©thode stable implicite semi-lagrangienne de Stam.
- * A noter que dans le cadre de notre mod√®le de flamme, le champ de densit√© n'est pas utilis√©, ce qui,
- * physiquement semble assez curieux (d'apr√®s Alexei). 
+/** La classe Field3D est une abstraction d'un champ de vecteur en 3D. Cette classe abstraite fournit une interface pour la
+ * dÈfinition des champs de vecteurs, mais elle ne contient aucune structure de donnÈe reprÈsentant les vÈlocitÈs. Ceci est
+ * laissÈ ‡ la charge des classes filles telles que RealField3D. La sÈparation est nÈcessaire car la classe FakeField3D simule
+ * un champ de vecteur et ne stocke pas les vÈlocitÈs par rapport ‡ une grille. Par contre, cette classe propose tout de mÍme
+ * les mÈthodes de dessin de la grille et du champ de vecteurs.
+ * 
  * 
  * @author	Flavien Bridault.
  */
 class Field3D : public Field
 {
 public:
-  /** Constructeur par d√©faut n√©cessaire pour l'h√©ritage multiple */
+  /** Constructeur par dÈfaut nÈcessaire pour l'hÈritage multiple */
   Field3D ();
   
-  /** Constructeur du solveur.
+  /** Constructeur du champ.
    * @param position Position du solveur de la flamme.
-   * @param n_x R√©solution de la grille en x.
-   * @param n_y R√©solution de la grille en y.
-   * @param n_z R√©solution de la grille en z.
-   * @param dim Dimension du solveur, utilis√© pour l'affichage de la flamme.
-   * @param timeStep Pas de temps utilis√© pour la simulation.
-   * @param buoyancy Intensit√© de la force de flottabilit√© dans le solveur.
+   * @param n_x RÈsolution de la grille en x.
+   * @param n_y RÈsolution de la grille en y.
+   * @param n_z RÈsolution de la grille en z.
+   * @param dim Dimension du solveur, utilisÈ pour l'affichage de la flamme.
+   * @param scale Echelle utilisÈe pour la taille du solveur.
+   * @param timeStep Pas de temps utilisÈ pour la simulation.
+   * @param buoyancy IntensitÈ de la force de flottabilitÈ dans le solveur.
    */
-  Field3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy);
+  Field3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Field3D ();
   
-  /** Lance une it√©ration du solveur. */
-  virtual void iterate ();
-
-  /** R√©cup√©ration d'une valeur de la composante horizontale de la v√©locit√© dans la grille du solveur.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
+  /** Lance une itÈration du solveur. */
+  virtual void iterate () = 0;
+    
+  /** RÈcupÈration de la valeur des trois composantes de la vÈlocitÈ dans la grille du solveur.
+   * @param i Indice ‡ l'horizontale (x).
+   * @param j Indice ‡ la verticale (y).
    * @param k Indice en profondeur (z).
-   * @return Valeur de v√©locit√©.
-   */   
-  double getU (uint i, uint j, uint k) const
-  {
-    return m_u[IX (i, j, k)];
-  };
-  
-  /** R√©cup√©ration d'une valeur de la composante verticale de la v√©locit√© dans la grille du solveur.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @return Valeur de v√©locit√©.
-   */   
-  double getV (uint i, uint j, uint k) const
-  {
-    return m_v[IX (i, j, k)];
-  };
-  
-  /** R√©cup√©ration d'une valeur de la composante verticale de la v√©locit√© dans la grille du solveur.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @return Valeur de v√©locit√©.
-   */   
-  double getW (uint i, uint j, uint k) const
-  {
-    return m_w[IX (i, j, k)];
-  };
-
-  /** R√©cup√©ration de la valeur des trois composantes de la v√©locit√© dans la grille du solveur.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @return Valeurs de v√©locit√©.
-   */   
-  Point getUVW (uint i, uint j, uint k) const
-  {
-    uint n=IX (i, j, k);
-    return Point(m_u[n], m_v[n], m_w[n]);
-  };
+   * @return Valeurs de vÈlocitÈ.
+   */
+  virtual Point getUVW (const Point& pos) const = 0;
   
   /** Ajout d'une force externe pour la composante U.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
+   * @param i Indice ‡ l'horizontale (x).
+   * @param j Indice ‡ la verticale (y).
    * @param k Indice en profondeur (z).
-   * @param value Valeur de v√©locit√© √† ajouter.
+   * @param value Valeur de vÈlocitÈ ‡ ajouter.
    */
-  void addUsrc (uint i, uint j, uint k, double value)
-  {
-    m_uSrc[IX (i, j, k)] += value;
-  };
+  virtual void addUsrc (const Point& pos, double value) = 0;
+  
   /** Ajout d'une force externe pour la composante V.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
+   * @param i Indice ‡ l'horizontale (x).
+   * @param j Indice ‡ la verticale (y).
    * @param k Indice en profondeur (z).
-   * @param value Valeur de v√©locit√© √† ajouter.
+   * @param value Valeur de vÈlocitÈ ‡ ajouter.
    */
-  void addVsrc (uint i, uint j, uint k, double value)
-  {
-    m_vSrc[IX (i, j, k)] += value;
-  };
+  virtual void addVsrc (const Point& pos, double value) = 0;
+  
   /** Ajout d'une force externe pour la composante W.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
+   * @param i Indice ‡ l'horizontale (x).
+   * @param j Indice ‡ la verticale (y).
    * @param k Indice en profondeur (z).
-   * @param value Valeur de v√©locit√© √† ajouter.
+   * @param value Valeur de vÈlocitÈ ‡ ajouter.
    */
-  void addWsrc (uint i, uint j, uint k, double value)
-  {
-    m_wSrc[IX (i, j, k)] += value;
-  };
-
-  /** Affectation d'une force externe pour la composante U.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @param value Valeur de v√©locit√© √† ajouter.
-   */
-  void setUsrc (uint i, uint j, uint k, double value)
-  {
-    m_uSrc[IX (i, j, k)] = value;
-  };
+  virtual void addWsrc (const Point& pos, double value) = 0;
   
   /** Affectation d'une force externe pour la composante V.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
+   * @param i Indice ‡ l'horizontale (x).
+   * @param j Indice ‡ la verticale (y).
    * @param k Indice en profondeur (z).
-   * @param value Valeur de v√©locit√© √† ajouter.
+   * @param value Valeur de vÈlocitÈ ‡ ajouter.
    */
-  void setVsrc (uint i, uint j, uint k, double value)
-  {
-    m_vSrc[IX (i, j, k)] = value;
-  };
+  virtual void setVsrc (const Point& pos, double value) = 0;
+    
+  /** Retourne la dimension sous forme d'un point.
+   * @return Dimension.
+   */
+  Point getDim() const { return m_dim; };
   
-  /** Remet √† z√©ro toutes les forces externes */
-  void cleanSources ();
-
+  /** Retourne la dimension en X.
+   * @return Dimension.
+   */
+  double getDimX () const { return m_dim.x; };
+  /** Retourne la dimension en Y.
+   * @return Dimension.
+   */
+  double getDimY () const { return m_dim.y; };
+  /** Retourne la dimension en Z.
+   * @return Dimension.
+   */
+  double getDimZ () const { return m_dim.z; };
+  
   /** Retourne le nombre de voxels en X.
    * @return Nombre de voxels.
    */
-  uint getXRes() const
-  {
-    return m_nbVoxelsX;
-  };
+  uint getXRes() const { return m_nbVoxelsX; };
   
   /** Retourne le nombre de voxels en Y.
    * @return Nombre de voxels.
    */
-  uint getYRes() const
-  {
-    return m_nbVoxelsY;
-  };
+  uint getYRes() const { return m_nbVoxelsY; };
   
   /** Retourne le nombre de voxels en Z.
    * @return Nombre de voxels.
    */
-  uint getZRes() const
-  {
-    return m_nbVoxelsZ;
-  };
+  uint getZRes() const { return m_nbVoxelsZ; };
 
-  /** Retourne la dimension sous forme d'un point.
-   * @return Dimension.
+  /** Retourne le facteur d'Èchelle.
+   * @return Echelle.
    */
-  Point getDim() const
-  {
-    return m_dim;
-  };
-    
-  /** Retourne la dimension en X.
-   * @return Dimension.
+  Point getScale () const { return m_scale; };
+  
+  /** Ajoute de faÁon ponctuelle des forces externes sur une des faces du solveur.
+   * @param position Nouvelle position du solveur. DÈtermine l'intensitÈ de la force.
+   * @param move Si true, alors le solveur est en plus dÈplacÈ ‡ la position passÈe en paramËtre.
    */
-  double getDimX () const
-  {
-    return m_dim.x;
-  };
-  /** Retourne la dimension en Y.
-   * @return Dimension.
-   */
-  double getDimY () const
-  {
-    return m_dim.y;
-  };
-  /** Retourne la dimension en Z.
-   * @return Dimension.
-   */
-  double getDimZ () const
-  {
-    return m_dim.z;
-  };
-
-  /** M√©thode permettant de retrouver les indices (i,j,k) de la cellule o√π est situ√©e la particule.
-   * @param p Point dans l'espace.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   */
-  void findPointPosition(Point& p, uint& i, uint& j, uint& k)
-  {
-    i = (uint) (p.x * m_nbVoxelsX) + 1;
-    j = (uint) (p.y * m_nbVoxelsY) + 1;
-    k = (uint) (p.z * m_nbVoxelsZ) + 1;
-  };
+  virtual void addExternalForces(const Point& position, bool move) = 0;
   
-  /** Ajoute de fa√ßon ponctuelle des forces externes sur une des faces du solveur.
-   * @param position Nouvelle position du solveur. D√©termine l'intensit√© de la force.
-   * @param move Si true, alors le solveur est en plus d√©plac√© √† la position pass√©e en param√®tre.
-   */
-  virtual void addExternalForces(Point& position, bool move);
+  /** Divise la rÈsolution de la grille par 2 */
+  virtual void divideRes () = 0 ;
   
-  /** Divise la r√©solution de la grille par 2 */
-  virtual void divideRes () {} ;
-
-  /** Multiplie la r√©solution de la grille par 2 */
-  virtual void multiplyRes () {} ;
+  /** Multiplie la rÈsolution de la grille par 2 */
+  virtual void multiplyRes () = 0 ;
   
-  /** Diminue la r√©solution de la grille de un voxel */
-  virtual void decreaseRes () {} ;
+  /** Diminue la rÈsolution de la grille de un voxel */
+  virtual void decreaseRes () = 0 ;
   
-  /** Augmente la r√©solution de la grille de un voxel */
-  virtual void increaseRes () {} ;
+  /** Augmente la rÈsolution de la grille de un voxel */
+  virtual void increaseRes () = 0 ;
   
-  /** Fonction de dessin du champ de v√©locit√© */
-  void displayVelocityField (void);
+  /** Fonction de dessin du champ de vÈlocitÈ */
+  void displayVelocityField (void) = 0;
   
-  /** Fonction de dessin du champ de densit√© */
+  /** Fonction de dessin du champ de densitÈ */
   void displayDensityField (void) {};
   
-  /** Fonction de dessin de la v√©locit√© d'une cellule */
-  void displayArrow (Vector& direction);
-  
-protected:
+protected:  
   /** Fonction de construction de la display list de la grille du solveur */
   void buildDLGrid ();
   
-  /** Fonction de construction de la display list du rep√®re du solveur */
+  /** Fonction de construction de la display list du repËre du solveur */
   void buildDLBase ();
-
-  /** M√©thode permettant de simplifier l'indexage d'un voxel.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @return Indice √† utiliser pour une des composantes de v√©locit√© {m_u,m_v,m_w}.
-   */
-  uint IX (uint i, uint j, uint k) const
-  {  
-    return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
-  };
   
-  /** M√©thode permettant de simplifier l'indexage d'un voxel dans une grille de taille
-   * deux fois inf√©rieure √† la grille courante.
-   * @param i Indice √† l'horizontale (x).
-   * @param j Indice √† la verticale (y).
-   * @param k Indice en profondeur (z).
-   * @return Indice √† utiliser pour une des composantes de v√©locit√© {m_u,m_v,m_w}.
-   */
-  uint IX2h (int i, int j, int k) const
-  {  
-    return( (i) + (m_nbVoxelsX/2 + 2) * (j) + (m_nbVoxelsX/2 + 2) * (m_nbVoxelsY/2 + 2) * (k) );
-  }; 
-    
-  /** Pas de r√©solution de la v√©locit√©. */
-  virtual void vel_step ();
-    
-  /** Nombre de voxels en X sur un c√¥t√© du cube. */
+  /** Fonction de dessin de la vÈlocitÈ d'une cellule */
+  void displayArrow (const Vector& direction);
+  
+  /** Nombre de voxels en X sur un cÙtÈ du cube. */
   uint m_nbVoxelsX;
-  /** Nombre de voxels en Y sur un c√¥t√© du cube. */
+  /** Nombre de voxels en Y sur un cÙtÈ du cube. */
   uint m_nbVoxelsY;
-  /** Nombre de voxels en Z sur un c√¥t√© du cube. */
+  /** Nombre de voxels en Z sur un cÙtÈ du cube. */
   uint m_nbVoxelsZ;
   
-  /** Dimension du solveur */
+  /** Dimensions du solveur */
   Point m_dim;
-
-  double *m_u, *m_v, *m_w, *m_uSrc, *m_vSrc, *m_wSrc;
+  /** Facteur d'Èchelle du solveur */
+  Point m_scale;
+  
+  double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
 };
-
 
 #endif

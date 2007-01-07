@@ -138,9 +138,10 @@ public:
   virtual void drawWick(bool displayBoxes)
   {      
     Point pt(getPosition());
+    Point scale(m_solver->getScale());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+    glScalef (scale.x, scale.y, scale.z);
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawWick(displayBoxes);
     for (uint i = 0; i < m_nbCloneFlames; i++)
@@ -151,9 +152,10 @@ public:
   virtual void drawFlame(bool display, bool displayParticle)
   {
     Point pt(m_solver->getPosition());
+    Point scale(m_solver->getScale());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (m_solver->getDimX(), m_solver->getDimY(), m_solver->getDimZ());
+    glScalef (scale.x, scale.y, scale.z);
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(display, displayParticle);
     for (uint i = 0; i < m_nbCloneFlames; i++)

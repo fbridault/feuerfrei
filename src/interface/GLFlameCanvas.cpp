@@ -150,36 +150,45 @@ void GLFlameCanvas::InitSolvers(void)
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
       m_solvers[i] = new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
-				  m_currentConfig->solvers[i].buoyancy);
+				    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				    m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale, 
+				    m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     case GCSSOR_SOLVER :
       m_solvers[i] = new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+					m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					m_currentConfig->solvers[i].epsilon);
       break;
     case HYBRID_SOLVER :
       m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				      m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-				      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-				      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep,
+					m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case LOD_HYBRID_SOLVER :
       m_solvers[i] = new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					 m_currentConfig->solvers[i].dim,  m_currentConfig->solvers[i].timeStep,
-					 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-					 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					   m_currentConfig->solvers[i].timeStep,
+					   m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					   m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case SIMPLE_FIELD :
-      m_solvers[i] = new Field3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].timeStep, 
-				  m_currentConfig->solvers[i].buoyancy);
+      m_solvers[i] = new RealField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      break;
+    case FAKE_FIELD :
+      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -236,7 +245,7 @@ void GLFlameCanvas::Restart (void)
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   glViewport (0, 0, m_width, m_height);
   
-  InitUISettings();
+//   InitUISettings();
   InitScene(false);
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
   ::wxStartTimer();
@@ -270,6 +279,8 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
+    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
+      m_solvers[i]->cleanSources();
     for (uint i = 0; i < m_currentConfig->nbFlames; i++)
       m_flames[i]->addForces (m_currentConfig->flames[i].flickering, m_currentConfig->flames[i].fdf);
     
@@ -314,8 +325,6 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->decreaseRes ();
-      for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-	m_flames[i]->locateInField(); 
       break;
 
     case 'L': 
@@ -323,8 +332,6 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->increaseRes ();
-      for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-	m_flames[i]->locateInField(); 
       break;
     case WXK_SPACE : m_run = !m_run; break;
     }
@@ -520,9 +527,11 @@ void GLFlameCanvas::drawScene()
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
       Point position(m_solvers[s]->getPosition ());
+      Point scale(m_solvers[s]->getScale ());
       
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
+      glScalef (scale.x, scale.y, scale.z);
       if (m_displayBase)
 	m_solvers[s]->displayBase();
       if (m_displayGrid)

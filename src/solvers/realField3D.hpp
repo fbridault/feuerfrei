@@ -1,0 +1,139 @@
+#ifndef REALFIELD3D_HPP
+#define REALFIELD3D_HPP
+
+#include "field3D.hpp"
+
+class Field3D;
+
+/** La classe RealField3D est une implémentation d'un champ de vecteurs 3D. Aucune équation différentielle n'est
+ * utilisée ici, tout au plus il s'agira d'une équation linéaire. Cette classe est à réserver pour des tests, car
+ * dans la pratique, il est inutile de calculer pour les valeurs de vélocité sur toute une grille pour une équation
+ * linéaire. Il est en effet préférable de n'effectuer le calcul que pour les particules, ce que propose de faire
+ * la classe FakeField3D.
+ * 
+ * @author	Flavien Bridault.
+ */
+class RealField3D : public Field3D
+{
+public:
+  /** Constructeur par défaut nécessaire pour l'héritage multiple */
+  RealField3D ();
+  
+  /** Constructeur du champ.
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param scale Echelle utilisée pour la taille du solveur.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   */
+  RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
+  /** Destructeur */
+  virtual ~RealField3D ();
+  
+  /********************* Redéfinition des méthodes héritées *********************/
+  virtual void iterate ();
+  
+  Point getUVW (const Point& pos) const
+  {
+    uint i,j,k,n;
+    
+    findPointPosition(pos,i,j,k); n=IX (i, j, k);
+    
+    return Point(m_u[n], m_v[n], m_w[n]);
+  };
+  
+  void addUsrc (const Point& pos, double value)
+  {
+    uint i,j,k;
+    
+    findPointPosition(pos,i,j,k);
+    
+    m_uSrc[IX (i, j, k)] += value;
+  };
+  
+  void addVsrc (const Point& pos, double value)
+  {
+    uint i,j,k;
+    
+    findPointPosition(pos,i,j,k);
+    
+    m_vSrc[IX (i, j, k)] += value;
+  };
+  
+  void addWsrc (const Point& pos, double value)
+  {
+    uint i,j,k;
+    
+    findPointPosition(pos,i,j,k);
+    
+    m_wSrc[IX (i, j, k)] += value;
+  };
+  
+  void setVsrc (const Point& pos, double value)
+  {
+    uint i,j,k;
+    
+    findPointPosition(pos,i,j,k);
+    
+    m_vSrc[IX (i, j, k)] = value;
+  };
+  
+  
+  /** Méthode permettant de retrouver les indices (i,j,k) de la cellule où est située la particule.
+   * @param p Point dans l'espace.
+   * @param i Indice à l'horizontale (x).
+   * @param j Indice à la verticale (y).
+   * @param k Indice en profondeur (z).
+   */
+  void findPointPosition(const Point& p, uint& i, uint& j, uint& k) const
+  {
+    i = (uint) (p.x * m_nbVoxelsXDivDimX) + 1;
+    j = (uint) (p.y * m_nbVoxelsYDivDimY) + 1;
+    k = (uint) (p.z * m_nbVoxelsZDivDimZ) + 1;
+  };
+  
+  virtual void addExternalForces(const Point& position, bool move);
+  
+  virtual void divideRes () {} ;  
+  virtual void multiplyRes () {} ;  
+  virtual void decreaseRes () {} ;  
+  virtual void increaseRes () {} ;
+
+  void cleanSources ();
+  
+  virtual void displayVelocityField (void);
+
+protected:
+  /***************************** Nouvelles méthodes *****************************/
+  virtual void vel_step ();
+  
+  /** Méthode permettant de simplifier l'indexage d'un voxel.
+   * @param i Indice à l'horizontale (x).
+   * @param j Indice à la verticale (y).
+   * @param k Indice en profondeur (z).
+   * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
+   */
+  uint IX (uint i, uint j, uint k) const
+  {  
+    return( (i) + (m_nbVoxelsX + 2) * (j) + (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (k) );
+  };
+  
+  /** Méthode permettant de simplifier l'indexage d'un voxel dans une grille de taille
+   * deux fois inférieure à la grille courante.
+   * @param i Indice à l'horizontale (x).
+   * @param j Indice à la verticale (y).
+   * @param k Indice en profondeur (z).
+   * @return Indice à utiliser pour une des composantes de vélocité {m_u,m_v,m_w}.
+   */
+  uint IX2h (int i, int j, int k) const
+  {  
+    return( (i) + (m_nbVoxelsX/2 + 2) * (j) + (m_nbVoxelsX/2 + 2) * (m_nbVoxelsY/2 + 2) * (k) );
+  };
+  
+  double *m_u, *m_v, *m_w, *m_uSrc, *m_vSrc, *m_wSrc;
+};
+
+#endif

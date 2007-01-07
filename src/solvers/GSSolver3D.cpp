@@ -1,7 +1,8 @@
 #include "GSSolver3D.hpp"
 
-GSSolver3D::GSSolver3D (Point& position, uint n_x, uint n_y, uint n_z, double dim, double timeStep, double buoyancy) : 
-  Solver3D(position, n_x, n_y, n_z, dim, timeStep, buoyancy)
+GSSolver3D::GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
+			double timeStep, double buoyancy) : 
+  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
 }
 

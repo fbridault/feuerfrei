@@ -100,7 +100,7 @@ public:
   /** Méthode permettant de cloner la flamme passée en paramètre
    * @param source Flamme à cloner
    */
-  void cloneNURBSPropertiesFrom(NurbsFlame& source)
+  void cloneNURBSPropertiesFrom(const NurbsFlame& source)
   {
     m_maxParticles = source.m_maxParticles;
     memcpy(m_ctrlPoints, source.m_ctrlPoints,(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3 * sizeof(GLfloat));

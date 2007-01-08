@@ -27,7 +27,7 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneFlame(FlameConfig* flameConfig, RealFlame *source, Point offset);
+  CloneFlame(FlameConfig* flameConfig, RealFlame *source, const Point& offset);
   virtual ~CloneFlame();
   
   /** Dessine la mèche de la flamme.
@@ -69,7 +69,7 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneLineFlame(FlameConfig* flameConfig, LineFlame *source, Point offset);
+  CloneLineFlame(FlameConfig* flameConfig, LineFlame *source, const Point& offset);
   virtual ~CloneLineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle){ 
@@ -93,7 +93,7 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  ClonePointFlame(FlameConfig* flameConfig, PointFlame *source, Point offset);
+  ClonePointFlame(FlameConfig* flameConfig, PointFlame *source, const Point& offset);
   virtual ~ClonePointFlame();
   
   virtual void drawFlame(bool display, bool displayParticle){ 

@@ -91,7 +91,7 @@ public:
    * @param scene Pointeur vers la scene.
    * @param offset Décalage de l'objet dans la scène.
    */
-  Object (Scene * const scene, Point& offset)
+  Object (Scene * const scene, const Point& offset)
   {
     m_scene = scene;
     m_attributes = 0;

@@ -47,7 +47,7 @@ public:
   /** Déplace la lumière à la position. Ceci déplace en réalité la lumière OpenGL.
    * @param pos Position de la lumière.
    */
-  void setLightPosition (Point& pos)
+  void setLightPosition (const Point& pos)
   {
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
@@ -263,7 +263,7 @@ public:
    *
    * @param shader vertex program utilisé pour le solide photométrique 
    */
-  void drawLuminary(CgBasicVertexShader& shader)
+  void drawLuminary(const CgBasicVertexShader& shader)
   {
     if(m_hasLuminary){
       Point position(getPosition());

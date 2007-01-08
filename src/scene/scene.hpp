@@ -206,7 +206,7 @@ public:
    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
    * scène éclairée avec des solides photométriques.
    */
-  void drawSceneWTEX(CgBasicVertexShader& shader) const
+  void drawSceneWTEX(const CgBasicVertexShader& shader) const
   {
     glCallList(m_displayLists[2]);
     glCallList(m_displayLists[4]);
@@ -257,7 +257,7 @@ public:
   };
   
   /** Dessin de tous les objets qui projettent des ombres */
-  void drawSceneWSV (CgBasicVertexShader& shader) const
+  void drawSceneWSV (const CgBasicVertexShader& shader) const
   {
     glCallList (m_displayLists[6]);
     

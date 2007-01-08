@@ -57,7 +57,7 @@ public:
   /** Duplique un squelette.
    * @param offset Valeur du décalage dans l'espace du squelette par rapport au squelette courant.
    */
-  virtual FreePeriSkeleton* dup(Point& offset);
+  virtual FreePeriSkeleton* dup(const Point& offset);
   
 private:  
   /** Dessine une particule d'un squelette guide.

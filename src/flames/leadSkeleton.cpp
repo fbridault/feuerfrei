@@ -59,7 +59,7 @@ FreeLeadSkeleton::~FreeLeadSkeleton ()
 {
 }
 
-FreePeriSkeleton* FreeLeadSkeleton::dup(Point& offset)
+FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
 {
   FreePeriSkeleton *copy = new FreePeriSkeleton(getSize (), m_solver, this);
   

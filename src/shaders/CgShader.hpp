@@ -31,28 +31,28 @@ public:
   virtual ~CgShader();
   
   /** Activation du profil. */
-  void enableProfile(){
+  void enableProfile() const{
     cgGLEnableProfile(profile);
   };
   
   /** Bind du programme. */
-  void bindProgram(){
+  void bindProgram() const{
     cgGLBindProgram(program);
   };
   
     /** Activation du shader. */
-  virtual void enableShader(){
+  virtual void enableShader() const{
     cgGLEnableProfile(profile);
     cgGLBindProgram(program);
   }
 
   /** Désactivation du profil. */
-  void disableProfile(){
+  void disableProfile() const{
     cgGLDisableProfile(profile);
   };
   
   /** Désactivation du shader. */
-  void disableShader(){
+  void disableShader() const{
     cgGLDisableProfile(profile);
   };
   
@@ -83,7 +83,7 @@ public:
    * modelview. Cette méthode doit être appelée après chaque série de transformations OpenGL
    * pour que celles-ci soit prises en compte par le vertex shader
    */
-  void setModelViewProjectionMatrix(){
+  void setModelViewProjectionMatrix() const{
     cgGLSetStateMatrixParameter(modelViewProjectionMatrix, CG_GL_MODELVIEW_PROJECTION_MATRIX,CG_GL_MATRIX_IDENTITY);
   };
 private:

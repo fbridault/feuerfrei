@@ -39,15 +39,15 @@ public:
     m_lifespan=P.m_lifespan;
   };
   
-  /** Décrémente la durée de vie de la particule */
+  /** Décrémente la durée de vie de la particule. */
   void decreaseLife(){m_lifespan--;};
   
-  /** Test pour déterminer si la particule est encore vivante
+  /** Test pour déterminer si la particule est encore vivante.
    * @return vraie si la particule est morte
    */  
   bool isDead(){return (m_lifespan < 1);};
   
-  /** Naissance d'une particule, on affecte sa durée de vie à la valeur passée en paramètre
+  /** Naissance d'une particule, on affecte sa durée de vie à la valeur passée en paramètre.
    * @param l durée de vie en terme d'itérations
    */
   void birth(uint l){m_lifespan=l;};
@@ -133,7 +133,7 @@ public:
     return (m_headIndex < 0);
   };
     
-  /** Dessine le squelette à l'écran */
+  /** Dessine le squelette à l'écran. */
   virtual void draw ();
   
   /** Déplacement des particules du squelette et suppression des particules mortes.
@@ -147,7 +147,7 @@ public:
   virtual bool moveParticle(Particle* const pos);
 
 protected:
-  /** Echange deux particules dans la file .
+  /** Echange deux particules dans la file.
    * @param i indice de la première particule
    * @param j indice de la seconde particule
    */
@@ -158,7 +158,7 @@ protected:
    */
   virtual void removeParticle(uint n);
   
-  /** Affectation de la position d'une particule dans l'espace 
+  /** Affectation de la position d'une particule dans l'espace.
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
@@ -209,12 +209,12 @@ public:
   void draw ();
   
   /** Déplacement des particules du squelette, génération d'une nouvelle particule et
-   * suppression des particules mortes 
+   * suppression des particules mortes.
    */
   void move();
   virtual bool moveParticle(Particle* const pos);
   
-  /** Déplacement de l'origine du squelette */
+  /** Déplacement de l'origine du squelette. */
   void moveRoot ();
   
   /** Retourne un pointeur sur l'origine du squelette.
@@ -230,7 +230,7 @@ protected:
    */
   void addParticle(const Point* const pt);
     
-  /** Dessine l'origine du squelette */
+  /** Dessine l'origine du squelette. */
   virtual void drawRoot ();
   
   /** Origine actuelle du squelette. */
@@ -245,7 +245,7 @@ private:
   
   /** Contient trois facteurs correctifs pour le déplacement de l'origine
    * des squelettes. Selon le type de flamme, il est en effet nécessaire
-   * que les origines se déplacent différemment
+   * que les origines se déplacent différemment.
    */
   Point m_rootMoveFactor;
 };

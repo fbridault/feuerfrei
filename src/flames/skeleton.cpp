@@ -182,7 +182,7 @@ void Skeleton::moveRoot ()
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
   m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_root);
-
+  
   return;
 }
 
@@ -195,7 +195,7 @@ void Skeleton::move ()
   
   if (getSize () < NB_PARTICLES_MAX - 1)
       addParticle (&m_root);
-
+  
   /* Déplacement des particules */
   /* Boucle de parcours : du haut vers le bas */
   for (i = 0; i < getSize (); i++)
@@ -216,10 +216,10 @@ void Skeleton::move ()
 bool Skeleton::moveParticle (Particle * const pos)
 {
   uint i, j, k;
-
+  
   if (pos->isDead ())
     return false;
-
+  
   /* Retrouver les quatres cellules adjacentes autour de la particule */
   *pos += m_solver->getUVW(*pos);
   

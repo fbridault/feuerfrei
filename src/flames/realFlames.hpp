@@ -166,10 +166,9 @@ public:
    * @param nbSkeletons Nombre de squelettes périphériques.
    * @param periSkeletons Tableaux contenant les squelettes périphériques.
    * @param tex Pointeur vers la texture à utiliser.
-   * @param solver Pointeur vers le solveur.
    */
   DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Field3D *solver);
+		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex);
   
   /** Destructeur*/
   virtual ~DetachedFlame ();
@@ -199,8 +198,6 @@ protected:
   uint m_nbLeadSkeletons;
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
   FreePeriSkeleton **m_periSkeletons;
-  /** Pointeur sur le solveur de fluides. */
-  Field3D *m_solver;  
   
   /** Tableau temporaire contenant les distances entre les particules d'un squelette. */
   double *m_distances;

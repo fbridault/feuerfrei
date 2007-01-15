@@ -24,7 +24,7 @@ void FakeField3D::iterate ()
 {
   if(arePermanentExternalForces)
     addExternalForces(permanentExternalForces,false);
-
+  
   m_nbIter++;
 }
 

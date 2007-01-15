@@ -156,7 +156,7 @@ void LineFlame::breakCheck()
       splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getSize()-1));
       periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
       
-      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_solver));
+      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex));
     }
   }
 }
@@ -274,9 +274,9 @@ void PointFlame::addForces (u_char perturbate, u_char fdf)
     break;
   case FLICKERING_RANDOM :
     m_solver->addVsrc(m_position, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(.1,0,0), rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(.1,0, 0), rand()/(10*(double)RAND_MAX));
     m_solver->addVsrc(m_position+Point(-.1,0,0), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(0,0,.1), rand()/(10*(double)RAND_MAX));
+    m_solver->addVsrc(m_position+Point(0,0, .1), rand()/(10*(double)RAND_MAX));
     m_solver->addVsrc(m_position+Point(0,0,-.1), rand()/(10*(double)RAND_MAX));
     break;
   case FLICKERING_NOISE :
@@ -307,16 +307,14 @@ void PointFlame::drawWick (bool displayBoxes)
 /**********************************************************************************************************************/
 
 DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex, Field3D *solver) :
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex) :
   NurbsFlame (source, nbSkeletons, 2, tex)
-{  
+{
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_nbLeadSkeletons = nbLeadSkeletons;
   m_leadSkeletons = leadSkeletons;
   m_periSkeletons = periSkeletons;
-  
-  m_solver = solver;
 }
 
 DetachedFlame::~DetachedFlame()

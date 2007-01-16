@@ -29,7 +29,7 @@ public:
    * @param pls Durée de vie initiale d'une particule.
    */
   PeriSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, 
-	       LeadSkeleton *leadSkeleton, uint *pls);
+	       LeadSkeleton *leadSkeleton, FlameConfig* flameConfig);
   /** Destructeur. */
   virtual ~PeriSkeleton();
   
@@ -38,6 +38,8 @@ public:
    * @param leadSkeleton squelette guide relatif.
    */
   FreePeriSkeleton* split (uint splitHeight, FreeLeadSkeleton* leadSkeleton);
+  
+  void addParticle(const Point* const pt);
   
   /** Retourne un pointeur sur le squelette guide relatif. */
   LeadSkeleton* getLeadSkeleton() const {return m_lead;};

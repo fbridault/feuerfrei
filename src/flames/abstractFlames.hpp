@@ -295,11 +295,11 @@ protected:
 };
 
 class DetachedFlame;
+
+#include <vector>
 /**********************************************************************************************************************/
 /********************************************* DEFINITION DE LA CLASSE REALFLAME **************************************/
 /**********************************************************************************************************************/
-
-#include "noise.hpp"
 
 /** La classe RealFlame, par rapport à la classe FixedFlame, ajoute la notion de squelettes de flamme ainsi que les
  * interactions avec un solveur de fluides.
@@ -324,16 +324,12 @@ public:
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s,
-	    float noiseIncrement, float noiseMin, float noiseMax);
+  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   * @param perturbate Type de perturbation parmi FLICKERING_VERTICAL, FLICKERING_RANDOM, etc...
-   * @param fdf Type de fonction de distribution de carburant parmi FDF_LINEAR, FDF_BILINEAR, 
-   * FDF_EXPONENTIAL, FDF_GAUSS, FDF_RANDOM.
    */
-  virtual void addForces (u_char perturbate, u_char fdf=0) = 0;
+  virtual void addForces ();
   
   /** Affectation de la vélocité induite par la flamme.
    * @param value Vélocité de la flamme.
@@ -362,8 +358,9 @@ public:
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
 protected:
-  /** Pointeur vers les squelettes guide. */
-  LeadSkeleton **m_leadSkeletons;
+  /** Vecteur contenant les squelettes guide. */
+  vector < LeadSkeleton * > m_leadSkeletons;
+  
   /** Nombres de squelettes guides */
   uint m_nbLeadSkeletons;
   /** Tableau contenant les pointeurs vers les squelettes périphériques. */
@@ -380,11 +377,6 @@ protected:
   int *m_maxDistancesIndexes;
   
   double m_innerForce;
-  
-  uint m_perturbateCount;
-
-  double m_seed;
-  PerlinNoise1D m_noiseGenerator;
 };
 
 #endif

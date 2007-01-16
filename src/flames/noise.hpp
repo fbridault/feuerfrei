@@ -7,6 +7,11 @@
 class PerlinNoise1D
 {
 public:
+  /** Constructeur.
+   * @param increment Valeur de l'incrémentation (x)
+   * @param min Valeur minimale du bruit (y)
+   * @param max Valeur maximale du bruit (y)
+   */
   PerlinNoise1D(float increment, float min, float max);
   /** Génération d'un bruit de Perlin pour une valeur x. */
   float getNextValue();

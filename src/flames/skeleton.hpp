@@ -28,7 +28,6 @@ public:
    */
   Particle(const Point& P, uint lifespan):Point(P)
   {
-    m_lifespan=lifespan;
   };
   
   /** Constructeur par recopie 
@@ -61,6 +60,9 @@ public:
    * @param P point dans l'espace
    */
   virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
+
+  /** Méthode de conversion en Point. */
+  Point asPoint(void){ return Point(x,y,z); };
 };
 
 class Field3D;
@@ -202,7 +204,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
+  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig *flameConfig);
   /** Destructeur. */
   virtual ~Skeleton(){};
   
@@ -228,7 +230,7 @@ protected:
   /** Insère une particule en queue de file.
    * @param pt position de la particule
    */
-  void addParticle(const Point* const pt);
+  virtual void addParticle(const Point* const pt) = 0;
     
   /** Dessine l'origine du squelette. */
   virtual void drawRoot ();
@@ -239,10 +241,9 @@ protected:
   /** Origine initiale du squelette. */
   Point m_rootSave;
   
-private:
-  /** Durée de vie initiale d'une particule */
-  uint *m_particleLifespan;  
-  
+  /** Pointeur vers la configuration. Nécessaire pour le nombre de particules par squelette, la fdf ou les perturbations. */
+  FlameConfig *m_flameConfig;
+private:  
   /** Contient trois facteurs correctifs pour le déplacement de l'origine
    * des squelettes. Selon le type de flamme, il est en effet nécessaire
    * que les origines se déplacent différemment.

@@ -70,8 +70,6 @@ public:
     
     return averagePos;
   }
-
-  void addForces(u_char perturbate, u_char fdf);
   
   Point* getTop() const { return m_leadSkeletons[m_nbLeadSkeletons/2]->getParticle(0); };  
   Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };
@@ -133,9 +131,7 @@ public:
   };
   virtual Point getCenter () const {
     return (*m_leadSkeletons[0]->getMiddleParticle ()+m_position);
-  }; 
-  
-  void addForces(u_char perturbate, u_char fdf=0);
+  };
   
   Point* getTop() const { return m_leadSkeletons[0]->getParticle(0); };
   Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };

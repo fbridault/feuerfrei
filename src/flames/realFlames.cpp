@@ -10,17 +10,16 @@
 LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Field3D *s, 
 		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
 		      DetachableFireSource *parentFire ) :
-  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s, .1, -.2, .2),
-  m_wick (wickFileName, flameConfig->skeletonsNumber, scene, flameConfig->position, wickName)
+  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
+  m_wick (wickFileName, flameConfig, scene, m_leadSkeletons, s, wickName)
 {
   Point pt;
   double largeur = .03;
   uint i,j;
   
-  Point rootMoveFactorP(2,.1,.5), rootMoveFactorL(2,.1,1);
+  Point rootMoveFactorP(2,.1,.5);
   
-  m_nbLeadSkeletons = m_wick.getLeadPointsArraySize ();
-  m_leadSkeletons = new LeadSkeleton *[m_nbLeadSkeletons];
+  m_nbLeadSkeletons = m_leadSkeletons.size();
   
   /** Allocation des squelettes périphériques = deux par squelette périphérique */
   /* plus 2 aux extrémités pour fermer la NURBS */
@@ -29,88 +28,36 @@ LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex
   /* Génération d'un côté des squelettes périphériques */
   for (i = 1; i <= m_nbLeadSkeletons; i++)
     {
-      pt = m_wick.getLeadPoint (i - 1)->m_pt;
-      m_leadSkeletons[i - 1] = new LeadSkeleton (m_solver, pt, rootMoveFactorL, &flameConfig->leadLifeSpan);
-      pt.z += (-largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i - 1], &flameConfig->periLifeSpan);
+      pt = *m_leadSkeletons[i - 1]->getRoot();
+      pt.z -= (largeur / 2.0);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i - 1], flameConfig);
     }
   
   /* Génération de l'autre côté des squelettes périphériques */
   for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
     {
-      pt = m_wick.getLeadPoint (j - 1)->m_pt;
+      pt = *m_leadSkeletons[j - 1]->getRoot();
       pt.z += (largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j - 1], &flameConfig->periLifeSpan);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j - 1], flameConfig);
     }
   
   /* Ajout des extrémités */
-  pt = m_wick.getLeadPoint (0)->m_pt;
-  pt.x += (-largeur / 2.0);
-  m_periSkeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[0], &flameConfig->periLifeSpan);
+  pt = *m_leadSkeletons[0]->getRoot();
+  pt.x -= (largeur / 2.0);
+  m_periSkeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[0], flameConfig);
   
-  pt = m_wick.getLeadPoint (m_nbLeadSkeletons - 1)->m_pt;
+  pt = *m_leadSkeletons[m_nbLeadSkeletons - 1]->getRoot();
   pt.x += (largeur / 2.0);
   m_periSkeletons[m_nbLeadSkeletons + 1] = 
-    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], &flameConfig->periLifeSpan);
+    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], flameConfig);
   
   m_parentFire = parentFire;
 
   m_detachedFlamesWidth = detachedFlamesWidth;
-
-  m_seed = 10*rand()/((double)RAND_MAX);
 }
 
 LineFlame::~LineFlame ()
 {
-}
-
-void LineFlame::addForces (u_char perturbate, u_char fdf)
-{ 
-  uint ptxPrev=MAXINT,ptyPrev=MAXINT,ptzPrev=MAXINT;
-  uint ptx,pty,ptz,i=0;
-  vector < WickPoint * >*wickLeadPointsArray = m_wick.getLeadPointsArray();
-  
-  for (vector < WickPoint * >::iterator pointsIterator = wickLeadPointsArray->begin ();
-       pointsIterator != wickLeadPointsArray->end (); pointsIterator++)
-    {
-	switch(fdf){
-	case FDF_LINEAR :
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * ((*pointsIterator)->m_u + 1));
-	  break;
-	case FDF_BILINEAR :
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * (*pointsIterator)->m_u * (*pointsIterator)->m_u );
-	  break;
-	case FDF_EXPONENTIAL :
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, .1 * exp(m_innerForce * 14 * (*pointsIterator)->m_u));
-	  break;
-	case FDF_GAUSS:
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce*exp(m_innerForce * 30 -((*pointsIterator)->m_u) * (*pointsIterator)->m_u)/(9.0));
-	  break;
-	case FDF_RANDOM:
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce * rand()/((double)RAND_MAX));
-	  break;
-	}
-	
-	switch(perturbate){
-	case FLICKERING_VERTICAL :
-	  if (m_perturbateCount == 5)
-	    {
-	      m_solver->addVsrc ((*pointsIterator)->m_pt, m_innerForce*5);
-	      m_perturbateCount = 0;
-	    }
-	  else
-	    m_perturbateCount++;
-	  break;
-	case FLICKERING_RANDOM :
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, rand()/((double)RAND_MAX)-.5);
-	  break;
-	case FLICKERING_NOISE :
-	  m_solver->addVsrc ((*pointsIterator)->m_pt, m_noiseGenerator.getNextValue(i));
-	  m_perturbateCount++;
-	  break;
-	}
-	i++;
-    }
 }
 
 void LineFlame::breakCheck()
@@ -217,74 +164,29 @@ void LineFlame::breakCheck()
 /**********************************************************************************************************************/
 
 PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D * s, double rayon):
-  RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s, .1, 0, .1)
+  RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
   double angle;
   
   m_nbLeadSkeletons = 1;
-  m_leadSkeletons = new LeadSkeleton *[m_nbLeadSkeletons];
   
-  m_leadSkeletons[0] = new LeadSkeleton (m_solver, m_position, Point(4,0,4), &flameConfig->leadLifeSpan);
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(4,0,4), flameConfig, 0, .1, 0, .1));
   
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
       m_periSkeletons[i] = new PeriSkeleton (m_solver, 
-					     Point (cos (angle) * rayon + m_position.x, 
-						    m_position.y, 
-						    sin (angle) * rayon + m_position.z),
+					     Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
 					     Point(4,.75,4),
-					     m_leadSkeletons[0], &flameConfig->periLifeSpan);
+					     m_leadSkeletons[0], flameConfig);
       angle += 2 * PI / m_nbSkeletons;
     }
-  m_seed = 10*rand()/((double)RAND_MAX);
 }
 
 PointFlame::~PointFlame ()
 {  
-}
-
-void PointFlame::addForces (u_char perturbate, u_char fdf)
-{
-  m_solver->addVsrc (m_position, m_innerForce);
-  
-  switch(perturbate){
-  case FLICKERING_VERTICAL :
-    if(m_perturbateCount>=2){
-      m_solver->setVsrc(m_position, 0.0002);
-      m_perturbateCount = 0;
-    }else
-      m_perturbateCount++;
-    break;
-  case FLICKERING_RIGHT :
-//     if(m_perturbateCount>=24)
-//       m_perturbateCount = 0;
-//     else{
-//       if(m_perturbateCount>=20){
-// 	for (uint i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes () / 4 + 1; i++)
-// 	  for (uint j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
-// 	    m_solver->setUsrc (m_solver->getXRes(),
-// 			       ((uint) (ceil (m_solver->getYRes() / 2.0))) + j,
-// 			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -.1);
-//       }
-//       m_perturbateCount++;
-//    }
-    break;
-  case FLICKERING_RANDOM :
-    m_solver->addVsrc(m_position, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(.1,0, 0), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(-.1,0,0), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(0,0, .1), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_position+Point(0,0,-.1), rand()/(10*(double)RAND_MAX));
-    break;
-  case FLICKERING_NOISE :
-    double value = m_noiseGenerator.getNextValue();
-    m_solver->addVsrc(m_position, value);
-    m_perturbateCount++;
-    break;
-  }
 }
 
 void PointFlame::drawWick (bool displayBoxes)

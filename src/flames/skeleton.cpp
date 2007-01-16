@@ -135,25 +135,12 @@ void FreeSkeleton::drawParticle (Particle * const particle)
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls) : 
+Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig* flameConfig) : 
   FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
 {  
   m_root = m_rootSave = position;
-  m_particleLifespan = pls;
-  addParticle(&m_root);
-}
-
-void Skeleton::addParticle(const Point* const pt)
-{
-  if(m_headIndex >= NB_PARTICLES_MAX-1){
-    puts("Erreur : trop de particules");
-    return;
-  }
-  m_headIndex++;
-  
-  m_queue[m_headIndex] = *pt;
-  m_queue[m_headIndex].birth(*m_particleLifespan);
+  m_flameConfig = flameConfig;
 }
 
 void Skeleton::draw ()

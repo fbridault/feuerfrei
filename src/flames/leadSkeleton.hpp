@@ -7,6 +7,8 @@ class FreePeriSkeleton;
 
 #include "skeleton.hpp"
 
+#include "noise.hpp"
+
 class Skeleton;
 
 /** Classe représentant les squelettes guides, voir la classe Skeleton pour plus de
@@ -24,19 +26,31 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint *pls);
-
+  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig* flameConfig, double u,
+	       float noiseIncrement, float noiseMin, float noiseMax);
+  
   /** Destructeur. */
   virtual ~LeadSkeleton();
   
-  /** Méthode de séparation d'un squelette
-   * @param splitHeight hauteur de la découpe
+  /** Méthode de séparation d'un squelette.
+   * @param splitHeight hauteur de la découpe.
    */
   FreeLeadSkeleton* split (uint splitHeight);
   
+  void addParticle(const Point* const pt);
+  
   virtual void drawRoot ();
+  void addForces ();
+  
 private:
   void drawParticle (Particle * const particle);
+  
+  /** Valeur d'entrée de la fonction de distribution de carburant F(u). */
+  double m_u;
+  
+  /** Générateur de bruit de Perlin. */
+  PerlinNoise1D m_noiseGenerator;
+  double m_perturbateCount;
 };
 
 /** Classe représentant les squelettes guides libres.

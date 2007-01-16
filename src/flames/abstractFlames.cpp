@@ -285,10 +285,8 @@ void FixedFlame::drawPointFlame ()
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s,
-		     float noiseIncrement, float noiseMin, float noiseMax) :
-  FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex),
-  m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
+RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s) :
+  FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
@@ -299,7 +297,6 @@ RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedP
   
   m_solver = s;
   m_innerForce = flameConfig->innerForce;
-  m_perturbateCount=0;
 }
 
 bool RealFlame::build ()
@@ -309,10 +306,11 @@ bool RealFlame::build ()
   m_maxParticles = 0;
   vtex = -0.5;
   
+  /* Déplacement des squelettes guides */
   for (i = 0; i < m_nbLeadSkeletons; i++)
     m_leadSkeletons[i]->move ();
   
-  /* Déplacement et détermination du maximum */
+  /* Déplacement des squelettes périphériques et détermination du maximum de particules par squelette */
   for (i = 0; i < m_nbSkeletons; i++)
     {
       m_periSkeletons[i]->move ();
@@ -486,15 +484,23 @@ bool RealFlame::build ()
   return true;
 }
 
+void RealFlame::addForces ()
+{
+  for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+       skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+    (*skeletonsIterator)->addForces ();
+}
+
 RealFlame::~RealFlame()
 {
   for (uint i = 0; i < m_nbSkeletons; i++)
     delete m_periSkeletons[i];
   delete[]m_periSkeletons;
   
-  for (uint i = 0; i < m_nbLeadSkeletons; i++)
-    delete m_leadSkeletons[i];
-  delete[]m_leadSkeletons;
+  for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+       skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+    delete (*skeletonsIterator);
+  m_leadSkeletons.clear ();
   
   delete[]m_distances;
   delete[]m_maxDistancesIndexes;

@@ -301,7 +301,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("None"),
     _("Vertical"),
     _("From right"),
-    _("Random"),
+    _("Random1"),
+    _("Random2"),
     _("Noise")
   };
   const wxString m_FDFRadioBoxChoices[] = {
@@ -351,7 +352,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_slidersSizer->Add(m_intensityCoefSlider, 6, wxEXPAND, 0);
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
-					5, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
+					6, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
   m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,

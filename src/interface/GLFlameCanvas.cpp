@@ -280,14 +280,15 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run){
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-      m_solvers[i]->cleanSources();
+      m_solvers[i]->cleanSources ();
     for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-      m_flames[i]->addForces (m_currentConfig->flames[i].flickering, m_currentConfig->flames[i].fdf);
+      m_flames[i]->addForces ();
     
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->iterate ();
   }
   
+  /* Force à redessiner */
   this->Refresh();
   
   /*  draw();*/

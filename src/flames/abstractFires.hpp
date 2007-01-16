@@ -278,14 +278,11 @@ public:
   }
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   * @param perturbate Type de perturbation parmi FLICKERING_VERTICAL, FLICKERING_RANDOM, etc...
-   * @param fdf Type de fonction de distribution de carburant parmi FDF_LINEAR, FDF_BILINEAR, 
-   * FDF_EXPONENTIAL, FDF_GAUSS, FDF_RANDOM.
    */
-  virtual void addForces (char perturbate, char fdf=0)
+  virtual void addForces ()
   {
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->addForces(perturbate,fdf);
+      m_flames[i]->addForces();
   }
   
   /** Affectation de la vélocité induite par la flamme.

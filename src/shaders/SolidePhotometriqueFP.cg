@@ -110,7 +110,7 @@ float4 fpSPTEX(in vertexOutputsTEX IN,
 /*     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi) */
 /*     // attention y est suppose etre la hauteur et z la profondeur */
     r = length(direction.xyz);
-    theta=acos(-direction.y )*.6+.4;
+    theta=acos(-direction.y );
 /*     phi=atan2(point.z,point.x); */
     
     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture

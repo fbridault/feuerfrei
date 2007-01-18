@@ -167,7 +167,6 @@ void FixedFlame::drawHalo (double angle)
   glPushMatrix ();
   
   /* Problème ici... */
-  cerr << m_position << endl;
   //  glTranslatef (m_position.x,m_position.y,m_position.z);
   glRotatef (angle, 0.0, 1.0, 0.0);
   

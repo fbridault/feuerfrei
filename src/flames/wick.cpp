@@ -191,7 +191,7 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   Point rootMoveFactorL(2,.1,1);
   /* Création des leadSkeletons */
   /* On prend simplement le barycentre de chaque partition */
-  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig, -1, .1, -.2, .2));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig, -1, .5, -.2, .3));
   
   for (int i = 0; i < flameConfig->skeletonsNumber; i++)
     {
@@ -212,12 +212,12 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
 	    }
 	  barycentre = barycentre / (double)n;
 	  
-	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig, 2*(i+1)/(double)(flameConfig->skeletonsNumber+1)-1, .1, -.2, .2));
+	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig, 2*(i+1)/(double)(flameConfig->skeletonsNumber+1)-1, .5, -.2, .3));
  	}
       else
 	 cerr << "Partition " << i << " vide" << endl;
     }
-  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig, 1, .1, -.2, .2));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig, 1, .5, -.2, .3));
   cerr << "Terminé" << endl;  
 }
 

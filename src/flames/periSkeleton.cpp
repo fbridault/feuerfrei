@@ -5,6 +5,8 @@
 
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver3D.hpp"
+#include "leadSkeleton.hpp"
+
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE PERISKELETON **************************************/
@@ -40,6 +42,25 @@ void PeriSkeleton::addParticle(const Point* const pt)
   
   m_queue[m_headIndex] = *pt;
   m_queue[m_headIndex].birth(m_flameConfig->periLifeSpan);
+}
+
+bool PeriSkeleton::moveParticle (Particle * const pos)
+{
+  uint i, j, k;
+  
+  if (pos->isDead ())
+    return false;
+  
+  /* Déplacement de la particule */
+  *pos += m_solver->getUVW(*pos, m_lead->getSelfVelocity()/1.1);
+  
+  /* Si la particule sort de la grille, elle est éliminée */
+  if (pos->x < 0 || pos->x > m_solver->getDimX()
+      || pos->y < 0 || pos->y > m_solver->getDimY()
+      || pos->z < 0 || pos->z > m_solver->getDimZ())
+    return false;
+  
+  return true;
 }
 
 /**********************************************************************************************************************/

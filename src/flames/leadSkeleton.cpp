@@ -48,30 +48,34 @@ void LeadSkeleton::addForces ()
   double innerForce = m_flameConfig->innerForce;
   char perturbate = m_flameConfig->flickering;
   int fdf = m_flameConfig->fdf;
-  
+  double force;
+
+  m_selfVelocity = 0;
+
   switch(fdf){
   case FDF_LINEAR :
-    m_solver->addVsrc (m_root, innerForce * (m_u + 1));
+    force = innerForce * (m_u + 1);
     break;
   case FDF_BILINEAR :
-    m_solver->addVsrc (m_root, innerForce * m_u * m_u );
+    force = innerForce * m_u * m_u;
     break;
   case FDF_EXPONENTIAL :
-    m_solver->addVsrc (m_root, .1 * exp(innerForce * 14 * m_u));
+    force = .1 * exp(innerForce * 14 * m_u);
     break;
   case FDF_GAUSS:
-    m_solver->addVsrc (m_root, innerForce*exp(innerForce * 30 -(m_u) * m_u)/(9.0));
+    force = innerForce*exp(innerForce * 30 -m_u * m_u)/(9.0);
     break;
   case FDF_RANDOM:
-    m_solver->addVsrc (m_root, innerForce * rand()/((double)RAND_MAX));
+    force = innerForce * rand()/((double)RAND_MAX);
     break;
   }
-  
+  m_solver->addVsrc( m_root, force, m_selfVelocity);
+
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if (m_perturbateCount >= 2)
       {
-	m_solver->addVsrc (m_root, innerForce*5);
+	force = innerForce*5;
 	m_perturbateCount = 0;
       }
     else
@@ -93,19 +97,16 @@ void LeadSkeleton::addForces ()
     //    }
     break;
   case FLICKERING_RANDOM1 :
-    m_solver->addVsrc (m_root, rand()/((double)RAND_MAX)-.5);
+    force = rand()/((double)RAND_MAX) - .5;
     break;
   case FLICKERING_RANDOM2 :
-    m_solver->addVsrc(m_root, rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_root+Point(.1,0, 0), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_root+Point(-.1,0,0), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_root+Point(0,0, .1), rand()/(10*(double)RAND_MAX));
-    m_solver->addVsrc(m_root+Point(0,0,-.1), rand()/(10*(double)RAND_MAX));
+    force = rand()/(10*(double)RAND_MAX);
     break;
   case FLICKERING_NOISE :
-    m_solver->addVsrc (m_root, m_noiseGenerator.getNextValue());
+    force = m_noiseGenerator.getNextValue();
     break;
   }
+  m_solver->addVsrc( m_root, force, m_selfVelocity);
 }
 
 void LeadSkeleton::addParticle(const Point* const pt)
@@ -152,6 +153,7 @@ FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
   }
   
   copy->m_headIndex = m_headIndex;
+  copy->m_selfVelocity = m_selfVelocity;
   return copy;
 }
 

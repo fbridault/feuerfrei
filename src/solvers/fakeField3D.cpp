@@ -75,7 +75,7 @@ void FakeField3D::displayVelocityField (void)
 	  glPushMatrix ();	  
 	  glTranslatef (pt.x, pt.y, pt.z);
 	  //SDL_mutexP (lock);
-	  vect = getUVW (pt);
+	  vect = getUVW (pt,0);
 	  //SDL_mutexV (lock);
 	  displayArrow (vect);
 	  glPopMatrix ();

@@ -64,7 +64,7 @@ void LineFlame::breakCheck()
 {
   double split,proba;
   uint threshold=4;
-  double detachThreshold=.9;
+  double detachThreshold=.95;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -171,7 +171,7 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D *
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(4,0,4), flameConfig, 0, .1, 0, .1));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(4,0,4), flameConfig, 0, .5, 0, .1));
   
   /* On créé les squelettes en cercle */
   angle = 0;

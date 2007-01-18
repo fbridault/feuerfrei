@@ -104,7 +104,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
   m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture());
   
   for(uint k=0; k < m_nbFlames; k++){
-    /* On prend l'inverse pour éviter une division et on divise par la taille */
+    /* On prend l'inverse pour éviter une division dans le shader et on divise par la taille */
     /* pour avoir sur l'intervalle [O:1] dans l'espace de la texture */
     /* Le calcul final d'un uv dans le shader est le suivant : */
     /* phi / m_lazimuth_lzenith[i].x / m_tex2Dsize[0] */

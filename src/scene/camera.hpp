@@ -24,7 +24,7 @@ public:
     x = q.x;
     y = q.y;
     z = q.z;
-    w = q.w;      
+    w = q.w;
   };
   
   ~Quaternion(){};

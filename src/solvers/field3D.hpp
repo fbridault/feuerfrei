@@ -2,6 +2,7 @@
 #define FIELD3D_HPP
 
 #include "field.hpp"
+#include "../flames/particle.hpp"
 
 class Field;
 
@@ -43,7 +44,7 @@ public:
    * @param k Indice en profondeur (z).
    * @return Valeurs de vélocité.
    */
-  virtual Point getUVW (const Point& pos) const = 0;
+  virtual Point getUVW (const Point& pos, double selfVelocity) const = 0;
   
   /** Ajout d'une force externe pour la composante U.
    * @param i Indice à l'horizontale (x).
@@ -59,7 +60,7 @@ public:
    * @param k Indice en profondeur (z).
    * @param value Valeur de vélocité à ajouter.
    */
-  virtual void addVsrc (const Point& pos, double value) = 0;
+  virtual void addVsrc (const Point& pos, double value, double& selfVelocity) = 0;
   
   /** Ajout d'une force externe pour la composante W.
    * @param i Indice à l'horizontale (x).

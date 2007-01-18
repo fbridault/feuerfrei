@@ -59,7 +59,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverC
 						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,SLIDER_RANGE/10, wxDefaultPosition, 
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,2*SLIDER_RANGE/10, wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*FORCE_SENSIBILITY));
@@ -320,7 +320,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_index = index;
   m_glBuffer = glBuffer;
   
-  m_innerForceSlider = new wxSlider(this,IDSL_FF,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
+  m_innerForceSlider = new wxSlider(this,IDSL_FF,0,-SLIDER_RANGE,2*SLIDER_RANGE, wxDefaultPosition,
 				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_innerForceLabel = new wxStaticText(this,-1,_("Force"));
   

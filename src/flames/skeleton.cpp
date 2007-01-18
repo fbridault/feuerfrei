@@ -29,6 +29,7 @@ FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
     m_queue[i].m_lifespan +=5;
   }
   m_headIndex = splitHeight;
+  m_selfVelocity = src->m_selfVelocity;
 }
 
 FreeSkeleton::~FreeSkeleton()
@@ -106,7 +107,7 @@ bool FreeSkeleton::moveParticle (Particle * const pos)
     
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  *pos += m_solver->getUVW (tmp);
+  *pos += m_solver->getUVW (tmp, m_selfVelocity);
   
   return true;
 }
@@ -141,6 +142,7 @@ Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMov
 {  
   m_root = m_rootSave = position;
   m_flameConfig = flameConfig;
+  m_selfVelocity=0;
 }
 
 void Skeleton::draw ()
@@ -168,7 +170,7 @@ void Skeleton::moveRoot ()
 {
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_root);
+  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_root, m_selfVelocity);
   
   return;
 }
@@ -208,7 +210,7 @@ bool Skeleton::moveParticle (Particle * const pos)
     return false;
   
   /* Retrouver les quatres cellules adjacentes autour de la particule */
-  *pos += m_solver->getUVW(*pos);
+  *pos += m_solver->getUVW(*pos, m_selfVelocity);
   
   /* Si la particule sort de la grille, elle est éliminée */
   if (pos->x < 0 || pos->x > m_solver->getDimX()

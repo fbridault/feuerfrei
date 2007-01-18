@@ -13,7 +13,7 @@ Field::Field (const Point& position, double timeStep, double buoyancy) : m_posit
   m_buoyancy=buoyancy;
 
   arePermanentExternalForces = false;
-  m_forceCoef = 10;
+  m_forceCoef = 2;
   m_forceRatio = 1/m_forceCoef;
 }
  

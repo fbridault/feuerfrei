@@ -334,7 +334,7 @@ public:
   /** Affectation de la vélocité induite par la flamme.
    * @param value Vélocité de la flamme.
    */
-  virtual void setForces(double value){  m_innerForce=value; };
+  virtual void setForces(double value){ m_innerForce=value; };
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
   void drawParticles()

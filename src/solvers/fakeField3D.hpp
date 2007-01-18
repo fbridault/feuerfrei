@@ -35,14 +35,14 @@ public:
   
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ();
-  
-  Point getUVW (const Point& pos) const
+    
+  Point getUVW (const Point& pos, double selfVelocity) const
   {
     Point value;
     
-    value.x += m_dt * m_forceCoef * m_uSrc * pos.y/m_dim.y;
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * pos.y/m_dim.y + m_vSrc);
-    value.z += m_dt * m_forceCoef * m_wSrc * pos.y/m_dim.y;
+    value.x += m_dt * m_forceCoef * m_uSrc * (pos.y+.1)/m_dim.y;
+    value.y += (m_dt * m_forceCoef) * (m_buoyancy * pos.y/m_dim.y + selfVelocity);
+    value.z += m_dt * m_forceCoef * m_wSrc * (pos.y+.1)/m_dim.y;
     
     return value;
   };
@@ -52,9 +52,9 @@ public:
     m_uSrc += value;
   };
   
-  void addVsrc (const Point& pos, double value)
+  void addVsrc (const Point& pos, double value, double& selfVelocity)
   {
-    m_vSrc += value;
+    selfVelocity += value;
   };
   
   void addWsrc (const Point& pos, double value)

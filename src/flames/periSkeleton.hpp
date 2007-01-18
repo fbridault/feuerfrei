@@ -40,6 +40,7 @@ public:
   FreePeriSkeleton* split (uint splitHeight, FreeLeadSkeleton* leadSkeleton);
   
   void addParticle(const Point* const pt);
+  virtual bool moveParticle(Particle* const pos);
   
   /** Retourne un pointeur sur le squelette guide relatif. */
   LeadSkeleton* getLeadSkeleton() const {return m_lead;};

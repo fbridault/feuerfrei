@@ -36,7 +36,7 @@ public:
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ();
   
-  Point getUVW (const Point& pos) const
+  Point getUVW (const Point& pos, double selfVelocity) const
   {
     uint i,j,k,n;
     
@@ -54,7 +54,7 @@ public:
     m_uSrc[IX (i, j, k)] += value;
   };
   
-  void addVsrc (const Point& pos, double value)
+  void addVsrc (const Point& pos, double value, double& selfVelocity)
   {
     uint i,j,k;
     

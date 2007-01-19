@@ -22,7 +22,7 @@ using namespace std;
 #define PARAMS_DIRECTORY _("/params")
 #define SCENES_DIRECTORY _("/scenes")
 #define TEXTURES_DIRECTORY _("/textures")
-#define SHADERS_OBJECTS_PATH _("build/shadersObjects")
+#define SHADERS_OBJECTS_PATH _("build/shadersObjects/")
 
 #define AS_ERROR(ret,str) {if(ret==-1) perror(str);}
 

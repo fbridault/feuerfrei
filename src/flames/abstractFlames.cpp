@@ -154,70 +154,6 @@ FixedFlame::~FixedFlame()
 {
 }
 
-void FixedFlame::drawHalo (double angle)
-{
-  double h = getTop()->distance(*getBottom());
-  Point *top = getTop();
-  Point *bottom = getBottom();
-  
-  glActiveTextureARB(GL_TEXTURE0_ARB);
-  glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  m_halo.bind ();
-  
-  glPushMatrix ();
-  
-  /* Problème ici... */
-  //  glTranslatef (m_position.x,m_position.y,m_position.z);
-  glRotatef (angle, 0.0, 1.0, 0.0);
-  
-  /* \todo On effectue une interpolation du mouvement en x et en z pour dessiner le halo.*/
-  /* Ce n'est probablement pas la meilleure solution. */
-  double x1, x2, x3, x4;
-  if(angle > 0)
-    if(angle < 90){
-      x1 = ((bottom->x - h) * (90 - angle) - (bottom->z + h) * angle)/180.0;
-      x2 = ((bottom->x + h) * (90 - angle) - (bottom->z - h) * angle)/180.0;
-      x3 = ((top->x + h) * (90 - angle) - (top->z - h) * angle)/180.0;
-      x4 = ((top->x - h) * (90 - angle) - (top->z + h) * angle)/180.0;
-    }else{
-      x1 = ((bottom->x + h) * (90 - angle) - (bottom->z + h) * (180-angle))/180.0;
-      x2 = ((bottom->x - h) * (90 - angle)  - (bottom->z - h) * (180-angle))/180.0;
-      x3 = ((top->x - h) * (90 - angle) - (top->z - h) * (180-angle))/180.0;
-      x4 = ((top->x + h) * (90 - angle) - (top->z + h) * (180-angle))/180.0;
-    }
-  else
-    if(angle > -90){
-      x1 = ((bottom->x - h) * (90 + angle) + (bottom->z - h) * -angle)/180.0;
-      x2 = ((bottom->x + h) * (90 + angle) + (bottom->z + h) * -angle)/180.0;
-      x3 = ((top->x + h) * (90 + angle) + (top->z + h) * -angle)/180.0;
-      x4 = ((top->x - h) * (90 + angle) + (top->z - h) * -angle)/180.0;
-    }else{
-      x1 = ((bottom->x + h) * (90 + angle) + (bottom->z - h) * (180+angle))/180.0;
-      x2 = ((bottom->x - h) * (90 + angle) + (bottom->z + h) * (180+angle))/180.0;
-      x3 = ((top->x - h) * (90 + angle) + (top->z + h) * (180+angle))/180.0;
-      x4 = ((top->x + h) * (90 + angle) + (top->z - h) * (180+angle))/180.0;
-    }
-  
-  glColor4f(0.0,0.0,0.0,0.0);
-  glBegin(GL_QUADS);
-  
-  glTexCoord2f(0.0,0.0);
-  glVertex3f(x1,bottom->y,0.0);
-  
-  glTexCoord2f(1.0,0.0);
-  glVertex3f(x2,bottom->y,0.0);
-  
-  glTexCoord2f(1.0,1.0);
-  glVertex3f(x3,top->y+h/3.0,0.0);
-  
-  glTexCoord2f(0.0,1.0);
-  glVertex3f(x4,top->y+h/3.0,0.0);
-  
-  glEnd();
-  
-  glPopMatrix();
-}
-
 void FixedFlame::drawPointFlame ()
 {
   if (m_toggle)
@@ -257,7 +193,6 @@ void FixedFlame::drawPointFlame ()
       angle3 = angle4 * 180 / (double) (PI);
       
       glEnable (GL_TEXTURE_2D);
-      drawHalo(angle3);
       /****************************************************************************************/
       /* Affichage de la flamme */
       glActiveTextureARB(GL_TEXTURE0_ARB);

@@ -257,12 +257,7 @@ public:
     drawWick(displayBoxes);
     drawFlame(display, displayParticle);
   };
-  
-  /** Affiche le halo.
-   * @param angle Angle de rotation pour le quad texturé.
-   */
-  virtual void drawHalo (double angle);
-  
+    
   /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
    * pour rester en face de l'observateur.
    */

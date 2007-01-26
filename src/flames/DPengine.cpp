@@ -115,6 +115,7 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles)
 
 void DepthPeelingEngine::render()
 {   
+  glShadeModel (GL_FLAT);
   glDisable (GL_DEPTH_TEST);
   
   glBlendFunc (GL_ONE, GL_ONE);
@@ -130,29 +131,13 @@ void DepthPeelingEngine::render()
 //   for(int l=1; l <= m_nbLayers ; l--){
   for(int l=m_nbLayers; l >= 0 ; l--){
     
-    m_colorTex[l]->bind();
+    m_colorTex[l]->drawOnScreen(m_width,m_height);
     
 //     if(l==0)
 //     glColor4f(1.0,1.0,1.0,1.0);
 //     else      
 //      glColor4f(1.0,1.0,1.0,0.6);
 //     glColor4f(1.0,1.0,1.0,0.6);
-    
-    glBegin(GL_QUADS);
-    
-    glTexCoord2f(0,m_height);
-    glVertex3d(-1.0,1.0,0.0);
-    
-    glTexCoord2f(0,0);
-    glVertex3d(-1.0,-1.0,0.0);
-    
-    glTexCoord2f(m_width,0);
-    glVertex3d(1.0,-1.0,0.0);
-    
-    glTexCoord2f(m_width,m_height);
-    glVertex3d(1.0,1.0,0.0);
-    
-    glEnd();
   }
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   
@@ -162,4 +147,5 @@ void DepthPeelingEngine::render()
   glPopMatrix();
   
   glEnable (GL_DEPTH_TEST);
+  glShadeModel (GL_SMOOTH);
 }

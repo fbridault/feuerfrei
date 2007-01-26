@@ -394,14 +394,13 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /* A définir de manière plus précise par la suite */
     //     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
-    sigma = 1.5;
+//     sigma = 2;
     
     if(m_currentConfig->depthPeelingEnabled){
       /* On décortique dans les calques */
       m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles);
       
       m_glowEngine->activate();
-      m_glowEngine->setGaussSigma(sigma);
       
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       
@@ -409,7 +408,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       m_depthPeelingEngine->render();
     }else{
       m_glowEngine->activate();
-      m_glowEngine->setGaussSigma(sigma);
       
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       

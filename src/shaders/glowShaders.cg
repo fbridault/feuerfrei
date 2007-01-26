@@ -3,14 +3,12 @@
 struct vertin
 {
   float4 position   : POSITION;
-  float3 color	    : COLOR0;
   float2 texcoords  : TEXCOORD0;
 };
 
 struct vertout
 {
   float4 position : POSITION;
-  float3 color    : COLOR0;
   float2 tc0      : TEXCOORD0;
   float2 tc1      : TEXCOORD1;
   float2 tc2      : TEXCOORD2;
@@ -26,9 +24,7 @@ vertout vertGlowX(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   vertout OUT;
   
   // transformation des coordonnees 3D dans le repere de la camera
-  OUT.position = mul(ModelViewProj, IN.position);
-  // passage de la couleur en sortie
-  OUT.color = IN.color;
+  OUT.position = IN.position;
   // passage des coordonnees de texture
   OUT.tc0.x = IN.texcoords.x + offsets[0];
   OUT.tc1.x = IN.texcoords.x + offsets[1];
@@ -54,9 +50,7 @@ vertout vertGlowY(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   vertout OUT;
   
   // transformation des coordonnees 3D dans le repere de la camera
-  OUT.position = mul(ModelViewProj, IN.position);
-  // passage de la couleur en sortie
-  OUT.color = IN.color;
+  OUT.position = IN.position;
   // passage des coordonnees de texture
   OUT.tc0.x = IN.texcoords.x;
   OUT.tc1.x = IN.texcoords.x;
@@ -84,5 +78,117 @@ float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, unif
 
   color = (texRECT(text,IN.tc0) * weights[0] + texRECT(text,IN.tc1) * weights[1] + texRECT(text,IN.tc2) * weights[2] + texRECT(text,IN.tc3) * weights[3] + texRECT(text,IN.tc4) * weights[4] + texRECT(text,IN.tc5) * weights[5] + texRECT(text,IN.tc6) * weights[6] + texRECT(text,IN.tc7) * weights[7])/divide;
   
+  return color;
+}
+
+struct vertout16
+{
+  float4 position : POSITION;
+  float3 fromXY   : COLOR0;
+  float2 tc0      : TEXCOORD0;
+  float2 tc1      : TEXCOORD1;
+  float2 tc2      : TEXCOORD2;
+  float2 tc3      : TEXCOORD3;
+  float2 tc4      : TEXCOORD4;
+  float2 tc5      : TEXCOORD5;
+  float2 tc6      : TEXCOORD6;
+  float2 tc7      : TEXCOORD7;
+};
+
+vertout16 vertGlowX16(vertin IN, uniform float offsets[16], uniform float4x4 ModelViewProj)
+{
+  vertout16 OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage des coordonnees de texture
+  OUT.tc0.x = IN.texcoords.x + offsets[0];
+  OUT.tc1.x = IN.texcoords.x + offsets[1];
+  OUT.tc2.x = IN.texcoords.x + offsets[2];
+  OUT.tc3.x = IN.texcoords.x + offsets[3];
+  OUT.tc4.x = IN.texcoords.x + offsets[4];
+  OUT.tc5.x = IN.texcoords.x + offsets[5];
+  OUT.tc6.x = IN.texcoords.x + offsets[6];
+  OUT.tc7.x = IN.texcoords.x + offsets[7];
+  OUT.tc0.y = IN.texcoords.x + offsets[8];
+  OUT.tc1.y = IN.texcoords.x + offsets[9];
+  OUT.tc2.y = IN.texcoords.x + offsets[10];
+  OUT.tc3.y = IN.texcoords.x + offsets[11];
+  OUT.tc4.y = IN.texcoords.x + offsets[12];
+  OUT.tc5.y = IN.texcoords.x + offsets[13];
+  OUT.tc6.y = IN.texcoords.x + offsets[14];
+  OUT.tc7.y = IN.texcoords.y;
+  OUT.fromXY.x = 1;
+  return OUT;
+}
+
+vertout16 vertGlowY16(vertin IN, uniform float offsets[16], uniform float4x4 ModelViewProj)
+{
+  vertout16 OUT;
+  
+  // transformation des coordonnees 3D dans le repere de la camera
+  OUT.position = mul(ModelViewProj, IN.position);
+  // passage des coordonnees de texture
+  OUT.tc0.x = IN.texcoords.y + offsets[0];
+  OUT.tc1.x = IN.texcoords.y + offsets[1];
+  OUT.tc2.x = IN.texcoords.y + offsets[2];
+  OUT.tc3.x = IN.texcoords.y + offsets[3];
+  OUT.tc4.x = IN.texcoords.y + offsets[4];
+  OUT.tc5.x = IN.texcoords.y + offsets[5];
+  OUT.tc6.x = IN.texcoords.y + offsets[6];
+  OUT.tc7.x = IN.texcoords.y + offsets[7];
+  OUT.tc0.y = IN.texcoords.y + offsets[8];
+  OUT.tc1.y = IN.texcoords.y + offsets[9];
+  OUT.tc2.y = IN.texcoords.y + offsets[10];
+  OUT.tc3.y = IN.texcoords.y + offsets[11];
+  OUT.tc4.y = IN.texcoords.y + offsets[12];
+  OUT.tc5.y = IN.texcoords.y + offsets[13];
+  OUT.tc6.y = IN.texcoords.y + offsets[14];
+  OUT.tc7.y = IN.texcoords.x;
+  OUT.fromXY.x = 0;
+  
+  return OUT;
+}
+
+float4 fragGlow16(vertout16 IN, uniform float weights[16], uniform float divide, uniform samplerRECT text ) : COLOR
+{
+  float4 color;
+  float2 tc0, tc1, tc2, tc3, tc4, tc5, tc6, tc7, tc8, tc9, tc10, tc11, tc12, tc13, tc14;
+  
+  if(IN.fromXY.x > 0){
+    color = (texRECT(text,float2(IN.tc0.x, IN.tc7.y)) * weights[0] +
+	     texRECT(text,float2(IN.tc1.x, IN.tc7.y)) * weights[1] +
+	     texRECT(text,float2(IN.tc2.x, IN.tc7.y)) * weights[2] +
+	     texRECT(text,float2(IN.tc3.x, IN.tc7.y)) * weights[3] +
+	     texRECT(text,float2(IN.tc4.x, IN.tc7.y)) * weights[4] +
+	     texRECT(text,float2(IN.tc5.x, IN.tc7.y)) * weights[5] +
+	     texRECT(text,float2(IN.tc6.x, IN.tc7.y)) * weights[6] +
+	     texRECT(text,float2(IN.tc7.x, IN.tc7.y)) * weights[7] +
+	     texRECT(text,float2(IN.tc0.y, IN.tc7.y)) * weights[8] +
+	     texRECT(text,float2(IN.tc1.y, IN.tc7.y)) * weights[9] +
+	     texRECT(text,float2(IN.tc2.y, IN.tc7.y)) * weights[10] +
+	     texRECT(text,float2(IN.tc3.y, IN.tc7.y)) * weights[11] +
+	     texRECT(text,float2(IN.tc4.y, IN.tc7.y)) * weights[12] +
+	     texRECT(text,float2(IN.tc5.y, IN.tc7.y)) * weights[13] +
+	     texRECT(text,float2(IN.tc6.y, IN.tc7.y)) * weights[14]
+	     )/divide;
+  }else{
+    color = (texRECT(text,float2(IN.tc7.y, IN.tc0.x)) * weights[0] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc1.x)) * weights[1] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc2.x)) * weights[2] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc3.x)) * weights[3] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc4.x)) * weights[4] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc5.x)) * weights[5] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc6.x)) * weights[6] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc7.x)) * weights[7] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc0.y)) * weights[8] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc1.y)) * weights[9] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc2.y)) * weights[10] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc3.y)) * weights[11] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc4.y)) * weights[12] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc5.y)) * weights[13] +
+	     texRECT(text,float2(IN.tc7.y, IN.tc6.y)) * weights[14]
+	     )/divide;
+  }
   return color;
 }

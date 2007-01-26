@@ -80,6 +80,41 @@ public:
   const void bind() const { glBindTexture(m_type, m_texName); };
   
   const bool hasAlpha() const { return m_hasAlpha; };
+  
+  void drawOnScreen(uint width, uint height) const
+  {
+    glBindTexture(m_type, m_texName);
+    glColor4f(1.0,1.0,1.0,1.0);
+    glBegin(GL_QUADS);
+    
+    glTexCoord2f(0,0);
+    glVertex3d(-1.0,-1.0,0.0);
+    glTexCoord2f(width,0);
+    glVertex3d(1.0,-1.0,0.0);
+    glTexCoord2f(width,height);
+    glVertex3d(1.0,1.0,0.0);
+    glTexCoord2f(0,height);
+    glVertex3d(-1.0,1.0,0.0);
+    
+    glEnd();
+  }
+  void drawOnScreen(uint width, uint height, double WRatio, double HRatio) const
+  {
+    glBindTexture(m_type, m_texName);
+    glColor4f(1.0,1.0,1.0,1.0);
+    glBegin(GL_QUADS);
+    
+    glTexCoord2f(0,0);
+    glVertex3d(-WRatio,-HRatio,0.0);
+    glTexCoord2f(width,0);
+    glVertex3d(WRatio,-HRatio,0.0);
+    glTexCoord2f(width,height);
+    glVertex3d(WRatio,HRatio,0.0);
+    glTexCoord2f(0,height);
+    glVertex3d(-WRatio,HRatio,0.0);
+    
+    glEnd();
+  }
 
 private:
   void loadWithAlphaChannel();

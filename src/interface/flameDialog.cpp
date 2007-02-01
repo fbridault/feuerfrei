@@ -242,10 +242,13 @@ void FlameDialog::OnClickButtonDelete(wxCommandEvent& event)
 
 void FlameDialog::OnOK(wxCommandEvent& event)
 {
-  delete [] m_currentConfig->flames;
+  FlameConfig* saveConfig;
+  uint saveNb;
   
-  m_currentConfig->nbFlames = m_nbPanels;
+  saveConfig = m_currentConfig->flames;
+  saveNb = m_currentConfig->nbFlames;
   
+  m_currentConfig->nbFlames = m_nbPanels;  
   m_currentConfig->flames = new FlameConfig[m_currentConfig->nbFlames];
   
   for(uint i = 0; i < m_currentConfig->nbFlames; i++)
@@ -258,20 +261,32 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    errorDialog->Destroy();
 	    return;
 	  }
-	  m_currentConfig->flames[i].innerForce = 0.005;
-	  m_currentConfig->flames[i].leadLifeSpan = 8;
-	  m_currentConfig->flames[i].periLifeSpan = 6;
-	}else{
-	  m_currentConfig->flames[i].innerForce = 0.04;
-	  m_currentConfig->flames[i].leadLifeSpan = 6;
-	  m_currentConfig->flames[i].periLifeSpan = 4;
 	}
-	m_currentConfig->flames[i].samplingTolerance = 100;
-	m_currentConfig->flames[i].flickering = 0;
-	m_currentConfig->flames[i].fdf = 0;
-	m_currentConfig->flames[i].IESFileName = _("IES/test.ies");
+	/* On recopie les anciens paramètres si ils existent */
+	if(saveNb > i)
+	  {
+	    m_currentConfig->flames[i].innerForce = saveConfig[i].innerForce;
+	    m_currentConfig->flames[i].leadLifeSpan = saveConfig[i].leadLifeSpan;
+	    m_currentConfig->flames[i].periLifeSpan = saveConfig[i].periLifeSpan;
+	    m_currentConfig->flames[i].intensityCoef = saveConfig[i].intensityCoef;
+	    m_currentConfig->flames[i].samplingTolerance = saveConfig[i].samplingTolerance;
+	    m_currentConfig->flames[i].flickering = saveConfig[i].flickering;
+	    m_currentConfig->flames[i].fdf = saveConfig[i].fdf;
+	    m_currentConfig->flames[i].IESFileName = saveConfig[i].IESFileName;	      
+	  }
+	else
+	  {
+	    m_currentConfig->flames[i].innerForce = 0.005;
+	    m_currentConfig->flames[i].leadLifeSpan = 6;
+	    m_currentConfig->flames[i].periLifeSpan = 4;
+	    m_currentConfig->flames[i].samplingTolerance = 100;
+	    m_currentConfig->flames[i].flickering = 0;
+	    m_currentConfig->flames[i].fdf = 0;
+	    m_currentConfig->flames[i].IESFileName = _("IES/test.ies");
+	  }
       }else
 	return;      
     }
+  delete [] saveConfig;
   wxDialog::OnOK(event);
 }

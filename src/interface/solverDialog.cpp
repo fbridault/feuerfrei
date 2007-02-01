@@ -205,6 +205,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
 
 bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
 {
+  /* Une exception est levée si l'un des contrôles n'a pas une valeur conforme */
   try
     {
       solverConfig->position.x = m_posXTextCtrl->GetSafelyValue();
@@ -355,18 +356,29 @@ void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
 }
 
 void SolverDialog::OnOK(wxCommandEvent& event)
-{
-  delete [] m_currentConfig->solvers;
+{ 
+  SolverConfig* saveConfig;
+  uint saveNb;
+
+  saveConfig = m_currentConfig->solvers;
+  saveNb = m_currentConfig->nbSolvers;
   
-  m_currentConfig->nbSolvers = m_nbPanels;
-  
+  m_currentConfig->nbSolvers = m_nbPanels;  
   m_currentConfig->solvers = new SolverConfig[m_currentConfig->nbSolvers];
   
   for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
       if(!m_solverPanels[i]->getCtrlValues(&m_currentConfig->solvers[i]))
 	return;
+      else
+	/* On recopie l'ancienne buoyancy si elle existe */
+	if(saveNb > i)
+	  m_currentConfig->solvers[i].buoyancy = saveConfig[i].buoyancy;
+	else
+	  m_currentConfig->solvers[i].buoyancy = 10;
     }
+  
+  delete [] saveConfig;
   wxDialog::OnOK(event);
 }
 

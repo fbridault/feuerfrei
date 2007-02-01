@@ -146,6 +146,7 @@ private:
   GLFlameCanvas *m_glBuffer;
   
   double FORCE_SENSIBILITY;
+  double LIGHT_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()

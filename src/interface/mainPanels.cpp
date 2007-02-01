@@ -313,6 +313,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
     _("Random")
   };
   
+  LIGHT_SENSIBILITY=100.0;
   FORCE_SENSIBILITY=500.0;
   SLIDER_RANGE=50;
   
@@ -385,7 +386,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfi
   m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
-  m_intensityCoefSlider->SetValue((int)(m_flameConfig->intensityCoef*10));
+  m_intensityCoefSlider->SetValue((int)(m_flameConfig->intensityCoef*LIGHT_SENSIBILITY));
   
   SetSizerAndFit(m_panelSizer);
 }
@@ -411,7 +412,7 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
     m_flameConfig->periLifeSpan = m_periLifeSlider->GetValue();
     break;
   case IDSL_IC:
-    m_flameConfig->intensityCoef = m_intensityCoefSlider->GetValue()/10.0;
+    m_flameConfig->intensityCoef = m_intensityCoefSlider->GetValue()/LIGHT_SENSIBILITY;
     m_glBuffer->setFlameIntensity(m_index, m_flameConfig->intensityCoef);
     break;
   }

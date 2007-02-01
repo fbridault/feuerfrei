@@ -40,9 +40,9 @@ public:
   {
     Point value;
     
-    value.x += m_dt * m_forceCoef * m_uSrc * (pos.y+.1)/m_dim.y;
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * pos.y/m_dim.y + selfVelocity);
-    value.z += m_dt * m_forceCoef * m_wSrc * (pos.y+.1)/m_dim.y;
+    value.x += m_dt * m_forceCoef * m_uSrc * (pos.y+.2)/m_dim.y;
+    value.z += m_dt * m_forceCoef * m_wSrc * (pos.y+.2)/m_dim.y;
+    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.2)/m_dim.y + selfVelocity) - fabs(value.x) - fabs(value.z);
     
     return value;
   };

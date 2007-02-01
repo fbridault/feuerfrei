@@ -179,7 +179,7 @@ PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D *
     {
       m_periSkeletons[i] = new PeriSkeleton (m_solver, 
 					     Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
-					     Point(4,.75,4),
+					     Point(1,.75,1),
 					     m_leadSkeletons[0], flameConfig);
       angle += 2 * PI / m_nbSkeletons;
     }

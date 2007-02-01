@@ -104,7 +104,7 @@ bool FreeSkeleton::moveParticle (Particle * const pos)
     tmp.y = m_solver->getDimY() - EPSILON;
   if ( tmp.z >= m_solver->getDimZ() )
     tmp.z = m_solver->getDimZ() - EPSILON;
-    
+  
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
   *pos += m_solver->getUVW (tmp, m_selfVelocity);

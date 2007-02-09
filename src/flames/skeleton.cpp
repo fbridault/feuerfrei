@@ -204,8 +204,6 @@ void Skeleton::move ()
 
 bool Skeleton::moveParticle (Particle * const pos)
 {
-  uint i, j, k;
-  
   if (pos->isDead ())
     return false;
   

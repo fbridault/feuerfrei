@@ -46,8 +46,6 @@ void PeriSkeleton::addParticle(const Point* const pt)
 
 bool PeriSkeleton::moveParticle (Particle * const pos)
 {
-  uint i, j, k;
-  
   if (pos->isDead ())
     return false;
   

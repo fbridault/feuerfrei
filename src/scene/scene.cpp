@@ -13,33 +13,32 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
   //sortTransparentObjects();
 }
 
-void Scene::sortTransparentObjects()
-{  
-  int i;
-  int size;
-  Object* object;
+// void Scene::sortTransparentObjects()
+// {  
+//   int i;
+//   int size;
+//   Object* object;
   
-  size = m_objectsArray.size(); i=0;
-  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
-       i < size; i++,objectsArrayIterator++)
-    if ((*objectsArrayIterator)->isTransparent ())
-      {
-	cerr << "bite" << endl;
-	object = *objectsArrayIterator;
-	objectsArrayIterator =  m_objectsArray.erase(objectsArrayIterator); 
-	m_objectsArray.push_back(object);
-      }
+//   size = m_objectsArray.size(); i=0;
+//   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
+//        i < size; i++,objectsArrayIterator++)
+//     if ((*objectsArrayIterator)->isTransparent ())
+//       {
+// 	object = *objectsArrayIterator;
+// 	objectsArrayIterator =  m_objectsArray.erase(objectsArrayIterator); 
+// 	m_objectsArray.push_back(object);
+//       }
   
-  size = m_objectsArrayWSV.size(); i=0;
-  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
-       i < size; i++,objectsArrayIteratorWSV++)
-    if ((*objectsArrayIteratorWSV)->isTransparent ())
-      {
-	object = *objectsArrayIteratorWSV;
-	objectsArrayIteratorWSV =  m_objectsArrayWSV.erase(objectsArrayIteratorWSV); 
-	m_objectsArrayWSV.push_back(object);
-      }  
-}
+//   size = m_objectsArrayWSV.size(); i=0;
+//   for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+//        i < size; i++,objectsArrayIteratorWSV++)
+//     if ((*objectsArrayIteratorWSV)->isTransparent ())
+//       {
+// 	object = *objectsArrayIteratorWSV;
+// 	objectsArrayIteratorWSV =  m_objectsArrayWSV.erase(objectsArrayIteratorWSV); 
+// 	m_objectsArrayWSV.push_back(object);
+//       }  
+// }
 
 void Scene::createDisplayLists(void)
 {
@@ -170,21 +169,45 @@ void Scene::getSceneAbsolutePath(const char* const fileName)
     }
 }
 
-bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const char* objName)
+bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 {
   char lettre,drop;
   char buffer[255];
   int coord_textures = 0, normales = 0;
   double x, y, z;
-  int a, b, c, d, an, bn, cn, dn, at, bt, ct, dt, w, matIndex=0;
-  int valeurLues;
+  int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
   bool alreadyOneObject = false, skip = false;
-  bool objectsAttributesSet=0;
+  bool objectsAttributesSet=false;
   int nbVertex=0, nbNormals=0, nbTexCoords=0;
   int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
-  Object* currentObject=NULL;  
+  Object* currentObject=NULL;
+  Mesh* currentMesh=NULL;  
   bool importSingleObject = (object != NULL);
   bool lookForSpecificObject = (objName != NULL);
+  /* Indique qu'un maillage ou un objet a été créé, utile pour ajouter les informations géométriques une fois */
+  /* qu'elles sont toutes lues car les objets sont crées auparavant. */
+  bool meshCreated=false, objectCreated=false;
+  
+  /**<Liste des points de l'objet */
+  list < Point  >vertexList;
+  /**<Liste des normales de l'objet */
+  list < Vector >normalsList;
+  /**<Liste des coordonnées de textures de l'objet */
+  list < Point  >texCoordsList;
+  /**<Liste des indices des points des facettes */
+  list < GLuint >vertexIndexList;
+  /**<Liste des indices des normales des facettes */
+  list < GLuint >normalsIndexList;  
+  /**<Liste des indices des coordonnées de textures des facettes */
+  list < GLuint >texCoordsIndexList;
+  
+  GLfloat *glVertexArray;
+  GLfloat *glNormalsArray;
+  GLfloat *glTexCoordsArray;
+  GLuint *glVertexIndexArray;
+  GLuint *glNormalsIndexArray;
+  GLuint *glTexCoordsIndexArray;
+
   
   getSceneAbsolutePath(fileName);
   
@@ -204,50 +227,103 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	  objFile.getline(buffer, sizeof (buffer));
 	  break;
 	case 'g':
+	  /* Définition d'un nouvel objet. */
+	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
+	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
+	  if(meshCreated){
+	    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+	    switch (coord_textures + normales){
+	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
+	    case 2:
+	    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
+	    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
+	    }
+	    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+	    meshCreated = false;
+	  }
+	  /* Cependant, on commence d'abord par valider les données de l'objet précédent. */
+	  if(objectCreated){
+	    currentObject->setGeometryCount(vertexList.size()*3, normalsList.size()*3, texCoordsList.size()*2);
+	    switch (coord_textures + normales){
+	    case 3: texCoordsStdListToGLArrayCopy(texCoordsList,&glTexCoordsArray);
+	    case 2:
+	    case 1: normalsStdListToGLArrayCopy(normalsList,&glNormalsArray);
+	    case 0: vertexStdListToGLArrayCopy(vertexList,&glVertexArray);
+	    }
+	    currentObject->setGeometry(glVertexArray, glNormalsArray, glTexCoordsArray);
+	  }
+	  
 	  objFile >> buffer;
 	  if(importSingleObject){
-	    /* Nouvel objet */
+	    /* On importe un seul objet. */
 	    if(alreadyOneObject){
+	      /* Un objet a déjà été importé, inutile de continuer. */
 	      objFile.close ();
-	      return (currentObject != NULL);
+	      return true;
 	    }else{
 	      if(lookForSpecificObject){
+		/* On recherche un objet en particulier. */
 		if(!strcmp(buffer,objName)){
-		  cerr << "import de " << objName << endl;
+		  /* Objet trouvé ! */
+		  cerr << "import of " << objName << endl;
 		  currentObject = object;
 		  alreadyOneObject = true;
+		  objectCreated = true;
 		  skip = false;
 		}else
 		  skip = true;
 	      }else{
+		/* Sinon on prend le premier objet dans le fichier. */
 		currentObject = object;
 		alreadyOneObject = true;
+		objectCreated = true;
 	      }
 	    }
-	  }else
+	  }else{
+	    /* On est en train d'importer tous les objets. */
 	    currentObject = new Object(this);
-	  
-	  if(!detached)
+	    objectCreated = true;
+	    
 	    if (!strncmp (buffer, "WSV", 3))
 	      addObject(currentObject, true);
 	    else
 	      addObject(currentObject, false);
-	  objectsAttributesSet = false;
+	  }
 	  nbObjectVertex = nbVertex;
 	  nbObjectNormals = nbNormals;
 	  nbObjectTexCoords = nbTexCoords;
 	  break;
-	case '\n':
-	case ' ':
+	case 'u':
+	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
+	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
+	  if(meshCreated){
+	    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+	    switch (coord_textures + normales){
+	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
+	    case 2:
+	    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
+	    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
+	    }
+	    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+	  }
+	  /* Création du nouveau mesh. */
+	  objFile >> buffer >> buffer;
+	  if(!skip){
+	    matIndex = getMaterialIndexByName(buffer);
+	    currentMesh = new Mesh(this, matIndex, currentObject);
+	    currentObject->addMesh(currentMesh);
+	    meshCreated = true;
+	    objectsAttributesSet = false;
+	  }
 	  break;
 	case 'm':
 	  /* Définition des matériaux */
 	  objFile >> buffer >> buffer;
-	  /* La définition des matériaux est évitée si l'on importe qu'un seul objet */
+	  /* La définition des matériaux est évitée si l'on importe qu'un seul objet. */
 	  if(!lookForSpecificObject)
 	    this->importMTL ((const char *) buffer);
 	  break;
-	case 'v':	  
+	case 'v':
 	  objFile.get(lettre);
 	  switch (lettre)
 	    {
@@ -256,20 +332,20 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	    case ' ':
 	      objFile >> x >> y >> z;
 	      if(!skip)
-		currentObject->addVertex(new Point(x, y, z));
+		vertexList.push_back(Point(x, y, z));
 	      nbVertex++;
 	      break;
 	    case 'n':
 	      objFile >> x >> y >> z;
 	      if(!skip)
-		currentObject->addNormal (new Vector(x, y, z));	      
+		normalsList.push_back(Vector(x, y, z));
 	      nbNormals++;
 	      break;
 	    case 't':
 	      objFile >> x >> y;
 	      if(!skip)
 		/* On inverse la coordonnée y */
-		currentObject->addTexCoord (new Point(x, -y, 0));	      
+		texCoordsList.push_back(Point(x, -y, 0));
 	      nbTexCoords++;
 	      break;
 	    }
@@ -281,109 +357,159 @@ bool Scene::importOBJ(const char* fileName, Object* object, bool detached, const
 	  }
 	  if(!objectsAttributesSet){
 	    objectsAttributesSet = true;
-	    if(currentObject->getNormalsArraySize())
+	    if(!normalsList.empty())
 	      normales = 1;
 	    else
 	      normales = 0;
-	    if(currentObject->getTexCoordsArraySize())
+	    if(!texCoordsList.empty())
 	      coord_textures = 2;
 	    else
 	      coord_textures = 0;
-	    currentObject->setAttributes(coord_textures + normales);
+	    currentMesh->setAttributes(coord_textures + normales);
 	  }
 	  switch (coord_textures + normales)
 	    {
 	    case 0:
-	      objFile >> a >> b >> c;// >> d;
-	      // if (valeurLues < 3){
-// 		cout << "Erreur de chargement : Le fichier "
-// 		     << fileName
-// 		     << " contient des erreurs d'indexation de points.\n";
-// 		return;
-// 	      }
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, UNDEFINED, UNDEFINED, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1, UNDEFINED, UNDEFINED, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1, UNDEFINED, UNDEFINED, matIndex));
-	      
-	      // if (valeurLues > 3)
-// 		cout << "problème: facette non triangulaire !!!" << endl;
-	      
+	      objFile >> a >> b >> c;
+	      vertexIndexList.push_back(a - nbObjectVertex - 1);
+	      vertexIndexList.push_back(b - nbObjectVertex - 1);
+	      vertexIndexList.push_back(c - nbObjectVertex - 1);
 	      break;
 	    case 1:
 	      objFile >> a >> drop >> drop >> an;
 	      objFile >> b >> drop >> drop >> bn;
 	      objFile >> c >> drop >> drop >> cn;
-	      //	      objFile >> d >> drop >> drop >> dn;
-// 	      if (valeurLues < 6)
-// 		{
-// 		  cout << "Erreur de chargement : Le fichier " << fileName
-// 		       << " contient des erreurs d'indexation de points.\n";
-// 		  return;
-// 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1, UNDEFINED, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1, UNDEFINED, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1, UNDEFINED, matIndex));
+	      vertexIndexList.push_back(a - nbObjectVertex - 1);
+	      vertexIndexList.push_back(b - nbObjectVertex - 1);
+	      vertexIndexList.push_back(c - nbObjectVertex - 1);
 	      
-	    //   if (valeurLues > 6)
-// 		  cout << "problème: facette non triangulaire !!!" << endl;	      
+	      normalsIndexList.push_back(an - nbObjectNormals - 1);
+	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
 	      break;
 	    case 2:
-	      objFile >> a >> drop >> w;
-	      objFile >> b >> drop >> w;
-	      objFile >> c >> drop >> w;
-	      //	      objFile >> d >> drop >> w;
-// 	      if (valeurLues < 6)
-// 		{
-// 		  cout << "Erreur de chargement : Le fichier " << fileName
-// 		       << " contient des erreurs d'indexation de points.\n";
-// 		  return;
-// 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1, UNDEFINED, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1, UNDEFINED, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1, UNDEFINED, matIndex));
+	      objFile >> a >> drop >> an;
+	      objFile >> b >> drop >> bn;
+	      objFile >> c >> drop >> cn;
+	      vertexIndexList.push_back(a - nbObjectVertex - 1);
+	      vertexIndexList.push_back(b - nbObjectVertex - 1);
+	      vertexIndexList.push_back(c - nbObjectVertex - 1);
 	      
-	      // if (valeurLues > 6)
-// 		cout << "problème: facette non triangulaire !!!" << endl;
+	      normalsIndexList.push_back(an - nbObjectNormals - 1);
+	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
  	      break;
 	    case 3:
 	      objFile >> a >> drop >> at >> drop >> an;
 	      objFile >> b >> drop >> bt >> drop >> bn;
 	      objFile >> c >> drop >> ct >> drop >> cn;
-	      //	      objFile >> d >> drop >> dt >> drop >> dn;
-	      // if (valeurLues < 9)
-// 		{
-// 		  cout << "Erreur de chargement : Le fichier " << fileName
-// 		       << " contient des erreurs d'indexation de points.\n";
-// 		  return;
-// 		}
-	      currentObject->addFacet(new PointIndices(a - nbObjectVertex - 1, an - nbObjectNormals - 1,
-						       at - nbObjectTexCoords - 1, matIndex),
-				      new PointIndices(b - nbObjectVertex - 1, bn - nbObjectNormals - 1,
-						       bt - nbObjectTexCoords - 1, matIndex),
-				      new PointIndices(c - nbObjectVertex - 1, cn - nbObjectNormals - 1,
-						       ct - nbObjectTexCoords - 1, matIndex));
-	      // if (valeurLues > 9)
-// 		cout << "problème: facette non triangulaire !!!" << endl;
-	      break;
+	      vertexIndexList.push_back(a - nbObjectVertex - 1);
+	      vertexIndexList.push_back(b - nbObjectVertex - 1);
+	      vertexIndexList.push_back(c - nbObjectVertex - 1);
 	      
+	      normalsIndexList.push_back(an - nbObjectNormals - 1);
+	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
+	      
+	      texCoordsIndexList.push_back(at - nbObjectTexCoords - 1);
+	      texCoordsIndexList.push_back(bt - nbObjectTexCoords - 1);
+	      texCoordsIndexList.push_back(ct - nbObjectTexCoords - 1);
+	      break;	      
 	    default:
 	      cout << "Erreur de chargement : Le fichier " << fileName << " contient des erreurs d'indexation de points.\n";
 	      return false;
 	      break;
 	    }
 	  break;
-	case 'u':
-	  objFile >> buffer >> buffer;
-	  matIndex = getMaterialIndexByName(buffer);
+	case '\n':
+	case ' ':
 	  break;
 	}
     }
   objFile.close ();
   
+  if(objectCreated){
+    /* On valide les données du dernier Objet. */
+    currentObject->setGeometryCount(vertexList.size()*3, normalsList.size()*3, texCoordsList.size()*2);
+    switch (coord_textures + normales){
+    case 3: texCoordsStdListToGLArrayCopy(texCoordsList,&glTexCoordsArray);
+    case 2:
+    case 1: normalsStdListToGLArrayCopy(normalsList,&glNormalsArray);
+    case 0: vertexStdListToGLArrayCopy(vertexList,&glVertexArray);
+    }
+    currentObject->setGeometry(glVertexArray, glNormalsArray, glTexCoordsArray);
+  }
+  if(meshCreated){
+    /* On valide les données du dernier Mesh. */
+    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+    switch (coord_textures + normales){
+    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
+    case 2:
+    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
+    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
+    }
+    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+  }
+  
   if(importSingleObject)
     return (currentObject != NULL);
   else
     return true;
+}
+
+void Scene::indexStdListToGLArrayCopy( list<GLuint> &stdlist, GLuint** array )
+{
+  uint i=0;
+  *array = new GLuint[stdlist.size()];
+  
+  for (list<GLuint>::iterator listIterator = stdlist.begin ();
+       listIterator != stdlist.end ();
+       listIterator++, i++)
+    (*array)[i] = *listIterator;
+  stdlist.clear ();
+}
+
+void Scene::vertexStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array )
+{
+  uint i=0;
+  *array = new GLfloat[stdlist.size()*3];
+  for (list<Point>::iterator listIterator = stdlist.begin ();
+       listIterator != stdlist.end ();
+       listIterator++, i+=3){
+    (*array)[i] = listIterator->x;
+    (*array)[i+1] = listIterator->y;
+    (*array)[i+2] = listIterator->z;
+  }
+  stdlist.clear ();
+}
+
+void Scene::normalsStdListToGLArrayCopy( list<Vector> &stdlist, GLfloat** array )
+{
+  uint i=0;
+  *array = new GLfloat[stdlist.size()*3];
+  
+  for (list<Vector>::iterator listIterator = stdlist.begin ();
+       listIterator != stdlist.end ();
+       listIterator++, i+=3){
+    (*array)[i] = listIterator->x;
+    (*array)[i+1] = listIterator->y;
+    (*array)[i+2] = listIterator->z;
+  }
+  stdlist.clear ();
+}
+
+void Scene::texCoordsStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array )
+{
+  uint i=0;
+  *array = new GLfloat[stdlist.size()*2];
+  
+  for (list<Point>::iterator listIterator = stdlist.begin ();
+       listIterator != stdlist.end ();
+       listIterator++, i+=2){
+    (*array)[i] = listIterator->x;
+    (*array)[i+1] = listIterator->y;
+  }
+  stdlist.clear ();
 }
 
 void Scene::getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix)

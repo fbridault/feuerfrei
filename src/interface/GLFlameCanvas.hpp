@@ -145,7 +145,7 @@ private:
   CgSVShader *m_SVShader;
   
   double *intensities;
-
+  
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()
 };

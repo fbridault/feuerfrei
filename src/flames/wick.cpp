@@ -15,7 +15,7 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   
   /* Chargement de la mèche */
   cerr << "Chargement de la mèche du fichier " << wickFileName << "...";
-  scene->importOBJ(wickFileName, this, true, wickName);
+  scene->importOBJ(wickFileName, this, wickName);
   
   /*******************************/
   /* Création de la display list */
@@ -59,17 +59,15 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
       bounds[i].x += midDist.x;
     }
     cellSpan.x=midDist.x;
-      
-    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if ((*vertexIterator)->x >= MaxBound.x)
-	  MaxBound = *(*vertexIterator);
+    
+    for (uint i = 0; i < m_nbVertex; i+=3){
+      /* Calcul du max */
+      if (m_vertexArray[i] >= MaxBound.x)
+	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
 	/* Calcul du min */
-	if ((*vertexIterator)->x <= MinBound.x)
-	  MinBound = *(*vertexIterator);
-      }
+      if (m_vertexArray[i] <= MinBound.x)
+	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    }
     //       cerr << "Découpe en x" << endl;
     break;
   case 1 :
@@ -79,17 +77,15 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
       bounds[i].y += midDist.y;
     }
     cellSpan.y=midDist.y;
-      
-    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if ((*vertexIterator)->y >= MaxBound.y)
-	  MaxBound = *(*vertexIterator);
+    
+    for (uint i = 0; i < m_nbVertex; i+=3){
+      /* Calcul du max */
+      if (m_vertexArray[i+1] >= MaxBound.y)
+	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
 	/* Calcul du min */
-	if ((*vertexIterator)->y <= MinBound.y)
-	  MinBound = *(*vertexIterator);
-      }
+      if (m_vertexArray[i+1] <= MinBound.y)
+	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    }
     //       cerr << "Découpe en y" << endl;
     break;
   case 2 :
@@ -100,16 +96,14 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
     }
     cellSpan.z=midDist.z;
 
-    for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if ((*vertexIterator)->z >= MaxBound.z)
-	  MaxBound = *(*vertexIterator);
+    for (uint i = 0; i < m_nbVertex; i+=3){
+      /* Calcul du max */
+      if (m_vertexArray[i+2] >= MaxBound.z)
+	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
 	/* Calcul du min */
-	if ((*vertexIterator)->z <= MinBound.z)
-	  MinBound = *(*vertexIterator);
-      }
+      if (m_vertexArray[i+2] <= MinBound.z)
+	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    }
     //       cerr << "Découpe en z" << endl;
     break;
   }
@@ -172,20 +166,19 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   }
   glEndList();
   
-  /* Tri des points dans les partitions */
+  /* Tri des points pour les ranger dans les partitions */
   /* Il serait possible de faire un tri par dichotomie */
   /* pour aller un peu plus vite */
-  for (vector < Point * >::iterator vertexIterator = m_vertexArray.begin ();
-       vertexIterator != m_vertexArray.end (); vertexIterator++)
+  for (uint j=0; j < m_nbVertex; j+=3)
     for (int i = 0; i < flameConfig->skeletonsNumber; i++){
       Point bounds2 = bounds[i]+cellSpan;
-      if ((*vertexIterator)->x > bounds[i].x &&
-	  (*vertexIterator)->y > bounds[i].y &&
-	  (*vertexIterator)->z > bounds[i].z &&
-	  (*vertexIterator)->x < bounds2.x &&
-	  (*vertexIterator)->y < bounds2.y &&
-	  (*vertexIterator)->z < bounds2.z)
-	pointsPartitionsArray[i].push_back (*vertexIterator);
+      if (m_vertexArray[j] > bounds[i].x &&
+	  m_vertexArray[j+1] > bounds[i].y &&
+	  m_vertexArray[j+2] > bounds[i].z &&
+	  m_vertexArray[j] < bounds2.x &&
+	  m_vertexArray[j+1] < bounds2.y &&
+	  m_vertexArray[j+2] < bounds2.z)
+	pointsPartitionsArray[i].push_back (new Point(m_vertexArray[j], m_vertexArray[j+1], m_vertexArray[j+2]));
     }
 
   Point rootMoveFactorL(2,.1,1);
@@ -215,7 +208,7 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
 	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig, 2*(i+1)/(double)(flameConfig->skeletonsNumber+1)-1, .5, -.2, .3));
  	}
       else
-	 cerr << "Partition " << i << " vide" << endl;
+	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;
     }
   leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig, 1, .5, -.2, .3));
   cerr << "Terminé" << endl;  

@@ -46,18 +46,22 @@ public:
    * Si object est non nul, un seul objet est chargé, le premier figurant dans le fichier. Si objName est
    * non nul, on cherchera à importer l'objet portant ce nom. Sinon si object est null tous les objets 
    * contenu dans le fichier sont importés.
-   * Si detached est true, l'objet ne sera pas ajouté dans la liste des objets de la scène. Ceci est par
+   * Si object esttrue, l'objet ne sera pas ajouté dans la liste des objets de la scène. Ceci est par
    * exemple utilisé pour les luminaires des flammes qui sont stockés dans FireSource et non dans Scene.
    *
    * @param fileName nom du fichier OBJ &agrave; importer.
    * @param object Optionnel, objet dans lequel importer le fichier.
-   * @param detached Optionnel, permet de spécifier si l'objet object doit appartenir à la scène ou non.
    * @param objName Optionel, permet de spécifier le nom de l'objet à charger.
    *
    * @return false si l'import a échoué.
    */
-  bool importOBJ(const char* fileName, Object* object=NULL, bool detached=false, const char* objName=NULL);
+  bool importOBJ(const char* fileName, Object* object=NULL, const char* objName=NULL);
   
+  void indexStdListToGLArrayCopy( list<GLuint> &stdlist, GLuint** array );
+  void vertexStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array );
+  void normalsStdListToGLArrayCopy( list<Vector> &stdlist, GLfloat** array );
+  void texCoordsStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array );
+
   /** Lit un fichier OBJ pass&eacute; en param&egrave;tres et importe les objets correspondant
    * au préfixe prefix. La liste des objets est retournée dans objectsList, ceux-ci ne sont en effet
    * pas stockés dans la liste des objets de la scène.

@@ -110,7 +110,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
 	 objListIterator != objList.end (); objListIterator++, i++)
       {      
 	m_luminary[i] = new Object(scene);
-	scene->importOBJ(filename, m_luminary[i], true, (*objListIterator).c_str());
+	scene->importOBJ(filename, m_luminary[i], (*objListIterator).c_str());
       }
     
     m_luminaryDL=glGenLists(1);
@@ -125,7 +125,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
       nbObj=1;
       m_luminary = new Object* [1];
       m_luminary[0] = new Object(scene);
-      m_hasLuminary = scene->importOBJ(filename, m_luminary[0], true, NULL);
+      m_hasLuminary = scene->importOBJ(filename, m_luminary[0], NULL);
       if(m_hasLuminary){
 	m_luminaryDL=glGenLists(1);
 	glNewList(m_luminaryDL,GL_COMPILE);

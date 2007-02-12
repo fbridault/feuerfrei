@@ -87,8 +87,6 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
 {  
   list<string> objList;
   char mtlName[255];
-  /** Luminaire */
-  Object **m_luminary;
   uint i;
   uint nbObj;
   
@@ -103,7 +101,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
     
     scene->getObjectsNameFromOBJ(filename, objList, objName);
     m_luminary = new Object* [objList.size()];
-    nbObj=objList.size();
+    m_nbObjLuminary=objList.size();
     
     i=0;
     for (list < string >::iterator objListIterator = objList.begin ();
@@ -113,32 +111,21 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
 	scene->importOBJ(filename, m_luminary[i], (*objListIterator).c_str());
       }
     
-    m_luminaryDL=glGenLists(1);
-    glNewList(m_luminaryDL,GL_COMPILE);
-    for (i=0; i < objList.size(); i++)
-      m_luminary[i]->draw();
-    glEndList();
+    for (i=0; i < m_nbObjLuminary; i++)
+      m_luminary[i]->buildVBOs();
     m_hasLuminary=true;
   }
   else
     {
-      nbObj=1;
+      m_nbObjLuminary=1;
       m_luminary = new Object* [1];
       m_luminary[0] = new Object(scene);
       m_hasLuminary = scene->importOBJ(filename, m_luminary[0], NULL);
       if(m_hasLuminary){
-	m_luminaryDL=glGenLists(1);
-	glNewList(m_luminaryDL,GL_COMPILE);
-	m_luminary[0]->draw();
-	glEndList();
+	m_luminary[0]->buildVBOs();
       }
     }
-  m_breakable=flameConfig->breakable;
-  
-  /* On efface le luminaire, il n'appartient pas à la scène */
-  for (uint i = 0; i < nbObj; i++)
-    delete m_luminary[i];
-  delete []m_luminary;
+  m_breakable=flameConfig->breakable;  
   
   m_intensityCoef = flameConfig->intensityCoef;
 }
@@ -148,8 +135,10 @@ FireSource::~FireSource()
   for (uint i = 0; i < m_nbFlames; i++)
     delete m_flames[i];
   delete[]m_flames;
-  
-  if(m_hasLuminary) glDeleteLists(m_luminaryDL,1);
+  /* On efface le luminaire, il n'appartient pas à la scène */
+  for (uint i = 0; i < m_nbObjLuminary; i++)
+    delete m_luminary[i];
+  delete []m_luminary;
 }
 
 void FireSource::build()

@@ -211,7 +211,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, m_flames, m_currentConfig->nbFlames, &m_context, recompileShaders);
   
-  m_scene->createDisplayLists();
+  m_scene->createVBOs();
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   

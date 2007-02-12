@@ -88,6 +88,12 @@ public:
    */
   void importMTL(const char* fileName);
 
+  /** Crée les VBOs - A n'appeler qu'une fois que tous les objets
+   * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
+   * loadObject() qui permet d'ajouter des objets individuels.
+   */
+  void createVBOs(void);
+  
   /** Crée les display lists - A n'appeler qu'une fois que tous les objets
    * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
    * loadObject() qui permet d'ajouter des objets individuels.
@@ -192,15 +198,27 @@ public:
   /** Dessin de la scène pour les objets texturés */
   void drawSceneTEX(void) const
   {
-    glCallList(m_displayLists[1]);
-    glCallList(m_displayLists[3]);
+    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
+	 objectsArrayIterator != m_objectsArray.end();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw(TEXTURED,true);
+    for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw(TEXTURED,true);
   };
   
   /** Dessin de la scène pour les objets non texturés */
   void drawSceneWTEX() const
-  {
-    glCallList(m_displayLists[2]);
-    glCallList(m_displayLists[4]);
+  {    
+    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
+	 objectsArrayIterator != m_objectsArray.end();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw(FLAT,false);
+    for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw(FLAT,false);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -212,8 +230,14 @@ public:
    */
   void drawSceneWTEX(const CgBasicVertexShader& shader) const
   {
-    glCallList(m_displayLists[2]);
-    glCallList(m_displayLists[4]);
+    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
+	 objectsArrayIterator != m_objectsArray.end();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw(FLAT,false);
+    for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw(FLAT,false);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
@@ -221,10 +245,16 @@ public:
   
   /** Dessin de tous les objets de la scène sans les textures */
   void drawSceneWT(void) const
-  {
-    glCallList(m_displayLists[6]);
-    glCallList(m_displayLists[7]);
-    
+  {    
+    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
+    for (vector < Object * >::const_iterator objectsArrayIterator = m_objectsArray.begin ();
+	 objectsArrayIterator != m_objectsArray.end ();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw (AMBIENT,false);
+
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
   };
@@ -232,8 +262,14 @@ public:
   /** Dessin de tous les objets de la scène */
   void drawScene (void) const
   {
-    glCallList (m_displayLists[0]);
-    glCallList (m_displayLists[5]);
+    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
+	 objectsArrayIterator != m_objectsArray.end();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw(ALL,true);
+    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw (ALL,true);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -244,17 +280,26 @@ public:
    */
   void drawScene (CgBasicVertexShader& shader) const
   {
-    glCallList (m_displayLists[0]);
-    glCallList (m_displayLists[5]);
+    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
+	 objectsArrayIterator != m_objectsArray.end();
+	 objectsArrayIterator++)
+      (*objectsArrayIterator)->draw(ALL,true);
+    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw (ALL,true);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
   };
 
-    /** Dessin de tous les objets qui projettent des ombres */
+  /** Dessin de tous les objets qui projettent des ombres */
   void drawSceneWSV (void) const
-  {
-    glCallList (m_displayLists[6]);
+  {    
+    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -262,8 +307,11 @@ public:
   
   /** Dessin de tous les objets qui projettent des ombres */
   void drawSceneWSV (const CgBasicVertexShader& shader) const
-  {
-    glCallList (m_displayLists[6]);
+  {    
+    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
+	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
+	 objectsArrayIteratorWSV++)
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
@@ -308,3 +356,85 @@ private:
 };//Scene
 
 #endif
+
+
+//   /** Dessin de la scène pour les objets texturés */
+//   void drawSceneTEX(void) const
+//   {
+//     glCallList(m_displayLists[1]);
+//     glCallList(m_displayLists[3]);
+//   };
+  
+//   /** Dessin de la scène pour les objets non texturés */
+//   void drawSceneWTEX() const
+//   {
+//     glCallList(m_displayLists[2]);
+//     glCallList(m_displayLists[4]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary();
+//   };
+  
+//   /** Dessin de la scène pour les objets non texturés.
+//    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
+//    * scène éclairée avec des solides photométriques.
+//    */
+//   void drawSceneWTEX(const CgBasicVertexShader& shader) const
+//   {
+//     glCallList(m_displayLists[2]);
+//     glCallList(m_displayLists[4]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary(shader);
+//   };
+  
+//   /** Dessin de tous les objets de la scène sans les textures */
+//   void drawSceneWT(void) const
+//   {
+//     glCallList(m_displayLists[6]);
+//     glCallList(m_displayLists[7]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary();
+//   };
+  
+//   /** Dessin de tous les objets de la scène */
+//   void drawScene (void) const
+//   {
+//     glCallList (m_displayLists[0]);
+//     glCallList (m_displayLists[5]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary();
+//   };
+//   /** Dessin de tous les objets de la scène.
+//    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
+//    * scène éclairée avec des solides photométriques.
+//    */
+//   void drawScene (CgBasicVertexShader& shader) const
+//   {
+//     glCallList (m_displayLists[0]);
+//     glCallList (m_displayLists[5]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary(shader);
+//   };
+
+//     /** Dessin de tous les objets qui projettent des ombres */
+//   void drawSceneWSV (void) const
+//   {
+//     glCallList (m_displayLists[6]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary();
+//   };
+  
+//   /** Dessin de tous les objets qui projettent des ombres */
+//   void drawSceneWSV (const CgBasicVertexShader& shader) const
+//   {
+//     glCallList (m_displayLists[6]);
+    
+//     for (int f = 0; f < m_nbFlames; f++)
+//       m_flames[f]->drawLuminary(shader);
+//   };
+  

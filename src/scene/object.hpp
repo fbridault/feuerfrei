@@ -92,6 +92,9 @@ public:
    */
   void getBoundingBox (Point& max, Point& min);
   
+  void bindVBO(GLuint bufferIndex) { glBindBuffer(GL_ARRAY_BUFFER, m_bufferID[bufferIndex]); };
+  
+  void buildVBOs();
   /** Fonction de dessin du groupe d'objets.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
@@ -131,6 +134,10 @@ private:
   
   /** Pointeur vers la scène. */
   Scene *m_scene;
+
+  GLuint m_bufferID[3];
+  
+  uint m_attributes;
 };
 
 /** 
@@ -155,11 +162,9 @@ public:
   /** Affecte les points, les normales et les coordonnées de texture.
    * @param newVertex point à ajouter 
    */
-  void setGeometryIndexCount (GLuint nbVertexIndex, GLuint nbNormalsIndex, GLuint nbTexCoordsIndex)
+  void setGeometryIndexCount (GLuint nbIndex)
   {
-    m_nbVertexIndex = nbVertexIndex;
-    m_nbNormalsIndex = nbNormalsIndex;
-    m_nbTexCoordsIndex = nbTexCoordsIndex;
+    m_nbIndex = nbIndex;
   };
   
   /** Affecte les points, les normales et les coordonnées de texture.
@@ -175,16 +180,16 @@ public:
   /** Lecture du nombre de polygones contenus dans le maillage.
    * @return Nombre de polygones.
    */
-  uint getPolygonsCount () const { return (m_nbVertexIndex / 3); };
+  uint getPolygonsCount () const { return (m_nbIndex / 3); };
   uint getMaterialIndex () const { return (m_materialIndex); };
   
   /** Met à jour les attributs de l'objet. */
-  void setAttributes (int attr)
-  {
-    m_attributes = attr;
-  };
+  void setAttributes (uint attr) { m_attributes = attr; };
+  /** Récupérer les attributs de l'objet. */
+  uint getAttributes () { return m_attributes; };
   
-  /** Fonction de dessin de l'objet.
+  void buildVBOs();
+  /** Fonction de dessin de l'objet avec utilisation des VBOs.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
    * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
@@ -194,6 +199,16 @@ public:
    */
   void draw(char drawCode, bool tex, uint& lastMaterialIndex);
 
+  /** Fonction de dessin de l'objet en mode immédiat.
+   * @param drawCode 
+   * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
+   * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
+   * si ALL alors l'objet est dessiné inconditionnellement
+   * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
+   * @param tex false si l'objet texturé doit être affiché sans sa texture
+   */
+  void drawImmediate(char drawCode, bool tex, uint& lastMaterialIndex);
+  
   const bool isTransparent ();
 
 private:
@@ -204,7 +219,7 @@ private:
   /**<Liste des indices des coordonnées de texture des facettes */
   GLuint *m_texCoordsIndexArray;
   
-  GLuint m_nbVertexIndex, m_nbTexCoordsIndex, m_nbNormalsIndex;
+  GLuint m_nbIndex;
   
   /** Pointeur vers la scène. */
   Scene *m_scene;
@@ -213,7 +228,8 @@ private:
   
   /** Pointeur vers le matériau utilisé. */
   uint m_materialIndex;
-  int m_attributes;
+  uint m_attributes;
+  GLuint m_bufferID[3];
 };
 
 #endif

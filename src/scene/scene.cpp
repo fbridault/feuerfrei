@@ -40,6 +40,14 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
 //       }  
 // }
 
+void Scene::createVBOs(void)
+{
+  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
+       objectsArrayIterator != m_objectsArray.end();
+       objectsArrayIterator++)
+    (*objectsArrayIterator)->buildVBOs();
+}
+
 void Scene::createDisplayLists(void)
 {
   m_displayLists[0] = glGenLists(NB_DISPLAY_LISTS);
@@ -171,22 +179,24 @@ void Scene::getSceneAbsolutePath(const char* const fileName)
 
 bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 {
-  char lettre,drop;
-  char buffer[255];
-  int coord_textures = 0, normales = 0;
-  double x, y, z;
-  int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
   bool alreadyOneObject = false, skip = false;
   bool objectsAttributesSet=false;
-  int nbVertex=0, nbNormals=0, nbTexCoords=0;
-  int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
-  Object* currentObject=NULL;
-  Mesh* currentMesh=NULL;  
   bool importSingleObject = (object != NULL);
   bool lookForSpecificObject = (objName != NULL);
   /* Indique qu'un maillage ou un objet a été créé, utile pour ajouter les informations géométriques une fois */
   /* qu'elles sont toutes lues car les objets sont crées auparavant. */
   bool meshCreated=false, objectCreated=false;
+
+  char lettre,drop;
+  char buffer[255];
+  uint coord_textures = 0, normales = 0;
+  int nbVertex=0, nbNormals=0, nbTexCoords=0;
+  int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
+  int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
+  double x, y, z;
+  
+  Object* currentObject=NULL;
+  Mesh* currentMesh=NULL;
   
   /**<Liste des points de l'objet */
   list < Point  >vertexList;
@@ -231,7 +241,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
 	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
 	  if(meshCreated){
-	    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+	    currentMesh->setGeometryIndexCount(vertexIndexList.size());
 	    switch (coord_textures + normales){
 	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
 	    case 2:
@@ -297,7 +307,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
 	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
 	  if(meshCreated){
-	    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+	    currentMesh->setGeometryIndexCount(vertexIndexList.size());
 	    switch (coord_textures + normales){
 	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
 	    case 2:
@@ -441,7 +451,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
   }
   if(meshCreated){
     /* On valide les données du dernier Mesh. */
-    currentMesh->setGeometryIndexCount(vertexIndexList.size(), normalsIndexList.size(), texCoordsIndexList.size());
+    currentMesh->setGeometryIndexCount(vertexIndexList.size());
     switch (coord_textures + normales){
     case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
     case 2:

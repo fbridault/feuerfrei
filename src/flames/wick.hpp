@@ -49,7 +49,7 @@ public:
    */
   virtual void drawWick(bool displayBoxes)
   {
-    glCallList(m_wickDisplayList);
+    draw(ALL,true);
     if(displayBoxes)
       glCallList(m_boxesDisplayList);
   };

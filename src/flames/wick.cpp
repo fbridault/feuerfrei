@@ -20,12 +20,9 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   /*******************************/
   /* Création de la display list */
   /*******************************/
-  m_wickDisplayList = glGenLists(1);
-  glNewList (m_wickDisplayList, GL_COMPILE);
   //glEnable (GL_LIGHTING);
-  draw (ALL,true);
+  buildVBOs();
   //glDisable (GL_LIGHTING);
-  glEndList ();
   
   /*****************************************************************************/
   /* Création des points qui vont servir d'origines pour les squelettes guides */

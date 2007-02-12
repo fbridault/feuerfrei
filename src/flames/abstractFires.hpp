@@ -253,7 +253,8 @@ public:
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
-      glCallList(m_luminaryDL);
+      for (uint i=0; i < m_nbObjLuminary; i++)
+	m_luminary[i]->draw();
       glPopMatrix();
     }
   }
@@ -272,7 +273,8 @@ public:
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
       shader.setModelViewProjectionMatrix();
-      glCallList(m_luminaryDL);
+      for (uint i=0; i < m_nbObjLuminary; i++)
+	m_luminary[i]->draw();
       glPopMatrix();
     }
   }
@@ -324,15 +326,20 @@ protected:
   /** Tableau contenant les flammes */
   RealFlame **m_flames;
   
+  /** Luminaire */
+  Object **m_luminary;
+  
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;
   
-  /** Pointeur sur le solveur de fluides */
-  Field3D *m_solver;
-
+  uint m_nbObjLuminary;
+  
   /** Est-ce que la source possède un luminaire */
   bool m_hasLuminary;
 
+  /** Pointeur sur le solveur de fluides */
+  Field3D *m_solver;
+  
   /** Indique si la source produit des flammes détachées */
   bool m_breakable;
 

@@ -57,11 +57,6 @@ public:
    */
   bool importOBJ(const char* fileName, Object* object=NULL, const char* objName=NULL);
   
-  void indexStdListToGLArrayCopy( list<GLuint> &stdlist, GLuint** array );
-  void vertexStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array );
-  void normalsStdListToGLArrayCopy( list<Vector> &stdlist, GLfloat** array );
-  void texCoordsStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array );
-
   /** Lit un fichier OBJ pass&eacute; en param&egrave;tres et importe les objets correspondant
    * au préfixe prefix. La liste des objets est retournée dans objectsList, ceux-ci ne sont en effet
    * pas stockés dans la liste des objets de la scène.
@@ -195,7 +190,7 @@ public:
   Texture* getTexture(const int index) const
   { return (m_texturesArray[index]); };
   
-  /** Dessin de la scène pour les objets texturés */
+  /** Dessin des objets texturés */
   void drawSceneTEX(void) const
   {
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
@@ -208,7 +203,7 @@ public:
       (*objectsArrayIteratorWSV)->draw(TEXTURED,true);
   };
   
-  /** Dessin de la scène pour les objets non texturés */
+  /** Dessin des objets non texturés */
   void drawSceneWTEX() const
   {    
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
@@ -243,7 +238,7 @@ public:
       m_flames[f]->drawLuminary(shader);
   };
   
-  /** Dessin de tous les objets de la scène sans les textures */
+  /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
   void drawSceneWT(void) const
   {    
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();

@@ -46,6 +46,10 @@ void Scene::createVBOs(void)
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++)
     (*objectsArrayIterator)->buildVBOs();
+  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+       objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+       objectsArrayIteratorWSV++)
+    (*objectsArrayIteratorWSV)->buildVBOs();
 }
 
 void Scene::createDisplayLists(void)
@@ -153,7 +157,7 @@ Scene::~Scene ()
     delete (*texturesArrayIterator);
   m_texturesArray.clear ();
   
-  glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
+//   glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
 }
 
 void Scene::getSceneAbsolutePath(const char* const fileName)
@@ -195,29 +199,18 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
   int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
   double x, y, z;
   
+  Vertex currentVertex;
   Object* currentObject=NULL;
   Mesh* currentMesh=NULL;
   
-  /**<Liste des points de l'objet */
-  list < Point  >vertexList;
   /**<Liste des normales de l'objet */
-  list < Vector >normalsList;
+  vector < Vector >normalsVector;
   /**<Liste des coordonnées de textures de l'objet */
-  list < Point  >texCoordsList;
-  /**<Liste des indices des points des facettes */
-  list < GLuint >vertexIndexList;
+  vector < Point  >texCoordsVector;
   /**<Liste des indices des normales des facettes */
-  list < GLuint >normalsIndexList;  
+  vector < GLuint >normalsIndexVector;  
   /**<Liste des indices des coordonnées de textures des facettes */
-  list < GLuint >texCoordsIndexList;
-  
-  GLfloat *glVertexArray;
-  GLfloat *glNormalsArray;
-  GLfloat *glTexCoordsArray;
-  GLuint *glVertexIndexArray;
-  GLuint *glNormalsIndexArray;
-  GLuint *glTexCoordsIndexArray;
-
+  vector < GLuint >texCoordsIndexVector;
   
   getSceneAbsolutePath(fileName);
   
@@ -241,28 +234,17 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
 	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
 	  if(meshCreated){
-	    currentMesh->setGeometryIndexCount(vertexIndexList.size());
-	    switch (coord_textures + normales){
-	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
-	    case 2:
-	    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
-	    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
-	    }
-	    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+	    /* On valide les données du dernier Mesh. */
+	    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);
+	    normalsIndexVector.clear();
+	    texCoordsIndexVector.clear();
 	    meshCreated = false;
 	  }
-	  /* Cependant, on commence d'abord par valider les données de l'objet précédent. */
 	  if(objectCreated){
-	    currentObject->setGeometryCount(vertexList.size()*3, normalsList.size()*3, texCoordsList.size()*2);
-	    switch (coord_textures + normales){
-	    case 3: texCoordsStdListToGLArrayCopy(texCoordsList,&glTexCoordsArray);
-	    case 2:
-	    case 1: normalsStdListToGLArrayCopy(normalsList,&glNormalsArray);
-	    case 0: vertexStdListToGLArrayCopy(vertexList,&glVertexArray);
-	    }
-	    currentObject->setGeometry(glVertexArray, glNormalsArray, glTexCoordsArray);
+	    normalsVector.clear();
+	    texCoordsVector.clear();
 	  }
-	  
+  
 	  objFile >> buffer;
 	  if(importSingleObject){
 	    /* On importe un seul objet. */
@@ -307,15 +289,12 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  /* Un nouveau matériau est appliqué, nous devons donc créer un nouveau Mesh. */
 	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
 	  if(meshCreated){
-	    currentMesh->setGeometryIndexCount(vertexIndexList.size());
-	    switch (coord_textures + normales){
-	    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
-	    case 2:
-	    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
-	    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
-	    }
-	    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+	    /* On valide les données du dernier Mesh. */
+	    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);	    
+	    normalsIndexVector.clear();
+	    texCoordsIndexVector.clear();
 	  }
+  
 	  /* Création du nouveau mesh. */
 	  objFile >> buffer >> buffer;
 	  if(!skip){
@@ -340,22 +319,22 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	    default:
 	      break;
 	    case ' ':
-	      objFile >> x >> y >> z;
+	      objFile >> currentVertex.x >> currentVertex.y >> currentVertex.z;
 	      if(!skip)
-		vertexList.push_back(Point(x, y, z));
+		currentObject->addVertex(currentVertex);
 	      nbVertex++;
 	      break;
 	    case 'n':
 	      objFile >> x >> y >> z;
 	      if(!skip)
-		normalsList.push_back(Vector(x, y, z));
+		normalsVector.push_back(Vector(x, y, z));
 	      nbNormals++;
 	      break;
 	    case 't':
 	      objFile >> x >> y;
 	      if(!skip)
 		/* On inverse la coordonnée y */
-		texCoordsList.push_back(Point(x, -y, 0));
+		texCoordsVector.push_back(Point(x, -y, 0));
 	      nbTexCoords++;
 	      break;
 	    }
@@ -367,63 +346,64 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  }
 	  if(!objectsAttributesSet){
 	    objectsAttributesSet = true;
-	    if(!normalsList.empty())
+	    if(!normalsVector.empty())
 	      normales = 1;
 	    else
 	      normales = 0;
-	    if(!texCoordsList.empty())
+	    if(!texCoordsVector.empty())
 	      coord_textures = 2;
 	    else
 	      coord_textures = 0;
 	    currentMesh->setAttributes(coord_textures + normales);
+	    currentObject->allocHashTable();
 	  }
 	  switch (coord_textures + normales)
 	    {
 	    case 0:
 	      objFile >> a >> b >> c;
-	      vertexIndexList.push_back(a - nbObjectVertex - 1);
-	      vertexIndexList.push_back(b - nbObjectVertex - 1);
-	      vertexIndexList.push_back(c - nbObjectVertex - 1);
+	      currentMesh->addIndex(a - nbObjectVertex - 1);
+	      currentMesh->addIndex(b - nbObjectVertex - 1);
+	      currentMesh->addIndex(c - nbObjectVertex - 1);
 	      break;
 	    case 1:
 	      objFile >> a >> drop >> drop >> an;
 	      objFile >> b >> drop >> drop >> bn;
 	      objFile >> c >> drop >> drop >> cn;
-	      vertexIndexList.push_back(a - nbObjectVertex - 1);
-	      vertexIndexList.push_back(b - nbObjectVertex - 1);
-	      vertexIndexList.push_back(c - nbObjectVertex - 1);
+	      currentMesh->addIndex(a - nbObjectVertex - 1);
+	      currentMesh->addIndex(b - nbObjectVertex - 1);
+	      currentMesh->addIndex(c - nbObjectVertex - 1);
 	      
-	      normalsIndexList.push_back(an - nbObjectNormals - 1);
-	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
-	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
 	      break;
 	    case 2:
 	      objFile >> a >> drop >> an;
 	      objFile >> b >> drop >> bn;
 	      objFile >> c >> drop >> cn;
-	      vertexIndexList.push_back(a - nbObjectVertex - 1);
-	      vertexIndexList.push_back(b - nbObjectVertex - 1);
-	      vertexIndexList.push_back(c - nbObjectVertex - 1);
+	      currentMesh->addIndex(a - nbObjectVertex - 1);
+	      currentMesh->addIndex(b - nbObjectVertex - 1);
+	      currentMesh->addIndex(c - nbObjectVertex - 1);
 	      
-	      normalsIndexList.push_back(an - nbObjectNormals - 1);
-	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
-	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
  	      break;
 	    case 3:
 	      objFile >> a >> drop >> at >> drop >> an;
 	      objFile >> b >> drop >> bt >> drop >> bn;
 	      objFile >> c >> drop >> ct >> drop >> cn;
-	      vertexIndexList.push_back(a - nbObjectVertex - 1);
-	      vertexIndexList.push_back(b - nbObjectVertex - 1);
-	      vertexIndexList.push_back(c - nbObjectVertex - 1);
+	      currentMesh->addIndex(a - nbObjectVertex - 1);
+	      currentMesh->addIndex(b - nbObjectVertex - 1);
+	      currentMesh->addIndex(c - nbObjectVertex - 1);
 	      
-	      normalsIndexList.push_back(an - nbObjectNormals - 1);
-	      normalsIndexList.push_back(bn - nbObjectNormals - 1);
-	      normalsIndexList.push_back(cn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
+	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
 	      
-	      texCoordsIndexList.push_back(at - nbObjectTexCoords - 1);
-	      texCoordsIndexList.push_back(bt - nbObjectTexCoords - 1);
-	      texCoordsIndexList.push_back(ct - nbObjectTexCoords - 1);
+	      texCoordsIndexVector.push_back(at - nbObjectTexCoords - 1);
+	      texCoordsIndexVector.push_back(bt - nbObjectTexCoords - 1);
+	      texCoordsIndexVector.push_back(ct - nbObjectTexCoords - 1);
 	      break;	      
 	    default:
 	      cout << "Erreur de chargement : Le fichier " << fileName << " contient des erreurs d'indexation de points.\n";
@@ -437,89 +417,20 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	}
     }
   objFile.close ();
-  
-  if(objectCreated){
-    /* On valide les données du dernier Objet. */
-    currentObject->setGeometryCount(vertexList.size()*3, normalsList.size()*3, texCoordsList.size()*2);
-    switch (coord_textures + normales){
-    case 3: texCoordsStdListToGLArrayCopy(texCoordsList,&glTexCoordsArray);
-    case 2:
-    case 1: normalsStdListToGLArrayCopy(normalsList,&glNormalsArray);
-    case 0: vertexStdListToGLArrayCopy(vertexList,&glVertexArray);
-    }
-    currentObject->setGeometry(glVertexArray, glNormalsArray, glTexCoordsArray);
-  }
   if(meshCreated){
     /* On valide les données du dernier Mesh. */
-    currentMesh->setGeometryIndexCount(vertexIndexList.size());
-    switch (coord_textures + normales){
-    case 3: indexStdListToGLArrayCopy(texCoordsIndexList,&glTexCoordsIndexArray);
-    case 2:
-    case 1: indexStdListToGLArrayCopy(normalsIndexList,&glNormalsIndexArray);
-    case 0: indexStdListToGLArrayCopy(vertexIndexList,&glVertexIndexArray);
-    }
-    currentMesh->setGeometryIndex(glVertexIndexArray, glNormalsIndexArray, glTexCoordsIndexArray);
+    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);
+    normalsIndexVector.clear();
+    texCoordsIndexVector.clear();
   }
-  
+  if(objectCreated){
+    normalsVector.clear();
+    texCoordsVector.clear();
+  }
   if(importSingleObject)
     return (currentObject != NULL);
   else
     return true;
-}
-
-void Scene::indexStdListToGLArrayCopy( list<GLuint> &stdlist, GLuint** array )
-{
-  uint i=0;
-  *array = new GLuint[stdlist.size()];
-  
-  for (list<GLuint>::iterator listIterator = stdlist.begin ();
-       listIterator != stdlist.end ();
-       listIterator++, i++)
-    (*array)[i] = *listIterator;
-  stdlist.clear ();
-}
-
-void Scene::vertexStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array )
-{
-  uint i=0;
-  *array = new GLfloat[stdlist.size()*3];
-  for (list<Point>::iterator listIterator = stdlist.begin ();
-       listIterator != stdlist.end ();
-       listIterator++, i+=3){
-    (*array)[i] = listIterator->x;
-    (*array)[i+1] = listIterator->y;
-    (*array)[i+2] = listIterator->z;
-  }
-  stdlist.clear ();
-}
-
-void Scene::normalsStdListToGLArrayCopy( list<Vector> &stdlist, GLfloat** array )
-{
-  uint i=0;
-  *array = new GLfloat[stdlist.size()*3];
-  
-  for (list<Vector>::iterator listIterator = stdlist.begin ();
-       listIterator != stdlist.end ();
-       listIterator++, i+=3){
-    (*array)[i] = listIterator->x;
-    (*array)[i+1] = listIterator->y;
-    (*array)[i+2] = listIterator->z;
-  }
-  stdlist.clear ();
-}
-
-void Scene::texCoordsStdListToGLArrayCopy( list<Point> &stdlist, GLfloat** array )
-{
-  uint i=0;
-  *array = new GLfloat[stdlist.size()*2];
-  
-  for (list<Point>::iterator listIterator = stdlist.begin ();
-       listIterator != stdlist.end ();
-       listIterator++, i+=2){
-    (*array)[i] = listIterator->x;
-    (*array)[i+1] = listIterator->y;
-  }
-  stdlist.clear ();
 }
 
 void Scene::getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix)

@@ -57,14 +57,16 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
     }
     cellSpan.x=midDist.x;
     
-    for (uint i = 0; i < m_nbVertex; i+=3){
-      /* Calcul du max */
-      if (m_vertexArray[i] >= MaxBound.x)
-	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if (vertexIterator->x >= MaxBound.x)
+	  MaxBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
 	/* Calcul du min */
-      if (m_vertexArray[i] <= MinBound.x)
-	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
-    }
+	if (vertexIterator->x <= MinBound.x)
+	  MinBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+      }
     //       cerr << "Découpe en x" << endl;
     break;
   case 1 :
@@ -75,14 +77,16 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
     }
     cellSpan.y=midDist.y;
     
-    for (uint i = 0; i < m_nbVertex; i+=3){
-      /* Calcul du max */
-      if (m_vertexArray[i+1] >= MaxBound.y)
-	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if (vertexIterator->y >= MaxBound.y)
+	  MaxBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
 	/* Calcul du min */
-      if (m_vertexArray[i+1] <= MinBound.y)
-	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
-    }
+	if (vertexIterator->y <= MinBound.y)
+	  MinBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+      }
     //       cerr << "Découpe en y" << endl;
     break;
   case 2 :
@@ -93,14 +97,16 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
     }
     cellSpan.z=midDist.z;
 
-    for (uint i = 0; i < m_nbVertex; i+=3){
-      /* Calcul du max */
-      if (m_vertexArray[i+2] >= MaxBound.z)
-	MaxBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
+    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      {
+	/* Calcul du max */
+	if (vertexIterator->z >= MaxBound.z)
+	  MaxBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
 	/* Calcul du min */
-      if (m_vertexArray[i+2] <= MinBound.z)
-	MinBound = Point(m_vertexArray[i], m_vertexArray[i+1], m_vertexArray[i+2]);
-    }
+	if (vertexIterator->z <= MinBound.z)
+	  MinBound = Point(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+      }
     //       cerr << "Découpe en z" << endl;
     break;
   }
@@ -166,16 +172,18 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   /* Tri des points pour les ranger dans les partitions */
   /* Il serait possible de faire un tri par dichotomie */
   /* pour aller un peu plus vite */
-  for (uint j=0; j < m_nbVertex; j+=3)
+
+  for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+       vertexIterator != m_vertexArray.end (); vertexIterator++)
     for (int i = 0; i < flameConfig->skeletonsNumber; i++){
       Point bounds2 = bounds[i]+cellSpan;
-      if (m_vertexArray[j] > bounds[i].x &&
-	  m_vertexArray[j+1] > bounds[i].y &&
-	  m_vertexArray[j+2] > bounds[i].z &&
-	  m_vertexArray[j] < bounds2.x &&
-	  m_vertexArray[j+1] < bounds2.y &&
-	  m_vertexArray[j+2] < bounds2.z)
-	pointsPartitionsArray[i].push_back (new Point(m_vertexArray[j], m_vertexArray[j+1], m_vertexArray[j+2]));
+      if (vertexIterator->x > bounds[i].x &&
+	  vertexIterator->y > bounds[i].y &&
+	  vertexIterator->z > bounds[i].z &&
+	  vertexIterator->x < bounds2.x &&
+	  vertexIterator->y < bounds2.y &&
+	  vertexIterator->z < bounds2.z)
+	pointsPartitionsArray[i].push_back (new Point(vertexIterator->x, vertexIterator->y, vertexIterator->z));
     }
 
   Point rootMoveFactorL(2,.1,1);

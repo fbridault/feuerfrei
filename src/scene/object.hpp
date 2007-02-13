@@ -12,7 +12,21 @@ class Mesh;
 #define FLAT     2
 #define AMBIENT  3
 
+#define BUFFER_OFFSET(i) ((char*)NULL + (i))
+
 #include <list>
+
+class Vertex
+{
+public:
+  GLfloat u, v, nx, ny, nz, x, y, z;
+  /* On ne peut pas définir d'opérateur sans condamner l'utilisation du memcpy */
+  static void copy(const Vertex& src, Vertex& dest){ 
+    dest.u  = src.u ; dest.v  = src.v;
+    dest.nx = src.nx; dest.ny = src.ny; dest.nz = src.nz;
+    dest.x  = src.x ; dest.y  = src.y;  dest.z  = src.z;
+  };
+};
 
 class Scene;
 
@@ -36,55 +50,12 @@ public:
     m_meshesList.push_back(mesh);
   }
   
-  /** Affecte les points, les normales et les coordonnées de texture.
-   * @param newVertex point à ajouter 
-   */
-  void setGeometryCount (uint nbVertex, uint nbNormals, uint nbTexCoords)
-  {
-    m_nbVertex = nbVertex;
-    m_nbNormals = nbNormals;
-    m_nbTexCoords = nbTexCoords;
-  };
-  
-  /** Affecte les points, les normales et les coordonnées de texture.
-   * @param newVertex point à ajouter 
-   */
-  void setGeometry (GLfloat *vertex, GLfloat *normals, GLfloat *texCoords)
-  {
-    m_vertexArray = vertex;
-    m_normalsArray = normals;
-    m_texCoordsArray = texCoords;
-  };
-  
   /** Lecture du nombre de points contenus dans l'objet.
    * @return Nombre de points.
    */
-  int getVertexArraySize () const { return m_nbVertex; };
+  uint getVertexArraySize () const { return m_vertexArray.size(); };
   
-  /** Lecture du nombre de normales contenus dans l'objet.
-   * @return Nombre de normales.
-   */
-  int getNormalsArraySize () const { return m_nbNormals; };
-  
-  /** Lecture du nombre de normales contenus dans l'objet.
-   * @return Nombre de normales.
-   */
-  int getTexCoordsArraySize () const { return m_nbTexCoords; };
-  
-  /** Lecture des points contenus dans l'objet.
-   * @return Tableau de points.
-   */
-  GLfloat getVertex (GLuint i) const { return m_vertexArray[i]; };
-  
-  /** Lecture des normales contenus dans l'objet.
-   * @return Tableau des normales.
-   */
-  GLfloat getNormal (GLuint i) const { return m_normalsArray[i]; };
-  
-  /** Lecture des coordonnées de texture contenus dans l'objet.
-   * @return Tableau des coordonnées de texture.
-   */
-  GLfloat getTexCoord (GLuint i) const { return m_texCoordsArray[i]; };
+  Vertex getVertex (GLuint i) const { return m_vertexArray[i]; };
   
   /** Donne l'englobant de l'objet.
    * @param max Retourne le coin supérieur de l'englobant.
@@ -92,7 +63,12 @@ public:
    */
   void getBoundingBox (Point& max, Point& min);
   
-  void bindVBO(GLuint bufferIndex) { glBindBuffer(GL_ARRAY_BUFFER, m_bufferID[bufferIndex]); };
+  void bindVBO() { 
+    glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
+    glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(2*sizeof(float)));
+    glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(5*sizeof(float)));
+   };
   
   void buildVBOs();
   /** Fonction de dessin du groupe d'objets.
@@ -110,18 +86,52 @@ public:
    */
   uint getPolygonsCount ();
   
+  /** Ajout d'un point dans le tableau de points.*/
+  void addVertex( const Vertex& v) { m_vertexArray.push_back(v); };
+  
+  /** Affectation des coordonnées de texture et de la normale d'un point donné.*/
+  void setVertex( uint i, float u, float v, float nx, float ny, float nz) { 
+    m_vertexArray[i].u  =  u;
+    m_vertexArray[i].v  =  v;
+    m_vertexArray[i].nx = nx;
+    m_vertexArray[i].ny = ny;
+    m_vertexArray[i].nz = nz;
+  };
+  
+  void allocHashTable(){ m_hashTable = new int[m_vertexArray.size()]; };
+  
+  void initHashTable(){ for(uint i=0; i<m_vertexArray.size(); i++) m_hashTable[i] = -1; };
+  
+  /** Ajout d'un indice dans la table de hachage.
+   * @param i indice du point dans le tableau de points.
+   * @param ref indice de la référence du ponit dans le tableau d'indice du mesh courant.
+   */
+  void addRefInHashTable(uint i, uint ref){ m_hashTable[i] = ref; };
+  
+  /** Recherche d'un indice dans la table de hachage. *
+   * @param i indice recherché
+   */
+  bool findRefInHashTable(uint i, Vertex& v)
+  { 
+    if( m_hashTable[i] >= 0){
+      v = m_vertexArray[m_hashTable[i]];
+      return true;
+    }
+    return false;
+  }
+
 protected:
   /**<Liste des points de l'objet */
-  GLfloat *m_vertexArray;
-  /**<Liste des coordonnées de textures de l'objet */
-  GLfloat *m_texCoordsArray;
-  /**<Liste des normales de l'objet */
-  GLfloat *m_normalsArray;
-  GLuint m_nbVertex, m_nbTexCoords, m_nbNormals;
-
+  vector <Vertex> m_vertexArray;
+  
 private:
   /** Liste des objets */
-  list < Mesh* > m_meshesList;  
+  list < Mesh* > m_meshesList;
+  /** Table de hachage permettant, lors de la reconstruction des index des normales et des coordonnées de texture
+   * d'un mesh, de stocker les références à un indice d'un point. Seule une référence est stockée pour chaque point 
+   * identique. Ce point est ensuite récupéré pour comparaison.
+   */
+  int *m_hashTable;
   
   /** Indice du matériau utilisé par le point précédent. Ceci permet de savoir lors de la phase de dessin
    * si le point courant utilise un autre matériau qui nécessite un appel à glMaterial().
@@ -135,7 +145,7 @@ private:
   /** Pointeur vers la scène. */
   Scene *m_scene;
 
-  GLuint m_bufferID[3];
+  GLuint m_bufferID;
   
   uint m_attributes;
 };
@@ -159,28 +169,10 @@ public:
   /** Destructeur par défaut. */
   virtual ~Mesh ();
   
-  /** Affecte les points, les normales et les coordonnées de texture.
-   * @param newVertex point à ajouter 
-   */
-  void setGeometryIndexCount (GLuint nbIndex)
-  {
-    m_nbIndex = nbIndex;
-  };
-  
-  /** Affecte les points, les normales et les coordonnées de texture.
-   * @param newVertex point à ajouter 
-   */
-  void setGeometryIndex (GLuint *vertexIndex, GLuint *normalsIndex, GLuint *texCoordsIndex)
-  {
-    m_vertexIndexArray = vertexIndex;
-    m_normalsIndexArray = normalsIndex;
-    m_texCoordsIndexArray = texCoordsIndex;
-  };
-  
   /** Lecture du nombre de polygones contenus dans le maillage.
    * @return Nombre de polygones.
    */
-  uint getPolygonsCount () const { return (m_nbIndex / 3); };
+  uint getPolygonsCount () const { return (m_indexArray.size() / 3); };
   uint getMaterialIndex () const { return (m_materialIndex); };
   
   /** Met à jour les attributs de l'objet. */
@@ -196,30 +188,20 @@ public:
    * si ALL alors l'objet est dessiné inconditionnellement
    * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
    * @param tex false si l'objet texturé doit être affiché sans sa texture
+   * @param lastMaterialIndex indice du dernier matériau appliqué, utilisé en entrée et en sortie.
    */
   void draw(char drawCode, bool tex, uint& lastMaterialIndex);
-
-  /** Fonction de dessin de l'objet en mode immédiat.
-   * @param drawCode 
-   * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
-   * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
-   * si ALL alors l'objet est dessiné inconditionnellement
-   * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
-   * @param tex false si l'objet texturé doit être affiché sans sa texture
-   */
-  void drawImmediate(char drawCode, bool tex, uint& lastMaterialIndex);
   
-  const bool isTransparent ();
+  void setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint > &normalsIndexVector, 
+			vector < Point >  &texCoordsVector, vector < GLuint > &texCoordsIndexVector);
 
+  const bool isTransparent ();
+  
+  void addIndex( GLuint i ) { m_indexArray.push_back(i); };
+  
 private:
   /**<Liste des indices des points des facettes */
-  GLuint *m_vertexIndexArray;
-  /**<Liste des indices des normales des facettes */
-  GLuint *m_normalsIndexArray;
-  /**<Liste des indices des coordonnées de texture des facettes */
-  GLuint *m_texCoordsIndexArray;
-  
-  GLuint m_nbIndex;
+  vector <GLuint> m_indexArray;
   
   /** Pointeur vers la scène. */
   Scene *m_scene;
@@ -229,7 +211,7 @@ private:
   /** Pointeur vers le matériau utilisé. */
   uint m_materialIndex;
   uint m_attributes;
-  GLuint m_bufferID[3];
+  GLuint m_bufferID;
 };
 
 #endif

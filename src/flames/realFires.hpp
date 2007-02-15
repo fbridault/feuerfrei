@@ -10,7 +10,6 @@ class Firmalampe;
 class PointFlame;
 class LineFlame;
 class FireSource;
-class CloneFlame;
 
 /** La classe Candle permet la définition d'une bougie.
  *

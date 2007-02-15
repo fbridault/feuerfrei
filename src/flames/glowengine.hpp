@@ -6,7 +6,6 @@ class GlowEngine;
 #include "flames.hpp"
 #include "fbo.hpp"
 #include "../shaders/CgBlurShaders.hpp"
-#include "../scene/scene.hpp"
 #include "../scene/camera.hpp"
 
 #define GLOW_LEVELS 2

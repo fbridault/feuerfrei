@@ -1,7 +1,6 @@
 /* Material.cpp: implementation of the Material class. */
 #include "material.hpp"
 
-#include "scene.hpp"
 
 Material::Material (Scene * const scene) : m_name("default")
 {
@@ -40,42 +39,6 @@ Material::Material ( Scene * const scene, const string& name,
   m_Kss = specularExponent;
   m_diffuseTexture = tex;
 }
-
-void Material::apply () const
-{
-  GLfloat matDiffuse[COMPOSANTES], matSpecular[COMPOSANTES],
-    matAmbient[COMPOSANTES], matShininess[1];
-  
-  matShininess[0] = m_Kss;
-  
-  for (int i = 0; i < COMPOSANTES - 1; i++)
-    {
-      matDiffuse[i] = m_Kd.getColor (i);
-      matSpecular[i] = m_Ks.getColor (i);
-      matAmbient[i] = m_Ka.getColor (i);
-    }
-  /* Mis à 0 pour indiquer que l'on ne fait pas de glow */
-  matDiffuse[3] = 0.0;
-  matSpecular[3] = 1.0;
-  matAmbient[3] = 1.0;
-  
-  //     for (int i = 0; i < COMPOSANTES-1; i++)
-  //       cout << matDiffuse[i] << " ";
-  //     cout << endl;
-
-  glMaterialfv (GL_FRONT, GL_DIFFUSE, matDiffuse);
-  glMaterialfv (GL_FRONT, GL_AMBIENT, matAmbient);
-  glMaterialfv (GL_FRONT, GL_SPECULAR, matSpecular);
-  glMaterialfv (GL_FRONT, GL_SHININESS, matShininess);
-  
-  glColor4fv(matDiffuse);
-}
-
-const Texture* Material::getDiffuseTexture() const
-{ 
-  return m_scene->getTexture(m_diffuseTexture);
-};
-
 
 const bool Material::isTransparent() const
 {

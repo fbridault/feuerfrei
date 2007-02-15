@@ -2,6 +2,12 @@
 #include <wx/gbsizer.h>
 #include <wx/file.h>
 
+#ifdef RTFLAMES_BUILD
+  #include "GLFlameCanvas.hpp"
+#else
+  #include "GLFluidsCanvas.hpp"
+#endif
+
 BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
   EVT_SCROLL(SolverMainPanel::OnScrollPosition)
   EVT_TEXT_ENTER(IDT_FXAPMIN, SolverMainPanel::OnFXAPMINEnter)

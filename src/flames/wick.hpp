@@ -9,7 +9,6 @@
  ****************************************************************************/
 class Wick;
 
-#include "../scene/material.hpp"
 #include "../scene/object.hpp"
 #include "leadSkeleton.hpp"
 

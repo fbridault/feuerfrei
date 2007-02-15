@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include "material.hpp"
+
 Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
 {  
   m_flames = flames;

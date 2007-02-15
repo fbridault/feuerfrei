@@ -3,16 +3,15 @@
 
 class Scene;
 
-class FireSource;
-
-#include "../flames/abstractFires.hpp"
-#include "material.hpp"
-#include "source.hpp"
 #include "object.hpp"
+#include "../flames/abstractFires.hpp"
+#include "source.hpp"
+#include "../shaders/CgShader.hpp"
 #include <vector>
 #include <list>
 
 class Material;
+class FireSource;
 class Object;
 
 #define NB_DISPLAY_LISTS 8

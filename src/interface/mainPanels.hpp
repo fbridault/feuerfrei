@@ -2,11 +2,13 @@
 #define MAINPANELS_H
 
 #include "interface.hpp"
+#include "../common.hpp"
+
 #include <wx/spinctrl.h>
 #ifdef RTFLAMES_BUILD
-  #include "GLFlameCanvas.hpp"
+  class GLFlameCanvas;
 #else
-  #include "GLFluidsCanvas.hpp"
+  class GLFluidsCanvas;
 #endif
 
 enum

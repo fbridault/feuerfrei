@@ -15,8 +15,9 @@ class FlamesFrame;
 #include <wx/wfstream.h>
 
 #include "interface.hpp"
-#include "GLFlameCanvas.hpp"
 #include "mainPanels.hpp"
+
+class GLFlameCanvas;
 
 enum
   {

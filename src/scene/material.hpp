@@ -7,6 +7,7 @@ class Material;
 #include <GL/gl.h>
 #include "intensity.hpp"
 #include "texture.hpp"
+#include "scene.hpp"
 
 class Texture;
 class Scene;
@@ -16,22 +17,23 @@ using namespace std;
 /** 
  * Classe de base représentant un matériau. 
  * Un matériau est définit par son comportement lumineux, c'est à dire la 
- * mani&egrave;re dont il réfléchi la lumière. 
+ * mani&egrave;re dont il réfléchit la lumière. 
  *
- * @author	Christophe Cassagnabère modifié par Flavien Bridault
+ * @author	Flavien Bridault
  * @see Intensity
  */
 class Material 
 {
 private:
   string m_name;   /** Nom du matériau. */
-  Intensity m_Kd;  /**Composante de réflexion diffuse.*/
-  Intensity m_Ks;  /**Composante de réflexion spéculaire.*/
-  double m_Kss;    /**Indice de tache spéculaire*/
-  Intensity m_Ka;  /**Composante de réflexion ambiante.*/
+  Intensity m_Kd;  /** Composante de réflexion diffuse. */
+  Intensity m_Ks;  /** Composante de réflexion spéculaire. */
+  double m_Kss;    /** Indice de tache spéculaire. */
+  Intensity m_Ka;  /** Composante de réflexion ambiante. */
   
   Scene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
   int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
+  
 public:
   /**
    * Constructeur par défaut. Crée un matériau blanc ambiant.
@@ -75,18 +77,41 @@ public:
   { return (m_Ka); };
   
   /** Applique le matériau avec glMaterial(). */ 
-  void apply () const;
+  void apply () const
+  {
+    GLfloat matDiffuse[COMPOSANTES], matSpecular[COMPOSANTES],
+      matAmbient[COMPOSANTES], matShininess[1];
+  
+    matShininess[0] = m_Kss;
+  
+    for (int i = 0; i < COMPOSANTES - 1; i++)
+      {
+	matDiffuse[i] = m_Kd.getColor (i);
+	matSpecular[i] = m_Ks.getColor (i);
+	matAmbient[i] = m_Ka.getColor (i);
+      }
+    /* Mis à 0 de l'alpha pour indiquer que l'on ne fait pas de glow */
+    matDiffuse[3] = 0.0;
+    matSpecular[3] = 1.0;
+    matAmbient[3] = 1.0;
+  
+    glMaterialfv (GL_FRONT, GL_DIFFUSE, matDiffuse);
+    glMaterialfv (GL_FRONT, GL_AMBIENT, matAmbient);
+    glMaterialfv (GL_FRONT, GL_SPECULAR, matSpecular);
+    glMaterialfv (GL_FRONT, GL_SHININESS, matShininess);
+  
+    glColor4fv(matDiffuse);
+  }
   
   /** Indique si le matériau possède une texture.
    * @return True si le matériau a une texture.
    */
-  const bool hasDiffuseTexture() const
-  { return (m_diffuseTexture!=-1);};
+  const bool hasDiffuseTexture() const { return (m_diffuseTexture!=-1); };
 
   /** Retourne un pointeur sur la texture du matériau.
    * @return Pointeur sur la texture
    */
-  const Texture* getDiffuseTexture() const;
+  const Texture* getDiffuseTexture() const { return m_scene->getTexture(m_diffuseTexture); };
 
   /** Indique si le matériau possède une texture.
    * @return True si le matériau a une texture.

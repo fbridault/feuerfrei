@@ -3,6 +3,7 @@
 #include "solverDialog.hpp"
 #include "flameDialog.hpp"
 #include "shadowsDialog.hpp"
+#include "GLFlameCanvas.hpp"
 
 // Déclarations de la table des événements
 // Sorte de relation qui lit des identifiants d'événements aux fonctions
@@ -187,7 +188,7 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
 {
   wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
-    
+  
   m_config = new wxFileConfig( file );
   
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);

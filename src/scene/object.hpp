@@ -4,7 +4,6 @@
 class Object;
 class Mesh;
 
-#include "material.hpp"
 #include "source.hpp"
 
 #define ALL      0

@@ -1,6 +1,7 @@
 #include "object.hpp"
 
 #include "scene.hpp"
+#include "material.hpp"
 
 Object::Object(Scene *scene)
 {

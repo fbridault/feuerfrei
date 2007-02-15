@@ -8,11 +8,11 @@ class FireSource;
 
 #include "../scene/graphicsFn.hpp"
 
-#include "realFlames.hpp"
 #include "../solvers/solver3D.hpp"
-#include "../scene/texture.hpp"
 #include "../scene/object.hpp"
+#include "../scene/texture.hpp"
 #include "../shaders/CgSVShader.hpp"
+#include "realFlames.hpp"
 #include "ies.hpp"
 
 class RealFlame;

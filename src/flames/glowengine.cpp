@@ -165,8 +165,6 @@ void GlowEngine::blur()
   
   /* Blur à une résolution inférieure */
   m_blurVertexShaderX8.enableShader();
-  m_blurFragmentShader8.setWeightsArray(weights[1],divide[1]);
-  m_blurVertexShaderX8.setOffsetsArray(offsets[1]);
   
   m_secondPassFBOs[1].Activate();
   glBlendColor(0.0,0.0,0.0,0.3);
@@ -175,16 +173,22 @@ void GlowEngine::blur()
   glViewport (0, 0, m_width[1], m_height[1]);
   glClear(GL_COLOR_BUFFER_BIT);
   
+  /* Partie X [-bandwidth/2;-bandwidth/4] du filtre */
+  m_blurFragmentShader8.setWeightsArray(weights[1],divide[1]);
+  m_blurVertexShaderX8.setOffsetsArray(offsets[1]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
+  /* Partie X [-bandwidth/4;0] du filtre */
   m_blurFragmentShader8.setWeightsArray(weights[2],divide[2]);
   m_blurVertexShaderX8.setOffsetsArray(offsets[2]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
 
+  /* Partie X [0;bandwidth/4] du filtre */
   m_blurFragmentShader8.setWeightsArray(weights[3],divide[3]);
   m_blurVertexShaderX8.setOffsetsArray(offsets[3]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
 
+  /* Partie X [bandwidth/4;bandwidth/2] du filtre */
   m_blurFragmentShader8.setWeightsArray(weights[4],divide[4]);
   m_blurVertexShaderX8.setOffsetsArray(offsets[4]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
@@ -197,10 +201,8 @@ void GlowEngine::blur()
   m_blurFragmentShader8.setWeightsArray(weights[0],divide[0]);
   
   m_firstPassFBOs[1].Activate();
-  glViewport (0, 0, m_width[1], m_height[1]);
   glClear(GL_COLOR_BUFFER_BIT);
-  
-  //m_secondPassTex[0]->drawOnScreen(m_width[1], m_height[1]);
+   
   m_secondPassTex[1]->drawOnScreen(m_width[1], m_height[1]);
 
   m_blurVertexShaderY8.disableProfile();  

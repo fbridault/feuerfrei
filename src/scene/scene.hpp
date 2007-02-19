@@ -7,6 +7,7 @@ class Scene;
 #include "../flames/abstractFires.hpp"
 #include "source.hpp"
 #include "../shaders/CgShader.hpp"
+#include "camera.hpp"
 #include <vector>
 #include <list>
 
@@ -189,17 +190,22 @@ public:
   Texture* getTexture(const int index) const
   { return (m_texturesArray[index]); };
   
+  /** Change l'affichage des sphères englobantes. */
+  void setBoundingSphereMode(bool mode) { m_boundingSpheresMode = mode; };
+  
+  void computeVisibility(Camera &view);
+  
   /** Dessin des objets texturés */
   void drawSceneTEX(void) const
   {
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(TEXTURED,true);
+      (*objectsArrayIterator)->draw(TEXTURED,true, m_boundingSpheresMode);
     for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw(TEXTURED,true);
+      (*objectsArrayIteratorWSV)->draw(TEXTURED,true, m_boundingSpheresMode);
   };
   
   /** Dessin des objets non texturés */
@@ -208,11 +214,11 @@ public:
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(FLAT,false);
+      (*objectsArrayIterator)->draw(FLAT,false, m_boundingSpheresMode);
     for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw(FLAT,false);
+      (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -227,11 +233,11 @@ public:
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(FLAT,false);
+      (*objectsArrayIterator)->draw(FLAT,false, m_boundingSpheresMode);
     for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw(FLAT,false);
+      (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
@@ -243,11 +249,11 @@ public:
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
     for (vector < Object * >::const_iterator objectsArrayIterator = m_objectsArray.begin ();
 	 objectsArrayIterator != m_objectsArray.end ();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw (AMBIENT,false);
+      (*objectsArrayIterator)->draw (AMBIENT,false, m_boundingSpheresMode);
 
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -259,11 +265,11 @@ public:
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(ALL,true);
+      (*objectsArrayIterator)->draw(ALL,true, m_boundingSpheresMode);
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (ALL,true);
+      (*objectsArrayIteratorWSV)->draw (ALL,true, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -277,11 +283,11 @@ public:
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
 	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(ALL,true);
+      (*objectsArrayIterator)->draw(ALL,true, m_boundingSpheresMode);
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (ALL,true);
+      (*objectsArrayIteratorWSV)->draw (ALL,true, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
@@ -293,7 +299,7 @@ public:
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary();
@@ -305,7 +311,7 @@ public:
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
+      (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
     
     for (int f = 0; f < m_nbFlames; f++)
       m_flames[f]->drawLuminary(shader);
@@ -347,6 +353,8 @@ private:
    */
   void getSceneAbsolutePath(const char* const fileName);
   
+  /** Mode d'affichage */
+  uint m_boundingSpheresMode;
 };//Scene
 
 #endif

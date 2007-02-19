@@ -19,6 +19,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_MENU(IDM_Quit, FlamesFrame::OnQuitMenu)
   EVT_MENU(IDM_About, FlamesFrame::OnAboutMenu)
   EVT_MENU(IDM_GlowOnly, FlamesFrame::OnGlowOnlyMenu)
+  EVT_MENU(IDM_BDS, FlamesFrame::OnBDSMenu)
   EVT_MENU(IDM_Grid, FlamesFrame::OnGridMenu)
   EVT_MENU(IDM_Base, FlamesFrame::OnBaseMenu)
   EVT_MENU(IDM_Velocity, FlamesFrame::OnVelocityMenu)
@@ -153,8 +154,9 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_menuDisplay->AppendCheckItem( IDM_Particles, _("&Particles"));
   m_menuDisplay->AppendCheckItem( IDM_WickBoxes, _("&Wick Boxes"));
   m_menuDisplay->Append( IDM_Flames, _("&Flames"), m_menuDisplayFlames);
-  m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));  
+  m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));
   m_menuDisplay->AppendCheckItem( IDM_GlowOnly, _("&Glow only"));
+  m_menuDisplay->AppendCheckItem( IDM_BDS, _("&Bounding spheres"));
   
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
@@ -621,6 +623,11 @@ void FlamesFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 void FlamesFrame::OnGlowOnlyMenu(wxCommandEvent& event)
 {
   m_glBuffer->ToggleGlowOnlyDisplay();
+}
+
+void FlamesFrame::OnBDSMenu(wxCommandEvent& event)
+{
+  m_glBuffer->setBoundingSphereMode(event.IsChecked());
 }
 
 void FlamesFrame::OnGridMenu(wxCommandEvent& event)

@@ -276,16 +276,16 @@ bool RealFlame::build ()
 	  /* On prend également en compte l'origine du squelette ET les extrémités du guide */
 	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */	  
 	  m_distances[0] = 
-	    m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (m_periSkeletons[i]->getParticle (0));
+	    m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (*m_periSkeletons[i]->getParticle (0));
 	  
 	  for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
 	    m_distances[j + 1] = 
-	      m_periSkeletons[i]->getParticle (j)->squaredDistanceFrom(m_periSkeletons[i]->getParticle (j + 1));
+	      m_periSkeletons[i]->getParticle (j)->squaredDistanceFrom(*m_periSkeletons[i]->getParticle (j + 1));
 	  
 	  m_distances[m_periSkeletons[i]->getSize ()] = 
-	    m_periSkeletons[i]->getLastParticle ()->squaredDistanceFrom (m_periSkeletons[i]->getRoot ());
+	    m_periSkeletons[i]->getLastParticle ()->squaredDistanceFrom (*m_periSkeletons[i]->getRoot ());
 	  m_distances[m_periSkeletons[i]->getSize () + 1] =
-	    m_periSkeletons[i]->getRoot()->squaredDistanceFrom(m_periSkeletons[i]->getLeadSkeleton ()->getRoot ());
+	    m_periSkeletons[i]->getRoot()->squaredDistanceFrom(*m_periSkeletons[i]->getLeadSkeleton ()->getRoot ());
 	  
 	  /* On cherche les indices des distances max */
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */

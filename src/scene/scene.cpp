@@ -12,6 +12,7 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
   addMaterial(new Material(this));
   cerr << "Chargement de la scène " << fileName << endl;
   importOBJ(fileName);
+  m_boundingSpheresMode=false;
   //sortTransparentObjects();
 }
 
@@ -42,16 +43,40 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
 //       }  
 // }
 
-void Scene::createVBOs(void)
+void Scene::computeVisibility(Camera &view)
 {
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++)
-    (*objectsArrayIterator)->buildVBOs();
+    (*objectsArrayIterator)->computeVisibility(view);
   for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++)
+    (*objectsArrayIteratorWSV)->computeVisibility(view);
+}
+
+void Scene::createVBOs(void)
+{
+  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
+       objectsArrayIterator != m_objectsArray.end();
+       objectsArrayIterator++){
+    (*objectsArrayIterator)->buildVBOs();
+    (*objectsArrayIterator)->buildBoundingSpheres();
+  }
+  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+       objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+       objectsArrayIteratorWSV++){
     (*objectsArrayIteratorWSV)->buildVBOs();
+    (*objectsArrayIteratorWSV)->buildBoundingSpheres();
+  }
+  
+  cout << "Terminé" << endl;
+  cout << "*******************************************" << endl;
+  cout << "Statistiques sur la scène :" << endl;
+  cout << getObjectsCount() << " objets" << endl;
+  cout << getPolygonsCount() << " polygones" << endl;
+  cout << getVertexCount() << " vertex" << endl;
+  cout << "*******************************************" << endl;
 }
 
 void Scene::createDisplayLists(void)

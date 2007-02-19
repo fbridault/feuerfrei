@@ -96,6 +96,9 @@ public:
   void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
   void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   
+  /** Change l'affichage des sphères englobantes. */
+  void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
+  
 private:
   void WriteFPS ();
   void DrawVelocity (void);

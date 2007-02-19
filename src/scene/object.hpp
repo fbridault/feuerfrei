@@ -5,6 +5,7 @@ class Object;
 class Mesh;
 
 #include "source.hpp"
+#include "camera.hpp"
 
 #define ALL      0
 #define TEXTURED 1
@@ -77,8 +78,9 @@ public:
    * si ALL alors l'objet est dessiné inconditionnellement
    * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
    * @param tex false si l'objet texturé doit être affiché sans sa texture
+   * @param boundingSpheres true si l'objet doit afficher les sphères englobantes
    */
-  void draw(char drawCode=ALL, bool tex=true);
+  void draw(char drawCode=ALL, bool tex=true, bool boundingSpheres=false);
   
   /** Lecture du nombre de polygones contenus dans l'objet.
    * @return Nombre de polygones.
@@ -97,28 +99,30 @@ public:
     m_vertexArray[i].nz = nz;
   };
   
-  void allocHashTable(){ m_hashTable = new int[m_vertexArray.size()]; };
+  void allocHashTable(){ if(m_hashTable) delete m_hashTable; m_hashTable = new int[m_vertexArray.size()]; };
   
   void initHashTable(){ for(uint i=0; i<m_vertexArray.size(); i++) m_hashTable[i] = -1; };
   
   /** Ajout d'un indice dans la table de hachage.
    * @param i indice du point dans le tableau de points.
-   * @param ref indice de la référence du ponit dans le tableau d'indice du mesh courant.
+   * @param ref indice de la référence du point dans le tableau d'indice du mesh courant.
    */
   void addRefInHashTable(uint i, uint ref){ m_hashTable[i] = ref; };
   
   /** Recherche d'un indice dans la table de hachage. *
    * @param i indice recherché
    */
-  bool findRefInHashTable(uint i, Vertex& v)
+  bool findRefInHashTable(uint i)
   { 
-    if( m_hashTable[i] >= 0){
-      v = m_vertexArray[m_hashTable[i]];
+    if( m_hashTable[i] >= 0)
       return true;
-    }
     return false;
   }
 
+  void computeVisibility(Camera &view);
+  void buildBoundingSpheres ();
+  void drawBoundingSpheres ();
+  
 protected:
   /**<Liste des points de l'objet */
   vector <Vertex> m_vertexArray;
@@ -179,7 +183,7 @@ public:
   /** Récupérer les attributs de l'objet. */
   uint getAttributes () { return m_attributes; };
   
-  void buildVBOs();
+  void buildVBO();
   /** Fonction de dessin de l'objet avec utilisation des VBOs.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
@@ -198,6 +202,10 @@ public:
   
   void addIndex( GLuint i ) { m_indexArray.push_back(i); };
   
+  void computeVisibility(Camera &view);
+  void buildBoundingSphere ();
+  void drawBoundingSphere ();
+
 private:
   /**<Liste des indices des points des facettes */
   vector <GLuint> m_indexArray;
@@ -211,6 +219,11 @@ private:
   uint m_materialIndex;
   uint m_attributes;
   GLuint m_bufferID;
+  /** Visibilité de l'objet par rapport au frustum. */
+  bool m_visibility;
+  
+  Point m_centre;
+  double m_radius;
 };
 
 #endif

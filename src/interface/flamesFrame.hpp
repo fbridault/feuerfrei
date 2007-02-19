@@ -45,6 +45,7 @@ enum
     IDM_Quit,
     IDM_About,
     IDM_GlowOnly,
+    IDM_BDS,
     IDM_Grid,
     IDM_Base,
     IDM_Velocity,
@@ -86,6 +87,7 @@ public:
   void OnQuitMenu(wxCommandEvent& event);
   void OnAboutMenu(wxCommandEvent& event);
   void OnGlowOnlyMenu(wxCommandEvent &event);
+  void OnBDSMenu(wxCommandEvent &event);
   void OnGridMenu(wxCommandEvent& event);
   void OnBaseMenu(wxCommandEvent& event);
   void OnVelocityMenu(wxCommandEvent& event);

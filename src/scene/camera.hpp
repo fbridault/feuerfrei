@@ -65,6 +65,8 @@ public:
 };
 
 
+class Scene;
+
 /** Classe définissant une caméra subjective à la première personne, qui permet donc 
  * de tourner, de se déplacer et de zoomer autour d'un point quelconque dans
  * l'espace. Elle fournit les fonctions pour les clics de la souris void OnMouseClick (wxMouseEvent& event) 
@@ -83,7 +85,7 @@ public:
   * @param h hauteur de la fenêtre de visualisation
   * @param clipping_value Distance de clipping
   */
-  Camera(int w, int h, double clipping_value);
+  Camera(int w, int h, double clipping_value, Scene* scene);
   virtual ~Camera() {};
 
   // void addCenterX(double value){ centerx+=value; eyex+=value; 
@@ -127,6 +129,7 @@ public:
    */
   void moveOnFrontOrBehind(double value){
     m_position = m_position + (m_view * value);
+    computeFrustrum();
   };  
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
    * On effectue ensuite une translation suivant le vecteur de vue
@@ -135,6 +138,10 @@ public:
   void moveUpOrDown(double value){
     m_position = m_position + (m_up * value);
   };
+  
+  void computeFrustrum();
+  
+  double *getFrustum(uint side){ return m_frustum[side]; };
   
 private:
   /** Position de la scène. La caméra reste toujours centrée en (0,0,0) */
@@ -160,7 +167,11 @@ private:
   /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
   double m_mouseSensitivity;
   /** Largeur et hauteur de la vue de la caméra */
-  int m_width, m_height;  
+  int m_width, m_height;
+  /** Plans du frustrum */
+  double m_frustum[6][4];
+  
+  Scene *m_scene;
 };
 
 #endif

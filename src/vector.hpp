@@ -183,11 +183,11 @@ public:
    * @param pt Position du point.
    * @return La distance au carré entre le point courant et celui passé en paramètre.
    */
-  double squaredDistanceFrom( const Point* const pt ) const
+  double squaredDistanceFrom( const Point& pt ) const
   {
-    return( (x - pt->x) * (x - pt->x)
-	    + (y - pt->y) * (y - pt->y)
-	    + (z - pt->z) * (z - pt->z) ) ;
+    return( (x - pt.x) * (x - pt.x)
+	    + (y - pt.y) * (y - pt.y)
+	    + (z - pt.z) * (z - pt.z) ) ;
   }
 
   static Point pointBetween( const Point* const pt1, const Point* const pt2 )

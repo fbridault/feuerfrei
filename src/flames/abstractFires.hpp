@@ -228,18 +228,6 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->drawFlame(display, displayParticle);  
     glPopMatrix();
-  }  
-  
-  /** Dessine la flamme et sa mèche.
-   * @param displayParticle affiche ou non les particules des squelettes.
-   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
-   */
-  void draw(bool display, bool displayParticle, bool displayBoxes)
-  {    
-    Point scale(m_solver->getScale());
-    glScalef (scale.x, scale.y, scale.z);
-    drawWick(displayBoxes);
-    drawFlame(display, displayParticle);
   }
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation

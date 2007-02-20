@@ -298,15 +298,12 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
   Vertex v;
   Vector normal, texCoord;
   uint dup=0,nondup=0;
-  
-//   cerr << " Over " << m_indexArray.size() << " vertices, ";
+
+  //   cerr << " Over " << m_indexArray.size() << " vertices, ";
   if(!m_attributes)
-    {
-      for (uint i = 0; i < m_indexArray.size(); i++)
-	m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-    }else{
-    /* On initialise la table de hachage */
-    m_parent->initHashTable();
+    for (uint i = 0; i < m_indexArray.size(); i++)
+      m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+  else
     if(m_attributes < 3)
       for (uint i = 0; i < m_indexArray.size(); i++)
 	{
@@ -339,7 +336,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	  
 	  if( m_parent->findRefInHashTable( m_indexArray[i] ) )
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
-	    {
+	    {	
 	      v = m_parent->getVertex(m_indexArray[i]);
 	      if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v && 
 		   ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz ){
@@ -350,7 +347,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 		m_parent->addVertex( v );
 		/* Le nouveau point est placé en dernier, on récupère son index et on le stocke */
 		m_indexArray[i] = m_parent->getVertexArraySize()-1;
-		dup++;
+		dup++;	  
 	      }
 	    }
 	  else
@@ -358,6 +355,5 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	  /* On affecte les coordonnées de texture et de normale au point courant */
 	  m_parent->setVertex( m_indexArray[i], texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
 	}
-  }
 //   cerr << dup << " have been duplicated, " << nondup << " untouched" << endl;
 }

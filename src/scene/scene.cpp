@@ -217,7 +217,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
   /* Indique qu'un maillage ou un objet a été créé, utile pour ajouter les informations géométriques une fois */
   /* qu'elles sont toutes lues car les objets sont crées auparavant. */
   bool meshCreated=false, objectCreated=false;
-
+  bool firstMesh = false;
   char lettre,drop;
   char buffer[255];
   uint coord_textures = 0, normales = 0;
@@ -288,6 +288,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 		  currentObject = object;
 		  alreadyOneObject = true;
 		  objectCreated = true;
+		  firstMesh = true;
 		  skip = false;
 		}else
 		  skip = true;
@@ -296,12 +297,14 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 		currentObject = object;
 		alreadyOneObject = true;
 		objectCreated = true;
+		firstMesh = true;
 	      }
 	    }
 	  }else{
 	    /* On est en train d'importer tous les objets. */
 	    currentObject = new Object(this);
 	    objectCreated = true;
+	    firstMesh = true;
 	    
 	    if (!strncmp (buffer, "WSV", 3))
 	      addObject(currentObject, true);
@@ -320,7 +323,9 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);	    
 	    normalsIndexVector.clear();
 	    texCoordsIndexVector.clear();
+	    firstMesh = false;
 	  }
+	    
   
 	  /* Création du nouveau mesh. */
 	  objFile >> buffer >> buffer;
@@ -382,7 +387,12 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	    else
 	      coord_textures = 0;
 	    currentMesh->setAttributes(coord_textures + normales);
-	    currentObject->allocHashTable();
+	    if(firstMesh){
+	      /* On ne doit allouer la table de hachage qu'une seule fois */
+	      currentObject->allocHashTable();
+	      /* On initialise la table de hachage */
+	      currentObject->initHashTable();
+	    }
 	  }
 	  switch (coord_textures + normales)
 	    {

@@ -26,7 +26,7 @@ public:
    * @param type : 1 ou 0 selon qu'il y ait interpolation ou non.
    * @param recompile Indique s'il faut recompiler le shader à partir du fichier .cg ou si le .o est déjà compilé.
    */
-  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, uint nbFlames, CGcontext *context, 
+  CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, uint nbFlames, const CGcontext* const context, 
 		     uint type, bool recompile=true);
   /** Destructeur. */
   virtual ~CgSPFragmentShader();
@@ -48,7 +48,7 @@ public:
   /** Initialise les paramètres uniformes du fragment program.
    * @param AZValues tableau contenant les valeurs azimuthales et zénithales.
    */
-  void SetInitialParameters(GLdouble *AZValues){
+  void SetInitialParameters(const GLdouble* const AZValues){
     
     cgGLSetTextureParameter(paramTextureSP, m_tex);
     cgGLEnableTextureParameter(paramTextureSP);
@@ -66,7 +66,7 @@ public:
    * @param fluctuationIntensite Coefficient pondérateur utilisé pour faire varier l'intensité de la source. Le
    * paramètre est un tableau contenant un coefficient pour chaque flamme.
    */
-  void enableShader(GLdouble *centreSP, GLdouble *fluctuationIntensite)
+  void enableShader(const GLdouble* const centreSP, const GLdouble* const fluctuationIntensite)
   {
 //     cgGLSetStateMatrixParameter(TextureSPMatrix, CG_GL_TEXTURE_MATRIX, CG_GL_MATRIX_IDENTITY);
     cgGLSetParameterArray3d(paramCentreSP, 0, m_nbFlames, centreSP);

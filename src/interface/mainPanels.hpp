@@ -61,10 +61,10 @@ class SolverMainPanel: public wxPanel
 {
 public:
 #ifdef RTFLAMES_BUILD
-  SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFlameCanvas *glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFlameCanvas* const glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #else
-  SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, GLFluidsCanvas *glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFluidsCanvas* const glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #endif
   virtual ~SolverMainPanel(){};
@@ -120,8 +120,8 @@ private:
 class FlameMainPanel: public wxPanel 
 {
 public:
-  FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, GLFlameCanvas *glBuffer, 
-		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+  FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flameConfig, int index, GLFlameCanvas* const glBuffer, 
+		 const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
   virtual ~FlameMainPanel(){};
 private:
   void OnScrollPosition(wxScrollEvent& event);

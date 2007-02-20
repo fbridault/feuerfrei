@@ -26,11 +26,11 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
 END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, 
-				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
+				 GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
 #else
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig *solverConfig, int index, 
-				 GLFluidsCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
+				 GLFluidsCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
 #endif
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
@@ -193,7 +193,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
     {
       double value = m_buoyancySlider->GetValue()/(FORCE_SENSIBILITY);
       
-      m_glBuffer->setBuoyancy(m_index, value);      
+      m_glBuffer->setBuoyancy(m_index, value);
       m_solverConfig->buoyancy = value;
     }
   else
@@ -299,8 +299,8 @@ BEGIN_EVENT_TABLE(FlameMainPanel, wxPanel)
 END_EVENT_TABLE();
 
 
-FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig *flameConfig, int index, 
-				 GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flameConfig, int index, 
+			       GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 { 
   const wxString m_flickeringRadioBoxChoices[] = {

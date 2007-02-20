@@ -4,7 +4,12 @@
 
 uint g_objectCount;
 
-Camera::Camera (int width, int height, double clipping, Scene* scene) : m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
+#ifdef RTFLAMES_BUILD
+Camera::Camera (int width, int height, double clipping, Scene* const scene) :
+#else
+Camera::Camera (int width, int height, double clipping) :
+#endif
+m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
 {
   m_width = width;
   m_height = height;
@@ -32,9 +37,10 @@ Camera::Camera (int width, int height, double clipping, Scene* scene) : m_positi
   glPushMatrix ();
   glLoadIdentity ();
   
+#ifdef RTFLAMES_BUILD
   m_scene = scene;
-
   computeFrustrum();
+#endif
 }
 
 void Camera::computeView(double x, double y)
@@ -121,10 +127,13 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
 	}
     m_beginMouseX = event.GetX();
     m_beginMouseY = event.GetY();
+#ifdef RTFLAMES_BUILD
     computeFrustrum();
+#endif
   }
 }
 
+#ifdef RTFLAMES_BUILD
 void Camera::computeFrustrum()
 {
    double   proj[16];
@@ -238,7 +247,8 @@ void Camera::computeFrustrum()
    m_frustum[5][3] /= t;
    
    /* Compute objects visibility */
-   g_objectCount=0;
+//    g_objectCount=0;
    m_scene->computeVisibility(*this);
-   cerr << g_objectCount << " objects drawn" << endl;
+//    cerr << g_objectCount << " objects drawn" << endl;
 }
+#endif

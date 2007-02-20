@@ -60,7 +60,7 @@ public:
    * @param z Profondeur de la texture
    * @param texels Pointeur vers le tableau de réels
    */
-  Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat *texels);
+  Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat* const texels);
   
   /** Destructeur */
   virtual ~Texture();

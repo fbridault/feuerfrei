@@ -13,7 +13,7 @@ class CgSPVertexShader;
 class CgCandleVertexShader : public CgBasicVertexShader
 {
 public:
-  CgCandleVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  CgCandleVertexShader(const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, bool recompile=false);
   virtual ~CgCandleVertexShader();
   
   void setTexTranslation(GLdouble value){
@@ -33,7 +33,7 @@ private:
 class CgCandleFragmentShader : public CgShader
 {
 public:
-  CgCandleFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  CgCandleFragmentShader(const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, bool recompile=false);
   virtual ~CgCandleFragmentShader();
   
   void setTexture(Texture* tex){

@@ -82,7 +82,7 @@ public:
   /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
-  virtual void drawWick(bool displayBoxes) {};
+  virtual void drawWick(bool displayBoxes) const {};
 
 };
 
@@ -134,7 +134,7 @@ public:
   
   virtual void build();
   
-  virtual void drawWick(bool displayBoxes)
+  virtual void drawWick(bool displayBoxes) const
   {      
     Point pt(getPosition());
     Point scale(m_solver->getScale());
@@ -148,7 +148,7 @@ public:
     glPopMatrix();
   }
   
-  virtual void drawFlame(bool display, bool displayParticle)
+  virtual void drawFlame(bool display, bool displayParticle) const
   {
     Point pt(m_solver->getPosition());
     Point scale(m_solver->getScale());

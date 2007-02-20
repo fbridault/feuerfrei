@@ -1,6 +1,7 @@
 #include "solidePhoto.hpp"
 
-PhotometricSolidsRenderer::PhotometricSolidsRenderer(Scene *s, FireSource **flames, uint nbFlames, CGcontext *context, bool recompileShaders) :
+PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, FireSource **flames, uint nbFlames, 
+						     const CGcontext* const context, bool recompileShaders) :
   m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders)
 {
   m_scene = s;

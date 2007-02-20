@@ -6,7 +6,8 @@
 using namespace std;
 
 
-CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, CGGLenum type, bool recompile, const wxString& extraParameters)
+CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, CGGLenum type, 
+		    bool recompile, const wxString& extraParameters)
 {
   wxString sourcePath = _("src/shaders/") + sourceName;
   wxString shaderPath = _("src/shaders/") + shaderName;
@@ -76,7 +77,7 @@ CgShader::~CgShader ()
     cgDestroyProgram (program);
 }
 
-CgBasicVertexShader::CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile) : 
+CgBasicVertexShader::CgBasicVertexShader(const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, bool recompile) : 
   CgShader (sourceName, shaderName, context, CG_GL_VERTEX, recompile)
 {
   // Récupération des paramètres

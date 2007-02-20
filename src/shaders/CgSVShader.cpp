@@ -1,6 +1,7 @@
 #include "CgSVShader.hpp"
 
-CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, CGcontext *context, double *fatnessVec, double *extrudeDistVec, bool recompile ):
+CgSVShader::CgSVShader (const wxString& sourceName, const wxString& shaderName, const CGcontext* const context,
+			const double* const fatnessVec, const double* const extrudeDistVec, bool recompile ):
   CgBasicVertexShader (sourceName, shaderName, context, recompile)
 {  
   // Récupération des paramètres

@@ -1,7 +1,7 @@
 #include "CgSPFragmentShader.hpp"
 
-CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, uint nbFlames, CGcontext *context,
-				       uint type, bool recompile) :
+CgSPFragmentShader::CgSPFragmentShader(const wxString& sourceName, const wxString& shaderName, uint nbFlames, 
+				       const CGcontext* const context, uint type, bool recompile) :
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT, recompile, wxString::Format(_("%s%d"),_("-DNB_SOURCES="), nbFlames))
 {  
   interp = type & 1;

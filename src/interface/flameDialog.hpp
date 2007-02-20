@@ -20,8 +20,8 @@ class FlamePanel: public wxPanel
 {
 public:
   FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(FlameConfig* solverConfig);
-  bool getCtrlValues(FlameConfig* solverConfig);
+  void setCtrlValues(FlameConfig* const solverConfig);
+  bool getCtrlValues(FlameConfig* const solverConfig);
   
 private:
   void setProperties();

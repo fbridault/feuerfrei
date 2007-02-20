@@ -146,7 +146,7 @@ void SolverPanel::doLayout()
   SetSizerAndFit(m_panelSizer);
 }
 
-void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
+void SolverPanel::setCtrlValues(SolverConfig* const solverConfig)
 {
   wxString tmp;
   
@@ -203,7 +203,7 @@ void SolverPanel::setCtrlValues(SolverConfig* solverConfig)
     }
 }
 
-bool SolverPanel::getCtrlValues(SolverConfig* solverConfig)
+bool SolverPanel::getCtrlValues(SolverConfig* const solverConfig)
 {
   /* Une exception est levée si l'un des contrôles n'a pas une valeur conforme */
   try

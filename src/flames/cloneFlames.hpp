@@ -27,7 +27,7 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneFlame(FlameConfig* flameConfig, RealFlame *source, const Point& offset);
+  CloneFlame(const FlameConfig* const flameConfig, const RealFlame* const source, const Point& offset);
   virtual ~CloneFlame();
   
   /** Dessine la mèche de la flamme.
@@ -35,7 +35,7 @@ public:
    * est simplement gardé pour des raisons de compatibilité, il est en effet ignoré
    * puisque la mèche n'est pas découpée.
    */
-  virtual void drawWick(bool displayBoxes)
+  virtual void drawWick(bool displayBoxes) const
   {
     Point diffPos = m_position - m_source->getPosition();
     glPushMatrix();
@@ -53,7 +53,7 @@ public:
   Point* getBottom() const { return m_source->getBottom(); };
   
 protected:
-  RealFlame *m_source;
+  const RealFlame *m_source;
 };
 
 /** La classe CloneLineFlame implémente une flamme clone dont la source est une LineFlame.
@@ -69,10 +69,10 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneLineFlame(FlameConfig* flameConfig, LineFlame *source, const Point& offset);
+  CloneLineFlame(const FlameConfig* const flameConfig, const LineFlame* const source, const Point& offset);
   virtual ~CloneLineFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle){ 
+  virtual void drawFlame(bool display, bool displayParticle) const{ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     if( display) drawLineFlame();
@@ -93,10 +93,10 @@ public:
    * @param source Pointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  ClonePointFlame(FlameConfig* flameConfig, PointFlame *source, const Point& offset);
+  ClonePointFlame(const FlameConfig* const flameConfig, const PointFlame* const source, const Point& offset);
   virtual ~ClonePointFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle){ 
+  virtual void drawFlame(bool display, bool displayParticle) const{ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     if( display) drawPointFlame(); 

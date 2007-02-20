@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader, const char* const IESFilename)
+FlameLight::FlameLight(Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename)
 {  
   m_scene = scene;
   
@@ -21,10 +21,8 @@ FlameLight::FlameLight(Scene *scene, uint index, CgSVShader * shader, const char
     case 7 : m_light = GL_LIGHT7; break;
   }
   
-  m_lightPosition[3] = 1.0;
-  
-  m_cgShader = shader;
-  
+  m_lightPosition[3] = 1.0;  
+  m_cgShader = shader;  
   m_orientationSPtheta = 0.0;
 
   m_iesFile = new IES(IESFilename);
@@ -80,8 +78,8 @@ void FlameLight::drawShadowVolume ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Scene *scene, const char *filename, 
-		       const wxString &texname,  uint index, CgSVShader *shader, const char *objName) : 
+FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames,  Scene *scene, const char *filename, 
+		       const wxString &texname,  uint index, const CgSVShader* const shader, const char *objName) : 
   FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
 {  
@@ -112,7 +110,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
       }
     
     for (i=0; i < m_nbObjLuminary; i++)
-      m_luminary[i]->buildVBOs();
+      m_luminary[i]->buildVBO();
     m_hasLuminary=true;
   }
   else
@@ -122,7 +120,7 @@ FireSource::FireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames,  Sce
       m_luminary[0] = new Object(scene);
       m_hasLuminary = scene->importOBJ(filename, m_luminary[0], NULL);
       if(m_hasLuminary){
-	m_luminary[0]->buildVBOs();
+	m_luminary[0]->buildVBO();
       }
     }
   m_breakable=flameConfig->breakable;  
@@ -183,9 +181,9 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
-DetachableFireSource::DetachableFireSource(FlameConfig *flameConfig, Field3D *s, uint nbFlames, 
-					   Scene *scene, const char *filename, const wxString &texname, 
-					   uint index, CgSVShader *shader, const char *objName) : 
+DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
+					   Scene* const scene, const char *filename, const wxString &texname, 
+					   uint index, const CgSVShader* const shader, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, shader, objName)
 {
 }

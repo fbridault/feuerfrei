@@ -26,7 +26,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig* flameConfig, double u,
+  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig, double u,
 	       float noiseIncrement, float noiseMin, float noiseMax);
   
   /** Destructeur. */
@@ -39,11 +39,11 @@ public:
   
   void addParticle(const Point* const pt);
   
-  virtual void drawRoot ();
+  virtual void drawRoot () const;
   void addForces ();
   
 private:
-  void drawParticle (Particle * const particle);
+  void drawParticle (Particle * const particle) const;
   
   /** Valeur d'entrée de la fonction de distribution de carburant F(u). */
   double m_u;
@@ -77,7 +77,7 @@ private:
   /** Dessine une particule d'un squelette guide.
    * @param particle Particule à dessiner.
    */
-  void drawParticle (Particle * const particle);
+  void drawParticle (Particle * const particle) const;
 };
 
 #endif

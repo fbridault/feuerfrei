@@ -36,18 +36,18 @@ public:
    * @param detachedFlamesWidth Largeur des flammes détachées.
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Field3D *s,
+  LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s,
 	     const char *wickFileName, double detachedFlamesWidth, 
 	     const char *wickName=NULL, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle) { 
+  virtual void drawFlame(bool display, bool displayParticle) const{ 
     /* Affichage des particules */
     if(displayParticle) drawParticles();
     if(display) drawLineFlame(); 
   };
   
-  virtual void drawWick(bool displayBoxes){ m_wick.drawWick(displayBoxes); };
+  virtual void drawWick(bool displayBoxes) const { m_wick.drawWick(displayBoxes); };
   
   virtual Vector getMainDirection() const
   {
@@ -113,18 +113,18 @@ public:
    * @param s Pointeur vers le solveur.
    * @param rayon Valeur du rayon du cercle formé par les racines des squelettes.
    */
-  PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D * s, double rayon);
+  PointFlame ( const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon);
   
   /** Destructeur*/
   virtual ~PointFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle) { 
+  virtual void drawFlame(bool display, bool displayParticle) const { 
     /* Affichage des particules */
     if(displayParticle) drawParticles();
     if(display) drawPointFlame(); 
   };
   
-  virtual void drawWick(bool displayBoxes);
+  virtual void drawWick(bool displayBoxes) const;
   
   virtual Vector getMainDirection() const {
     return(*(m_leadSkeletons[0]->getMiddleParticle()));
@@ -163,21 +163,21 @@ public:
    * @param periSkeletons Tableaux contenant les squelettes périphériques.
    * @param tex Pointeur vers la texture à utiliser.
    */
-  DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex);
+  DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
+		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex);
   
   /** Destructeur*/
   virtual ~DetachedFlame ();
   
   virtual bool build();
   
-  virtual void drawFlame(bool display, bool displayParticle) { 
+  virtual void drawFlame(bool display, bool displayParticle) const { 
     /* Affichage des particules */
     if(displayParticle) drawParticles();
     if(display) drawLineFlame(); 
   };
   
-  void drawParticles()
+  void drawParticles() const
   {
       uint i;
       /* Déplacement et détermination du maximum */

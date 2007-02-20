@@ -14,7 +14,7 @@ class CgShader;
 class CgBlurVertexShader : public CgBasicVertexShader
 {
 public:
-  CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, bool recompile=false);
   virtual ~CgBlurVertexShader();
   
   void setOffsetsArray(double offsets[FILTER_SIZE]){
@@ -28,7 +28,7 @@ private:
 class CgBlurFragmentShader : public CgShader
 {
 public:
-  CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, CGcontext *context, bool recompile=false);
+  CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, const CGcontext* const context, bool recompile=false);
   virtual ~CgBlurFragmentShader();
   
   void setWeightsArray(double weights[FILTER_SIZE], double divide){
@@ -36,7 +36,7 @@ public:
     cgGLSetParameter1d(paramDivide, divide);
   };
   
-  void setTexture(Texture* tex){
+  void setTexture(const Texture* const tex){
     cgGLSetTextureParameter(paramTexture, tex->getTexture());
     cgGLEnableTextureParameter(paramTexture);
   };

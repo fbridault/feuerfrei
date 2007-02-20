@@ -42,7 +42,7 @@ public:
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
-  NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex);
+  NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
    * @param source Pointeur sur la flamme qui a généré la flamme courante.
@@ -50,7 +50,7 @@ public:
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
-  NurbsFlame(NurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex);
+  NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   virtual ~NurbsFlame ();
   
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
@@ -60,42 +60,42 @@ public:
    */
   virtual bool build() = 0;
       
-  virtual void drawLineFlame();  
+  virtual void drawLineFlame() const;  
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture.
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    */
-  virtual void drawFlame(bool display, bool displayParticle) = 0;
+  virtual void drawFlame(bool display, bool displayParticle) const = 0;
   
   /** Dessine la flamme et sa mèche.
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  void draw(bool display, bool displayParticle, bool displayBoxes){
+  void draw(bool display, bool displayParticle, bool displayBoxes) const{
     drawFlame(display, displayParticle);
   };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
    * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
    */
-  virtual void setSamplingTolerance(double value){ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
+  virtual void setSamplingTolerance(double value) const{ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void toggleSmoothShading ();
   
-  Point getPosition(){ return m_position; };
+  Point getPosition() const { return m_position; };
   
   /** Retourne le nombre de squelettes */
-  uint getNbSkeletons(){ return m_nbSkeletons; };
+  uint getNbSkeletons() const { return m_nbSkeletons; };
   
 //   void setRenderMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
 //   void setTesselateMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
   
   /** Retourne le nombre de points fixes, autrement dit le nombre de racines dans la flamme */
-  unsigned short getNbFixedPoints(){ return m_nbFixedPoints; };
+  unsigned short getNbFixedPoints() const{ return m_nbFixedPoints; };
   
   /** Méthode permettant de cloner la flamme passée en paramètre
    * @param source Flamme à cloner
@@ -113,13 +113,13 @@ public:
     m_size = source.m_size;
   }
   
-  Texture *getTexture() const { return m_tex; };
+  const Texture *getTexture() const { return m_tex; };
 
 protected:
   /** Affiche la flamme sous forme de NURBS, à partir du tableau de points de contrôles et du tableau
    * de coordonnées de texture construits au préalable.
    */
-  void drawNurbs ();
+  void drawNurbs () const;
   
   /** Fonction simplifiant l'affectation d'un point de contrôle. L'algorithme de construction
    * de la NURBS parcours de façon séquentielle les squelettes, aucun indice dans le tableau
@@ -213,13 +213,13 @@ protected:
   bool m_toggle;  
   
   /** Texture de la flamme */
-  Texture *m_tex;
+  const Texture *m_tex;
     
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;
   
   /** Configuration de la flamme */
-  FlameConfig *m_flameConfig;
+  const FlameConfig *m_flameConfig;
 };
 
 
@@ -244,16 +244,16 @@ public:
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
-  FixedFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex);
+  FixedFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   
   virtual ~FixedFlame ();
   
   /** Dessine la mèche de la flamme.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  virtual void drawWick(bool displayBoxes) = 0;
+  virtual void drawWick(bool displayBoxes) const = 0;
   
-  void draw(bool display, bool displayParticle, bool displayBoxes){
+  void draw(bool display, bool displayParticle, bool displayBoxes) const{
     drawWick(displayBoxes);
     drawFlame(display, displayParticle);
   };
@@ -261,7 +261,7 @@ public:
   /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
    * pour rester en face de l'observateur.
    */
-  virtual void drawPointFlame();
+  virtual void drawPointFlame() const;
   
   /** Retourne la direction de la base de la flamme vers la derniere particule
    * pour orienter le solide photométrique.
@@ -319,7 +319,7 @@ public:
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s);
+  RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex, Field3D* const s);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
@@ -332,7 +332,7 @@ public:
   virtual void setForces(double value){ m_innerForce=value; };
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
-  void drawParticles()
+  void drawParticles() const
   {
     uint i;
     /* Déplacement et détermination du maximum */

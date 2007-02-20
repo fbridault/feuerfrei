@@ -84,8 +84,13 @@ public:
   * @param w largeur de la fenêtre de visualisation
   * @param h hauteur de la fenêtre de visualisation
   * @param clipping_value Distance de clipping
+  * @param scene Pointeur sur la scène
   */
-  Camera(int w, int h, double clipping_value, Scene* scene);
+#ifdef RTFLAMES_BUILD
+  Camera(int w, int h, double clipping_value, Scene* const scene);
+#else
+  Camera(int w, int h, double clipping_value);
+#endif
   virtual ~Camera() {};
 
   // void addCenterX(double value){ centerx+=value; eyex+=value; 
@@ -129,7 +134,9 @@ public:
    */
   void moveOnFrontOrBehind(double value){
     m_position = m_position + (m_view * value);
+#ifdef RTFLAMES_BUILD
     computeFrustrum();
+#endif
   };  
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
    * On effectue ensuite une translation suivant le vecteur de vue
@@ -139,9 +146,11 @@ public:
     m_position = m_position + (m_up * value);
   };
   
+#ifdef RTFLAMES_BUILD
   void computeFrustrum();
   
-  double *getFrustum(uint side){ return m_frustum[side]; };
+  const double* getFrustum(uint side) const { return m_frustum[side]; };
+#endif
   
 private:
   /** Position de la scène. La caméra reste toujours centrée en (0,0,0) */
@@ -168,10 +177,11 @@ private:
   double m_mouseSensitivity;
   /** Largeur et hauteur de la vue de la caméra */
   int m_width, m_height;
+#ifdef RTFLAMES_BUILD
   /** Plans du frustrum */
   double m_frustum[6][4];
-  
   Scene *m_scene;
+#endif
 };
 
 #endif

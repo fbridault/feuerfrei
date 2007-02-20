@@ -1,7 +1,7 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders, CGcontext *cgcontext) : 
+GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders, const CGcontext* const cgcontext) : 
   m_blurVertexShaderX8   (_("glowShaders.cg"),_("vertGlowX"),  cgcontext, recompileShaders),
   m_blurVertexShaderY8   (_("glowShaders.cg"),_("vertGlowY"),  cgcontext, recompileShaders),
   m_blurFragmentShader8  (_("glowShaders.cg"),_("fragGlow"),  cgcontext, recompileShaders)

@@ -24,7 +24,7 @@ public:
    * @param context Pointeur vers le contexte Cg.
    * @param recompileShaders Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
-  PhotometricSolidsRenderer(Scene *s, FireSource **flames, uint nbFlames, CGcontext *context, bool recompileShaders);
+  PhotometricSolidsRenderer(const Scene* const s, FireSource **flames, uint nbFlames, const CGcontext* const context, bool recompileShaders);
   /** Destructeur. */
   virtual ~PhotometricSolidsRenderer();
   
@@ -40,7 +40,7 @@ public:
 
 private:  
   /** Pointeur vers la scène 3D. */
-  Scene *m_scene;
+  const Scene* m_scene;
   /** Pointeur vers les flammes. */
   FireSource **m_flames;
   

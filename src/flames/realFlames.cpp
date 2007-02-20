@@ -7,7 +7,7 @@
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (FlameConfig* flameConfig, Scene *scene, Texture* const tex, Field3D *s, 
+LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s, 
 		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
 		      DetachableFireSource *parentFire ) :
   RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
@@ -163,7 +163,7 @@ void LineFlame::breakCheck()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame ( FlameConfig* flameConfig, Texture* const tex, Field3D * s, double rayon):
+PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon):
   RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -189,7 +189,7 @@ PointFlame::~PointFlame ()
 {  
 }
 
-void PointFlame::drawWick (bool displayBoxes)
+void PointFlame::drawWick (bool displayBoxes) const
 {
   double hauteur = 1 / 6.0;
   double largeur = 1 / 60.0;
@@ -208,8 +208,8 @@ void PointFlame::drawWick (bool displayBoxes)
 /*************************************** IMPLEMENTATION DE LA CLASSE DETACHEDFLAME ************************************/
 /**********************************************************************************************************************/
 
-DetachedFlame::DetachedFlame(RealFlame *source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, Texture* const tex) :
+DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];

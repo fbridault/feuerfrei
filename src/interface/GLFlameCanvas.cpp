@@ -216,7 +216,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
-  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, m_flames, m_currentConfig->nbFlames, &m_context);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, m_flames, m_currentConfig->nbFlames);
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)

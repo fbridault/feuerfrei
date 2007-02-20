@@ -20,8 +20,8 @@ class SolverPanel: public wxPanel
 {
 public:
   SolverPanel(wxWindow* parent, int id, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(SolverConfig* solverConfig);
-  bool getCtrlValues(SolverConfig* solverConfig);
+  void setCtrlValues(SolverConfig* const solverConfig);
+  bool getCtrlValues(SolverConfig* const solverConfig);
 
   void OnSelectType(wxCommandEvent& event);
 

@@ -136,7 +136,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
   m_wxtex->Destroy();
 }
 
-Texture::Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat *texels)
+Texture::Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat* const texels)
 {  
   m_wxtex = NULL;
   m_type = GL_TEXTURE_3D;

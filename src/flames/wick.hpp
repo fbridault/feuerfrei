@@ -39,14 +39,14 @@ public:
    * @param leadSkeletons Vecteur des squelettes guides.
    * @param wickName Optionnel, nom de l'objet dans le fichier OBJ.
    */
-  Wick(const char *wickFileName, FlameConfig* flameConfig, Scene *scene, 
-       vector< LeadSkeleton * >& leadSkeletons, Field3D *solver, const char*wickName=NULL);
+  Wick(const char *wickFileName, const FlameConfig* const flameConfig, Scene* const scene, 
+       vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver, const char*wickName=NULL);
   virtual ~Wick();
   	
   /** Affiche la mèche
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  virtual void drawWick(bool displayBoxes)
+  virtual void drawWick(bool displayBoxes) const
   {
     draw(ALL,true);
     if(displayBoxes)

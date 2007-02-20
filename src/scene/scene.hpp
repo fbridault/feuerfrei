@@ -193,7 +193,7 @@ public:
   /** Change l'affichage des sphères englobantes. */
   void setBoundingSphereMode(bool mode) { m_boundingSpheresMode = mode; };
   
-  void computeVisibility(Camera &view);
+  void computeVisibility(const Camera &view);
   
   /** Dessin des objets texturés */
   void drawSceneTEX(void) const

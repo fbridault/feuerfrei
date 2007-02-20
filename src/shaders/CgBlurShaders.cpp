@@ -3,7 +3,7 @@
 #include <math.h>
 
 CgBlurVertexShader::CgBlurVertexShader(const wxString& sourceName, const wxString& shaderName, 
-				       CGcontext *context, bool recompile) : 
+				       const CGcontext* const context, bool recompile) : 
   CgBasicVertexShader (sourceName, shaderName, context, recompile)
 {
   // Récupération des paramètres
@@ -17,7 +17,7 @@ CgBlurVertexShader::~CgBlurVertexShader()
 /***********************************************************************************************************/
 
 CgBlurFragmentShader::CgBlurFragmentShader(const wxString& sourceName, const wxString& shaderName, 
-					   CGcontext *context, bool recompile) : 
+					   const CGcontext* const context, bool recompile) : 
   CgShader (sourceName, shaderName, context, CG_GL_FRAGMENT, recompile)
 {
   // Récupération des paramètres

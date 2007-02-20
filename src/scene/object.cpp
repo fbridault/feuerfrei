@@ -5,7 +5,7 @@
 
 extern uint g_objectCount;
 
-Object::Object(Scene *scene)
+Object::Object(const Scene* const scene)
 {
   m_scene = scene;
   m_attributes = 0;
@@ -72,7 +72,7 @@ void Object::drawBoundingSpheres ()
     (*meshesListIterator)->drawBoundingSphere();
 }
 
-void Object::computeVisibility(Camera &view)
+void Object::computeVisibility(const Camera &view)
 {
   for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
@@ -80,20 +80,20 @@ void Object::computeVisibility(Camera &view)
     (*meshesListIterator)->computeVisibility(view);
 }
 
-uint Object::getPolygonsCount ()
+uint Object::getPolygonsCount () const
 {
   uint count=0;
-  for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+  for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
     count += (*meshesListIterator)->getPolygonsCount();
   return count;
 }
 
-void Object::buildVBOs()
+void Object::buildVBO()
 {
   /* Détermination du type de données décrites à partir des maillages */
-  for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+  for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
     if( (*meshesListIterator)->getAttributes() > m_attributes)
@@ -102,21 +102,21 @@ void Object::buildVBOs()
   glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
   glBufferData(GL_ARRAY_BUFFER, m_vertexArray.size()*sizeof(Vertex), &m_vertexArray[0], GL_STATIC_DRAW);
     
-  for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+  for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
     (*meshesListIterator)->buildVBO();	
   glBindBuffer(GL_ARRAY_BUFFER, 0 );
 }
 
-void Object::draw (char drawCode, bool tex, bool boundingSpheres)
+void Object::draw (char drawCode, bool tex, bool boundingSpheres) const
 {
   /* On initialise le dernier matériau au premier de la liste, le matériau par défaut */
   uint lastMaterialIndex=0;
   
   if(boundingSpheres){
     m_scene->getMaterial(0)->apply();
-    for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+    for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 	 meshesListIterator != m_meshesList.end ();
 	 meshesListIterator++)
       (*meshesListIterator)->drawBoundingSphere();
@@ -126,7 +126,7 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres)
       m_scene->getMaterial(0)->apply();
     
     /* Parcours de la liste des meshes */
-    for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+    for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 	 meshesListIterator != m_meshesList.end ();
 	 meshesListIterator++)
       (*meshesListIterator)->draw(drawCode, tex, lastMaterialIndex);
@@ -139,7 +139,7 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres)
 }
 
 /********************************************* Mesh Definition *********************************************/
-Mesh::Mesh (Scene* const scene, uint materialIndex, Object* parent)
+Mesh::Mesh (const Scene* const scene, uint materialIndex, Object* parent)
 {
   m_scene = scene;
   m_attributes = 0;
@@ -156,11 +156,10 @@ Mesh::~Mesh ()
   glDeleteBuffers(1, &m_bufferID);
 }
 
-void Mesh::buildVBO(){
-  
+void Mesh::buildVBO() const
+{  
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexArray.size()*sizeof(GLuint), &m_indexArray[0], GL_STATIC_DRAW);
-  
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexArray.size()*sizeof(GLuint), &m_indexArray[0], GL_STATIC_DRAW); 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
@@ -208,10 +207,10 @@ void Mesh::drawBoundingSphere()
   glPopMatrix();
 }
 
-void Mesh::computeVisibility(Camera &view)
+void Mesh::computeVisibility(const Camera &view)
 {
   uint i;
-  double *plan;
+  const double *plan;
 
   // Centre dans le frustrum ?
 //   for( p = 0; p < 6; p++ )
@@ -228,12 +227,12 @@ void Mesh::computeVisibility(Camera &view)
       return;
     }
   }
-  g_objectCount++;
+//   g_objectCount++;
   m_visibility = true;
   return;
 }
 
-void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex)
+void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 {  
   if(!m_visibility)
     return;
@@ -285,7 +284,7 @@ void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex)
   lastMaterialIndex = m_materialIndex;
 }
 
-const bool Mesh::isTransparent ()
+const bool Mesh::isTransparent () const
 { 
   if(m_scene->getMaterial(m_materialIndex)->hasDiffuseTexture())
     if( m_scene->getMaterial(m_materialIndex)->isTransparent())
@@ -293,8 +292,8 @@ const bool Mesh::isTransparent ()
   return false;
 }
 
-void Mesh::setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint > &normalsIndexVector, 
-			    vector < Point >  &texCoordsVector, vector < GLuint > &texCoordsIndexVector)
+void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector < GLuint > &normalsIndexVector, 
+			    const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector)
 {
   Vertex v;
   Vector normal, texCoord;
@@ -304,7 +303,7 @@ void Mesh::setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint 
   if(!m_attributes)
     {
       for (uint i = 0; i < m_indexArray.size(); i++)
-	m_parent->setVertex( m_indexArray[i], 0, 0, 0, 0, 0);
+	m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
     }else{
     /* On initialise la table de hachage */
     m_parent->initHashTable();
@@ -316,7 +315,7 @@ void Mesh::setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint 
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
 	    {
 	      v = m_parent->getVertex(m_indexArray[i]);
-	      if ( normal.x == v.nx && normal.y == v.ny && normal.z == v.nz ){
+	      if ( ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz ){
 		nondup++;
 		/* La normale du point courant est identique à la précédente référence, il n'y a donc rien à faire */
 		continue;
@@ -330,7 +329,7 @@ void Mesh::setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint 
 	  else
 	    m_parent->addRefInHashTable( m_indexArray[i], i);
 	  /* On affecte les coordonnées de texture et de normale au point courant */
-	  m_parent->setVertex( m_indexArray[i], 0, 0, normal.x, normal.y, normal.z);
+	  m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, normal.x, normal.y, normal.z);
 	}
     else      
       for (uint i = 0; i < m_indexArray.size(); i++)
@@ -342,7 +341,8 @@ void Mesh::setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint 
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
 	    {
 	      v = m_parent->getVertex(m_indexArray[i]);
-	      if ( texCoord.x == v.u && texCoord.y == v.v && normal.x == v.nx && normal.y == v.ny && normal.z == v.nz ){
+	      if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v && 
+		   ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz ){
 		nondup++;
 		/* La normale et les coordonnées de texture du point courant sont identiques à la précédente référence, il n'y a donc rien à faire */
 		continue;

@@ -1,7 +1,7 @@
 #include "DPengine.hpp"
 
-DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, Scene *scene, FireSource **flames, 
-				       uint nbFlames, CGcontext *cgcontext )
+DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, FireSource **flames, 
+				       uint nbFlames )
 {
   m_width = width;
   m_height = height;

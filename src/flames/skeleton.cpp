@@ -112,7 +112,7 @@ bool FreeSkeleton::moveParticle (Particle * const pos)
   return true;
 }
 
-void FreeSkeleton::draw ()
+void FreeSkeleton::draw () const
 {
   for (uint i = 0; i < getSize (); i++)
     drawParticle( getParticle (i) ) ;
@@ -122,7 +122,7 @@ void FreeSkeleton::draw ()
   glEnd();    
 }
 
-void FreeSkeleton::drawParticle (Particle * const particle)
+void FreeSkeleton::drawParticle (Particle * const particle) const
 {
   glColor4f (1.0, 1.0, 0.25, 0.8);
   glPushMatrix ();
@@ -136,7 +136,7 @@ void FreeSkeleton::drawParticle (Particle * const particle)
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig* flameConfig) : 
+Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig) : 
   FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
 {  
@@ -145,7 +145,7 @@ Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMov
   m_selfVelocity=0;
 }
 
-void Skeleton::draw ()
+void Skeleton::draw () const
 {
   drawRoot();
   for (uint i = 0; i < getSize (); i++)
@@ -157,7 +157,7 @@ void Skeleton::draw ()
   glEnd();
 }
 
-void Skeleton::drawRoot ()
+void Skeleton::drawRoot () const
 {
   glColor4f (1.0, 0.0, 0.25, 0.8);
   glPushMatrix ();

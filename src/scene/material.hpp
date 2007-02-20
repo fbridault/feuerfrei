@@ -24,21 +24,11 @@ using namespace std;
  */
 class Material 
 {
-private:
-  string m_name;   /** Nom du matériau. */
-  Intensity m_Kd;  /** Composante de réflexion diffuse. */
-  Intensity m_Ks;  /** Composante de réflexion spéculaire. */
-  double m_Kss;    /** Indice de tache spéculaire. */
-  Intensity m_Ka;  /** Composante de réflexion ambiante. */
-  
-  Scene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
-  int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
-  
 public:
   /**
    * Constructeur par défaut. Crée un matériau blanc ambiant.
    */
-  Material( Scene * const scene );
+  Material(const Scene* const scene );
   /**
    * Constructeur.
    * @param name Nom donné au matériau.
@@ -48,7 +38,7 @@ public:
    * @param specularExponent Indice de tache spéculaire.
    * @param tex Pointeur optionel sur la texture.
    */
-  Material( Scene * const scene, const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, int tex=-1);
+  Material(const Scene* const scene, const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, int tex=-1);
   /** Destructeur par défaut. */
   ~Material(){};
   
@@ -117,6 +107,16 @@ public:
    * @return True si le matériau a une texture.
    */
   const bool isTransparent() const;
+
+private:
+  string m_name;   /** Nom du matériau. */
+  Intensity m_Kd;  /** Composante de réflexion diffuse. */
+  Intensity m_Ks;  /** Composante de réflexion spéculaire. */
+  double m_Kss;    /** Indice de tache spéculaire. */
+  Intensity m_Ka;  /** Composante de réflexion ambiante. */
+  
+  const Scene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
+  int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
 };
 
 #endif

@@ -10,7 +10,7 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
-LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor, FlameConfig *flameConfig,
+LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig,
 			    double u, float noiseIncrement, float noiseMin, float noiseMax) :
   Skeleton (s, position, rootMoveFactor, flameConfig),
   m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
@@ -24,7 +24,7 @@ LeadSkeleton::~LeadSkeleton ()
 {
 }
 
-void LeadSkeleton::drawParticle (Particle * const particle)
+void LeadSkeleton::drawParticle (Particle * const particle) const
 {
   glColor4f (0.1, 1.0, 0.1, 0.8);
   glPushMatrix ();
@@ -33,7 +33,7 @@ void LeadSkeleton::drawParticle (Particle * const particle)
   glPopMatrix ();
 }
 
-void LeadSkeleton::drawRoot ()
+void LeadSkeleton::drawRoot () const
 {
   glColor4f (0.0, 0.4, 0.0, 0.8);
   glPushMatrix ();
@@ -157,7 +157,7 @@ FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
   return copy;
 }
 
-void FreeLeadSkeleton::drawParticle (Particle * const particle)
+void FreeLeadSkeleton::drawParticle (Particle * const particle) const
 {
   glColor4f (0.1, 1.0, 0.1, 0.8);
   glPushMatrix ();

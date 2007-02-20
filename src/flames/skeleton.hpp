@@ -85,7 +85,7 @@ public:
   };
     
   /** Dessine le squelette à l'écran. */
-  virtual void draw ();
+  virtual void draw () const;
   
   /** Déplacement des particules du squelette et suppression des particules mortes.
    * Aucune particule n'est générée dans cette classe.
@@ -118,7 +118,7 @@ protected:
   /** Dessine les particules du squelettes 
    * @param particle Particule à dessiner.
    */
-  virtual void drawParticle (Particle * const particle);
+  virtual void drawParticle (Particle * const particle) const;
   
   /** Pointeur sur le solveur de fluides. */
   Field3D *m_solver;
@@ -155,11 +155,11 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, FlameConfig *flameConfig);
+  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig);
   /** Destructeur. */
   virtual ~Skeleton(){};
   
-  void draw ();
+  void draw () const;
   
   /** Déplacement des particules du squelette, génération d'une nouvelle particule et
    * suppression des particules mortes.
@@ -182,9 +182,9 @@ protected:
    * @param pt position de la particule
    */
   virtual void addParticle(const Point* const pt) = 0;
-    
+  
   /** Dessine l'origine du squelette. */
-  virtual void drawRoot ();
+  virtual void drawRoot () const;
   
   /** Origine actuelle du squelette. */
   Point m_root;
@@ -193,7 +193,7 @@ protected:
   Point m_rootSave;
   
   /** Pointeur vers la configuration. Nécessaire pour le nombre de particules par squelette, la fdf ou les perturbations. */
-  FlameConfig *m_flameConfig;
+  const FlameConfig *m_flameConfig;
 private:  
   /** Contient trois facteurs correctifs pour le déplacement de l'origine
    * des squelettes. Selon le type de flamme, il est en effet nécessaire

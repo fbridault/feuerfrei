@@ -11,8 +11,8 @@ END_EVENT_TABLE();
 
 /**************************************** ShadowsDialog Class methods **************************************/
 
-ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig *config, 
-			     GLFlameCanvas *glBuffer, const wxPoint& pos, const wxSize& size, long style):
+ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, 
+			     GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
   wxString tmp;

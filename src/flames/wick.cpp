@@ -3,8 +3,8 @@
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
 
-Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene, 
-	    vector< LeadSkeleton * >& leadSkeletons, Field3D *solver, const char*wickName) :
+Wick::Wick (const char *wickFileName, const FlameConfig* const flameConfig, Scene* const scene, 
+	    vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver, const char*wickName) :
   Object(scene)
 {
   Point bounds[flameConfig->skeletonsNumber + 1];
@@ -17,11 +17,9 @@ Wick::Wick (const char *wickFileName, FlameConfig *flameConfig, Scene *scene,
   cerr << "Chargement de la mèche du fichier " << wickFileName << "...";
   scene->importOBJ(wickFileName, this, wickName);
   
-  /*******************************/
-  /* Création de la display list */
-  /*******************************/
+  /* Création du VBO */
   //glEnable (GL_LIGHTING);
-  buildVBOs();
+  buildVBO();
   //glDisable (GL_LIGHTING);
   
   /*****************************************************************************/

@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
 
-NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex)
+NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex)
 {
   m_nbSkeletons = nbSkeletons;
   m_nbFixedPoints = nbFixedPoints;
@@ -51,7 +51,7 @@ NurbsFlame::NurbsFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixe
   m_tex = tex;
 }
 
-NurbsFlame::NurbsFlame(NurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex)
+NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex)
 {  
   m_nbSkeletons = nbSkeletons;
   m_nbFixedPoints = nbFixedPoints;
@@ -110,7 +110,7 @@ void NurbsFlame::toggleSmoothShading()
   m_toggle = !m_toggle;
 }
 
-void NurbsFlame::drawNurbs ()
+void NurbsFlame::drawNurbs () const
 {
   gluBeginSurface (m_nurbs);
   gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 2,
@@ -120,7 +120,7 @@ void NurbsFlame::drawNurbs ()
   gluEndSurface (m_nurbs);
 }
 
-void NurbsFlame::drawLineFlame ()
+void NurbsFlame::drawLineFlame () const
 {
   if (m_toggle)
     {
@@ -144,7 +144,7 @@ void NurbsFlame::drawLineFlame ()
 /************************************** IMPLEMENTATION DE LA CLASSE FIXEDFLAME ****************************************/
 /**********************************************************************************************************************/
 
-FixedFlame::FixedFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex) :
+FixedFlame::FixedFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex) :
   NurbsFlame(flameConfig, nbSkeletons, nbFixedPoints, tex),
   m_halo(_("textures/halo.png"), GL_CLAMP, GL_CLAMP)
 {
@@ -154,7 +154,7 @@ FixedFlame::~FixedFlame()
 {
 }
 
-void FixedFlame::drawPointFlame ()
+void FixedFlame::drawPointFlame () const
 {
   if (m_toggle)
     {
@@ -219,7 +219,8 @@ void FixedFlame::drawPointFlame ()
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-RealFlame::RealFlame(FlameConfig* flameConfig, uint nbSkeletons, ushort nbFixedPoints, Texture* const tex, Field3D *s) :
+RealFlame::RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, 
+		     const Texture* const tex, Field3D* const s) :
   FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];

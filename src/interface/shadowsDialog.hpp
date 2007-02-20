@@ -19,7 +19,7 @@ enum
 class ShadowsDialog: public wxDialog 
 {
 public:
-  ShadowsDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig *config, GLFlameCanvas *glBuffer, 
+  ShadowsDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, GLFlameCanvas* const glBuffer, 
 		const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
 
 private:

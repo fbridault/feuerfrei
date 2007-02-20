@@ -39,7 +39,7 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param IESFilename nom du fichier IES à utiliser
    */
-  FlameLight (Scene *scene, uint index, CgSVShader* shader, const char* const IESFilename);
+  FlameLight (Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename);
   
   /** Destructeur */
   virtual ~FlameLight();
@@ -122,7 +122,7 @@ private:
   Scene *m_scene;
   
   /** Pointeur sur le shader générateur de volumes d'ombres. */
-  CgSVShader *m_cgShader;
+  const CgSVShader *m_cgShader;
   
   /** Position de la lumière ponctuelle OpenGL dans l'espace. */
   GLfloat m_lightPosition[4];
@@ -161,8 +161,8 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  FireSource (FlameConfig* flameConfig, Field3D * s, uint nbFlames, Scene *scene, const char *filename,
-	      const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
+  FireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
+	      const wxString &texname, uint index, const CgSVShader* const shader, const char *objName=NULL);
   /** Destructeur */
   virtual ~FireSource ();
 
@@ -187,7 +187,7 @@ public:
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
-  Point getPosition ()
+  Point getPosition () const
   {
     return Point(m_solver->getPosition());
   }
@@ -200,7 +200,7 @@ public:
   /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
-  virtual void drawWick(bool displayBoxes)
+  virtual void drawWick(bool displayBoxes) const
   {      
     Point pt(getPosition());
     Point scale(m_solver->getScale());
@@ -218,7 +218,7 @@ public:
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  virtual void drawFlame(bool display, bool displayParticle)
+  virtual void drawFlame(bool display, bool displayParticle) const
   {
     Point pt(m_solver->getPosition());
     Point scale(m_solver->getScale());
@@ -233,7 +233,7 @@ public:
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
-  void drawLuminary()
+  void drawLuminary() const
   {
     if(m_hasLuminary){
       Point position(getPosition());
@@ -252,7 +252,7 @@ public:
    *
    * @param shader vertex program utilisé pour le solide photométrique 
    */
-  void drawLuminary(const CgBasicVertexShader& shader)
+  void drawLuminary(const CgBasicVertexShader& shader) const
   {
     if(m_hasLuminary){
       Point position(getPosition());
@@ -294,7 +294,7 @@ public:
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    * pour orienter le solide photométrique.
    */
-  virtual Vector getMainDirection()
+  virtual Vector getMainDirection() const
   {
     Vector averageVec;
     
@@ -353,8 +353,8 @@ public:
    * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  DetachableFireSource (FlameConfig* flameConfig, Field3D * s, uint nbFlames, Scene *scene, const char *filename,
-			const wxString &texname, uint index, CgSVShader * shader, const char *objName=NULL);
+  DetachableFireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
+			const wxString &texname, uint index, const CgSVShader* const shader, const char *objName=NULL);
   virtual ~DetachableFireSource();
   
   virtual void build();

@@ -87,7 +87,7 @@ void FlamePanel::doLayout()
 }
 
 
-void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
+void FlamePanel::setCtrlValues(FlameConfig* const flameConfig)
 {  
   m_posXTextCtrl->Clear();
   m_posYTextCtrl->Clear();
@@ -113,7 +113,7 @@ void FlamePanel::setCtrlValues(FlameConfig* flameConfig)
 }
 
 
-bool FlamePanel::getCtrlValues(FlameConfig* flameConfig)
+bool FlamePanel::getCtrlValues(FlameConfig* const flameConfig)
 {
   try
     {

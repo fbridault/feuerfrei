@@ -2,7 +2,7 @@
 #include "material.hpp"
 
 
-Material::Material (Scene * const scene) : m_name("default")
+Material::Material (const Scene* const scene) : m_name("default")
 {
   double coeff[3] = { 1.0, 1.0, 1.0 };
  
@@ -15,7 +15,7 @@ Material::Material (Scene * const scene) : m_name("default")
   m_diffuseTexture = -1;
 }
 
-Material::Material ( Scene * const scene, const string& name, 
+Material::Material ( const Scene* const scene, const string& name, 
 		     double *const ambientCoefficients,
 		     double *const diffuseCoefficients,
 		     double *const specularCoefficients,

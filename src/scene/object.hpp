@@ -20,12 +20,6 @@ class Vertex
 {
 public:
   GLfloat u, v, nx, ny, nz, x, y, z;
-  /* On ne peut pas définir d'opérateur sans condamner l'utilisation du memcpy */
-  static void copy(const Vertex& src, Vertex& dest){ 
-    dest.u  = src.u ; dest.v  = src.v;
-    dest.nx = src.nx; dest.ny = src.ny; dest.nz = src.nz;
-    dest.x  = src.x ; dest.y  = src.y;  dest.z  = src.z;
-  };
 };
 
 class Scene;
@@ -40,7 +34,7 @@ public:
    * Constructeur par d&eacute;faut.
    * @param scene Pointeur vers la scene.
    */
-  Object(Scene *scene);
+  Object(const Scene* const scene);
   
   /** Destructeur par défaut. */
   virtual ~Object ();
@@ -63,14 +57,17 @@ public:
    */
   void getBoundingBox (Point& max, Point& min);
   
-  void bindVBO() { 
+  void bindVBO() const 
+  { 
     glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
     glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
     glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(2*sizeof(float)));
     glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(5*sizeof(float)));
    };
   
-  void buildVBOs();
+  /** Construction du Vertex Buffer Object de l'objet, ici le tableau de points, normales et coordonnées de texture. */
+  void buildVBO();
+  
   /** Fonction de dessin du groupe d'objets.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
@@ -80,12 +77,12 @@ public:
    * @param tex false si l'objet texturé doit être affiché sans sa texture
    * @param boundingSpheres true si l'objet doit afficher les sphères englobantes
    */
-  void draw(char drawCode=ALL, bool tex=true, bool boundingSpheres=false);
+  void draw(char drawCode=ALL, bool tex=true, bool boundingSpheres=false) const;
   
   /** Lecture du nombre de polygones contenus dans l'objet.
    * @return Nombre de polygones.
    */
-  uint getPolygonsCount ();
+  uint getPolygonsCount () const;
   
   /** Ajout d'un point dans le tableau de points.*/
   void addVertex( const Vertex& v) { m_vertexArray.push_back(v); };
@@ -119,7 +116,7 @@ public:
     return false;
   }
 
-  void computeVisibility(Camera &view);
+  void computeVisibility(const Camera &view);
   void buildBoundingSpheres ();
   void drawBoundingSpheres ();
   
@@ -146,7 +143,7 @@ private:
   bool m_previousMeshWasTextured;
   
   /** Pointeur vers la scène. */
-  Scene *m_scene;
+  const Scene *m_scene;
 
   GLuint m_bufferID;
   
@@ -167,23 +164,27 @@ public:
    * Constructeur par d&eacute;faut.
    * @param scene Pointeur vers la scene.
    */
-  Mesh (Scene * const scene, uint materialIndex, Object *parent);
+  Mesh (const Scene* const scene, uint materialIndex, Object *parent);
   
   /** Destructeur par défaut. */
   virtual ~Mesh ();
   
   /** Lecture du nombre de polygones contenus dans le maillage.
-   * @return Nombre de polygones.
-   */
+   * @return Nombre de polygones. */
   uint getPolygonsCount () const { return (m_indexArray.size() / 3); };
+  
+  /** Lecture de l'index du matériau utilisé par le maillage. 
+   * @return Index du matériau dans la liste de matériau contenu dans la scène. */
   uint getMaterialIndex () const { return (m_materialIndex); };
   
   /** Met à jour les attributs de l'objet. */
   void setAttributes (uint attr) { m_attributes = attr; };
   /** Récupérer les attributs de l'objet. */
-  uint getAttributes () { return m_attributes; };
+  uint getAttributes () const { return m_attributes; };
   
-  void buildVBO();
+  /** Construction du Vertex Buffer Object du maillage, ici le tableau d'indice. */
+  void buildVBO() const;
+  
   /** Fonction de dessin de l'objet avec utilisation des VBOs.
    * @param drawCode 
    * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
@@ -193,16 +194,16 @@ public:
    * @param tex false si l'objet texturé doit être affiché sans sa texture
    * @param lastMaterialIndex indice du dernier matériau appliqué, utilisé en entrée et en sortie.
    */
-  void draw(char drawCode, bool tex, uint& lastMaterialIndex);
+  void draw(char drawCode, bool tex, uint& lastMaterialIndex) const;
   
-  void setUVsAndNormals(vector < Vector > &normalsVector,   vector < GLuint > &normalsIndexVector, 
-			vector < Point >  &texCoordsVector, vector < GLuint > &texCoordsIndexVector);
+  void setUVsAndNormals(const vector < Vector > &normalsVector,   const vector < GLuint > &normalsIndexVector, 
+			const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector);
 
-  const bool isTransparent ();
+  const bool isTransparent () const;
   
   void addIndex( GLuint i ) { m_indexArray.push_back(i); };
   
-  void computeVisibility(Camera &view);
+  void computeVisibility(const Camera &view);
   void buildBoundingSphere ();
   void drawBoundingSphere ();
 
@@ -211,7 +212,7 @@ private:
   vector <GLuint> m_indexArray;
   
   /** Pointeur vers la scène. */
-  Scene *m_scene;
+  const Scene *m_scene;
   /** Pointeur vers l'objet parent */
   Object *m_parent;
   

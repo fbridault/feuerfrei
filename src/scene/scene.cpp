@@ -43,7 +43,7 @@ Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
 //       }  
 // }
 
-void Scene::computeVisibility(Camera &view)
+void Scene::computeVisibility(const Camera &view)
 {
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
@@ -60,13 +60,13 @@ void Scene::createVBOs(void)
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++){
-    (*objectsArrayIterator)->buildVBOs();
+    (*objectsArrayIterator)->buildVBO();
     (*objectsArrayIterator)->buildBoundingSpheres();
   }
   for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++){
-    (*objectsArrayIteratorWSV)->buildVBOs();
+    (*objectsArrayIteratorWSV)->buildVBO();
     (*objectsArrayIteratorWSV)->buildBoundingSpheres();
   }
   

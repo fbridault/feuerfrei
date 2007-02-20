@@ -358,7 +358,7 @@ public:
   virtual ~DetachableFireSource();
   
   virtual void build();
-  virtual void drawFlame(bool display, bool displayParticle);
+  virtual void drawFlame(bool display, bool displayParticle) const;
   
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.

@@ -196,7 +196,7 @@ DetachableFireSource::~DetachableFireSource()
   m_detachedFlamesList.clear ();
 }
 
-void DetachableFireSource::drawFlame(bool display, bool displayParticle)
+void DetachableFireSource::drawFlame(bool display, bool displayParticle) const
 {
   Point pt(m_solver->getPosition());
   Point scale(m_solver->getScale());
@@ -205,7 +205,7 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle)
   glScalef (scale.x, scale.y, scale.z);
   for (uint i = 0; i < m_nbFlames; i++)
     m_flames[i]->drawFlame(display, displayParticle);
-  for (list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
+  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
     (*flamesIterator)->drawFlame(display, displayParticle);
   glPopMatrix();

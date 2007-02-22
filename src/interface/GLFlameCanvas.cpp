@@ -396,7 +396,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     if(m_currentConfig->depthPeelingEnabled){
       /* On décortique dans les calques */
-      m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles);
+      m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
       
       m_glowEngine->activate();
       
@@ -417,7 +417,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
       /* Dessin de la flamme */
       for (f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]->drawFlame (m_displayFlame, m_displayParticles);
+	m_flames[f]->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
     }
     m_glowEngine->blur();
     
@@ -431,12 +431,12 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(!m_currentConfig->glowEnabled && m_displayFlame || m_displayParticles)
       if(m_currentConfig->depthPeelingEnabled)
 	{
-	  m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles);  	  
+	  m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);  	  
 	  m_depthPeelingEngine->render();
 	}
       else{
 	for (f = 0; f < m_currentConfig->nbFlames; f++)
-	  m_flames[f]->drawFlame (m_displayFlame, m_displayParticles);
+	  m_flames[f]->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
       }
   }
   /********************* PLACAGE DU GLOW ****************************************/

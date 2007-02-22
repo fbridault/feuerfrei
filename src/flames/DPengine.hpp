@@ -69,10 +69,10 @@ public:
    * @param recompileShaders indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, FireSource **flames, uint nbFlames );
+  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, FireSource** const flames, uint nbFlames );
   virtual ~DepthPeelingEngine();
   
-  void makePeels(bool displayFlames, bool displayParticles);
+  void makePeels(bool displayFlames, bool displayParticles, bool displayBoundingSphere);
   void render();
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};

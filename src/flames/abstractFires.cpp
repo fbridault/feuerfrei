@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename)
+FlameLight::FlameLight(const Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename)
 {  
   m_scene = scene;
   
@@ -126,6 +126,7 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   m_breakable=flameConfig->breakable;  
   
   m_intensityCoef = flameConfig->intensityCoef;
+  m_visibility = false;
 }
 
 FireSource::~FireSource()
@@ -159,9 +160,9 @@ void FireSource::computeIntensityPositionAndDirection()
   
   Vector o = getMainDirection();
   
-  // l'intensité est calculée à partir du rapport de la longeur de la flamme (o)
+  // l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
-  m_intensity=o.length()/(m_solver->getScale().y)*m_intensityCoef;
+  m_intensity=o.length()*(m_solver->getScale().y)*m_intensityCoef;
   
    //  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -181,6 +182,26 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
+void FireSource::computeVisibility(const Camera &view)
+{  
+  Vector o = getMainDirection();
+  bool save=m_visibility;
+  m_boundingSphere.radius = o.length()*m_solver->getScale().y/2.0;
+  m_boundingSphere.centre = getCenterSP();
+  
+  m_visibility = m_boundingSphere.isVisible(view);
+
+  if(m_visibility && !save){
+    m_solver->setRunningState(true);
+    cerr << "Flame is now visible" << endl;
+  }
+  if(!m_visibility && save){
+    m_solver->setRunningState(false);
+    cerr << "Flame is now hidden" << endl;
+  }
+}
+
+
 DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
 					   Scene* const scene, const char *filename, const wxString &texname, 
 					   uint index, const CgSVShader* const shader, const char *objName) : 
@@ -196,19 +217,23 @@ DetachableFireSource::~DetachableFireSource()
   m_detachedFlamesList.clear ();
 }
 
-void DetachableFireSource::drawFlame(bool display, bool displayParticle) const
+void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
 {
-  Point pt(m_solver->getPosition());
-  Point scale(m_solver->getScale());
-  glPushMatrix();
-  glTranslatef (pt.x, pt.y, pt.z);
-  glScalef (scale.x, scale.y, scale.z);
-  for (uint i = 0; i < m_nbFlames; i++)
-    m_flames[i]->drawFlame(display, displayParticle);
-  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-       flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-    (*flamesIterator)->drawFlame(display, displayParticle);
-  glPopMatrix();
+  if(displayBoundingSphere)
+    m_boundingSphere.draw();
+  else{
+    Point pt(m_solver->getPosition());
+    Point scale(m_solver->getScale());
+    glPushMatrix();
+    glTranslatef (pt.x, pt.y, pt.z);
+    glScalef (scale.x, scale.y, scale.z);
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->drawFlame(display, displayParticle);
+    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+      (*flamesIterator)->drawFlame(display, displayParticle);
+    glPopMatrix();
+  }
 }
 
 void DetachableFireSource::build()

@@ -129,6 +129,7 @@ public:
   /** Fonction de dessin de la vélocité d'une cellule */
   virtual void displayArrow (const Vector& direction) = 0;
   
+  virtual void setRunningState(bool state) { m_run = state; } ;
 protected:
   /** Fonction de construction de la display list de la grille du solveur */
   virtual void buildDLGrid () = 0;
@@ -159,6 +160,8 @@ protected:
 
   double m_forceCoef;
   double m_forceRatio;
+
+  bool m_run;
 };
 
 

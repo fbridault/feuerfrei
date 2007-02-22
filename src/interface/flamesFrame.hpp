@@ -54,6 +54,7 @@ enum
     IDM_Flames,
     IDM_ShadowVolumes,
     IDM_Hide,
+    IDM_FBDS,
     IDM_Wired,
     IDM_Shaded,
     IDM_SolversSettings,
@@ -94,6 +95,7 @@ public:
   void OnParticlesMenu(wxCommandEvent& event);
   void OnWickBoxesMenu(wxCommandEvent& event);
   void OnHideMenu(wxCommandEvent& event);
+  void OnFBDSMenu(wxCommandEvent &event);
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);
   void OnSolversMenu(wxCommandEvent& event);

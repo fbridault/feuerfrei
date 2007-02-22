@@ -39,7 +39,7 @@ public:
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    * @param IESFilename nom du fichier IES à utiliser
    */
-  FlameLight (Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename);
+  FlameLight (const Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename);
   
   /** Destructeur */
   virtual ~FlameLight();
@@ -78,7 +78,11 @@ public:
    * @param y Coordonnée y.
    * @param z Coordonnée z.
    */
-  const void getCenterSP(double& x, double& y, double& z) const { x = m_centreSP.x; y = m_centreSP.y; z = m_centreSP.z; };
+  void getCenterSP(double& x, double& y, double& z) const { x = m_centreSP.x; y = m_centreSP.y; z = m_centreSP.z; };
+  
+  /** Récupération du centre.
+   */
+  Point getCenterSP(void) const { return m_centreSP; };
   
   const double getLazimut() const {return m_iesFile->getLazimut();};
   
@@ -119,7 +123,7 @@ private:
   short m_light;
   
   /** Pointeur sur la scène. */
-  Scene *m_scene;
+  const Scene *m_scene;
   
   /** Pointeur sur le shader générateur de volumes d'ombres. */
   const CgSVShader *m_cgShader;
@@ -218,16 +222,20 @@ public:
    *
    * @param displayParticle affiche ou non les particules des squelettes
    */
-  virtual void drawFlame(bool display, bool displayParticle) const
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
   {
-    Point pt(m_solver->getPosition());
-    Point scale(m_solver->getScale());
-    glPushMatrix();
-    glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (scale.x, scale.y, scale.z);
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawFlame(display, displayParticle);  
-    glPopMatrix();
+    if(displayBoundingSphere)
+      m_boundingSphere.draw();
+    else{
+      Point pt(m_solver->getPosition());
+      Point scale(m_solver->getScale());
+      glPushMatrix();
+      glTranslatef (pt.x, pt.y, pt.z);
+      glScalef (scale.x, scale.y, scale.z);
+      for (uint i = 0; i < m_nbFlames; i++)
+	m_flames[i]->drawFlame(display, displayParticle);
+      glPopMatrix();
+    }
   }
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
@@ -285,10 +293,10 @@ public:
   }
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
-  virtual void toggleSmoothShading ()
+  virtual void setSmoothShading (bool state)
   {
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->toggleSmoothShading();
+      m_flames[i]->setSmoothShading(state);
   }
   
   /** Fonction permettant de récupérer l'orientation principale de la flamme
@@ -307,6 +315,10 @@ public:
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
+  
+  /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante 
+   * et teste ensuite la visibilité de celle-ci. */
+  virtual void computeVisibility(const Camera &view);
   
 protected:
   /** Nombre de flammes */
@@ -333,6 +345,11 @@ protected:
 
   /** Texture utilisée pour les flammes */
   Texture m_texture;
+  
+  /** Sphère englobante. */
+  BoundingSphere m_boundingSphere;
+  /** Visibilité de la flamme. */
+  bool m_visibility;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -358,7 +375,7 @@ public:
   virtual ~DetachableFireSource();
   
   virtual void build();
-  virtual void drawFlame(bool display, bool displayParticle) const;
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const;
   
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.

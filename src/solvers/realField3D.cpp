@@ -46,6 +46,9 @@ void RealField3D::vel_step ()
 void RealField3D::iterate ()
 { 
   double tmp;
+  
+  if(!m_run)
+    return;
   m_u = (double *) memset (m_u, 0, m_nbVoxels * sizeof (double));
   m_v = (double *) memset (m_v, 0, m_nbVoxels * sizeof (double));
   m_w = (double *) memset (m_w, 0, m_nbVoxels * sizeof (double));

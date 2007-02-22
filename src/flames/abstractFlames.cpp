@@ -41,8 +41,8 @@ NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, u
   gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
   gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
   
-  m_toggle=false;
-  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
+  m_smoothShading=true;
+  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_smoothShading);
   
   m_position=flameConfig->position;
   
@@ -86,8 +86,8 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
   gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
   
-  m_toggle=false;
-  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_toggle);
+  m_smoothShading=true;
+  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_smoothShading);
   
   m_position=source->m_position;
 
@@ -105,11 +105,6 @@ NurbsFlame::~NurbsFlame()
   delete[]m_texTmp;
 }
 
-void NurbsFlame::toggleSmoothShading()
-{
-  m_toggle = !m_toggle;
-}
-
 void NurbsFlame::drawNurbs () const
 {
   gluBeginSurface (m_nurbs);
@@ -122,7 +117,7 @@ void NurbsFlame::drawNurbs () const
 
 void NurbsFlame::drawLineFlame () const
 {
-  if (m_toggle)
+  if (!m_smoothShading)
     {
       glColor4f (1.0, 1.0, 1.0, 1.0);      
       drawNurbs ();
@@ -156,7 +151,7 @@ FixedFlame::~FixedFlame()
 
 void FixedFlame::drawPointFlame () const
 {
-  if (m_toggle)
+  if (!m_smoothShading)
     {
       glColor4f (1.0, 1.0, 1.0, 1.0);      
       drawNurbs ();

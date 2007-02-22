@@ -130,7 +130,7 @@ public:
     return(*(m_leadSkeletons[0]->getMiddleParticle()));
   };
   virtual Point getCenter () const {
-    return (*m_leadSkeletons[0]->getMiddleParticle ()+m_position);
+    return (*m_leadSkeletons[0]->getMiddleParticle ());
   };
   
   Point* getTop() const { return m_leadSkeletons[0]->getParticle(0); };

@@ -4,7 +4,7 @@
 
 #include "material.hpp"
 
-Scene::Scene (const char* const fileName, FireSource **flames, int nbFlames)
+Scene::Scene (const char* const fileName, FireSource** const flames, int nbFlames)
 {  
   m_flames = flames;
   m_nbFlames = nbFlames;
@@ -53,6 +53,8 @@ void Scene::computeVisibility(const Camera &view)
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++)
     (*objectsArrayIteratorWSV)->computeVisibility(view);
+  for (uint i = 0; i < m_nbFlames; i++)
+    m_flames[i]->computeVisibility(view);
 }
 
 void Scene::createVBOs(void)
@@ -84,7 +86,7 @@ void Scene::createDisplayLists(void)
   m_displayLists[0] = glGenLists(NB_DISPLAY_LISTS);
   for(int i=1; i<8; i++)
     m_displayLists[i] = m_displayLists[0] + i;
-
+  
   glNewList(m_displayLists[0],GL_COMPILE);
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
@@ -168,12 +170,12 @@ Scene::~Scene ()
        objectsArrayIteratorWSV++)
     delete (*objectsArrayIteratorWSV);
   m_objectsArrayWSV.clear ();
-
+  
   for (vector < Source * >::iterator lightSourcesIterator = m_lightSourcesArray.begin ();
        lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
     delete (*lightSourcesIterator);
   m_lightSourcesArray.clear ();
-
+  
   for (vector < Material * >::iterator materialArrayIterator = m_materialArray.begin ();
        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
     delete (*materialArrayIterator);

@@ -22,6 +22,9 @@ FakeField3D::~FakeField3D ()
 
 void FakeField3D::iterate ()
 {
+  if(!m_run)
+    return;
+  
   if(arePermanentExternalForces)
     addExternalForces(permanentExternalForces,false);
   

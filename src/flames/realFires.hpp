@@ -148,21 +148,25 @@ public:
     glPopMatrix();
   }
   
-  virtual void drawFlame(bool display, bool displayParticle) const
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
   {
-    Point pt(m_solver->getPosition());
-    Point scale(m_solver->getScale());
-    glPushMatrix();
-    glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (scale.x, scale.y, scale.z);
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawFlame(display, displayParticle);
-    for (uint i = 0; i < m_nbCloneFlames; i++)
-      m_cloneFlames[i]->drawFlame(display, displayParticle); 
-    glPopMatrix();
+    if(displayBoundingSphere)
+      m_boundingSphere.draw();
+    else{
+      Point pt(m_solver->getPosition());
+      Point scale(m_solver->getScale());
+      glPushMatrix();
+      glTranslatef (pt.x, pt.y, pt.z);
+      glScalef (scale.x, scale.y, scale.z);
+      for (uint i = 0; i < m_nbFlames; i++)
+	m_flames[i]->drawFlame(display, displayParticle);
+      for (uint i = 0; i < m_nbCloneFlames; i++)
+	m_cloneFlames[i]->drawFlame(display, displayParticle); 
+      glPopMatrix();
+    }
   }
   
-  virtual void toggleSmoothShading ();  
+  virtual void toggleSmoothShading (bool state);  
   virtual void setSamplingTolerance(double value){
     FireSource::setSamplingTolerance(value);
     for (uint i = 0; i < m_nbCloneFlames; i++)

@@ -166,6 +166,8 @@ void Solver3D::vel_step ()
 
 void Solver3D::iterate ()
 { 
+  if(!m_run)
+    return;
   /* Cellule(s) génératrice(s) */
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){

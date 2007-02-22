@@ -37,7 +37,7 @@ public:
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
    */
-  Scene(const char* const fileName, FireSource **flames, int nbFlames);
+  Scene(const char* const fileName, FireSource** const flames, int nbFlames);
 
   /** Destructeur par d&eacute;faut. */
   ~Scene();

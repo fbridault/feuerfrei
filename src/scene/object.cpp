@@ -146,7 +146,6 @@ Mesh::Mesh (const Scene* const scene, uint materialIndex, Object* parent)
   m_materialIndex = materialIndex;
   m_parent = parent;
   m_visibility = true;
-  m_radius=0;
   glGenBuffers(1, &m_bufferID);
 }
 
@@ -179,7 +178,7 @@ void Mesh::buildBoundingSphere ()
 	{
 	  v = m_parent->getVertex(m_indexArray[i]);
 	  m_parent->addRefInHashTable( m_indexArray[i], i );
-	  m_centre = (m_centre*n + Point(v.x, v.y, v.z)) / (double)(n+1);	  
+	  m_boundingSphere.centre = (m_boundingSphere.centre*n + Point(v.x, v.y, v.z)) / (double)(n+1);	  
 	  n++;
 	}
     }
@@ -190,45 +189,23 @@ void Mesh::buildBoundingSphere ()
       Point p;
       v=m_parent->getVertex(*indexIterator);
       p=Point(v.x, v.y, v.z);
-      dist=p.squaredDistanceFrom(m_centre);
-      if( dist > m_radius)
-	m_radius = dist;
+      dist=p.squaredDistanceFrom(m_boundingSphere.centre);
+      if( dist > m_boundingSphere.radius)
+	m_boundingSphere.radius = dist;
     }
-  m_radius = sqrt(m_radius);
+  m_boundingSphere.radius = sqrt(m_boundingSphere.radius);
   //cerr << "sphere de centre " << m_centre << " et de rayon " << m_radius << endl;
 }
 
 void Mesh::drawBoundingSphere()
 {
-  glPushMatrix();
-  glTranslatef(m_centre.x, m_centre.y, m_centre.z);
-  glColor3d(1.0,0.0,0.0);
-  GraphicsFn::SolidSphere(m_radius, 20, 20);
-  glPopMatrix();
+  m_boundingSphere.draw();
 }
 
 void Mesh::computeVisibility(const Camera &view)
 {
-  uint i;
-  const double *plan;
-
-  // Centre dans le frustrum ?
-//   for( p = 0; p < 6; p++ )
-//     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ){
-//       m_visibility = false;
-//       return;
-//     }
-
-  // Sphère dans le frustrum ?
-  for( i = 0; i < 6; i++ ){
-    plan=view.getFrustum(i);
-    if( plan[0] * m_centre.x + plan[1] * m_centre.y + plan[2] * m_centre.z + plan[3] <= -m_radius ){
-      m_visibility = false;
-      return;
-    }
-  }
-//   g_objectCount++;
-  m_visibility = true;
+  m_visibility = m_boundingSphere.isVisible(view);
+//  if(m_visibility) g_objectCount++;
   return;
 }
 

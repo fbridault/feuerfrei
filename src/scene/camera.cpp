@@ -5,7 +5,7 @@
 uint g_objectCount;
 
 #ifdef RTFLAMES_BUILD
-Camera::Camera (int width, int height, double clipping, Scene* const scene) :
+Camera::Camera (int width, int height, double clipping, Scene* const scene ) :
 #else
 Camera::Camera (int width, int height, double clipping) :
 #endif
@@ -140,13 +140,13 @@ void Camera::computeFrustrum()
    double   modl[16];
    double   clip[16];
    double   t;
-
+   
    /* Get the current PROJECTION matrix from OpenGL */
    glGetDoublev( GL_PROJECTION_MATRIX, proj );
-
+   
    /* Get the current MODELVIEW matrix from OpenGL */
    glGetDoublev( GL_MODELVIEW_MATRIX, modl );
-
+   
    /* Combine the two matrices (multiply projection by modelview) */
    clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
    clip[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];

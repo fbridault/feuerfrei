@@ -120,9 +120,9 @@ void CandleStick::build()
   setLightPosition(averagePos);
 }
 
-void CandleStick::toggleSmoothShading(void)
+void CandleStick::toggleSmoothShading(bool state)
 {
-  FireSource::toggleSmoothShading();
+  FireSource::setSmoothShading(state);
   for (uint i = 0; i < m_nbCloneFlames; i++)
-    m_cloneFlames[i]->toggleSmoothShading();
+    m_cloneFlames[i]->setSmoothShading(state);
 }

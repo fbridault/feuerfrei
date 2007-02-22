@@ -6,6 +6,7 @@ class Mesh;
 
 #include "source.hpp"
 #include "camera.hpp"
+#include "graphicsFn.hpp"
 
 #define ALL      0
 #define TEXTURED 1
@@ -20,6 +21,46 @@ class Vertex
 {
 public:
   GLfloat u, v, nx, ny, nz, x, y, z;
+};
+
+class BoundingSphere
+{
+public:
+  /** Centre de la sphère englobante. */
+  Point centre;
+  
+  /** Rayon de la sphère englobante. */
+  double radius;
+  
+  /** Calcule la visibilité de la sphère par rapport au point de vue courant.
+   * @param view Référence sur la caméra
+   */
+  bool isVisible(const Camera &view) const{
+    uint i;
+    const double *plan;
+    
+    // Centre dans le frustrum ?
+    //   for( p = 0; p < 6; p++ )
+    //     if( frustum[p][0] * x + frustum[p][1] * y + frustum[p][2] * z + frustum[p][3] <= 0 ){
+    //       m_visibility = false;
+    //       return;
+    //     }
+    
+    // Sphère dans le frustrum ?
+    for( i = 0; i < 6; i++ ){
+      plan=view.getFrustum(i);
+      if( plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3] <= -radius )
+	return false;
+    }
+    return true;
+  }
+  void draw(void) const{
+    glPushMatrix();
+    glTranslatef(centre.x, centre.y, centre.z);
+    glColor3d(1.0,0.0,0.0);
+    GraphicsFn::SolidSphere(radius, 20, 20);
+    glPopMatrix();
+  }
 };
 
 class Scene;
@@ -96,8 +137,10 @@ public:
     m_vertexArray[i].nz = nz;
   };
   
+  /** Allocation de la table de hachage, éventuellement détruite si elle a été allouée précedemment. */
   void allocHashTable(){ if(m_hashTable) delete m_hashTable; m_hashTable = new int[m_vertexArray.size()]; };
   
+  /** Initialisation de tous les éléments de la table de hachage à -1. */
   void initHashTable(){ for(uint i=0; i<m_vertexArray.size(); i++) m_hashTable[i] = -1; };
   
   /** Ajout d'un indice dans la table de hachage.
@@ -116,8 +159,15 @@ public:
     return false;
   }
 
+  /** Calcule la visibilité de l'objet
+   * @param view Référence sur la caméra
+   */
   void computeVisibility(const Camera &view);
+
+  /** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
   void buildBoundingSpheres ();
+
+  /** Dessin des sphères englobantes. */
   void drawBoundingSpheres ();
   
 protected:
@@ -129,7 +179,7 @@ private:
   list < Mesh* > m_meshesList;
   /** Table de hachage permettant, lors de la reconstruction des index des normales et des coordonnées de texture
    * d'un mesh, de stocker les références à un indice d'un point. Seule une référence est stockée pour chaque point 
-   * identique. Ce point est ensuite récupéré pour comparaison.
+   * identique. Ce point est ensuite utilisé pour comparaison.
    */
   int *m_hashTable;
   
@@ -145,8 +195,15 @@ private:
   /** Pointeur vers la scène. */
   const Scene *m_scene;
 
+  /* Identifiant du Vertex Buffer Object. */
   GLuint m_bufferID;
   
+  /** Type d'attributs présents dans le maillage soit :<li>
+   * <ol>0 pour points,</ol>
+   * <ol>1 pour points et normales,</ol>
+   * <ol>2 pour points et normales,</ol>
+   * <ol>3 pour points, normales et coordonnées de texture.</ol>
+   * </li> */
   uint m_attributes;
 };
 
@@ -196,15 +253,43 @@ public:
    */
   void draw(char drawCode, bool tex, uint& lastMaterialIndex) const;
   
+  /** Fusion des trois tableaux en un seul tableau.
+   * Le format OBJ gère trois tableaux d'indices, alors qu'en OpenGL il n'y a qu'un seul tableau d'indice.
+   * L'algorithme présent dans cette fonction réalise la fusion des ces trois tableaux en un seul.<br>
+   * Le principe est le suivant : pour chaque indice du tableau de points, on regarde si il a déjà été référencé
+   * auparavant dans le tableau. Si c'est le cas, alors on regarde si ses normales et ses coordonnées de texture 
+   * (pas les indices mais les coordonnées réelles, car certains exportateurs en OBJ ont tendance à dupliquer les
+   * normales et les coordonnées de textures) sont égales à celle de la première référence. Dans l'affirmative, il n'y
+   * a rien à faire, l'indice du point est correct. Dans le cas contraire, il est nécessaire de dupliquer le point dans
+   * le tableau de point de l'objet, d'affecter les coordonnées de texture et la normale, et enfin de modifier l'indice
+   * du point courant en conséquence. Enfin dans le cas où le point n'a pas encore été référencé dans le tableau, on
+   * mémorise cette référence dans une table de hachage utilisé pour le premier cas, et ensuite on affecte les coordonnées
+   * de texture et la normale.
+   *
+   * @param normalsVector Vecteur des normales.
+   * @param normalsIndexVector Vecteur des indices des normales.
+   * @param texCoordsVector Vecteur des coordonnées de texture.
+   * @param texCoordsIndexVector Vecteur des indices des coordonnées de texture. 
+   */
   void setUVsAndNormals(const vector < Vector > &normalsVector,   const vector < GLuint > &normalsIndexVector, 
 			const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector);
 
   const bool isTransparent () const;
   
+  /** Ajout d'un index de point dans le tableau d'indices.
+   * @param i indice à ajouter.
+   */
   void addIndex( GLuint i ) { m_indexArray.push_back(i); };
   
+  /** Calcule la visibilité de l'objet
+   * @param view Référence sur la caméra
+   */
   void computeVisibility(const Camera &view);
+  
+  /** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
   void buildBoundingSphere ();
+  
+  /** Dessin des sphères englobantes. */
   void drawBoundingSphere ();
 
 private:
@@ -218,13 +303,23 @@ private:
   
   /** Pointeur vers le matériau utilisé. */
   uint m_materialIndex;
+
+  /** Type d'attributs présents dans le maillage soit :
+   * <li>
+   * <ol>0 pour points,</ol>
+   * <ol>1 pour points et normales,</ol>
+   * <ol>2 pour points et normales,</ol>
+   * <ol>3 pour points, normales et coordonnées de texture.</ol>
+   * </li> */
   uint m_attributes;
+  
+  /* Identifiant du Vertex Buffer Object. */
   GLuint m_bufferID;
+  
   /** Visibilité de l'objet par rapport au frustum. */
   bool m_visibility;
-  
-  Point m_centre;
-  double m_radius;
+
+  BoundingSphere m_boundingSphere;
 };
 
 #endif

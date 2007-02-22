@@ -84,7 +84,7 @@ public:
   virtual void setSamplingTolerance(double value) const{ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
-  virtual void toggleSmoothShading ();
+  virtual void setSmoothShading (bool state) { m_smoothShading = state; };
   
   Point getPosition() const { return m_position; };
   
@@ -149,17 +149,17 @@ protected:
     exit(0);
   }
 
-  static void CALLBACK NurbsBegin(GLenum type, GLvoid *toggle)
+  static void CALLBACK NurbsBegin(GLenum type, GLvoid *smoothShading)
   {
-    if( * (bool *)toggle )
+    if( ! * (bool *)smoothShading )
       glPolygonMode(GL_FRONT,GL_LINE);
     glBegin(type);
   }
 
-  static void CALLBACK NurbsEnd(GLvoid *toggle)
+  static void CALLBACK NurbsEnd(GLvoid *smoothShading)
   {
     glEnd();
-    if( * (bool *)toggle )
+    if( ! * (bool *)smoothShading )
       glPolygonMode(GL_FRONT,GL_FILL);
   }
 
@@ -210,7 +210,7 @@ protected:
   GLUnurbsObj *m_nurbs;
   
   uint m_size;
-  bool m_toggle;  
+  bool m_smoothShading;  
   
   /** Texture de la flamme */
   const Texture *m_tex;

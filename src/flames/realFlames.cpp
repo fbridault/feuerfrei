@@ -103,7 +103,7 @@ void LineFlame::breakCheck()
       splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getSize()-1));
       periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
       
-      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex));
+      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_smoothShading));
     }
   }
 }
@@ -209,7 +209,7 @@ void PointFlame::drawWick (bool displayBoxes) const
 /**********************************************************************************************************************/
 
 DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex) :
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, bool smoothShading) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
@@ -217,6 +217,7 @@ DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons
   m_nbLeadSkeletons = nbLeadSkeletons;
   m_leadSkeletons = leadSkeletons;
   m_periSkeletons = periSkeletons;
+  m_smoothShading = smoothShading;
 }
 
 DetachedFlame::~DetachedFlame()

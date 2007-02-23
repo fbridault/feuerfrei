@@ -28,19 +28,19 @@ long LongTextCtrl::GetSafelyValue(void)
 
 void LongTextCtrl::nonNumericErrorDialog(wxString& s)
 {
-  wxMessageDialog *errorDialog = new wxMessageDialog(this,_("\"") + s + _("\" is a not an integer value"),
+  wxMessageDialog errorDialog(this,_("\"") + s + _("\" is a not an integer value"),
 						     _("Error"),wxOK|wxICON_ERROR);
-  errorDialog->ShowModal();
-  errorDialog->Destroy();
+  errorDialog.ShowModal();
+  errorDialog.Destroy();
 }
   
 void LongTextCtrl::rangeErrorDialog(wxString& s)
 {
   wxString message;
   message << _("Bad value range : ") << s << _("\nValue must be between ") << m_min << _(" and ") << m_max;
-  wxMessageDialog *errorDialog = new wxMessageDialog(this,message, _("Error"),wxOK|wxICON_ERROR);
-  errorDialog->ShowModal();
-  errorDialog->Destroy();
+  wxMessageDialog errorDialog(this,message, _("Error"),wxOK|wxICON_ERROR);
+  errorDialog.ShowModal();
+  errorDialog.Destroy();
 }
 
 DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, double min, double max, const wxString& value, 
@@ -72,17 +72,16 @@ double DoubleTextCtrl::GetSafelyValue(void)
 
 void DoubleTextCtrl::nonNumericErrorDialog(wxString& s)
 {
-  wxMessageDialog *errorDialog = new wxMessageDialog(this,_("\"") + s + _("\" is not a numeric value"),
-						     _("Error"),wxOK|wxICON_ERROR);
-  errorDialog->ShowModal();
-  errorDialog->Destroy();
+  wxMessageDialog errorDialog (this,_("\"") + s + _("Not a numeric value"), _("Error"),wxOK|wxICON_ERROR);
+  errorDialog.ShowModal();
+  errorDialog.Destroy();
 }
   
 void DoubleTextCtrl::rangeErrorDialog(wxString& s)
 {
   wxString message;
   message << _("Bad value range : ") << s << _("\nValue must be between ") << m_min << _(" and ") << m_max;
-  wxMessageDialog *errorDialog = new wxMessageDialog(this,message, _("Error"),wxOK|wxICON_ERROR);
-  errorDialog->ShowModal();
-  errorDialog->Destroy();
+  wxMessageDialog errorDialog(this,message, _("Error"),wxOK|wxICON_ERROR);
+  errorDialog.ShowModal();
+  errorDialog.Destroy();
 }

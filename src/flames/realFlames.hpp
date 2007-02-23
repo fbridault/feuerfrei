@@ -164,7 +164,7 @@ public:
    * @param tex Pointeur vers la texture à utiliser.
    */
   DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-		 uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex);
+		uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, bool smoothShading);
   
   /** Destructeur*/
   virtual ~DetachedFlame ();

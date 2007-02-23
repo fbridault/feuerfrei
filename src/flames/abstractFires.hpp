@@ -393,6 +393,9 @@ public:
     m_detachedFlamesList.remove(detachedFlame);
   }
   
+  /** Active ou désactive l'affichage texturé sur la flamme. */
+  virtual void setSmoothShading (bool state);
+  
 private:
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;

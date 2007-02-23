@@ -13,9 +13,9 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   wxString itemName;
   
   m_posLabel = new wxStaticText(this, -1, _("Position"));
-  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0,5"));
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
-  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
+  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0,5"));
   
   m_skeletonsNumberLabel = new wxStaticText(this, -1, _("Skeletons number"));
   m_skeletonsNumberCtrl = new LongTextCtrl(this, -1, 0, 100, _("4"));
@@ -44,6 +44,9 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   
   setProperties();
   doLayout();
+  m_wickLabel->Disable();
+  m_wickTextCtrl->Disable();
+  m_wickBrowseButton->Disable();
 }
 
 
@@ -87,7 +90,7 @@ void FlamePanel::doLayout()
 }
 
 
-void FlamePanel::setCtrlValues(FlameConfig* const flameConfig)
+void FlamePanel::setCtrlValues(const FlameConfig* const flameConfig)
 {  
   m_posXTextCtrl->Clear();
   m_posYTextCtrl->Clear();
@@ -105,10 +108,14 @@ void FlamePanel::setCtrlValues(FlameConfig* const flameConfig)
 
   (*m_skeletonsNumberCtrl) << (int)flameConfig->skeletonsNumber;
   
-  if(flameConfig->type == CANDLE){
+  if(flameConfig->type == CANDLE || flameConfig->type == CANDLESTICK){
     m_wickLabel->Disable();
     m_wickTextCtrl->Disable();
     m_wickBrowseButton->Disable();
+  }else{
+    m_wickLabel->Enable();
+    m_wickTextCtrl->Enable();    
+    m_wickBrowseButton->Enable();
   }
 }
 
@@ -120,6 +127,7 @@ bool FlamePanel::getCtrlValues(FlameConfig* const flameConfig)
       flameConfig->position.x = m_posXTextCtrl->GetSafelyValue();
       flameConfig->position.y = m_posYTextCtrl->GetSafelyValue();
       flameConfig->position.z = m_posZTextCtrl->GetSafelyValue();
+      flameConfig->skeletonsNumber = m_skeletonsNumberCtrl->GetSafelyValue();
     }
   catch(wxString s)
     {
@@ -127,8 +135,6 @@ bool FlamePanel::getCtrlValues(FlameConfig* const flameConfig)
     }
   if(!m_wickTextCtrl->GetValue().IsEmpty())
     flameConfig->wickName = m_wickTextCtrl->GetValue();
-
-  flameConfig->skeletonsNumber = m_skeletonsNumberCtrl->GetSafelyValue();
     
   flameConfig->solverIndex = m_solverComboBox->GetSelection();
   flameConfig->type = m_flameTypeRadioBox->GetSelection();
@@ -138,7 +144,7 @@ bool FlamePanel::getCtrlValues(FlameConfig* const flameConfig)
 
 void FlamePanel::OnSelectType(wxCommandEvent& event)
 {
-  if(event.GetSelection() != CANDLE)
+  if(event.GetSelection() != CANDLE && event.GetSelection() != CANDLESTICK)
     {
       m_wickLabel->Enable();
       m_wickTextCtrl->Enable();    
@@ -180,8 +186,8 @@ BEGIN_EVENT_TABLE(FlameDialog, wxDialog)
 END_EVENT_TABLE();
 
 
-FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig *config, 
-			   const wxPoint& pos, const wxSize& size, long style):
+FlameDialog::FlameDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig* const config, 
+			 const wxPoint& pos, const wxSize& size, long style):
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
   m_flameNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
@@ -242,51 +248,50 @@ void FlameDialog::OnClickButtonDelete(wxCommandEvent& event)
 
 void FlameDialog::OnOK(wxCommandEvent& event)
 {
-  FlameConfig* saveConfig;
-  uint saveNb;
+  FlameConfig *newConfig;
+  uint newNb;
+    
+  newNb = m_nbPanels;
+  newConfig = new FlameConfig[newNb];
   
-  saveConfig = m_currentConfig->flames;
-  saveNb = m_currentConfig->nbFlames;
-  
-  m_currentConfig->nbFlames = m_nbPanels;  
-  m_currentConfig->flames = new FlameConfig[m_currentConfig->nbFlames];
-  
-  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
+  for(uint i = 0; i < newNb; i++)
     {
-      if( m_flamePanels[i]->getCtrlValues(&m_currentConfig->flames[i]) ){
-	if(m_currentConfig->flames[i].type != CANDLE && m_currentConfig->flames[i].type != CANDLESTICK){
-	  if(m_currentConfig->flames[i].wickName.IsEmpty()){
-	    wxMessageDialog *errorDialog = new wxMessageDialog(this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
-	    errorDialog->ShowModal();
-	    errorDialog->Destroy();
+      if( m_flamePanels[i]->getCtrlValues(&newConfig[i]) ){
+	if( newConfig[i].type != CANDLE && newConfig[i].type != CANDLESTICK ){
+	  if( newConfig[i].wickName.IsEmpty() ){
+	    wxMessageDialog errorDialog (this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
+	    errorDialog.ShowModal();
+	    errorDialog.Destroy();
 	    return;
 	  }
 	}
 	/* On recopie les anciens paramètres si ils existent */
-	if(saveNb > i)
+	if( m_currentConfig->nbFlames > i )
 	  {
-	    m_currentConfig->flames[i].innerForce = saveConfig[i].innerForce;
-	    m_currentConfig->flames[i].leadLifeSpan = saveConfig[i].leadLifeSpan;
-	    m_currentConfig->flames[i].periLifeSpan = saveConfig[i].periLifeSpan;
-	    m_currentConfig->flames[i].intensityCoef = saveConfig[i].intensityCoef;
-	    m_currentConfig->flames[i].samplingTolerance = saveConfig[i].samplingTolerance;
-	    m_currentConfig->flames[i].flickering = saveConfig[i].flickering;
-	    m_currentConfig->flames[i].fdf = saveConfig[i].fdf;
-	    m_currentConfig->flames[i].IESFileName = saveConfig[i].IESFileName;	      
+	    newConfig[i].innerForce = m_currentConfig->flames[i].innerForce;
+	    newConfig[i].leadLifeSpan = m_currentConfig->flames[i].leadLifeSpan;
+	    newConfig[i].periLifeSpan = m_currentConfig->flames[i].periLifeSpan;
+	    newConfig[i].intensityCoef = m_currentConfig->flames[i].intensityCoef;
+	    newConfig[i].samplingTolerance = m_currentConfig->flames[i].samplingTolerance;
+	    newConfig[i].flickering = m_currentConfig->flames[i].flickering;
+	    newConfig[i].fdf = m_currentConfig->flames[i].fdf;
+	    newConfig[i].IESFileName = m_currentConfig->flames[i].IESFileName;	      
 	  }
 	else
 	  {
-	    m_currentConfig->flames[i].innerForce = 0.005;
-	    m_currentConfig->flames[i].leadLifeSpan = 6;
-	    m_currentConfig->flames[i].periLifeSpan = 4;
-	    m_currentConfig->flames[i].samplingTolerance = 100;
-	    m_currentConfig->flames[i].flickering = 0;
-	    m_currentConfig->flames[i].fdf = 0;
-	    m_currentConfig->flames[i].IESFileName = _("IES/test.ies");
+	    newConfig[i].innerForce = 0.005;
+	    newConfig[i].leadLifeSpan = 6;
+	    newConfig[i].periLifeSpan = 4;
+	    newConfig[i].samplingTolerance = 100;
+	    newConfig[i].flickering = 0;
+	    newConfig[i].fdf = 0;
+	    newConfig[i].IESFileName = _("IES/test.ies");
 	  }
       }else
-	return;      
+	return;
     }
-  delete [] saveConfig;
+  delete [] m_currentConfig->flames;
+  m_currentConfig->nbFlames = newNb;
+  m_currentConfig->flames = newConfig;
   wxDialog::OnOK(event);
 }

@@ -260,3 +260,11 @@ void DetachableFireSource::build()
   averagePos += getPosition();
   setLightPosition(averagePos);
 }
+
+void DetachableFireSource::setSmoothShading (bool state)
+{
+  FireSource::setSmoothShading(state);
+  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+       flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+    (*flamesIterator)->setSmoothShading(state);
+}

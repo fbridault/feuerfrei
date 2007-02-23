@@ -63,6 +63,15 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
   
   setProperties();
   doLayout();
+
+  m_omegaDiffLabel->Disable();
+  m_omegaDiffTextCtrl->Disable();
+  m_omegaProjLabel->Disable();
+  m_omegaProjTextCtrl->Disable();
+  m_epsilonLabel->Disable();
+  m_epsilonTextCtrl->Disable();
+  m_nbMaxIterLabel->Disable();
+  m_nbMaxIterTextCtrl->Disable();
 }
 
 void SolverPanel::setProperties()
@@ -187,7 +196,7 @@ void SolverPanel::setCtrlValues(SolverConfig* const solverConfig)
   (*m_epsilonTextCtrl) << tmp;
   (*m_nbMaxIterTextCtrl) << (int)solverConfig->nbMaxIter;
 
-  if(solverConfig->type == GS_SOLVER)
+  if(solverConfig->type == GS_SOLVER || solverConfig->type == FAKE_FIELD)
     {
       m_omegaDiffLabel->Disable();
       m_omegaDiffTextCtrl->Disable();
@@ -196,10 +205,25 @@ void SolverPanel::setCtrlValues(SolverConfig* const solverConfig)
       m_epsilonLabel->Disable();
       m_epsilonTextCtrl->Disable();
     }
+  else
+    {
+      m_omegaDiffLabel->Enable();
+      m_omegaDiffTextCtrl->Enable();
+      m_omegaProjLabel->Enable();
+      m_omegaProjTextCtrl->Enable();
+      m_epsilonLabel->Enable();
+      m_epsilonTextCtrl->Enable();
+    }
+    
   if(solverConfig->type != LOGRES_SOLVER && solverConfig->type != LOGRESAVG_SOLVER && solverConfig->type != LOGRESAVGTIME_SOLVER)
     {
       m_nbMaxIterLabel->Disable();
       m_nbMaxIterTextCtrl->Disable();
+    }
+  else
+    {
+      m_nbMaxIterLabel->Enable();
+      m_nbMaxIterTextCtrl->Enable();
     }
 }
 
@@ -357,28 +381,27 @@ void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
 
 void SolverDialog::OnOK(wxCommandEvent& event)
 { 
-  SolverConfig* saveConfig;
-  uint saveNb;
-
-  saveConfig = m_currentConfig->solvers;
-  saveNb = m_currentConfig->nbSolvers;
+  SolverConfig* newConfig;
+  uint newNb;
   
-  m_currentConfig->nbSolvers = m_nbPanels;  
-  m_currentConfig->solvers = new SolverConfig[m_currentConfig->nbSolvers];
+  newNb = m_nbPanels;  
+  newConfig = new SolverConfig[newNb];
   
-  for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
+  for(uint i = 0; i < newNb; i++)
     {
-      if(!m_solverPanels[i]->getCtrlValues(&m_currentConfig->solvers[i]))
+      if(!m_solverPanels[i]->getCtrlValues(&newConfig[i]))
 	return;
       else
 	/* On recopie l'ancienne buoyancy si elle existe */
-	if(saveNb > i)
-	  m_currentConfig->solvers[i].buoyancy = saveConfig[i].buoyancy;
+	if(m_currentConfig->nbSolvers > i)
+	  newConfig[i].buoyancy = m_currentConfig->solvers[i].buoyancy;
 	else
-	  m_currentConfig->solvers[i].buoyancy = 10;
+	  newConfig[i].buoyancy = .2;
     }
   
-  delete [] saveConfig;
+  delete [] m_currentConfig->solvers;
+  m_currentConfig->solvers = newConfig;
+  m_currentConfig->nbSolvers = newNb;
   wxDialog::OnOK(event);
 }
 

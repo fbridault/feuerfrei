@@ -20,7 +20,7 @@ class FlamePanel: public wxPanel
 {
 public:
   FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(FlameConfig* const solverConfig);
+  void setCtrlValues(const FlameConfig* const solverConfig);
   bool getCtrlValues(FlameConfig* const solverConfig);
   
 private:
@@ -50,7 +50,7 @@ private:
 class FlameDialog: public wxDialog 
 {
 public:
-  FlameDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
+  FlameDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
 
 private:
   void doLayout();

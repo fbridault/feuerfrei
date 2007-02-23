@@ -1,6 +1,8 @@
 #include "camera.hpp"
 
+#ifdef RTFLAMES_BUILD
 #include "scene.hpp"
+#endif
 
 uint g_objectCount;
 

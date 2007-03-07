@@ -56,7 +56,7 @@ public:
   
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
-  void ToggleRun(void) { m_run=!m_run; };
+  void setRunningState(bool run) { m_run=run; };
   
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
   void ToggleBaseDisplay(void) { m_displayBase=!m_displayBase; };

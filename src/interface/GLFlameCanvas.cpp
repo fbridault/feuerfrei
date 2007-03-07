@@ -38,14 +38,16 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
   m_init = false;
-  m_run = 0;
+  m_run = false;
   m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
   m_framesCount = 0;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
-  intensities = NULL;
+  m_intensities = NULL;
   m_switch = false;
+  m_currentConfig = NULL;
+  //m_framesCountForSwitch = 0;
   
   srand(clock());
 }
@@ -54,6 +56,7 @@ GLFlameCanvas::~GLFlameCanvas()
 {
   DestroyScene();
   delete [] m_pixels;
+  if( m_intensities ) delete [] m_intensities;
   delete m_SVShader;
   if (m_context)
     cgDestroyContext (m_context);
@@ -111,8 +114,7 @@ void GLFlameCanvas::InitFlames(void)
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
       m_flames[i] = new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				m_scene, "scenes/bougie.obj", i, m_SVShader, 
-				1/ 7.0);
+				m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 7.0);
       break;
     case FIRMALAMPE :
       m_flames[i] = new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
@@ -128,8 +130,7 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case CANDLESTICK :
       m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				     m_scene, "scenes/bougie.obj", i, m_SVShader, 
-				     1/ 7.0);
+				     m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 7.0);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -138,8 +139,8 @@ void GLFlameCanvas::InitFlames(void)
   }
   prevNbFlames = m_currentConfig->nbFlames;
   
-  if( intensities ) delete intensities;
-  intensities = new double[m_currentConfig->nbFlames];
+  if( m_intensities ) delete [] m_intensities;
+  m_intensities = new double[m_currentConfig->nbFlames];
   //  ToggleDepthPeeling();
 }
 
@@ -249,6 +250,7 @@ void GLFlameCanvas::Restart (void)
   InitScene(false);
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
   ::wxStartTimer();
+  m_run = true;
   m_init = true;
   cerr << "Initialization over" << endl;
   Enable();
@@ -278,7 +280,7 @@ void GLFlameCanvas::DestroyScene(void)
 
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
-  if(m_run){
+  if(m_run && m_init){
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->cleanSources ();
     for (uint i = 0; i < m_currentConfig->nbFlames; i++)
@@ -322,15 +324,15 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':
-      m_framesCountForSwitch = 1;
-      m_switch = true;
+//       m_framesCountForSwitch = 1;
+//       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->decreaseRes ();
       break;
 
     case 'L': 
-      m_framesCountForSwitch = 1;
-      m_switch = true;
+//       m_framesCountForSwitch = 1;
+//       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->increaseRes ();
       break;
@@ -363,13 +365,13 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   /********** CONSTRUCTION DES FLAMMES *******************************/
   // SDL_mutexP (lock);
-  if(m_framesCountForSwitch){
-    if(m_framesCountForSwitch == 6){
-      m_switch = false;
-      m_framesCountForSwitch = 0;
-    }else
-      m_framesCountForSwitch++;
-  }
+//   if(m_framesCountForSwitch){
+//     if(m_framesCountForSwitch == 6){
+//       m_switch = false;
+//       m_framesCountForSwitch = 0;
+//     }else
+//       m_framesCountForSwitch++;
+//   }
   if(m_run && !m_switch)
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->build();

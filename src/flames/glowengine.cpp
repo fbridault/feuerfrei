@@ -61,6 +61,10 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
 
 GlowEngine::~GlowEngine()
 {
+  for(int i=0; i < GLOW_LEVELS; i++){
+    delete m_firstPassTex[i];
+    delete m_secondPassTex[i];
+  }
 }
 
 void GlowEngine::computeWeights(uint index, double sigma)

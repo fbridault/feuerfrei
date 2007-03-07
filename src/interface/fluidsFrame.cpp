@@ -191,6 +191,7 @@ void FluidsFrame::InitSolversPanels()
 
 void FluidsFrame::OnClose(wxCloseEvent& event)
 {
+  delete [] m_currentConfig.solvers;
   delete m_config;
   
   Destroy();
@@ -199,11 +200,13 @@ void FluidsFrame::OnClose(wxCloseEvent& event)
 // Fonction qui est exécutée lors du click sur le bouton.
 void FluidsFrame::OnClickButtonRun(wxCommandEvent& event)
 {
-  if(m_glBuffer->IsRunning())
+  if(m_glBuffer->IsRunning()){
     m_buttonRun->SetLabel(_("Continue"));
-  else
+    m_glBuffer->setRunningState(false);
+  }else{
     m_buttonRun->SetLabel(_("Pause"));
-  m_glBuffer->ToggleRun();
+    m_glBuffer->setRunningState(true);
+  }
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.

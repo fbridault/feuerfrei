@@ -238,6 +238,7 @@ bool DetachedFlame::build()
 {
   uint i, j, l;
   double vinc, vtmp, vtex;
+  double dist_max;
   m_maxParticles = 0;
   vtex = 0;
   
@@ -291,8 +292,7 @@ bool DetachedFlame::build()
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
-	      double dist_max = FLT_MIN;
-	      
+	      dist_max = FLT_MIN;
 	      for (j = 0; j < m_periSkeletons[i]->getSize () - 1 + m_nbFixedPoints; j++)
 		{
 		  if (m_distances[j] > dist_max)

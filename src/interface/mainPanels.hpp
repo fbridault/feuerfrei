@@ -127,7 +127,7 @@ private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);
   void OnSelectFDF(wxCommandEvent& event);
-
+  
   void OnClickButtonBrowse(wxCommandEvent& event);
   void OnPhotoSolidEnter(wxCommandEvent& event);
   
@@ -141,7 +141,7 @@ private:
   wxBoxSizer *m_panelSizer, *m_photoSolidSizer;
   wxFlexGridSizer *m_slidersSizer;
   wxRadioBox *m_flickeringRadioBox, *m_FDFRadioBox;
-
+  
   FlameConfig *m_flameConfig;
   /* Index du solveur */
   int m_index;

@@ -389,9 +389,10 @@ void SolverDialog::OnOK(wxCommandEvent& event)
   
   for(uint i = 0; i < newNb; i++)
     {
-      if(!m_solverPanels[i]->getCtrlValues(&newConfig[i]))
+      if(!m_solverPanels[i]->getCtrlValues(&newConfig[i])){
+	delete [] newConfig;
 	return;
-      else
+      }else
 	/* On recopie l'ancienne buoyancy si elle existe */
 	if(m_currentConfig->nbSolvers > i)
 	  newConfig[i].buoyancy = m_currentConfig->solvers[i].buoyancy;

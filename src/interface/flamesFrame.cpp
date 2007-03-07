@@ -175,6 +175,8 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_configFileName = configFileName;
   GetSettingsFromConfigFile();
   
+  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
+
   SetSizerAndFit(m_mainSizer);
   
   CreateStatusBar();
@@ -297,7 +299,7 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
   /* Crée un bug lors d'un restart si la valeur est différente de la précédente */
   /* Cela survient dès que l'on a utilisé une méthode DeleteAllPages sur les Notebooks */
   /* Je ne vois pas le rapport pour l'instant mais cela ne se produit pas avec GTK 2.8 */
-  //m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
+//   m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
   
   if(m_currentConfig.depthPeelingEnabled)
     m_depthPeelingSlider->Enable();
@@ -359,6 +361,9 @@ void FlamesFrame::InitFlamesPanels()
 
 void FlamesFrame::OnClose(wxCloseEvent& event)
 {
+  m_glBuffer->setRunningState(false);
+  delete [] m_currentConfig.flames;
+  delete [] m_currentConfig.solvers;
   delete m_config;
   
   Destroy();
@@ -367,11 +372,13 @@ void FlamesFrame::OnClose(wxCloseEvent& event)
 // Fonction qui est exécutée lors du click sur le bouton.
 void FlamesFrame::OnClickButtonRun(wxCommandEvent& event)
 {
-  if(m_glBuffer->IsRunning())
+  if(m_glBuffer->IsRunning()){
     m_buttonRun->SetLabel(_("Continue"));
-  else
+    m_glBuffer->setRunningState(false);
+  }else{
     m_buttonRun->SetLabel(_("Pause"));
-  m_glBuffer->ToggleRun();
+    m_glBuffer->setRunningState(true);
+  }
 }
 
 // Fonction qui est exécutée lors du click sur le bouton.
@@ -422,10 +429,8 @@ void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 
 void FlamesFrame::OnScrollDP(wxScrollEvent& event)
 {
-  if(event.GetId() == IDSL_DP){
-    m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
-    m_currentConfig.nbDepthPeelingLayers = m_depthPeelingSlider->GetValue();
-  }
+  m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
+  m_currentConfig.nbDepthPeelingLayers = m_depthPeelingSlider->GetValue();
 }
 
 void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
@@ -441,6 +446,7 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
   
   wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
+    m_glBuffer->setRunningState(false);
     filename = fileDialog.GetPath();
     
     /* Récupération le chemin absolu vers la scène */
@@ -466,6 +472,8 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
     filename = fileDialog.GetPath();
     
     if(!filename.IsEmpty()){
+      m_glBuffer->setRunningState(false);
+      Disable();
       /* Récupération le chemin absolu vers la scène */
       filename.Replace(wxGetWorkingDirectory(),_(""),false);
       /* Suppression du premier slash */
@@ -474,11 +482,10 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_configFileName = filename;
       
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
-
-      delete [] m_currentConfig.flames;
-      m_flamesNotebook->DeleteAllPages();
       
+      delete [] m_currentConfig.flames;
       delete [] m_currentConfig.solvers;
+      m_flamesNotebook->DeleteAllPages();      
       m_solversNotebook->DeleteAllPages();
 
       GetSettingsFromConfigFile();
@@ -486,6 +493,7 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_mainSizer->Fit(this);
       m_mainSizer->SetSizeHints(this);
       Layout();
+      Enable();
     }
   }
 }

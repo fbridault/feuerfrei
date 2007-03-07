@@ -49,9 +49,9 @@ void LeadSkeleton::addForces ()
   char perturbate = m_flameConfig->flickering;
   int fdf = m_flameConfig->fdf;
   double force;
-
+  
   m_selfVelocity = 0;
-
+  
   switch(fdf){
   case FDF_LINEAR :
     force = innerForce * (m_u + 1);

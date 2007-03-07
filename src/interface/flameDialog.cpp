@@ -262,6 +262,7 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    wxMessageDialog errorDialog (this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
 	    errorDialog.ShowModal();
 	    errorDialog.Destroy();
+	    delete [] newConfig;
 	    return;
 	  }
 	}
@@ -287,8 +288,10 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].fdf = 0;
 	    newConfig[i].IESFileName = _("IES/test.ies");
 	  }
-      }else
+      }else{
+	delete [] newConfig;
 	return;
+      }
     }
   delete [] m_currentConfig->flames;
   m_currentConfig->nbFlames = newNb;

@@ -214,7 +214,16 @@ Wick::Wick (const char *wickFileName, const FlameConfig* const flameConfig, Scen
 	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;
     }
   leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig, 1, .5, -.2, .3));
-  cerr << "Terminé" << endl;  
+
+  /* Suppression des points */
+  for (int i = 0; i < flameConfig->skeletonsNumber; i++)
+    {
+      for (vector < Point * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
+	   pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
+	delete (*pointsIterator);
+      pointsPartitionsArray[i].clear();
+    }
+  cerr << "Terminé" << endl;
 }
 
 Wick::~Wick ()

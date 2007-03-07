@@ -467,12 +467,12 @@ void FlameMainPanel::OnPhotoSolidEnter(wxCommandEvent& event)
   }
   if(m_glBuffer->IsRunning()){
     restart = true;
-    m_glBuffer->ToggleRun();
+    m_glBuffer->setRunningState(false);
   }
   m_flameConfig->IESFileName = filename;
   m_glBuffer->RegeneratePhotometricSolids(m_index,filename);
   if(restart)
-    m_glBuffer->ToggleRun();
+    m_glBuffer->setRunningState(true);
 }
 
 #endif

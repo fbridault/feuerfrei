@@ -61,7 +61,7 @@ public:
   
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
-  void ToggleRun(void) { m_run=!m_run; };
+  void setRunningState(bool run) { m_run=run; };
   
   /** Active/Désactive le glow seul */
   void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
@@ -126,7 +126,7 @@ private:
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;
 
-  uint m_framesCountForSwitch;
+  //  uint m_framesCountForSwitch;
   bool m_switch;
   int m_t;
   
@@ -148,7 +148,7 @@ private:
   Scene *m_scene;
   CgSVShader *m_SVShader;
   
-  double *intensities;
+  double *m_intensities;
   
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()

@@ -86,7 +86,7 @@ void Solver3D::advect (unsigned char b, double *const d, const double *const d0,
 		     const double *const u, const double *const v,
 		     const double *const w)
 {
-  uint i, j, k, i0, j0, k0, i1, j1, k1;
+  uint i0, j0, k0, i1, j1, k1;
   double x, y, z, r0, s0, t0, r1, s1, t1, dt0_x, dt0_y, dt0_z;
 
   dt0_x = m_dt * m_nbVoxelsX;

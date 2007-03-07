@@ -26,6 +26,7 @@ public:
 class BoundingSphere
 {
 public:
+  BoundingSphere() : radius(0.0) {};
   /** Centre de la sphère englobante. */
   Point centre;
   
@@ -138,7 +139,7 @@ public:
   };
   
   /** Allocation de la table de hachage, éventuellement détruite si elle a été allouée précedemment. */
-  void allocHashTable(){ if(m_hashTable) delete m_hashTable; m_hashTable = new int[m_vertexArray.size()]; };
+  void allocHashTable(){ if(m_hashTable) delete [] m_hashTable; m_hashTable = new int[m_vertexArray.size()]; };
   
   /** Initialisation de tous les éléments de la table de hachage à -1. */
   void initHashTable(){ for(uint i=0; i<m_vertexArray.size(); i++) m_hashTable[i] = -1; };

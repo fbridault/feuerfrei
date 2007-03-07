@@ -81,82 +81,6 @@ void Scene::createVBOs(void)
   cout << "*******************************************" << endl;
 }
 
-void Scene::createDisplayLists(void)
-{
-  m_displayLists[0] = glGenLists(NB_DISPLAY_LISTS);
-  for(int i=1; i<8; i++)
-    m_displayLists[i] = m_displayLists[0] + i;
-  
-  glNewList(m_displayLists[0],GL_COMPILE);
-  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
-       objectsArrayIterator != m_objectsArray.end();
-       objectsArrayIterator++)
-    (*objectsArrayIterator)->draw(ALL,true);
-  glEndList();
-  
-  glNewList(m_displayLists[1],GL_COMPILE);
-  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
-       objectsArrayIterator != m_objectsArray.end();
-       objectsArrayIterator++)
-    (*objectsArrayIterator)->draw(TEXTURED,true);
-  glEndList();
-  
-  glNewList(m_displayLists[2],GL_COMPILE);
-  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
-       objectsArrayIterator != m_objectsArray.end();
-       objectsArrayIterator++)
-    (*objectsArrayIterator)->draw(FLAT,false);
-  glEndList();  
-  
-  glNewList(m_displayLists[3],GL_COMPILE); 
-  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
-       objectsArrayIteratorWSV != m_objectsArrayWSV.end();
-       objectsArrayIteratorWSV++)
-    (*objectsArrayIteratorWSV)->draw(TEXTURED,true);
-  glEndList();  
-  
-  /* Création de la display list des objets qui projettent des ombres sans les textures */
-  /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  glNewList(m_displayLists[4],GL_COMPILE); 
-  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
-       objectsArrayIteratorWSV != m_objectsArrayWSV.end();
-       objectsArrayIteratorWSV++)
-    (*objectsArrayIteratorWSV)->draw(FLAT,false);
-  glEndList();	
-  
-  glNewList (m_displayLists[7], GL_COMPILE);
-  for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
-       objectsArrayIterator != m_objectsArray.end ();
-       objectsArrayIterator++)
-    (*objectsArrayIterator)->draw (AMBIENT,false);
-  glEndList ();
-  
-  /* Création de la display list des objets qui projettent des ombres */
-  glNewList (m_displayLists[5], GL_COMPILE);
-  for (vector < Object * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
-       objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
-       objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (ALL,true);
-  glEndList ();
-  
-  /* Création de la display list des objets qui projettent des ombres sans les textures */
-  /* Ce qui permet d'aller plus vite lors de la génération des shadow volumes */
-  glNewList (m_displayLists[6], GL_COMPILE);  
-  for (vector < Object * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
-       objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
-       objectsArrayIteratorWSV++)
-    (*objectsArrayIteratorWSV)->draw (AMBIENT,false);
-  glEndList ();
-  
-  cout << "Terminé" << endl;
-  cout << "*******************************************" << endl;
-  cout << "Statistiques sur la scène :" << endl;
-  cout << getObjectsCount() << " objets" << endl;
-  cout << getPolygonsCount() << " polygones" << endl;
-  cout << getVertexCount() << " vertex" << endl;
-  cout << "*******************************************" << endl;
-}
-
 Scene::~Scene ()
 {
   for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
@@ -185,8 +109,6 @@ Scene::~Scene ()
        texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
     delete (*texturesArrayIterator);
   m_texturesArray.clear ();
-  
-//   glDeleteLists(m_displayLists[0],NB_DISPLAY_LISTS);
 }
 
 void Scene::getSceneAbsolutePath(const char* const fileName)

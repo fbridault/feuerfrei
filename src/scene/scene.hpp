@@ -324,18 +324,6 @@ private:
   vector<Material*> m_materialArray; /** Liste des matériaux.*/
   vector<Texture*> m_texturesArray; /** Liste des textures.*/
   
-  /** Display lists de la scène
-   * [0] Tous les objets de la scène ne projetant pas d'ombres
-   * [1] Objets texturés ne projetant pas d'ombres
-   * [2] Objets sans textures ne projetant pas d'ombres
-   * [3] Objets texturés qui projettent des ombres
-   * [4] Objets sans textures qui projettent des ombres
-   * [5] Tous les objets qui projettent des ombres
-   * [6] Tous les objets qui projettent des ombres, sans les textures éventuelles
-   * [7] Tous les objets sans les textures éventuelles 
-   */
-  GLuint m_displayLists[8];
-  
   /** Tableaux de flammes. Il s'agit d'un pointeur sur le tableau de flamme créé dans la classe GlFlameCanvas. 
    * Celles-ci sont nécessaires pour dessiner les luminaires lors du dessin de la scène.
    */
@@ -358,85 +346,3 @@ private:
 };//Scene
 
 #endif
-
-
-//   /** Dessin de la scène pour les objets texturés */
-//   void drawSceneTEX(void) const
-//   {
-//     glCallList(m_displayLists[1]);
-//     glCallList(m_displayLists[3]);
-//   };
-  
-//   /** Dessin de la scène pour les objets non texturés */
-//   void drawSceneWTEX() const
-//   {
-//     glCallList(m_displayLists[2]);
-//     glCallList(m_displayLists[4]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary();
-//   };
-  
-//   /** Dessin de la scène pour les objets non texturés.
-//    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
-//    * scène éclairée avec des solides photométriques.
-//    */
-//   void drawSceneWTEX(const CgBasicVertexShader& shader) const
-//   {
-//     glCallList(m_displayLists[2]);
-//     glCallList(m_displayLists[4]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary(shader);
-//   };
-  
-//   /** Dessin de tous les objets de la scène sans les textures */
-//   void drawSceneWT(void) const
-//   {
-//     glCallList(m_displayLists[6]);
-//     glCallList(m_displayLists[7]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary();
-//   };
-  
-//   /** Dessin de tous les objets de la scène */
-//   void drawScene (void) const
-//   {
-//     glCallList (m_displayLists[0]);
-//     glCallList (m_displayLists[5]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary();
-//   };
-//   /** Dessin de tous les objets de la scène.
-//    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
-//    * scène éclairée avec des solides photométriques.
-//    */
-//   void drawScene (CgBasicVertexShader& shader) const
-//   {
-//     glCallList (m_displayLists[0]);
-//     glCallList (m_displayLists[5]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary(shader);
-//   };
-
-//     /** Dessin de tous les objets qui projettent des ombres */
-//   void drawSceneWSV (void) const
-//   {
-//     glCallList (m_displayLists[6]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary();
-//   };
-  
-//   /** Dessin de tous les objets qui projettent des ombres */
-//   void drawSceneWSV (const CgBasicVertexShader& shader) const
-//   {
-//     glCallList (m_displayLists[6]);
-    
-//     for (int f = 0; f < m_nbFlames; f++)
-//       m_flames[f]->drawLuminary(shader);
-//   };
-  

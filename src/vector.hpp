@@ -321,6 +321,9 @@ public:
    */
   GLdouble operator*(const Point& P) const
   {return(x*P.x + y*P.y + z*P.z);};
+
+  Vector scaleBy(const Vector& V) const
+  {return Vector(x*V.x, y*V.y, z*V.z); };
 	
   /**
    * Calcul de la norme d'un vecteur. 

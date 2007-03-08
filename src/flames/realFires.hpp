@@ -150,20 +150,21 @@ public:
   
   virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
   {
-    if(displayBoundingSphere)
-      m_boundingSphere.draw();
-    else{
-      Point pt(m_solver->getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (pt.x, pt.y, pt.z);
-      glScalef (scale.x, scale.y, scale.z);
-      for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->drawFlame(display, displayParticle);
-      for (uint i = 0; i < m_nbCloneFlames; i++)
-	m_cloneFlames[i]->drawFlame(display, displayParticle); 
-      glPopMatrix();
-    }
+    if(m_visibility)
+      if(displayBoundingSphere)
+	m_boundingSphere.draw();
+      else{
+	Point pt(m_solver->getPosition());
+	Point scale(m_solver->getScale());
+	glPushMatrix();
+	glTranslatef (pt.x, pt.y, pt.z);
+	glScalef (scale.x, scale.y, scale.z);
+	for (uint i = 0; i < m_nbFlames; i++)
+	  m_flames[i]->drawFlame(display, displayParticle);
+	for (uint i = 0; i < m_nbCloneFlames; i++)
+	  m_cloneFlames[i]->drawFlame(display, displayParticle); 
+	glPopMatrix();
+      }
   }
   
   virtual void toggleSmoothShading (bool state);  

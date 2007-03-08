@@ -224,18 +224,19 @@ public:
    */
   virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
   {
-    if(displayBoundingSphere)
-      m_boundingSphere.draw();
-    else{
-      Point pt(m_solver->getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (pt.x, pt.y, pt.z);
-      glScalef (scale.x, scale.y, scale.z);
-      for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->drawFlame(display, displayParticle);
-      glPopMatrix();
-    }
+    if(m_visibility)
+      if(displayBoundingSphere)
+	m_boundingSphere.draw();
+      else{
+	Point pt(m_solver->getPosition());
+	Point scale(m_solver->getScale());
+	glPushMatrix();
+	glTranslatef (pt.x, pt.y, pt.z);
+	glScalef (scale.x, scale.y, scale.z);
+	for (uint i = 0; i < m_nbFlames; i++)
+	  m_flames[i]->drawFlame(display, displayParticle);
+	glPopMatrix();
+      }
   }
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
@@ -299,8 +300,18 @@ public:
       m_flames[i]->setSmoothShading(state);
   }
   
+  /** Fonction permettant de récupérer le centre de la flamme dans le repère local */
+  virtual Point getCenter() const
+  {
+    Point averagePt;
+    
+    for (uint i = 0; i < m_nbFlames; i++)
+      averagePt += m_flames[i]->getCenter ();
+    averagePt = averagePt/m_nbFlames;
+    
+    return(averagePt);
+  }
   /** Fonction permettant de récupérer l'orientation principale de la flamme
-   * pour orienter le solide photométrique.
    */
   virtual Vector getMainDirection() const
   {
@@ -315,6 +326,9 @@ public:
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
+  
+  /** Construction des sphères englobantes de l'objet. */
+  void buildBoundingSphere ();
   
   /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante 
    * et teste ensuite la visibilité de celle-ci. */

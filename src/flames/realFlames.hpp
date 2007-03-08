@@ -127,7 +127,7 @@ public:
   virtual void drawWick(bool displayBoxes) const;
   
   virtual Vector getMainDirection() const {
-    return(*(m_leadSkeletons[0]->getMiddleParticle()));
+    return(*(m_leadSkeletons[0]->getParticle(0)));
   };
   virtual Point getCenter () const {
     return (*m_leadSkeletons[0]->getMiddleParticle ());

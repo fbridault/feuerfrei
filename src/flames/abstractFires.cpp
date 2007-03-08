@@ -126,7 +126,7 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   m_breakable=flameConfig->breakable;  
   
   m_intensityCoef = flameConfig->intensityCoef;
-  m_visibility = false;
+  m_visibility = true;
 }
 
 FireSource::~FireSource()
@@ -182,12 +182,19 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
+void FireSource::buildBoundingSphere ()
+{
+  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
+  m_boundingSphere.centre = getCenterSP();
+}
+ 
 void FireSource::computeVisibility(const Camera &view)
 {  
-  Vector o = getMainDirection();
   bool save=m_visibility;
-  m_boundingSphere.radius = o.length()*m_solver->getScale().y/2.0;
-  m_boundingSphere.centre = getCenterSP();
+
+  /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
+  /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
+  if(m_visibility) buildBoundingSphere();
   
   m_visibility = m_boundingSphere.isVisible(view);
 
@@ -219,21 +226,22 @@ DetachableFireSource::~DetachableFireSource()
 
 void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
 {
-  if(displayBoundingSphere)
-    m_boundingSphere.draw();
-  else{
-    Point pt(m_solver->getPosition());
-    Point scale(m_solver->getScale());
-    glPushMatrix();
-    glTranslatef (pt.x, pt.y, pt.z);
-    glScalef (scale.x, scale.y, scale.z);
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->drawFlame(display, displayParticle);
-    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-      (*flamesIterator)->drawFlame(display, displayParticle);
-    glPopMatrix();
-  }
+  if(m_visibility)
+    if(displayBoundingSphere)
+      m_boundingSphere.draw();
+    else{
+      Point pt(m_solver->getPosition());
+      Point scale(m_solver->getScale());
+      glPushMatrix();
+      glTranslatef (pt.x, pt.y, pt.z);
+      glScalef (scale.x, scale.y, scale.z);
+      for (uint i = 0; i < m_nbFlames; i++)
+	m_flames[i]->drawFlame(display, displayParticle);
+      for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	   flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	(*flamesIterator)->drawFlame(display, displayParticle);
+      glPopMatrix();
+    }
 }
 
 void DetachableFireSource::build()

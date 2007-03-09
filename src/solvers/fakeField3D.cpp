@@ -50,11 +50,11 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
   
   /* Ajouter des forces externes */
   if(force.x)
-    m_uSrc += strength.x;
+    m_uSrc -= strength.x;
   if(force.y)
-    m_vSrc += strength.y;
+    m_vSrc -= strength.y;
   if(force.z)
-    m_wSrc += strength.z;
+    m_wSrc -= strength.z;
 }
 
 void FakeField3D::displayVelocityField (void)

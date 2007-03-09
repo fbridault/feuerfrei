@@ -78,6 +78,22 @@ public:
     m_currentField->displayVelocityField ();
   };
   
+  void addPermanentExternalForces(Point& forces)
+  {
+    m_fakeField.addPermanentExternalForces(forces);
+    m_solver.addPermanentExternalForces(forces);
+  }
+
+  virtual void setBuoyancy(double value){ 
+    m_fakeField.setBuoyancy(value);
+    m_solver.setBuoyancy(value);
+  };
+  
+  virtual void setRunningState(bool state) { 
+    m_fakeField.setRunningState(state);
+    m_solver.setRunningState(state);  
+  };
+  
   virtual bool isRealSolver () { return (m_currentField == &m_solver); };
   virtual void switchToRealSolver () { m_currentField = &m_solver; };
   virtual void switchToFakeField () { m_currentField = &m_fakeField; };

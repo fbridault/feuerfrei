@@ -82,7 +82,7 @@ public:
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
    * @param forces Intensité de la force en (x,y,z).
    */
-  void addPermanentExternalForces(Point& forces)
+  virtual void addPermanentExternalForces(Point& forces)
   {
     permanentExternalForces = forces;
     if(!forces.x && !forces.y)
@@ -111,12 +111,12 @@ public:
   virtual void increaseRes () = 0;
   
   /** Fonction de dessin de la grille */
-  void displayGrid (){
+  virtual void displayGrid (){
     glCallList (m_gridDisplayList);
   };
   
   /** Fonction de dessin du repère de base */
-  void displayBase (){
+  virtual void displayBase (){
     glCallList (m_baseDisplayList);
   };
   

@@ -97,11 +97,6 @@ public:
   
   virtual void addExternalForces(const Point& position, bool move);
   
-  virtual void divideRes () {} ;  
-  virtual void multiplyRes () {} ;  
-  virtual void decreaseRes () {} ;  
-  virtual void increaseRes () {} ;
-
   void cleanSources ();
   
   virtual void displayVelocityField (void);

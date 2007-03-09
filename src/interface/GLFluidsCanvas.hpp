@@ -13,14 +13,7 @@ class GLFluidsCanvas;
 #include "../scene/camera.hpp"
 #include "../scene/graphicsFn.hpp"
 
-#include "../solvers/GSSolver2D.hpp"
-#include "../solvers/GSSolver3D.hpp"
-#include "../solvers/GCSSORSolver3D.hpp"
-#include "../solvers/HybridSolver3D.hpp"
-#include "../solvers/logResSolver3D.hpp"
-#include "../solvers/logResAvgSolver3D.hpp"
-#include "../solvers/logResAvgTimeSolver3D.hpp"
-#include "../solvers/fakeField3D.hpp"
+#include "../solvers/field.hpp"
 
 class GLFluidsCanvas : public wxGLCanvas
 {

@@ -3,10 +3,6 @@
 #include <math.h>
 #include "../scene/graphicsFn.hpp"
 
-FakeField3D::FakeField3D ()
-{
-}
-
 FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
 			  double timeStep, double buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)

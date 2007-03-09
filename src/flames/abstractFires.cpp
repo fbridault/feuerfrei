@@ -127,6 +127,7 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   
   m_intensityCoef = flameConfig->intensityCoef;
   m_visibility = true;
+  m_dist=0;
 }
 
 FireSource::~FireSource()
@@ -188,26 +189,35 @@ void FireSource::buildBoundingSphere ()
   m_boundingSphere.centre = getCenterSP();
 }
  
-void FireSource::computeVisibility(const Camera &view)
+void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool save=m_visibility;
-
+  double oldDist=m_dist;
+  
   /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
   /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
-  if(m_visibility) buildBoundingSphere();
+  if(m_visibility || forceSpheresBuild) buildBoundingSphere();
+
+  m_dist=m_boundingSphere.visibleDistance(view);
+  m_visibility = (m_dist);
   
-  m_visibility = m_boundingSphere.isVisible(view);
-
-  if(m_visibility && !save){
-    m_solver->setRunningState(true);
-    cerr << "Flame is now visible" << endl;
-  }
-  if(!m_visibility && save){
-    m_solver->setRunningState(false);
-    cerr << "Flame is now hidden" << endl;
-  }
+  if(m_visibility){
+    if(m_dist > 5){
+      if(m_solver->isRealSolver())
+	m_solver->switchToFakeField();
+    }else
+      if(!m_solver->isRealSolver())
+	m_solver->switchToRealSolver();
+    if(!save){
+      m_solver->setRunningState(true);
+      cerr << "Flame is now visible" << endl;
+    }
+  }else
+    if(!m_visibility && save){
+      m_solver->setRunningState(false);
+      cerr << "Flame is now hidden" << endl;
+    }
 }
-
 
 DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
 					   Scene* const scene, const char *filename, const wxString &texname, 

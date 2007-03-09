@@ -15,10 +15,7 @@ class Field3D;
  */
 class FakeField3D : public Field3D
 {
-public:
-  /** Constructeur par défaut nécessaire pour l'héritage multiple */
-  FakeField3D ();
-  
+public:  
   /** Constructeur du champ.
    * @param position Position du solveur de la flamme.
    * @param n_x Résolution de la grille en x.
@@ -68,12 +65,7 @@ public:
   };
   
   virtual void addExternalForces(const Point& position, bool move);
-  
-  virtual void  divideRes  () {} ;  
-  virtual void multiplyRes () {} ;  
-  virtual void decreaseRes () {} ;  
-  virtual void increaseRes () {} ;
-  
+    
   void cleanSources ();
   
   void displayVelocityField (void);

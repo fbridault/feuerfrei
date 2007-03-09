@@ -332,7 +332,7 @@ public:
   
   /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante 
    * et teste ensuite la visibilité de celle-ci. */
-  virtual void computeVisibility(const Camera &view);
+  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
 protected:
   /** Nombre de flammes */
@@ -364,6 +364,8 @@ protected:
   BoundingSphere m_boundingSphere;
   /** Visibilité de la flamme. */
   bool m_visibility;
+  /** Distance par rapport à la caméra */
+  double m_dist;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.

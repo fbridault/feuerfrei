@@ -65,7 +65,7 @@ AUX_SOURCE_DIRECTORY(flames FLAMES_SRCS)
 AUX_SOURCE_DIRECTORY(interface INTERFACE_SRCS)
 AUX_SOURCE_DIRECTORY(scene SCENE_SRCS)
 AUX_SOURCE_DIRECTORY(shaders SHADERS_SRCS)
-SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/HybridSolver3D.cpp)
+SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/HybridSolver3D.cpp)
 SET(INTERFACE_SRCS interface/GLFlameCanvas.cpp interface/flameDialog.cpp interface/flamesFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/shadowsDialog.cpp interface/solverDialog.cpp)
 
 SET(RTFLAMES_SRCS flames.cpp ${FLAMES_SRCS} ${INTERFACE_SRCS} ${SCENE_SRCS} ${SHADERS_SRCS} ${SOLVERS_SRCS})

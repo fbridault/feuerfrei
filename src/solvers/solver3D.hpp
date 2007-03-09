@@ -32,19 +32,7 @@ public:
 	    double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~Solver3D ();
-    
-  /** Divise la résolution de la grille par 2 */
-  virtual void divideRes () {} ;
-
-  /** Multiplie la résolution de la grille par 2 */
-  virtual void multiplyRes () {} ;
   
-  /** Diminue la résolution de la grille de un voxel */
-  virtual void decreaseRes () {} ;
-  
-  /** Augmente la résolution de la grille de un voxel */
-  virtual void increaseRes () {} ;
-    
   /** Lance une itération du solveur. */
   virtual void iterate ();
   /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur.

@@ -54,7 +54,28 @@ public:
 	return false;
     }
     return true;
+  }  
+  
+  /** Calcule la visibilité de la sphère par rapport au point de vue courant.
+   * Variation permettant de récupérer en même temps la distance par rapport à la caméra.
+   * @param view Référence sur la caméra.
+   * @return 0 si non visible, distance à la caméra sinon.
+   */
+  double visibleDistance(const Camera &view) const{
+    uint i;
+    const double *plan;
+    double d;
+    
+    // Sphère dans le frustrum ?
+    for( i = 0; i < 6; i++ ){
+      plan=view.getFrustum(i);
+      d = plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3];
+      if( d <= -radius )
+	return 0;
+    }
+   return d + radius;
   }
+  
   void draw(void) const{
     glPushMatrix();
     glTranslatef(centre.x, centre.y, centre.z);

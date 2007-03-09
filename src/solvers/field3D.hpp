@@ -39,41 +39,32 @@ public:
   virtual void iterate () = 0;
     
   /** Récupération de la valeur des trois composantes de la vélocité dans la grille du solveur.
-   * @param i Indice à l'horizontale (x).
-   * @param j Indice à la verticale (y).
-   * @param k Indice en profondeur (z).
+   * @param pos Position relative de la particule dans le solveur
    * @return Valeurs de vélocité.
    */
   virtual Point getUVW (const Point& pos, double selfVelocity) const = 0;
   
   /** Ajout d'une force externe pour la composante U.
-   * @param i Indice à l'horizontale (x).
-   * @param j Indice à la verticale (y).
-   * @param k Indice en profondeur (z).
+   * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    */
   virtual void addUsrc (const Point& pos, double value) = 0;
   
   /** Ajout d'une force externe pour la composante V.
-   * @param i Indice à l'horizontale (x).
-   * @param j Indice à la verticale (y).
-   * @param k Indice en profondeur (z).
+   * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
+   * @param selfVelocity Valeur de vélocité propre.
    */
   virtual void addVsrc (const Point& pos, double value, double& selfVelocity) = 0;
   
   /** Ajout d'une force externe pour la composante W.
-   * @param i Indice à l'horizontale (x).
-   * @param j Indice à la verticale (y).
-   * @param k Indice en profondeur (z).
+   * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    */
   virtual void addWsrc (const Point& pos, double value) = 0;
   
   /** Affectation d'une force externe pour la composante V.
-   * @param i Indice à l'horizontale (x).
-   * @param j Indice à la verticale (y).
-   * @param k Indice en profondeur (z).
+   * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    */
   virtual void setVsrc (const Point& pos, double value) = 0;
@@ -123,16 +114,22 @@ public:
   virtual void addExternalForces(const Point& position, bool move) = 0;
   
   /** Divise la résolution de la grille par 2 */
-  virtual void divideRes () = 0 ;
+  virtual void divideRes () {};
   
   /** Multiplie la résolution de la grille par 2 */
-  virtual void multiplyRes () = 0 ;
+  virtual void multiplyRes () {};
   
   /** Diminue la résolution de la grille de un voxel */
-  virtual void decreaseRes () = 0 ;
+  virtual void decreaseRes () {};
   
   /** Augmente la résolution de la grille de un voxel */
-  virtual void increaseRes () = 0 ;
+  virtual void increaseRes () {};
+  
+  /** Donne le type de solveur courant, seulement valable pour les bi-solveurs */
+  virtual bool isRealSolver () {};
+  /** Change de type de solveur à la volée, seulement valable pour les bi-solveurs */
+  virtual void switchToRealSolver () {};
+  virtual void switchToFakeField () {};
   
   /** Fonction de dessin du champ de vélocité */
   void displayVelocityField (void) = 0;

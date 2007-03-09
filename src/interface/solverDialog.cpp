@@ -32,10 +32,11 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("Hybrid"),
     _("LOD Hybrid"),
     _("Simple field"),
-    _("Fake field")
+    _("Fake field"),
+    _("LOD field")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					6, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					7, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #else
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
@@ -44,13 +45,14 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, const wxPoint& pos, const wxS
     _("LOD Hybrid"),
     _("Simple field"),
     _("Fake field"),
+    _("LOD field"),
     _("Both - log residuals"),
     _("Both - log residuals averages"),
     _("Both - log residuals averages + time"),
     _("Gauss-Seidel 2D")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					10, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					11, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));

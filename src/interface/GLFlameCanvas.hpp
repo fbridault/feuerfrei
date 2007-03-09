@@ -19,10 +19,7 @@ class GLFlameCanvas;
 #include "../flames/DPengine.hpp"
 #include "../flames/solidePhoto.hpp"
 
-#include "../solvers/GSSolver3D.hpp"
-#include "../solvers/GCSSORSolver3D.hpp"
-#include "../solvers/HybridSolver3D.hpp"
-#include "../solvers/fakeField3D.hpp"
+#include "../solvers/field3D.hpp"
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -74,7 +71,7 @@ public:
   void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
   void setSmoothShading(bool state) { 
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->setSmoothShading (state);
+      m_flames[f]->setSmoothShading (state);
   };
 //   void ToggleDepthPeeling(void) { 
 //     if(m_currentConfig->depthPeelingEnabled)
@@ -85,7 +82,11 @@ public:
 // 	m_flames[f]-> setRenderMode();
 //   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
+  void moveSolver(int selectedSolver, Point& pt, bool move){ 
+    m_solvers[selectedSolver]->addExternalForces(pt,move);
+    for (uint f = 0; f < m_currentConfig->nbFlames; f++)
+      m_flames[f]->computeVisibility(*m_camera,true);
+  };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };

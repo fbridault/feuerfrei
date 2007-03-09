@@ -3,6 +3,16 @@
 #include "fluidsFrame.hpp"
 #include <iostream>
 
+#include "../solvers/GSSolver2D.hpp"
+#include "../solvers/GSSolver3D.hpp"
+#include "../solvers/GCSSORSolver3D.hpp"
+#include "../solvers/HybridSolver3D.hpp"
+#include "../solvers/logResSolver3D.hpp"
+#include "../solvers/logResAvgSolver3D.hpp"
+#include "../solvers/logResAvgTimeSolver3D.hpp"
+#include "../solvers/fakeField3D.hpp"
+#include "../solvers/LODField3D.hpp"
+
 BEGIN_EVENT_TABLE(GLFluidsCanvas, wxGLCanvas)
   EVT_SIZE(GLFluidsCanvas::OnSize)
   EVT_PAINT(GLFluidsCanvas::OnPaint)
@@ -174,6 +184,14 @@ void GLFluidsCanvas::InitSolvers(void)
 				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
 				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
 				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      break;
+    case LOD_FIELD :
+      m_solvers[i] = new LODField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+				    m_currentConfig->solvers[i].epsilon);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;

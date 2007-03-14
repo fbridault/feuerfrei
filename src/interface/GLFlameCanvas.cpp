@@ -104,6 +104,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   glPolygonMode(GL_FRONT,GL_FILL);
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
+  glDisable (GL_LIGHTING);
   // Création du contexte CG
   m_context = cgCreateContext();
   
@@ -136,7 +137,7 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case CANDLESTICK :
       m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				     m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 7.0);
+				     m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 5.0);
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -370,8 +371,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   SetCurrent();
   
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   /* Déplacement du camera */
@@ -410,6 +409,16 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
 //     sigma = 2;
     
+//     /* Dessin des englobants */
+
+//     m_glowEngine->activateVisibilityBuffer();
+//     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//     glDisable(GL_LIGHTING);
+//     for (f = 0; f < m_currentConfig->nbFlames; f++)
+//       m_flames[f]->drawFlame (true, false, true);
+//     glEnable(GL_LIGHTING);
+//     m_glowEngine->deactivateVisibilityBuffer();
+    
     if(m_currentConfig->depthPeelingEnabled){
       /* On décortique dans les calques */
       m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
@@ -439,7 +448,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     
     m_glowEngine->deactivate();
   }
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   
   if(!m_glowOnly){
     drawScene();
@@ -503,20 +511,15 @@ void GLFlameCanvas::drawScene()
   else
     glBlendFunc (GL_ONE, GL_ZERO);
   
+  if (m_currentConfig->shadowsEnabled)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  else
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /******************* AFFICHAGE DE LA SCENE *******************************/
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->drawWick (m_displayWickBoxes);
   
-  /**** Affichage de la scène ****/
-  glPushAttrib (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-  
-    glEnable (GL_LIGHTING);
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    if (!m_currentConfig->shadowsEnabled)
-      for (f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]->switchOn ();
-  }
-  
+  /**** Affichage de la scène ****/  
   if (m_drawShadowVolumes)
     for (f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->drawShadowVolume ();
@@ -527,15 +530,15 @@ void GLFlameCanvas::drawScene()
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
     else{
+      glEnable (GL_LIGHTING);
+      for (f = 0; f < m_currentConfig->nbFlames; f++)
+	m_flames[f]->switchOn ();
       m_scene->drawScene();
       glDisable (GL_LIGHTING);
     }
   
-  glPopAttrib ();  
-  
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
@@ -641,6 +644,7 @@ void GLFlameCanvas::castShadows ()
 {
   uint f;
   
+  glEnable (GL_LIGHTING);
   for (f = 0; f < m_currentConfig->nbFlames; f++)
     m_flames[f]->switchOff ();
   m_scene->drawSceneWT ();
@@ -650,8 +654,7 @@ void GLFlameCanvas::castShadows ()
       m_flames[f]->switchOn ();
     }
   
-  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-		GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
+  glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT);
   
   glColorMask (0, 0, 0, 0);
   glDepthMask (0);
@@ -681,8 +684,7 @@ void GLFlameCanvas::castShadows ()
   
   /* On teste ensuite Ã  l'endroit où il faut dessiner */
   glDepthFunc (GL_LEQUAL);
-
-  glEnable (GL_STENCIL_TEST);
+  
   glStencilFunc (GL_EQUAL, 0, ~0);
   glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   glBlendFunc (GL_ONE, GL_ONE);
@@ -708,6 +710,9 @@ void GLFlameCanvas::castShadows ()
       m_flames[f]->switchOn ();
     
     m_scene->drawScene ();
-  }else
+    glDisable (GL_LIGHTING);
+  }else{
+    glDisable (GL_LIGHTING);
     m_photoSolid->draw(m_currentConfig->BPSEnabled);
+  }
 }

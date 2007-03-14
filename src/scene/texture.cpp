@@ -21,6 +21,22 @@ Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
   m_wxtex = NULL;
 }
 
+Texture::Texture(GLenum type, GLenum filter, uint width, uint height, bool dummy)
+{  
+  m_type = type;
+  m_hasAlpha = true;
+  
+  glGenTextures(1, &m_texName);
+  glBindTexture(m_type, m_texName); 
+  
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
+  
+  glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+  m_wxtex = NULL;
+}
 
 Texture::Texture(uint width, uint height, GLenum func, bool dummy)
 {

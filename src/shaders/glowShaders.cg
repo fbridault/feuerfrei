@@ -34,14 +34,7 @@ vertout vertGlowX(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   OUT.tc5.x = IN.texcoords.x + offsets[5];
   OUT.tc6.x = IN.texcoords.x + offsets[6];
   OUT.tc7.x = IN.texcoords.x + offsets[7];
-  OUT.tc0.y = IN.texcoords.y;
-  OUT.tc1.y = IN.texcoords.y;
-  OUT.tc2.y = IN.texcoords.y;
-  OUT.tc3.y = IN.texcoords.y;
-  OUT.tc4.y = IN.texcoords.y;
-  OUT.tc5.y = IN.texcoords.y;
-  OUT.tc6.y = IN.texcoords.y;
-  OUT.tc7.y = IN.texcoords.y;
+  OUT.tc0.y = OUT.tc1.y = OUT.tc2.y = OUT.tc3.y = OUT.tc4.y = OUT.tc5.y = OUT.tc6.y = OUT.tc7.y = IN.texcoords.y;
   return OUT;
 }
 
@@ -52,14 +45,7 @@ vertout vertGlowY(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   // transformation des coordonnees 3D dans le repere de la camera
   OUT.position = IN.position;
   // passage des coordonnees de texture
-  OUT.tc0.x = IN.texcoords.x;
-  OUT.tc1.x = IN.texcoords.x;
-  OUT.tc2.x = IN.texcoords.x;
-  OUT.tc3.x = IN.texcoords.x;
-  OUT.tc4.x = IN.texcoords.x;
-  OUT.tc5.x = IN.texcoords.x;
-  OUT.tc6.x = IN.texcoords.x;
-  OUT.tc7.x = IN.texcoords.x;
+  OUT.tc0.x = OUT.tc1.x = OUT.tc2.x = OUT.tc3.x = OUT.tc4.x = OUT.tc5.x = OUT.tc6.x = OUT.tc7.x = IN.texcoords.x;
   OUT.tc0.y = IN.texcoords.y + offsets[0];
   OUT.tc1.y = IN.texcoords.y + offsets[1];
   OUT.tc2.y = IN.texcoords.y + offsets[2];
@@ -72,10 +58,12 @@ vertout vertGlowY(vertin IN, uniform float offsets[8], uniform float4x4 ModelVie
   return OUT;
 }
 
-float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, uniform samplerRECT text ) : COLOR
+float4 fragGlow(vertout IN, uniform float weights[8], uniform float divide, uniform samplerRECT visibilityTex , uniform samplerRECT text  ) : COLOR
 {
   float4 color;
-
+/*   float4 tex=texRECT(visibilityTex,IN.tc0); */
+/*   if( !tex.r ) */
+/*     discard; */
   color = (texRECT(text,IN.tc0) * weights[0] + texRECT(text,IN.tc1) * weights[1] + texRECT(text,IN.tc2) * weights[2] + texRECT(text,IN.tc3) * weights[3] + texRECT(text,IN.tc4) * weights[4] + texRECT(text,IN.tc5) * weights[5] + texRECT(text,IN.tc6) * weights[6] + texRECT(text,IN.tc7) * weights[7])/divide;
   
   return color;
@@ -192,3 +180,61 @@ float4 fragGlow16(vertout16 IN, uniform float weights[16], uniform float divide,
   }
   return color;
 }
+
+/* !!ARBfp1.0 */
+/* OPTION ARB_precision_hint_fastest; */
+/* # cgc version 1.5.0014, build date Sep 18 2006 21:56:59 */
+/* # command line args: -q -fastmath -fastprecision -profile arbfp1 */
+/* # source file: src/shaders/glowShaders.cg */
+/* #vendor NVIDIA Corporation */
+/* #version 1.5.0.14 */
+/* #profile arbfp1 */
+/* #program fragGlow */
+/* #semantic fragGlow.weights */
+/* #semantic fragGlow.divide */
+/* #semantic fragGlow.visibilityTex */
+/* #semantic fragGlow.text */
+/* #var float2 IN.tc0 : $vin.TEXCOORD0 : TEX0 : 0 : 1 */
+/* #var float2 IN.tc1 : $vin.TEXCOORD1 : TEX1 : 0 : 1 */
+/* #var float2 IN.tc2 : $vin.TEXCOORD2 : TEX2 : 0 : 1 */
+/* #var float2 IN.tc3 : $vin.TEXCOORD3 : TEX3 : 0 : 1 */
+/* #var float2 IN.tc4 : $vin.TEXCOORD4 : TEX4 : 0 : 1 */
+/* #var float2 IN.tc5 : $vin.TEXCOORD5 : TEX5 : 0 : 1 */
+/* #var float2 IN.tc6 : $vin.TEXCOORD6 : TEX6 : 0 : 1 */
+/* #var float2 IN.tc7 : $vin.TEXCOORD7 : TEX7 : 0 : 1 */
+/* #var float weights[0] :  : c[0] : 1 : 1 */
+/* #var float weights[1] :  : c[1] : 1 : 1 */
+/* #var float weights[2] :  : c[2] : 1 : 1 */
+/* #var float weights[3] :  : c[3] : 1 : 1 */
+/* #var float weights[4] :  : c[4] : 1 : 1 */
+/* #var float weights[5] :  : c[5] : 1 : 1 */
+/* #var float weights[6] :  : c[6] : 1 : 1 */
+/* #var float weights[7] :  : c[7] : 1 : 1 */
+/* #var float divide :  : c[8] : 2 : 1 */
+/* #var samplerRECT visibilityTex :  :  : 3 : 0 */
+/* #var samplerRECT text :  : texunit 0 : 4 : 1 */
+/* #var float4 fragGlow : $vout.COLOR : COL : -1 : 1 */
+/* PARAM c[9] = { program.local[0..8] }; */
+/* TEMP R0; */
+/* TEMP R1; */
+/* TEMP R2; */
+/* TEX R0, fragment.texcoord[0], texture[1], RECT; */
+/* ADD R0.x, R0.x, -0.5; */
+/* KIL R0.x; */
+/* TEX R0, fragment.texcoord[1], texture[0], RECT; */
+/* MUL R1, R0, c[1].x; */
+/* TEX R0, fragment.texcoord[0], texture[0], RECT; */
+/* MAD R1, R0, c[0].x, R1; */
+/* TEX R0, fragment.texcoord[2], texture[0], RECT; */
+/* MAD R1, R0, c[2].x, R1; */
+/* TEX R0, fragment.texcoord[3], texture[0], RECT; */
+/* MAD R1, R0, c[3].x, R1; */
+/* TEX R0, fragment.texcoord[4], texture[0], RECT; */
+/* MAD R1, R0, c[4].x, R1; */
+/* TEX R0, fragment.texcoord[5], texture[0], RECT; */
+/* MAD R1, R0, c[5].x, R1; */
+/* TEX R0, fragment.texcoord[6], texture[0], RECT; */
+/* MAD R1, R0, c[6].x, R1; */
+/* TEX R0, fragment.texcoord[7], texture[0], RECT; */
+/* RCP R2.x, c[8].x; */
+/* MAD R0, R0, c[7].x, R1; */

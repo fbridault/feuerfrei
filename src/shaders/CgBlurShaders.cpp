@@ -23,6 +23,7 @@ CgBlurFragmentShader::CgBlurFragmentShader(const wxString& sourceName, const wxS
   // Récupération des paramètres
   paramWeights = cgGetNamedParameter(program, "weights");
   paramTexture = cgGetNamedParameter(program, "text");
+  paramVisibilityTex = cgGetNamedParameter(program, "visibilityTex");
   paramDivide = cgGetNamedParameter(program, "divide");
 }
 

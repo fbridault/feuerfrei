@@ -50,6 +50,7 @@ private:
   CGparameter paramWeights;
   CGparameter paramDivide;
   CGparameter paramTexture;
+  CGparameter paramVisibilityTex;
 };
 
 #endif

@@ -94,7 +94,7 @@ public:
     m_solver.setRunningState(state);  
   };
   
-  virtual bool isRealSolver () { return (m_currentField == &m_solver); };
+  virtual bool isRealSolver () const { return (m_currentField == &m_solver); };
   virtual void switchToRealSolver () { m_currentField = &m_solver; };
   virtual void switchToFakeField () { m_currentField = &m_fakeField; };
 private:

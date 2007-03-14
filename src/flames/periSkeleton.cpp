@@ -32,6 +32,11 @@ FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadS
   return( skel );
 }
 
+void PeriSkeleton::addForces ()
+{
+  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce()/1.1, m_selfVelocity);  
+}
+
 void PeriSkeleton::addParticle(const Point* const pt)
 {
   if(m_headIndex >= NB_PARTICLES_MAX-1){

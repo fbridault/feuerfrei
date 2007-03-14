@@ -3,7 +3,7 @@
 
 #include <sys/types.h>
 
-/** Classe de méthodes statiques permettant de générer un bruit de Perlin en une dimension. */
+/** Classe permettant de générer un bruit de Perlin sur une dimension. */
 class PerlinNoise1D
 {
 public:

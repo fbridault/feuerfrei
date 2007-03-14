@@ -3,7 +3,7 @@
 
 #define SWAP(x0,x) {double *tmp=x0;x0=x;x=tmp;}
 // Pour le calcul du dégradé de couleur des pyramides
-#define VELOCITE_MAX 1
+#define VELOCITE_MAX .1
 
 #define RAD_TO_DEG 180/PI
 

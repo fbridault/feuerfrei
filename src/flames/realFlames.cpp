@@ -204,6 +204,16 @@ void PointFlame::drawWick (bool displayBoxes) const
   glPopMatrix ();
 }
 
+void PointFlame::addForces ()
+{
+  for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+       skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+    (*skeletonsIterator)->addForces ();
+  if( m_solver->isRealSolver())
+    for (uint i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->addForces ();
+}
+
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE DETACHEDFLAME ************************************/
 /**********************************************************************************************************************/

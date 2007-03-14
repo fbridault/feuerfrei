@@ -48,34 +48,32 @@ void LeadSkeleton::addForces ()
   double innerForce = m_flameConfig->innerForce;
   char perturbate = m_flameConfig->flickering;
   int fdf = m_flameConfig->fdf;
-  double force;
   
   m_selfVelocity = 0;
   
   switch(fdf){
   case FDF_LINEAR :
-    force = innerForce * (m_u + 1);
+    m_lastAppliedForce = innerForce * (m_u + 1);
     break;
   case FDF_BILINEAR :
-    force = innerForce * m_u * m_u;
+    m_lastAppliedForce = innerForce * m_u * m_u;
     break;
   case FDF_EXPONENTIAL :
-    force = .1 * exp(innerForce * 14 * m_u);
+    m_lastAppliedForce = .1 * exp(innerForce * 14 * m_u);
     break;
   case FDF_GAUSS:
-    force = innerForce*exp(innerForce * 30 -m_u * m_u)/(9.0);
+    m_lastAppliedForce = innerForce*exp(innerForce * 30 -m_u * m_u)/(9.0);
     break;
   case FDF_RANDOM:
-    force = innerForce * rand()/((double)RAND_MAX);
+    m_lastAppliedForce = innerForce * rand()/((double)RAND_MAX);
     break;
   }
-  m_solver->addVsrc( m_root, force, m_selfVelocity);
 
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if (m_perturbateCount >= 2)
       {
-	force = innerForce*5;
+	m_lastAppliedForce += innerForce*5;
 	m_perturbateCount = 0;
       }
     else
@@ -97,16 +95,16 @@ void LeadSkeleton::addForces ()
     //    }
     break;
   case FLICKERING_RANDOM1 :
-    force = rand()/((double)RAND_MAX) - .5;
+    m_lastAppliedForce += rand()/((double)RAND_MAX) - .5;
     break;
   case FLICKERING_RANDOM2 :
-    force = rand()/(10*(double)RAND_MAX);
+    m_lastAppliedForce += rand()/(10*(double)RAND_MAX);
     break;
   case FLICKERING_NOISE :
-    force = m_noiseGenerator.getNextValue();
+    m_lastAppliedForce += m_noiseGenerator.getNextValue();
     break;
   }
-  m_solver->addVsrc( m_root, force, m_selfVelocity);
+  m_solver->addVsrc( m_root, m_lastAppliedForce, m_selfVelocity);
 }
 
 void LeadSkeleton::addParticle(const Point* const pt)

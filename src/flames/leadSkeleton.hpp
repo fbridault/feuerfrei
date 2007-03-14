@@ -40,13 +40,16 @@ public:
   void addParticle(const Point* const pt);
   
   virtual void drawRoot () const;
+  
   void addForces ();
+  double getLastAppliedForce () const { return m_lastAppliedForce; };
   
 private:
   void drawParticle (Particle * const particle) const;
   
   /** Valeur d'entrée de la fonction de distribution de carburant F(u). */
   double m_u;
+  double m_lastAppliedForce;
   
   /** Générateur de bruit de Perlin. */
   PerlinNoise1D m_noiseGenerator;

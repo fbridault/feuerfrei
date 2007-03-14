@@ -140,6 +140,7 @@ public:
    * Dans le cas d'une PointFlame, cette méthode ne fait rien du tout pour l'instant.
    */
   void breakCheck() {};
+  void addForces ();
 };
 
 

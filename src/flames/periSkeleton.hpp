@@ -44,6 +44,8 @@ public:
   
   /** Retourne un pointeur sur le squelette guide relatif. */
   LeadSkeleton* getLeadSkeleton() const {return m_lead;};
+  
+  void addForces ();
 
 private:  
   /** Pointeur sur le squelette guide associé (généralement le plus proche,

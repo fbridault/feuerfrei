@@ -1,9 +1,9 @@
 #ifndef FAKEFIELD3D_HPP
 #define FAKEFIELD3D_HPP
 
-#include "field3D.hpp"
+class FakeField3D;
 
-class Field3D;
+#include "field3D.hpp"
 
 /** La classe FakeField3D simule un champ de vecteurs 3D. Aucune équation différentielle n'est utilisée ici, tout au plus 
  * il s'agira d'une équation linéaire. Cette classe, à la différence de RealField3D, permet de n'effectuer le calcul des 
@@ -39,7 +39,7 @@ public:
     
     value.x += m_dt * m_forceCoef * m_uSrc * (pos.y+.2)/m_dim.y;
     value.z += m_dt * m_forceCoef * m_wSrc * (pos.y+.2)/m_dim.y;
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.2)/m_dim.y + selfVelocity) - fabs(value.x) - fabs(value.z);
+    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.2)/m_dim.y + selfVelocity) - 2*(fabs(value.x) - fabs(value.z));
     
     return value;
   };
@@ -70,6 +70,7 @@ public:
   
   void displayVelocityField (void);
   
+  virtual bool isRealSolver () const { return false; };
 protected:
   
   /** Coefficients pour les forces externes. */

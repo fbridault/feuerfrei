@@ -34,6 +34,7 @@ public:
   virtual ~RealField3D ();
   
   /********************* Redéfinition des méthodes héritées *********************/
+  /** Lance une itération du solveur. */
   virtual void iterate ();
   
   Point getUVW (const Point& pos, double selfVelocity) const

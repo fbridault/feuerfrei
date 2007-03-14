@@ -125,8 +125,8 @@ public:
   /** Augmente la résolution de la grille de un voxel */
   virtual void increaseRes () {};
   
-  /** Donne le type de solveur courant, seulement valable pour les bi-solveurs */
-  virtual bool isRealSolver () {};
+  /** Donne le type de solveur courant */
+  virtual bool isRealSolver () const { return true; };
   /** Change de type de solveur à la volée, seulement valable pour les bi-solveurs */
   virtual void switchToRealSolver () {};
   virtual void switchToFakeField () {};

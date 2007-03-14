@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <iostream>
+
 PerlinNoise1D::PerlinNoise1D(float increment, float min, float max)
 {
   m_increment = increment;

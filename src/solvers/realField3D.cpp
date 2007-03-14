@@ -53,17 +53,17 @@ void RealField3D::iterate ()
   m_v = (double *) memset (m_v, 0, m_nbVoxels * sizeof (double));
   m_w = (double *) memset (m_w, 0, m_nbVoxels * sizeof (double));
   /* Cellule(s) génératrice(s) */
-  for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-    for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-      for (uint k = 1; k < m_nbVoxelsZ + 1; k++){
-	tmp = m_buoyancy * j/(double)m_nbVoxelsY;
+  for (uint j = 1; j < m_nbVoxelsY + 1; j++){
+    tmp = m_buoyancy * j/m_nbVoxelsY;
+    for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+      for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
 	m_vSrc[IX(i,j,k)] += tmp;
-      }
+  }
   if(arePermanentExternalForces)
     addExternalForces(permanentExternalForces,false);
   
   vel_step ();
-
+  
   m_nbIter++;
 }
 
@@ -76,7 +76,6 @@ void RealField3D::cleanSources ()
 
 void RealField3D::addExternalForces(const Point& position, bool move)
 {
-  uint i,j;
   Point strength;
   Point force;
   
@@ -88,52 +87,23 @@ void RealField3D::addExternalForces(const Point& position, bool move)
     force = position;
     strength = position * .1;
   }
-  
+    
   /* Ajouter des forces externes */
   if(force.x)
-      for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    m_uSrc[IX(i, j, k)] += strength.x*j/(double)m_nbVoxelsY;
+    for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+      for (uint j = 1; j < m_nbVoxelsY + 1; j++)
+	for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
+	  m_uSrc[IX(i, j, k)] += strength.x*j/(double)m_nbVoxelsY;
   if(force.y)
-      for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    m_vSrc[IX(i, j, k)] += strength.y;
+    for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+      for (uint j = 1; j < m_nbVoxelsY + 1; j++)
+	for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
+	  m_vSrc[IX(i, j, k)] += strength.y;
   if(force.z)
-      for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-	for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-	  for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	    m_wSrc[IX(i, j, k)] += strength.z*j/(double)m_nbVoxelsY;
-
-//   /* Ajouter des forces externes */
-//   if(force.x)
-//     if( force.x > 0)
-//       for (i = ceilz; i <= widthz; i++)
-// 	for (j = ceily; j <= widthy; j++)
-// 	  addUsrc (m_nbVoxelsX, j, i, -strength.x);
-//     else
-//       for (i = ceilz; i <= widthz; i++)
-// 	for (j = ceily; j <= widthy; j++)
-// 	  addUsrc (1, j, i, strength.x); 
-//   if(force.y)
-//     if( force.y > 0)
-//       for (i = ceilx; i <= widthx; i++)
-// 	for (j = ceilz; j < widthz; j++)
-// 	  addVsrc (i, m_nbVoxelsY, j, -strength.y/10.0);
-//     else
-//       for (i = ceilx; i <= widthx; i++)
-// 	for (j = ceilz; j <= widthz; j++)
-// 	  addVsrc (i, 1, j, strength.y/10.0);
-//   if(force.z)
-//     if( force.z > 0)
-//       for (i = ceilx; i <= widthx; i++)
-// 	for (j = ceily; j <= widthy; j++)
-// 	  addWsrc (i, j, m_nbVoxelsZ, -strength.z);
-//     else
-//       for (i = ceilx; i <= widthx; i++)
-// 	for (j = ceily; j <= widthy; j++)
-// 	  addWsrc (i, j, 1, strength.z);
+    for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+      for (uint j = 1; j < m_nbVoxelsY + 1; j++)
+	for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
+	  m_wSrc[IX(i, j, k)] += strength.z*j/(double)m_nbVoxelsY;
 }
 
 void RealField3D::displayVelocityField (void)

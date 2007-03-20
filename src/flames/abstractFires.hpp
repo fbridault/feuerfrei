@@ -334,6 +334,7 @@ public:
    * et teste ensuite la visibilité de celle-ci. */
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
+  bool isVisible() { return m_visibility; };
 protected:
   /** Nombre de flammes */
   uint m_nbFlames;

@@ -188,19 +188,19 @@ void GlowEngine::blur()
   m_blurVertexShaderX8.setOffsetsArray(offsets[2]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
-
+  
   /* Partie X [0;bandwidth/4] du filtre */
   m_blurFragmentShader8.setWeightsArray(weights[3],divide[3]);
   m_blurVertexShaderX8.setOffsetsArray(offsets[3]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
-
+  
   /* Partie X [bandwidth/4;bandwidth/2] du filtre */
   m_blurFragmentShader8.setWeightsArray(weights[4],divide[4]);
   m_blurVertexShaderX8.setOffsetsArray(offsets[4]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
-    
+  
   glBlendFunc (GL_ONE, GL_ZERO);
   m_blurVertexShaderY8.enableShader();
   m_blurVertexShaderY8.setOffsetsArray(offsets[0]);
@@ -212,7 +212,7 @@ void GlowEngine::blur()
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->drawOnScreen(m_width[1], m_height[1]);
   
-  m_blurVertexShaderY8.disableProfile();  
+  m_blurVertexShaderY8.disableProfile();
   m_blurFragmentShader8.disableProfile();
   
   //  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -303,7 +303,6 @@ void GlowEngine::drawBlur()
     m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
   //  m_firstPassTex[1]->drawTexOnScreen(m_width[1], m_height[1]);
   //m_visibilityTex->drawOnScreen(m_width[0], m_height[0]);
-  
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   
   glMatrixMode(GL_PROJECTION);

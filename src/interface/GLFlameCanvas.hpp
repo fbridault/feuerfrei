@@ -145,7 +145,8 @@ private:
   CgGammaShader *m_gammaShader;
   
   double *m_intensities;
-  
+  bool m_visibility;
+
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()
 };

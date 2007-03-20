@@ -88,10 +88,10 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
     m_sceneDepthTex->bind();
     m_peelProgram.enableShader();
     
-    /* Pour le premier layer, on construit la displayt list */
+    /* Pour le premier layer, on construit la display list */
     /* et le premier test de profondeur est toujours vrai */
     glActiveTextureARB(GL_TEXTURE1_ARB);
-    if(l == 0){
+    if( !l ){
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
@@ -110,7 +110,6 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
   }
   m_fbo.Deactivate();
   
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glDeleteLists(m_flamesDisplayList,1);
 }
 

@@ -82,7 +82,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
-  m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,1,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,40,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   DoLayout();
   CreateMenuBar();

@@ -394,7 +394,16 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   // SDL_mutexV (lock);
   
   /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
-  if(m_displayFlame || m_displayParticles){
+  m_visibility = false;
+  if(m_displayFlame){
+    for (f = 0; f < m_currentConfig->nbFlames; f++)
+      if(m_flames[f]->isVisible()){
+	m_visibility = true;
+	break;
+      }
+  }
+  
+  if(m_visibility || m_displayParticles){
     if(m_currentConfig->glowEnabled ){
       //    GLdouble m[4][4];
       //    double dist, sigma;
@@ -426,11 +435,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       if(m_currentConfig->depthPeelingEnabled){
 	/* On décortique dans les calques */
 	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
-      
+	
 	m_glowEngine->activate();
-      
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      
+	
 	/* On affiche la superposition des calques que l'on vient de décortiquer */
 	m_depthPeelingEngine->render();
       }else{
@@ -461,14 +470,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   if(!m_glowOnly){
     drawScene();
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-    if(!m_currentConfig->glowEnabled && m_displayFlame || m_displayParticles)
+    if(!m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
       if(m_currentConfig->depthPeelingEnabled)
 	m_depthPeelingEngine->render();
       else
 	for (f = 0; f < m_currentConfig->nbFlames; f++)
 	  m_flames[f]->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
   }
-  if(m_currentConfig->glowEnabled)
+  if(m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
     m_glowEngine->drawBlur();
   m_gammaShader->disableGamma();
   

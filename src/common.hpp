@@ -81,8 +81,6 @@ public:
   wxString IESFileName;
   /** Indique si le feu peut générer des flammes détachées */
   bool breakable;
-  /** Coefficient pour l'intensité lumineuse de la source */
-  double intensityCoef;
 };
 
 class FlameAppConfig{

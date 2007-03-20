@@ -299,7 +299,6 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
       m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
       m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
-      m_config->Read(groupName + _("intensityCoef"), &m_currentConfig.flames[i].intensityCoef, 5);
       m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
       m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
       m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
@@ -605,7 +604,6 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
       m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
       m_config->Write(groupName + _("SamplingTolerance"), m_currentConfig.flames[i].samplingTolerance);
-      m_config->Write(groupName + _("intensityCoef"), m_currentConfig.flames[i].intensityCoef);
       m_config->Write(groupName + _("nbLeadParticles"), (int )m_currentConfig.flames[i].leadLifeSpan);
       m_config->Write(groupName + _("nbPeriParticles"), (int )m_currentConfig.flames[i].periLifeSpan);
       m_config->Write(groupName + _("IESFileName"),m_currentConfig.flames[i].IESFileName);

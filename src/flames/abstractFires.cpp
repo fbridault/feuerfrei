@@ -125,7 +125,7 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
     }
   m_breakable=flameConfig->breakable;  
   
-  m_intensityCoef = flameConfig->intensityCoef;
+  m_intensityCoef = 0.3;
   m_visibility = true;
   m_dist=0;
 }

@@ -271,7 +271,6 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].innerForce = m_currentConfig->flames[i].innerForce;
 	    newConfig[i].leadLifeSpan = m_currentConfig->flames[i].leadLifeSpan;
 	    newConfig[i].periLifeSpan = m_currentConfig->flames[i].periLifeSpan;
-	    newConfig[i].intensityCoef = m_currentConfig->flames[i].intensityCoef;
 	    newConfig[i].samplingTolerance = m_currentConfig->flames[i].samplingTolerance;
 	    newConfig[i].flickering = m_currentConfig->flames[i].flickering;
 	    newConfig[i].fdf = m_currentConfig->flames[i].fdf;

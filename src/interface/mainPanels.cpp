@@ -341,10 +341,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_periLifeLabel = new wxStaticText(this,-1,_("Peri life span"));
   
-  m_intensityCoefSlider = new wxSlider(this,IDSL_IC,0,0,100, wxDefaultPosition,
-				       wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_intensityCoefLabel = new wxStaticText(this,-1,_("Intensity"));
-  
   m_slidersSizer = new wxFlexGridSizer(2);
   m_slidersSizer->AddGrowableCol(1,0);
   m_slidersSizer->Add(m_innerForceLabel, 1, wxADJUST_MINSIZE, 0);
@@ -355,8 +351,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
   m_slidersSizer->Add(m_periLifeSlider, 6, wxEXPAND, 0);
   m_slidersSizer->Add(m_samplingToleranceLabel, 1, wxADJUST_MINSIZE, 0);
   m_slidersSizer->Add(m_samplingToleranceSlider, 6, wxEXPAND, 0);
-  m_slidersSizer->Add(m_intensityCoefLabel, 1, wxADJUST_MINSIZE, 0);
-  m_slidersSizer->Add(m_intensityCoefSlider, 6, wxEXPAND, 0);
   
   m_flickeringRadioBox = new wxRadioBox(this, IDRB_FLICK, _("Flickering"), wxDefaultPosition, wxDefaultSize, 
 					6, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
@@ -392,7 +386,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
   m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
   m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
   m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
-  m_intensityCoefSlider->SetValue((int)(m_flameConfig->intensityCoef*LIGHT_SENSIBILITY));
   
   SetSizerAndFit(m_panelSizer);
 }
@@ -416,10 +409,6 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
     break;
   case IDSL_NPP:
     m_flameConfig->periLifeSpan = m_periLifeSlider->GetValue();
-    break;
-  case IDSL_IC:
-    m_flameConfig->intensityCoef = m_intensityCoefSlider->GetValue()/LIGHT_SENSIBILITY;
-    m_glBuffer->setFlameIntensity(m_index, m_flameConfig->intensityCoef);
     break;
   }
 }

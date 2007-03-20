@@ -131,9 +131,9 @@ private:
   void OnClickButtonBrowse(wxCommandEvent& event);
   void OnPhotoSolidEnter(wxCommandEvent& event);
   
-  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider, *m_intensityCoefSlider;
+  wxSlider *m_innerForceSlider, *m_samplingToleranceSlider, *m_leadLifeSlider, *m_periLifeSlider;
   wxStaticText *m_innerForceLabel, *m_samplingToleranceLabel, *m_leadLifeLabel, *m_periLifeLabel,
-    *m_photoSolidLabel, *m_intensityCoefLabel;
+    *m_photoSolidLabel;
   
   wxButton *m_photoSolidBrowseButton;
   wxTextCtrl *m_photoSolidTextCtrl;

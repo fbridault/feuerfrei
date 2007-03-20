@@ -135,7 +135,7 @@ bool FlamePanel::getCtrlValues(FlameConfig* const flameConfig)
     }
   if(!m_wickTextCtrl->GetValue().IsEmpty())
     flameConfig->wickName = m_wickTextCtrl->GetValue();
-    
+  
   flameConfig->solverIndex = m_solverComboBox->GetSelection();
   flameConfig->type = m_flameTypeRadioBox->GetSelection();
   return true;
@@ -295,9 +295,10 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   delete [] m_currentConfig->flames;
   m_currentConfig->nbFlames = newNb;
   m_currentConfig->flames = newConfig;
+  EndModal(wxID_OK);
 }
 
 void FlameDialog::OnCancel(wxCommandEvent& event)
 {
-  Destroy();
+  EndModal(wxID_CANCEL);
 }

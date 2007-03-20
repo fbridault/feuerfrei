@@ -7,9 +7,6 @@ FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, d
 			  double timeStep, double buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_uSrc = 0;
-  m_vSrc = 0;
-  m_wSrc = 0;
 }
 
 FakeField3D::~FakeField3D ()
@@ -20,18 +17,21 @@ void FakeField3D::iterate ()
 {
   if(!m_run)
     return;
-  
-  if(arePermanentExternalForces)
-    addExternalForces(permanentExternalForces,false);
-  
+
+  if(m_arePermanentExternalForces){
+    if(fabs(m_latentForces.x) < fabs(m_permanentExternalForces.x) || fabs(m_latentForces.y) < fabs(m_permanentExternalForces.y) ||
+       fabs(m_latentForces.z) < fabs(m_permanentExternalForces.z))
+      m_latentForces = m_latentForces + m_permanentExternalForces * 0.1;
+    addExternalForces(m_latentForces,false);
+  }
   m_nbIter++;
 }
 
 void FakeField3D::cleanSources ()
 {
-  m_uSrc = 0;
-  m_vSrc = 0;
-  m_wSrc = 0;
+  m_src.x = 0;
+  m_src.y = 0;
+  m_src.z = 0;
 }
 
 void FakeField3D::addExternalForces(const Point& position, bool move)
@@ -50,11 +50,11 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
   
   /* Ajouter des forces externes */
   if(force.x)
-    m_uSrc -= strength.x;
+    m_src.x -= strength.x;
   if(force.y)
-    m_vSrc -= strength.y;
+    m_src.y -= strength.y;
   if(force.z)
-    m_wSrc -= strength.z;
+    m_src.z -= strength.z;
 }
 
 void FakeField3D::displayVelocityField (void)

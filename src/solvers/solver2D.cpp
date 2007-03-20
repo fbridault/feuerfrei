@@ -160,8 +160,8 @@ void Solver2D::iterate ()
     for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	m_vSrc[IX(i, j)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
   
-  if(arePermanentExternalForces)
-    addExternalForces(permanentExternalForces,false);
+  if(m_arePermanentExternalForces)
+    addExternalForces(m_permanentExternalForces,false);
   
   vel_step ();
   dens_step();

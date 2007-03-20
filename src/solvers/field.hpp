@@ -84,11 +84,11 @@ public:
    */
   virtual void addPermanentExternalForces(Point& forces)
   {
-    permanentExternalForces = forces;
+    m_permanentExternalForces = forces;
     if(!forces.x && !forces.y)
-      arePermanentExternalForces = false;
+      m_arePermanentExternalForces = false;
     else
-      arePermanentExternalForces = true;
+      m_arePermanentExternalForces = true;
   }
 
   virtual void addDensity(int id) {} ;
@@ -155,8 +155,8 @@ protected:
   /** Display list de la base de la grille du solveur. */
   GLuint m_baseDisplayList;
   
-  Point permanentExternalForces;
-  bool arePermanentExternalForces;
+  Point m_permanentExternalForces;
+  bool m_arePermanentExternalForces;
 
   double m_forceCoef;
   double m_forceRatio;

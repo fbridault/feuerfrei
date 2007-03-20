@@ -107,10 +107,14 @@ public:
    */
   Point getScale () const { return m_scale; };
   
-  /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur.
-   * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
-   * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
-   */
+  virtual void addPermanentExternalForces(Point& forces)
+  {
+    m_permanentExternalForces = forces;
+    if(!forces.x && !forces.y && !forces.z)
+      m_arePermanentExternalForces = false;
+    else
+      m_arePermanentExternalForces = true;
+  }
   virtual void addExternalForces(const Point& position, bool move) = 0;
   
   /** Divise la résolution de la grille par 2 */

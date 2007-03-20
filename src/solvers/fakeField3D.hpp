@@ -37,16 +37,18 @@ public:
   {
     Point value;
     
-    value.x += m_dt * m_forceCoef * m_uSrc * (pos.y+.2)/m_dim.y;
-    value.z += m_dt * m_forceCoef * m_wSrc * (pos.y+.2)/m_dim.y;
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.2)/m_dim.y + selfVelocity) - 2*(fabs(value.x) - fabs(value.z));
+//     value.x += m_dt * m_forceCoef * m_src.x * (m_src.x < 0 ? pos.x/m_dim.x : (m_dim.x-pos.x/m_dim.x)) * (pos.y+.1)/m_dim.y;
+//     value.z += m_dt * m_forceCoef * m_src.z * (m_src.z < 0 ? pos.z/m_dim.z : (m_dim.z-pos.z/m_dim.z)) * (pos.y+.1)/m_dim.y;
+    value.x += m_dt * m_forceCoef * m_src.x * (pos.y+.1)/m_dim.y;
+    value.z += m_dt * m_forceCoef * m_src.z * (pos.y+.1)/m_dim.y;
+    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.1)/m_dim.y + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
     
     return value;
   };
   
   void addUsrc (const Point& pos, double value)
   {
-    m_uSrc += value;
+    m_src.x += value;
   };
   
   void addVsrc (const Point& pos, double value, double& selfVelocity)
@@ -56,16 +58,25 @@ public:
   
   void addWsrc (const Point& pos, double value)
   {
-    m_wSrc += value;
+    m_src.z += value;
   };
   
   void setVsrc (const Point& pos, double value)
   {
-    m_vSrc = value;
+    m_src.y = value;
   };
   
   virtual void addExternalForces(const Point& position, bool move);
     
+  virtual void addPermanentExternalForces(Point& forces)
+  {
+    m_permanentExternalForces = forces;
+    //    m_latentForces.resetToNull();
+    if(!forces.x && !forces.y && !forces.z)
+      m_arePermanentExternalForces = false;
+    else
+      m_arePermanentExternalForces = true;
+  }
   void cleanSources ();
   
   void displayVelocityField (void);
@@ -74,7 +85,8 @@ public:
 protected:
   
   /** Coefficients pour les forces externes. */
-  double m_uSrc, m_vSrc, m_wSrc;
+  Point m_src;
+  Point m_latentForces;
 };
 
 #endif

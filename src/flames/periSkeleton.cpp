@@ -34,7 +34,7 @@ FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadS
 
 void PeriSkeleton::addForces ()
 {
-  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce()/1.1, m_selfVelocity);  
+  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), m_selfVelocity);  
 }
 
 void PeriSkeleton::addParticle(const Point* const pt)
@@ -58,7 +58,7 @@ bool PeriSkeleton::moveParticle (Particle * const pos)
   *pos += m_solver->getUVW(*pos, m_lead->getSelfVelocity()/1.1);
   
   /* Si la particule sort de la grille, elle est éliminée */
-  if (pos->x < 0 || pos->x > m_solver->getDimX()
+  if (   pos->x < 0 || pos->x > m_solver->getDimX()
       || pos->y < 0 || pos->y > m_solver->getDimY()
       || pos->z < 0 || pos->z > m_solver->getDimZ())
     return false;

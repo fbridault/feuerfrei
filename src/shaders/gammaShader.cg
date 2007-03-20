@@ -1,0 +1,13 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+struct vertout
+{
+  float4 Pos	 : POSITION;
+  float2 tc      : TEXCOORD0;
+};
+
+float4 gamma(vertout IN, uniform float gamma, uniform samplerRECT text  ) : COLOR
+{  
+  return pow(texRECT(text,IN.tc), gamma);
+//  return float4(1,1,0,0);
+}

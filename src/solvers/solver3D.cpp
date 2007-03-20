@@ -32,7 +32,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, double 
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
-
+  
 //   m_forceCoef = 1;
 //   m_forceRatio = 1;
 }
@@ -186,8 +186,8 @@ void Solver3D::iterate ()
 //     m_t+=m_t2nx;
 //   }//for k
     
-  if(arePermanentExternalForces)
-    addExternalForces(permanentExternalForces,false);
+  if(m_arePermanentExternalForces)
+    addExternalForces(m_permanentExternalForces,false);
   
   vel_step ();
 
@@ -201,6 +201,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   uint ceilx, ceily, ceilz;
   Point strength;
   Point force;
+  double factor = m_dim.y/(m_nbVoxelsY - 1);
   
   if(move){
     force = position - m_position;
@@ -214,7 +215,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     strength.z = fabs(strength.z);  
   }
   
-  findPointPosition(m_dim-Point(.1,.3,.1),widthx,widthy,widthz);
+  findPointPosition(m_dim-Point(.05,.1,.05),widthx,widthy,widthz);
   findPointPosition(Point(0,0,0),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */
@@ -222,11 +223,11 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     if( force.x > 0)
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  m_uSrc[IX(m_nbVoxelsX, j, i)] -= strength.x;
+	  m_uSrc[IX(m_nbVoxelsX, j, i)] -= strength.x;//*(m_nbVoxelsY - j)*factor;
     else
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
-	  m_uSrc[IX(1, j, i)] += strength.x;
+	  m_uSrc[IX(1, j, i)] += strength.x;//*(m_nbVoxelsY - j)*factor;
   if(force.y)
     if( force.y > 0)
       for (i = ceilx; i <= widthx; i++)
@@ -240,11 +241,11 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     if( force.z > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  m_wSrc[IX(i, j, m_nbVoxelsZ)] -= strength.z;
+	  m_wSrc[IX(i, j, m_nbVoxelsZ)] -= strength.z;//*(m_nbVoxelsY - j)*factor;
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
-	  m_wSrc[IX(i, j, 1)] += strength.z;
+	  m_wSrc[IX(i, j, 1)] += strength.z;//*(m_nbVoxelsY - j)*factor;
 }
 
 void Solver3D::prolonger(double  *const v2h, double *const vh)

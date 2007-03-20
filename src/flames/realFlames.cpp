@@ -171,16 +171,17 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(4,0,4), flameConfig, 0, .5, 0, .1));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0,2), flameConfig, 0, .5, 0, .1));
   
   /* On créé les squelettes en cercle */
   angle = 0;
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, 
-					     Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
-					     Point(1,.75,1),
-					     m_leadSkeletons[0], flameConfig);
+      m_periSkeletons[i] = new PeriSkeleton
+	(m_solver, 
+	 Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
+	 Point(1,.75,1),
+	 m_leadSkeletons[0], flameConfig);
       angle += 2 * PI / m_nbSkeletons;
     }
 }

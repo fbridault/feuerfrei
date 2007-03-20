@@ -197,7 +197,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
   /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
   if(m_visibility || forceSpheresBuild) buildBoundingSphere();
-
+  
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);
   

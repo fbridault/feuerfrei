@@ -487,9 +487,9 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd;//=wxGetCwd();
-  pwd << _("params");//PARAMS_DIRECTORY;
-  cerr << pwd.fn_str() << endl;
+  wxString pwd=wxGetCwd();
+  pwd << PARAMS_DIRECTORY;
+  
   wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();

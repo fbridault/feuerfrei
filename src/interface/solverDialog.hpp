@@ -74,6 +74,7 @@ private:
   void OnClickButtonAdd(wxCommandEvent& event);
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
+  void OnCancel(wxCommandEvent& event);
   void OnPageChanging(wxNotebookEvent& event);
   /** Vérifie si un solveur est utilisé par des flammes.
    * Si c'est le cas, le bouton d'effacement du solveur est désactivé

@@ -2,8 +2,8 @@
 
 #include "solverDialog.hpp"
 
-// Déclarations de la table des événements
-// Sorte de relation qui lit des identifiants d'événements aux fonctions
+// DÃ©clarations de la table des Ã©vÃ©nements
+// Sorte de relation qui lit des identifiants d'Ã©vÃ©nements aux fonctions
 BEGIN_EVENT_TABLE(FluidsFrame, wxFrame)
   EVT_SIZE(FluidsFrame::OnSize)
   EVT_BUTTON(IDB_Run, FluidsFrame::OnClickButtonRun)
@@ -33,11 +33,11 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
 			      1                 ,
 			      0                  };
   
-  /*********************************** Création des contrôles *************************************************/
-  // Création d'un bouton. Ce bouton est associé à l'identifiant 
-  // événement ID_Bt_Click, en consultant, la table des événements
-  // on en déduit que c'est la fonction OnClickButton qui sera 
-  // appelée lors d'un click sur ce bouton
+  /*********************************** CrÃ©ation des contrÃ´les *************************************************/
+  // CrÃ©ation d'un bouton. Ce bouton est associÃ© Ã  l'identifiant 
+  // Ã©vÃ©nement ID_Bt_Click, en consultant, la table des Ã©vÃ©nements
+  // on en dÃ©duit que c'est la fonction OnClickButton qui sera 
+  // appelÃ©e lors d'un click sur ce bouton
   m_glBuffer = new GLFluidsCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
     
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
@@ -47,7 +47,7 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
   
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
-  /* Réglages globaux */
+  /* RÃ©glages globaux */
   m_globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
   m_globalTopSizer->Add(m_buttonRun, 0, 0, 0);
   m_globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
@@ -68,7 +68,7 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
   m_mainSizer->Add(m_rightSizer, 1, 0, 0);
   
-  /* Création des menus */
+  /* CrÃ©ation des menus */
   m_menuFile = new wxMenu;
   
   m_menuFile->Append( IDM_LoadParam, _("&Load simulation file...") );
@@ -197,7 +197,7 @@ void FluidsFrame::OnClose(wxCloseEvent& event)
   Destroy();
 }
 
-// Fonction qui est exécutée lors du click sur le bouton.
+// Fonction qui est exÃ©cutÃ©e lors du click sur le bouton.
 void FluidsFrame::OnClickButtonRun(wxCommandEvent& event)
 {
   if(m_glBuffer->IsRunning()){
@@ -209,7 +209,7 @@ void FluidsFrame::OnClickButtonRun(wxCommandEvent& event)
   }
 }
 
-// Fonction qui est exécutée lors du click sur le bouton.
+// Fonction qui est exÃ©cutÃ©e lors du click sur le bouton.
 void FluidsFrame::OnClickButtonRestart(wxCommandEvent& event)
 {
   m_glBuffer->Restart();
@@ -223,7 +223,7 @@ void FluidsFrame::OnCheckSaveImages(wxCommandEvent& event)
 void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
   
   wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.slv"), wxOPEN|wxFILE_MUST_EXIST);
@@ -231,8 +231,8 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
     filename = fileDialog.GetPath();
     
     if(!filename.IsEmpty()){
-      /* Récupération le chemin absolu vers la scène */
-      filename.Replace(wxGetWorkingDirectory(),_(""),false);
+      /* RÃ©cupÃ©ration le chemin absolu vers la scÃ¨ne */
+      filename.Replace(wxGetCwd(),_(""),false);
       /* Suppression du premier slash */
       filename=filename.Mid(1);
 
@@ -308,14 +308,14 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 void FluidsFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
   
-  wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxHIDE_READONLY|wxOVERWRITE_PROMPT);
+  wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxOVERWRITE_PROMPT);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
-    /* Récupération le chemin absolu vers la scène */
-    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    /* RÃ©cupÃ©ration le chemin absolu vers la scÃ¨ne */
+    filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
   

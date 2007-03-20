@@ -13,6 +13,7 @@ class FlamesFrame;
 #include <wx/fileconf.h>
 #include <wx/stream.h>
 #include <wx/wfstream.h>
+#include <wx/notebook.h>
 
 #include "interface.hpp"
 #include "mainPanels.hpp"
@@ -27,6 +28,7 @@ enum
     IDCHK_DP,
     IDCHK_SaveImages,
     IDSL_DP,
+    IDSL_Gamma,
   };
 
 enum
@@ -72,6 +74,8 @@ public:
   void InitGLBuffer (bool recompileShaders);
   void InitSolversPanels();
   void InitFlamesPanels();
+  void DoLayout();
+  void CreateMenuBar();
   
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
@@ -112,6 +116,7 @@ public:
   void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
   void OnScrollDP(wxScrollEvent& event);
+  void OnScrollGamma(wxScrollEvent& event);
   void OnSize(wxSizeEvent& event);
   void SetFPS(int fps);
 
@@ -133,11 +138,9 @@ private:
   wxCheckBox *m_blendedSolidCheckBox;
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox;
+  wxSlider *m_depthPeelingSlider, *m_gammaSlider;
+  wxBoxSizer *m_mainSizer;
   
-  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer;  
-  wxBoxSizer *m_leftSizer, *m_bottomSizer, *m_mainSizer, *m_rightSizer, *m_lightingBottomSizer, *m_multiTopSizer, *m_globalTopSizer;
-  wxSlider *m_depthPeelingSlider;
-
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
   FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];
   

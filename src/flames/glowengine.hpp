@@ -73,7 +73,7 @@ public:
   /** Effectue le blur en trois passes */
   void blur();
   /** Plaque le blur à l'écran */
-  void drawBlur(double alpha);
+  void drawBlur();
 
   void setGaussSigma(uint index, double sigma)
   {

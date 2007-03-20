@@ -37,7 +37,7 @@ public:
   void deleteTexture(void){ delete m_photometricSolidsTex; };
   /** Générer une nouvelle texture pour le solide photométrique. */
   void generateTexture(void);
-
+  
 private:  
   /** Pointeur vers la scène 3D. */
   const Scene* m_scene;

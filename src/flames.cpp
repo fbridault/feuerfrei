@@ -71,7 +71,8 @@ bool FlamesApp::areShadersCompiled()
       if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("fragGlow.o"))))
 	if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("SVExtrude.o"))))
 	  if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vpSPTEX.o"))))
-	     return false;
+	    if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("gamma.o"))))
+	      return false;
   cerr << "Cg shaders are not compiled yet, that will be done during this run." << endl;
   return true;
 }

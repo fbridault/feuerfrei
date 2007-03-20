@@ -57,6 +57,7 @@ private:
   void OnClickButtonAdd(wxCommandEvent& event);
   void OnClickButtonDelete(wxCommandEvent& event);
   void OnOK(wxCommandEvent& event);
+  void OnCancel(wxCommandEvent& event);
   
   int m_nbPanels;
   FlamePanel* m_flamePanels[NB_MAXFLAMMES];

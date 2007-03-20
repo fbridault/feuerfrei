@@ -13,6 +13,7 @@ class FluidsFrame;
 #include <wx/fileconf.h>
 #include <wx/stream.h>
 #include <wx/wfstream.h>
+#include <wx/notebook.h>
 
 #include "interface.hpp"
 #include "GLFluidsCanvas.hpp"

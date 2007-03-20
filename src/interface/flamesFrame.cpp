@@ -39,6 +39,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_DP, FlamesFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, FlamesFrame::OnCheckSaveImages)
   EVT_COMMAND_SCROLL(IDSL_DP, FlamesFrame::OnScrollDP)
+  EVT_COMMAND_SCROLL(IDSL_Gamma, FlamesFrame::OnScrollGamma)
   EVT_CLOSE(FlamesFrame::OnClose)
 END_EVENT_TABLE();
 
@@ -81,6 +82,26 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
+  m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,1,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  
+  DoLayout();
+  CreateMenuBar();
+  
+  m_configFileName = configFileName;
+  GetSettingsFromConfigFile();
+  
+  m_currentConfig.gammaCorrection = 1;
+  m_gammaSlider->SetValue(m_currentConfig.gammaCorrection*100);
+  
+  CreateStatusBar();
+  SetStatusText( _("FPS will be here...") );
+}
+
+void FlamesFrame::DoLayout()
+{
+  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer, *m_gammaSizer;  
+  wxBoxSizer *m_leftSizer, *m_bottomSizer, *m_rightSizer, *m_lightingBottomSizer, *m_multiTopSizer, *m_globalTopSizer;
+  
   /* Réglages globaux */
   m_globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
   m_globalTopSizer->Add(m_buttonRun, 0, 0, 0);
@@ -99,9 +120,13 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
   m_lightingSizer->Add(m_lightingBottomSizer, 1, 0, 0);
   
+  m_gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
+  m_gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
+  
   m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
   m_bottomSizer->Add(m_globalSizer, 1, wxEXPAND, 0);
   m_bottomSizer->Add(m_lightingSizer, 1, wxEXPAND, 0);
+  m_bottomSizer->Add(m_gammaSizer, 1, wxEXPAND, 0);
   
   /* Réglages du glow */
   m_multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -131,6 +156,11 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_mainSizer->Add(m_leftSizer, 0, 0, 0);
   m_mainSizer->Add(m_rightSizer, 1, 0, 0);
   
+  SetSizerAndFit(m_mainSizer);
+}
+
+void FlamesFrame::CreateMenuBar()
+{
   /* Création des menus */
   m_menuFile = new wxMenu;
   
@@ -171,16 +201,6 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_menuBar->Append( m_menuSettings, _("&Settings") );
   
   SetMenuBar( m_menuBar );
-  
-  m_configFileName = configFileName;
-  GetSettingsFromConfigFile();
-  
-  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
-
-  SetSizerAndFit(m_mainSizer);
-  
-  CreateStatusBar();
-  SetStatusText( _("FPS will be here...") );
 }
 
 void FlamesFrame::OnSize(wxSizeEvent& event)
@@ -296,11 +316,8 @@ void FlamesFrame::GetSettingsFromConfigFile (void)
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
   
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
-  /* Crée un bug lors d'un restart si la valeur est différente de la précédente */
-  /* Cela survient dès que l'on a utilisé une méthode DeleteAllPages sur les Notebooks */
-  /* Je ne vois pas le rapport pour l'instant mais cela ne se produit pas avec GTK 2.8 */
-//   m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
-  
+  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
+    
   if(m_currentConfig.depthPeelingEnabled)
     m_depthPeelingSlider->Enable();
   else
@@ -433,6 +450,12 @@ void FlamesFrame::OnScrollDP(wxScrollEvent& event)
   m_currentConfig.nbDepthPeelingLayers = m_depthPeelingSlider->GetValue();
 }
 
+void FlamesFrame::OnScrollGamma(wxScrollEvent& event)
+{
+  m_currentConfig.gammaCorrection = m_gammaSlider->GetValue()/100.0;
+  m_glBuffer->setGammaCorrection( m_currentConfig.gammaCorrection );
+}
+
 void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
 {
   m_glBuffer->ToggleSaveImages();  
@@ -441,7 +464,7 @@ void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
 void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd << SCENES_DIRECTORY;
   
   wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
@@ -450,7 +473,7 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
     filename = fileDialog.GetPath();
     
     /* Récupération le chemin absolu vers la scène */
-    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
     
@@ -464,9 +487,9 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
-  pwd << PARAMS_DIRECTORY;
-  
+  wxString pwd;//=wxGetCwd();
+  pwd << _("params");//PARAMS_DIRECTORY;
+  cerr << pwd.fn_str() << endl;
   wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
@@ -475,7 +498,7 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_glBuffer->setRunningState(false);
       Disable();
       /* Récupération le chemin absolu vers la scène */
-      filename.Replace(wxGetWorkingDirectory(),_(""),false);
+      filename.Replace(wxGetCwd(),_(""),false);
       /* Suppression du premier slash */
       filename=filename.Mid(1);
 
@@ -599,14 +622,14 @@ void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
   
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
   
-  wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxHIDE_READONLY|wxOVERWRITE_PROMPT);
+  wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxOVERWRITE_PROMPT);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
     /* Récupération le chemin absolu vers la scène */
-    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
   
@@ -677,9 +700,8 @@ void FlamesFrame::OnShadowVolumesMenu(wxCommandEvent& event)
 
 void FlamesFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
 {
-  ShadowsDialog *shadowsDialog = new ShadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
-  shadowsDialog->ShowModal();  
-  shadowsDialog->Destroy();
+  ShadowsDialog shadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
+  shadowsDialog.ShowModal();  
 }
 
 void FlamesFrame::OnFBDSMenu(wxCommandEvent& event)
@@ -727,22 +749,20 @@ void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 
 void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
 {
-  SolverDialog *solverDialog = new SolverDialog(GetParent(),-1,_("Solvers settings"),&m_currentConfig);
-  if(solverDialog->ShowModal() == wxID_OK){
+  SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
+  if(solverDialog.ShowModal() == wxID_OK){
     InitSolversPanels();
     m_glBuffer->Restart();
   }
-  solverDialog->Destroy();
 }
 
 void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
 {
-  FlameDialog *flameDialog = new FlameDialog(GetParent(),-1,_("Flames settings"),&m_currentConfig);
-  if(flameDialog->ShowModal() == wxID_OK){
+  FlameDialog flameDialog (GetParent(),-1,_("Flames settings"),&m_currentConfig);
+  if(flameDialog.ShowModal() == wxID_OK){
     InitFlamesPanels();
     m_glBuffer->Restart();
   }
-  flameDialog->Destroy();
 }
 
 void FlamesFrame::SetFPS(int fps)

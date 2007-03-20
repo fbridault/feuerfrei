@@ -62,6 +62,7 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
 //   m_visibilityFBO.Activate();
 //   m_visibilityFBO.ColorAttach(m_visibilityTex->getTexture(), 0);
 //   m_visibilityFBO.RenderBufferAttach();
+  m_secondPassFBOs[GLOW_LEVELS-1].Deactivate();
 }
 
 GlowEngine::~GlowEngine()
@@ -199,9 +200,7 @@ void GlowEngine::blur()
   m_blurVertexShaderX8.setOffsetsArray(offsets[4]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
-  
-  m_blurVertexShaderX8.disableProfile();
-  
+    
   glBlendFunc (GL_ONE, GL_ZERO);
   m_blurVertexShaderY8.enableShader();
   m_blurVertexShaderY8.setOffsetsArray(offsets[0]);
@@ -217,6 +216,8 @@ void GlowEngine::blur()
   m_blurFragmentShader8.disableProfile();
   
   //  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
+  m_firstPassFBOs[1].Deactivate();
   
   glMatrixMode(GL_PROJECTION);
   glPopMatrix();
@@ -281,7 +282,7 @@ void GlowEngine::blur()
 //   glEnable(GL_DEPTH_TEST);
 // }
 
-void GlowEngine::drawBlur(double alpha)
+void GlowEngine::drawBlur()
 {
   GLboolean params;
   glDisable (GL_DEPTH_TEST);
@@ -302,7 +303,7 @@ void GlowEngine::drawBlur(double alpha)
     m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
   //  m_firstPassTex[1]->drawTexOnScreen(m_width[1], m_height[1]);
   //m_visibilityTex->drawOnScreen(m_width[0], m_height[0]);
-
+  
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   
   glMatrixMode(GL_PROJECTION);

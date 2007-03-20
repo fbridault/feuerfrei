@@ -28,11 +28,11 @@ CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, cons
   //   }else{
   //     cmd += (_(" -profile arbfp1 "));
   //   }
-   
+  
   //   cmd += sourceName;
-   
+  
   //   cout << cmd.mb_str() << endl;
-   
+  
   //system(cmd.ToAscii());
   //    int code = wxExecute( cmd, wxEXEC_SYNC|wxEXEC_RELATIVE_PATH );
   
@@ -55,7 +55,7 @@ CgShader::CgShader (const wxString& sourceName, const wxString& shaderName, cons
       system(buffer);
     }
   }
-     
+  
   program = cgCreateProgramFromFile (*context, CG_OBJECT, compiledName.mb_str(), profile, shaderPath.mb_str(), 0);
   
   // Initialiser les profils et les options du compilateur CG

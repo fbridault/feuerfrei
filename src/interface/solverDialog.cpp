@@ -405,7 +405,11 @@ void SolverDialog::OnOK(wxCommandEvent& event)
   delete [] m_currentConfig->solvers;
   m_currentConfig->solvers = newConfig;
   m_currentConfig->nbSolvers = newNb;
-  wxDialog::OnOK(event);
+}
+
+void SolverDialog::OnCancel(wxCommandEvent& event)
+{
+  Destroy();
 }
 
 void SolverDialog::OnPageChanging(wxNotebookEvent& event)

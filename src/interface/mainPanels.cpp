@@ -437,7 +437,7 @@ void FlameMainPanel::OnSelectFDF(wxCommandEvent& event)
 void FlameMainPanel::OnClickButtonBrowse(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd <<_("/IES");
   
   wxFileDialog fileDialog(this, _("Choose a IES file for this flame"), pwd, _(""), _("*.ies"), wxOPEN|wxFILE_MUST_EXIST);
@@ -454,7 +454,7 @@ void FlameMainPanel::OnPhotoSolidEnter(wxCommandEvent& event)
 {
   bool restart = false;
   wxString filename = m_photoSolidTextCtrl->GetValue();
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   
   filename.Replace(pwd,_(""),false);
   if(!wxFile::Exists(filename)){

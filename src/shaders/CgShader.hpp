@@ -32,12 +32,12 @@ public:
   virtual ~CgShader();
   
   /** Activation du profil. */
-  void enableProfile() const{
+  virtual void enableProfile() const{
     cgGLEnableProfile(profile);
   };
   
   /** Bind du programme. */
-  void bindProgram() const{
+  virtual void bindProgram() const{
     cgGLBindProgram(program);
   };
   
@@ -48,12 +48,12 @@ public:
   }
 
   /** Désactivation du profil. */
-  void disableProfile() const{
+  virtual void disableProfile() const{
     cgGLDisableProfile(profile);
   };
   
   /** Désactivation du shader. */
-  void disableShader() const{
+  virtual void disableShader(){
     cgGLDisableProfile(profile);
   };
   

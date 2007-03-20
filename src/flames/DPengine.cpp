@@ -110,6 +110,7 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
   }
   m_fbo.Deactivate();
   
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glDeleteLists(m_flamesDisplayList,1);
 }
 

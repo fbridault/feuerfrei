@@ -161,7 +161,7 @@ void FlamePanel::OnSelectType(wxCommandEvent& event)
 void FlamePanel::OnClickButtonBrowseWick(wxCommandEvent& event)
 {
   wxString filename;
-  wxString pwd=wxGetWorkingDirectory();
+  wxString pwd=wxGetCwd();
   pwd << _("/scenes");
   
   wxFileDialog fileDialog(this, _("Choose a OBJ file for the wick"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
@@ -169,7 +169,7 @@ void FlamePanel::OnClickButtonBrowseWick(wxCommandEvent& event)
     filename = fileDialog.GetPath();
     
     /* On récupère le chemin absolu vers la scène */
-    filename.Replace(wxGetWorkingDirectory(),_(""),false);
+    filename.Replace(wxGetCwd(),_(""),false);
     filename=filename.Mid(1);
     
     if(!filename.IsEmpty())
@@ -261,7 +261,6 @@ void FlameDialog::OnOK(wxCommandEvent& event)
 	  if( newConfig[i].wickName.IsEmpty() ){
 	    wxMessageDialog errorDialog (this,_("You must provide a filename for the wick"),_("Error"),wxOK|wxICON_ERROR);
 	    errorDialog.ShowModal();
-	    errorDialog.Destroy();
 	    delete [] newConfig;
 	    return;
 	  }
@@ -296,5 +295,9 @@ void FlameDialog::OnOK(wxCommandEvent& event)
   delete [] m_currentConfig->flames;
   m_currentConfig->nbFlames = newNb;
   m_currentConfig->flames = newConfig;
-  wxDialog::OnOK(event);
+}
+
+void FlameDialog::OnCancel(wxCommandEvent& event)
+{
+  Destroy();
 }

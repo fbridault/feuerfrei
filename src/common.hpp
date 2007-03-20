@@ -107,6 +107,7 @@ public:
   FlameConfig *flames;
   double fatness[4];
   double extrudeDist[4];
+  double gammaCorrection;
 };
 
 class FluidsAppConfig{

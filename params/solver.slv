@@ -13,7 +13,7 @@ FileName=scenes/boulanger/BOUTIQUEboulanger2portique.obj
 [Solvers]
 Number=1
 [Solver0]
-Type=4
+Type=2
 Pos.x=-0,5
 Pos.y=-0,5
 Pos.z=-0,5
@@ -27,3 +27,7 @@ omegaProj=1,5
 epsilon=0,0001
 nbMaxIter=50
 Buoyancy=2,20688e-312
+Dim=1
+Scale.x=1
+Scale.y=1
+Scale.z=1

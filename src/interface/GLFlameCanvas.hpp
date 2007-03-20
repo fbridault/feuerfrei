@@ -9,6 +9,7 @@ class GLFlameCanvas;
 #include <wx/glcanvas.h>
 
 #include "../shaders/CgSVShader.hpp"
+#include "../shaders/CgGammaShader.hpp"
 
 #include "../scene/camera.hpp"
 #include "../scene/scene.hpp"
@@ -17,9 +18,10 @@ class GLFlameCanvas;
 #include "../flames/realFires.hpp"
 #include "../flames/glowengine.hpp"
 #include "../flames/DPengine.hpp"
-#include "../flames/solidePhoto.hpp"
 
 #include "../solvers/field3D.hpp"
+
+class PhotometricSolidsRenderer;
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -73,14 +75,6 @@ public:
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->setSmoothShading (state);
   };
-//   void ToggleDepthPeeling(void) { 
-//     if(m_currentConfig->depthPeelingEnabled)
-//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-// 	m_flames[f]-> setTesselateMode();
-//     else
-//       for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-// 	m_flames[f]-> setRenderMode();
-//   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ 
     m_solvers[selectedSolver]->addExternalForces(pt,move);
@@ -100,7 +94,7 @@ public:
   /** Change l'affichage des sphères englobantes. */
   void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
   void setBoundingSphereDisplay(bool display) { m_displayFlamesBoundingSpheres = display; };
-  
+  void setGammaCorrection(double gamma) { m_gammaShader->SetGamma(gamma); };
 private:
   void WriteFPS ();
   void DrawVelocity (void);
@@ -148,6 +142,7 @@ private:
   FireSource **m_flames;
   Scene *m_scene;
   CgSVShader *m_SVShader;
+  CgGammaShader *m_gammaShader;
   
   double *m_intensities;
   

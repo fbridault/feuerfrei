@@ -67,6 +67,17 @@ public:
 	   (z <= P.z+EPSILON  &&  z >= P.z-EPSILON));
   };
   /**
+   * Op&eacute;rateur d'in&eacute;galit&eacute;. Une marge correspondant &egrave; plus ou moins <CODE>epsilon</CODE> est tol&eacute;r&eacute;e 
+   * afin de lisser les impr&eacute;cisions de calcul d'intersection. Cet op&eacute;rateur doit être surcharg&eacute; dans 
+   * toute classe fille de Point.
+   */
+  virtual bool operator!= (const Point& P) const
+  {
+    return(! (x <= P.x+EPSILON  &&  x >= P.x-EPSILON) &&
+	     (y <= P.y+EPSILON  &&  y >= P.y-EPSILON) &&
+	     (z <= P.z+EPSILON  &&  z >= P.z-EPSILON));
+  };
+  /**
    * Op&eacute;rateur de soustraction. Retourne la diff&eacute;rence entre deux points.  Cet op&eacute;rateur doit être surcharg&eacute; 
    * dans toute classe fille de Point.
    * @param P	point a soustraire au point courant.

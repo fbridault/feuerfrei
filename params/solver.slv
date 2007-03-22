@@ -13,7 +13,7 @@ FileName=scenes/boulanger/BOUTIQUEboulanger2portique.obj
 [Solvers]
 Number=1
 [Solver0]
-Type=2
+Type=5
 Pos.x=-0,5
 Pos.y=-0,5
 Pos.z=-0,5

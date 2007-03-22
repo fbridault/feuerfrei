@@ -15,14 +15,65 @@ FakeField3D::~FakeField3D ()
 
 void FakeField3D::iterate ()
 {
+  double coef=.1;
   if(!m_run)
     return;
 
   if(m_arePermanentExternalForces){
-    if(fabs(m_latentForces.x) < fabs(m_permanentExternalForces.x) || fabs(m_latentForces.y) < fabs(m_permanentExternalForces.y) ||
-       fabs(m_latentForces.z) < fabs(m_permanentExternalForces.z))
-      m_latentForces = m_latentForces + m_permanentExternalForces * 0.1;
+//     if(fabs(m_latentForces.x) < fabs(m_permanentExternalForces.x))
+//       m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
+//     else
+//       m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
+//     if(fabs(m_latentForces.y) < fabs(m_permanentExternalForces.y))      
+//       m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
+//     else
+//       m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;
+//     if(fabs(m_latentForces.z) < fabs(m_permanentExternalForces.z))
+//       m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
+//     else
+//       m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
+    if(m_permanentExternalForces.x > 0)
+      if(m_latentForces.x < m_permanentExternalForces.x)
+	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
+      else
+	m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
+    if(m_permanentExternalForces.y > 0)
+      if(m_latentForces.y < m_permanentExternalForces.y)
+	m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
+      else
+	m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;	
+    if(m_permanentExternalForces.z > 0)
+      if(m_latentForces.z < m_permanentExternalForces.z)
+	m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
+      else
+	m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
+	
+    if(m_permanentExternalForces.x < 0)
+      if(m_latentForces.x > m_permanentExternalForces.x)
+	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
+      else
+	m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
+    if(m_permanentExternalForces.y < 0)
+       if(m_latentForces.y > m_permanentExternalForces.y)
+	 m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
+       else
+	 m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;
+    if(m_permanentExternalForces.z < 0)
+       if(m_latentForces.z > m_permanentExternalForces.z)
+	 m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
+       else
+	 m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
+    
     addExternalForces(m_latentForces,false);
+  }else{
+    if(m_latentForces.x > 0) m_latentForces.x = m_latentForces.x - coef;
+    if(m_latentForces.y > 0) m_latentForces.y = m_latentForces.y - coef;
+    if(m_latentForces.z > 0) m_latentForces.z = m_latentForces.z - coef;
+    if(m_latentForces.x < 0) m_latentForces.x = m_latentForces.x + coef;
+    if(m_latentForces.y < 0) m_latentForces.y = m_latentForces.y + coef;
+    if(m_latentForces.z < 0) m_latentForces.z = m_latentForces.z + coef;
+   
+    if(!m_latentForces.x && !m_latentForces.y && !m_latentForces.z) addExternalForces(m_latentForces,false);
   }
   m_nbIter++;
 }

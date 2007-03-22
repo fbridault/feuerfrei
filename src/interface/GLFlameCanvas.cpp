@@ -478,7 +478,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   if(!m_glowOnly){
     drawScene();
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-    if(!m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
+    if(m_visibility && !m_currentConfig->glowEnabled || m_displayParticles)
       if(m_currentConfig->depthPeelingEnabled)
 	m_depthPeelingEngine->render();
       else

@@ -20,6 +20,7 @@ class GLFlameCanvas;
 #include "../flames/DPengine.hpp"
 
 #include "../solvers/field3D.hpp"
+#include "../solvers/globalField.hpp"
 
 class PhotometricSolidsRenderer;
 
@@ -137,6 +138,7 @@ private:
   DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
   Field3D **m_solvers;
+  GlobalField *m_globalField;
     
   /********* Variables relatives à la simulation *************************/
   FireSource **m_flames;

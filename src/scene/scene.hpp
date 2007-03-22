@@ -317,6 +317,7 @@ public:
       m_flames[f]->drawLuminary(shader);
   };
   
+  void computeBoundingBox(Point& max, Point& min);
 private:
   vector<Object*> m_objectsArray; /** Liste des objets de la scene ne projetant pas d'ombres. */
   vector<Object*> m_objectsArrayWSV; /** Liste des objets de la scene projetant des ombres. */

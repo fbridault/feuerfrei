@@ -88,7 +88,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   CreateMenuBar();
   
   m_configFileName = configFileName;
-  GetSettingsFromConfigFile();
+  LoadSettings();
   
   m_currentConfig.gammaCorrection = 1;
   m_gammaSlider->SetValue(m_currentConfig.gammaCorrection*100);
@@ -208,132 +208,6 @@ void FlamesFrame::OnSize(wxSizeEvent& event)
   // this is also necessary to update the context on some platforms
   wxFrame::OnSize(event);
   Layout();
-}
-
-void FlamesFrame::GetSettingsFromConfigFile (void)
-{
-  wxFileInputStream file( m_configFileName );
-  //if(!wxFileInputStream::Ok())
-  
-  m_config = new wxFileConfig( file );
-  
-  m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
-  m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
-  m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
-  m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
-  m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
-  m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
-  m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
-  m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
-  m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
-  m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
-  
-  m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
-  m_config->Read(_("/Shadows/Fatness.y"), &m_currentConfig.fatness[1], -.001);
-  m_config->Read(_("/Shadows/Fatness.z"), &m_currentConfig.fatness[2], -.001);
-  m_config->Read(_("/Shadows/ExtrudeDist.x"), &m_currentConfig.extrudeDist[0], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.y"), &m_currentConfig.extrudeDist[1], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.z"), &m_currentConfig.extrudeDist[2], 5);
-  m_currentConfig.fatness[3] = 0;
-  m_currentConfig.extrudeDist[3] = 0;
-  
-  m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
-  m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
-  m_nbSolversMax = m_currentConfig.nbSolvers;
-  
-  wxString groupName,tabName;
-  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
-    {
-      groupName.Printf(_("/Solver%d/"), i);
-      
-      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
-      
-      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.solvers[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.solvers[i].position.y, 0.0);
-      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.solvers[i].position.z, 0.0);
-      
-      m_currentConfig.solvers[i].resx = m_config->Read(groupName + _("X_res"), 15);
-      m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
-      m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
-      
-      m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim, 1.0);
-      m_config->Read(groupName + _("Scale.x"),&m_currentConfig.solvers[i].scale.x,1.0);
-      m_config->Read(groupName + _("Scale.y"),&m_currentConfig.solvers[i].scale.y,1.0);
-      m_config->Read(groupName + _("Scale.z"),&m_currentConfig.solvers[i].scale.z,1.0);
-      
-      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep, 0.4);      
-      m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
-      
-      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff, 1.5);
-      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj, 1.5);
-      m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon, 0.00001);
-      m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
-      
-      tabName.Printf(_("Solver #%d"),i+1);
-      
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);      
-      m_solversNotebook->AddPage(m_solverPanels[i], tabName);
-    }
-  
-  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
-  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
-  m_nbFlamesMax = m_currentConfig.nbFlames;
-  
-  for(uint i=0; i < m_currentConfig.nbFlames; i++)
-    {
-      groupName.Printf(_("/Flame%d/"),i);
-      
-      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
-      m_config->Read(groupName + _("Solver"), &m_currentConfig.flames[i].solverIndex, 0);
-      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
-      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
-      if(m_currentConfig.flames[i].type != CANDLE){
-	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
-	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 5);
-	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
-      }else{
-	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 4);
-	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
-      }
-      m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
-      m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
-      m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
-      m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
-      m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
-      m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
-      
-      tabName.Printf(_("Flame #%d"),i+1);
-      
-      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
-      m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
-    }
-  
-  m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
-  m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
-  m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
-  m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
-  
-  m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
-  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
-    
-  if(m_currentConfig.depthPeelingEnabled)
-    m_depthPeelingSlider->Enable();
-  else
-    m_depthPeelingSlider->Disable();
-  switch(m_currentConfig.lightingMode)
-    {
-    case LIGHTING_STANDARD : 
-      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
-      m_blendedSolidCheckBox->Disable();
-      break;
-    case LIGHTING_PHOTOMETRIC :
-      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
-      m_blendedSolidCheckBox->Enable();
-      break;
-    }
-  
-  return;
 }
 
 void FlamesFrame::InitGLBuffer(bool recompileShaders)
@@ -510,7 +384,7 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       m_flamesNotebook->DeleteAllPages();      
       m_solversNotebook->DeleteAllPages();
 
-      GetSettingsFromConfigFile();
+      LoadSettings();
       m_glBuffer->Restart();
       m_mainSizer->Fit(this);
       m_mainSizer->SetSizeHints(this);
@@ -520,8 +394,171 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
   }
 }
 
+
+void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig)
+{
+  m_config->Read(groupName + _("Type"), (int *) &solverConfig.type, 1);
+  
+  m_config->Read(groupName + _("Pos.x"), &solverConfig.position.x, 0.0);
+  m_config->Read(groupName + _("Pos.y"), &solverConfig.position.y, 0.0);
+  m_config->Read(groupName + _("Pos.z"), &solverConfig.position.z, 0.0);
+  
+  solverConfig.resx = m_config->Read(groupName + _("X_res"), 15);
+  solverConfig.resy = m_config->Read(groupName + _("Y_res"), 15);
+  solverConfig.resz = m_config->Read(groupName + _("Z_res"), 15);
+  
+  m_config->Read(groupName + _("Dim"),&solverConfig.dim, 1.0);
+  m_config->Read(groupName + _("Scale.x"),&solverConfig.scale.x,1.0);
+  m_config->Read(groupName + _("Scale.y"),&solverConfig.scale.y,1.0);
+  m_config->Read(groupName + _("Scale.z"),&solverConfig.scale.z,1.0);
+  
+  m_config->Read(groupName + _("TimeStep"),&solverConfig.timeStep, 0.4);      
+  m_config->Read(groupName + _("Buoyancy"), &solverConfig.buoyancy, 0.02);
+  
+  m_config->Read(groupName + _("omegaDiff"),&solverConfig.omegaDiff, 1.5);
+  m_config->Read(groupName + _("omegaProj"),&solverConfig.omegaProj, 1.5);
+  m_config->Read(groupName + _("epsilon"),&solverConfig.epsilon, 0.00001);
+  solverConfig.nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
+}
+
+void FlamesFrame::LoadSettings (void)
+{
+  wxString groupName,tabName;
+  
+  wxFileInputStream file( m_configFileName );
+  //if(!wxFileInputStream::Ok())
+  
+  m_config = new wxFileConfig( file );
+  
+  m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
+  m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
+  m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
+  m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
+  m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
+  m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
+  m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
+  m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
+  m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
+  m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
+  
+  m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
+  m_config->Read(_("/Shadows/Fatness.y"), &m_currentConfig.fatness[1], -.001);
+  m_config->Read(_("/Shadows/Fatness.z"), &m_currentConfig.fatness[2], -.001);
+  m_config->Read(_("/Shadows/ExtrudeDist.x"), &m_currentConfig.extrudeDist[0], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.y"), &m_currentConfig.extrudeDist[1], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.z"), &m_currentConfig.extrudeDist[2], 5);
+  m_currentConfig.fatness[3] = 0;
+  m_currentConfig.extrudeDist[3] = 0;
+  
+  m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
+  m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
+  m_nbSolversMax = m_currentConfig.nbSolvers;
+  
+  groupName << _("/GlobalField/");
+  LoadSolverSettings(groupName,m_currentConfig.globalField);
+
+  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
+    {
+      groupName.Printf(_("/Solver%d/"), i);
+      LoadSolverSettings(groupName, m_currentConfig.solvers[i]);
+      
+      tabName.Printf(_("Solver #%d"),i+1);
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);      
+      m_solversNotebook->AddPage(m_solverPanels[i], tabName);
+    }
+  
+  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
+  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
+  m_nbFlamesMax = m_currentConfig.nbFlames;
+  
+  for(uint i=0; i < m_currentConfig.nbFlames; i++)
+    {
+      groupName.Printf(_("/Flame%d/"),i);
+      
+      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
+      m_config->Read(groupName + _("Solver"), &m_currentConfig.flames[i].solverIndex, 0);
+      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
+      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
+      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
+      if(m_currentConfig.flames[i].type != CANDLE){
+	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
+	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 5);
+	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
+      }else{
+	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 4);
+	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
+      }
+      m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
+      m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
+      m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
+      m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
+      m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
+      m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
+      
+      tabName.Printf(_("Flame #%d"),i+1);
+      
+      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
+      m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
+    }
+  
+  m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
+  m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
+  m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
+  m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
+  
+  m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
+  m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
+    
+  if(m_currentConfig.depthPeelingEnabled)
+    m_depthPeelingSlider->Enable();
+  else
+    m_depthPeelingSlider->Disable();
+  switch(m_currentConfig.lightingMode)
+    {
+    case LIGHTING_STANDARD : 
+      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
+      m_blendedSolidCheckBox->Disable();
+      break;
+    case LIGHTING_PHOTOMETRIC :
+      m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
+      m_blendedSolidCheckBox->Enable();
+      break;
+    }
+  
+  return;
+}
+
+void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig)
+{
+  m_config->Write(groupName + _("Type"), (int)solverConfig.type);
+  
+  m_config->Write(groupName + _("Pos.x"),solverConfig.position.x);
+  m_config->Write(groupName + _("Pos.y"),solverConfig.position.y);
+  m_config->Write(groupName + _("Pos.z"),solverConfig.position.z);
+  
+  m_config->Write(groupName + _("X_res"),(int)solverConfig.resx);
+  m_config->Write(groupName + _("Y_res"),(int)solverConfig.resy);
+  m_config->Write(groupName + _("Z_res"),(int)solverConfig.resz);
+  
+  m_config->Write(groupName + _("Dim"),solverConfig.dim);
+  m_config->Write(groupName + _("Scale.x"),solverConfig.scale.x);
+  m_config->Write(groupName + _("Scale.y"),solverConfig.scale.y);
+  m_config->Write(groupName + _("Scale.z"),solverConfig.scale.z);
+  
+  m_config->Write(groupName + _("TimeStep"),solverConfig.timeStep);      
+  m_config->Write(groupName + _("Buoyancy"), solverConfig.buoyancy);
+  
+  m_config->Write(groupName + _("omegaDiff"),solverConfig.omegaDiff);
+  m_config->Write(groupName + _("omegaProj"),solverConfig.omegaProj);
+  m_config->Write(groupName + _("epsilon"),solverConfig.epsilon);
+  
+  m_config->Write(groupName + _("nbMaxIter"),(int)solverConfig.nbMaxIter);
+}
+
 void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
+  wxString groupName;
+  
   m_config->Write(_("/Display/Width"), (int)m_currentConfig.width);
   m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
@@ -541,42 +578,23 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Shadows/ExtrudeDist.z"), m_currentConfig.extrudeDist[2]);
   
   m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
+
+  groupName << _("/GlobalField/");
+  m_config->DeleteGroup(groupName);
+  SaveSolverSettings(groupName,m_currentConfig.globalField);
   
-  wxString groupName;
   for(uint i=0; i < m_nbSolversMax; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
 
       m_config->DeleteGroup(groupName);
     }
- 
+  
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
       
-      m_config->Write(groupName + _("Type"), (int)m_currentConfig.solvers[i].type);
-      
-      m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);
-      m_config->Write(groupName + _("Pos.y"),m_currentConfig.solvers[i].position.y);
-      m_config->Write(groupName + _("Pos.z"),m_currentConfig.solvers[i].position.z);
-      
-      m_config->Write(groupName + _("X_res"),(int)m_currentConfig.solvers[i].resx);
-      m_config->Write(groupName + _("Y_res"),(int)m_currentConfig.solvers[i].resy);
-      m_config->Write(groupName + _("Z_res"),(int)m_currentConfig.solvers[i].resz);
-      
-      m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
-      m_config->Write(groupName + _("Scale.x"),m_currentConfig.solvers[i].scale.x);
-      m_config->Write(groupName + _("Scale.y"),m_currentConfig.solvers[i].scale.y);
-      m_config->Write(groupName + _("Scale.z"),m_currentConfig.solvers[i].scale.z);
-
-      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);      
-      m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
-      
-      m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
-      m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
-      m_config->Write(groupName + _("epsilon"),m_currentConfig.solvers[i].epsilon);
-      
-      m_config->Write(groupName + _("nbMaxIter"),(int)m_currentConfig.solvers[i].nbMaxIter);
+      SaveSolverSettings(groupName,m_currentConfig.solvers[i]);
     }
   
   m_config->Write(_("/Flames/Number"), (int)m_currentConfig.nbFlames);

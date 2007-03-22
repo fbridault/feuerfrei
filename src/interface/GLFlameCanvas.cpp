@@ -227,6 +227,11 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   m_flames = new FireSource *[m_currentConfig->nbFlames];
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
+
+  m_globalField = new GlobalField(m_solvers, m_currentConfig->nbSolvers, m_scene, m_currentConfig->globalField.type,
+				  m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
+				  0.0, m_currentConfig->globalField.omegaDiff, 
+				  m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
   
   InitFlames();
   
@@ -293,6 +298,7 @@ void GLFlameCanvas::DestroyScene(void)
   for (uint f = 0; f < prevNbFlames; f++)
     delete m_flames[f];
   delete[]m_flames;
+  delete m_globalField;
    for (uint s = 0; s < prevNbSolvers; s++)
     delete m_solvers[s];
   delete[]m_solvers;
@@ -301,6 +307,7 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run && m_init){
+    m_globalField->cleanSources ();
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->cleanSources ();
     for (uint i = 0; i < m_currentConfig->nbFlames; i++)
@@ -308,6 +315,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
     
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->iterate ();
+    m_globalField->iterate();
   }
   
   /* Force à redessiner */
@@ -339,8 +347,8 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     {      
     case WXK_LEFT: m_camera->moveOnSides(step); break;
     case WXK_RIGHT: m_camera->moveOnSides(-step); break;
-    case WXK_UP: m_camera->moveOnFrontOrBehind(-step); break;
-    case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
+    case WXK_UP: m_camera->moveOnFrontOrBehind(-step*10); break;
+    case WXK_DOWN: m_camera->moveOnFrontOrBehind(step*10); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':
@@ -519,6 +527,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void GLFlameCanvas::drawScene()
 {
   uint f,s;
+  Point position, scale;
   
   if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -555,10 +564,21 @@ void GLFlameCanvas::drawScene()
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
+  position = m_globalField->getPosition ();
+  glPushMatrix ();
+  glTranslatef (position.x, position.y, position.z);
+  if (m_displayBase)
+    m_globalField->displayBase();
+  if (m_displayGrid)
+    m_globalField->displayGrid();
+  if (m_displayVelocity)
+    m_globalField->displayVelocityField();
+  glPopMatrix ();
+  
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
-      Point position(m_solvers[s]->getPosition ());
-      Point scale(m_solvers[s]->getScale ());
+      position = m_solvers[s]->getPosition ();
+      scale =  m_solvers[s]->getScale ();
       
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
@@ -569,7 +589,6 @@ void GLFlameCanvas::drawScene()
 	m_solvers[s]->displayGrid();
       if (m_displayVelocity)
 	m_solvers[s]->displayVelocityField();
-      
       glPopMatrix ();
     }
 }

@@ -43,6 +43,52 @@ Scene::Scene (const char* const fileName, FireSource** const flames, int nbFlame
 //       }  
 // }
 
+void Scene::computeBoundingBox(Point& max, Point& min)
+{ 
+  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point objMax, objMin;
+  
+  for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
+       objectsArrayIterator != m_objectsArray.end();
+       objectsArrayIterator++){
+    (*objectsArrayIterator)->getBoundingBox(objMax, objMin);
+    /* Calcul du max */
+    if ( objMax.x > ptMax.x)
+      ptMax.x = objMax.x;
+    if ( objMax.y > ptMax.y)
+      ptMax.y = objMax.y;
+    if ( objMax.z > ptMax.z)
+      ptMax.z = objMax.z;
+    /* Calcul du min */
+    if ( objMin.x < ptMin.x)
+      ptMin.x = objMin.x;
+    if ( objMin.y < ptMin.y)
+      ptMin.y = objMin.y;
+    if ( objMin.z < ptMin.z)
+      ptMin.z = objMin.z;
+  }
+  for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
+       objectsArrayIteratorWSV != m_objectsArrayWSV.end();
+       objectsArrayIteratorWSV++){
+    (*objectsArrayIteratorWSV)->getBoundingBox(objMax, objMin);
+    /* Calcul du max */
+    if ( objMax.x > ptMax.x)
+      ptMax.x = objMax.x;
+    if ( objMax.y > ptMax.y)
+      ptMax.y = objMax.y;
+    if ( objMax.z > ptMax.z)
+      ptMax.z = objMax.z;
+    /* Calcul du min */
+    if ( objMin.x < ptMin.x)
+      ptMin.x = objMin.x;
+    if ( objMin.y < ptMin.y)
+      ptMin.y = objMin.y;
+    if ( objMin.z < ptMin.z)
+      ptMin.z = objMin.z;
+  }
+  max = ptMax; min = ptMin;
+}
+
 void Scene::computeVisibility(const Camera &view)
 {
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();

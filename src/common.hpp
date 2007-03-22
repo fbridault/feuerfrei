@@ -101,6 +101,8 @@ public:
   int IPSEnabled, BPSEnabled;
   uint nbSolvers;
   SolverConfig *solvers;
+  bool useGlobalField;
+  SolverConfig globalField;
   uint nbFlames;
   FlameConfig *flames;
   double fatness[4];

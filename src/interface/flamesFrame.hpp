@@ -70,7 +70,9 @@ class FlamesFrame: public wxFrame
 public:
   FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini")); 
   
-  void GetSettingsFromConfigFile (void);
+  void LoadSettings (void);
+  void LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig);
+  void SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig);
   void InitGLBuffer (bool recompileShaders);
   void InitSolversPanels();
   void InitFlamesPanels();

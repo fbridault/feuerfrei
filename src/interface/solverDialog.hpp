@@ -13,15 +13,16 @@ enum
     IDB_Cancel,
     IDNB_Solvers,
     IDRS_Type,
+    IDCHK_GS,
   };
 
 /** Panneau pour les onglets de la boîte de dialogue des solveurs */
 class SolverPanel: public wxPanel 
 {
 public:
-  SolverPanel(wxWindow* parent, int id, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(SolverConfig* const solverConfig);
-  bool getCtrlValues(SolverConfig* const solverConfig);
+  SolverPanel(wxWindow* parent, int id, bool localSolver=true, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+  void setCtrlValues(SolverConfig& solverConfig);
+  bool getCtrlValues(SolverConfig& solverConfig);
 
   void OnSelectType(wxCommandEvent& event);
 
@@ -55,7 +56,7 @@ protected:
   DoubleTextCtrl* m_epsilonTextCtrl;
   wxStaticText* m_nbMaxIterLabel;
   LongTextCtrl* m_nbMaxIterTextCtrl;
-
+  bool m_localSolver;
   DECLARE_EVENT_TABLE()
 };
 
@@ -76,6 +77,9 @@ private:
   void OnOK(wxCommandEvent& event);
   void OnCancel(wxCommandEvent& event);
   void OnPageChanging(wxNotebookEvent& event);
+#ifdef RTFLAMES_BUILD
+  void OnCheckActivateGlobalSolver(wxCommandEvent& event);
+#endif
   /** Vérifie si un solveur est utilisé par des flammes.
    * Si c'est le cas, le bouton d'effacement du solveur est désactivé
    * @param solverIndex index du solveur à vérifier
@@ -88,6 +92,8 @@ private:
   wxButton *m_addSolverButton, *m_deleteSolverButton, *m_okButton, *m_cancelButton;
 #ifdef RTFLAMES_BUILD
   FlameAppConfig *m_currentConfig;
+  SolverPanel *m_globalSolverPanel;
+  wxCheckBox *m_activateGlobalSolverCheckBox;
 #else
   FluidsAppConfig *m_currentConfig;
 #endif

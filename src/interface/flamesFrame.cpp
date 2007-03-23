@@ -765,20 +765,24 @@ void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 
 void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
 {
+  m_glBuffer->setRunningState(false);
   SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog.ShowModal() == wxID_OK){
     InitSolversPanels();
     m_glBuffer->Restart();
   }
+  m_glBuffer->setRunningState(true);
 }
 
 void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
 {
+  m_glBuffer->setRunningState(false);
   FlameDialog flameDialog (GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog.ShowModal() == wxID_OK){
     InitFlamesPanels();
     m_glBuffer->Restart();
   }
+  m_glBuffer->setRunningState(true);
 }
 
 void FlamesFrame::SetFPS(int fps)

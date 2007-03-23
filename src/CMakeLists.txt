@@ -78,8 +78,8 @@ SET_TARGET_PROPERTIES(${FLAMESEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -D
 SET(INTERFACE_SRCS interface/GLFluidsCanvas.cpp interface/fluidsFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/solverDialog.cpp)
 SET(SCENE_SRCS scene/camera.cpp scene/graphicsFn.cpp)
 
-AUX_SOURCE_DIRECTORY(solvers FLUIDS_SOLVERS_SRCS)
-SET(RTFLUIDS_SRCS fluids.cpp ${INTERFACE_SRCS} ${SCENE_SRCS} ${FLUIDS_SOLVERS_SRCS})
+SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver2D.cpp solvers/solver3D.cpp solvers/GSSolver2D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/HybridSolver3D.cpp  solvers/benchsolver3D.cpp solvers/logResAvgSolver3D.cpp solvers/logResAvgTimeSolver3D.cpp solvers/logResSolver3D.cpp)
+SET(RTFLUIDS_SRCS fluids.cpp ${INTERFACE_SRCS} ${SCENE_SRCS} ${SOLVERS_SRCS})
 
 SET(FLUIDSEXE "rtfluids")
 ADD_EXECUTABLE(${FLUIDSEXE} ${RTFLUIDS_SRCS}) 

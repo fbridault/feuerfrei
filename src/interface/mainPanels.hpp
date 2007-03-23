@@ -76,7 +76,7 @@ private:
   void OnFYAPMAXEnter(wxCommandEvent& event);
   void OnFZAPMINEnter(wxCommandEvent& event);
   void OnFZAPMAXEnter(wxCommandEvent& event);
-  void ComputeSlidersValues(void);
+  void SetSlidersValues(char type);
   void OnCheckMove(wxCommandEvent& event);
 #ifdef RTFLUIDS_BUILD
   void OnClickDensities(wxCommandEvent& event);

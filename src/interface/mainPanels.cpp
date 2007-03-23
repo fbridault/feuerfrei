@@ -142,11 +142,44 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_panelSizer->Add(m_densitiesSizer, 0, 0, 0);
 #endif
   
-  ComputeSlidersValues();
+  SetSlidersValues(type);
   
   SetSizerAndFit(m_panelSizer);
 }
 
+void SolverMainPanel::SetSlidersValues(char type)
+{  
+  m_saveSliderValues.x = m_solverConfig->position.x;
+  m_saveSliderValues.y = m_solverConfig->position.y;
+  m_saveSliderValues.z = m_solverConfig->position.z;
+  
+  m_solverXAxisPositionSliderMin->Clear();
+  m_solverXAxisPositionSliderMax->Clear();
+  m_solverYAxisPositionSliderMin->Clear();
+  m_solverYAxisPositionSliderMax->Clear();
+  m_solverZAxisPositionSliderMin->Clear();
+  m_solverZAxisPositionSliderMax->Clear();
+  
+  (*m_solverXAxisPositionSliderMin) << m_saveSliderValues.x-SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMax) << m_saveSliderValues.x+SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMin) << m_saveSliderValues.y-SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMax) << m_saveSliderValues.y+SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMin) << m_saveSliderValues.z-SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMax) << m_saveSliderValues.z+SLIDER_RANGE;
+
+  if(type < 1){
+    m_solverXAxisPositionSliderMin->Disable();
+    m_solverXAxisPositionSliderMax->Disable();
+    m_solverYAxisPositionSliderMin->Disable();
+    m_solverYAxisPositionSliderMax->Disable();
+    m_solverZAxisPositionSliderMin->Disable();
+    m_solverZAxisPositionSliderMax->Disable();
+  }else{
+    m_solverXAxisPositionSlider->SetValue((int)(m_saveSliderValues.x*SLIDER_SENSIBILITY));
+    m_solverYAxisPositionSlider->SetValue((int)(m_saveSliderValues.y*SLIDER_SENSIBILITY));
+    m_solverZAxisPositionSlider->SetValue((int)(m_saveSliderValues.z*SLIDER_SENSIBILITY));
+  }
+}
 
 void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
 {
@@ -160,11 +193,7 @@ void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
   
   m_saveSliderValues = oldValues;
   
-#ifdef RTFLUIDS_BUILD
   if(m_moveCheckBox->IsChecked())
-#else
-    if( ( (!m_type) ? m_moveCheckBox->IsChecked() : (m_type > 0)) )
-#endif
     {
       long min, max;
       
@@ -275,34 +304,6 @@ void SolverMainPanel::OnClickDensities(wxCommandEvent& event)
   m_glBuffer->addDensityInSolver(m_index, event.GetId());
 }
 #endif
-
-void SolverMainPanel::ComputeSlidersValues(void)
-{
-  m_saveSliderValues.x = m_solverConfig->position.x;
-  m_saveSliderValues.y = m_solverConfig->position.y;
-  m_saveSliderValues.z = m_solverConfig->position.z;
-  
-  m_solverXAxisPositionSliderMin->Clear();
-  m_solverXAxisPositionSliderMax->Clear();
-  m_solverYAxisPositionSliderMin->Clear();
-  m_solverYAxisPositionSliderMax->Clear();
-  m_solverZAxisPositionSliderMin->Clear();
-  m_solverZAxisPositionSliderMax->Clear();
-  
-  (*m_solverXAxisPositionSliderMin) << m_saveSliderValues.x-SLIDER_RANGE;
-  (*m_solverXAxisPositionSliderMax) << m_saveSliderValues.x+SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMin) << m_saveSliderValues.y-SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMax) << m_saveSliderValues.y+SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMin) << m_saveSliderValues.z-SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMax) << m_saveSliderValues.z+SLIDER_RANGE;
-  
-  m_solverXAxisPositionSliderMin->Disable();
-  m_solverXAxisPositionSliderMax->Disable();
-  m_solverYAxisPositionSliderMin->Disable();
-  m_solverYAxisPositionSliderMax->Disable();
-  m_solverZAxisPositionSliderMin->Disable();
-  m_solverZAxisPositionSliderMax->Disable();
-}
 
 #ifdef RTFLAMES_BUILD
 /************************ FlameMainPanel class definition *********************************************/

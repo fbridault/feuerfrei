@@ -223,12 +223,19 @@ void FlamesFrame::InitGLBuffer(bool recompileShaders)
 void FlamesFrame::InitSolversPanels()
 {
   wxString tabName;
+  char type=0;
   
   m_solversNotebook->DeleteAllPages();
   
+  if(m_currentConfig.useGlobalField)
+    {
+      m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.globalField, -1, m_glBuffer, -1);
+      m_solversNotebook->AddPage(m_solverPanels[0], _("Global Field"));
+      type = 1;
+    }
   for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
     {
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);	
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer, type);
       tabName.Printf(_("Solver #%d"),i+1);
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
@@ -423,7 +430,7 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
 
 void FlamesFrame::LoadSettings (void)
 {
-  wxString groupName,tabName;
+  wxString groupName;
   
   wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
@@ -454,6 +461,7 @@ void FlamesFrame::LoadSettings (void)
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
   m_nbSolversMax = m_currentConfig.nbSolvers;
   
+  m_config->Read(_("/GlobalField/Enabled"), &m_currentConfig.useGlobalField, 0);
   groupName << _("/GlobalField/");
   LoadSolverSettings(groupName,m_currentConfig.globalField);
 
@@ -461,11 +469,8 @@ void FlamesFrame::LoadSettings (void)
     {
       groupName.Printf(_("/Solver%d/"), i);
       LoadSolverSettings(groupName, m_currentConfig.solvers[i]);
-      
-      tabName.Printf(_("Solver #%d"),i+1);
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);      
-      m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
+  InitSolversPanels();
   
   m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
   m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
@@ -494,12 +499,8 @@ void FlamesFrame::LoadSettings (void)
       m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
       m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
       m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
-      
-      tabName.Printf(_("Flame #%d"),i+1);
-      
-      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);      
-      m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
+  InitFlamesPanels();
   
   m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
@@ -579,6 +580,7 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   
   m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
 
+  m_config->Write(_("/GlobalField/Enabled"), m_currentConfig.useGlobalField);
   groupName << _("/GlobalField/");
   m_config->DeleteGroup(groupName);
   SaveSolverSettings(groupName,m_currentConfig.globalField);

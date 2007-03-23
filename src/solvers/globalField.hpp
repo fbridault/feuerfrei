@@ -43,6 +43,17 @@ public:
    */
   void addExternalForces(const Point& position, bool move);
   
+  /** Ajoute de façon permanente des forces externes sur une des faces du solveur. Cette méthode
+   * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
+   * @param forces Intensité de la force en (x,y,z).
+   */
+  virtual void addPermanentExternalForces(Point& forces){ m_field->addPermanentExternalForces(forces); }
+
+  /** Modifie la force de flottabilité dans le solveur
+   * @param value Nouvelle valeur.
+   */
+  virtual void setBuoyancy(double value){ m_field->setBuoyancy(value); };
+  
   /** Fonction de dessin du champ de vélocité */
   void displayVelocityField (void) { m_field->displayVelocityField(); };
   

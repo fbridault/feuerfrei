@@ -62,7 +62,7 @@ class SolverMainPanel: public wxPanel
 public:
 #ifdef RTFLAMES_BUILD
   SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFlameCanvas* const glBuffer, 
-		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+		  char type, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #else
   SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFluidsCanvas* const glBuffer, 
 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
@@ -96,10 +96,12 @@ private:
   wxCheckBox *m_moveCheckBox;
   
   SolverConfig *m_solverConfig;
-  /* Index du solveur */
+  /** Index du solveur */
   int m_index;
 #ifdef RTFLAMES_BUILD
   GLFlameCanvas *m_glBuffer;
+  /** 0 si l'on peut bouger et appliquer des forces, -1 pour uniquement les forces, 1 pour uniquement le déplacement */
+  char m_type;
 #else
   GLFluidsCanvas *m_glBuffer;
   wxStaticBoxSizer *m_densitiesSizer;

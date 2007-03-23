@@ -27,7 +27,8 @@ END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
 SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
-				 GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
+				 GLFlameCanvas* const glBuffer, char type, const wxPoint& pos, 
+				 const wxSize& size, long style):
 #else
 SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
 				 GLFluidsCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
@@ -103,15 +104,23 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
-  
-  m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
-  
+    
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
   m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
-  m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);  
+
+#ifdef RTFLUIDS_BUILD
+  m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
+  m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);
+#else
+  m_type = type;
+  if(!m_type){
+    m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
+    m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);
+  }
+#endif
   m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversXAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
@@ -119,7 +128,6 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
-
 #ifdef RTFLUIDS_BUILD
   m_densityLButton = new wxButton(this, IDB_LEFT, _("Left"));
   m_densityRButton = new wxButton(this, IDB_RIGHT, _("Right"));
@@ -133,6 +141,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_densitiesSizer->Add(m_densityBButton, 0, 0, 0);
   m_panelSizer->Add(m_densitiesSizer, 0, 0, 0);
 #endif
+  
   ComputeSlidersValues();
   
   SetSizerAndFit(m_panelSizer);
@@ -151,10 +160,14 @@ void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
   
   m_saveSliderValues = oldValues;
   
+#ifdef RTFLUIDS_BUILD
   if(m_moveCheckBox->IsChecked())
+#else
+    if( ( (!m_type) ? m_moveCheckBox->IsChecked() : (m_type > 0)) )
+#endif
     {
       long min, max;
-            
+      
       m_solverXAxisPositionSliderMin->GetValue().ToLong(&min);
       m_solverXAxisPositionSliderMax->GetValue().ToLong(&max);
       m_solverXAxisPositionSlider->SetRange(min, max);
@@ -202,7 +215,11 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 	       m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 	       m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       
+#ifdef RTFLUIDS_BUILD
       if(m_moveCheckBox->IsChecked()){
+#else
+      if( ( (!m_type) ? m_moveCheckBox->IsChecked() : (m_type > 0)) ){
+#endif
 	m_glBuffer->moveSolver(m_index, pt, true);
 	m_solverConfig->position = pt;
       }else

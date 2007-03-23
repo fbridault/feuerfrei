@@ -446,6 +446,8 @@ void SolverDialog::OnOK(wxCommandEvent& event)
   else{
     m_currentConfig->globalField = newGlobalConfig;
     m_currentConfig->useGlobalField = m_activateGlobalSolverCheckBox->GetValue();
+    m_currentConfig->globalField.buoyancy=0;
+    
   }
 #endif
   for(uint i = 0; i < newNb; i++)

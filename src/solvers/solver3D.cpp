@@ -207,6 +207,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     force = position - m_position;
     strength.x = strength.y = strength.z = .001;  
     m_position=position;
+    cerr << force << endl;
   }else{
     force = position;
     strength = position * .1;

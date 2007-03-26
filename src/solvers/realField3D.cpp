@@ -81,7 +81,7 @@ void RealField3D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = strength.z = .001;
+    strength.x = strength.y = strength.z = 1;
     m_position=position;
   }else{
     force = position;

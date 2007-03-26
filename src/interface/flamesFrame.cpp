@@ -235,9 +235,9 @@ void FlamesFrame::InitSolversPanels()
     }
   for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
     {
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer, type);
+      m_solverPanels[i+type] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer, type);
       tabName.Printf(_("Solver #%d"),i+1);
-      m_solversNotebook->AddPage(m_solverPanels[i], tabName);
+      m_solversNotebook->AddPage(m_solverPanels[i+type], tabName);
     }
 }
 

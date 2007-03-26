@@ -78,16 +78,17 @@ public:
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ 
-    m_solvers[selectedSolver]->addExternalForces(pt,move);
+    if(selectedSolver >= 0) m_solvers[selectedSolver]->addExternalForces(pt,move);
+    else m_globalField->addExternalForces(pt,move);
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->computeVisibility(*m_camera,true);
   };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ 
-    if(selectedSolver > 0) m_solvers[selectedSolver]->addPermanentExternalForces(pt);
+    if(selectedSolver >= 0) m_solvers[selectedSolver]->addPermanentExternalForces(pt);
     else m_globalField->addPermanentExternalForces(pt);
   };
   void setBuoyancy(int index, double value){ 
-    if(index > 0) m_solvers[index]->setBuoyancy(value);
+    if(index >= 0) m_solvers[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };

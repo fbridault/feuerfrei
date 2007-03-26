@@ -62,10 +62,10 @@ class SolverMainPanel: public wxPanel
 public:
 #ifdef RTFLAMES_BUILD
   SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFlameCanvas* const glBuffer, 
-		  char type, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+ 		  char type=0, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #else
   SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFluidsCanvas* const glBuffer, 
-		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+ 		  char type=0, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #endif
   virtual ~SolverMainPanel(){};
 private:

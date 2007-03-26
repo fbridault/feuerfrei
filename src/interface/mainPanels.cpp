@@ -31,7 +31,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
 				 const wxSize& size, long style):
 #else
 SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
-				 GLFluidsCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
+				 GLFluidsCanvas* const glBuffer, char type,  const wxPoint& pos, const wxSize& size, long style):
 #endif
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {

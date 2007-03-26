@@ -66,7 +66,7 @@ public:
   /** Retourne la position du solveur dans le repère du monde 
    * @return Position dans l'espace.
    */
-  Point getPosition ()
+  virtual Point getPosition ()
   {
     return (m_position);
   };

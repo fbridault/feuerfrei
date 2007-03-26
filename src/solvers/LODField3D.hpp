@@ -61,12 +61,7 @@ public:
   void setVsrc (const Point& pos, double value)
   {
     m_currentField->setVsrc (pos, value);
-  };
-  
-  virtual void addExternalForces(const Point& position, bool move)
-  {
-    m_currentField->addExternalForces(position, move);
-  };
+  };  
     
   void cleanSources ()
   {
@@ -78,6 +73,17 @@ public:
     m_currentField->displayVelocityField ();
   };
   
+  /** Retourne la position du solveur dans le repère du monde 
+   * @return Position dans l'espace.
+   */
+  Point getPosition (void) { return m_currentField->getPosition(); };
+  
+  void addTemporaryExternalForces(Point& forces)
+  {
+    m_fakeField.addTemporaryExternalForces(forces);
+    m_solver.addTemporaryExternalForces(forces);
+  }
+    
   void addPermanentExternalForces(Point& forces)
   {
     m_fakeField.addPermanentExternalForces(forces);
@@ -98,6 +104,8 @@ public:
   virtual void switchToRealSolver () { m_currentField = &m_solver; };
   virtual void switchToFakeField () { m_currentField = &m_fakeField; };
 private:
+  virtual void addExternalForces(const Point& position, bool move) {};
+  
   FakeField3D m_fakeField;
   HybridSolver3D m_solver;
   /** Pointeur sur le champ de vecteur utilisé. */

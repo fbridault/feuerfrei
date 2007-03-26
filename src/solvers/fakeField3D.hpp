@@ -5,11 +5,11 @@ class FakeField3D;
 
 #include "field3D.hpp"
 
-/** La classe FakeField3D simule un champ de vecteurs 3D. Aucune équation différentielle n'est utilisée ici, tout au plus 
- * il s'agira d'une équation linéaire. Cette classe, à la différence de RealField3D, permet de n'effectuer le calcul des 
- * vélocités que pour des points particuliers de la grille autrement dit les particules. Le constructeur demande tout de même
- * une résolution en x,y,z, mais elle n'est utilisée que si l'affichage du champ ou de la grille est demandée. Elle n'intervient
- * en aucun cas dans le calcul des vélocités des particules.
+/** La classe FakeField3D simule un champ de vecteurs 3D. Aucune Ã©quation diffÃ©rentielle n'est utilisÃ©e ici, tout au plus 
+ * il s'agira d'une Ã©quation linÃ©aire. Cette classe, Ã  la diffÃ©rence de RealField3D, permet de n'effectuer le calcul des 
+ * vÃ©locitÃ©s que pour des points particuliers de la grille autrement dit les particules. Le constructeur demande tout de mÃªme
+ * une rÃ©solution en x,y,z, mais elle n'est utilisÃ©e que si l'affichage du champ ou de la grille est demandÃ©e. Elle n'intervient
+ * en aucun cas dans le calcul des vÃ©locitÃ©s des particules.
  * 
  * @author	Flavien Bridault.
  */
@@ -18,19 +18,19 @@ class FakeField3D : public Field3D
 public:  
   /** Constructeur du champ.
    * @param position Position du solveur de la flamme.
-   * @param n_x Résolution de la grille en x.
-   * @param n_y Résolution de la grille en y.
-   * @param n_z Résolution de la grille en z.
-   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
-   * @param scale Echelle utilisée pour la taille du solveur.
-   * @param timeStep Pas de temps utilisé pour la simulation.
-   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param n_x RÃ©solution de la grille en x.
+   * @param n_y RÃ©solution de la grille en y.
+   * @param n_z RÃ©solution de la grille en z.
+   * @param dim Dimension du solveur, utilisÃ© pour l'affichage de la flamme.
+   * @param scale Echelle utilisÃ©e pour la taille du solveur.
+   * @param timeStep Pas de temps utilisÃ© pour la simulation.
+   * @param buoyancy IntensitÃ© de la force de flottabilitÃ© dans le solveur.
    */
   FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
   /** Destructeur */
   virtual ~FakeField3D ();
   
-  /********************* Redéfinition des méthodes héritées *********************/
+  /********************* RedÃ©finition des mÃ©thodes hÃ©ritÃ©es *********************/
   virtual void iterate ();
     
   Point getUVW (const Point& pos, double selfVelocity) const
@@ -65,24 +65,14 @@ public:
   {
     m_src.y = value;
   };
-  
-  virtual void addExternalForces(const Point& position, bool move);
-    
-  virtual void addPermanentExternalForces(Point& forces)
-  {
-    m_permanentExternalForces = forces;
-    //    m_latentForces.resetToNull();
-    if(!forces.x && !forces.y && !forces.z)
-      m_arePermanentExternalForces = false;
-    else
-      m_arePermanentExternalForces = true;
-  }
   void cleanSources ();
   
   void displayVelocityField (void);
   
   virtual bool isRealSolver () const { return false; };
-protected:
+  
+protected:  
+  virtual void addExternalForces(const Point& position, bool move);
   
   /** Coefficients pour les forces externes. */
   Point m_src;

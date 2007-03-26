@@ -316,6 +316,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
       m_globalField->cleanSources ();
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
       m_solvers[i]->cleanSources ();
+    
     for (uint i = 0; i < m_currentConfig->nbFlames; i++)
       m_flames[i]->addForces ();
     

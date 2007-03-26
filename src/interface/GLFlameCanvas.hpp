@@ -78,8 +78,8 @@ public:
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ 
-    if(selectedSolver >= 0) m_solvers[selectedSolver]->addExternalForces(pt,move);
-    else m_globalField->addExternalForces(pt,move);
+    if(selectedSolver >= 0) m_solvers[selectedSolver]->addTemporaryExternalForces(pt);
+    else m_globalField->addTemporaryExternalForces(pt);
     for (uint f = 0; f < m_currentConfig->nbFlames; f++)
       m_flames[f]->computeVisibility(*m_camera,true);
   };

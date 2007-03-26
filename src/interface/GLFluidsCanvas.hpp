@@ -56,7 +56,7 @@ public:
   void ToggleVelocityDisplay(void) { m_displayVelocity=!m_displayVelocity; };
   void ToggleDensityDisplay(void) { m_displayDensity=!m_displayDensity; };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addExternalForces(pt,move); };
+  void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addTemporaryExternalForces(pt); };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, double value){ m_solvers[index]->setBuoyancy(value); };
   void addDensityInSolver(int index, int id){ m_solvers[index]->addDensity(id); };

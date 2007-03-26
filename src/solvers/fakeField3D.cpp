@@ -18,20 +18,8 @@ void FakeField3D::iterate ()
   double coef=.1;
   if(!m_run)
     return;
-
-  if(m_arePermanentExternalForces){
-//     if(fabs(m_latentForces.x) < fabs(m_permanentExternalForces.x))
-//       m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
-//     else
-//       m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
-//     if(fabs(m_latentForces.y) < fabs(m_permanentExternalForces.y))      
-//       m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
-//     else
-//       m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;
-//     if(fabs(m_latentForces.z) < fabs(m_permanentExternalForces.z))
-//       m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
-//     else
-//       m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
+  
+  if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z){
     if(m_permanentExternalForces.x > 0)
       if(m_latentForces.x < m_permanentExternalForces.x)
 	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
@@ -73,8 +61,15 @@ void FakeField3D::iterate ()
     if(m_latentForces.y < 0) m_latentForces.y = m_latentForces.y + coef;
     if(m_latentForces.z < 0) m_latentForces.z = m_latentForces.z + coef;
    
-    if(!m_latentForces.x && !m_latentForces.y && !m_latentForces.z) addExternalForces(m_latentForces,false);
+    if(m_latentForces.x || m_latentForces.y || m_latentForces.z) addExternalForces(m_latentForces,false);
   }
+  
+  if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
+    {
+      addExternalForces(m_temporaryExternalForces,true);
+      m_temporaryExternalForces.resetToNull();
+    }
+  
   m_nbIter++;
 }
 
@@ -92,7 +87,9 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = strength.z = .001;
+    strength.x = force.x > 0 ? .2 : -.2;
+    strength.y = force.y > 0 ? .2 : -.2;
+    strength.z = force.z > 0 ? .2 : -.2;
     m_position=position;
   }else{
     force = position;

@@ -106,17 +106,7 @@ public:
    * @return Echelle.
    */
   Point getScale () const { return m_scale; };
-  
-  virtual void addPermanentExternalForces(Point& forces)
-  {
-    m_permanentExternalForces = forces;
-    if(!forces.x && !forces.y && !forces.z)
-      m_arePermanentExternalForces = false;
-    else
-      m_arePermanentExternalForces = true;
-  }
-  virtual void addExternalForces(const Point& position, bool move) = 0;
-  
+    
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () {};
   

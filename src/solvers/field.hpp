@@ -42,7 +42,12 @@ public:
    * @param x Composante à traiter.
    * @param src Composante contenant les forces engendrées par les sources externes.
    */
-  virtual void add_source (double *const x, double *const src);
+  virtual void add_source (double *const x, double *const src)
+  {
+    uint i;
+    for (i = 0; i < m_nbVoxels; i++)
+      x[i] += m_dt * src[i] * m_forceCoef;
+  };
   
   /** Remet à zéro toutes les forces externes */
   virtual void cleanSources () = 0;
@@ -71,25 +76,17 @@ public:
     return (m_position);
   };
   
-  /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur. Cette méthode
-   * est utilisée principalement lorsque qu'une flamme est déplacée.
-   * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
-   * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
+  /** Ajoute de façon temporaire (une itération) des forces externes sur une des faces du solveur. Cette méthode
+   * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
+   * @param forces Intensité de la force en (x,y,z).
    */
-  virtual void addExternalForces(const Point& position, bool move) = 0;
-  
+  virtual void addTemporaryExternalForces(Point& forces) { m_temporaryExternalForces = forces; }
+
   /** Ajoute de façon permanente des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
    * @param forces Intensité de la force en (x,y,z).
    */
-  virtual void addPermanentExternalForces(Point& forces)
-  {
-    m_permanentExternalForces = forces;
-    if(!forces.x && !forces.y)
-      m_arePermanentExternalForces = false;
-    else
-      m_arePermanentExternalForces = true;
-  }
+  virtual void addPermanentExternalForces(Point& forces) { m_permanentExternalForces = forces; }
 
   virtual void addDensity(int id) {} ;
   
@@ -131,6 +128,13 @@ public:
   
   virtual void setRunningState(bool state) { m_run = state; } ;
 protected:
+  /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur. Cette méthode
+   * est utilisée principalement lorsque qu'une flamme est déplacée.
+   * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
+   * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
+   */
+  virtual void addExternalForces(const Point& position, bool move) = 0;
+  
   /** Fonction de construction de la display list de la grille du solveur */
   virtual void buildDLGrid () = 0;
   
@@ -156,7 +160,7 @@ protected:
   GLuint m_baseDisplayList;
   
   Point m_permanentExternalForces;
-  bool m_arePermanentExternalForces;
+  Point m_temporaryExternalForces;
 
   double m_forceCoef;
   double m_forceRatio;

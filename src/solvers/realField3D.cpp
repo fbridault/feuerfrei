@@ -59,8 +59,14 @@ void RealField3D::iterate ()
       for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
 	m_vSrc[IX(i,j,k)] += tmp;
   }
-  if(m_arePermanentExternalForces)
+  
+  if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
+  if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
+    {
+      addExternalForces(m_temporaryExternalForces,true);
+      m_temporaryExternalForces.resetToNull();
+    }
   
   vel_step ();
   

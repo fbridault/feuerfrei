@@ -49,6 +49,12 @@ public:
    */
   virtual void addPermanentExternalForces(Point& forces){ m_field->addPermanentExternalForces(forces); }
 
+  /** Ajoute de façon temporaire (une itération) des forces externes sur une des faces du solveur. Cette méthode
+   * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
+   * @param forces Intensité de la force en (x,y,z).
+   */
+  virtual void addTemporaryExternalForces(Point& forces) { m_field->addTemporaryExternalForces(forces); }
+
   /** Modifie la force de flottabilité dans le solveur
    * @param value Nouvelle valeur.
    */

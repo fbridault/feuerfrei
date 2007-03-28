@@ -76,6 +76,13 @@ public:
     return (m_position);
   };
   
+  /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur. Cette méthode
+   * est utilisée principalement lorsque qu'une flamme est déplacée.
+   * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
+   * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
+   */
+  virtual void addExternalForces(const Point& position, bool move) = 0;
+  
   /** Ajoute de façon temporaire (une itération) des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
    * @param forces Intensité de la force en (x,y,z).
@@ -128,13 +135,6 @@ public:
   
   virtual void setRunningState(bool state) { m_run = state; } ;
 protected:
-  /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur. Cette méthode
-   * est utilisée principalement lorsque qu'une flamme est déplacée.
-   * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
-   * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
-   */
-  virtual void addExternalForces(const Point& position, bool move) = 0;
-  
   /** Fonction de construction de la display list de la grille du solveur */
   virtual void buildDLGrid () = 0;
   

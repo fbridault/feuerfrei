@@ -7,11 +7,11 @@
 #include "../interface/interface.hpp"
 
 GlobalField::GlobalField(Field3D **const localFields, uint nbLocalFields, Scene* const scene, char type, uint n,
-			 double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon)
+			 double timeStep, double omegaDiff, double omegaProj, double epsilon)
 {
   Point max, min, width, position, scale(1,1,1);
   uint n_x, n_y, n_z;
-  double dim;
+  double dim, buoyancy=0.0;
   
   m_localFields = localFields; 
   m_nbLocalFields = nbLocalFields;
@@ -70,6 +70,35 @@ GlobalField::GlobalField(Field3D **const localFields, uint nbLocalFields, Scene*
   }
 }
 
-void GlobalField::addExternalForces(const Point& position, bool move)
+void GlobalField::shareForces()
 {
+  Point pt,ldim;
+  Point strength[8];
+  double dump=0;
+  
+  for(uint i=0; i < m_nbLocalFields; i++)
+    {
+      /* Localisation des solveurs */
+      /* On cherche dans quelle cellule se trouve chacune des six faces du solveur local */
+      pt = m_localFields[i]->getPosition() - m_field->getPosition();
+      ldim = m_localFields[i]->getDim();
+      ldim.x *= m_localFields[i]->getScale().x;
+      ldim.y *= m_localFields[i]->getScale().y;
+      ldim.z *= m_localFields[i]->getScale().z;
+      
+      /* Coordonnée de la cellule du coin (0,0,0) dans le solveur global */
+      strength[0] = m_field->getUVW(pt,dump);
+      strength[1] = m_field->getUVW(pt+Point(0,ldim.y,0),dump);
+      strength[2] = m_field->getUVW(pt+Point(0,ldim.y,ldim.z),dump);
+      strength[3] = m_field->getUVW(pt+Point(0,0,ldim.z),dump);
+      strength[4] = m_field->getUVW(pt+Point(ldim.x,ldim.y,0),dump);
+      strength[5] = m_field->getUVW(pt+Point(ldim.x,0,0),dump);
+      strength[6] = m_field->getUVW(pt+Point(ldim.x,ldim.y,ldim.z),dump);
+      strength[7] = m_field->getUVW(pt+Point(ldim.x,0,ldim.z),dump);
+      
+      m_localFields[i]->addForcesOnFace(LEFT_FACE,strength[0], strength[1], strength[2], strength[3]);
+      m_localFields[i]->addForcesOnFace(BACK_FACE,strength[0], strength[1], strength[4], strength[5]);
+      m_localFields[i]->addForcesOnFace(FRONT_FACE,strength[3], strength[2], strength[6], strength[7]);
+      m_localFields[i]->addForcesOnFace(RIGHT_FACE,strength[7], strength[6], strength[4], strength[5]);
+    }
 }

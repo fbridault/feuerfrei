@@ -28,12 +28,12 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   GlobalField (Field3D **const localFields, uint nbLocalFields, Scene *const scene, char type, uint n,
-	       double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+	       double timeStep, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
   virtual ~GlobalField () { delete m_field; };
 
   /** Lance une itération du solveur. */
-  void iterate (void) { m_field->iterate(); };
+  void iterate (void) { m_field->iterate(); shareForces(); };
   void cleanSources (void) { m_field->cleanSources(); };
   
   /** Ajoute de façon ponctuelle des forces externes sur une des faces du champ. Il faut également considérer
@@ -41,7 +41,7 @@ public:
    * @param position Nouvelle position du solveur. Détermine l'intensité de la force.
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
-  void addExternalForces(const Point& position, bool move);
+  void shareForces();
   
   /** Ajoute de façon permanente des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
@@ -61,7 +61,7 @@ public:
   virtual void setBuoyancy(double value){ m_field->setBuoyancy(value); };
   
   /** Fonction de dessin du champ de vélocité */
-  void displayVelocityField (void) { m_field->displayVelocityField(); };
+  void displayVelocityField (void) { /*m_field->displayVelocityField();*/ };
   
   /** Fonction de dessin de la grille */
   void displayGrid (void){ m_field->displayGrid(); };

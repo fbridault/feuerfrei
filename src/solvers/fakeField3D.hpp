@@ -42,7 +42,6 @@ public:
     value.x += m_dt * m_forceCoef * m_src.x * (pos.y+.1)/m_dim.y;
     value.z += m_dt * m_forceCoef * m_src.z * (pos.y+.1)/m_dim.y;
     value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.1)/m_dim.y + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
-    
     return value;
   };
   
@@ -69,11 +68,14 @@ public:
   
   void displayVelocityField (void);
   
-  virtual bool isRealSolver () const { return false; };
-  
-protected:  
   virtual void addExternalForces(const Point& position, bool move);
   
+  virtual bool isRealSolver () const { return false; };
+  
+  void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+		       const Point& TRStrength, const Point& BRStrength);
+  
+protected:  
   /** Coefficients pour les forces externes. */
   Point m_src;
   Point m_latentForces;

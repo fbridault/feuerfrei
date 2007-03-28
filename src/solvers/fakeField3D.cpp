@@ -128,3 +128,14 @@ void FakeField3D::displayVelocityField (void)
 	  glPopMatrix ();
 	}
 }
+
+void FakeField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+				  const Point& TRStrength, const Point& BRStrength)
+{
+  switch(face){
+  case LEFT_FACE : m_src.x += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
+  case RIGHT_FACE : m_src.x += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
+  case BACK_FACE : m_src.z += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
+  case FRONT_FACE : m_src.z += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
+  }
+}

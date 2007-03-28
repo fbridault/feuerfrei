@@ -40,6 +40,9 @@ public:
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
   void addExternalForces(const Point& position, bool move);
+
+  void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength, 
+		       const Point& TRStrength, const Point& BRStrength);
 protected:
   /** Traitement de valeurs aux bords du solveur.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.

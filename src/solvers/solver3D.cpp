@@ -253,6 +253,36 @@ void Solver3D::addExternalForces(const Point& position, bool move)
 	  m_wSrc[IX(i, j, 1)] += strength.z;//*(m_nbVoxelsY - j)*factor;
 }
 
+void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+			       const Point& TRStrength, const Point& BRStrength)
+{
+  uint i,j;
+  double inci,incj;
+  
+  switch(face){
+  case LEFT_FACE :
+    for (i = 1; i <= m_nbVoxelsZ; i++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
+	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0;
+    break;
+  case RIGHT_FACE : 
+    for (i = 1; i <= m_nbVoxelsZ; i++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
+	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0;
+    break;
+  case BACK_FACE : 
+    for (i = 1; i <= m_nbVoxelsX; i++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
+	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0;
+    break;
+  case FRONT_FACE : 
+    for (i = 1; i <= m_nbVoxelsX; i++)
+      for (j = 1; j <= m_nbVoxelsY; j++)
+	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0;
+    break;
+  }
+}
+
 void Solver3D::prolonger(double  *const v2h, double *const vh)
 {
   // on utilise une interpolation bilinéaire

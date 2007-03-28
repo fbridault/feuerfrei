@@ -4,6 +4,13 @@
 #include "field.hpp"
 #include "../flames/particle.hpp"
 
+enum{
+  LEFT_FACE = 1,
+  RIGHT_FACE,
+  BACK_FACE,
+  FRONT_FACE,
+};
+
 class Field;
 
 /** La classe Field3D est une abstraction d'un champ de vecteur en 3D. Cette classe abstraite fournit une interface pour la
@@ -130,6 +137,12 @@ public:
   
   /** Fonction de dessin du champ de densité */
   void displayDensityField (void) {};
+
+  /** Ajoute des forces externes sur une des six faces du solveur
+   * @param face identifiant de la face parmi LEFT_FACE, RIGHT_FACE, FRONT_FACE, BACK_FACE
+   */
+  virtual void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength, 
+			       const Point& TRStrength, const Point& BRStrength) = 0;
   
 protected:  
   /** Fonction de construction de la display list de la grille du solveur */

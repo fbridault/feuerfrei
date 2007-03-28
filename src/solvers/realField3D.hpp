@@ -96,13 +96,15 @@ public:
     k = (uint) (p.z * m_nbVoxelsZDivDimZ) + 1;
   };
   
+  virtual void addExternalForces(const Point& position, bool move);
+  virtual void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+			       const Point& TRStrength, const Point& BRStrength);
+
   void cleanSources ();
   
   virtual void displayVelocityField (void);
 
 protected:
-  virtual void addExternalForces(const Point& position, bool move);
-  
   /***************************** Nouvelles méthodes *****************************/
   virtual void vel_step ();
   

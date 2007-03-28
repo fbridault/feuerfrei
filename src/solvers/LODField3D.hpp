@@ -90,15 +90,22 @@ public:
     m_solver.addPermanentExternalForces(forces);
   }
 
+  void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+		       const Point& TRStrength, const Point& BRStrength)
+  {
+    m_fakeField.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
+    m_solver.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
+  }
+  
   virtual void setBuoyancy(double value){ 
     m_fakeField.setBuoyancy(value);
     m_solver.setBuoyancy(value);
-  };
+  }
   
   virtual void setRunningState(bool state) { 
     m_fakeField.setRunningState(state);
     m_solver.setRunningState(state);  
-  };
+  }
   
   virtual bool isRealSolver () const { return (m_currentField == &m_solver); };
   virtual void switchToRealSolver () { m_currentField = &m_solver; };

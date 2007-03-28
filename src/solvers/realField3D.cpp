@@ -112,6 +112,17 @@ void RealField3D::addExternalForces(const Point& position, bool move)
 	  m_wSrc[IX(i, j, k)] += strength.z*j/(double)m_nbVoxelsY;
 }
 
+void RealField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
+				  const Point& TRStrength, const Point& BRStrength)
+{
+  switch(face){
+  case LEFT_FACE : ;
+  case RIGHT_FACE : ;
+  case BACK_FACE : ;
+  case FRONT_FACE : ;
+  }
+}
+
 void RealField3D::displayVelocityField (void)
 {
   double inc_x = m_dim.x / (double) m_nbVoxelsX;

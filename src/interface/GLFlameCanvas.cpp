@@ -232,8 +232,8 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   if(m_currentConfig->useGlobalField)
     m_globalField = new GlobalField(m_solvers, m_currentConfig->nbSolvers, m_scene, m_currentConfig->globalField.type,
 				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
-				    0.0, m_currentConfig->globalField.omegaDiff, 
-				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
+				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
+				    m_currentConfig->globalField.epsilon);
   
   InitFlames();
   

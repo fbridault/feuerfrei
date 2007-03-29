@@ -771,7 +771,7 @@ void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
   SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog.ShowModal() == wxID_OK){
     InitSolversPanels();
-    m_glBuffer->Restart();
+    m_glBuffer->ReloadSolversAndFlames();
   }
   m_glBuffer->setRunningState(true);
 }
@@ -782,7 +782,7 @@ void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
   FlameDialog flameDialog (GetParent(),-1,_("Flames settings"),&m_currentConfig);
   if(flameDialog.ShowModal() == wxID_OK){
     InitFlamesPanels();
-    m_glBuffer->Restart();
+    m_glBuffer->ReloadSolversAndFlames();
   }
   m_glBuffer->setRunningState(true);
 }

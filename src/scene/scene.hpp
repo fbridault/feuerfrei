@@ -37,7 +37,7 @@ public:
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
    */
-  Scene(const char* const fileName, FireSource** const flames, int nbFlames);
+  Scene(const char* const fileName, const vector <FireSource *> *flames);
 
   /** Destructeur par d&eacute;faut. */
   ~Scene();
@@ -76,8 +76,8 @@ public:
    */
   bool getMTLFileNameFromOBJ(const char* fileName, char* mtlName);
   
-   /** Lit un fichier MTL pass&eacute; en param&egrave;tres et importe les matériaux qu'il contient 
-    * dans la scène.
+  /** Lit un fichier MTL pass&eacute; en param&egrave;tres et importe les matériaux qu'il contient 
+   * dans la scène.
    *
    * @param fileName nom du fichier OBJ &agrave; importer.
    */
@@ -219,9 +219,10 @@ public:
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
-    
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary();
+
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary();
   };
   
   /** Dessin de la scène pour les objets non texturés.
@@ -239,8 +240,9 @@ public:
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
     
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary(shader);
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary(shader);
   };
   
   /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
@@ -255,8 +257,9 @@ public:
 	 objectsArrayIterator++)
       (*objectsArrayIterator)->draw (AMBIENT,false, m_boundingSpheresMode);
 
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary();
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary();
   };
   
   /** Dessin de tous les objets de la scène */
@@ -270,9 +273,10 @@ public:
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw (ALL,true, m_boundingSpheresMode);
-    
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary();
+
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary();
   };
   /** Dessin de tous les objets de la scène.
    * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
@@ -289,8 +293,9 @@ public:
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw (ALL,true, m_boundingSpheresMode);
     
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary(shader);
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary(shader);
   };
 
   /** Dessin de tous les objets qui projettent des ombres */
@@ -301,8 +306,9 @@ public:
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
     
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary();
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary();
   };
   
   /** Dessin de tous les objets qui projettent des ombres */
@@ -313,8 +319,9 @@ public:
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
     
-    for (int f = 0; f < m_nbFlames; f++)
-      m_flames[f]->drawLuminary(shader);
+    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	 flamesIterator != m_flames->end (); flamesIterator++)
+      (*flamesIterator)->drawLuminary(shader);
   };
   
   void computeBoundingBox(Point& max, Point& min);
@@ -328,9 +335,7 @@ private:
   /** Tableaux de flammes. Il s'agit d'un pointeur sur le tableau de flamme créé dans la classe GlFlameCanvas. 
    * Celles-ci sont nécessaires pour dessiner les luminaires lors du dessin de la scène.
    */
-  FireSource **m_flames;
-  /** Nombre de flammes. */
-  int m_nbFlames;
+  const vector <FireSource *> *m_flames;
   
   /** Chaîne de caractère contenant le chemin courant. Elle est utilisée dans les fonctions d'import pour
    * parcourir les différents répertoires (scenes, textures, ...).

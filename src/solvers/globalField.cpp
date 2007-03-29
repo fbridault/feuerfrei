@@ -6,7 +6,7 @@
 #include "../scene/scene.hpp"
 #include "../interface/interface.hpp"
 
-GlobalField::GlobalField(Field3D **const localFields, uint nbLocalFields, Scene* const scene, char type, uint n,
+GlobalField::GlobalField(const vector < Field3D* > &localFields, Scene* const scene, char type, uint n,
 			 double timeStep, double omegaDiff, double omegaProj, double epsilon)
 {
   Point max, min, width, position, scale(1,1,1);
@@ -14,7 +14,6 @@ GlobalField::GlobalField(Field3D **const localFields, uint nbLocalFields, Scene*
   double dim, buoyancy=0.0;
   
   m_localFields = localFields; 
-  m_nbLocalFields = nbLocalFields;
   
   scene->computeBoundingBox(max,min);
   width = max - min;
@@ -75,16 +74,17 @@ void GlobalField::shareForces()
   Point pt,ldim;
   Point strength[8];
   double dump=0;
-  
-  for(uint i=0; i < m_nbLocalFields; i++)
+
+  for (vector < Field3D* >::const_iterator solversIterator = m_localFields.begin ();
+       solversIterator != m_localFields.end (); solversIterator++)
     {
       /* Localisation des solveurs */
       /* On cherche dans quelle cellule se trouve chacune des six faces du solveur local */
-      pt = m_localFields[i]->getPosition() - m_field->getPosition();
-      ldim = m_localFields[i]->getDim();
-      ldim.x *= m_localFields[i]->getScale().x;
-      ldim.y *= m_localFields[i]->getScale().y;
-      ldim.z *= m_localFields[i]->getScale().z;
+      pt = (*solversIterator)->getPosition() - m_field->getPosition();
+      ldim = (*solversIterator)->getDim();
+      ldim.x *= (*solversIterator)->getScale().x;
+      ldim.y *= (*solversIterator)->getScale().y;
+      ldim.z *= (*solversIterator)->getScale().z;
       
       /* Coordonnée de la cellule du coin (0,0,0) dans le solveur global */
       strength[0] = m_field->getUVW(pt,dump);
@@ -96,9 +96,9 @@ void GlobalField::shareForces()
       strength[6] = m_field->getUVW(pt+Point(ldim.x,ldim.y,ldim.z),dump);
       strength[7] = m_field->getUVW(pt+Point(ldim.x,0,ldim.z),dump);
       
-      m_localFields[i]->addForcesOnFace(LEFT_FACE,strength[0], strength[1], strength[2], strength[3]);
-      m_localFields[i]->addForcesOnFace(BACK_FACE,strength[0], strength[1], strength[4], strength[5]);
-      m_localFields[i]->addForcesOnFace(FRONT_FACE,strength[3], strength[2], strength[6], strength[7]);
-      m_localFields[i]->addForcesOnFace(RIGHT_FACE,strength[7], strength[6], strength[4], strength[5]);
+      (*solversIterator)->addForcesOnFace(LEFT_FACE,strength[0], strength[1], strength[2], strength[3]);
+      (*solversIterator)->addForcesOnFace(BACK_FACE,strength[0], strength[1], strength[4], strength[5]);
+      (*solversIterator)->addForcesOnFace(FRONT_FACE,strength[3], strength[2], strength[6], strength[7]);
+      (*solversIterator)->addForcesOnFace(RIGHT_FACE,strength[7], strength[6], strength[4], strength[5]);
     }
 }

@@ -4,10 +4,9 @@
 
 #include "material.hpp"
 
-Scene::Scene (const char* const fileName, FireSource** const flames, int nbFlames)
+Scene::Scene (const char* const fileName, const vector <FireSource *> *flames)
 {  
   m_flames = flames;
-  m_nbFlames = nbFlames;
   
   addMaterial(new Material(this));
   cerr << "Chargement de la scène " << fileName << endl;
@@ -99,8 +98,9 @@ void Scene::computeVisibility(const Camera &view)
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++)
     (*objectsArrayIteratorWSV)->computeVisibility(view);
-  for (uint i = 0; i < m_nbFlames; i++)
-    m_flames[i]->computeVisibility(view);
+  for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+       flamesIterator != m_flames->end (); flamesIterator++)
+    (*flamesIterator)->computeVisibility(view);
 }
 
 void Scene::createVBOs(void)

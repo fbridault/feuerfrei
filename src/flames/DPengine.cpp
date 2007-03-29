@@ -1,14 +1,13 @@
 #include "DPengine.hpp"
 
-DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, FireSource** const flames, 
-				       uint nbFlames )
+DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, 
+				       const vector <FireSource *> *flames)
 {
   m_width = width;
   m_height = height;
   m_nbLayers = m_nbLayersMax = nbLayers;
   m_scene = scene;
   m_flames = flames;
-  m_nbFlames = nbFlames;
   
   m_fbo.Initialize(m_width,m_height);
   
@@ -95,8 +94,9 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
-      for (f = 0; f < m_nbFlames; f++)
-	m_flames[f]->drawFlame (displayFlames, displayParticles, displayBoundingSphere);
+      for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	   flamesIterator != m_flames->end (); flamesIterator++)
+	(*flamesIterator)->drawFlame (displayFlames, displayParticles, displayBoundingSphere);
       glEndList();
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */

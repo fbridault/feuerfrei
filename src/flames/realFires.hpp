@@ -109,6 +109,35 @@ public:
   /** Destructeur */
   virtual ~CampFire(){};
 };
+/** La classe Torche permet la définition d'une flamme de type torche.
+ * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
+ * en Wick*. Celle-ci ne sont pas affichées à l'écran. Les objets composant le luminaire 
+ * doivent s'appeler Torch.*
+ *
+ * @author	Flavien Bridault
+ */
+class CandlesSet : public FireSource
+{
+public:
+  /** Constructeur d'une torche.
+   * @param flameConfig Configuration de la flamme.
+   * @param s Pointeur sur le solveur de fluides.
+   * @param scene Pointeur sur la scène.
+   * @param torchName nom du fichier contenant le luminaire.
+   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
+   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   */
+  CandlesSet(FlameConfig *flameConfig, Field3D ** s, Scene *scene, const char *lampName, uint index, 
+	     CgSVShader * shader);
+  /** Destructeur */
+  virtual ~CandlesSet(){}; 
+
+  /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
+   * est donc effectuée pour tenir compte du placement du feu dans le monde.
+   */
+  virtual void drawWick(bool displayBoxes) const {};
+
+};
 
 /** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
  * clones.

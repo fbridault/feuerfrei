@@ -1,19 +1,18 @@
 #include "solidePhoto.hpp"
 
-PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, FireSource **flames, uint nbFlames, 
+PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, 
 						     const CGcontext* const context, bool recompileShaders) :
   m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders)
 {
   m_scene = s;
   m_flames = flames;
-  m_nbFlames = nbFlames;
   
-  m_centers = new double[m_nbFlames*3];
-  m_intensities = new double[m_nbFlames];
-  m_lazimuth_lzenith = new double[m_nbFlames*2];
+  m_centers = new double[m_flames->size()*3];
+  m_intensities = new double[m_flames->size()];
+  m_lazimuth_lzenith = new double[m_flames->size()*2];
   
-  m_SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"), m_nbFlames, context, 0, true);
-  m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"), m_nbFlames, context, 2, true);
+  m_SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"), m_flames->size(), context, 0, true);
+  m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"), m_flames->size(), context, 2, true);
   
   generateTexture();
 }
@@ -36,11 +35,12 @@ void PhotometricSolidsRenderer::generateTexture(void)
   
   m_tex2DSize[0] = m_tex2DSize[1] = 0;
   /* Calcul de la taille maximale */
-  for(uint k=0; k < m_nbFlames; k++){
-    if(m_flames[k]->getIESAzimuthSize() > m_tex2DSize[0])
-      m_tex2DSize[0] = m_flames[k]->getIESAzimuthSize();
-    if(m_flames[k]->getIESZenithSize() > m_tex2DSize[1])
-      m_tex2DSize[1] = m_flames[k]->getIESZenithSize();
+  for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+       flamesIterator != m_flames->end (); flamesIterator++){
+    if((*flamesIterator)->getIESAzimuthSize() > m_tex2DSize[0])
+      m_tex2DSize[0] = (*flamesIterator)->getIESAzimuthSize();
+    if((*flamesIterator)->getIESZenithSize() > m_tex2DSize[1])
+      m_tex2DSize[1] = (*flamesIterator)->getIESZenithSize();
   }
   
   /* On prend la puissance de deux supérieure */
@@ -64,14 +64,16 @@ void PhotometricSolidsRenderer::generateTexture(void)
   
   cerr << "Texture 3D size : " << m_tex2DSize[0] << " " << m_tex2DSize[1] << endl;
   
-  tex3DValues = new float[m_tex2DSize[0]*m_tex2DSize[1]*m_nbFlames];
+  tex3DValues = new float[m_tex2DSize[0]*m_tex2DSize[1]*m_flames->size()];
   ptrTex = tex3DValues;
   
-  for(uint k=0; k < m_nbFlames; k++){
-    float *values = m_flames[k]->getIntensities();
+  
+  for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+       flamesIterator != m_flames->end (); flamesIterator++){
+    float *values = (*flamesIterator)->getIntensities();
     
-    sizex = m_flames[k]->getIESAzimuthSize();
-    sizey = m_flames[k]->getIESZenithSize();
+    sizex = (*flamesIterator)->getIESAzimuthSize();
+    sizey = (*flamesIterator)->getIESZenithSize();
     
     /* On crée la texture 3D en remplissant de 0 là où on n'a pas de valeur */
     for(uint j=0; j < sizey; j++){
@@ -99,20 +101,22 @@ void PhotometricSolidsRenderer::generateTexture(void)
 //     cerr << "Fin 2D" << endl;
 //   }
   
-  m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_nbFlames, tex3DValues);
+  m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
   
   m_SPFragmentShader[0]->SetTexture(m_photometricSolidsTex->getTexture());
   m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture());
   
-  for(uint k=0; k < m_nbFlames; k++){
+  uint k=0;
+  for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+       flamesIterator != m_flames->end (); flamesIterator++, k++){
     /* On prend l'inverse pour éviter une division dans le shader et on divise par la taille */
     /* pour avoir sur l'intervalle [O:1] dans l'espace de la texture */
     /* Le calcul final d'un uv dans le shader est le suivant : */
     /* phi / m_lazimuth_lzenith[i].x / m_tex2Dsize[0] */
     /* Ce qui est simplifié grâce au traitement effectué ici en : */
     /* phi * m_lazimuth_lzenith[i].x */
-    m_lazimuth_lzenith[k*2] = (1/m_flames[k]->getLazimut())/m_tex2DSize[0];
-    m_lazimuth_lzenith[k*2+1] = (1/m_flames[k]->getLzenith())/m_tex2DSize[1];
+    m_lazimuth_lzenith[k*2] = (1/(*flamesIterator)->getLazimut())/m_tex2DSize[0];
+    m_lazimuth_lzenith[k*2+1] = (1/(*flamesIterator)->getLzenith())/m_tex2DSize[1];
 //     cerr << m_lazimuth_lzenith[k*2] << " " << m_lazimuth_lzenith[k*2+1] << endl;
   }
   
@@ -124,13 +128,16 @@ void PhotometricSolidsRenderer::generateTexture(void)
 
 void PhotometricSolidsRenderer::draw(u_char color)
 {
+  uint k=0;
   /* Récupération des propriétés des flammes */
-  for(uint k=0; k < m_nbFlames; k++){
-    m_flames[k]->computeIntensityPositionAndDirection();
-    
-    m_intensities[k] = m_flames[k]->getIntensity();
-    m_flames[k]->getCenterSP(m_centers[k*3], m_centers[k*3+1], m_centers[k*3+2]);
-  }
+  for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+       flamesIterator != m_flames->end (); flamesIterator++, k++)
+    {
+      (*flamesIterator)->computeIntensityPositionAndDirection();
+      
+      m_intensities[k] = (*flamesIterator)->getIntensity();
+      (*flamesIterator)->getCenterSP(m_centers[k*3], m_centers[k*3+1], m_centers[k*3+2]);
+    }
   
   /* Affichage des objets sans couleur */
   if(color == 0){

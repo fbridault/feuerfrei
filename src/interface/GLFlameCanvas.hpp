@@ -55,6 +55,7 @@ public:
   /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
+  void ReloadSolversAndFlames (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(FlameAppConfig *config, bool recompileShaders);
@@ -144,11 +145,11 @@ private:
   
   DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
-  Field3D **m_solvers;
+  vector <Field3D *> m_solvers;
   GlobalField *m_globalField;
     
   /********* Variables relatives à la simulation *************************/
-  FireSource **m_flames;
+  vector <FireSource *> m_flames;
   Scene *m_scene;
   CgSVShader *m_SVShader;
   CgGammaShader *m_gammaShader;

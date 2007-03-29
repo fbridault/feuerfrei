@@ -126,24 +126,25 @@ void GLFlameCanvas::InitFlames(void)
   for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
-      m_flames[i] = new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 8.0);
+      m_flames.push_back( new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				      m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 8.0));
       break;
     case FIRMALAMPE :
-      m_flames[i] = new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				   m_scene, "scenes/firmalampe.obj", i, m_SVShader, m_currentConfig->flames[i].wickName.fn_str());
+      m_flames.push_back( new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+					 m_scene, "scenes/firmalampe.obj", i, m_SVShader,
+					 m_currentConfig->flames[i].wickName.fn_str()));
       break;
     case TORCH :
-      m_flames[i] = new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
-			      m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader);
+      m_flames.push_back( new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
+				    m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader));
       break;
     case CAMPFIRE :
-      m_flames[i] = new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				 m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader);
+      m_flames.push_back( new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+				       m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader));
       break;
     case CANDLESTICK :
-      m_flames[i] = new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				     m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 5.0);
+      m_flames.push_back( new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+					   m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 8.0));
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -154,63 +155,61 @@ void GLFlameCanvas::InitFlames(void)
   
   if( m_intensities ) delete [] m_intensities;
   m_intensities = new double[m_currentConfig->nbFlames];
-  //  ToggleDepthPeeling();
 }
 
 void GLFlameCanvas::InitSolvers(void)
 {
-  m_solvers = new Field3D *[m_currentConfig->nbSolvers];
   for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
     switch(m_currentConfig->solvers[i].type){
     case GS_SOLVER :
-      m_solvers[i] = new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				    m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale, 
-				    m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      m_solvers.push_back( new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
       break;
     case GCSSOR_SOLVER :
-      m_solvers[i] = new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
-					m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					m_currentConfig->solvers[i].epsilon);
+      m_solvers.push_back( new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					      m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+					      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					      m_currentConfig->solvers[i].epsilon));
       break;
     case HYBRID_SOLVER :
-      m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					m_currentConfig->solvers[i].timeStep,
-					m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-					m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      m_solvers.push_back( new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					      m_currentConfig->solvers[i].timeStep,
+					      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff,
+					      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon));
       break;
     case LOD_HYBRID_SOLVER :
-      m_solvers[i] = new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					   m_currentConfig->solvers[i].timeStep,
-					   m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
-					   m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      m_solvers.push_back( new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+						 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+						 m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+						 m_currentConfig->solvers[i].timeStep,
+						 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff,
+						 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon));
       break;
     case SIMPLE_FIELD :
-      m_solvers[i] = new RealField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      m_solvers.push_back( new RealField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					   m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
       break;
     case FAKE_FIELD :
-      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-				     m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy);
+      m_solvers.push_back( new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					   m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
       break;
     case LOD_FIELD :
-      m_solvers[i] = new LODField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
-				    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
-				    m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-				    m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
-				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-				    m_currentConfig->solvers[i].epsilon);
+      m_solvers.push_back( new LODField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+					  m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					  m_currentConfig->solvers[i].epsilon));
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
@@ -223,28 +222,27 @@ void GLFlameCanvas::InitSolvers(void)
 void GLFlameCanvas::InitScene(bool recompileShaders)
 {  
   uint glowScales[2] = { 1, 4 };
+  
   InitSolvers();
   
-  m_flames = new FireSource *[m_currentConfig->nbFlames];
-  
-  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), m_flames, m_currentConfig->nbFlames);
+  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_flames);
 
+  InitFlames();
+  
   if(m_currentConfig->useGlobalField)
-    m_globalField = new GlobalField(m_solvers, m_currentConfig->nbSolvers, m_scene, m_currentConfig->globalField.type,
+    m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,
 				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
-  
-  InitFlames();
-  
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, m_flames, m_currentConfig->nbFlames, &m_context, recompileShaders);
+    
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, &m_context, recompileShaders);
   
   m_scene->createVBOs();
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
-  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, m_flames, m_currentConfig->nbFlames);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, &m_flames);
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
@@ -283,6 +281,46 @@ void GLFlameCanvas::Restart (void)
   Enable();
 }
 
+void GLFlameCanvas::ReloadSolversAndFlames (void)
+{
+  Disable();
+  m_init = false;
+  
+  delete m_photoSolid;
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    delete (*flamesIterator);
+  m_flames.clear();
+    
+  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+       solversIterator != m_solvers.end (); solversIterator++)
+    delete (*solversIterator);
+  m_solvers.clear();
+  
+  if(m_globalField){
+    delete m_globalField;
+    m_globalField = NULL;
+  }
+  
+  InitSolvers();
+  
+  InitFlames();
+  
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, &m_context, false);
+  
+  if(m_currentConfig->useGlobalField)
+    m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,
+				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
+				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
+				    m_currentConfig->globalField.epsilon);
+  
+  ::wxStartTimer();
+  m_run = true;
+  m_init = true;
+  cerr << "Initialization over" << endl;
+  Enable();
+}
+
 void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
 {
   m_flames[flameIndex]->useNewIESFile(IESFileName.ToAscii());
@@ -297,16 +335,20 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
-  for (uint f = 0; f < prevNbFlames; f++)
-    delete m_flames[f];
-  delete[]m_flames;
+  
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    delete (*flamesIterator);
+  m_flames.clear();
+  
   if(m_globalField){
     delete m_globalField;
     m_globalField = NULL;
   }
-   for (uint s = 0; s < prevNbSolvers; s++)
-    delete m_solvers[s];
-  delete[]m_solvers;
+  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+       solversIterator != m_solvers.end (); solversIterator++)
+    delete (*solversIterator);
+  m_solvers.clear();
 }
 
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
@@ -314,15 +356,18 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
   if(m_run && m_init){
     if(m_currentConfig->useGlobalField)
       m_globalField->cleanSources ();
-    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-      m_solvers[i]->cleanSources ();
+    for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+	 solversIterator != m_solvers.end (); solversIterator++)
+      (*solversIterator)->cleanSources ();
     
-    for (uint i = 0; i < m_currentConfig->nbFlames; i++)
-      m_flames[i]->addForces ();
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->addForces ();
     
     if(m_currentConfig->useGlobalField) m_globalField->iterate();
-    for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-      m_solvers[i]->iterate ();
+    for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+	 solversIterator != m_solvers.end (); solversIterator++)
+      (*solversIterator)->iterate ();
   }
   
   /* Force à redessiner */
@@ -359,17 +404,19 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':
-//       m_framesCountForSwitch = 1;
+      //       m_framesCountForSwitch = 1;
 //       m_switch = true;
-      for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-	m_solvers[i]->decreaseRes ();
+      for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+	   solversIterator != m_solvers.end (); solversIterator++)
+	(*solversIterator)->decreaseRes ();
       break;
-
+      
     case 'L': 
-//       m_framesCountForSwitch = 1;
-//       m_switch = true;
-      for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
-	m_solvers[i]->increaseRes ();
+      //       m_framesCountForSwitch = 1;
+      //       m_switch = true;
+      for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+	   solversIterator != m_solvers.end (); solversIterator++)
+	(*solversIterator)->increaseRes ();
       break;
     case WXK_SPACE : m_run = !m_run; break;
     }
@@ -379,8 +426,6 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 /** Fonction de dessin global */
 void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
-  uint f;
-  
   if(!m_init)
     return;
   
@@ -404,15 +449,17 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 //       m_framesCountForSwitch++;
 //   }
   if(m_run && !m_switch)
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->build();
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->build();
   // SDL_mutexV (lock);
   
   /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
   m_visibility = false;
   if(m_displayFlame){
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      if(m_flames[f]->isVisible()){
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      if((*flamesIterator)->isVisible()){
 	m_visibility = true;
 	break;
       }
@@ -470,8 +517,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 	/* Dessin de la flamme */
-	for (f = 0; f < m_currentConfig->nbFlames; f++)
-	  m_flames[f]->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
+	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	     flamesIterator != m_flames.end (); flamesIterator++)
+	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
       }
       m_glowEngine->blur();
     
@@ -489,8 +537,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       if(m_currentConfig->depthPeelingEnabled)
 	m_depthPeelingEngine->render();
       else
-	for (f = 0; f < m_currentConfig->nbFlames; f++)
-	  m_flames[f]->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
+	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	     flamesIterator != m_flames.end (); flamesIterator++)
+	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
   }
   if(m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
     m_glowEngine->drawBlur();
@@ -533,7 +582,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 void GLFlameCanvas::drawScene()
 {
-  uint f,s;
   Point position, scale;
   
   if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
@@ -547,13 +595,15 @@ void GLFlameCanvas::drawScene()
   else
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /******************* AFFICHAGE DE LA SCENE *******************************/
-  for (f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->drawWick (m_displayWickBoxes);
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    (*flamesIterator)->drawWick (m_displayWickBoxes);
   
   /**** Affichage de la scène ****/  
   if (m_drawShadowVolumes)
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->drawShadowVolume ();
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->drawShadowVolume ();
   
   if (m_currentConfig->shadowsEnabled)
     castShadows();  
@@ -562,8 +612,9 @@ void GLFlameCanvas::drawScene()
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
     else{
       glEnable (GL_LIGHTING);
-      for (f = 0; f < m_currentConfig->nbFlames; f++)
-	m_flames[f]->switchOn ();
+      for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	   flamesIterator != m_flames.end (); flamesIterator++)
+	(*flamesIterator)->switchOn ();
       m_scene->drawScene();
       glDisable (GL_LIGHTING);
     }
@@ -583,21 +634,21 @@ void GLFlameCanvas::drawScene()
       m_globalField->displayVelocityField();
     glPopMatrix ();
   }
-  
-  for (s = 0; s < m_currentConfig->nbSolvers; s++)
+  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
+       solversIterator != m_solvers.end (); solversIterator++)
     {
-      position = m_solvers[s]->getPosition ();
-      scale =  m_solvers[s]->getScale ();
+      position = (*solversIterator)->getPosition ();
+      scale =  (*solversIterator)->getScale ();
       
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
       if (m_displayBase)
-	m_solvers[s]->displayBase();
+	(*solversIterator)->displayBase();
       if (m_displayGrid)
-	m_solvers[s]->displayGrid();
+	(*solversIterator)->displayGrid();
       if (m_displayVelocity)
-	m_solvers[s]->displayVelocityField();
+	(*solversIterator)->displayVelocityField();
       glPopMatrix ();
     }
 }
@@ -685,17 +736,16 @@ void GLFlameCanvas::OnSize(wxSizeEvent& event)
 
 void GLFlameCanvas::castShadows ()
 {
-  uint f;
-  
   glEnable (GL_LIGHTING);
-  for (f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->switchOff ();
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    (*flamesIterator)->switchOff ();
   m_scene->drawSceneWT ();
   
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
-    for (f = 0; f < m_currentConfig->nbFlames; f++){
-      m_flames[f]->switchOn ();
-    }
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->switchOn ();
   
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT);
   
@@ -719,9 +769,10 @@ void GLFlameCanvas::castShadows ()
 	       GL_KEEP);	// depth test pass
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
-  
-  for (f = 0; f < m_currentConfig->nbFlames; f++)
-    m_flames[f]->drawShadowVolume ();
+
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    (*flamesIterator)->drawShadowVolume ();
   
   glPopAttrib ();
   
@@ -749,8 +800,9 @@ void GLFlameCanvas::castShadows ()
   
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    for (f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->switchOn ();
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->switchOn ();
     
     m_scene->drawScene ();
     glDisable (GL_LIGHTING);

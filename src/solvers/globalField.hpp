@@ -4,6 +4,7 @@
 class GlobalField;
 
 #include "field3D.hpp"
+#include <vector>
 
 class Field3D;
 class Scene;
@@ -27,7 +28,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GlobalField (Field3D **const localFields, uint nbLocalFields, Scene *const scene, char type, uint n,
+  GlobalField (const vector < Field3D* > &localFields, Scene *const scene, char type, uint n,
 	       double timeStep, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
   virtual ~GlobalField () { delete m_field; };
@@ -76,8 +77,7 @@ public:
   
 protected:
   /** Pointeur sur les solveurs contenus */
-  Field3D **m_localFields;
-  uint m_nbLocalFields;
+  vector <Field3D*> m_localFields;
   Field3D *m_field;
 };
 

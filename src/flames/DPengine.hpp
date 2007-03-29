@@ -69,7 +69,7 @@ public:
    * @param recompileShaders indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, FireSource** const flames, uint nbFlames );
+  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, const vector <FireSource *> *flames);
   virtual ~DepthPeelingEngine();
   
   void makePeels(bool displayFlames, bool displayParticles, bool displayBoundingSphere);
@@ -95,8 +95,8 @@ private:
   GLuint m_curDepthTex;
 
   const Scene *m_scene;
-  FireSource **m_flames;
-  uint m_nbFlames;
+  const vector <FireSource *> *m_flames;
+  
   ARBFragmentShader m_peelProgram;
 
   GLuint m_flamesDisplayList;

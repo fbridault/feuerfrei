@@ -63,6 +63,25 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
     }
 }
 
+CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D **s, Scene *scene, const char *lampName, uint index,
+		       CgSVShader * shader):
+  FireSource (flameConfig, *s, 0, scene, lampName, _("textures/bougie2.png"), index, shader, "Lamp")
+{
+  list<string> objList;
+  int i=0;
+  
+  scene->getObjectsNameFromOBJ(lampName, objList, WICK_NAME_PREFIX);
+  
+  m_nbFlames = objList.size();
+  m_flames = new RealFlame* [m_nbFlames];
+  
+  for (list < string >::iterator objListIterator = objList.begin ();
+       objListIterator != objList.end (); objListIterator++, i++)
+    {
+      m_flames[i] = new PointFlame( flameConfig, &m_texture, *s, .4 );
+    }
+}
+
 CandleStick::CandleStick (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  CgSVShader * shader, double rayon):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, shader)

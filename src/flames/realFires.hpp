@@ -119,24 +119,50 @@ public:
 class CandlesSet : public FireSource
 {
 public:
-  /** Constructeur d'une torche.
+  /** Constructeur d'un ensemble de bougies. A la base, cette classe a été créée pour permettre
+   * de modéliser la lampe "tour" vue au Cyprus Museum de Nicosie. La particularité de cette source de feu
+   * qu'elle crée elle même une liste de solveurs. En effet, à la lecture du fichier OBJ contenant le luminaire,
+   * chaque objet nommé "Wick*" donne naissance à une bougie, qui chacune a besoin d'un solveur.
    * @param flameConfig Configuration de la flamme.
    * @param s Pointeur sur le solveur de fluides.
+   * @param flameSolvers Liste des solveurs créés.
    * @param scene Pointeur sur la scène.
-   * @param torchName nom du fichier contenant le luminaire.
+   * @param lampName nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
    */
-  CandlesSet(FlameConfig *flameConfig, Field3D ** s, Scene *scene, const char *lampName, uint index, 
-	     CgSVShader * shader);
+  CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
+	     const char *lampName, uint index, CgSVShader * shader, Point scale);
   /** Destructeur */
   virtual ~CandlesSet(){}; 
-
-  /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
-   * est donc effectuée pour tenir compte du placement du feu dans le monde.
-   */
-  virtual void drawWick(bool displayBoxes) const {};
-
+  
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
+  {
+    if(m_visibility)
+      if(displayBoundingSphere)
+	m_boundingSphere.draw();
+      else{
+	Point pt;
+	Point scale;
+	
+	pt = getPosition();
+	scale = m_solver->getScale();
+	glPushMatrix();
+	glTranslatef (pt.x, pt.y, pt.z);
+	glScalef (scale.x, scale.y, scale.z);
+    
+	for (uint i = 0; i < m_nbFlames; i++){
+	  pt = m_flames[i]->getSolver()->getPosition();
+	  scale =  m_flames[i]->getSolver()->getScale();
+	  glPushMatrix();
+	  glTranslatef (pt.x, pt.y, pt.z);
+	  glScalef (scale.x, scale.y, scale.z);
+	  m_flames[i]->drawFlame(display, displayParticle);
+	  glPopMatrix();
+	}
+	glPopMatrix();
+      }
+  }
 };
 
 /** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
@@ -164,7 +190,7 @@ public:
   virtual void build();
   
   virtual void drawWick(bool displayBoxes) const
-  {      
+  {
     Point pt(getPosition());
     Point scale(m_solver->getScale());
     glPushMatrix();

@@ -1,6 +1,7 @@
 #include "realFlames.hpp"
 
 #include "../scene/graphicsFn.hpp"
+#include "../scene/scene.hpp"
 #include "abstractFires.hpp"
 
 /**********************************************************************************************************************/
@@ -163,7 +164,8 @@ void LineFlame::breakCheck()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon):
+PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, 
+			double rayon, Scene* const scene, const char *wickFileName, const char *wickName):
   RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -184,6 +186,17 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
 	 m_leadSkeletons[0], flameConfig);
       angle += 2 * PI / m_nbSkeletons;
     }
+  
+  if(wickFileName && wickName){
+    wick = new Object(scene);
+    scene->importOBJ(wickFileName, wick, wickName);
+    wick->buildVBO();
+    wick->buildBoundingSpheres();
+    /* On décale pour que le centre du solveur soit calé avec la mèche ( et non pas le coin inférieur gauche) */
+    s->setPosition(wick->getPosition() - m_position * s->getScale());
+  }else
+    wick = NULL;
+  
 }
 
 PointFlame::~PointFlame ()
@@ -192,17 +205,21 @@ PointFlame::~PointFlame ()
 
 void PointFlame::drawWick (bool displayBoxes) const
 {
-  double hauteur = 1 / 6.0;
-  double largeur = 1 / 60.0;
-  /* Affichage de la mèche */
-  glPushMatrix ();
-  glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);
-  glRotatef (-90.0, 1.0, 0.0, 0.0);
-  glColor3f (0.0, 0.0, 0.0);
-  GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
-  glTranslatef (0.0, 0.0, hauteur);
-  GraphicsFn::SolidDisk (largeur, 10, 10);
-  glPopMatrix ();
+  if(!wick){
+    double hauteur = 1 / 6.0;
+    double largeur = 1 / 60.0;
+    /* Affichage de la mèche */
+    glPushMatrix ();
+    glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);
+    glRotatef (-90.0, 1.0, 0.0, 0.0);
+    glColor3f (0.0, 0.0, 0.0);
+    GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
+    glTranslatef (0.0, 0.0, hauteur);
+    GraphicsFn::SolidDisk (largeur, 10, 10);
+    glPopMatrix ();
+  }else{
+    wick->draw();
+  }
 }
 
 void PointFlame::addForces ()

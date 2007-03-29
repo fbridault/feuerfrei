@@ -165,6 +165,7 @@ void Scene::getSceneAbsolutePath(const char* const fileName)
   if(strlen(fileName) > 255)
     cerr << "Dir string too long" << endl;
   
+  /* On parcourt la chaîne en partant de la fin */
   for( int i=strlen(fileName)-1 ; i >= 0 ; i--)
     {
       if(found)

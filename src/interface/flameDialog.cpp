@@ -34,10 +34,11 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
     _("Oil Lamp"),
     _("Torch"),
     _("Camp Fire"),
+    _("Candles Set"),
     _("Candlestick")
   };
   m_flameTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					5, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
+					6, m_flameTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
   m_wickLabel = new wxStaticText(this, -1, _("Wick"));
   m_wickTextCtrl = new wxTextCtrl(this, -1, _("meche2.obj"));
   m_wickBrowseButton = new wxButton(this, IDBF_BrowseWick, _("Browse..."));

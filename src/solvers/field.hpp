@@ -55,7 +55,7 @@ public:
   /** Retourne le pas de temps.
    * @return Valeur du pas de temps en ms.
    */
-  double getTimeStep()
+  double getTimeStep() const
   {
     return m_dt;
   };
@@ -63,7 +63,7 @@ public:
   /** Retourne l'itération en cours.
    * @return Numéro de l'itération.
    */
-  double getNbIter()
+  double getNbIter() const
   {
     return m_nbIter;
   };
@@ -71,10 +71,12 @@ public:
   /** Retourne la position du solveur dans le repère du monde 
    * @return Position dans l'espace.
    */
-  virtual Point getPosition ()
-  {
-    return (m_position);
-  };
+  virtual Point getPosition () const { return (m_position); }; 
+  
+  /** Affecte la position du solveur dans le repère du monde 
+   * @return Position dans l'espace.
+   */
+  virtual void setPosition (const Point& position) { m_position = position; };
   
   /** Ajoute de façon ponctuelle des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque qu'une flamme est déplacée.

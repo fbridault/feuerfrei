@@ -73,10 +73,12 @@ public:
     m_currentField->displayVelocityField ();
   };
   
-  /** Retourne la position du solveur dans le repère du monde 
-   * @return Position dans l'espace.
-   */
-  Point getPosition (void) { return m_currentField->getPosition(); };
+  Point getPosition (void) const { return m_currentField->getPosition(); };
+  
+  void setPosition (const Point& position) { 
+    m_fakeField.setPosition(position);
+    m_solver.setPosition(position); 
+  };
   
   void addTemporaryExternalForces(Point& forces)
   {

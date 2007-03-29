@@ -140,8 +140,7 @@ void NurbsFlame::drawLineFlame () const
 /**********************************************************************************************************************/
 
 FixedFlame::FixedFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex) :
-  NurbsFlame(flameConfig, nbSkeletons, nbFixedPoints, tex),
-  m_halo(_("textures/halo.png"), GL_CLAMP, GL_CLAMP)
+  NurbsFlame(flameConfig, nbSkeletons, nbFixedPoints, tex)
 {
 }
 
@@ -158,7 +157,7 @@ void FixedFlame::drawPointFlame () const
     }
   else
     {
-      double angle, angle2, angle3, angle4;
+      double angle, angle2, angle4;
       
       /* Déplacement de la texture de maniÃ¨re Ã  ce qu'elle reste "en face" de l'observateur */
       GLdouble m[4][4];
@@ -183,9 +182,7 @@ void FixedFlame::drawPointFlame () const
       angle2 = acos (direction * worldLookX);
       
       /****************************************************************************************/
-      /* Génération du halo */
       angle4 = (angle2 < PI / 2.0) ? -angle : angle;
-      angle3 = angle4 * 180 / (double) (PI);
       
       glEnable (GL_TEXTURE_2D);
       /****************************************************************************************/

@@ -112,8 +112,10 @@ public:
    * @param tex Pointeur vers la texture à utiliser.
    * @param s Pointeur vers le solveur.
    * @param rayon Valeur du rayon du cercle formé par les racines des squelettes.
+   * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  PointFlame ( const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon);
+  PointFlame ( const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon,
+	       Scene* const scene=NULL, const char *wickFileName=NULL, const char *wickName=NULL);
   
   /** Destructeur*/
   virtual ~PointFlame();
@@ -141,6 +143,9 @@ public:
    */
   void breakCheck() {};
   void addForces ();
+
+protected:
+  Object *wick;
 };
 
 

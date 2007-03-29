@@ -87,6 +87,132 @@ public:
 
 class Scene;
 
+/**********************************************************************************************************************/
+/********************************************* DECLARATION DE LA CLASSE MESH ******************************************/
+/**********************************************************************************************************************/
+
+/** 
+ * Classe repr&eacute;sentant un maillage.
+ * Un maillage sc&egrave;ne comporte une liste index&eacute;e des polygones, des normales et des coordonnées de textures. 
+ * Un seul matériau est appliqué à un maillage.
+ *
+ * @author	Flavien Bridault
+ */
+class Mesh
+{
+public:
+  /**
+   * Constructeur par d&eacute;faut.
+   * @param scene Pointeur vers la scene.
+   */
+  Mesh (const Scene* const scene, uint materialIndex, Object *parent);
+  
+  /** Destructeur par défaut. */
+  virtual ~Mesh ();
+  
+  /** Lecture du nombre de polygones contenus dans le maillage.
+   * @return Nombre de polygones. */
+  uint getPolygonsCount () const { return (m_indexArray.size() / 3); };
+  
+  /** Lecture de l'index du matériau utilisé par le maillage. 
+   * @return Index du matériau dans la liste de matériau contenu dans la scène. */
+  uint getMaterialIndex () const { return (m_materialIndex); };
+  
+  /** Met à jour les attributs de l'objet. */
+  void setAttributes (uint attr) { m_attributes = attr; };
+  /** Récupérer les attributs de l'objet. */
+  uint getAttributes () const { return m_attributes; };
+  
+  /** Construction du Vertex Buffer Object du maillage, ici le tableau d'indice. */
+  void buildVBO() const;
+  
+  /** Fonction de dessin de l'objet avec utilisation des VBOs.
+   * @param drawCode 
+   * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
+   * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
+   * si ALL alors l'objet est dessiné inconditionnellement
+   * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
+   * @param tex false si l'objet texturé doit être affiché sans sa texture
+   * @param lastMaterialIndex indice du dernier matériau appliqué, utilisé en entrée et en sortie.
+   */
+  void draw(char drawCode, bool tex, uint& lastMaterialIndex) const;
+  
+  /** Fusion des trois tableaux en un seul tableau.
+   * Le format OBJ gère trois tableaux d'indices, alors qu'en OpenGL il n'y a qu'un seul tableau d'indice.
+   * L'algorithme présent dans cette fonction réalise la fusion des ces trois tableaux en un seul.<br>
+   * Le principe est le suivant : pour chaque indice du tableau de points, on regarde si il a déjà été référencé
+   * auparavant dans le tableau. Si c'est le cas, alors on regarde si ses normales et ses coordonnées de texture 
+   * (pas les indices mais les coordonnées réelles, car certains exportateurs en OBJ ont tendance à dupliquer les
+   * normales et les coordonnées de textures) sont égales à celle de la première référence. Dans l'affirmative, il n'y
+   * a rien à faire, l'indice du point est correct. Dans le cas contraire, il est nécessaire de dupliquer le point dans
+   * le tableau de point de l'objet, d'affecter les coordonnées de texture et la normale, et enfin de modifier l'indice
+   * du point courant en conséquence. Enfin dans le cas où le point n'a pas encore été référencé dans le tableau, on
+   * mémorise cette référence dans une table de hachage utilisé pour le premier cas, et ensuite on affecte les coordonnées
+   * de texture et la normale.
+   *
+   * @param normalsVector Vecteur des normales.
+   * @param normalsIndexVector Vecteur des indices des normales.
+   * @param texCoordsVector Vecteur des coordonnées de texture.
+   * @param texCoordsIndexVector Vecteur des indices des coordonnées de texture. 
+   */
+  void setUVsAndNormals(const vector < Vector > &normalsVector,   const vector < GLuint > &normalsIndexVector, 
+			const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector);
+
+  const bool isTransparent () const;
+  
+  /** Ajout d'un index de point dans le tableau d'indices.
+   * @param i indice à ajouter.
+   */
+  void addIndex( GLuint i ) { m_indexArray.push_back(i); };
+  
+  /** Calcule la visibilité de l'objet
+   * @param view Référence sur la caméra
+   */
+  void computeVisibility(const Camera &view);
+  
+  /** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
+  void buildBoundingSphere ();
+  
+  /** Dessin des sphères englobantes. */
+  void drawBoundingSphere ();
+
+  Point getPosition () const { return m_boundingSphere.centre; };
+private:
+  /**<Liste des indices des points des facettes */
+  vector <GLuint> m_indexArray;
+  
+  /** Pointeur vers la scène. */
+  const Scene *m_scene;
+  /** Pointeur vers l'objet parent */
+  Object *m_parent;
+  
+  /** Pointeur vers le matériau utilisé. */
+  uint m_materialIndex;
+
+  /** Type d'attributs présents dans le maillage soit :
+   * <li>
+   * <ol>0 pour points,</ol>
+   * <ol>1 pour points et normales,</ol>
+   * <ol>2 pour points et normales,</ol>
+   * <ol>3 pour points, normales et coordonnées de texture.</ol>
+   * </li> */
+  uint m_attributes;
+  
+  /* Identifiant du Vertex Buffer Object. */
+  GLuint m_bufferID;
+  
+  /** Visibilité de l'objet par rapport au frustum. */
+  bool m_visibility;
+
+  BoundingSphere m_boundingSphere;
+};
+
+
+
+/**********************************************************************************************************************/
+/********************************************* DECLARATION DE LA CLASSE OBJECT ****************************************/
+/**********************************************************************************************************************/
+
 /** Classe représentant un groupe d'objets. Elle stocke les points, les normales et les coordonnées de ces points. 
  * Ceci permet d'éviter des changements trop fréquents de VBO.
  */
@@ -192,6 +318,14 @@ public:
   /** Dessin des sphères englobantes. */
   void drawBoundingSpheres ();
   
+  Point getPosition () const { 
+    Point average;
+    for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
+	 meshesListIterator != m_meshesList.end ();
+	 meshesListIterator++)
+      average += (*meshesListIterator)->getPosition();
+    return (average/m_meshesList.size());
+  };
 protected:
   /**<Liste des points de l'objet */
   vector <Vertex> m_vertexArray;
@@ -227,121 +361,6 @@ private:
    * <ol>3 pour points, normales et coordonnées de texture.</ol>
    * </li> */
   uint m_attributes;
-};
-
-/** 
- * Classe repr&eacute;sentant un maillage.
- * Un maillage sc&egrave;ne comporte une liste index&eacute;e des polygones, des normales et des coordonnées de textures. 
- * Un seul matériau est appliqué à un maillage.
- *
- * @author	Flavien Bridault
- */
-class Mesh
-{
-public:
-  /**
-   * Constructeur par d&eacute;faut.
-   * @param scene Pointeur vers la scene.
-   */
-  Mesh (const Scene* const scene, uint materialIndex, Object *parent);
-  
-  /** Destructeur par défaut. */
-  virtual ~Mesh ();
-  
-  /** Lecture du nombre de polygones contenus dans le maillage.
-   * @return Nombre de polygones. */
-  uint getPolygonsCount () const { return (m_indexArray.size() / 3); };
-  
-  /** Lecture de l'index du matériau utilisé par le maillage. 
-   * @return Index du matériau dans la liste de matériau contenu dans la scène. */
-  uint getMaterialIndex () const { return (m_materialIndex); };
-  
-  /** Met à jour les attributs de l'objet. */
-  void setAttributes (uint attr) { m_attributes = attr; };
-  /** Récupérer les attributs de l'objet. */
-  uint getAttributes () const { return m_attributes; };
-  
-  /** Construction du Vertex Buffer Object du maillage, ici le tableau d'indice. */
-  void buildVBO() const;
-  
-  /** Fonction de dessin de l'objet avec utilisation des VBOs.
-   * @param drawCode 
-   * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
-   * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
-   * si ALL alors l'objet est dessiné inconditionnellement
-   * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
-   * @param tex false si l'objet texturé doit être affiché sans sa texture
-   * @param lastMaterialIndex indice du dernier matériau appliqué, utilisé en entrée et en sortie.
-   */
-  void draw(char drawCode, bool tex, uint& lastMaterialIndex) const;
-  
-  /** Fusion des trois tableaux en un seul tableau.
-   * Le format OBJ gère trois tableaux d'indices, alors qu'en OpenGL il n'y a qu'un seul tableau d'indice.
-   * L'algorithme présent dans cette fonction réalise la fusion des ces trois tableaux en un seul.<br>
-   * Le principe est le suivant : pour chaque indice du tableau de points, on regarde si il a déjà été référencé
-   * auparavant dans le tableau. Si c'est le cas, alors on regarde si ses normales et ses coordonnées de texture 
-   * (pas les indices mais les coordonnées réelles, car certains exportateurs en OBJ ont tendance à dupliquer les
-   * normales et les coordonnées de textures) sont égales à celle de la première référence. Dans l'affirmative, il n'y
-   * a rien à faire, l'indice du point est correct. Dans le cas contraire, il est nécessaire de dupliquer le point dans
-   * le tableau de point de l'objet, d'affecter les coordonnées de texture et la normale, et enfin de modifier l'indice
-   * du point courant en conséquence. Enfin dans le cas où le point n'a pas encore été référencé dans le tableau, on
-   * mémorise cette référence dans une table de hachage utilisé pour le premier cas, et ensuite on affecte les coordonnées
-   * de texture et la normale.
-   *
-   * @param normalsVector Vecteur des normales.
-   * @param normalsIndexVector Vecteur des indices des normales.
-   * @param texCoordsVector Vecteur des coordonnées de texture.
-   * @param texCoordsIndexVector Vecteur des indices des coordonnées de texture. 
-   */
-  void setUVsAndNormals(const vector < Vector > &normalsVector,   const vector < GLuint > &normalsIndexVector, 
-			const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector);
-
-  const bool isTransparent () const;
-  
-  /** Ajout d'un index de point dans le tableau d'indices.
-   * @param i indice à ajouter.
-   */
-  void addIndex( GLuint i ) { m_indexArray.push_back(i); };
-  
-  /** Calcule la visibilité de l'objet
-   * @param view Référence sur la caméra
-   */
-  void computeVisibility(const Camera &view);
-  
-  /** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
-  void buildBoundingSphere ();
-  
-  /** Dessin des sphères englobantes. */
-  void drawBoundingSphere ();
-
-private:
-  /**<Liste des indices des points des facettes */
-  vector <GLuint> m_indexArray;
-  
-  /** Pointeur vers la scène. */
-  const Scene *m_scene;
-  /** Pointeur vers l'objet parent */
-  Object *m_parent;
-  
-  /** Pointeur vers le matériau utilisé. */
-  uint m_materialIndex;
-
-  /** Type d'attributs présents dans le maillage soit :
-   * <li>
-   * <ol>0 pour points,</ol>
-   * <ol>1 pour points et normales,</ol>
-   * <ol>2 pour points et normales,</ol>
-   * <ol>3 pour points, normales et coordonnées de texture.</ol>
-   * </li> */
-  uint m_attributes;
-  
-  /* Identifiant du Vertex Buffer Object. */
-  GLuint m_bufferID;
-  
-  /** Visibilité de l'objet par rapport au frustum. */
-  bool m_visibility;
-
-  BoundingSphere m_boundingSphere;
 };
 
 #endif

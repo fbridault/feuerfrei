@@ -230,7 +230,7 @@ protected:
 /** La classe FixedFlame est l'objet de plus bas niveau représentant une flamme dont la base est fixe. Par rapport à la
  * classe de base NurbsFlame, elle rajoute la prise en compte des origines des squelettes, notamment pour l'allocation
  * des tableaux de points de contrôles. Elle défini également quelques méthodes abstraites pour obtenir des informations
- * sur la localisation de la flamme nécessaire pour l'éclairage et la construction d'un halo. Tout ceci n'est en effet
+ * sur la localisation de la flamme nécessaire pour l'éclairage. Tout ceci n'est en effet
  * pas nécessaire pour la définition d'une flamme détachée.
  *
  * @author	Flavien Bridault
@@ -284,9 +284,6 @@ public:
    */
   virtual Point* getBottom() const = 0;
   
-protected:
-  /* Texture pour le halo */
-  Texture m_halo;
 };
 
 class DetachedFlame;
@@ -330,6 +327,8 @@ public:
    * @param value Vélocité de la flamme.
    */
   virtual void setForces(double value){ m_innerForce=value; };
+  
+  virtual Field3D* getSolver () { return m_solver; };
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
   void drawParticles() const

@@ -6,7 +6,8 @@
 #define FIRMALAMPE 1
 #define TORCH 2
 #define CAMPFIRE 3
-#define CANDLESTICK 4
+#define CANDLESSET 4
+#define CANDLESTICK 5
 
 /* Types de solveurs */
 /* Attention la valeur est importante car elle va correspondre à */

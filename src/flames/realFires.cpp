@@ -2,6 +2,7 @@
 
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
+#include "../solvers/fakeField3D.hpp"
 
 #include <vector>
 #include <string>
@@ -63,9 +64,9 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
     }
 }
 
-CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D **s, Scene *scene, const char *lampName, uint index,
-		       CgSVShader * shader):
-  FireSource (flameConfig, *s, 0, scene, lampName, _("textures/bougie2.png"), index, shader, "Lamp")
+CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
+		       const char *lampName, uint index, CgSVShader * shader, Point scale):
+  FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, shader, "Lamp")
 {
   list<string> objList;
   int i=0;
@@ -78,7 +79,10 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D **s, Scene *scene, cons
   for (list < string >::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new PointFlame( flameConfig, &m_texture, *s, .4 );
+      Point pt;
+      Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
+      flameSolvers.push_back( field );
+      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, lampName, (*objListIterator).c_str());
     }
 }
 

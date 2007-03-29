@@ -123,6 +123,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
 
 void GLFlameCanvas::InitFlames(void)
 {
+  vector <Field3D *> extraSolvers;
   for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
@@ -141,6 +142,12 @@ void GLFlameCanvas::InitFlames(void)
     case CAMPFIRE :
       m_flames.push_back( new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
 				       m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader));
+      break;
+    case CANDLESSET :
+      m_flames.push_back( new CandlesSet (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
+					  extraSolvers, m_scene, m_currentConfig->flames[i].wickName.fn_str(),
+					  i, m_SVShader, m_currentConfig->solvers[m_currentConfig->flames[i].solverIndex].scale));
+      m_solvers.insert(m_solvers.end(),extraSolvers.begin(),extraSolvers.end());
       break;
     case CANDLESTICK :
       m_flames.push_back( new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],

@@ -349,7 +349,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
 				    wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_innerForceLabel = new wxStaticText(this,-1,_("Force"));
   
-  m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,0,2000, wxDefaultPosition,
+  m_samplingToleranceSlider = new wxSlider(this,IDSL_SPTOL,0,10,2000, wxDefaultPosition,
 					   wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_samplingToleranceLabel = new wxStaticText(this,-1,_("Sampling"));
   m_leadLifeSlider = new wxSlider(this,IDSL_NLP,0,0,NB_PARTICLES_MAX, wxDefaultPosition,

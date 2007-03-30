@@ -179,17 +179,19 @@ void Scene::getSceneAbsolutePath(const char* const fileName)
     }
 }
 
-bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
+bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
+		      list<Wick*>* const wicksList, const char* prefix)
 {
-  bool alreadyOneObject = false, skip = false;
+  bool skip = false;
   bool objectsAttributesSet=false;
-  bool importSingleObject = (object != NULL);
-  bool lookForSpecificObject = (objName != NULL);
+  bool storeObjectsInList = (objectsList != NULL), storeWicksInList = (wicksList != NULL);
+  bool lookForSpecificObjects = (prefix != NULL);
+  uint prefixlen;
   /* Indique qu'un maillage ou un objet a été créé, utile pour ajouter les informations géométriques une fois */
   /* qu'elles sont toutes lues car les objets sont crées auparavant. */
   bool meshCreated=false, objectCreated=false;
   bool firstMesh = false;
-  char lettre,drop;
+  char lettre,dump;
   char buffer[255];
   uint coord_textures = 0, normales = 0;
   int nbVertex=0, nbNormals=0, nbTexCoords=0;
@@ -210,6 +212,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
   /**<Liste des indices des coordonnées de textures des facettes */
   vector < GLuint >texCoordsIndexVector;
   
+  if(lookForSpecificObjects) prefixlen = strlen(prefix);
   getSceneAbsolutePath(fileName);
   
   ifstream objFile(fileName, ios::in);
@@ -244,39 +247,41 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  }
   
 	  objFile >> buffer;
-	  if(importSingleObject){
-	    /* On importe un seul objet. */
-	    if(alreadyOneObject){
-	      /* Un objet a déjà été importé, inutile de continuer. */
-	      objFile.close ();
-	      return true;
-	    }else{
-	      if(lookForSpecificObject){
-		/* On recherche un objet en particulier. */
-		if(!strcmp(buffer,objName)){
-		  /* Objet trouvé ! */
-		  cerr << "import of " << objName << endl;
-		  currentObject = object;
-		  alreadyOneObject = true;
-		  objectCreated = true;
-		  firstMesh = true;
-		  skip = false;
-		}else
-		  skip = true;
-	      }else{
-		/* Sinon on prend le premier objet dans le fichier. */
-		currentObject = object;
-		alreadyOneObject = true;
+
+	  if(storeObjectsInList || storeWicksInList){
+	    if(lookForSpecificObjects){
+	      /* On recherche un objet en particulier. */
+	      if(!strncmp(buffer,prefix,prefixlen)){
+		/* Objet trouvé ! */
+		if(storeObjectsInList){
+		  currentObject = new Object(this);
+		  objectsList->push_back(currentObject);
+		}else{
+		  currentObject = new Wick(this);
+		  wicksList->push_back((Wick* )currentObject);
+		}
 		objectCreated = true;
 		firstMesh = true;
+		skip = false;
+	      }else
+		skip = true;
+	    }else{
+	      /* Sinon on prend tous les objets dans le fichier. */
+	      if(storeObjectsInList){
+		currentObject = new Object(this);
+		objectsList->push_back(currentObject);
+	      }else{
+		currentObject = new Wick(this);
+		wicksList->push_back((Wick *)currentObject);
 	      }
+	      objectCreated = true;
+	      firstMesh = true;
 	    }
-	  }else{
-	    /* On est en train d'importer tous les objets. */
+	  }
+	  else{
 	    currentObject = new Object(this);
 	    objectCreated = true;
 	    firstMesh = true;
-	    
 	    if (!strncmp (buffer, "WSV", 3))
 	      addObject(currentObject, true);
 	    else
@@ -312,7 +317,7 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	  /* Définition des matériaux */
 	  objFile >> buffer >> buffer;
 	  /* La définition des matériaux est évitée si l'on importe qu'un seul objet. */
-	  if(!lookForSpecificObject)
+	  if(!lookForSpecificObjects)
 	    this->importMTL ((const char *) buffer);
 	  break;
 	case 'v':
@@ -374,9 +379,9 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
 	      break;
 	    case 1:
-	      objFile >> a >> drop >> drop >> an;
-	      objFile >> b >> drop >> drop >> bn;
-	      objFile >> c >> drop >> drop >> cn;
+	      objFile >> a >> dump >> dump >> an;
+	      objFile >> b >> dump >> dump >> bn;
+	      objFile >> c >> dump >> dump >> cn;
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
@@ -386,9 +391,9 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
 	      break;
 	    case 2:
-	      objFile >> a >> drop >> an;
-	      objFile >> b >> drop >> bn;
-	      objFile >> c >> drop >> cn;
+	      objFile >> a >> dump >> an;
+	      objFile >> b >> dump >> bn;
+	      objFile >> c >> dump >> cn;
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
@@ -398,9 +403,9 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
 	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
  	      break;
 	    case 3:
-	      objFile >> a >> drop >> at >> drop >> an;
-	      objFile >> b >> drop >> bt >> drop >> bn;
-	      objFile >> c >> drop >> ct >> drop >> cn;
+	      objFile >> a >> dump >> at >> dump >> an;
+	      objFile >> b >> dump >> bt >> dump >> bn;
+	      objFile >> c >> dump >> ct >> dump >> cn;
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
@@ -435,44 +440,13 @@ bool Scene::importOBJ(const char* fileName, Object* object, const char* objName)
     normalsVector.clear();
     texCoordsVector.clear();
   }
-  if(importSingleObject)
-    return (currentObject != NULL);
+  if(storeObjectsInList)
+    return (objectsList->size() > 0);
+  else
+    if(storeWicksInList)
+      return (wicksList->size() > 0);
   else
     return true;
-}
-
-void Scene::getObjectsNameFromOBJ(const char* fileName, list<string> &objectsList, const char* prefix)
-{
-  char lettre;
-  char buffer[255];
-  string objName;
-  
-  int len = strlen(prefix);
-  
-  ifstream objFile(fileName, ios::in);
-  if (!objFile.is_open ()){
-    throw (ios::failure ("Open error"));
-    return;
-  }
-  while (!objFile.eof())
-    {
-      objFile >> lettre;
-      
-      switch (lettre)
-	{
-	case 'g':
-	  objFile >> buffer;
-	  if(!strncmp(prefix,buffer,len)){
-	    objName = buffer;
-	    objectsList.push_back(objName);
-	  }
-	  break;
-	default:
-	  objFile.getline(buffer, sizeof (buffer));
-	  break;
-	}
-    }
-  objFile.close ();
 }
 
 bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)

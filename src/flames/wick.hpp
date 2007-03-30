@@ -32,17 +32,19 @@ private:
   
 public:
   /** Constructeur de mèche.
-   * @param wickFileName nom du fichier de scène où est stockée la mèche.
+   * @param scene Pointeur sur la scène.
+   */
+  Wick(Scene* const scene);
+  virtual ~Wick();
+  
+  /* Construction de la mèche *
    * @param nb_lead_squelettes Nombre de squelettes guides à placer sur la mèche.
    * @param scene Pointeur sur la scène.
    * @param position Position de la mèche dans l'espace.
    * @param leadSkeletons Vecteur des squelettes guides.
-   * @param wickName Optionnel, nom de l'objet dans le fichier OBJ.
    */
-  Wick(const char *wickFileName, const FlameConfig* const flameConfig, Scene* const scene, 
-       vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver, const char*wickName=NULL);
-  virtual ~Wick();
-  	
+  void build(const FlameConfig* const flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver);
+  
   /** Affiche la mèche
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */

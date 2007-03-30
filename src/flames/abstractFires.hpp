@@ -250,8 +250,9 @@ public:
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
-      for (uint i=0; i < m_nbObjLuminary; i++)
-	m_luminary[i]->draw();
+      for (list < Object* >::const_iterator luminaryIterator = m_luminary.begin ();
+	   luminaryIterator  != m_luminary.end (); luminaryIterator++)
+	(*luminaryIterator)->draw();
       glPopMatrix();
     }
   }
@@ -270,8 +271,9 @@ public:
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
       shader.setModelViewProjectionMatrix();
-      for (uint i=0; i < m_nbObjLuminary; i++)
-	m_luminary[i]->draw();
+      for (list < Object* >::const_iterator luminaryIterator = m_luminary.begin ();
+	   luminaryIterator  != m_luminary.end (); luminaryIterator++)
+	(*luminaryIterator)->draw();
       glPopMatrix();
     }
   }
@@ -342,7 +344,7 @@ protected:
   RealFlame **m_flames;
   
   /** Luminaire */
-  Object **m_luminary;
+  list <Object *> m_luminary;
   
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;

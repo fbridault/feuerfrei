@@ -23,25 +23,30 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, cons
 		       CgSVShader * shader, const char *wickFileName):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
 {
-  m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, wickFileName, 0.01);
+  list<Wick *> objList;
+  
+  scene->importOBJ(wickFileName, NULL, &objList);
+  
+  if(objList.size() > 0)
+    m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, (*objList.begin()), 0.01);
 }
 
 Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
 	     CgSVShader * shader):
   DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, shader, TORCH_NAME)
 {
-  list<string> objList;
+  list<Wick *> objList;
   int i=0;
   
-  scene->getObjectsNameFromOBJ(torchName, objList, WICK_NAME_PREFIX);
+  scene->importOBJ(torchName, NULL, &objList, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
   
-  for (list < string >::iterator objListIterator = objList.begin ();
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, torchName, 0.1, (*objListIterator).c_str(), this);
+      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, (*objListIterator), 0.1, this);
     }
 }
 
@@ -49,18 +54,18 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
 		   CgSVShader * shader):
   DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, shader, TORCH_NAME)
 {
-  list<string> objList;
+  list<Wick *> objList;
   int i=0;
   
-  scene->getObjectsNameFromOBJ(fireName, objList, WICK_NAME_PREFIX);
+  scene->importOBJ(fireName, NULL, &objList, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
   
-  for (list < string >::iterator objListIterator = objList.begin ();
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, fireName, 0.04, (*objListIterator).c_str(), this);
+      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, (*objListIterator), 0.04, this);
     }
 }
 
@@ -68,21 +73,21 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>&
 		       const char *lampName, uint index, CgSVShader * shader, Point scale):
   FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, shader, "Lamp")
 {
-  list<string> objList;
+  list<Object *> objList;
   int i=0;
   
-  scene->getObjectsNameFromOBJ(lampName, objList, WICK_NAME_PREFIX);
+  scene->importOBJ(lampName, &objList, NULL, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
   
-  for (list < string >::iterator objListIterator = objList.begin ();
+  for (list < Object *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
       Point pt;
       Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
       flameSolvers.push_back( field );
-      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, lampName, (*objListIterator).c_str());
+      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, (*objListIterator));
       m_flames[i]->buildBoundingSphere();
     }
 }

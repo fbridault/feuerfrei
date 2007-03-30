@@ -83,7 +83,6 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
 {  
-  list<string> objList;
   char mtlName[255];
   uint i;
   uint nbObj;
@@ -97,31 +96,20 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
     if(scene->getMTLFileNameFromOBJ(filename, mtlName))
       scene->importMTL(mtlName);
     
-    scene->getObjectsNameFromOBJ(filename, objList, objName);
-    m_luminary = new Object* [objList.size()];
-    m_nbObjLuminary=objList.size();
+    scene->importOBJ(filename, &m_luminary, NULL, objName);
     
-    i=0;
-    for (list < string >::iterator objListIterator = objList.begin ();
-	 objListIterator != objList.end (); objListIterator++, i++)
-      {      
-	m_luminary[i] = new Object(scene);
-	scene->importOBJ(filename, m_luminary[i], (*objListIterator).c_str());
-      }
-    
-    for (i=0; i < m_nbObjLuminary; i++)
-      m_luminary[i]->buildVBO();
+    for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
+	 luminaryIterator  != m_luminary.end (); luminaryIterator++)
+      (*luminaryIterator)->buildVBO();
     m_hasLuminary=true;
   }
   else
     {
-      m_nbObjLuminary=1;
-      m_luminary = new Object* [1];
-      m_luminary[0] = new Object(scene);
-      m_hasLuminary = scene->importOBJ(filename, m_luminary[0], NULL);
-      if(m_hasLuminary){
-	m_luminary[0]->buildVBO();
-      }
+      m_hasLuminary = scene->importOBJ(filename, &m_luminary);
+      if(m_hasLuminary)
+	for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
+	     luminaryIterator  != m_luminary.end (); luminaryIterator++)
+	  (*luminaryIterator)->buildVBO();
     }
   m_breakable=flameConfig->breakable;  
   
@@ -137,9 +125,11 @@ FireSource::~FireSource()
     delete m_flames[i];
   delete[]m_flames;
   /* On efface le luminaire, il n'appartient pas à la scène */
-  for (uint i = 0; i < m_nbObjLuminary; i++)
-    delete m_luminary[i];
-  delete []m_luminary;
+  
+  for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
+       luminaryIterator  != m_luminary.end (); luminaryIterator++)
+    delete (*luminaryIterator);
+  m_luminary.clear();
 }
 
 void FireSource::build()

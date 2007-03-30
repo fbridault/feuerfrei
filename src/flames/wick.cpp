@@ -3,19 +3,17 @@
 #include "../scene/graphicsFn.hpp"
 #include "../scene/scene.hpp"
 
-Wick::Wick (const char *wickFileName, const FlameConfig* const flameConfig, Scene* const scene, 
-	    vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver, const char*wickName) :
-  Object(scene)
+Wick::Wick (Scene* const scene) : Object(scene) 
+{
+}
+
+void Wick::build (const FlameConfig* const flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver )
 {
   Point bounds[flameConfig->skeletonsNumber + 1];
   Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MIN, DBL_MIN);
   Point midDist, cellSpan;
   vector < Point * >pointsPartitionsArray[flameConfig->skeletonsNumber];
   u_char max; /* 0 -> x, 1 -> y, 2 -> z */
-  
-  /* Chargement de la mèche */
-  cerr << "Chargement de la mèche du fichier " << wickFileName << "...";
-  scene->importOBJ(wickFileName, this, wickName);
   
   /* Création du VBO */
   //glEnable (GL_LIGHTING);
@@ -29,7 +27,7 @@ Wick::Wick (const char *wickFileName, const FlameConfig* const flameConfig, Scen
   /* Parcours des points */
   /* La bounding box est délimitée par les points ptMax[flameConfig->skeletonsNumber] et ptMin[0] */
   getBoundingBox (bounds[flameConfig->skeletonsNumber], bounds[0]);
-    
+  
   /* Découpage de la bounding box en flameConfig->skeletonsNumber partitions */
   midDist = (bounds[flameConfig->skeletonsNumber] - bounds[0]) / (flameConfig->skeletonsNumber);
   cellSpan = bounds[flameConfig->skeletonsNumber] - bounds[0];

@@ -37,8 +37,7 @@ public:
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
   LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s,
-	     const char *wickFileName, double detachedFlamesWidth, 
-	     const char *wickName=NULL, DetachableFireSource *parentFire=NULL);
+	     Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const{ 
@@ -51,7 +50,7 @@ public:
     }
   };
   
-  virtual void drawWick(bool displayBoxes) const { m_wick.drawWick(displayBoxes); };
+  virtual void drawWick(bool displayBoxes) const { m_wick->drawWick(displayBoxes); };
   
   virtual Vector getMainDirection() const
   {
@@ -86,7 +85,7 @@ public:
 //   virtual void generateAndDrawSparks();
 private:
   /** Mèche de la flamme */
-  Wick m_wick;
+  Wick *m_wick;
 
   /** Liste des particules utilisées pour afficher des étincelles */
   list<Particle *> m_sparksList;
@@ -119,7 +118,7 @@ public:
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
   PointFlame ( const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon,
-	       Scene* const scene=NULL, const char *wickFileName=NULL, const char *wickName=NULL);
+	       Scene* const scene=NULL, Object *wick=NULL);
   
   /** Destructeur*/
   virtual ~PointFlame();
@@ -153,7 +152,7 @@ public:
   void addForces ();
 
 protected:
-  Object *wick;
+  Object *m_wick;
 };
 
 

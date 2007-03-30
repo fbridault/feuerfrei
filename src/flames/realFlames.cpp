@@ -9,10 +9,8 @@
 /**********************************************************************************************************************/
 
 LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s, 
-		      const char *wickFileName, double detachedFlamesWidth, const char *wickName,
-		      DetachableFireSource *parentFire ) :
-  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s),
-  m_wick (wickFileName, flameConfig, scene, m_leadSkeletons, s, wickName)
+		      Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire ) :
+  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s)
 {
   Point pt;
   double largeur = .03;
@@ -20,6 +18,8 @@ LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const 
   
   Point rootMoveFactorP(2,.1,.5);
   
+  m_wick = wickObject;
+  m_wick->build(flameConfig, m_leadSkeletons, s);
   m_nbLeadSkeletons = m_leadSkeletons.size();
   
   /** Allocation des squelettes périphériques = deux par squelette périphérique */
@@ -59,6 +59,7 @@ LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const 
 
 LineFlame::~LineFlame ()
 {
+  delete m_wick;
 }
 
 void LineFlame::breakCheck()
@@ -165,7 +166,7 @@ void LineFlame::breakCheck()
 /**********************************************************************************************************************/
 
 PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, 
-			double rayon, Scene* const scene, const char *wickFileName, const char *wickName):
+			double rayon, Scene* const scene, Object *wick):
   RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -187,25 +188,24 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
       angle += 2 * PI / m_nbSkeletons;
     }
   
-  if(wickFileName && wickName){
-    wick = new Object(scene);
-    scene->importOBJ(wickFileName, wick, wickName);
-    wick->buildVBO();
-    wick->buildBoundingSpheres();
+  m_wick = wick;
+  if(m_wick){
+    m_wick->buildVBO();
+    m_wick->buildBoundingSpheres();
     /* On décale pour que le centre du solveur soit calé avec la mèche ( et non pas le coin inférieur gauche) */
-    s->setPosition(wick->getPosition() - m_position * s->getScale());
-  }else
-    wick = NULL;
-  
+    s->setPosition(m_wick->getPosition() - m_position * s->getScale());
+  }
 }
 
 PointFlame::~PointFlame ()
 {  
+  if(m_wick)
+    delete m_wick;
 }
 
 void PointFlame::drawWick (bool displayBoxes) const
 {
-  if(!wick){
+  if(!m_wick){
     double hauteur = 1 / 6.0;
     double largeur = 1 / 60.0;
     /* Affichage de la mèche */
@@ -218,7 +218,7 @@ void PointFlame::drawWick (bool displayBoxes) const
     GraphicsFn::SolidDisk (largeur, 10, 10);
     glPopMatrix ();
   }else{
-    wick->draw();
+    m_wick->draw();
   }
 }
 

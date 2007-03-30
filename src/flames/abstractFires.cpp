@@ -188,7 +188,7 @@ void FireSource::buildBoundingSphere ()
   m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
   m_boundingSphere.centre = getCenterSP();
 }
- 
+
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool save=m_visibility;
@@ -202,21 +202,33 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   m_visibility = (m_dist);
   
   if(m_visibility){
+    /* Il faut prendre en compte la taille de l'objet */
+    m_dist = m_dist - m_boundingSphere.radius;
     if(m_dist > 5){
+//       cerr << 2000 << endl;
+      setSamplingTolerance(2000);
       if(m_solver->isRealSolver())
 	m_solver->switchToFakeField();
-    }else
+    }else{
       if(!m_solver->isRealSolver())
 	m_solver->switchToRealSolver();
-    if(!save){
+      if(m_dist > 3){
+//  	cerr << 500 << endl;
+	setSamplingTolerance(500);
+      }else
+	if(m_dist > 2){
+//  	  cerr << 60 << endl;
+	  setSamplingTolerance(40);
+	}else{
+//  	  cerr << 25 << endl;
+	  setSamplingTolerance(20);
+	}
+    }
+    if(!save)
       m_solver->setRunningState(true);
-      cerr << "Flame is now visible" << endl;
-    }
   }else
-    if(!m_visibility && save){
+    if(!m_visibility && save)
       m_solver->setRunningState(false);
-      cerr << "Flame is now hidden" << endl;
-    }
 }
 
 DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 

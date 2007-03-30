@@ -104,7 +104,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   
   glEnable (GL_AUTO_NORMAL);
   glEnable (GL_NORMALIZE);
-
+  
   glPolygonMode(GL_FRONT,GL_FILL);
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
@@ -233,7 +233,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   InitSolvers();
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_flames);
-
+  
   InitFlames();
   
   if(m_currentConfig->useGlobalField)
@@ -241,7 +241,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
-    
+  
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, &m_context, recompileShaders);
   
   m_scene->createVBOs();
@@ -298,7 +298,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
        flamesIterator != m_flames.end (); flamesIterator++)
     delete (*flamesIterator);
   m_flames.clear();
-    
+  
   for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
        solversIterator != m_solvers.end (); solversIterator++)
     delete (*solversIterator);

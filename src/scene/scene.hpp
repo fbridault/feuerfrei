@@ -46,7 +46,7 @@ public:
    * Si object est non nul, un seul objet est chargé, le premier figurant dans le fichier. Si objName est
    * non nul, on cherchera à importer l'objet portant ce nom. Sinon si object est null tous les objets 
    * contenu dans le fichier sont importés.
-   * Si object esttrue, l'objet ne sera pas ajouté dans la liste des objets de la scène. Ceci est par
+   * Si object est non nul, l'objet ne sera pas ajouté dans la liste des objets de la scène. Ceci est par
    * exemple utilisé pour les luminaires des flammes qui sont stockés dans FireSource et non dans Scene.
    *
    * @param fileName nom du fichier OBJ &agrave; importer.

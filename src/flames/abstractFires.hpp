@@ -234,7 +234,7 @@ public:
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
 	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle);
+	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
 	glPopMatrix();
       }
   }
@@ -327,7 +327,7 @@ public:
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
   
-  /** Construction des sphères englobantes de l'objet. */
+  /** Construction de la sphère englobante de l'objet. */
   void buildBoundingSphere ();
   
   /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante 

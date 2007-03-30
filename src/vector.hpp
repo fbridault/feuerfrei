@@ -207,6 +207,17 @@ public:
   }
 	
   void resetToNull(){x=0.0; y=0.0; z=0.0;};
+
+  double max()
+  { 
+    if(x>y){
+      if(x>z)
+	return(x);
+    }else
+      if(y>z)
+	return(y);
+    return(z);
+  }
 };//Point
 
 /** 

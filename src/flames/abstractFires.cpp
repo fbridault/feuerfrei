@@ -128,6 +128,7 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   m_intensityCoef = 0.3;
   m_visibility = true;
   m_dist=0;
+  buildBoundingSphere();
 }
 
 FireSource::~FireSource()
@@ -185,18 +186,20 @@ void FireSource::computeIntensityPositionAndDirection()
 
 void FireSource::buildBoundingSphere ()
 {
-  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
-  m_boundingSphere.centre = getCenterSP();
+  double p,k;
+  p = m_solver->getDim().max()/2.0;
+  k = p*p;
+  m_boundingSphere.radius = sqrt(k+k);
+  m_boundingSphere.centre = m_solver->getPosition() + p;
+  //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
+  //  m_boundingSphere.centre = getCenterSP();
 }
 
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool save=m_visibility;
-  double oldDist=m_dist;
   
-  /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
-  /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
-  if(m_visibility || forceSpheresBuild) buildBoundingSphere();
+  if(forceSpheresBuild) buildBoundingSphere();
   
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);
@@ -258,10 +261,10 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool di
       glTranslatef (pt.x, pt.y, pt.z);
       glScalef (scale.x, scale.y, scale.z);
       for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->drawFlame(display, displayParticle);
+	m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
       for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
 	   flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-	(*flamesIterator)->drawFlame(display, displayParticle);
+	(*flamesIterator)->drawFlame(display, displayParticle, displayBoundingSphere);
       glPopMatrix();
     }
 }

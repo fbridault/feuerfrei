@@ -79,7 +79,7 @@ public:
   void draw(void) const{
     glPushMatrix();
     glTranslatef(centre.x, centre.y, centre.z);
-    glColor3d(1.0,0.0,0.0);
+    glColor4d(1.0,0.0,0.0,1.0);
     GraphicsFn::SolidSphere(radius, 20, 20);
     glPopMatrix();
   }

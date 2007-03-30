@@ -41,10 +41,14 @@ public:
 	     const char *wickName=NULL, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle) const{ 
-    /* Affichage des particules */
-    if(displayParticle) drawParticles();
-    if(display) drawLineFlame(); 
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const{ 
+    if(displayBoundingSphere)
+      m_boundingSphere.draw();
+    if(m_visibility){
+      /* Affichage des particules */
+      if(displayParticle) drawParticles();
+      if(display) drawLineFlame(); 
+    }
   };
   
   virtual void drawWick(bool displayBoxes) const { m_wick.drawWick(displayBoxes); };
@@ -120,10 +124,14 @@ public:
   /** Destructeur*/
   virtual ~PointFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle) const { 
-    /* Affichage des particules */
-    if(displayParticle) drawParticles();
-    if(display) drawPointFlame(); 
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const { 
+    if(displayBoundingSphere)
+      m_boundingSphere.draw();
+    if(m_visibility){
+      /* Affichage des particules */
+      if(displayParticle) drawParticles();
+      if(display) drawPointFlame();
+    }
   };
   
   virtual void drawWick(bool displayBoxes) const;
@@ -177,8 +185,7 @@ public:
   
   virtual bool build();
   
-  virtual void drawFlame(bool display, bool displayParticle) const { 
-    /* Affichage des particules */
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const { 
     if(displayParticle) drawParticles();
     if(display) drawLineFlame(); 
   };

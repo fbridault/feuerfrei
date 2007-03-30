@@ -224,6 +224,8 @@ RealFlame::RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ush
   
   m_solver = s;
   m_innerForce = flameConfig->innerForce;
+  m_visibility = true;
+  m_dist=0;
 }
 
 bool RealFlame::build ()
@@ -233,6 +235,8 @@ bool RealFlame::build ()
   double dist_max;
   m_maxParticles = 0;
   vtex = -0.5;
+  
+  if(!m_visibility) return false;
   
   /* Déplacement des squelettes guides */
   for (i = 0; i < m_nbLeadSkeletons; i++)
@@ -431,4 +435,52 @@ RealFlame::~RealFlame()
   
   delete[]m_distances;
   delete[]m_maxDistancesIndexes;
+}
+
+void RealFlame::buildBoundingSphere ()
+{
+  double p,k;
+  p = m_solver->getDim().max()/2.0;
+  k = p*p;
+  m_boundingSphere.radius = sqrt(k+k);
+  m_boundingSphere.centre = m_solver->getPosition() + p;
+}
+
+void RealFlame::computeVisibility(const Camera &view, bool forceSpheresBuild)
+{  
+  bool save=m_visibility;
+  
+  if(forceSpheresBuild) buildBoundingSphere();
+  
+  m_dist=m_boundingSphere.visibleDistance(view);
+  m_visibility = (m_dist);
+  
+  if(m_visibility){
+    /* Il faut prendre en compte la taille de l'objet */
+    m_dist = m_dist - m_boundingSphere.radius;
+    if(m_dist > 5){
+//       cerr << 2000 << endl;
+      setSamplingTolerance(2000);
+      if(m_solver->isRealSolver())
+	m_solver->switchToFakeField();
+    }else{
+      if(!m_solver->isRealSolver())
+	m_solver->switchToRealSolver();
+      if(m_dist > 3){
+//  	cerr << 500 << endl;
+	setSamplingTolerance(500);
+      }else
+	if(m_dist > 2){
+//  	  cerr << 60 << endl;
+	  setSamplingTolerance(40);
+	}else{
+//  	  cerr << 25 << endl;
+	  setSamplingTolerance(20);
+	}
+    }
+    if(!save)
+      m_solver->setRunningState(true);
+  }else
+    if(!m_visibility && save)
+      m_solver->setRunningState(false);
 }

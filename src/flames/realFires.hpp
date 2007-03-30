@@ -157,12 +157,14 @@ public:
 	  glPushMatrix();
 	  glTranslatef (pt.x, pt.y, pt.z);
 	  glScalef (scale.x, scale.y, scale.z);
-	  m_flames[i]->drawFlame(display, displayParticle);
+	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
 	  glPopMatrix();
 	}
 	glPopMatrix();
       }
   }
+  
+  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
 };
 
 /** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
@@ -215,9 +217,9 @@ public:
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
 	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle);
+	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
 	for (uint i = 0; i < m_nbCloneFlames; i++)
-	  m_cloneFlames[i]->drawFlame(display, displayParticle); 
+	  m_cloneFlames[i]->drawFlame(display, displayParticle, displayBoundingSphere); 
 	glPopMatrix();
       }
   }

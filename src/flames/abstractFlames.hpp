@@ -10,6 +10,7 @@ class RealFlame;
 #include "leadSkeleton.hpp"
 #include "../solvers/solver3D.hpp"
 #include "../scene/texture.hpp"
+#include "../scene/object.hpp"
 
 #include <list>
 
@@ -67,15 +68,15 @@ public:
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    */
-  virtual void drawFlame(bool display, bool displayParticle) const = 0;
+  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const = 0;
   
   /** Dessine la flamme et sa mèche.
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  void draw(bool display, bool displayParticle, bool displayBoxes) const{
-    drawFlame(display, displayParticle);
+  void draw(bool display, bool displayParticle, bool displayBoxes, bool displayBoundingSphere) const{
+    drawFlame(display, displayParticle, displayBoundingSphere);
   };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
@@ -253,9 +254,9 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const = 0;
   
-  void draw(bool display, bool displayParticle, bool displayBoxes) const{
+  void draw(bool display, bool displayParticle, bool displayBoxes, bool displayBoundingSphere) const{
     drawWick(displayBoxes);
-    drawFlame(display, displayParticle);
+    drawFlame(display, displayParticle, displayBoundingSphere);
   };
     
   /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
@@ -294,7 +295,7 @@ class DetachedFlame;
 /**********************************************************************************************************************/
 
 /** La classe RealFlame, par rapport à la classe FixedFlame, ajoute la notion de squelettes de flamme ainsi que les
- * interactions avec un solveur de fluides.
+ * interactions avec un solveur de fluides. Elle est qualifiée de "Real" en comparaison avec les CloneFlame.
  * Cette classe reste abstraite et est héritée par les classes LineFlame et PointFlame.
  * Elle permet de définir une primitive géométrique pour une flamme, mais ne permet pas de construire une flamme
  * en tant que source de lumière d'une scène. C'est la classe FireSource qui permet de définir ceci, en utilisant
@@ -351,6 +352,13 @@ public:
     
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
+
+  /** Construction de la sphère englobante de l'objet. */
+  void buildBoundingSphere ();
+  
+  /** Calcul de la visibilité d'une flamme. */
+  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
+  
 protected:
   /** Vecteur contenant les squelettes guide. */
   vector < LeadSkeleton * > m_leadSkeletons;
@@ -371,6 +379,13 @@ protected:
   int *m_maxDistancesIndexes;
   
   double m_innerForce;
+  
+  /** Sphère englobante. */
+  BoundingSphere m_boundingSphere;
+  /** Visibilité de la flamme. */
+  bool m_visibility;
+  /** Distance par rapport à la caméra */
+  double m_dist;
 };
 
 #endif

@@ -83,8 +83,32 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>&
       Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
       flameSolvers.push_back( field );
       m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, lampName, (*objListIterator).c_str());
+      m_flames[i]->buildBoundingSphere();
     }
 }
+
+
+void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
+{  
+  //  bool save=m_visibility;
+  
+  /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
+  /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
+  // if(m_visibility || forceSpheresBuild) buildBoundingSphere();
+  
+//   m_dist=m_boundingSphere.visibleDistance(view);
+//   m_visibility = (m_dist);
+  
+//   if(m_visibility){
+//     if(!save)
+//       m_solver->setRunningState(true);
+//   }else
+//     if(!m_visibility && save)
+//       m_solver->setRunningState(false);
+  for (uint i = 0; i < m_nbFlames; i++)
+    m_flames[i]->computeVisibility(view, forceSpheresBuild);
+}
+  
 
 CandleStick::CandleStick (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  CgSVShader * shader, double rayon):

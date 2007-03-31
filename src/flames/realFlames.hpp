@@ -40,11 +40,8 @@ public:
 	     Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const{ 
-    if(displayBoundingSphere)
-      m_boundingSphere.draw();
+  virtual void drawFlame(bool display, bool displayParticle) const{
     if(m_visibility){
-      /* Affichage des particules */
       if(displayParticle) drawParticles();
       if(display) drawLineFlame(); 
     }
@@ -123,11 +120,9 @@ public:
   /** Destructeur*/
   virtual ~PointFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const { 
-    if(displayBoundingSphere)
-      m_boundingSphere.draw();
+  virtual void drawFlame(bool display, bool displayParticle) const
+  {
     if(m_visibility){
-      /* Affichage des particules */
       if(displayParticle) drawParticles();
       if(display) drawPointFlame();
     }
@@ -184,7 +179,7 @@ public:
   
   virtual bool build();
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const { 
+  virtual void drawFlame(bool display, bool displayParticle) const { 
     if(displayParticle) drawParticles();
     if(display) drawLineFlame(); 
   };

@@ -176,9 +176,11 @@ void FireSource::computeIntensityPositionAndDirection()
 
 void FireSource::buildBoundingSphere ()
 {
-  double p,k;
-  p = m_solver->getDim().max()/2.0;
-  k = p*p;
+  Point p;
+  double t,k;
+  p = (m_solver->getScale() * m_solver->getDim())/2.0;
+  t = p.max();
+  k = t*t;
   m_boundingSphere.radius = sqrt(k+k);
   m_boundingSphere.centre = m_solver->getPosition() + p;
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
@@ -251,10 +253,10 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool di
       glTranslatef (pt.x, pt.y, pt.z);
       glScalef (scale.x, scale.y, scale.z);
       for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
+	m_flames[i]->drawFlame(display, displayParticle);
       for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
 	   flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-	(*flamesIterator)->drawFlame(display, displayParticle, displayBoundingSphere);
+	(*flamesIterator)->drawFlame(display, displayParticle);
       glPopMatrix();
     }
 }

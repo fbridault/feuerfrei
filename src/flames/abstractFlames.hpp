@@ -68,15 +68,15 @@ public:
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    */
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const = 0;
+  virtual void drawFlame(bool display, bool displayParticle) const = 0;
   
   /** Dessine la flamme et sa mèche.
    * @param display Affiche ou non la flamme.
    * @param displayParticle Affiche ou non les particules.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
-  void draw(bool display, bool displayParticle, bool displayBoxes, bool displayBoundingSphere) const{
-    drawFlame(display, displayParticle, displayBoundingSphere);
+  void draw(bool display, bool displayParticle, bool displayBoxes) const{
+    drawFlame(display, displayParticle);
   };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
@@ -254,9 +254,9 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const = 0;
   
-  void draw(bool display, bool displayParticle, bool displayBoxes, bool displayBoundingSphere) const{
+  void draw(bool display, bool displayParticle, bool displayBoxes) const{
     drawWick(displayBoxes);
-    drawFlame(display, displayParticle, displayBoundingSphere);
+    drawFlame(display, displayParticle);
   };
     
   /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
@@ -354,10 +354,12 @@ public:
   virtual void breakCheck() = 0;
 
   /** Construction de la sphère englobante de l'objet. */
-  void buildBoundingSphere ();
+  void buildBoundingSphere (const Point& parentSolverPosition);
+  /** Dessin de la sphère englobante. */
+  void drawBoundingSphere () { m_boundingSphere.draw(); };
   
   /** Calcul de la visibilité d'une flamme. */
-  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
+  virtual void computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild=false);
   
 protected:
   /** Vecteur contenant les squelettes guide. */

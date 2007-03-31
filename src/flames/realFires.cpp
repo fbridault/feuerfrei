@@ -4,9 +4,6 @@
 #include "../scene/scene.hpp"
 #include "../solvers/fakeField3D.hpp"
 
-#include <vector>
-#include <string>
-
 #define WICK_NAME_PREFIX "Wick"
 #define TORCH_NAME "Torch"
 
@@ -88,7 +85,7 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>&
       Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
       flameSolvers.push_back( field );
       m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, (*objListIterator));
-      m_flames[i]->buildBoundingSphere();
+      m_flames[i]->buildBoundingSphere( s->getPosition() );
     }
 }
 
@@ -111,7 +108,7 @@ void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
 //     if(!m_visibility && save)
 //       m_solver->setRunningState(false);
   for (uint i = 0; i < m_nbFlames; i++)
-    m_flames[i]->computeVisibility(view, forceSpheresBuild);
+    m_flames[i]->computeVisibility(view, m_solver->getPosition(), forceSpheresBuild);
 }
   
 

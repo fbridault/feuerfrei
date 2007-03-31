@@ -437,20 +437,22 @@ RealFlame::~RealFlame()
   delete[]m_maxDistancesIndexes;
 }
 
-void RealFlame::buildBoundingSphere ()
+void RealFlame::buildBoundingSphere (const Point& parentSolverPosition)
 {
-  double p,k;
-  p = m_solver->getDim().max()/2.0;
-  k = p*p;
+  Point p;
+  double t,k;
+  p = (m_solver->getScale() * m_solver->getDim())/2.0;
+  t = p.max();
+  k = t*t;
   m_boundingSphere.radius = sqrt(k+k);
-  m_boundingSphere.centre = m_solver->getPosition() + p;
+  m_boundingSphere.centre = m_solver->getPosition() + parentSolverPosition + p;
 }
 
-void RealFlame::computeVisibility(const Camera &view, bool forceSpheresBuild)
+void RealFlame::computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild)
 {  
   bool save=m_visibility;
   
-  if(forceSpheresBuild) buildBoundingSphere();
+  if(forceSpheresBuild) buildBoundingSphere(parentSolverPosition);
   
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);

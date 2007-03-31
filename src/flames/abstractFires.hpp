@@ -234,7 +234,7 @@ public:
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
 	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
+	  m_flames[i]->drawFlame(display, displayParticle);
 	glPopMatrix();
       }
   }

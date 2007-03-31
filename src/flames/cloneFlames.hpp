@@ -72,7 +72,7 @@ public:
   CloneLineFlame(const FlameConfig* const flameConfig, const LineFlame* const source, const Point& offset);
   virtual ~CloneLineFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const{ 
+  virtual void drawFlame(bool display, bool displayParticle) const{ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     if( display) drawLineFlame();
@@ -96,7 +96,7 @@ public:
   ClonePointFlame(const FlameConfig* const flameConfig, const PointFlame* const source, const Point& offset);
   virtual ~ClonePointFlame();
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const{ 
+  virtual void drawFlame(bool display, bool displayParticle) const{ 
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     if( display) drawPointFlame(); 

@@ -138,11 +138,14 @@ public:
   
   virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
   {
+    Point pt;
     if(m_visibility)
       if(displayBoundingSphere)
-	m_boundingSphere.draw();
+	for (uint i = 0; i < m_nbFlames; i++){
+	  pt = m_flames[i]->getSolver()->getPosition();
+	  m_flames[i]->drawBoundingSphere();
+	}
       else{
-	Point pt;
 	Point scale;
 	
 	pt = getPosition();
@@ -150,14 +153,14 @@ public:
 	glPushMatrix();
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
-    
+      
 	for (uint i = 0; i < m_nbFlames; i++){
 	  pt = m_flames[i]->getSolver()->getPosition();
 	  scale =  m_flames[i]->getSolver()->getScale();
 	  glPushMatrix();
 	  glTranslatef (pt.x, pt.y, pt.z);
 	  glScalef (scale.x, scale.y, scale.z);
-	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
+	  m_flames[i]->drawFlame(display, displayParticle);
 	  glPopMatrix();
 	}
 	glPopMatrix();
@@ -217,9 +220,9 @@ public:
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
 	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle, displayBoundingSphere);
+	  m_flames[i]->drawFlame(display, displayParticle);
 	for (uint i = 0; i < m_nbCloneFlames; i++)
-	  m_cloneFlames[i]->drawFlame(display, displayParticle, displayBoundingSphere); 
+	  m_cloneFlames[i]->drawFlame(display, displayParticle); 
 	glPopMatrix();
       }
   }

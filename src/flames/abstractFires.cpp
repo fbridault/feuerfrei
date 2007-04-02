@@ -24,7 +24,7 @@ FlameLight::FlameLight(const Scene* const scene, uint index, const CgSVShader* c
   m_lightPosition[3] = 1.0;  
   m_cgShader = shader;  
   m_orientationSPtheta = 0.0;
-
+  
   m_iesFile = new IES(IESFilename);
 }
 

@@ -60,8 +60,7 @@ void FlameLight::drawShadowVolume ()
 {
   m_cgShader->setLightPos (m_lightPosition);
   
-  m_cgShader->enableProfile ();
-  m_cgShader->bindProgram ();
+  m_cgShader->enableShader ();
   
   glPushMatrix ();
   glLoadIdentity ();

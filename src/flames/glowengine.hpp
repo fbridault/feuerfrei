@@ -5,10 +5,12 @@ class GlowEngine;
 
 #include "flames.hpp"
 #include "fbo.hpp"
-#include "../shaders/CgBlurShaders.hpp"
+#include "../shaders/glsl.hpp"
 #include "../scene/camera.hpp"
+#include "../scene/texture.hpp"
 
 #define GLOW_LEVELS 2
+#define FILTER_SIZE 8
 
 /** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
  * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
@@ -40,7 +42,7 @@ public:
    * @param recompileShaders indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS-1], bool recompileShaders, const CGcontext* const cgcontext );
+  GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS-1], bool recompileShaders );
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
@@ -69,7 +71,6 @@ public:
     glViewport (0, 0, m_initialWidth, m_initialHeight);
   };
 
-  void blur(uint i, uint isrc, CgBlurVertexShader& blurVertexShader, FBO& drawfbo, Texture* srctex);
   /** Effectue le blur en trois passes */
   void blur();
   /** Plaque le blur à l'écran */
@@ -111,21 +112,21 @@ private:
   uint m_scaleFactor[GLOW_LEVELS];
   
   /** Tableau contenant la largeur du filtre */
-  double offsets[GLOW_LEVELS+3][FILTER_SIZE];
+  float m_offsets[GLOW_LEVELS+3][FILTER_SIZE];
   /** Tableau contenant les poids des pixels du filtre */
-  double weights[GLOW_LEVELS+3][FILTER_SIZE];
+  float m_weights[GLOW_LEVELS+3][FILTER_SIZE];
   /** Diviseur correspondant à la somme des poids */
-  double divide[GLOW_LEVELS+3];
-
-  /** Pbuffer */
-  //  PBuffer m_pbuffer;
+  float m_divide[GLOW_LEVELS+3];
+  
+  /** FBOs */
   FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS], m_visibilityFBO;
+  GLSLProgram m_programX, m_programY;
   /** Vertex Shader pour le blur en X */
-  CgBlurVertexShader m_blurVertexShaderX8;//, m_blurVertexShaderX16;
+  GLSLVertexShader m_blurVertexShaderX8;//, m_blurVertexShaderX16;
   /** Vertex Shader pour le blur en Y */
-  CgBlurVertexShader m_blurVertexShaderY8;//, m_blurVertexShaderY16;
+  GLSLVertexShader m_blurVertexShaderY8;//, m_blurVertexShaderY16;
   /** Fragment Shader pour le blur */
-  CgBlurFragmentShader m_blurFragmentShader8;//, m_blurFragmentShader16;
+  GLSLFragmentShader m_blurFragmentShader8;//, m_blurFragmentShader16;
   /** Vertex Shader pour le blur en X */
 //   CgBlurVertexShader *m_blurVertexShaderX[2];
 //   /** Vertex Shader pour le blur en Y */

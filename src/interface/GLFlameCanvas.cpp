@@ -67,7 +67,7 @@ GLFlameCanvas::~GLFlameCanvas()
   delete [] m_pixels;
   if( m_intensities ) delete [] m_intensities;
   delete m_SVShader;
-  delete m_gammaShader;
+  delete m_gammaEngine;
   if (m_context)
     cgDestroyContext (m_context);
 }
@@ -117,7 +117,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   
   m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, 
 			       m_currentConfig->fatness, m_currentConfig->extrudeDist, recompileShaders);
-  m_gammaShader = new CgGammaShader (_("gammaShader.cg"), _("gamma"), m_width, m_height, &m_context, recompileShaders);
+  m_gammaEngine = new GammaEngine (m_width, m_height, recompileShaders);
   setGammaCorrection( m_currentConfig->gammaCorrection );
 }
 
@@ -248,7 +248,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
-  m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders, &m_context);
+  m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders);
   m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, &m_flames);
 }
 
@@ -536,7 +536,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
 	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);  
   }
-  m_gammaShader->enableGamma();
+  m_gammaEngine->enableGamma();
   if(!m_glowOnly){
     drawScene();
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
@@ -550,7 +550,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   }
   if(m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
     m_glowEngine->drawBlur();
-  m_gammaShader->disableGamma();
+  m_gammaEngine->disableGamma();
   
   /******** A VERIFIER *******/
   //   glFlush();

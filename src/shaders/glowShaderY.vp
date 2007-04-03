@@ -1,0 +1,27 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+uniform float offsets[8];
+
+ // main procedure, the original name was vertGlowY
+void main()
+{
+    gl_TexCoord[7].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[6].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[5].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[4].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[3].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[2].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[1].x = gl_MultiTexCoord0.x;
+    gl_TexCoord[0].x = gl_MultiTexCoord0.x;
+    
+    gl_TexCoord[0].y = gl_MultiTexCoord0.y + offsets[0];
+    gl_TexCoord[1].y = gl_MultiTexCoord0.y + offsets[1];
+    gl_TexCoord[2].y = gl_MultiTexCoord0.y + offsets[2];
+    gl_TexCoord[3].y = gl_MultiTexCoord0.y + offsets[3];
+    gl_TexCoord[4].y = gl_MultiTexCoord0.y + offsets[4];
+    gl_TexCoord[5].y = gl_MultiTexCoord0.y + offsets[5];
+    gl_TexCoord[6].y = gl_MultiTexCoord0.y + offsets[6];
+    gl_TexCoord[7].y = gl_MultiTexCoord0.y + offsets[7];
+    
+    gl_Position = gl_Vertex;
+}

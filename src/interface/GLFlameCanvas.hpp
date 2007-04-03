@@ -9,7 +9,7 @@ class GLFlameCanvas;
 #include <wx/glcanvas.h>
 
 #include "../shaders/CgSVShader.hpp"
-#include "../shaders/CgGammaShader.hpp"
+#include "../scene/gammaEngine.hpp"
 
 #include "../scene/camera.hpp"
 #include "../scene/scene.hpp"
@@ -103,7 +103,7 @@ public:
   /** Change l'affichage des sphères englobantes. */
   void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
   void setBoundingSphereDisplay(bool display) { m_displayFlamesBoundingSpheres = display; };
-  void setGammaCorrection(double gamma) { m_gammaShader->SetGamma(gamma); };
+  void setGammaCorrection(double gamma) { m_gammaEngine->SetGamma(gamma); };
 private:
   void WriteFPS ();
   void DrawVelocity (void);
@@ -152,7 +152,7 @@ private:
   vector <FireSource *> m_flames;
   Scene *m_scene;
   CgSVShader *m_SVShader;
-  CgGammaShader *m_gammaShader;
+  GammaEngine *m_gammaEngine;
   
   double *m_intensities;
   bool m_visibility;

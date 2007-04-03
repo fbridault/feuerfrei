@@ -1,17 +1,22 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders, const CGcontext* const cgcontext) : 
-  m_blurVertexShaderX8   (_("glowShaders.cg"),_("vertGlowX"),  cgcontext, recompileShaders),
-  m_blurVertexShaderY8   (_("glowShaders.cg"),_("vertGlowY"),  cgcontext, recompileShaders),
-  m_blurFragmentShader8  (_("glowShaders.cg"),_("fragGlow"),  cgcontext, recompileShaders)
-//   m_blurVertexShaderX16  (_("glowShaders.cg"),_("vertGlowX16"),  cgcontext, recompileShaders),
-//   m_blurVertexShaderY16  (_("glowShaders.cg"),_("vertGlowY16"),  cgcontext, recompileShaders),
-//   m_blurFragmentShader16 (_("glowShaders.cg"),_("fragGlow16"),  cgcontext, recompileShaders)
+GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders)
 {
   m_initialWidth = w;
   m_initialHeight = h;
 
+  m_blurVertexShaderX8.load ("glowShaderX.vp", recompileShaders);
+  m_blurVertexShaderY8.load ("glowShaderY.vp", recompileShaders);
+  m_blurFragmentShader8.load("glowShader.fp", recompileShaders);
+
+  m_programX.attachShader(m_blurVertexShaderX8);
+  m_programX.attachShader(m_blurFragmentShader8);
+  m_programY.attachShader(m_blurVertexShaderY8);
+  m_programY.attachShader(m_blurFragmentShader8);
+  
+  m_programX.link();  
+  m_programY.link();
 //   m_blurVertexShaderX[0] = &m_blurVertexShaderX8;
 //   m_blurVertexShaderY[0] = &m_blurVertexShaderY8;
 //   m_blurFragmentShader[0] = &m_blurFragmentShader8;
@@ -20,19 +25,19 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
 //   m_blurFragmentShader[1] = &m_blurFragmentShader16;
 
   for(int j=0; j < FILTER_SIZE; j++)
-    offsets[0][j] = j-FILTER_SIZE/2+1;
+    m_offsets[0][j] = j-FILTER_SIZE/2+1;
   
   for(int j=0; j < FILTER_SIZE; j++)
-    offsets[1][j] = j-FILTER_SIZE*2+1;
+    m_offsets[1][j] = j-FILTER_SIZE*2+1;
   
   for(int j=0; j < FILTER_SIZE; j++)
-    offsets[2][j] = j-FILTER_SIZE+1;
+    m_offsets[2][j] = j-FILTER_SIZE+1;
   
   for(int j=0; j < FILTER_SIZE; j++)
-    offsets[3][j] = j;
+    m_offsets[3][j] = j;
 
   for(int j=0; j < FILTER_SIZE; j++)
-    offsets[4][j] = j+FILTER_SIZE;
+    m_offsets[4][j] = j+FILTER_SIZE;
   
   setGaussSigma(0,2);
   setGaussSigma(1,10);
@@ -78,69 +83,53 @@ void GlowEngine::computeWeights(uint index, double sigma)
 {
   int offset;
   //coef = 1/sqrt(2*PI*sigma);
-  divide[index] = 0.0;
+  m_divide[index] = 0.0;
   
     /* Calcul des poids */
   switch(index){
   case 0:
     offset = FILTER_SIZE/2;
     for(int x=-offset+1 ; x<=offset-1 ; x++){
-      weights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
-      divide[index] += weights[index][x+offset-1];
+      m_weights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
+      m_divide[index] += m_weights[index][x+offset-1];
     }
     break;
   case 1:
     offset = FILTER_SIZE*2-1;
     for(int x=-FILTER_SIZE*2+1 ; x<= -FILTER_SIZE; x++){
-      weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
-      divide[index] += weights[index][x+offset];
-//        cerr << x << " " << x+offset << " " << weights[index][x+offset] << endl;
+      m_weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_divide[index] += m_weights[index][x+offset];
+//        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
     }
-//     cerr << divide[index] << endl;
+//     cerr << m_divide[index] << endl;
     break;
   case 2:
     offset = FILTER_SIZE-1;
     for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
-      weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
-      divide[index] += weights[index][x+offset];
-//        cerr << x << " " << x+offset << " " << weights[index][x+offset] << endl;
+      m_weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_divide[index] += m_weights[index][x+offset];
+//        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
     }
-//     cerr << divide[index] << endl;
+//     cerr << m_divide[index] << endl;
     break;
   case 3:
     for(int x=0 ; x< FILTER_SIZE; x++){
-      weights[index][x] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
-      divide[index] += weights[index][x];
-//        cerr << x << " " << weights[index][x] << endl;
+      m_weights[index][x] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_divide[index] += m_weights[index][x];
+//        cerr << x << " " << m_weights[index][x] << endl;
     }
-//     cerr << divide[index] << endl;
+//     cerr << m_divide[index] << endl;
     break;
   case 4:
     offset = FILTER_SIZE;
     for(int x= FILTER_SIZE ; x< FILTER_SIZE*2; x++){
-      weights[index][x-offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
-      divide[index] += weights[index][x-offset];
-//        cerr << x << " " << weights[index][x] << endl;
+      m_weights[index][x-offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_divide[index] += m_weights[index][x-offset];
+//        cerr << x << " " << m_weights[index][x] << endl;
     }
-//     cerr << divide[index] << endl;
+//     cerr << m_divide[index] << endl;
     break;
   }
-}
-
-void GlowEngine::blur(uint i, uint isrc, CgBlurVertexShader& blurVertexShader, FBO& fbo, Texture* srcTex)
-{
-  blurVertexShader.enableShader();
-
-  /* Premier blur */
-  /* On dessine dans le FBO #2 avec comme source la texture résultante du FBO #1 */
-  blurVertexShader.setOffsetsArray(offsets[i]);
-  
-  fbo.Activate();
-  glViewport (0, 0, m_width[i], m_height[i]);    
-  //glClear(GL_COLOR_BUFFER_BIT);
-  
-  srcTex->drawOnScreen(m_width[isrc], m_height[isrc]);
-  //  blurVertexShader.disableProfile();
 }
 
 void GlowEngine::blur()
@@ -160,17 +149,28 @@ void GlowEngine::blur()
   glPushMatrix();
   glLoadIdentity();
   
-  m_blurFragmentShader8.enableShader();
-  
   /* Blur à la résolution de l'écran */
-  m_blurFragmentShader8.setWeightsArray(weights[0],divide[0]);
-  blur(0,0,m_blurVertexShaderX8,m_secondPassFBOs[0],m_firstPassTex[0]);
-  blur(0,0,m_blurVertexShaderY8,m_firstPassFBOs[0],m_secondPassTex[0]);
+  m_programX.enable();
+  m_programX.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[0]);
+  m_programX.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
   
-  /* Blur à une résolution inférieure */
-  m_blurVertexShaderX8.enableShader();
+  m_secondPassFBOs[0].Activate();
+  glViewport (0, 0, m_width[0], m_height[0]);
+  m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
+  m_programY.enable();
+  m_programY.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1f("divide",m_divide[0]);
+  m_programY.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
+  
+  m_firstPassFBOs[0].Activate();
+  glViewport (0, 0, m_width[0], m_height[0]);    
+  m_secondPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
+  
+  /* Blur à une résolution inférieure */  
   m_secondPassFBOs[1].Activate();
+  m_programX.enable();
   glBlendColor(0.3,0.3,0.3,1.0);
   glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
   
@@ -178,33 +178,38 @@ void GlowEngine::blur()
   glClear(GL_COLOR_BUFFER_BIT);
   
   /* Partie X [-bandwidth/2;-bandwidth/4] du filtre */
-  m_blurFragmentShader8.setWeightsArray(weights[1],divide[1]);
-  m_blurVertexShaderX8.setOffsetsArray(offsets[1]);
+  m_programX.setUniform1fv("offsets",(float *)m_offsets[1],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",(float *)m_weights[1],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[1]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [-bandwidth/4;0] du filtre */
-  m_blurFragmentShader8.setWeightsArray(weights[2],divide[2]);
-  m_blurVertexShaderX8.setOffsetsArray(offsets[2]);
+  m_programX.setUniform1fv("offsets",(float *)m_offsets[2],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",(float *)m_weights[2],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[2]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [0;bandwidth/4] du filtre */
-  m_blurFragmentShader8.setWeightsArray(weights[3],divide[3]);
-  m_blurVertexShaderX8.setOffsetsArray(offsets[3]);
+  m_programX.setUniform1fv("offsets",(float *)m_offsets[3],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",(float *)m_weights[3],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[3]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [bandwidth/4;bandwidth/2] du filtre */
-  m_blurFragmentShader8.setWeightsArray(weights[4],divide[4]);
-  m_blurVertexShaderX8.setOffsetsArray(offsets[4]);
+  m_programX.setUniform1fv("offsets",(float *)m_offsets[4],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",(float *)m_weights[4],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[4]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   glBlendFunc (GL_ONE, GL_ZERO);
-  m_blurVertexShaderY8.enableShader();
-  m_blurVertexShaderY8.setOffsetsArray(offsets[0]);
-  m_blurFragmentShader8.setWeightsArray(weights[0],divide[0]);
+  m_programY.enable();
+  m_programY.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1f("divide",m_divide[0]);
   
   m_firstPassFBOs[1].Activate();
   //glClear(GL_COLOR_BUFFER_BIT);
@@ -212,8 +217,7 @@ void GlowEngine::blur()
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->drawOnScreen(m_width[1], m_height[1]);
   
-  m_blurVertexShaderY8.disableProfile();
-  m_blurFragmentShader8.disableProfile();
+  m_programY.disable();
   
   //  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
@@ -248,8 +252,8 @@ void GlowEngine::blur()
 //   /* Blurs en X */
 //   for(int i=0; i < GLOW_LEVELS; i++){
 //     /* On dessine dans le FBO #2,i avec comme source la texture résultante du FBO #1 */
-//     m_blurVertexShaderX8.setOffsetsArray(offsets[i]);
-//     m_blurFragmentShader8.setWeightsArray(weights[i],divide[i]);
+//     m_blurVertexShaderX8.setM_OffsetsArray(m_offsets[i]);
+//     m_blurFragmentShader8.setWeightsArray(m_weights[i],divide[i]);
     
 //     m_secondPassFBOs[i].Activate();
 //     glViewport (0, 0, m_width[i], m_height[i]);    
@@ -262,8 +266,8 @@ void GlowEngine::blur()
 //   for(int i=0; i < GLOW_LEVELS; i++){
 //     /* Deuxième blur */
 //     /* On dessine dans le FBO #1 avec comme source la texture résultante du FBO #2 */
-//     m_blurVertexShaderY8.setOffsetsArray(offsets[i]);
-//     m_blurFragmentShader8.setWeightsArray(weights[i],divide[i]);
+//     m_blurVertexShaderY8.setOffsetsArray(m_offsets[i]);
+//     m_blurFragmentShader8.setWeightsArray(m_weights[i],divide[i]);
     
 //     m_firstPassFBOs[i].Activate();
 //     glViewport (0, 0, m_width[i], m_height[i]);

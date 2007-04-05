@@ -1,26 +1,36 @@
 #include "solidePhoto.hpp"
 
 PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, 
-						     const CGcontext* const context, bool recompileShaders) :
-  m_SPVertexShaderTex(_("SolidePhotometriqueVP.cg"),_("vpSPTEX"),context,recompileShaders)
+						     bool recompileShaders)
 {
+  char macro[25];
+
   m_scene = s;
   m_flames = flames;
+
+  sprintf(macro,"#define NBSOURCES %d\n",m_flames->size());
   
-  m_centers = new double[m_flames->size()*3];
-  m_intensities = new double[m_flames->size()];
-  m_lazimuth_lzenith = new double[m_flames->size()*2];
+  m_centers = new GLfloat[m_flames->size()*3];
+  m_intensities = new GLfloat[m_flames->size()];
+  m_lazimuth_lzenith = new GLfloat[m_flames->size()*2];
   
-  m_SPFragmentShader[0] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPSeul"), m_flames->size(), context, 0, true);
-  m_SPFragmentShader[1] = new CgSPFragmentShader(_("SolidePhotometriqueFP.cg"),_("fpSPTEX"), m_flames->size(), context, 2, true);
+  m_SPVertexShaderTex.load("photoSolid.vp",recompileShaders);
+  m_SPFragmentShader[0].load("photoSolidOnly.fp", true,macro);
+  m_SPFragmentShader[1].load("photoSolid.fp", true,macro);
+  
+  m_SPProgram1.attachShader(m_SPVertexShaderTex);
+  m_SPProgram1.attachShader(m_SPFragmentShader[0]);
+  m_SPProgram2.attachShader(m_SPVertexShaderTex);
+  m_SPProgram2.attachShader(m_SPFragmentShader[1]);
+  
+  m_SPProgram1.link();  
+  m_SPProgram2.link();
   
   generateTexture();
 }
 
 PhotometricSolidsRenderer::~PhotometricSolidsRenderer()
 {
-  for(ushort i=0; i < m_NBSHADER; i++)
-    delete m_SPFragmentShader[i];
   delete [] m_centers;
   delete [] m_intensities;
   delete [] m_lazimuth_lzenith;
@@ -31,7 +41,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 {
   uint tmp, sav, p;
   uint sizex, sizey;
-  float *tex3DValues, *ptrTex;
+  GLfloat *tex3DValues, *ptrTex;
   
   m_tex2DSize[0] = m_tex2DSize[1] = 0;
   /* Calcul de la taille maximale */
@@ -70,7 +80,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
   
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++){
-    float *values = (*flamesIterator)->getIntensities();
+    GLfloat *values = (*flamesIterator)->getIntensities();
     
     sizex = (*flamesIterator)->getIESAzimuthSize();
     sizey = (*flamesIterator)->getIESZenithSize();
@@ -102,10 +112,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 //   }
   
   m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
-  
-  m_SPFragmentShader[0]->SetTexture(m_photometricSolidsTex->getTexture());
-  m_SPFragmentShader[1]->SetTexture(m_photometricSolidsTex->getTexture());
-  
+    
   uint k=0;
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++, k++){
@@ -120,9 +127,6 @@ void PhotometricSolidsRenderer::generateTexture(void)
 //     cerr << m_lazimuth_lzenith[k*2] << " " << m_lazimuth_lzenith[k*2+1] << endl;
   }
   
-  m_SPFragmentShader[0]->SetInitialParameters(m_lazimuth_lzenith);
-  m_SPFragmentShader[1]->SetInitialParameters(m_lazimuth_lzenith);
-
   delete [] tex3DValues;
 }
 
@@ -139,24 +143,33 @@ void PhotometricSolidsRenderer::draw(u_char color)
       (*flamesIterator)->getCenterSP(m_centers[k*3], m_centers[k*3+1], m_centers[k*3+2]);
     }
   
-  /* Affichage des objets sans couleur */
+  /* Affichage du solide seul */
   if(color == 0){
-    m_SPVertexShaderTex.enableShader();
-    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
-    m_SPVertexShaderTex.setModelViewProjectionMatrix();
-    m_scene->drawScene(m_SPVertexShaderTex);
-    m_SPVertexShaderTex.disableProfile();
-    m_SPFragmentShader[color]->disableProfile();
+    m_SPProgram1.enable();
+    m_SPProgram1.setUniform3fv("centreSP", m_centers, m_flames->size());
+    m_SPProgram1.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
+    m_SPProgram1.setUniform2fv("lazimut_lzenith",m_lazimuth_lzenith, m_flames->size());
+    m_SPProgram1.setUniform1i("inc", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);
+    
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+    m_photometricSolidsTex->bind();
+    m_scene->drawScene();
+    m_SPProgram1.disable();
+    
   }else{
-    /* Affichage des objets avec textures */
-    m_SPVertexShaderTex.enableShader();
-    m_SPFragmentShader[color]->enableShader(m_centers,m_intensities);
-    m_SPVertexShaderTex.setModelViewProjectionMatrix();
-    m_SPFragmentShader[color]->setIsTextured(1);
+    /* Affichage du solide modulé avec la couleur des objets  */
+    m_SPProgram2.enable();
+    m_SPProgram2.setUniform3fv("centreSP", m_centers, m_flames->size());
+    m_SPProgram2.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
+    m_SPProgram2.setUniform2fv("lazimut_lzenith", m_lazimuth_lzenith, m_flames->size());
+    m_SPProgram2.setUniform1i("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);    
+    m_SPProgram2.setUniform1i("isTextured",1);
+
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    m_photometricSolidsTex->bind();
     m_scene->drawSceneTEX();
-    m_SPFragmentShader[color]->setIsTextured(0);
-    m_scene->drawSceneWTEX(m_SPVertexShaderTex);
-    m_SPVertexShaderTex.disableProfile();
-    m_SPFragmentShader[color]->disableProfile();
+    m_SPProgram2.setUniform1i("isTextured",0);
+    m_scene->drawSceneWTEX();
+    m_SPProgram2.disable();
   }
 }

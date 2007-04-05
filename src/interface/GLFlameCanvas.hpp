@@ -8,7 +8,7 @@ class GLFlameCanvas;
 
 #include <wx/glcanvas.h>
 
-#include "../shaders/CgSVShader.hpp"
+#include "../shaders/glsl.hpp"
 #include "../scene/gammaEngine.hpp"
 
 #include "../scene/camera.hpp"
@@ -96,8 +96,6 @@ public:
   void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
   void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
-  void UpdateShadowsFatness(void){ m_SVShader->setFatness(m_currentConfig->fatness); };
-  void UpdateShadowsExtrudeDist(void){ m_SVShader->setShadowExtrudeDist(m_currentConfig->extrudeDist); };
   void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   
   /** Change l'affichage des sphères englobantes. */
@@ -125,7 +123,6 @@ private:
   uint m_width, m_height;
   uint prevNbSolvers, prevNbFlames;
   
-  CGcontext m_context;
   Camera *m_camera;
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;
@@ -151,7 +148,8 @@ private:
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_flames;
   Scene *m_scene;
-  CgSVShader *m_SVShader;
+  GLSLProgram *m_SVProgram;
+  GLSLVertexShader *m_SVShader;
   GammaEngine *m_gammaEngine;
   
   double *m_intensities;

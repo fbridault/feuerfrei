@@ -24,22 +24,6 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_CHAR(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
-CGcontext *contextCopy;
-
-/** Fonction appelée en cas d'erreur provoquée par Cg */
-void cgErrorCallback(void)
-{
-  CGerror LastError = cgGetError();
-  
-  if(LastError){
-    const char *Listing = cgGetLastListing(*contextCopy);
-    cerr << "\n---------------------------------------------------\n" << endl;
-    cerr << cgGetErrorString(LastError) << endl << endl;
-    if(Listing != NULL) cerr << Listing << endl;
-    cerr << "---------------------------------------------------\n" << endl;
-    cerr << "Cg error, exiting...\n" << endl << flush;
-  }
-}
 
 GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
 		       long style, const wxString& name, const wxPalette& palette)
@@ -66,10 +50,9 @@ GLFlameCanvas::~GLFlameCanvas()
   DestroyScene();
   delete [] m_pixels;
   if( m_intensities ) delete [] m_intensities;
-  delete m_SVShader;
   delete m_gammaEngine;
-  if (m_context)
-    cgDestroyContext (m_context);
+  delete m_SVShader;
+  delete m_SVProgram;
 }
 
 void GLFlameCanvas::InitUISettings(void)
@@ -109,14 +92,13 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
   glDisable (GL_LIGHTING);
-  // Création du contexte CG
-  m_context = cgCreateContext();
   
-  contextCopy = &m_context;
-  cgSetErrorCallback(cgErrorCallback);
+  m_SVShader = new GLSLVertexShader();
+  m_SVProgram = new GLSLProgram();
+  m_SVShader->load ("shadowVolume.vp", recompileShaders);
+  m_SVProgram->attachShader(*m_SVShader);
+  m_SVProgram->link();
   
-  m_SVShader = new CgSVShader (_("ShadowVolumeExtrusion.cg"), _("SVExtrude"), &m_context, 
-			       m_currentConfig->fatness, m_currentConfig->extrudeDist, recompileShaders);
   m_gammaEngine = new GammaEngine (m_width, m_height, recompileShaders);
   setGammaCorrection( m_currentConfig->gammaCorrection );
 }
@@ -128,30 +110,30 @@ void GLFlameCanvas::InitFlames(void)
     switch(m_currentConfig->flames[i].type){
     case CANDLE :
       m_flames.push_back( new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				      m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 8.0));
+				      m_scene, "scenes/bougie.obj", i, m_SVProgram, 1/ 8.0));
       break;
     case FIRMALAMPE :
       m_flames.push_back( new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					 m_scene, "scenes/firmalampe.obj", i, m_SVShader,
+					 m_scene, "scenes/firmalampe.obj", i, m_SVProgram,
 					 m_currentConfig->flames[i].wickName.fn_str()));
       break;
     case TORCH :
       m_flames.push_back( new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
-				    m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader));
+				    m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVProgram));
       break;
     case CAMPFIRE :
       m_flames.push_back( new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				       m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVShader));
+				       m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVProgram));
       break;
     case CANDLESSET :
       m_flames.push_back( new CandlesSet (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
 					  extraSolvers, m_scene, m_currentConfig->flames[i].wickName.fn_str(),
-					  i, m_SVShader, m_currentConfig->solvers[m_currentConfig->flames[i].solverIndex].scale));
+					  i, m_SVProgram, m_currentConfig->solvers[m_currentConfig->flames[i].solverIndex].scale));
       m_solvers.insert(m_solvers.end(),extraSolvers.begin(),extraSolvers.end());
       break;
     case CANDLESTICK :
       m_flames.push_back( new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					   m_scene, "scenes/bougie.obj", i, m_SVShader, 1/ 8.0));
+					   m_scene, "scenes/bougie.obj", i, m_SVProgram, 1/ 8.0));
       break;
     default :
       cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
@@ -242,7 +224,7 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, &m_context, recompileShaders);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, recompileShaders);
   
   m_scene->createVBOs();
   
@@ -313,7 +295,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
   
   InitFlames();
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, &m_context, false);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, false);
   
   if(m_currentConfig->useGlobalField)
     m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,
@@ -516,7 +498,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	glBlendColor(.2,.2,.2,1.0);
 	glBlendFunc (GL_ONE, GL_CONSTANT_COLOR);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      
+	
 	/* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
 	glDrawBuffer(GL_NONE);
 	glReadBuffer(GL_NONE);
@@ -540,7 +522,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   if(!m_glowOnly){
     drawScene();
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-    if(m_visibility && !m_currentConfig->glowEnabled || m_displayParticles)
+    if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
       if(m_currentConfig->depthPeelingEnabled)
 	m_depthPeelingEngine->render();
       else
@@ -548,7 +530,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	     flamesIterator != m_flames.end (); flamesIterator++)
 	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
   }
-  if(m_visibility && m_currentConfig->glowEnabled || m_displayParticles)
+  if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur();
   m_gammaEngine->disableGamma();
   
@@ -593,9 +575,8 @@ void GLFlameCanvas::drawScene()
   
   if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  else{
+  else
     glBlendFunc (GL_ONE, GL_ZERO);
-  }
   
   if (m_currentConfig->shadowsEnabled)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -610,7 +591,7 @@ void GLFlameCanvas::drawScene()
   if (m_drawShadowVolumes)
     for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->drawShadowVolume ();
+      (*flamesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
   
   if (m_currentConfig->shadowsEnabled)
     castShadows();  
@@ -779,7 +760,7 @@ void GLFlameCanvas::castShadows ()
 
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
        flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawShadowVolume ();
+    (*flamesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
   
   glPopAttrib ();
   

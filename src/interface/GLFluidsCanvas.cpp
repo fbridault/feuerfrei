@@ -26,22 +26,6 @@ BEGIN_EVENT_TABLE(GLFluidsCanvas, wxGLCanvas)
   EVT_CHAR(GLFluidsCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
-CGcontext *contextCopy;
-
-/** Fonction appelée en cas d'erreur provoquée par Cg */
-void cgErrorCallback(void)
-{
-  CGerror LastError = cgGetError();
-  
-  if(LastError){
-    const char *Listing = cgGetLastListing(*contextCopy);
-    cerr << "\n---------------------------------------------------\n" << endl;
-    cerr << cgGetErrorString(LastError) << endl << endl;
-    if(Listing != NULL) cerr << Listing << endl;
-    cerr << "---------------------------------------------------\n" << endl;
-    cerr << "Cg error, exiting...\n" << endl << flush;
-  }
-}
 
 GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
 			     long style, const wxString& name, const wxPalette& palette)
@@ -61,8 +45,6 @@ GLFluidsCanvas::~GLFluidsCanvas()
 {
   DestroyScene();
   delete [] m_pixels;
-  if (m_context)
-    cgDestroyContext (m_context);
 }
 
 void GLFluidsCanvas::InitUISettings(void)
@@ -98,12 +80,6 @@ void GLFluidsCanvas::InitGL(bool recompileShaders)
 
   glPolygonMode(GL_FRONT,GL_FILL);
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-  
-  // Création du contexte CG
-  m_context = cgCreateContext();
-  
-  contextCopy = &m_context;
-  cgSetErrorCallback(cgErrorCallback);
 }
 
 void GLFluidsCanvas::InitSolvers(void)

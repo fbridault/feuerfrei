@@ -2,7 +2,6 @@
 
 uniform float offsets[8];
 
- // main procedure, the original name was vertGlowY
 void main()
 {
     gl_TexCoord[7].x = gl_MultiTexCoord0.x;

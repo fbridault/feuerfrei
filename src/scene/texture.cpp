@@ -17,7 +17,7 @@ Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
   glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
   glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
   
-  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   m_wxtex = NULL;
 }
 

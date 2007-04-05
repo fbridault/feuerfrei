@@ -448,14 +448,14 @@ void FlamesFrame::LoadSettings (void)
   m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
   
-  m_config->Read(_("/Shadows/Fatness.x"), &m_currentConfig.fatness[0], -.001);
-  m_config->Read(_("/Shadows/Fatness.y"), &m_currentConfig.fatness[1], -.001);
-  m_config->Read(_("/Shadows/Fatness.z"), &m_currentConfig.fatness[2], -.001);
-  m_config->Read(_("/Shadows/ExtrudeDist.x"), &m_currentConfig.extrudeDist[0], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.y"), &m_currentConfig.extrudeDist[1], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.z"), &m_currentConfig.extrudeDist[2], 5);
-  m_currentConfig.fatness[3] = 0;
-  m_currentConfig.extrudeDist[3] = 0;
+  m_config->Read(_("/Shadows/Fatness.x"), (double *)&m_currentConfig.fatness[0], -.001);
+  m_config->Read(_("/Shadows/Fatness.y"), (double *)&m_currentConfig.fatness[1], -.001);
+  m_config->Read(_("/Shadows/Fatness.z"), (double *)&m_currentConfig.fatness[2], -.001);
+  m_config->Read(_("/Shadows/ExtrudeDist.x"), (double *)&m_currentConfig.extrudeDist[0], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.y"), (double *)&m_currentConfig.extrudeDist[1], 5);
+  m_config->Read(_("/Shadows/ExtrudeDist.z"), (double *)&m_currentConfig.extrudeDist[2], 5);
+  m_currentConfig.fatness[3] = 0.0f;
+  m_currentConfig.extrudeDist[3] = 0.0f;
   
   m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
@@ -571,12 +571,12 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
   
-  m_config->Write(_("/Shadows/Fatness.x"), m_currentConfig.fatness[0]);
-  m_config->Write(_("/Shadows/Fatness.y"), m_currentConfig.fatness[1]);
-  m_config->Write(_("/Shadows/Fatness.z"), m_currentConfig.fatness[2]);
-  m_config->Write(_("/Shadows/ExtrudeDist.x"), m_currentConfig.extrudeDist[0]);
-  m_config->Write(_("/Shadows/ExtrudeDist.y"), m_currentConfig.extrudeDist[1]);
-  m_config->Write(_("/Shadows/ExtrudeDist.z"), m_currentConfig.extrudeDist[2]);
+  m_config->Write(_("/Shadows/Fatness.x"), (GLfloat)m_currentConfig.fatness[0]);
+  m_config->Write(_("/Shadows/Fatness.y"), (GLfloat)m_currentConfig.fatness[1]);
+  m_config->Write(_("/Shadows/Fatness.z"), (GLfloat)m_currentConfig.fatness[2]);
+  m_config->Write(_("/Shadows/ExtrudeDist.x"), (GLfloat)m_currentConfig.extrudeDist[0]);
+  m_config->Write(_("/Shadows/ExtrudeDist.y"), (GLfloat)m_currentConfig.extrudeDist[1]);
+  m_config->Write(_("/Shadows/ExtrudeDist.z"), (GLfloat)m_currentConfig.extrudeDist[2]);
   
   m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
 

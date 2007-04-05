@@ -11,7 +11,7 @@ class FireSource;
 #include "../solvers/solver3D.hpp"
 #include "../scene/object.hpp"
 #include "../scene/texture.hpp"
-#include "../shaders/CgSVShader.hpp"
+#include "../shaders/glsl.hpp"
 #include "realFlames.hpp"
 #include "ies.hpp"
 
@@ -36,10 +36,10 @@ public:
   /** Constructeur de source lumineuse de type flamme.
    * @param scene pointeur sur la scène.
    * @param index Indice de la lumière pour OpenGL. Compris entre [0;7].
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param IESFilename nom du fichier IES à utiliser
    */
-  FlameLight (const Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename);
+  FlameLight (const Scene* const scene, uint index, const GLSLProgram* const program, const char* const IESFilename);
   
   /** Destructeur */
   virtual ~FlameLight();
@@ -56,7 +56,7 @@ public:
   }
   
   /** Dessine les shadow volumes à partir de la source. */
-  void drawShadowVolume ();  
+  void drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4]);  
   
   /** Active la source de lumière. */
   void switchOn ();  
@@ -78,7 +78,9 @@ public:
    * @param y Coordonnée y.
    * @param z Coordonnée z.
    */
-  void getCenterSP(double& x, double& y, double& z) const { x = m_centreSP.x; y = m_centreSP.y; z = m_centreSP.z; };
+  void getCenterSP(GLfloat& x, GLfloat& y, GLfloat& z) const { 
+    x = (GLfloat)m_centreSP.x; y = (GLfloat)m_centreSP.y; z = (GLfloat)m_centreSP.z;
+  };
   
   /** Récupération du centre.
    */
@@ -125,8 +127,8 @@ private:
   /** Pointeur sur la scène. */
   const Scene *m_scene;
   
-  /** Pointeur sur le shader générateur de volumes d'ombres. */
-  const CgSVShader *m_cgShader;
+  /** Pointeur sur le program générateur de volumes d'ombres. */
+  const GLSLProgram *m_SVProgram;
   
   /** Position de la lumière ponctuelle OpenGL dans l'espace. */
   GLfloat m_lightPosition[4];
@@ -162,11 +164,11 @@ public:
    * @param filename Nom du fichier contenant le luminaire.
    * @param texname Nom du fichier contenant le luminaire.
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program Pointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   FireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
-	      const wxString &texname, uint index, const CgSVShader* const shader, const char *objName=NULL);
+	      const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
   /** Destructeur */
   virtual ~FireSource ();
 
@@ -250,27 +252,6 @@ public:
       glPushMatrix();
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
-      for (list < Object* >::const_iterator luminaryIterator = m_luminary.begin ();
-	   luminaryIterator  != m_luminary.end (); luminaryIterator++)
-	(*luminaryIterator)->draw();
-      glPopMatrix();
-    }
-  }
-  
-  /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
-   * est donc effectuée pour tenir compte du placement du feu dans le monde.
-   *
-   * @param shader vertex program utilisé pour le solide photométrique 
-   */
-  void drawLuminary(const CgBasicVertexShader& shader) const
-  {
-    if(m_hasLuminary){
-      Point position(getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (position.x, position.y, position.z);
-      glScalef (scale.x, scale.y, scale.z);
-      shader.setModelViewProjectionMatrix();
       for (list < Object* >::const_iterator luminaryIterator = m_luminary.begin ();
 	   luminaryIterator  != m_luminary.end (); luminaryIterator++)
 	(*luminaryIterator)->draw();
@@ -386,11 +367,11 @@ public:
    * @param scene Pointeur sur la scène.
    * @param texname Nom du fichier image de la texture.
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader Pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program Pointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   DetachableFireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
-			const wxString &texname, uint index, const CgSVShader* const shader, const char *objName=NULL);
+			const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
   virtual ~DetachableFireSource();
   
   virtual void build();

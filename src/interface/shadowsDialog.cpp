@@ -28,11 +28,11 @@ ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, Fl
   m_shadowExtrudeDistYTextCtrl = new DoubleTextCtrl(this, IDT_SEDY, 0, 100, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
   m_shadowExtrudeDistZTextCtrl = new DoubleTextCtrl(this, IDT_SEDZ, 0, 100, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 
-  tmp.Printf(_("%.5lf"), m_currentConfig->fatness[0]);
+  tmp.Printf(_("%.5f"), m_currentConfig->fatness[0]);
   (*m_fatnessXTextCtrl) << tmp;
-  tmp.Printf(_("%.5lf"), m_currentConfig->fatness[1]);
+  tmp.Printf(_("%.5f"), m_currentConfig->fatness[1]);
   (*m_fatnessYTextCtrl) << tmp;
-  tmp.Printf(_("%.5lf"),  m_currentConfig->fatness[2]);
+  tmp.Printf(_("%.5f"),  m_currentConfig->fatness[2]);
   (*m_fatnessZTextCtrl) << tmp;
 
   (*m_shadowExtrudeDistXTextCtrl) << m_currentConfig->extrudeDist[0];
@@ -83,7 +83,6 @@ void ShadowsDialog::OnFatnessEnter(wxCommandEvent& event)
       m_currentConfig->fatness[2]=m_fatnessZTextCtrl->GetSafelyValue();
       break;
     }
-  m_glBuffer->UpdateShadowsFatness();
 }
 
 void ShadowsDialog::OnShadowsExtrudeDistEnter(wxCommandEvent& event)
@@ -100,5 +99,4 @@ void ShadowsDialog::OnShadowsExtrudeDistEnter(wxCommandEvent& event)
       m_currentConfig->extrudeDist[2]=m_shadowExtrudeDistZTextCtrl->GetSafelyValue();
       break;
     }
-  m_glBuffer->UpdateShadowsExtrudeDist();
 }

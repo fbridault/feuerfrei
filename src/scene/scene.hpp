@@ -6,7 +6,6 @@ class Scene;
 #include "object.hpp"
 #include "../flames/abstractFires.hpp"
 #include "source.hpp"
-#include "../shaders/CgShader.hpp"
 #include "camera.hpp"
 #include <vector>
 #include <list>
@@ -215,26 +214,6 @@ public:
       (*flamesIterator)->drawLuminary();
   };
   
-  /** Dessin de la scène pour les objets non texturés.
-   * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
-   * scène éclairée avec des solides photométriques.
-   */
-  void drawSceneWTEX(const CgBasicVertexShader& shader) const
-  {
-    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
-	 objectsArrayIterator != m_objectsArray.end();
-	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(FLAT,false, m_boundingSpheresMode);
-    for (vector<Object*>::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
-	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
-	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
-    
-    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
-	 flamesIterator != m_flames->end (); flamesIterator++)
-      (*flamesIterator)->drawLuminary(shader);
-  };
-  
   /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
   void drawSceneWT(void) const
   {    
@@ -268,26 +247,7 @@ public:
 	 flamesIterator != m_flames->end (); flamesIterator++)
       (*flamesIterator)->drawLuminary();
   };
-  /** Dessin de tous les objets de la scène.
-   * @param shader Référence vers un vertex shader. Utilisé par exemple pour le dessin de la
-   * scène éclairée avec des solides photométriques.
-   */
-  void drawScene (CgBasicVertexShader& shader) const
-  {
-    for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
-	 objectsArrayIterator != m_objectsArray.end();
-	 objectsArrayIterator++)
-      (*objectsArrayIterator)->draw(ALL,true, m_boundingSpheresMode);
-    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
-	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
-	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (ALL,true, m_boundingSpheresMode);
-    
-    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
-	 flamesIterator != m_flames->end (); flamesIterator++)
-      (*flamesIterator)->drawLuminary(shader);
-  };
-
+  
   /** Dessin de tous les objets qui projettent des ombres */
   void drawSceneWSV (void) const
   {    
@@ -299,19 +259,6 @@ public:
     for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	 flamesIterator != m_flames->end (); flamesIterator++)
       (*flamesIterator)->drawLuminary();
-  };
-  
-  /** Dessin de tous les objets qui projettent des ombres */
-  void drawSceneWSV (const CgBasicVertexShader& shader) const
-  {    
-    for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
-	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
-	 objectsArrayIteratorWSV++)
-      (*objectsArrayIteratorWSV)->draw (AMBIENT,false, m_boundingSpheresMode);
-    
-    for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
-	 flamesIterator != m_flames->end (); flamesIterator++)
-      (*flamesIterator)->drawLuminary(shader);
   };
   
   void computeBoundingBox(Point& max, Point& min);

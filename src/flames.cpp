@@ -81,7 +81,8 @@ bool FlamesApp::OnInit()
 {
   bool recompileShaders;
   wxString configFileName;
-  
+
+  setlocale(LC_NUMERIC, "C");
   /* Déclaration des handlers pour la gestion des formats d'image */
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);

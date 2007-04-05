@@ -28,7 +28,7 @@ vpconn SVExtrude(
 
   // Transformer la position de la lumière dans le repère de l'objet
   // Create normalized vector from vertex to light
-  float4 light_to_vert = normalize(IN.Position - mul(ModelViewMatrix, LightPos));
+  float4 light_to_vert = normalize(IN.Position - LightPos);
 	
   // N dot L to decide if point should be move away
   // from the light to extrude the volume

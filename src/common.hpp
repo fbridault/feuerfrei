@@ -105,8 +105,8 @@ public:
   SolverConfig globalField;
   uint nbFlames;
   FlameConfig *flames;
-  double fatness[4];
-  double extrudeDist[4];
+  GLfloat fatness[4];
+  GLfloat extrudeDist[4];
   double gammaCorrection;
 };
 

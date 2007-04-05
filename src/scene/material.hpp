@@ -80,8 +80,7 @@ public:
 	matSpecular[i] = m_Ks.getColor (i);
 	matAmbient[i] = m_Ka.getColor (i);
       }
-    /* Mis à 0 de l'alpha pour indiquer que l'on ne fait pas de glow */
-    matDiffuse[3] = 0.0;
+    matDiffuse[3] = 1.0;
     matSpecular[3] = 1.0;
     matAmbient[3] = 1.0;
   

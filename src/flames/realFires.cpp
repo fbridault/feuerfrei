@@ -8,17 +8,15 @@
 #define TORCH_NAME "Torch"
 
 Candle::Candle (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-		CgSVShader * shader, double rayon):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, shader)
-	       //   cgCandleVertexShader (_("bougieShader.cg"),_("vertCandle"),context),
-	       //   cgCandleFragmentShader (_("bougieShader.cg"),_("fragCandle"),context)
+		const GLSLProgram * const program, double rayon):
+  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
 }
 
 Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
-		       CgSVShader * shader, const char *wickFileName):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, shader)
+		       const GLSLProgram * const program, const char *wickFileName):
+  FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, program)
 {
   list<Wick *> objList;
   
@@ -29,8 +27,8 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, cons
 }
 
 Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
-	     CgSVShader * shader):
-  DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, shader, TORCH_NAME)
+	     const GLSLProgram * const program):
+  DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, program, TORCH_NAME)
 {
   list<Wick *> objList;
   int i=0;
@@ -48,8 +46,8 @@ Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *to
 }
 
 CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
-		   CgSVShader * shader):
-  DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, shader, TORCH_NAME)
+		   const GLSLProgram * const program):
+  DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, program, TORCH_NAME)
 {
   list<Wick *> objList;
   int i=0;
@@ -67,8 +65,8 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
 }
 
 CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
-		       const char *lampName, uint index, CgSVShader * shader, Point scale):
-  FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, shader, "Lamp")
+		       const char *lampName, uint index, const GLSLProgram * const program, Point scale):
+  FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, program, "Lamp")
 {
   list<Object *> objList;
   int i=0;
@@ -113,8 +111,8 @@ void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
   
 
 CandleStick::CandleStick (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-			  CgSVShader * shader, double rayon):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, shader)
+			  const GLSLProgram * const program, double rayon):
+  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
 

@@ -43,6 +43,7 @@ public:
   void disableGamma(){
     m_fbo.Deactivate();
     glDisable(GL_DEPTH_TEST);
+    glBlendFunc (GL_ONE, GL_ZERO);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     glMatrixMode(GL_PROJECTION);
@@ -56,7 +57,6 @@ public:
   
     enable();
     setUniform1f("gamma", m_gamma);
-    setUniform1i("boucle", (int)m_gamma);
     m_renderTex->drawOnScreen(m_width,m_height);
     disable();
 

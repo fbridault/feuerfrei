@@ -5,7 +5,7 @@ class PhotometricSolidsRenderer;
 
 #include "flames.hpp"
 #include "ies.hpp"
-#include "../shaders/CgSPFragmentShader.hpp"
+#include "../shaders/glsl.hpp"
 #include "../scene/scene.hpp"
 
 /** Abstraction d'un solide photométrique.<br>
@@ -24,8 +24,7 @@ public:
    * @param context Pointeur vers le contexte Cg.
    * @param recompileShaders Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
-  PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, const CGcontext* const context,
-			    bool recompileShaders);
+  PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, bool recompileShaders);
   /** Destructeur. */
   virtual ~PhotometricSolidsRenderer();
   
@@ -48,26 +47,25 @@ private:
   /** Nombre de fragments shaders dans le tableau SPFragmentShader. */
   const static int m_NBSHADER=2;
   
+  GLSLProgram m_SPProgram1, m_SPProgram2;
   /** Vertex Shader pour les objets texturés. */
-  CgBasicVertexShader m_SPVertexShaderTex;
+  GLSLVertexShader m_SPVertexShaderTex;
   
   /** Tableau contenant les fragment programs
-   * [0] : SP non interpolé sans couleur des objets - fpSPSeul<br>
-   * [1] : SP interpolé sans couleur des objets - fpSPSeulInterpole<br>
-   * [2] : SP non interpolé avec couleur des objets - fpSPTEX<br>
-   * [3] : SP interpolé avec couleur des objets - fpSPTestTEX<br>
+   * [0] : SP interpolé sans couleur des objets - fpSPSeul<br>
+   * [1] : SP interpolé avec couleur des objets - fpSPTEX<br>
    */
-  CgSPFragmentShader *m_SPFragmentShader[m_NBSHADER];
+  GLSLFragmentShader m_SPFragmentShader[m_NBSHADER];
 
   /** Texture 3D contenant les valeurs de luminance de tous les flammes. */
   Texture *m_photometricSolidsTex;
 
   /** Tableau contenant les centres de tous les solides. */
-  double *m_centers;
+  GLfloat *m_centers;
   /** Tableau contenant les intensités de tous les solides. */
-  double *m_intensities;
+  GLfloat *m_intensities;
   /** Tableau contenant les valeurs de tous les solides. */
-  double *m_lazimuth_lzenith;
+  GLfloat *m_lazimuth_lzenith;
   /** Tableau contenant la taille des textures 2D. */
   uint m_tex2DSize[2];
 };

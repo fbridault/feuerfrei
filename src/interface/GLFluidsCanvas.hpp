@@ -7,8 +7,6 @@ class GLFluidsCanvas;
 #include "interface.hpp"
 
 #include <wx/glcanvas.h>
-#include <Cg/cg.h>
-#include <Cg/cgGL.h>
 
 #include "../scene/camera.hpp"
 #include "../scene/graphicsFn.hpp"
@@ -78,7 +76,6 @@ private:
   uint m_width, m_height;
   uint prevNbSolvers;
   
-  CGcontext m_context;
   Camera *m_camera;
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;

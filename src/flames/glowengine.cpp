@@ -149,26 +149,27 @@ void GlowEngine::blur()
   glPushMatrix();
   glLoadIdentity();
   
+  glActiveTextureARB(GL_TEXTURE0_ARB);
   /* Blur à la résolution de l'écran */
   m_programX.enable();
-  m_programX.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[0]);
-  m_programX.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   
   m_secondPassFBOs[0].Activate();
   glViewport (0, 0, m_width[0], m_height[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   m_programY.enable();
-  m_programY.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[0]);
-  m_programY.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   
   m_firstPassFBOs[0].Activate();
   glViewport (0, 0, m_width[0], m_height[0]);    
   m_secondPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
-  /* Blur à une résolution inférieure */  
+  /* Blur à une résolution inférieure */
   m_secondPassFBOs[1].Activate();
   m_programX.enable();
   glBlendColor(0.3,0.3,0.3,1.0);
@@ -178,37 +179,37 @@ void GlowEngine::blur()
   glClear(GL_COLOR_BUFFER_BIT);
   
   /* Partie X [-bandwidth/2;-bandwidth/4] du filtre */
-  m_programX.setUniform1fv("offsets",(float *)m_offsets[1],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",(float *)m_weights[1],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[1]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [-bandwidth/4;0] du filtre */
-  m_programX.setUniform1fv("offsets",(float *)m_offsets[2],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",(float *)m_weights[2],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[2]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [0;bandwidth/4] du filtre */
-  m_programX.setUniform1fv("offsets",(float *)m_offsets[3],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",(float *)m_weights[3],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[3],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[3],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[3]);
 //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   /* Partie X [bandwidth/4;bandwidth/2] du filtre */
-  m_programX.setUniform1fv("offsets",(float *)m_offsets[4],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",(float *)m_weights[4],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[4],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[4]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
   
   glBlendFunc (GL_ONE, GL_ZERO);
   m_programY.enable();
-  m_programY.setUniform1fv("offsets",(float *)m_offsets[0],FILTER_SIZE);
-  m_programY.setUniform1fv("weights",(float *)m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[0]);
   
   m_firstPassFBOs[1].Activate();
@@ -303,6 +304,7 @@ void GlowEngine::drawBlur()
   
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
   
+  glActiveTextureARB(GL_TEXTURE0_ARB);
   for(int i=0; i < GLOW_LEVELS; i++)
     m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
   //  m_firstPassTex[1]->drawTexOnScreen(m_width[1], m_height[1]);

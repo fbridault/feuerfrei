@@ -24,11 +24,11 @@ public:
    * @param scene Pointeur sur la scène.
    * @param filename Nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
   Candle(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-	 CgSVShader * shader, double rayon);
+	 const GLSLProgram * const program, double rayon);
   /** Destructeur */
   virtual ~Candle(){};
 };
@@ -47,11 +47,11 @@ public:
    * @param scene Pointeur sur la scène.
    * @param filename nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param wickFileName nom du fichier contenant la mèche
    */
   Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-	     CgSVShader * shader, const char *wickFileName);
+	     const GLSLProgram * const program, const char *wickFileName);
   /** Destructeur */
   virtual ~Firmalampe(){};
 };
@@ -72,10 +72,10 @@ public:
    * @param scene Pointeur sur la scène.
    * @param torchName nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
   Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index, 
-	CgSVShader * shader);
+	const GLSLProgram * const program);
   /** Destructeur */
   virtual ~Torch(){}; 
 
@@ -102,10 +102,10 @@ public:
    * @param scene Pointeur sur la scène.
    * @param fireName nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
   CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
-	   CgSVShader * shader);
+	   const GLSLProgram * const program);
   /** Destructeur */
   virtual ~CampFire(){};
 };
@@ -129,10 +129,10 @@ public:
    * @param scene Pointeur sur la scène.
    * @param lampName nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
   CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
-	     const char *lampName, uint index, CgSVShader * shader, Point scale);
+	     const char *lampName, uint index, const GLSLProgram * const program, Point scale);
   /** Destructeur */
   virtual ~CandlesSet(){}; 
   
@@ -184,11 +184,11 @@ public:
    * @param scene Pointeur sur la scène.
    * @param filename Nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param shader pointeur sur le shader chargé de la construction des shadow volumes.
+   * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
   CandleStick(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-	      CgSVShader * shader, double rayon);
+	      const GLSLProgram * const program, double rayon);
   /** Destructeur */
   virtual ~CandleStick();
   

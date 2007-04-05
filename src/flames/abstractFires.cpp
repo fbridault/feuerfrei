@@ -6,23 +6,24 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(const Scene* const scene, uint index, const CgSVShader* const shader, const char* const IESFilename)
+FlameLight::FlameLight(const Scene* const scene, uint index, const GLSLProgram* const program, const char* const IESFilename)
 {  
   m_scene = scene;
   
   switch(index){
-    case 0 : m_light = GL_LIGHT0; break;
-    case 1 : m_light = GL_LIGHT1; break;
-    case 2 : m_light = GL_LIGHT2; break;
-    case 3 : m_light = GL_LIGHT3; break;
-    case 4 : m_light = GL_LIGHT4; break;
-    case 5 : m_light = GL_LIGHT5; break;
-    case 6 : m_light = GL_LIGHT6; break;
-    case 7 : m_light = GL_LIGHT7; break;
+  case 0 : m_light = GL_LIGHT0; break;
+  case 1 : m_light = GL_LIGHT1; break;
+  case 2 : m_light = GL_LIGHT2; break;
+  case 3 : m_light = GL_LIGHT3; break;
+  case 4 : m_light = GL_LIGHT4; break;
+  case 5 : m_light = GL_LIGHT5; break;
+  case 6 : m_light = GL_LIGHT6; break;
+  case 7 : m_light = GL_LIGHT7; break;
+  default : m_light = GL_LIGHT0; break;
   }
   
   m_lightPosition[3] = 1.0;  
-  m_cgShader = shader;  
+  m_SVProgram = program;  
   m_orientationSPtheta = 0.0;
   
   m_iesFile = new IES(IESFilename);
@@ -56,21 +57,15 @@ void FlameLight::switchOn()
   glEnable(m_light);
 }
 
-void FlameLight::drawShadowVolume ()
+void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
 {
-  m_cgShader->setLightPos (m_lightPosition);
+  m_SVProgram->enable();
+  m_SVProgram->setUniform4f("LightPos",m_lightPosition);
+  m_SVProgram->setUniform4f("Fatness",fatness);
+  m_SVProgram->setUniform4f("ShadowExtrudeDist",extrudeDist);
   
-  m_cgShader->enableShader ();
-  
-  glPushMatrix ();
-  glLoadIdentity ();
-  m_cgShader->setModelViewMatrixToInverse ();
-  glPopMatrix ();
-  m_cgShader->setModelViewProjectionMatrix ();
-  
-  m_scene->drawSceneWSV(*m_cgShader);
-  
-  m_cgShader->disableProfile ();
+  m_scene->drawSceneWSV();
+  m_SVProgram->disable();
 }
 
 /**********************************************************************************************************************/
@@ -78,8 +73,8 @@ void FlameLight::drawShadowVolume ()
 /**********************************************************************************************************************/
 
 FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames,  Scene *scene, const char *filename, 
-		       const wxString &texname,  uint index, const CgSVShader* const shader, const char *objName) : 
-  FlameLight(scene, index, shader, flameConfig->IESFileName.ToAscii()),
+		       const wxString &texname,  uint index, const GLSLProgram* const program, const char *objName) : 
+  FlameLight(scene, index, program, flameConfig->IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
 {  
   char mtlName[255];
@@ -227,8 +222,8 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 
 DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
 					   Scene* const scene, const char *filename, const wxString &texname, 
-					   uint index, const CgSVShader* const shader, const char *objName) : 
-  FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, shader, objName)
+					   uint index, const GLSLProgram* const program, const char *objName) : 
+  FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
 {
 }
 

@@ -1,0 +1,27 @@
+// -*-C-*- // utilisation du mode C dans emacs
+
+// Le parametre PT3D passe en sortie doit correspondre a la coordonnees 3D du point
+// dans le repere global. Deux cas sont possible :
+// 1 : on lit une scene dans un fichier et donc tous les points sont specifies dans
+//     le repere global, alors PT3D est juste un passage de la position du point.
+// 2 : on construit la scene avec des appels a glTranslate et glRotate ... etc,
+//     alors PT3D est la multiplication de la position du point et de la matrice
+//     MODELVIEW permettant le positionnement du point dans le repere global.
+//     Attention a ne pas prendre en compte les transformations utilisees pour la
+//     visualisation de la scene comme le panorama ou le eyeball.
+
+varying vec3 normal;
+varying vec4 point3D;
+#version 120
+
+void main()
+{
+  gl_Position = ftransform();
+  
+  gl_FrontColor = gl_Color;
+  
+  gl_TexCoord[0].xy = gl_MultiTexCoord0.xy;
+  
+  point3D = gl_Vertex;
+  normal = gl_Normal;
+} // main end

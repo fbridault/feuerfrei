@@ -3,7 +3,7 @@
 
 uniform float weights[8];
 uniform float divide;
-uniform samplerRect text;
+uniform sampler2DRect text;
 
 void main()
 {

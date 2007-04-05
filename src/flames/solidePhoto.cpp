@@ -74,10 +74,9 @@ void PhotometricSolidsRenderer::generateTexture(void)
   
   cerr << "Texture 3D size : " << m_tex2DSize[0] << " " << m_tex2DSize[1] << endl;
   
-  tex3DValues = new float[m_tex2DSize[0]*m_tex2DSize[1]*m_flames->size()];
+  tex3DValues = new GLfloat[m_tex2DSize[0]*m_tex2DSize[1]*m_flames->size()];
   ptrTex = tex3DValues;
-  
-  
+    
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++){
     GLfloat *values = (*flamesIterator)->getIntensities();
@@ -100,19 +99,19 @@ void PhotometricSolidsRenderer::generateTexture(void)
 	*ptrTex++ = 0;      
   }
   
-//   ptrTex = tex3DValues;
-//   for(uint k=0; k < m_nbFlames; k++){
-//     for(uint j=0; j < m_tex2DSize[1]; j++){
-//       for(uint i=0; i < m_tex2DSize[0]; i++){
-// 	cerr << *ptrTex++ << " ";
-//       }
-//       cerr << endl;
-//     }
-//     cerr << "Fin 2D" << endl;
-//   }
+//    ptrTex = tex3DValues;
+//    for(uint k=0; k < m_flames->size(); k++){
+//      for(uint j=0; j < m_tex2DSize[1]; j++){
+//        for(uint i=0; i < m_tex2DSize[0]; i++){
+//  	cerr << *ptrTex++ << " ";
+//        }
+//        cerr << endl;
+//      }
+//      cerr << "Fin 2D" << endl;
+//    }
   
   m_photometricSolidsTex = new Texture((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
-    
+  
   uint k=0;
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++, k++){
@@ -148,25 +147,28 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPProgram1.enable();
     m_SPProgram1.setUniform3fv("centreSP", m_centers, m_flames->size());
     m_SPProgram1.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
-    m_SPProgram1.setUniform2fv("lazimut_lzenith",m_lazimuth_lzenith, m_flames->size());
-    m_SPProgram1.setUniform1i("inc", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);
+    m_SPProgram1.setUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
+    m_SPProgram1.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);
     
-    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glActiveTexture(GL_TEXTURE0);
     m_photometricSolidsTex->bind();
-    m_scene->drawScene();
+    m_SPProgram1.setUniform1i("textureSP",0);
+    /* Dessin en enlevant toutes les textures si nécessaire */
+    m_scene->drawSceneWT();
     m_SPProgram1.disable();
-    
   }else{
     /* Affichage du solide modulé avec la couleur des objets  */
     m_SPProgram2.enable();
     m_SPProgram2.setUniform3fv("centreSP", m_centers, m_flames->size());
     m_SPProgram2.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
-    m_SPProgram2.setUniform2fv("lazimut_lzenith", m_lazimuth_lzenith, m_flames->size());
-    m_SPProgram2.setUniform1i("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);    
+    m_SPProgram2.setUniform2fv("angles", m_lazimuth_lzenith, m_flames->size());
+    m_SPProgram2.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);    
     m_SPProgram2.setUniform1i("isTextured",1);
-
-    glActiveTextureARB(GL_TEXTURE1_ARB);
+    
+    glActiveTexture(GL_TEXTURE1);
     m_photometricSolidsTex->bind();
+    m_SPProgram2.setUniform1i("textureSP",1);
+    m_SPProgram2.setUniform1i("textureObjet",0);
     m_scene->drawSceneTEX();
     m_SPProgram2.setUniform1i("isTextured",0);
     m_scene->drawSceneWTEX();

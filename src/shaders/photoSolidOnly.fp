@@ -11,11 +11,11 @@
 varying vec3 normal;
 varying vec4 point3D;
 
-uniform samplerCube textureSP;
+uniform sampler3D textureSP;
 uniform vec3 centreSP[NBSOURCES];
 uniform float fluctuationIntensite[NBSOURCES];
-uniform vec2 lazimut_lzenith[NBSOURCES];
-uniform int inc;
+uniform vec2 angles[NBSOURCES];
+uniform float incr;
 
 void main()
 {
@@ -24,33 +24,34 @@ void main()
   // application de la rotation du SP selon l'inclinaison de la flamme
 /*   IN.PT3D = mul(TextureSPMatrix, IN.PT3D); */
   
-  vec3 point,texcoordsSP;
+  vec3 direction,texcoordsSP;
   float theta, phi, r, attenuation, colorSP;
   float rtex=0.0;
   float color=0.0;
   for (int i = 0; i < NBSOURCES; i++) {
     // translation inverse du centre du SP
-    point =  centreSP[i] - point3D.xyz;
+    direction =  centreSP[i] - point3D.xyz;
+    direction = normalize(direction);
     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
     // attention y est suppose etre la hauteur et z la profondeur
-    r = length(point.xyz);
-    theta = acos(point.y / r);
-    phi = atan(point.z,point.x);
+    r = length(direction.xyz);
+    theta = acos(direction.y / r);
+    phi = atan(direction.z,direction.x);
     
     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
     // On divise par la taille max de la texture en 2D (xy) pour avoir entre 0 et 1
-    texcoordsSP = vec3(phi * lazimut_lzenith[i].x, theta * lazimut_lzenith[i].y, rtex);
+    texcoordsSP = vec3(phi * angles[i].x, theta * angles[i].y, rtex);
     
     // recuperation de l'intensite du fragment
-    colorSP = textureCube(textureSP, texcoordsSP).x * fluctuationIntensite[i];
+    colorSP = texture3D(textureSP, texcoordsSP).r * fluctuationIntensite[i];
     
     // attenuation de l'intensite en fonction de la distance
 /*     attenuation = 3.0/r; */
 /*     if(attenuation < 1.0) */
 /*       colorSP *= attenuation; */
     // attenuation de l'intensite en fonction de la flamme
-    rtex += float(inc);
     color += colorSP;
+    rtex += float(incr);
   }
   color = color / float(NBSOURCES);
   

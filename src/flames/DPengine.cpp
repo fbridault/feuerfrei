@@ -126,6 +126,8 @@ void DepthPeelingEngine::render()
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
+  
+  glActiveTexture(GL_TEXTURE0_ARB);
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
   
 //   for(int l=1; l <= m_nbLayers ; l--){

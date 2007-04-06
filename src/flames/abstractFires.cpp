@@ -218,6 +218,13 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   }else
     if(!m_visibility && save)
       m_solver->setRunningState(false);
+  
+  sort(m_flames,m_flames+m_nbFlames,RealFlame::cmp);
+}
+
+bool FireSource::operator<(const FireSource& other) const{
+  cerr << "buive" << endl;
+  return (m_dist < other.m_dist);
 }
 
 DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 

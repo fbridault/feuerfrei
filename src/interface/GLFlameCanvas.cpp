@@ -485,9 +485,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	m_depthPeelingEngine->render();
       }else{
 	m_glowEngine->activate();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBlendColor(.2,.2,.2,1.0);
 	glBlendFunc (GL_ONE, GL_CONSTANT_COLOR);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	/* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
 	glDrawBuffer(GL_NONE);

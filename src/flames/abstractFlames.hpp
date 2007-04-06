@@ -361,6 +361,9 @@ public:
   /** Calcul de la visibilité d'une flamme. */
   virtual void computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild=false);
   
+  static bool cmp( const RealFlame* a, const RealFlame* b ) {
+    return a->m_dist < b->m_dist;
+  }
 protected:
   /** Vecteur contenant les squelettes guide. */
   vector < LeadSkeleton * > m_leadSkeletons;

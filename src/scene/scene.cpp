@@ -4,7 +4,7 @@
 
 #include "material.hpp"
 
-Scene::Scene (const char* const fileName, const vector <FireSource *> *flames)
+Scene::Scene (const char* const fileName, vector <FireSource *> *flames)
 {  
   m_flames = flames;
   
@@ -101,6 +101,7 @@ void Scene::computeVisibility(const Camera &view)
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++)
     (*flamesIterator)->computeVisibility(view);
+  sort(m_flames->begin(),m_flames->end(),FireSource::cmp);
 }
 
 void Scene::createVBOs(void)

@@ -36,7 +36,7 @@ public:
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
    */
-  Scene(const char* const fileName, const vector <FireSource *> *flames);
+  Scene(const char* const fileName, vector <FireSource *> *flames);
 
   /** Destructeur par d&eacute;faut. */
   ~Scene();
@@ -272,7 +272,7 @@ private:
   /** Tableaux de flammes. Il s'agit d'un pointeur sur le tableau de flamme créé dans la classe GlFlameCanvas. 
    * Celles-ci sont nécessaires pour dessiner les luminaires lors du dessin de la scène.
    */
-  const vector <FireSource *> *m_flames;
+  vector <FireSource *> *m_flames;
   
   /** Chaîne de caractère contenant le chemin courant. Elle est utilisée dans les fonctions d'import pour
    * parcourir les différents répertoires (scenes, textures, ...).

@@ -41,22 +41,22 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
   
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[1][j] = (j-FILTER_SIZE+1)*(int)(m_scaleFactor[1]);
-    cerr << m_offsets[1][j] << endl;
+//     cerr << m_offsets[1][j] << endl;
   }
   
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[2][j] = j*(int)(m_scaleFactor[1]);
-    cerr << m_offsets[2][j] << endl;
+//     cerr << m_offsets[2][j] << endl;
   }
   
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[3][j] = (j-FILTER_SIZE+1);
-    cerr << m_offsets[3][j] << endl;
+//     cerr << m_offsets[3][j] << endl;
   }
   
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[4][j] = j;
-    cerr << m_offsets[4][j] << endl;
+//     cerr << m_offsets[4][j] << endl;
   }
   
   m_secondPassFBOs[GLOW_LEVELS-1].Deactivate();
@@ -114,7 +114,7 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
 {
   uint shaderIndex;
   
-  glDisable(GL_DEPTH_TEST);
+  glDepthFunc (GL_LEQUAL);
 //   glGetBooleanv(GL_LIGHTING,&params);
 //   cerr << (params == GL_FALSE) << endl;
   glBlendFunc (GL_ONE, GL_ZERO);
@@ -127,6 +127,7 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_programX.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   
   m_secondPassFBOs[0].Activate();
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   m_firstPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
@@ -140,6 +141,7 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   
   m_firstPassFBOs[0].Activate();
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   m_secondPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
        flamesIterator != m_flames.end (); flamesIterator++)
@@ -152,7 +154,7 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
   
   glViewport (0, 0, m_width[1], m_height[1]);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
   /* Partie X [-bandwidth/4;0] du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
@@ -184,7 +186,7 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_programX.setUniform1f("scale",m_scaleFactor[0]);
   
   m_firstPassFBOs[1].Activate();
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
@@ -211,7 +213,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   
   m_firstPassFBOs[1].Deactivate();
   
-  glEnable(GL_DEPTH_TEST);
+//   glEnable (GL_DEPTH_TEST);
+  glDepthFunc (GL_LESS);
 }
 
 void GlowEngine::drawBlur()

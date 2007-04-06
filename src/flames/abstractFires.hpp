@@ -318,6 +318,13 @@ public:
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
   bool isVisible() { return m_visibility; };
+  double dist() { return m_dist; };
+
+  virtual bool operator<(const FireSource& other) const;
+  
+  static bool cmp( const FireSource* a, const FireSource* b ) {
+    return a->m_dist < b->m_dist;
+  }
 protected:
   /** Nombre de flammes */
   uint m_nbFlames;

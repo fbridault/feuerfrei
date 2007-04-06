@@ -11,7 +11,7 @@ class GlowEngine;
 #include "abstractFires.hpp"
 
 #define GLOW_LEVELS 2
-#define FILTER_SIZE 8
+#define FILTER_SIZE 16
 
 /** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
  * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>

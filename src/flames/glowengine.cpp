@@ -36,12 +36,13 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
     m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
     m_secondPassFBOs[i].RenderBufferAttach();
   }  
-  for(int j=0; j < FILTER_SIZE; j++)
-    m_offsets[0][j] = j-FILTER_SIZE/2+1;
-  
   for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[1][j] = (j-FILTER_SIZE+1)*(int)(m_scaleFactor[1]);
-//     cerr << m_offsets[1][j] << endl;
+    m_offsets[0][j] = j-FILTER_SIZE/2+1;
+    cerr << m_offsets[0][j] << endl;
+  }
+  for(int j=0; j < FILTER_SIZE; j++){
+    m_offsets[1][j] = (j-FILTER_SIZE/2+1)*(int)(m_scaleFactor[1]);
+     cerr << m_offsets[1][j] << endl;
   }
   
   for(int j=0; j < FILTER_SIZE; j++){
@@ -83,18 +84,24 @@ void GlowEngine::computeWeights(uint index, double sigma)
     for(int x=-offset+1 ; x<=offset-1 ; x++){
       m_weights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
       m_divide[index] += m_weights[index][x+offset-1];
-//       cerr << x << " " << x+offset << " " << m_weights[index][x+offset-1] << endl;
+      cerr << x << " " << x+offset << " " << m_weights[index][x+offset-1] << endl;
     }
 //     cerr << m_divide[index] << endl;
     m_divide[index] = 1/m_divide[index];
     break;
   case 1:
-    offset = FILTER_SIZE-1;
-    for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
-      m_weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
-      m_divide[index] += m_weights[index][x+offset];
-//        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
+    offset = FILTER_SIZE/2;
+    for(int x=-offset+1 ; x<=offset-1 ; x++){
+      m_weights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
+      m_divide[index] += m_weights[index][x+offset-1];
+      cerr << x << " " << x+offset << " " << m_weights[index][x+offset-1] << endl;
     }
+//     offset = FILTER_SIZE-1;
+//     for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
+//       m_weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+//       m_divide[index] += m_weights[index][x+offset];
+// //        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
+//     }
     m_divide[index] = 1/m_divide[index];
 //     cerr << m_divide[index] << endl;
     break;
@@ -114,20 +121,21 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
 {
   uint shaderIndex;
   
-  glDepthFunc (GL_LEQUAL);
+  glDisable (GL_DEPTH_TEST);
+  //  glDepthFunc (GL_LEQUAL);
 //   glGetBooleanv(GL_LIGHTING,&params);
 //   cerr << (params == GL_FALSE) << endl;
   glBlendFunc (GL_ONE, GL_ZERO);
   
   /* Blur à la résolution de l'écran */
   m_programX.enable();
+  m_programX.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[0]);
   m_programX.setUniform1f("scale",m_scaleFactor[0]);
-  m_programX.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   
   m_secondPassFBOs[0].Activate();
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   m_firstPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
@@ -135,13 +143,13 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
     (*flamesIterator)->drawFlame (true, false, true);
   
   m_programY.enable();
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[0]);
-  m_programX.setUniform1f("scale",m_scaleFactor[0]);
-  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
   m_firstPassFBOs[0].Activate();
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   m_secondPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
        flamesIterator != m_flames.end (); flamesIterator++)
@@ -150,11 +158,9 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   /* Blur à une résolution inférieure */
   m_secondPassFBOs[1].Activate();
   m_programX.enable();
-  glBlendColor(0.6,0.6,0.6,1.0);
-  glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
   
   glViewport (0, 0, m_width[1], m_height[1]);
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   
   /* Partie X [-bandwidth/4;0] du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
@@ -168,25 +174,25 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
     (*flamesIterator)->drawFlame (true, false, true);
   
   /* Partie X [0;bandwidth/4] du filtre */
-  m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
-  m_programX.setUniform1f("divide",m_divide[2]);
-  m_programX.setUniform1f("scale",m_scaleFactor[1]);
-  //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
-  m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+//   m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
+//   m_programX.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
+//   m_programX.setUniform1f("divide",m_divide[2]);
+//   m_programX.setUniform1f("scale",m_scaleFactor[1]);
+//   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
+//   m_firstPassTex[0]->bind();
+//   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+//        flamesIterator != m_flames.end (); flamesIterator++)
+//     (*flamesIterator)->drawFlame (true, false, true);
     
   /* Partie Y [-bandwidth/4;0] du filtre */
   m_programY.enable();
-  m_programY.setUniform1fv("offsets",m_offsets[3],FILTER_SIZE);
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
   m_programY.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[1]);
-  m_programX.setUniform1f("scale",m_scaleFactor[0]);
+  m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
   m_firstPassFBOs[1].Activate();
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
@@ -195,26 +201,25 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
     (*flamesIterator)->drawFlame (true, false, true);
   
   /* Partie Y [0;bandwidth/4] du filtre */
-  m_programY.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
-  m_programY.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
-  m_programY.setUniform1f("divide",m_divide[2]);
-  m_programX.setUniform1f("scale",m_scaleFactor[0]);
+//   m_programY.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
+//   m_programY.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
+//   m_programY.setUniform1f("divide",m_divide[2]);
+//   m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
-  //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
-  m_secondPassTex[1]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+//   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
+//   m_secondPassTex[1]->bind();
+//   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+//        flamesIterator != m_flames.end (); flamesIterator++)
+//     (*flamesIterator)->drawFlame (true, false, true);
   
   m_programY.disable();
   
-  glBlendFunc (GL_ONE, GL_ZERO);
   //  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   m_firstPassFBOs[1].Deactivate();
   
-//   glEnable (GL_DEPTH_TEST);
-  glDepthFunc (GL_LESS);
+  glEnable (GL_DEPTH_TEST);
+   //  glDepthFunc (GL_LESS);
 }
 
 void GlowEngine::drawBlur()

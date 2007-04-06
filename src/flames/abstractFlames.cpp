@@ -184,10 +184,10 @@ void FixedFlame::drawPointFlame () const
       /****************************************************************************************/
       angle4 = (angle2 < PI / 2.0) ? -angle : angle;
       
+      glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable (GL_TEXTURE_2D);
       /****************************************************************************************/
       /* Affichage de la flamme */
-      glActiveTextureARB(GL_TEXTURE0_ARB);
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       m_tex->bind();
       

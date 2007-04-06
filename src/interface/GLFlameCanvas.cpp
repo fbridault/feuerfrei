@@ -472,17 +472,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       //     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
       //sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
       //     sigma = 2;
-    
-      //     /* Dessin des englobants */
-
-      //     m_glowEngine->activateVisibilityBuffer();
-      //     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      //     glDisable(GL_LIGHTING);
-      //     for (f = 0; f < m_currentConfig->nbFlames; f++)
-      //       m_flames[f]->drawFlame (true, false, true);
-      //     glEnable(GL_LIGHTING);
-      //     m_glowEngine->deactivateVisibilityBuffer();
-    
+      
       if(m_currentConfig->depthPeelingEnabled){
 	/* On décortique dans les calques */
 	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
@@ -510,7 +500,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	     flamesIterator != m_flames.end (); flamesIterator++)
 	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
       }
-      m_glowEngine->blur();
+      m_glowEngine->blur(m_flames);
     
       m_glowEngine->deactivate();
     }else

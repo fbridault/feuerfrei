@@ -101,7 +101,7 @@ void Scene::computeVisibility(const Camera &view)
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++)
     (*flamesIterator)->computeVisibility(view);
-  //sort(m_flames->begin(),m_flames->end(),FireSource::cmp);
+  sort(m_flames->begin(),m_flames->end(),FireSource::cmp);
 }
 
 void Scene::createVBOs(void)

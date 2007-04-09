@@ -1,8 +1,8 @@
 // -*-C-*- // utilisation du mode C dans emacs
 #extension GL_ARB_texture_rectangle : enable
 
-uniform float offsets[16];
-uniform float weights[16];
+uniform float offsets[8];
+uniform float weights[8];
 uniform float divide;
 uniform float scale;
 uniform sampler2DRect text;
@@ -36,30 +36,6 @@ void main()
 
   texcoord.y = pos2Dy+offsets[7];
   color += texture2DRect(text, texcoord)*weights[7];
-  
-  texcoord.y = pos2Dy+offsets[8];
-  color += texture2DRect(text, texcoord)*weights[8];
-
-  texcoord.y = pos2Dy+offsets[9];
-  color += texture2DRect(text, texcoord)*weights[9];
-
-  texcoord.y = pos2Dy+offsets[10];
-  color += texture2DRect(text, texcoord)*weights[10];
-
-  texcoord.y = pos2Dy+offsets[11];
-  color += texture2DRect(text, texcoord)*weights[11];
-
-  texcoord.y = pos2Dy+offsets[12];
-  color += texture2DRect(text, texcoord)*weights[12];
-
-  texcoord.y = pos2Dy+offsets[13];
-  color += texture2DRect(text, texcoord)*weights[13];
-
-  texcoord.y = pos2Dy+offsets[14];
-  color += texture2DRect(text, texcoord)*weights[14];
-  
-/*   texcoord.y = pos2Dy+offsets[15]; */
-/*   color += texture2DRect(text, texcoord)*weights[15]; */
 
   gl_FragColor = color*divide;
 }

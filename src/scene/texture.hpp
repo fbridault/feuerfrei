@@ -99,23 +99,6 @@ public:
     
     glEnd();
   }
-  void drawOnScreen(uint width, uint height, double WRatio, double HRatio) const
-  {
-    glBindTexture(m_type, m_texName);
-    glColor4f(1.0,1.0,1.0,1.0);
-    glBegin(GL_QUADS);
-    
-    glTexCoord2f(0,0);
-    glVertex3d(-WRatio,-HRatio,0.0);
-    glTexCoord2f(width,0);
-    glVertex3d(WRatio,-HRatio,0.0);
-    glTexCoord2f(width,height);
-    glVertex3d(WRatio,HRatio,0.0);
-    glTexCoord2f(0,height);
-    glVertex3d(-WRatio,HRatio,0.0);
-    
-    glEnd();
-  }
 
 private:
   void loadWithAlphaChannel();

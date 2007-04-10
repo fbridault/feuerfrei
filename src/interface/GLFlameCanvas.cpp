@@ -484,7 +484,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	/* On affiche la superposition des calques que l'on vient de décortiquer */
-	m_depthPeelingEngine->render();
+	m_depthPeelingEngine->render(m_flames);
       }else{
 	m_glowEngine->activate();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -517,14 +517,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
     if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
       if(m_currentConfig->depthPeelingEnabled)
-	m_depthPeelingEngine->render();
+	m_depthPeelingEngine->render(m_flames);
       else
 	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	     flamesIterator != m_flames.end (); flamesIterator++)
 	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
   }
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
-    m_glowEngine->drawBlur();
+    m_glowEngine->drawBlur(m_flames);
   if(m_gammaCorrection)
     m_gammaEngine->disableGamma();
   

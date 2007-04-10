@@ -63,9 +63,9 @@ public:
   };
 
   /** Effectue le blur en trois passes */
-  void blur(vector <FireSource *>& m_flames);
+  void blur(vector <FireSource *>& flames);
   /** Plaque le blur à l'écran */
-  void drawBlur();
+  void drawBlur(vector <FireSource *>& flames);
 
   void setGaussSigma(uint index, double sigma)
   {
@@ -91,9 +91,9 @@ private:
   
   /** FBOs */
   FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS], m_visibilityFBO;
-  GLSLProgram m_programX, m_programY;
+  GLSLProgram m_programX, m_programY, m_blurRendererProgram;
   /** Fragment Shader pour le blur */
-  GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y;
+  GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y, m_blurRendererShader;
   /** Textures servant à réaliser le blur */
   Texture *m_firstPassTex[GLOW_LEVELS], *m_secondPassTex[GLOW_LEVELS], *m_visibilityTex;
 };

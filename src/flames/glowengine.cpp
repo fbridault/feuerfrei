@@ -8,12 +8,14 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recom
 
   m_blurFragmentShader8X.load("glowShaderX.fp", recompileShaders);
   m_blurFragmentShader8Y.load("glowShaderY.fp", recompileShaders);
-
   m_programX.attachShader(m_blurFragmentShader8X);
-  m_programY.attachShader(m_blurFragmentShader8Y);
-  
+  m_programY.attachShader(m_blurFragmentShader8Y);  
   m_programX.link();
   m_programY.link();
+
+  m_blurRendererShader.load("viewportSizedScaledTex.fp", recompileShaders);
+  m_blurRendererProgram.attachShader(m_blurRendererShader);
+  m_blurRendererProgram.link();
 
   setGaussSigma(0,2);
   setGaussSigma(1,10);
@@ -110,7 +112,7 @@ void GlowEngine::computeWeights(uint index, double sigma)
   }
 }
 
-void GlowEngine::blur(vector <FireSource *>& m_flames)
+void GlowEngine::blur(vector <FireSource *>& flames)
 {
   uint shaderIndex;
   
@@ -130,8 +132,9 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
   
   m_programY.enable();
@@ -143,8 +146,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_firstPassFBOs[0].Activate();
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   m_secondPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
   
   /* Blur à une résolution inférieure */
@@ -163,8 +166,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
   
   /* Partie X [0;bandwidth/4] du filtre */
@@ -174,8 +177,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
     
   /* Partie Y [-bandwidth/4;0] du filtre */
@@ -190,8 +193,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
   
   /* Partie Y [0;bandwidth/4] du filtre */
@@ -202,8 +205,8 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   
   //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
+  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+       flamesIterator != flames.end (); flamesIterator++)
     (*flamesIterator)->drawFlame (true, false, true);
   
   m_programY.disable();
@@ -217,31 +220,28 @@ void GlowEngine::blur(vector <FireSource *>& m_flames)
   glDepthFunc (GL_LESS);
 }
 
-void GlowEngine::drawBlur()
+void GlowEngine::drawBlur(vector <FireSource *>& flames)
 {
   glDisable (GL_DEPTH_TEST);
   
   glBlendFunc (GL_ONE, GL_ONE);
-  
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(-1, 1, -1, 1);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-  
+    
   glActiveTextureARB(GL_TEXTURE0);
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
+  m_blurRendererProgram.enable();
+  m_blurRendererProgram.setUniform1i("text",0);
   
-  for(int i=0; i < GLOW_LEVELS; i++)
-    m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
-  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+  for(int i=0; i < GLOW_LEVELS; i++){
+    m_blurRendererProgram.setUniform1f("scale",1/(double)m_scaleFactor[i]);
+    m_firstPassTex[i]->bind();
+    for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+	 flamesIterator != flames.end (); flamesIterator++)
+      (*flamesIterator)->drawFlame (true, false, true);
+  }
+  //    m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
 
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
+  m_blurRendererProgram.disable();
+  glDisable(GL_TEXTURE_RECTANGLE_ARB);
 
   glEnable (GL_DEPTH_TEST);
 }

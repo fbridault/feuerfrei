@@ -38,6 +38,10 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, c
   m_depthTex[2] = new Texture(m_width, m_height, GL_ALWAYS, true);
   m_sceneDepthTex = new Texture(m_width, m_height, GL_LESS, true);
   
+  m_dpRendererShader.load("viewportSizedTex.fp", true);
+  m_dpRendererProgram.attachShader(m_dpRendererShader);
+  m_dpRendererProgram.link();
+
   m_flamesDisplayList = glGenLists(1);
 }
 
@@ -113,41 +117,27 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
   glDeleteLists(m_flamesDisplayList,1);
 }
 
-void DepthPeelingEngine::render()
+void DepthPeelingEngine::render(vector <FireSource *>& flames)
 {   
   glShadeModel (GL_FLAT);
   glDisable (GL_DEPTH_TEST);
   
   glBlendFunc (GL_ONE, GL_ONE);
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(-1, 1, -1, 1);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
   
   glActiveTexture(GL_TEXTURE0_ARB);
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
   
-//   for(int l=1; l <= m_nbLayers ; l--){
+  m_dpRendererProgram.enable();
+  m_dpRendererProgram.setUniform1i("text",0);
   for(int l=m_nbLayers; l >= 0 ; l--){
-    
-    m_colorTex[l]->drawOnScreen(m_width,m_height);
-    
-//     if(l==0)
-//     glColor4f(1.0,1.0,1.0,1.0);
-//     else      
-//      glColor4f(1.0,1.0,1.0,0.6);
-//     glColor4f(1.0,1.0,1.0,0.6);
+    m_colorTex[l]->bind();
+    for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+	 flamesIterator != flames.end (); flamesIterator++)
+      (*flamesIterator)->drawFlame (true, false, true);
   }
+  m_dpRendererProgram.disable();
+    
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
-  
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-  
   glEnable (GL_DEPTH_TEST);
   glShadeModel (GL_SMOOTH);
 }

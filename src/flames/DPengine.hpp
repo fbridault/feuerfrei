@@ -73,7 +73,7 @@ public:
   virtual ~DepthPeelingEngine();
   
   void makePeels(bool displayFlames, bool displayParticles, bool displayBoundingSphere);
-  void render();
+  void render(vector <FireSource *>& flames);
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};
   void removeLayer() { m_nbLayers = (m_nbLayers > 0) ? m_nbLayers-1 : m_nbLayers;};
@@ -98,6 +98,8 @@ private:
   const vector <FireSource *> *m_flames;
   
   ARBFragmentShader m_peelProgram;
+  GLSLProgram m_dpRendererProgram;
+  GLSLFragmentShader m_dpRendererShader;
 
   GLuint m_flamesDisplayList;
 };

@@ -119,9 +119,7 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
 
 void DepthPeelingEngine::render(vector <FireSource *>& flames)
 {   
-  glShadeModel (GL_FLAT);
-  glDisable (GL_DEPTH_TEST);
-  
+  glDepthFunc (GL_LEQUAL);
   glBlendFunc (GL_ONE, GL_ONE);
   
   glActiveTexture(GL_TEXTURE0_ARB);
@@ -138,6 +136,5 @@ void DepthPeelingEngine::render(vector <FireSource *>& flames)
   m_dpRendererProgram.disable();
     
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
-  glEnable (GL_DEPTH_TEST);
-  glShadeModel (GL_SMOOTH);
+  glDepthFunc (GL_LESS);
 }

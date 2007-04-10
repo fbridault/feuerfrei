@@ -222,8 +222,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
 
 void GlowEngine::drawBlur(vector <FireSource *>& flames)
 {
-  glDisable (GL_DEPTH_TEST);
-  
+  glDepthFunc (GL_LEQUAL);
   glBlendFunc (GL_ONE, GL_ONE);
     
   glActiveTextureARB(GL_TEXTURE0);
@@ -242,6 +241,5 @@ void GlowEngine::drawBlur(vector <FireSource *>& flames)
 
   m_blurRendererProgram.disable();
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
-
-  glEnable (GL_DEPTH_TEST);
+  glDepthFunc (GL_LESS);
 }

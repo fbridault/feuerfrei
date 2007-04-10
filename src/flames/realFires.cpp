@@ -107,6 +107,8 @@ void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
 //       m_solver->setRunningState(false);
   for (uint i = 0; i < m_nbFlames; i++)
     m_flames[i]->computeVisibility(view, m_solver->getPosition(), forceSpheresBuild);
+  
+  sort(m_flames,m_flames+m_nbFlames,RealFlame::cmp);
 }
   
 

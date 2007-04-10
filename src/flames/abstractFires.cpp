@@ -218,8 +218,6 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   }else
     if(!m_visibility && save)
       m_solver->setRunningState(false);
-  
-  sort(m_flames,m_flames+m_nbFlames,RealFlame::cmp);
 }
 
 bool FireSource::operator<(const FireSource& other) const{

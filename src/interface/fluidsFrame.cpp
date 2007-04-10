@@ -166,10 +166,10 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
   return;
 }
 
-void FluidsFrame::InitGLBuffer(bool recompileShaders)
+void FluidsFrame::InitGLBuffer()
 {
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
-  m_glBuffer->Init(&m_currentConfig,recompileShaders);
+  m_glBuffer->Init(&m_currentConfig);
   m_mainSizer->Fit(this);
   m_mainSizer->SetSizeHints(this);
   Layout();

@@ -97,7 +97,8 @@ bool FlamesApp::OnInit()
     return false;
   }
   
-  recompileShaders = areShadersCompiled();
+  // Plus utilisé, était nécessaire avec Cg, ne l'est plus avec GLSL
+  //  recompileShaders = areShadersCompiled();
   
   /* Teste s'il est nécessaire de recompiler les shaders */
   FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
@@ -106,7 +107,7 @@ bool FlamesApp::OnInit()
 
   SetTopWindow(frame);
  
-  frame->InitGLBuffer(recompileShaders);
+  frame->InitGLBuffer();
 	
   return true;
 }

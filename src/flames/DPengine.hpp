@@ -66,7 +66,7 @@ public:
    * @param w largeur du viewport
    * @param h hauteur du viewport
    * @param scaleFactor rapport entre le viewport et la texture utilisée, typiquement > 1
-   * @param recompileShaders indique s'il faut compiler ou non les shaders
+   * @param  indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
   DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, const vector <FireSource *> *flames);

@@ -56,7 +56,7 @@ void GLFluidsCanvas::InitUISettings(void)
   m_displayBase = m_displayVelocity = m_displayDensity = true;
 }
 
-void GLFluidsCanvas::InitGL(bool recompileShaders)
+void GLFluidsCanvas::InitGL()
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
@@ -177,13 +177,13 @@ void GLFluidsCanvas::InitSolvers(void)
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
-void GLFluidsCanvas::Init (FluidsAppConfig *config, bool recompileShaders)
+void GLFluidsCanvas::Init (FluidsAppConfig *config)
 {  
   m_currentConfig = config;
 
   InitUISettings();
   SetCurrent();
-  InitGL(recompileShaders);
+  InitGL();
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   InitSolvers();  

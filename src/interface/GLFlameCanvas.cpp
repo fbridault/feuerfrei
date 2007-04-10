@@ -67,7 +67,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_gammaCorrection = false;
 }
 
-void GLFlameCanvas::InitGL(bool recompileShaders)
+void GLFlameCanvas::InitGL()
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
@@ -96,11 +96,11 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   
   m_SVShader = new GLSLVertexShader();
   m_SVProgram = new GLSLProgram();
-  m_SVShader->load ("shadowVolume.vp", recompileShaders);
+  m_SVShader->load ("shadowVolume.vp");
   m_SVProgram->attachShader(*m_SVShader);
   m_SVProgram->link();
   
-  m_gammaEngine = new GammaEngine (m_width, m_height, recompileShaders);
+  m_gammaEngine = new GammaEngine (m_width, m_height);
   setGammaCorrection( m_currentConfig->gammaCorrection );
   
 }
@@ -210,7 +210,7 @@ void GLFlameCanvas::InitSolvers(void)
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
-void GLFlameCanvas::InitScene(bool recompileShaders)
+void GLFlameCanvas::InitScene()
 {  
   uint glowScales[2] = { 1, 4 };
   
@@ -226,25 +226,25 @@ void GLFlameCanvas::InitScene(bool recompileShaders)
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, recompileShaders);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
   
   m_scene->createVBOs();
   
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
-  m_glowEngine  = new GlowEngine (m_width, m_height, glowScales, recompileShaders);
+  m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
   m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, &m_flames);
 }
 
-void GLFlameCanvas::Init (FlameAppConfig *config, bool recompileShaders)
+void GLFlameCanvas::Init (FlameAppConfig *config)
 {  
   m_currentConfig = config;
   
   InitUISettings();
   SetCurrent();
-  InitGL(recompileShaders);
+  InitGL();
   
-  InitScene(recompileShaders);
+  InitScene();
   
   ::wxStartTimer();
   
@@ -263,7 +263,7 @@ void GLFlameCanvas::Restart (void)
   glViewport (0, 0, m_width, m_height);
   
 //   InitUISettings();
-  InitScene(false);
+  InitScene();
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
   ::wxStartTimer();
   m_run = true;
@@ -297,7 +297,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
   
   InitFlames();
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames, false);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
   
   if(m_currentConfig->useGlobalField)
     m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,

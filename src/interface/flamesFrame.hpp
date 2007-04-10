@@ -74,7 +74,7 @@ public:
   void LoadSettings (void);
   void LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig);
   void SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig);
-  void InitGLBuffer (bool recompileShaders);
+  void InitGLBuffer ();
   void InitSolversPanels();
   void InitFlamesPanels();
   void DoLayout();

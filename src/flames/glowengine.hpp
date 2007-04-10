@@ -40,10 +40,10 @@ public:
    * @param w largeur du viewport
    * @param h hauteur du viewport
    * @param scaleFactor rapport entre le viewport et la texture utilisée, typiquement > 1
-   * @param recompileShaders indique s'il faut compiler ou non les shaders
+   * @param  indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS-1], bool recompileShaders );
+  GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS-1] );
   virtual ~GlowEngine();
 
   /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette

@@ -213,10 +213,10 @@ void FlamesFrame::OnSize(wxSizeEvent& event)
   Layout();
 }
 
-void FlamesFrame::InitGLBuffer(bool recompileShaders)
+void FlamesFrame::InitGLBuffer()
 {
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
-  m_glBuffer->Init(&m_currentConfig,recompileShaders);
+  m_glBuffer->Init(&m_currentConfig);
   m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
   m_mainSizer->Fit(this);
   m_mainSizer->SetSizeHints(this);

@@ -22,9 +22,9 @@ public:
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
    * @param context Pointeur vers le contexte Cg.
-   * @param recompileShaders Booléne indiquant s'il faut recompiler ou non les shaders Cg.
+   * @param  Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
-  PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, bool recompileShaders);
+  PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames);
   /** Destructeur. */
   virtual ~PhotometricSolidsRenderer();
   

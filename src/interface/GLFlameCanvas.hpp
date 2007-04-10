@@ -45,20 +45,20 @@ public:
   void OnSize(wxSizeEvent& event);
   
   /** Initialisations relatives à l'environnement OpenGL */
-  void InitGL(bool recompileShaders);
+  void InitGL();
   /** Initialisations relatives aux flammes */
   void InitFlames(void);
   /** Initialisations relatives aux solveurs */
   void InitSolvers(void);
   /** Initialisations relatives à la scène */
-  void InitScene(bool recompileShaders);
+  void InitScene();
   /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
   void ReloadSolversAndFlames (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
-  void Init(FlameAppConfig *config, bool recompileShaders);
+  void Init(FlameAppConfig *config);
   
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */

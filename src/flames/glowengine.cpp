@@ -1,19 +1,19 @@
 #include "glowengine.hpp"
 
 
-GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS], bool recompileShaders)
+GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
 {
   m_initialWidth = w;
   m_initialHeight = h;
 
-  m_blurFragmentShader8X.load("glowShaderX.fp", recompileShaders);
-  m_blurFragmentShader8Y.load("glowShaderY.fp", recompileShaders);
+  m_blurFragmentShader8X.load("glowShaderX.fp");
+  m_blurFragmentShader8Y.load("glowShaderY.fp");
   m_programX.attachShader(m_blurFragmentShader8X);
   m_programY.attachShader(m_blurFragmentShader8Y);  
   m_programX.link();
   m_programY.link();
 
-  m_blurRendererShader.load("viewportSizedScaledTex.fp", recompileShaders);
+  m_blurRendererShader.load("viewportSizedScaledTex.fp");
   m_blurRendererProgram.attachShader(m_blurRendererShader);
   m_blurRendererProgram.link();
 

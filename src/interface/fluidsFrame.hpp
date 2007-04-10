@@ -51,7 +51,7 @@ public:
   FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini")); 
   
   void GetSettingsFromConfigFile (void);
-  void InitGLBuffer (bool recompileShaders);
+  void InitGLBuffer ();
   void InitSolversPanels();
   
   void OnClose(wxCloseEvent& event);

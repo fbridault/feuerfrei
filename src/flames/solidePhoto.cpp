@@ -1,7 +1,6 @@
 #include "solidePhoto.hpp"
 
-PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames, 
-						     bool recompileShaders)
+PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames)
 {
   char macro[25];
 
@@ -14,7 +13,7 @@ PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const
   m_intensities = new GLfloat[m_flames->size()];
   m_lazimuth_lzenith = new GLfloat[m_flames->size()*2];
   
-  m_SPVertexShaderTex.load("photoSolid.vp",recompileShaders);
+  m_SPVertexShaderTex.load("photoSolid.vp");
   m_SPFragmentShader[0].load("photoSolidOnly.fp", true,macro);
   m_SPFragmentShader[1].load("photoSolid.fp", true,macro);
   

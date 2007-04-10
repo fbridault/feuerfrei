@@ -38,6 +38,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_Glow, FlamesFrame::OnCheckGlow)
   EVT_CHECKBOX(IDCHK_DP, FlamesFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, FlamesFrame::OnCheckSaveImages)
+  EVT_CHECKBOX(IDCHK_Gamma, FlamesFrame::OnCheckGamma)
   EVT_COMMAND_SCROLL(IDSL_DP, FlamesFrame::OnScrollDP)
   EVT_COMMAND_SCROLL(IDSL_Gamma, FlamesFrame::OnScrollGamma)
   EVT_CLOSE(FlamesFrame::OnClose)
@@ -82,6 +83,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
+  m_gammaCheckBox =  new wxCheckBox(this,IDCHK_Gamma,_("Enable"));
   m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,40,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   DoLayout();
@@ -121,6 +123,7 @@ void FlamesFrame::DoLayout()
   m_lightingSizer->Add(m_lightingBottomSizer, 1, 0, 0);
   
   m_gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
+  m_gammaSizer->Add(m_gammaCheckBox, 0, wxEXPAND, 0);
   m_gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
   
   m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -313,6 +316,15 @@ void FlamesFrame::OnCheckGlow(wxCommandEvent& event)
 {
   m_currentConfig.glowEnabled = !m_currentConfig.glowEnabled;
   m_menuDisplayFlames->Enable(IDM_GlowOnly,m_currentConfig.glowEnabled);
+}
+
+void FlamesFrame::OnCheckGamma(wxCommandEvent& event)
+{
+  m_glBuffer->setGammaCorrectionState( event.IsChecked() );
+  if(event.IsChecked())
+    m_gammaSlider->Enable();
+  else
+    m_gammaSlider->Disable();
 }
 
 void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)

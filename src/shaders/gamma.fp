@@ -6,7 +6,5 @@ uniform float gamma;
 
 void main()
 {  
-  vec4 color;
-  color=pow(texture2DRect(text,gl_TexCoord[0].st), vec4(gamma,gamma,gamma,gamma));
-  gl_FragColor = color;
+  gl_FragColor = pow(texture2DRect(text,gl_TexCoord[0].st), vec4(gamma,gamma,gamma,gamma));
 }

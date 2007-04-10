@@ -64,6 +64,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = m_displayWickBoxes = false;
   m_displayFlame = true;
   m_drawShadowVolumes = false;
+  m_gammaCorrection = false;
 }
 
 void GLFlameCanvas::InitGL(bool recompileShaders)
@@ -101,6 +102,7 @@ void GLFlameCanvas::InitGL(bool recompileShaders)
   
   m_gammaEngine = new GammaEngine (m_width, m_height, recompileShaders);
   setGammaCorrection( m_currentConfig->gammaCorrection );
+  
 }
 
 void GLFlameCanvas::InitFlames(void)
@@ -508,7 +510,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
 	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);  
   }
-  m_gammaEngine->enableGamma();
+  if(m_gammaCorrection)
+    m_gammaEngine->enableGamma();
   if(!m_glowOnly){
     drawScene();
     /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
@@ -522,7 +525,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   }
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur();
-  m_gammaEngine->disableGamma();
+  if(m_gammaCorrection)
+    m_gammaEngine->disableGamma();
   
   /******** A VERIFIER *******/
   //   glFlush();

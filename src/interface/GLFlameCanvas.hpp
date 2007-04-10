@@ -102,6 +102,7 @@ public:
   void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
   void setBoundingSphereDisplay(bool display) { m_displayFlamesBoundingSpheres = display; };
   void setGammaCorrection(double gamma) { m_gammaEngine->SetGamma(gamma); };
+  void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
 private:
   void WriteFPS ();
   void DrawVelocity (void);
@@ -115,7 +116,7 @@ private:
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
-  bool m_drawShadowVolumes, m_displayFlamesBoundingSpheres, m_glowOnly;
+  bool m_drawShadowVolumes, m_displayFlamesBoundingSpheres, m_glowOnly, m_gammaCorrection;
   /** true si l'application est correctement initialisée, 0 sinon */
   bool m_init;
 

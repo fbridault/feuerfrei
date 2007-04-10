@@ -27,6 +27,7 @@ enum
     IDCHK_Glow,
     IDCHK_DP,
     IDCHK_SaveImages,
+    IDCHK_Gamma,
     IDSL_DP,
     IDSL_Gamma,
   };
@@ -115,6 +116,7 @@ public:
   void OnCheckGlow(wxCommandEvent& event);
   void OnCheckDepthPeeling(wxCommandEvent& event);
   void OnCheckSaveImages(wxCommandEvent& event);
+  void OnCheckGamma(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
   void OnSelectSolver(wxCommandEvent& event);
   void OnScrollDP(wxScrollEvent& event);
@@ -139,7 +141,7 @@ private:
 
   wxCheckBox *m_blendedSolidCheckBox;
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
-  wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox;
+  wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox, *m_gammaCheckBox;
   wxSlider *m_depthPeelingSlider, *m_gammaSlider;
   wxBoxSizer *m_mainSizer;
   

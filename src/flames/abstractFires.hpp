@@ -318,7 +318,7 @@ public:
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
   bool isVisible() { return m_visibility; };
-  double dist() { return m_dist; };
+  double getDistance() { return m_dist; };
 
   virtual bool operator<(const FireSource& other) const;
   
@@ -403,9 +403,13 @@ public:
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state);
   
+  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
+  
 private:
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;
+  /** Sphère englobante pour les flammes détachées. */
+  BoundingSphere m_boundingSphereForDetachedFlames;
 };
 
 #endif

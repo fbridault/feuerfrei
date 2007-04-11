@@ -221,7 +221,6 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 }
 
 bool FireSource::operator<(const FireSource& other) const{
-  cerr << "buive" << endl;
   return (m_dist < other.m_dist);
 }
 
@@ -243,9 +242,10 @@ DetachableFireSource::~DetachableFireSource()
 void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
 {
   if(m_visibility)
-    if(displayBoundingSphere)
+    if(displayBoundingSphere){
+      m_boundingSphereForDetachedFlames.draw();
       m_boundingSphere.draw();
-    else{
+    }else{
       Point pt(m_solver->getPosition());
       Point scale(m_solver->getScale());
       glPushMatrix();
@@ -283,6 +283,29 @@ void DetachableFireSource::build()
   averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
+    
+  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point pt;
+  /* Calcul de la bouding sphere pour les flammes détachées */
+  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+       flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+    pt = (*flamesIterator)->getTop();
+    if(pt.x > ptMax.x)
+      ptMax.x = pt.x;
+    if(pt.y > ptMax.y)
+      ptMax.y = pt.y;
+    if(pt.z > ptMax.z)
+      ptMax.z = pt.z;
+    pt = (*flamesIterator)->getBottom();
+    if(pt.x < ptMin.x)
+      ptMin.x = pt.x;
+    if(pt.y < ptMin.y)
+      ptMin.y = pt.y;
+    if(pt.z < ptMin.z)
+      ptMin.z = pt.z;
+  }
+  m_boundingSphereForDetachedFlames.centre = (ptMax + ptMin)/2.0+m_solver->getPosition();
+  m_boundingSphereForDetachedFlames.radius = ptMax.distance(ptMin)/2.0;
 }
 
 void DetachableFireSource::setSmoothShading (bool state)
@@ -291,4 +314,44 @@ void DetachableFireSource::setSmoothShading (bool state)
   for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
     (*flamesIterator)->setSmoothShading(state);
+}
+
+void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
+{  
+  bool save=m_visibility;
+  
+  if(forceSpheresBuild)
+    buildBoundingSphere();
+  
+  m_dist=m_boundingSphere.visibleDistance(view);
+  m_visibility = (m_dist) || m_boundingSphereForDetachedFlames.isVisible(view);
+  
+  if(m_visibility){
+    /* Il faut prendre en compte la taille de l'objet */
+    m_dist = m_dist - m_boundingSphere.radius;
+    if(m_dist > 5){
+//       cerr << 2000 << endl;
+      setSamplingTolerance(2000);
+      if(m_solver->isRealSolver())
+	m_solver->switchToFakeField();
+    }else{
+      if(!m_solver->isRealSolver())
+	m_solver->switchToRealSolver();
+      if(m_dist > 3){
+//  	cerr << 500 << endl;
+	setSamplingTolerance(500);
+      }else
+	if(m_dist > 2){
+//  	  cerr << 60 << endl;
+	  setSamplingTolerance(40);
+	}else{
+//  	  cerr << 25 << endl;
+	  setSamplingTolerance(20);
+	}
+    }
+    if(!save)
+      m_solver->setRunningState(true);
+  }else
+    if(save)
+      m_solver->setRunningState(false);
 }

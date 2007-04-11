@@ -186,13 +186,30 @@ public:
   
   void drawParticles() const
   {
-      uint i;
-      /* Déplacement et détermination du maximum */
-      for (i = 0; i < m_nbSkeletons; i++)
-	m_periSkeletons[i]->draw();
-      for (i = 0; i < m_nbLeadSkeletons; i++)
-	m_leadSkeletons[i]->draw();
+    uint i;
+    /* Déplacement et détermination du maximum */
+    for (i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->draw();
+    for (i = 0; i < m_nbLeadSkeletons; i++)
+      m_leadSkeletons[i]->draw();
   };
+  
+  virtual Point getTop() const
+  {
+    Point averagePos;
+    for (uint i = 0; i < m_nbLeadSkeletons; i++)
+      averagePos += *m_leadSkeletons[i]->getParticle(0);
+    averagePos = averagePos / m_nbLeadSkeletons;
+    return averagePos;
+  }
+  virtual Point getBottom() const
+  {
+    Point averagePos;
+    for (uint i = 0; i < m_nbLeadSkeletons; i++)
+      averagePos += *m_leadSkeletons[i]->getLastParticle();
+    averagePos = averagePos / m_nbLeadSkeletons;
+    return averagePos;
+  }
   
 protected:
   /** Pointeur vers les squelettes guide. */

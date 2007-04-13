@@ -64,7 +64,7 @@ bool FluidsApp::OnInit()
     return false;
   }
   
-  recompileShaders = areShadersCompiled();
+  //  recompileShaders = areShadersCompiled();
   
   /* Teste s'il est nécessaire de recompiler les shaders */
   FluidsFrame *frame = new FluidsFrame( _("Real-time Fluids - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
@@ -72,7 +72,7 @@ bool FluidsApp::OnInit()
   frame->Show(TRUE);
 
   SetTopWindow(frame);
-  frame->InitGLBuffer(recompileShaders);
-	
+  frame->InitGLBuffer();
+  
   return true;
 }

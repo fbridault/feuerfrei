@@ -335,8 +335,8 @@ void FluidsFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
 
 void FluidsFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 {
-  wxMessageBox(_("Real-time simulation of flames\nOasis Team"),
-	       _("About flames"), wxOK | wxICON_INFORMATION, this);
+  wxMessageBox(_("Real-time simulation of fluids\nOasis Team"),
+	       _("About fluids"), wxOK | wxICON_INFORMATION, this);
 }
 
 void FluidsFrame::OnGridMenu(wxCommandEvent& event)

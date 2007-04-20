@@ -82,7 +82,7 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>&
       Point pt;
       Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
       flameSolvers.push_back( field );
-      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .2, scene, (*objListIterator));
+      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, (*objListIterator));
       m_flames[i]->buildBoundingSphere( s->getPosition() );
     }
 }

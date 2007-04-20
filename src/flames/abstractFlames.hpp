@@ -278,12 +278,12 @@ public:
   /** Renvoie un pointeur vers le sommet de la flamme.
    * @return Pointeur vers le sommet.
    */
-  virtual Point* getTop() const = 0;
+  virtual Point getTop() const = 0;
   
   /** Renvoie un pointeur vers le bas de la flamme.
    * @return Pointeur vers le bas.
    */
-  virtual Point* getBottom() const = 0;
+  virtual Point getBottom() const = 0;
   
 };
 
@@ -347,8 +347,8 @@ public:
   virtual Vector getMainDirection() const = 0;  
   virtual Point getCenter () const = 0;
   
-  virtual Point* getTop() const = 0;
-  virtual Point* getBottom() const = 0;
+  virtual Point getTop() const = 0;
+  virtual Point getBottom() const = 0;
     
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;

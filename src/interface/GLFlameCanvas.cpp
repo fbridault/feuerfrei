@@ -65,6 +65,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_displayFlame = true;
   m_drawShadowVolumes = false;
   m_gammaCorrection = false;
+  m_displayFlamesBoundingVolumes = 0;
 }
 
 void GLFlameCanvas::InitGL()
@@ -477,7 +478,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       
       if(m_currentConfig->depthPeelingEnabled){
 	/* On décortique dans les calques */
-	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
+	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
 	
 	m_glowEngine->activate();
 	
@@ -500,7 +501,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	/* Dessin de la flamme */
 	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	     flamesIterator != m_flames.end (); flamesIterator++)
-	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
+	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
       }
       m_glowEngine->blur(m_flames);
     
@@ -508,7 +509,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     }else
       if(m_currentConfig->depthPeelingEnabled)
 	/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
-	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);  
+	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);  
   }
   if(m_gammaCorrection)
     m_gammaEngine->enableGamma();
@@ -521,7 +522,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       else
 	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	     flamesIterator != m_flames.end (); flamesIterator++)
-	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingSpheres);
+	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
   }
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur(m_flames);

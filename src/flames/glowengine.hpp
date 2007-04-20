@@ -83,11 +83,11 @@ private:
   uint m_scaleFactor[GLOW_LEVELS];
   
   /** Tableau contenant la largeur du filtre */
-  GLfloat m_offsets[GLOW_LEVELS+3][FILTER_SIZE];
+  GLfloat m_offsets[6][FILTER_SIZE];
   /** Tableau contenant les poids des pixels du filtre */
-  GLfloat m_weights[GLOW_LEVELS+1][FILTER_SIZE];
+  GLfloat m_weights[3][FILTER_SIZE];
   /** Diviseur correspondant à la somme des poids */
-  GLfloat m_divide[GLOW_LEVELS+1];
+  GLfloat m_divide[3];
   
   /** FBOs */
   FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS], m_visibilityFBO;

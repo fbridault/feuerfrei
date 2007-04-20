@@ -65,3 +65,40 @@ GraphicsFn::SolidDisk (GLdouble rayon, GLint slices, GLint loops)
      with gluQuadricTexture and/or gluQuadricOrientation. */
   gluDisk (quadObj, 0, rayon, slices, loops);
 }
+
+void
+GraphicsFn::SolidBox (const Point& ptMin, const Point& ptMax)
+{
+  glColor4f(1.0,1.0,0.0,0.0);
+  glBegin(GL_QUADS);
+  glVertex3f(ptMin.x,ptMin.y,ptMin.z);
+  glVertex3f(ptMin.x,ptMax.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMin.y,ptMin.z);
+
+  glVertex3f(ptMin.x,ptMin.y,ptMax.z);
+  glVertex3f(ptMax.x,ptMin.y,ptMax.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMax.z);
+  glVertex3f(ptMin.x,ptMax.y,ptMax.z);
+
+  glVertex3f(ptMin.x,ptMin.y,ptMin.z);
+  glVertex3f(ptMin.x,ptMin.y,ptMax.z);
+  glVertex3f(ptMin.x,ptMax.y,ptMax.z);
+  glVertex3f(ptMin.x,ptMax.y,ptMin.z);
+  
+  glVertex3f(ptMax.x,ptMin.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMax.z);
+  glVertex3f(ptMax.x,ptMin.y,ptMax.z);
+  
+  glVertex3f(ptMin.x,ptMin.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMin.y,ptMin.z);
+  glVertex3f(ptMax.x,ptMin.y,ptMax.z);
+  glVertex3f(ptMin.x,ptMin.y,ptMax.z);
+  
+  glVertex3f(ptMin.x,ptMax.y,ptMin.z);
+  glVertex3f(ptMin.x,ptMax.y,ptMax.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMax.z);
+  glVertex3f(ptMax.x,ptMax.y,ptMin.z);  
+  glEnd();
+}

@@ -28,6 +28,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_MENU(IDM_ShadowVolumes, FlamesFrame::OnShadowVolumesMenu)
   EVT_MENU(IDM_Hide, FlamesFrame::OnHideMenu)
   EVT_MENU(IDM_FBDS, FlamesFrame::OnFBDSMenu)
+  EVT_MENU(IDM_FBDB, FlamesFrame::OnFBDBMenu)
   EVT_MENU(IDM_Wired, FlamesFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, FlamesFrame::OnShadedMenu)
   EVT_MENU(IDM_SolversSettings, FlamesFrame::OnSolversMenu)
@@ -178,6 +179,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuDisplayFlames = new wxMenu;
   m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("&Hide"));
   m_menuDisplayFlames->AppendCheckItem( IDM_FBDS, _("&Bounding Spheres"));
+  m_menuDisplayFlames->AppendCheckItem( IDM_FBDB, _("&Bounding Boxes"));
   m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("&Wired"));
   m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("&Shaded"));
   m_menuDisplayFlames->Check(IDM_Shaded,true);
@@ -736,45 +738,40 @@ void FlamesFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
 
 void FlamesFrame::OnFBDSMenu(wxCommandEvent& event)
 {
-  if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
-    m_menuDisplayFlames->Check(IDM_Shaded,false);
-    m_glBuffer->setBoundingSphereDisplay(true);
-  }else
-    if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
-      m_menuDisplayFlames->Check(IDM_Wired,false);
-      m_glBuffer->setBoundingSphereDisplay(true);
-    }else
-      m_menuDisplayFlames->Check(IDM_FBDS,true);
+  m_menuDisplayFlames->Check(IDM_Shaded,false);
+  m_menuDisplayFlames->Check(IDM_Wired,false);
+  m_menuDisplayFlames->Check(IDM_FBDB,false);
+  m_menuDisplayFlames->Check(IDM_FBDS,true);
+  m_glBuffer->setBoundingVolumesDisplay(BOUNDING_SPHERE);
+}
+
+void FlamesFrame::OnFBDBMenu(wxCommandEvent& event)
+{
+  m_menuDisplayFlames->Check(IDM_Shaded,false);
+  m_menuDisplayFlames->Check(IDM_Wired,false);
+  m_menuDisplayFlames->Check(IDM_FBDB,true);
+  m_menuDisplayFlames->Check(IDM_FBDS,false);
+  m_glBuffer->setBoundingVolumesDisplay(BOUNDING_BOX);
 }
 
 void FlamesFrame::OnWiredMenu(wxCommandEvent& event)
 {
-  if(m_menuDisplayFlames->IsChecked(IDM_Shaded)){
-    m_glBuffer->setSmoothShading(false);
-    m_glBuffer->setBoundingSphereDisplay(false);
-    m_menuDisplayFlames->Check(IDM_Shaded,false);
-  }else
-    if(m_menuDisplayFlames->IsChecked(IDM_FBDS)){
-      m_glBuffer->setSmoothShading(false);
-      m_glBuffer->setBoundingSphereDisplay(false);
-      m_menuDisplayFlames->Check(IDM_FBDS,false);
-    }else
-      m_menuDisplayFlames->Check(IDM_Wired,true);
+  m_menuDisplayFlames->Check(IDM_Shaded,false);
+  m_menuDisplayFlames->Check(IDM_Wired,true);
+  m_menuDisplayFlames->Check(IDM_FBDS,false);
+  m_menuDisplayFlames->Check(IDM_FBDB,false);
+  m_glBuffer->setSmoothShading(false);
+  m_glBuffer->setBoundingVolumesDisplay(NO_BOUNDING_VOLUME);
 }
 
 void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 {
-  if(m_menuDisplayFlames->IsChecked(IDM_Wired)){
-    m_glBuffer->setSmoothShading(true);
-    m_glBuffer->setBoundingSphereDisplay(false);
-    m_menuDisplayFlames->Check(IDM_Wired,false);
-  }else
-    if(m_menuDisplayFlames->IsChecked(IDM_FBDS)){
-      m_glBuffer->setSmoothShading(true);
-      m_glBuffer->setBoundingSphereDisplay(false);
-      m_menuDisplayFlames->Check(IDM_FBDS,false);
-    }else
-      m_menuDisplayFlames->Check(IDM_Shaded,true);
+  m_menuDisplayFlames->Check(IDM_Shaded,true);
+  m_menuDisplayFlames->Check(IDM_Wired,false);
+  m_menuDisplayFlames->Check(IDM_FBDS,false);
+  m_menuDisplayFlames->Check(IDM_FBDB,false);
+  m_glBuffer->setSmoothShading(true);
+  m_glBuffer->setBoundingVolumesDisplay(false);
 }
 
 void FlamesFrame::OnSolversMenu(wxCommandEvent& event)

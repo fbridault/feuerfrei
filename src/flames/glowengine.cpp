@@ -37,28 +37,26 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
     m_secondPassFBOs[i].Activate();
     m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
     m_secondPassFBOs[i].RenderBufferAttach();
-  }  
-  for(int j=0; j < FILTER_SIZE; j++)
-    m_offsets[0][j] = j-FILTER_SIZE/2+1;
+  }
   
+  /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
+  for(int j=0; j < FILTER_SIZE; j++)
+    m_offsets[0][j] = j-FILTER_SIZE/2+1;  
+  /* Offsets gauches pour taille texture en entrée > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[1][j] = (j-FILTER_SIZE+1)*(int)(m_scaleFactor[1]);
-//     cerr << m_offsets[1][j] << endl;
-  }
-  
+  }  
+  /* Offsets droits pour taille texture en entrée > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[2][j] = j*(int)(m_scaleFactor[1]);
-//     cerr << m_offsets[2][j] << endl;
-  }
-  
+  }  
+  /* Offsets gauches pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[3][j] = (j-FILTER_SIZE+1);
-//     cerr << m_offsets[3][j] << endl;
-  }
-  
+  }  
+  /* Offsets droits pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[4][j] = j;
-//     cerr << m_offsets[4][j] << endl;
   }
   
   m_secondPassFBOs[GLOW_LEVELS-1].Deactivate();
@@ -117,8 +115,6 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   uint shaderIndex;
   
   glDepthFunc (GL_LEQUAL);
-//   glGetBooleanv(GL_LIGHTING,&params);
-//   cerr << (params == GL_FALSE) << endl;
   glBlendFunc (GL_ONE, GL_ZERO);
   
   /* Blur à la résolution de l'écran */
@@ -135,7 +131,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox ();
   
   m_programY.enable();
   m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
@@ -148,7 +144,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_secondPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox();
   
   /* Blur à une résolution inférieure */
   m_secondPassFBOs[1].Activate();
@@ -159,29 +155,27 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   glViewport (0, 0, m_width[1], m_height[1]);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
-  /* Partie X [-bandwidth/4;0] du filtre */
+  /* Partie X [-bandwidth/2;0] du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
   m_programX.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[1]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
-  //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox();
   
-  /* Partie X [0;bandwidth/4] du filtre */
+  /* Partie X [0;bandwidth/2] du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
   m_programX.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[2]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
-  //   drawTexOnScreen(m_width[0], m_height[0],m_firstPassTex[0]);
   m_firstPassTex[0]->bind();
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox();
     
-  /* Partie Y [-bandwidth/4;0] du filtre */
+  /* Partie Y [-bandwidth/2;0] du filtre */
   m_programY.enable();
   m_programY.setUniform1fv("offsets",m_offsets[3],FILTER_SIZE);
   m_programY.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
@@ -191,32 +185,28 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_firstPassFBOs[1].Activate();
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
-  //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox();
   
-  /* Partie Y [0;bandwidth/4] du filtre */
+  /* Partie Y [0;bandwidth/2] du filtre */
   m_programY.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
   m_programY.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[2]);
   m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
-  //drawTexOnScreen(m_width[1], m_height[1],m_secondPassTex[1]);
   m_secondPassTex[1]->bind();
   for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
        flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawFlame (true, false, true);
+    (*flamesIterator)->drawBoundingBox();
   
   m_programY.disable();
   
   glBlendFunc (GL_ONE, GL_ZERO);
-  //  glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   m_firstPassFBOs[1].Deactivate();
   
-//   glEnable (GL_DEPTH_TEST);
   glDepthFunc (GL_LESS);
 }
 
@@ -235,9 +225,8 @@ void GlowEngine::drawBlur(vector <FireSource *>& flames)
     m_firstPassTex[i]->bind();
     for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
 	 flamesIterator != flames.end (); flamesIterator++)
-      (*flamesIterator)->drawFlame (true, false, true);
+      (*flamesIterator)->drawBoundingBox();
   }
-  //    m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
 
   m_blurRendererProgram.disable();
   glDisable(GL_TEXTURE_RECTANGLE_ARB);

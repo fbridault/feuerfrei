@@ -56,7 +56,7 @@ DepthPeelingEngine::~DepthPeelingEngine()
   delete m_sceneDepthTex;
 }
   
-void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bool displayBoundingSphere)
+void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_char boundingVolume)
 {
   uint f,l;
   
@@ -100,7 +100,7 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, bo
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
       for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	   flamesIterator != m_flames->end (); flamesIterator++)
-	(*flamesIterator)->drawFlame (displayFlames, displayParticles, displayBoundingSphere);
+	(*flamesIterator)->drawFlame (displayFlames, displayParticles, boundingVolume);
       glEndList();
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */
@@ -131,7 +131,7 @@ void DepthPeelingEngine::render(vector <FireSource *>& flames)
     m_colorTex[l]->bind();
     for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
 	 flamesIterator != flames.end (); flamesIterator++)
-      (*flamesIterator)->drawFlame (true, false, true);
+      (*flamesIterator)->drawBoundingBox();
   }
   m_dpRendererProgram.disable();
     

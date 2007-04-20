@@ -1,6 +1,10 @@
 #if !defined(FIRE_H)
 #define FIRE_H
 
+#define NO_BOUNDING_VOLUME 0
+#define BOUNDING_SPHERE 1
+#define BOUNDING_BOX 2
+
 class FlameLight;
 class FireSource;
 
@@ -222,24 +226,45 @@ public:
    * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
    *
+   * @param display affiche ou non la flamme
    * @param displayParticle affiche ou non les particules des squelettes
+   * @parma boundingVolume Optionel, volume englobant à afficher: 0 aucun, 1 sphère, 2 boîte
    */
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
+  virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
   {
-    if(m_visibility)
-      if(displayBoundingSphere)
-	m_boundingSphere.draw();
-      else{
-	Point pt(m_solver->getPosition());
-	Point scale(m_solver->getScale());
-	glPushMatrix();
-	glTranslatef (pt.x, pt.y, pt.z);
-	glScalef (scale.x, scale.y, scale.z);
-	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle);
-	glPopMatrix();
+      switch(boundingVolume){
+      case BOUNDING_SPHERE : drawBoundingSphere(); break;
+      case BOUNDING_BOX : drawBoundingBox(); break;
+      default : 
+	if(m_visibility)
+	  {
+	    Point pt(m_solver->getPosition());
+	    Point scale(m_solver->getScale());
+	    glPushMatrix();
+	    glTranslatef (pt.x, pt.y, pt.z);
+	    glScalef (scale.x, scale.y, scale.z);
+	    for (uint i = 0; i < m_nbFlames; i++)
+	      m_flames[i]->drawFlame(display, displayParticle);
+	    glPopMatrix();
+	  }
+	break;
       }
   }
+  
+  virtual void drawBoundingSphere() const { if(m_visibility) m_boundingSphere.draw(); };
+  
+  virtual void drawBoundingBox() const
+  {
+    if(m_visibility){
+      Point position(getPosition());
+      Point scale(m_solver->getScale());
+      glPushMatrix();
+      glTranslatef (position.x, position.y, position.z);
+      glScalef (scale.x, scale.y, scale.z);
+      GraphicsFn::SolidBox(Point(),m_solver->getDim());
+      glPopMatrix();
+    }
+  };
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
@@ -382,8 +407,10 @@ public:
   virtual ~DetachableFireSource();
   
   virtual void build();
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const;
+  virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
   
+  virtual void drawBoundingBox () const;
+
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.
    */

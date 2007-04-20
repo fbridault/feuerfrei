@@ -49,8 +49,8 @@ public:
   
   virtual bool build();
   
-  Point* getTop() const { return m_source->getTop(); };
-  Point* getBottom() const { return m_source->getBottom(); };
+  Point getTop() const { return m_source->getTop(); };
+  Point getBottom() const { return m_source->getBottom(); };
   
 protected:
   const RealFlame *m_source;

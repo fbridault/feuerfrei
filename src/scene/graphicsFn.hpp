@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
-#include "texture.hpp"
+#include "../vector.hpp"
 
 /** Ensemble de fonctions statiques utilisées pour le dessin de la scène.
  *
@@ -18,6 +18,7 @@ public:
   static void SolidCylinder(GLdouble base, GLdouble height, GLint slices, GLint stacks);
   static void SolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
   static void SolidDisk (GLdouble rayon, GLint slices, GLint loops);
+  static void SolidBox (const Point& ptMin, const Point& ptMax);
 };
 
 #endif

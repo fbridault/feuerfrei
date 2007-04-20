@@ -136,37 +136,57 @@ public:
   /** Destructeur */
   virtual ~CandlesSet(){}; 
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
+  virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
   {
-    Point pt;
-    if(m_visibility)
-      if(displayBoundingSphere)
-	for (uint i = 0; i < m_nbFlames; i++){
-	  pt = m_flames[i]->getSolver()->getPosition();
-	  m_flames[i]->drawBoundingSphere();
-	}
-      else{
-	Point scale;
-	
-	pt = getPosition();
-	scale = m_solver->getScale();
-	glPushMatrix();
-	glTranslatef (pt.x, pt.y, pt.z);
-	glScalef (scale.x, scale.y, scale.z);
-      
-	for (uint i = 0; i < m_nbFlames; i++){
-	  pt = m_flames[i]->getSolver()->getPosition();
-	  scale =  m_flames[i]->getSolver()->getScale();
+    switch(boundingVolume){
+    case BOUNDING_SPHERE : drawBoundingSphere(); break;
+    case BOUNDING_BOX : drawBoundingBox(); break;
+    default : 
+      if(m_visibility)
+	{
+	  Point pt(m_solver->getPosition());
+	  Point scale(m_solver->getScale());	
+	  pt = getPosition();
+	  scale = m_solver->getScale();
 	  glPushMatrix();
 	  glTranslatef (pt.x, pt.y, pt.z);
 	  glScalef (scale.x, scale.y, scale.z);
-	  m_flames[i]->drawFlame(display, displayParticle);
+	  
+	  for (uint i = 0; i < m_nbFlames; i++){
+	    pt = m_flames[i]->getSolver()->getPosition();
+	    scale =  m_flames[i]->getSolver()->getScale();
+	    glPushMatrix();
+	    glTranslatef (pt.x, pt.y, pt.z);
+	    glScalef (scale.x, scale.y, scale.z);
+	    m_flames[i]->drawFlame(display, displayParticle);
+	    glPopMatrix();
+	  }
 	  glPopMatrix();
 	}
-	glPopMatrix();
+    }
+  };
+  
+  virtual void drawBoundingSphere() const
+  {
+    Point pt;
+    if(m_visibility)
+      for (uint i = 0; i < m_nbFlames; i++){
+	pt = m_flames[i]->getSolver()->getPosition();
+	m_flames[i]->drawBoundingSphere();
       }
   }
+
   
+  virtual void drawBoundingBox() const
+  {
+    Point pt;
+    if(m_visibility)
+      for (uint i = 0; i < m_nbFlames; i++){
+	pt = m_flames[i]->getSolver()->getPosition();
+	m_flames[i]->drawBoundingSphere();
+      }
+  }
+
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
 };
 
@@ -208,23 +228,26 @@ public:
     glPopMatrix();
   }
   
-  virtual void drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
+  virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
   {
-    if(m_visibility)
-      if(displayBoundingSphere)
-	m_boundingSphere.draw();
-      else{
-	Point pt(m_solver->getPosition());
-	Point scale(m_solver->getScale());
-	glPushMatrix();
-	glTranslatef (pt.x, pt.y, pt.z);
-	glScalef (scale.x, scale.y, scale.z);
-	for (uint i = 0; i < m_nbFlames; i++)
-	  m_flames[i]->drawFlame(display, displayParticle);
-	for (uint i = 0; i < m_nbCloneFlames; i++)
-	  m_cloneFlames[i]->drawFlame(display, displayParticle); 
-	glPopMatrix();
-      }
+    switch(boundingVolume){
+    case BOUNDING_SPHERE : drawBoundingSphere(); break;
+    case BOUNDING_BOX : drawBoundingBox(); break;
+    default : 
+      if(m_visibility)
+	{
+	  Point pt(m_solver->getPosition());
+	  Point scale(m_solver->getScale());
+	  glPushMatrix();
+	  glTranslatef (pt.x, pt.y, pt.z);
+	  glScalef (scale.x, scale.y, scale.z);
+	  for (uint i = 0; i < m_nbFlames; i++)
+	    m_flames[i]->drawFlame(display, displayParticle);
+	  for (uint i = 0; i < m_nbCloneFlames; i++)
+	    m_cloneFlames[i]->drawFlame(display, displayParticle); 
+	  glPopMatrix();
+	}
+    }
   }
   
   virtual void toggleSmoothShading (bool state);  

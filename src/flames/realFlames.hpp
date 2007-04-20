@@ -60,6 +60,22 @@ public:
     return direction;
   }
 
+  virtual bool build()
+  {
+    RealFlame::build();
+    top.resetToNull();
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      top += *((*skeletonsIterator)->getParticle(0));
+    top = top / (double)m_leadSkeletons.size();
+    
+    bottom.resetToNull();
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      bottom += *((*skeletonsIterator)->getRoot());
+    bottom = bottom / (double)m_leadSkeletons.size();
+  }
+  
   virtual Point getCenter () const
   {
     Point averagePos;    
@@ -71,8 +87,8 @@ public:
     return averagePos;
   }
   
-  Point* getTop() const { return m_leadSkeletons[m_nbLeadSkeletons/2]->getParticle(0); };  
-  Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };
+  Point getTop() const { return top; };  
+  Point getBottom() const { return bottom; };
 
   void breakCheck();
   
@@ -92,6 +108,8 @@ private:
   
   /** Largeur des flammes détachées */
   double m_detachedFlamesWidth;
+
+  Point top, bottom;
 };
 
 /**********************************************************************************************************************/
@@ -137,8 +155,8 @@ public:
     return (*m_leadSkeletons[0]->getMiddleParticle ());
   };
   
-  Point* getTop() const { return m_leadSkeletons[0]->getParticle(0); };
-  Point* getBottom() const { return m_leadSkeletons[0]->getRoot(); };
+  Point getTop() const { return *(m_leadSkeletons[0]->getParticle(0)); };
+  Point getBottom() const { return *(m_leadSkeletons[0]->getRoot()); };
   
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division.
    * Dans le cas d'une PointFlame, cette méthode ne fait rien du tout pour l'instant.

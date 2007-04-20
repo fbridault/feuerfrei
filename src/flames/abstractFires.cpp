@@ -48,7 +48,7 @@ void FlameLight::switchOn()
   GLfloat val_null[]={0.0,0.0,0.0,1.0};
   GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
   
-  /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
+  /* DÃ©finition de l'intensitÃ© lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
   glLightfv(m_light,GL_POSITION,m_lightPosition);
   glLightfv(m_light,GL_DIFFUSE,val_diffuse);
   glLightfv(m_light,GL_SPECULAR,val_specular);
@@ -118,7 +118,7 @@ FireSource::~FireSource()
   for (uint i = 0; i < m_nbFlames; i++)
     delete m_flames[i];
   delete[]m_flames;
-  /* On efface le luminaire, il n'appartient pas à la scène */
+  /* On efface le luminaire, il n'appartient pas Ã  la scÃ¨ne */
   
   for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
        luminaryIterator  != m_luminary.end (); luminaryIterator++)
@@ -146,20 +146,20 @@ void FireSource::computeIntensityPositionAndDirection()
   
   Vector o = getMainDirection();
   
-  // l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
+  // l'intensitÃ© est calculÃ©e Ã  partir du rapport de la longueur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
   m_intensity=o.length()*(m_solver->getScale().y)*m_intensityCoef;
   
    //  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
-  /* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
+  /* Fonction de smoothing pour Ã©viter d'avoir trop de fluctuation */
   m_intensity = sqrt(m_intensity);
   
-  // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
-  // de o projeté perpendiculairement dans ce plan
+  // l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnÃ©es
+  // de o projetÃ© perpendiculairement dans ce plan
 //   m_axeRotation.set(-o.z,0.0,o.x);
   
-//   // l'angle de rotation theta est la coordonnée sphérique correspondante
+//   // l'angle de rotation theta est la coordonnÃ©e sphÃ©rique correspondante
 //   y=o.y;
 //   r = (double)o.length();
 //   if(r - fabs(y) < EPSILON)
@@ -239,25 +239,28 @@ DetachableFireSource::~DetachableFireSource()
   m_detachedFlamesList.clear ();
 }
 
-void DetachableFireSource::drawFlame(bool display, bool displayParticle, bool displayBoundingSphere) const
+void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
 {
-  if(m_visibility)
-    if(displayBoundingSphere){
-      m_boundingSphereForDetachedFlames.draw();
-      m_boundingSphere.draw();
-    }else{
-      Point pt(m_solver->getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (pt.x, pt.y, pt.z);
-      glScalef (scale.x, scale.y, scale.z);
-      for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->drawFlame(display, displayParticle);
-      for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	   flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-	(*flamesIterator)->drawFlame(display, displayParticle);
-      glPopMatrix();
-    }
+  switch(boundingVolume){
+  case 1 : drawBoundingSphere(); break;
+  case 2 : drawBoundingBox(); break;
+  default : 
+    if(m_visibility)
+      {
+	Point pt(m_solver->getPosition());
+	Point scale(m_solver->getScale());
+	glPushMatrix();
+	glTranslatef (pt.x, pt.y, pt.z);
+	glScalef (scale.x, scale.y, scale.z);
+	for (uint i = 0; i < m_nbFlames; i++)
+	  m_flames[i]->drawFlame(display, displayParticle);
+	for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	     flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	  (*flamesIterator)->drawFlame(display, displayParticle);
+	glPopMatrix();
+      }
+    break;
+  }
 }
 
 void DetachableFireSource::build()
@@ -283,10 +286,10 @@ void DetachableFireSource::build()
   averagePos /= m_nbFlames;
   averagePos += getPosition();
   setLightPosition(averagePos);
-    
+
   Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   Point pt;
-  /* Calcul de la bouding sphere pour les flammes détachées */
+  /* Calcul de la bouding sphere pour les flammes dÃ©tachÃ©es */
   for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
        flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
     pt = (*flamesIterator)->getTop();
@@ -304,8 +307,16 @@ void DetachableFireSource::build()
     if(pt.z < ptMin.z)
       ptMin.z = pt.z;
   }
-  m_boundingSphereForDetachedFlames.centre = (ptMax + ptMin)/2.0+m_solver->getPosition();
-  m_boundingSphereForDetachedFlames.radius = ptMax.distance(ptMin)/2.0;
+  Point p;
+  double t,k;
+  p = (m_solver->getScale() * m_solver->getDim())/2.0;
+  t = p.max();
+  k = t*t;
+  m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
+  m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0)/2.0;
+  
+//   m_boundingSphereForDetachedFlames.radius = ptMax.distance(ptMin)/2.0;
+//   m_boundingSphereForDetachedFlames.centre = (ptMax + ptMin)/2.0+m_solver->getPosition();
 }
 
 void DetachableFireSource::setSmoothShading (bool state)
@@ -354,4 +365,46 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
   }else
     if(save)
       m_solver->setRunningState(false);
+}
+
+void DetachableFireSource::drawBoundingBox () const
+{
+  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point pt;
+  Point pos(m_solver->getPosition());
+  
+  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+       flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+    pt = (*flamesIterator)->getTop();
+    if(pt.x > ptMax.x)
+      ptMax.x = pt.x;
+    if(pt.y > ptMax.y)
+      ptMax.y = pt.y;
+    if(pt.z > ptMax.z)
+      ptMax.z = pt.z;
+    pt = (*flamesIterator)->getBottom();
+    if(pt.x < ptMin.x)
+      ptMin.x = pt.x;
+    if(pt.y < ptMin.y)
+      ptMin.y = pt.y;
+    if(pt.z < ptMin.z)
+      ptMin.z = pt.z;
+  }
+  pt = m_solver->getDim();
+  if(pt.x > ptMax.x)
+    ptMax.x = pt.x;
+  if(pt.y > ptMax.y)
+    ptMax.y = pt.y;
+  if(pt.z > ptMax.z)
+    ptMax.z = pt.z;
+  if(0.0 < ptMin.x)
+    ptMin.x = 0.0;
+  if(0.0 < ptMin.y)
+    ptMin.y = 0.0;
+  if(0.0 < ptMin.z)
+    ptMin.z = 0.0;
+  glPushMatrix();
+  glTranslatef(pos.x,pos.y,pos.z);
+  GraphicsFn::SolidBox(ptMin,ptMax);
+  glPopMatrix();
 }

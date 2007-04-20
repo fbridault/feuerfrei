@@ -72,7 +72,7 @@ public:
   DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, const vector <FireSource *> *flames);
   virtual ~DepthPeelingEngine();
   
-  void makePeels(bool displayFlames, bool displayParticles, bool displayBoundingSphere);
+  void makePeels(bool displayFlames, bool displayParticles, u_char boundingVolume);
   void render(vector <FireSource *>& flames);
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};

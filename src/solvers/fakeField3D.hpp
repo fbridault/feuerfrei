@@ -39,9 +39,9 @@ public:
     
 //     value.x += m_dt * m_forceCoef * m_src.x * (m_src.x < 0 ? pos.x/m_dim.x : (m_dim.x-pos.x/m_dim.x)) * (pos.y+.1)/m_dim.y;
 //     value.z += m_dt * m_forceCoef * m_src.z * (m_src.z < 0 ? pos.z/m_dim.z : (m_dim.z-pos.z/m_dim.z)) * (pos.y+.1)/m_dim.y;
-    value.x += m_dt * m_forceCoef * m_src.x * (pos.y+.1)/m_dim.y;
-    value.z += m_dt * m_forceCoef * m_src.z * (pos.y+.1)/m_dim.y;
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * (pos.y+.1)/m_dim.y + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
+    value.x += m_dt * m_forceCoef * m_src.x * ((pos.y/m_dim.y)+.1);
+    value.z += m_dt * m_forceCoef * m_src.z * ((pos.y/m_dim.y)+.1);
+    value.y += (m_dt * m_forceCoef) * (m_buoyancy * ((pos.y/m_dim.y)+.1) + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
     return value;
   };
   

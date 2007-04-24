@@ -6,6 +6,8 @@
 #include <wx/wx.h>
 #endif
 
+#define RESOLUTION_MIN 6
+
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
 HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
 				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
@@ -108,6 +110,22 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
   memset (m_uTmp, 0, m_nbVoxels * sizeof (double));
   memset (m_vTmp, 0, m_nbVoxels * sizeof (double));
   memset (m_wTmp, 0, m_nbVoxels * sizeof (double));
+
+  /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
+  if (m_nbVoxelsX < m_nbVoxelsY){
+    if (m_nbVoxelsX < m_nbVoxelsZ){
+      m_nbMaxDiv = (m_nbVoxelsX-RESOLUTION_MIN)/2;
+    }else{
+      m_nbMaxDiv = (m_nbVoxelsZ-RESOLUTION_MIN)/2;
+    }
+  }else{
+    if (m_nbVoxelsY < m_nbVoxelsZ){
+      m_nbMaxDiv = (m_nbVoxelsY-RESOLUTION_MIN)/2;
+    }else{
+      m_nbMaxDiv = (m_nbVoxelsZ-RESOLUTION_MIN)/2;
+    }
+  }
+  
 }
 
 LODHybridSolver3D::~LODHybridSolver3D ()
@@ -119,7 +137,7 @@ LODHybridSolver3D::~LODHybridSolver3D ()
 
 void LODHybridSolver3D::divideRes ()
 {
-  if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
+  if(m_nbVoxelsX < RESOLUTION_MIN || m_nbVoxelsY < RESOLUTION_MIN || m_nbVoxelsZ < RESOLUTION_MIN ){
     cerr << "Minimum grid resolution already reached !" << endl;
     return;
   }
@@ -159,7 +177,7 @@ void LODHybridSolver3D::divideRes ()
 
 void LODHybridSolver3D::decreaseRes ()
 {
-  if(m_nbVoxelsX < 4 || m_nbVoxelsY < 4 || m_nbVoxelsZ < 4 ){
+  if(m_nbVoxelsX < RESOLUTION_MIN || m_nbVoxelsY < RESOLUTION_MIN || m_nbVoxelsZ < RESOLUTION_MIN ){
     cerr << "Minimum grid resolution already reached !" << endl;
     return;
   }
@@ -212,7 +230,7 @@ void LODHybridSolver3D::multiplyRes ()
   
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
-    
+  
   /* Reconstruction des display lists */
   glDeleteLists(m_baseDisplayList,1);
   glDeleteLists(m_gridDisplayList,1);
@@ -231,7 +249,7 @@ void LODHybridSolver3D::multiplyRes ()
 
 void LODHybridSolver3D::increaseRes ()
 {  
-  if(m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
+  if( m_nbVoxelsX == initialNbVoxelsX || m_nbVoxelsY == initialNbVoxelsY || m_nbVoxelsZ > initialNbVoxelsZ ){
     cerr << "Maximum grid resolution already reached !" << endl;
     return;
   }

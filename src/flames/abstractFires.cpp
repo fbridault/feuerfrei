@@ -175,6 +175,7 @@ void FireSource::buildBoundingSphere ()
   p = (m_solver->getScale() * m_solver->getDim())/2.0;
   t = p.max();
   k = t*t;
+  
   m_boundingSphere.radius = sqrt(k+k);
   m_boundingSphere.centre = m_solver->getPosition() + p;
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
@@ -194,7 +195,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     if(m_dist > 5){
-//       cerr << 2000 << endl;
+      cerr << 2000 << endl;
       setSamplingTolerance(2000);
       if(m_solver->isRealSolver())
 	m_solver->switchToFakeField();
@@ -202,14 +203,14 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
       if(!m_solver->isRealSolver())
 	m_solver->switchToRealSolver();
       if(m_dist > 3){
-//  	cerr << 500 << endl;
+  	cerr << 500 << endl;
 	setSamplingTolerance(500);
       }else
 	if(m_dist > 2){
-//  	  cerr << 60 << endl;
+  	  cerr << 60 << endl;
 	  setSamplingTolerance(40);
 	}else{
-//  	  cerr << 25 << endl;
+  	  cerr << 25 << endl;
 	  setSamplingTolerance(20);
 	}
     }
@@ -229,6 +230,7 @@ DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig,
 					   uint index, const GLSLProgram* const program, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
 {
+  m_differenceDist = 0.0;
 }
 
 DetachableFireSource::~DetachableFireSource()
@@ -273,6 +275,7 @@ void DetachableFireSource::build()
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
   }
+  /* Destruction des flammes détachées en fin de vie */
   list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
   while( flamesIterator != m_detachedFlamesList.end()){
     if(!(*flamesIterator)->build()){
@@ -289,34 +292,36 @@ void DetachableFireSource::build()
 
   Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   Point pt;
-  /* Calcul de la bouding sphere pour les flammes détachées */
-  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-       flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
-    pt = (*flamesIterator)->getTop();
-    if(pt.x > ptMax.x)
-      ptMax.x = pt.x;
-    if(pt.y > ptMax.y)
-      ptMax.y = pt.y;
-    if(pt.z > ptMax.z)
-      ptMax.z = pt.z;
-    pt = (*flamesIterator)->getBottom();
-    if(pt.x < ptMin.x)
-      ptMin.x = pt.x;
-    if(pt.y < ptMin.y)
-      ptMin.y = pt.y;
-    if(pt.z < ptMin.z)
-      ptMin.z = pt.z;
-  }
   Point p;
   double t,k;
   p = (m_solver->getScale() * m_solver->getDim())/2.0;
   t = p.max();
   k = t*t;
-  m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
-  m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0)/2.0;
   
-//   m_boundingSphereForDetachedFlames.radius = ptMax.distance(ptMin)/2.0;
-//   m_boundingSphereForDetachedFlames.centre = (ptMax + ptMin)/2.0+m_solver->getPosition();
+  /* Calcul de la bouding sphere pour les flammes détachées */
+  if( m_detachedFlamesList.size () )
+    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+      pt = (*flamesIterator)->getTop();
+      if(pt.x > ptMax.x)
+	ptMax.x = pt.x;
+      if(pt.y > ptMax.y)
+	ptMax.y = pt.y;
+      if(pt.z > ptMax.z)
+	ptMax.z = pt.z;
+      pt = (*flamesIterator)->getBottom();
+      if(pt.x < ptMin.x)
+      ptMin.x = pt.x;
+      if(pt.y < ptMin.y)
+	ptMin.y = pt.y;
+      if(pt.z < ptMin.z)
+	ptMin.z = pt.z;
+      m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
+      m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0)/2.0;
+    }else{
+    m_boundingSphere.radius = sqrt(k+k);
+    m_boundingSphere.centre = m_solver->getPosition() + p;
+  }
 }
 
 void DetachableFireSource::setSmoothShading (bool state)
@@ -330,6 +335,8 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool save=m_visibility;
+  double distSave = m_dist;
+  const double INCREMENT=3.0;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -340,26 +347,16 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
   if(m_visibility){
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
-    if(m_dist > 5){
-//       cerr << 2000 << endl;
-      setSamplingTolerance(2000);
-      if(m_solver->isRealSolver())
-	m_solver->switchToFakeField();
-    }else{
-      if(!m_solver->isRealSolver())
-	m_solver->switchToRealSolver();
-      if(m_dist > 3){
-//  	cerr << 500 << endl;
-	setSamplingTolerance(500);
-      }else
-	if(m_dist > 2){
-//  	  cerr << 60 << endl;
-	  setSamplingTolerance(40);
-	}else{
-//  	  cerr << 25 << endl;
-	  setSamplingTolerance(20);
-	}
-    }
+    m_differenceDist += m_dist - distSave;
+    
+    if(m_differenceDist > INCREMENT){
+      m_solver->decreaseRes();
+      m_differenceDist -= INCREMENT;
+    }else
+      if(m_differenceDist < -INCREMENT){
+	if(m_dist < m_solver->getNbMaxDiv()*INCREMENT) m_solver->increaseRes();
+	m_differenceDist += INCREMENT;
+      }
     if(!save)
       m_solver->setRunningState(true);
   }else
@@ -403,6 +400,7 @@ void DetachableFireSource::drawBoundingBox () const
     ptMin.y = 0.0;
   if(0.0 < ptMin.z)
     ptMin.z = 0.0;
+  
   glPushMatrix();
   glTranslatef(pos.x,pos.y,pos.z);
   GraphicsFn::SolidBox(ptMin,ptMax);

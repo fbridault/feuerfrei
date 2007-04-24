@@ -437,6 +437,7 @@ private:
   list<DetachedFlame *> m_detachedFlamesList;
   /** Sphère englobante pour les flammes détachées. */
   BoundingSphere m_boundingSphereForDetachedFlames;
+  double m_differenceDist;
 };
 
 #endif

@@ -126,6 +126,8 @@ public:
   /** Augmente la résolution de la grille de un voxel */
   virtual void increaseRes () {};
   
+  virtual uint getNbMaxDiv () {};
+  
   /** Donne le type de solveur courant */
   virtual bool isRealSolver () const { return true; };
   /** Change de type de solveur à la volée, seulement valable pour les bi-solveurs */
@@ -167,6 +169,7 @@ protected:
   Point m_scale;
   
   double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
+  uint m_nbMaxDiv;
 };
 
 #endif

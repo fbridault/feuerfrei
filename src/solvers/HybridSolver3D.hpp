@@ -84,7 +84,7 @@ public:
   virtual void multiplyRes ();  
   virtual void decreaseRes ();  
   virtual void increaseRes ();
-  
+  virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
 private:
   double *m_uTmp, *m_vTmp, *m_wTmp;
 

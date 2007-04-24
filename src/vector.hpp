@@ -94,9 +94,7 @@ public:
    */
   GLdouble distance (const Point& P) const
   {
-    return(sqrt((x-P.x)*(x-P.x)+
-		(y-P.y)*(y-P.y)+
-		(z-P.z)*(z-P.z)));
+    return(sqrt((x-P.x)*(x-P.x)+ (y-P.y)*(y-P.y)+ (z-P.z)*(z-P.z)));
   };
   /** 
    * Obtenir un point obtenu en multipliant le point courant

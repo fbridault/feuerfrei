@@ -153,6 +153,7 @@ private:
   GLSLProgram *m_SVProgram;
   GLSLVertexShader *m_SVShader;
   GammaEngine *m_gammaEngine;
+  wxStopWatch *m_swatch;
   
   double *m_intensities;
   bool m_visibility;

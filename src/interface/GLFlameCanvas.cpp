@@ -20,7 +20,7 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_MIDDLE_UP(GLFlameCanvas::OnMouseClick)
   EVT_RIGHT_DOWN(GLFlameCanvas::OnMouseClick)
   EVT_RIGHT_UP(GLFlameCanvas::OnMouseClick)
-  EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
+EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
   EVT_CHAR(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
@@ -235,6 +235,8 @@ void GLFlameCanvas::InitScene()
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
   m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, &m_flames);
+  m_swatch = new wxStopWatch();
+  m_swatch->Pause();
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config)
@@ -247,7 +249,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
   
   InitScene();
   
-  ::wxStartTimer();
+  m_swatch->Start();
   
   m_init = true;
   
@@ -266,7 +268,7 @@ void GLFlameCanvas::Restart (void)
 //   InitUISettings();
   InitScene();
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
-  ::wxStartTimer();
+  m_swatch->Start();
   m_run = true;
   m_init = true;
   cerr << "Initialization over" << endl;
@@ -306,7 +308,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
   
-  ::wxStartTimer();
+  m_swatch->Start();
   m_run = true;
   m_init = true;
   cerr << "Initialization over" << endl;
@@ -541,10 +543,10 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   m_framesCount++;
   m_globalFramesCount++;
   
-  m_t = ::wxGetElapsedTime (false);
+  m_t = m_swatch->Time();
   if (m_t >= 2000){    
     ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
-    ::wxStartTimer();
+    m_swatch->Start();
     m_framesCount = 0;
   }
   

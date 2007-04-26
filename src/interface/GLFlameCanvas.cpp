@@ -362,6 +362,18 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
     for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
 	 solversIterator != m_solvers.end (); solversIterator++)
       (*solversIterator)->iterate ();
+    
+    /********** CONSTRUCTION DES FLAMMES *******************************/
+    //   if(m_framesCountForSwitch){
+    //     if(m_framesCountForSwitch == 6){
+    //       m_switch = false;
+    //       m_framesCountForSwitch = 0;
+    //     }else
+    //       m_framesCountForSwitch++;
+    //   }
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->build();
   }
   
   /* Force à redessiner */
@@ -432,33 +444,19 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   /* Déplacement du camera */
   m_camera->setView();
-  
-  /********** CONSTRUCTION DES FLAMMES *******************************/
-  // SDL_mutexP (lock);
-//   if(m_framesCountForSwitch){
-//     if(m_framesCountForSwitch == 6){
-//       m_switch = false;
-//       m_framesCountForSwitch = 0;
-//     }else
-//       m_framesCountForSwitch++;
-//   }
-  if(m_run && !m_switch)
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->build();
-  // SDL_mutexV (lock);
-  
-  /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
-  m_visibility = false;
-  if(m_displayFlame){
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      if((*flamesIterator)->isVisible()){
-	m_visibility = true;
-	break;
-      }
+    
+  if(m_run && !m_switch){
+    /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
+    m_visibility = false;
+    if(m_displayFlame){
+      for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	   flamesIterator != m_flames.end (); flamesIterator++)
+	if((*flamesIterator)->isVisible()){
+	  m_visibility = true;
+	  break;
+	}
+    }
   }
-  
   if(m_visibility || m_displayParticles){
     if(m_currentConfig->glowEnabled ){
       //    GLdouble m[4][4];

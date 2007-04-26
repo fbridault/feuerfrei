@@ -22,6 +22,8 @@ NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, u
   m_vknots = new GLfloat[m_vorder + NB_PARTICLES_MAX + m_nbFixedPoints];
   m_texTmp = new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints)];
   
+  m_uknotsCount = m_vknotsCount = 0;
+  
   /* Initialisation des pointeurs de sauvegarde des tableaux */
   m_ctrlPointsSave = m_ctrlPoints;
   m_texPointsSave = m_texPoints;
@@ -67,6 +69,8 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   m_vknots = new GLfloat[m_vorder + NB_PARTICLES_MAX + m_nbFixedPoints];
   m_texTmp = new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints)];
   
+  m_uknotsCount = m_vknotsCount = 0;
+  
   /* Initialisation des pointeurs de sauvegarde des tableaux */
   m_ctrlPointsSave = m_ctrlPoints;
   m_texPointsSave = m_texPoints;
@@ -107,12 +111,14 @@ NurbsFlame::~NurbsFlame()
 
 void NurbsFlame::drawNurbs () const
 {
-  gluBeginSurface (m_nurbs);
-  gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 2,
-		   2, m_texPoints, m_uorder, m_vorder, GL_MAP2_TEXTURE_COORD_2);
-  gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
-		   3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
-  gluEndSurface (m_nurbs);
+  if(m_uknotsCount){
+    gluBeginSurface (m_nurbs);
+    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 2,
+		     2, m_texPoints, m_uorder, m_vorder, GL_MAP2_TEXTURE_COORD_2);
+    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
+		     3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
+    gluEndSurface (m_nurbs);
+  }
 }
 
 void NurbsFlame::drawLineFlame () const

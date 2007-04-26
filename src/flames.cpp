@@ -79,7 +79,7 @@ bool FlamesApp::areShadersCompiled()
 
 bool FlamesApp::OnInit()
 {
-  bool recompileShaders;
+  //  bool recompileShaders;
   wxString configFileName;
 
   setlocale(LC_NUMERIC, "C");

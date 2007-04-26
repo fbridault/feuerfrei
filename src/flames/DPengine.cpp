@@ -58,7 +58,7 @@ DepthPeelingEngine::~DepthPeelingEngine()
   
 void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_char boundingVolume)
 {
-  uint f,l;
+  uint l;
   
   m_fbo.Activate();
   

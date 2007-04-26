@@ -126,7 +126,7 @@ public:
   /** Augmente la résolution de la grille de un voxel */
   virtual void increaseRes () {};
   
-  virtual uint getNbMaxDiv () {};
+  virtual uint getNbMaxDiv () { return 1; };
   
   /** Donne le type de solveur courant */
   virtual bool isRealSolver () const { return true; };

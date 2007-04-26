@@ -16,7 +16,7 @@ Field::Field (const Point& position, double timeStep, double buoyancy) : m_posit
   m_forceRatio = 1/m_forceCoef;
   m_run = true;
 }
- 
+
 Field::~Field ()
 {
   glDeleteLists(m_baseDisplayList,1);

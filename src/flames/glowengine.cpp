@@ -112,8 +112,6 @@ void GlowEngine::computeWeights(uint index, double sigma)
 
 void GlowEngine::blur(vector <FireSource *>& flames)
 {
-  uint shaderIndex;
-  
   glDepthFunc (GL_LEQUAL);
   glBlendFunc (GL_ONE, GL_ZERO);
   

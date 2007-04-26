@@ -206,7 +206,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   uint ceilx, ceily, ceilz;
   Point strength;
   Point force;
-  double factor = m_dim.y/(m_nbVoxelsY - 1);
+  //  double factor = m_dim.y/(m_nbVoxelsY - 1);
   
   if(move){
     force = position - m_position;
@@ -257,7 +257,6 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
 			       const Point& TRStrength, const Point& BRStrength)
 {
   uint i,j;
-  double inci,incj;
   
   switch(face){
   case LEFT_FACE :

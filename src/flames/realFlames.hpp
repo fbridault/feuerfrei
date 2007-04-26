@@ -62,18 +62,21 @@ public:
 
   virtual bool build()
   {
-    RealFlame::build();
-    top.resetToNull();
-    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-      top += *((*skeletonsIterator)->getParticle(0));
-    top = top / (double)m_leadSkeletons.size();
-    
-    bottom.resetToNull();
-    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-      bottom += *((*skeletonsIterator)->getRoot());
-    bottom = bottom / (double)m_leadSkeletons.size();
+    if(RealFlame::build()){
+      top.resetToNull();
+      for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+	top += *((*skeletonsIterator)->getParticle(0));
+      top = top / (double)m_leadSkeletons.size();
+      
+      bottom.resetToNull();
+      for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+	bottom += *((*skeletonsIterator)->getRoot());
+      bottom = bottom / (double)m_leadSkeletons.size();
+      return true;
+    }
+    return false;
   }
   
   virtual Point getCenter () const

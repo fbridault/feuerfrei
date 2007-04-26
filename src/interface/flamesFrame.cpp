@@ -94,7 +94,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   LoadSettings();
   
   m_currentConfig.gammaCorrection = 1;
-  m_gammaSlider->SetValue(m_currentConfig.gammaCorrection*100);
+  m_gammaSlider->SetValue((int)m_currentConfig.gammaCorrection*100);
   
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );

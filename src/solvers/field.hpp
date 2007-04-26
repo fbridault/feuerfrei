@@ -12,13 +12,10 @@
 
 #include "../common.hpp"
 
-class Field;
-
-/** La classe Solver propose une implémentation de la méthode stable implicite semi-lagrangienne de Stam.
- * A noter que dans le cadre de notre modèle de flamme, le champ de densité n'est pas utilisé, ce qui,
- * physiquement semble assez curieux (d'après Alexei). 
+/** La Field est une interface basique pour tous les champs de vélocité, sans notion de dimension
+ * qui est apportée par ses filles Field2D et Field3D.
  * 
- * @author	Flavien Bridault et Michel Lebond.
+ * @author	Flavien Bridault.
  */
 class Field
 {

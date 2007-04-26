@@ -7,7 +7,7 @@ PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const
   m_scene = s;
   m_flames = flames;
 
-  sprintf(macro,"#define NBSOURCES %d\n",m_flames->size());
+  sprintf(macro,"#define NBSOURCES %d\n",(int)m_flames->size());
   
   m_centers = new GLfloat[m_flames->size()*3];
   m_intensities = new GLfloat[m_flames->size()];

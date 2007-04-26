@@ -78,8 +78,6 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   m_texture(texname, GL_CLAMP, GL_REPEAT)
 {  
   char mtlName[255];
-  uint i;
-  uint nbObj;
   
   m_solver = s;
   

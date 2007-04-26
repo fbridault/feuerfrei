@@ -87,6 +87,8 @@ bool FlamesApp::OnInit()
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
   
+  wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
+  
   if(argc == 2){
     configFileName = wxString(argv[1]);
   }else

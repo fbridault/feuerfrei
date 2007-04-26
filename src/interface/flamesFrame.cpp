@@ -65,7 +65,8 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
+  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER);
+  m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
   
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
 				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);

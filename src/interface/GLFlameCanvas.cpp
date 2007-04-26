@@ -379,7 +379,6 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
   /* Force à redessiner */
   this->Refresh();
   
-  /*  draw();*/
   //event.RequestMore();
 }
 
@@ -530,7 +529,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     m_gammaEngine->disableGamma();
   
   /******** A VERIFIER *******/
-  //   glFlush();
+  //glFlush();
   //glFinish();
   /***************************/
   SwapBuffers ();

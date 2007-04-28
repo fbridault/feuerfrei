@@ -1,13 +1,11 @@
 #include "DPengine.hpp"
 
-DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, 
-				       const vector <FireSource *> *flames)
+DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene)
 {
   m_width = width;
   m_height = height;
   m_nbLayers = m_nbLayersMax = nbLayers;
   m_scene = scene;
-  m_flames = flames;
   
   m_fbo.Initialize(m_width,m_height);
   
@@ -21,7 +19,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, c
     "TEX R1.x, fragment.position, texture[1], SHADOWRECT;\n"
     "TEX R2.x, fragment.position, texture[2], SHADOWRECT;\n"
     // KIL supprime le fragment si une des composantes du vecteur est nulle
-    // On place donc le résultat de {0,1} en {-.5;.5}
+    // On place donc le rÃ©sultat de {0,1} en {-.5;.5}
     "ADD R1.x, R1.x, -0.5;\n"
     "KIL R1.x;\n"
     "ADD R2.x, R2.x, -0.5;\n"
@@ -56,17 +54,18 @@ DepthPeelingEngine::~DepthPeelingEngine()
   delete m_sceneDepthTex;
 }
   
-void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_char boundingVolume)
+void DepthPeelingEngine::makePeels(const vector <FireSource *>& flames, bool displayFlames, 
+				   bool displayParticles, u_char boundingVolume)
 {
   uint l;
   
   m_fbo.Activate();
   
-  /* On désactive l'écriture dans le color buffer */
+  /* On dÃ©sactive l'Ã©criture dans le color buffer */
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
-  /* On stocke la profondeur de la scène dans une texture qui servira */
-  /* comme deuxième test de profondeur pour le depth peeling */
+  /* On stocke la profondeur de la scÃ¨ne dans une texture qui servira */
+  /* comme deuxiÃ¨me test de profondeur pour le depth peeling */
   /* Il y a donc en tout trois tests de profondeur */
   m_fbo.DepthAttach(m_sceneDepthTex->getTexture());
   
@@ -79,6 +78,7 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_
   
   m_curDepthTex = 0;
   
+  glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
   for(l=0; l <= m_nbLayers; l++){
     // On effectue le rendu dans le FBO
@@ -98,13 +98,13 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
-      for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
-	   flamesIterator != m_flames->end (); flamesIterator++)
+      for (vector < FireSource* >::const_iterator flamesIterator = flames.begin ();
+	   flamesIterator != flames.end (); flamesIterator++)
 	(*flamesIterator)->drawFlame (displayFlames, displayParticles, boundingVolume);
       glEndList();
     }else{
-      /* Pour les layers > 0, le premier test de profondeur est effectué avec */
-      /* la profondeur de la passe précédente */
+      /* Pour les layers > 0, le premier test de profondeur est effectuÃ© avec */
+      /* la profondeur de la passe prÃ©cÃ©dente */
       m_depthTex[1-m_curDepthTex]->bind();
       glCallList(m_flamesDisplayList);
     }
@@ -112,14 +112,16 @@ void DepthPeelingEngine::makePeels(bool displayFlames, bool displayParticles, u_
     
     m_curDepthTex = 1 - m_curDepthTex;
   }
+  glDisable (GL_BLEND);
   m_fbo.Deactivate();
   
   glDeleteLists(m_flamesDisplayList,1);
 }
 
-void DepthPeelingEngine::render(vector <FireSource *>& flames)
+void DepthPeelingEngine::render(const vector <FireSource *>& flames)
 {   
   glDepthFunc (GL_LEQUAL);
+  glEnable (GL_BLEND);
   glBlendFunc (GL_ONE, GL_ONE);
   
   glActiveTexture(GL_TEXTURE0_ARB);
@@ -129,12 +131,13 @@ void DepthPeelingEngine::render(vector <FireSource *>& flames)
   m_dpRendererProgram.setUniform1i("text",0);
   for(int l=m_nbLayers; l >= 0 ; l--){
     m_colorTex[l]->bind();
-    for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
+    for (vector < FireSource* >::const_iterator flamesIterator = flames.begin ();
 	 flamesIterator != flames.end (); flamesIterator++)
       (*flamesIterator)->drawBoundingBox();
   }
   m_dpRendererProgram.disable();
     
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
+  glDisable (GL_BLEND);
   glDepthFunc (GL_LESS);
 }

@@ -77,8 +77,7 @@ void GLFlameCanvas::InitGL()
   glViewport (0, 0, m_width, m_height);
   
   glEnable (GL_DEPTH_TEST);
-  glEnable (GL_BLEND);
-  //glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glDisable (GL_BLEND);
   
   glShadeModel (GL_SMOOTH);
   glEnable (GL_LINE_SMOOTH);
@@ -91,7 +90,6 @@ void GLFlameCanvas::InitGL()
   glEnable (GL_NORMALIZE);
   
   glPolygonMode(GL_FRONT,GL_FILL);
-  //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   
   glDisable (GL_LIGHTING);
   
@@ -234,7 +232,7 @@ void GLFlameCanvas::InitScene()
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
-  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene, &m_flames);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene);
   m_swatch = new wxStopWatch();
   m_swatch->Pause();
 }
@@ -477,7 +475,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       
       if(m_currentConfig->depthPeelingEnabled){
 	/* On décortique dans les calques */
-	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	m_depthPeelingEngine->makePeels(m_flames, m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
 	
 	m_glowEngine->activate();
 	
@@ -487,28 +485,31 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	m_depthPeelingEngine->render(m_flames);
       }else{
 	m_glowEngine->activate();
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glBlendColor(.2,.2,.2,1.0);
-	glBlendFunc (GL_ONE, GL_CONSTANT_COLOR);
 	
-	/* Dessin de la scène sans les textures pour avoir les occlusions sur les flammes */
-	glDrawBuffer(GL_NONE);
-	glReadBuffer(GL_NONE);
-	m_scene->drawSceneWT ();
-	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+	/* Dessin de la scène dans le depth buffer sans les textures pour avoir les occlusions sur les flammes */
+	glClear(GL_DEPTH_BUFFER_BIT);
+ 	glDrawBuffer(GL_NONE);
+ 	glReadBuffer(GL_NONE);
+ 	m_scene->drawSceneWT ();
+ 	glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+ 	glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+	
+	glClear(GL_COLOR_BUFFER_BIT);
+	glEnable(GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	/* Dessin de la flamme */
 	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	     flamesIterator != m_flames.end (); flamesIterator++)
 	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	glDisable(GL_BLEND);
       }
       m_glowEngine->blur(m_flames);
-    
+      
       m_glowEngine->deactivate();
     }else
       if(m_currentConfig->depthPeelingEnabled)
 	/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
-	m_depthPeelingEngine->makePeels(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);  
+	m_depthPeelingEngine->makePeels(m_flames, m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
   }
   if(m_gammaCorrection)
     m_gammaEngine->enableGamma();
@@ -528,10 +529,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   if(m_gammaCorrection)
     m_gammaEngine->disableGamma();
   
-  /******** A VERIFIER *******/
-  //glFlush();
+  /* Permet d'attendre que toutes les commandes OpenGL soient bien effectuées avant de faire le rendu */
+  /* La différence n'est pas forcément visible en pratique, cela supprime surtout quelques petits bugs d'affichage */
+  /* potentiels, par contre le framerate en prend un sacré coup !! */
+  /* Dans l'idéal, je pense donc qu'il serait utile de placer du code CPU ici ! */
   //glFinish();
-  /***************************/
   SwapBuffers ();
   
   //event.Skip();
@@ -566,12 +568,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void GLFlameCanvas::drawScene()
 {
   Point position, scale;
-  
-  if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  else
-    glBlendFunc (GL_ONE, GL_ZERO);
-  
+    
   if (m_currentConfig->shadowsEnabled)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   else
@@ -582,13 +579,17 @@ void GLFlameCanvas::drawScene()
     (*flamesIterator)->drawWick (m_displayWickBoxes);
   
   /**** Affichage de la scène ****/  
-  if (m_drawShadowVolumes)
+  if (m_drawShadowVolumes){
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
 	 flamesIterator != m_flames.end (); flamesIterator++)
       (*flamesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
-  
+    glDisable(GL_BLEND);
+  }
+   
   if (m_currentConfig->shadowsEnabled)
-    castShadows();  
+    castShadows();
   else
     if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
@@ -602,6 +603,7 @@ void GLFlameCanvas::drawScene()
     }
   
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
+  glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
   if(m_currentConfig->useGlobalField){
@@ -633,71 +635,8 @@ void GLFlameCanvas::drawScene()
 	(*solversIterator)->displayVelocityField();
       glPopMatrix ();
     }
+  glDisable (GL_BLEND);
 }
-// void
-// GLFlameCanvas::cast_shadows_double_multiple ()
-// {
-//   switch_off_lights ();
-//   m_scene->drawSceneWTEX ();
-
-//   glBlendFunc (GL_ONE, GL_ONE);
-//   for (int i = 0; i < 1 /*m_nbLights *//**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-//     {
-//       enable_only_ambient_light (i);
-//       glClear (GL_STENCIL_BUFFER_BIT);
-//       glDepthFunc (GL_LESS);
-//       glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |
-// 		    GL_POLYGON_BIT | GL_STENCIL_BUFFER_BIT);
-
-//       glColorMask (0, 0, 0, 0);
-//       glDepthMask (0);
-
-//       glDisable (GL_CULL_FACE);
-//       glEnable (GL_STENCIL_TEST);
-//       glEnable (GL_STENCIL_TEST_TWO_SIDE_EXT);
-
-//       glActiveStencilFaceEXT (GL_BACK);
-//       glStencilOp (GL_KEEP,	// stencil test fail
-// 		   GL_DECR_WRAP_EXT,	// depth test fail
-// 		   GL_KEEP);	// depth test pass
-//       glStencilMask (~0);
-//       glStencilFunc (GL_ALWAYS, 0, ~0);
-
-//       glActiveStencilFaceEXT (GL_FRONT);
-//       glStencilOp (GL_KEEP,	// stencil test fail
-// 		   GL_INCR_WRAP_EXT,	// depth test fail
-// 		   GL_KEEP);	// depth test pass
-//       glStencilMask (~0);
-//       glStencilFunc (GL_ALWAYS, 0, ~0);
-
-//       draw_shadowVolume2 (i);
-
-//       glPopAttrib ();
-
-//       glDepthFunc (GL_EQUAL);
-
-//       glEnable (GL_STENCIL_TEST);
-//       glStencilFunc (GL_EQUAL, 0, ~0);
-//       glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-
-//       m_scene->drawSceneWTEX ();
-      
-//       reset_diffuse_light (i);
-//     }
-//   glDisable (GL_STENCIL_TEST);
-//   for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-//     {
-//       enable_only_ambient_light (i);
-//     }
-//   m_scene->drawSceneWTEX ();
-//   for (int i = 0; i < m_nbLights /**SHADOW_SAMPLE_PER_LIGHT*/ ; i++)
-//     {
-//       reset_diffuse_light (i);
-//     }
-//   switch_on_lights ();
-//   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-//   m_scene->drawScene ();
-// }
 
 void GLFlameCanvas::OnSize(wxSizeEvent& event)
 {
@@ -763,6 +702,7 @@ void GLFlameCanvas::castShadows ()
   
   glStencilFunc (GL_EQUAL, 0, ~0);
   glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  glEnable(GL_BLEND);
   glBlendFunc (GL_ONE, GL_ONE);
   
   /* Activation de l'éclairage ambiant uniquement */
@@ -792,4 +732,5 @@ void GLFlameCanvas::castShadows ()
     glDisable (GL_LIGHTING);
     m_photoSolid->draw(m_currentConfig->BPSEnabled);
   }
+  glDisable(GL_BLEND);
 }

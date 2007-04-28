@@ -113,7 +113,6 @@ void GlowEngine::computeWeights(uint index, double sigma)
 void GlowEngine::blur(vector <FireSource *>& flames)
 {
   glDepthFunc (GL_LEQUAL);
-  glBlendFunc (GL_ONE, GL_ZERO);
   
   /* Blur à la résolution de l'écran */
   m_programX.enable();
@@ -148,6 +147,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_secondPassFBOs[1].Activate();
   m_programX.enable();
   glBlendColor(0.6,0.6,0.6,1.0);
+  glEnable (GL_BLEND);
   glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
   
   glViewport (0, 0, m_width[1], m_height[1]);
@@ -200,8 +200,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
     (*flamesIterator)->drawBoundingBox();
   
   m_programY.disable();
-  
-  glBlendFunc (GL_ONE, GL_ZERO);
+  glDisable(GL_BLEND);
   
   m_firstPassFBOs[1].Deactivate();
   
@@ -211,6 +210,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
 void GlowEngine::drawBlur(vector <FireSource *>& flames)
 {
   glDepthFunc (GL_LEQUAL);
+  glEnable (GL_BLEND);
   glBlendFunc (GL_ONE, GL_ONE);
     
   glActiveTextureARB(GL_TEXTURE0);
@@ -229,4 +229,5 @@ void GlowEngine::drawBlur(vector <FireSource *>& flames)
   m_blurRendererProgram.disable();
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   glDepthFunc (GL_LESS);
+  glDisable (GL_BLEND);
 }

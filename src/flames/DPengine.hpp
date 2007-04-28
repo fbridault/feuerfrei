@@ -69,11 +69,19 @@ public:
    * @param  indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene, const vector <FireSource *> *flames);
+  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene);
   virtual ~DepthPeelingEngine();
   
-  void makePeels(bool displayFlames, bool displayParticles, u_char boundingVolume);
-  void render(vector <FireSource *>& flames);
+  /** Epluche les flammes en fonction de leur profondeur en plusieurs calques. Une fois cette méthode appelée,
+   * il faut utiliser la méthode render() pour afficher les flammes.<br>
+   * @param flames Vecteur contenant les flammes.
+   * @param displayFlames Indique si les flammes doivent être affichées.
+   * @param displayParticles Indique si les particules doivent être affichées.
+   * @param boundingVolume Le cas échéant, volume englobant à afficher à la place des flammes.
+   * (le paramètre displayFlames doit tout de même être à <i>true</i> pour les visualiser)
+   */
+  void makePeels(const vector <FireSource *>& flames, bool displayFlames, bool displayParticles, u_char boundingVolume);
+  void render(const vector <FireSource *>& flames);
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};
   void removeLayer() { m_nbLayers = (m_nbLayers > 0) ? m_nbLayers-1 : m_nbLayers;};
@@ -95,7 +103,6 @@ private:
   GLuint m_curDepthTex;
 
   const Scene *m_scene;
-  const vector <FireSource *> *m_flames;
   
   ARBFragmentShader m_peelProgram;
   GLSLProgram m_dpRendererProgram;

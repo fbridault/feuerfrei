@@ -20,7 +20,7 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_MIDDLE_UP(GLFlameCanvas::OnMouseClick)
   EVT_RIGHT_DOWN(GLFlameCanvas::OnMouseClick)
   EVT_RIGHT_UP(GLFlameCanvas::OnMouseClick)
-EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
+  EVT_MOUSEWHEEL(GLFlameCanvas::OnMouseWheel)
   EVT_CHAR(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
@@ -47,6 +47,12 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 GLFlameCanvas::~GLFlameCanvas()
 {
+  /* Arrêt des threads */
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++){
+    (*threadsIterator)->Stop();
+    (*threadsIterator)->Wait();
+  }
   DestroyScene();
   delete [] m_pixels;
   if( m_intensities ) delete [] m_intensities;
@@ -209,6 +215,38 @@ void GLFlameCanvas::InitSolvers(void)
   prevNbSolvers = m_currentConfig->nbSolvers;
 }
 
+void GLFlameCanvas::InitThreads()
+{
+  uint i=0;
+  FieldFlamesAssociation *fieldFlamesAssociation;
+
+  for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
+       solversIterator != m_solvers.end (); solversIterator++, i++){
+    fieldFlamesAssociation = new FieldFlamesAssociation(*solversIterator);
+    /* Ajout des flammes concernées par chaque solveur dans le thread correspondant */
+    for(uint j=0 ; j < m_currentConfig->nbFlames; j++)
+      if(m_currentConfig->flames[j].solverIndex == i)
+	fieldFlamesAssociation->addFireSource(m_flames[j]);
+    
+    m_fieldFlamesAssociations.push_back(fieldFlamesAssociation);
+    /* Instanciation des threads : 1 solveur = 1 thread */
+    m_threads.push_back(new FieldThread(fieldFlamesAssociation));
+  }
+  
+  for (list <FieldThread *>::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++)    
+    /* Création proprement dite du thread, il ne reste plus qu'à le lancer avec Run() */
+    if ( (*threadsIterator)->Create() != wxTHREAD_NO_ERROR )
+      {
+	wxLogError(_("Can't create thread!"));
+      }
+  
+  /* Lancement des threads */
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++)
+    (*threadsIterator)->Run();
+}
+
 void GLFlameCanvas::InitScene()
 {  
   uint glowScales[2] = { 1, 4 };
@@ -232,9 +270,12 @@ void GLFlameCanvas::InitScene()
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping, m_scene);
   
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
-  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX, m_scene);
+  m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX);
+  
   m_swatch = new wxStopWatch();
   m_swatch->Pause();
+  
+  InitThreads();
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config)
@@ -258,14 +299,20 @@ void GLFlameCanvas::Restart (void)
 {
   Disable();
   m_init = false;
+  /* Arrêt des threads */
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++){
+    (*threadsIterator)->Stop();
+    (*threadsIterator)->Wait();
+  }
   DestroyScene();
   
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   glViewport (0, 0, m_width, m_height);
   
-//   InitUISettings();
-  InitScene();
   setNbDepthPeelingLayers(m_currentConfig->nbDepthPeelingLayers);
+  
+  InitScene();
   m_swatch->Start();
   m_run = true;
   m_init = true;
@@ -277,6 +324,19 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
 {
   Disable();
   m_init = false;
+  /* Arrêt des threads */
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++){
+    (*threadsIterator)->Stop();
+    (*threadsIterator)->Wait();
+    delete (*threadsIterator);
+  }
+  m_threads.clear();
+  
+  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
+       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++)
+    delete (*ffaIterator);
+  m_fieldFlamesAssociations.clear();
   
   delete m_photoSolid;
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
@@ -295,7 +355,6 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
   }
   
   InitSolvers();
-  
   InitFlames();
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
@@ -306,6 +365,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
 				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
 				    m_currentConfig->globalField.epsilon);
   
+  InitThreads();
   m_swatch->Start();
   m_run = true;
   m_init = true;
@@ -328,6 +388,16 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_scene;
   delete m_photoSolid;
   
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++)
+    delete (*threadsIterator);
+  m_threads.clear();
+  
+  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
+       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++)
+    delete (*ffaIterator);
+  m_fieldFlamesAssociations.clear();
+  
   for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
        flamesIterator != m_flames.end (); flamesIterator++)
     delete (*flamesIterator);
@@ -346,20 +416,10 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run && m_init){
-    if(m_currentConfig->useGlobalField)
-      m_globalField->cleanSources ();
-    for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-	 solversIterator != m_solvers.end (); solversIterator++)
-      (*solversIterator)->cleanSources ();
+//     if(m_currentConfig->useGlobalField)
+//       m_globalField->cleanSources ();
     
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->addForces ();
-    
-    if(m_currentConfig->useGlobalField) m_globalField->iterate();
-    for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-	 solversIterator != m_solvers.end (); solversIterator++)
-      (*solversIterator)->iterate ();
+//     if(m_currentConfig->useGlobalField) m_globalField->iterate();
     
     /********** CONSTRUCTION DES FLAMMES *******************************/
     //   if(m_framesCountForSwitch){
@@ -369,9 +429,6 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
     //     }else
     //       m_framesCountForSwitch++;
     //   }
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->build();
   }
   
   /* Force à redessiner */
@@ -454,6 +511,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	}
     }
   }
+  
   if(m_visibility || m_displayParticles){
     if(m_currentConfig->glowEnabled ){
       //    GLdouble m[4][4];
@@ -475,7 +533,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       
       if(m_currentConfig->depthPeelingEnabled){
 	/* On décortique dans les calques */
-	m_depthPeelingEngine->makePeels(m_flames, m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	m_depthPeelingEngine->makePeels(this, m_scene);
 	
 	m_glowEngine->activate();
 	
@@ -497,10 +555,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	/* Dessin de la flamme */
-	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	     flamesIterator != m_flames.end (); flamesIterator++)
-	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	drawFlames();
 	glDisable(GL_BLEND);
       }
       m_glowEngine->blur(m_flames);
@@ -509,7 +564,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     }else
       if(m_currentConfig->depthPeelingEnabled)
 	/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
-	m_depthPeelingEngine->makePeels(m_flames, m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	m_depthPeelingEngine->makePeels(this, m_scene);
   }
   if(m_gammaCorrection)
     m_gammaEngine->enableGamma();
@@ -520,9 +575,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       if(m_currentConfig->depthPeelingEnabled)
 	m_depthPeelingEngine->render(m_flames);
       else
-	for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	     flamesIterator != m_flames.end (); flamesIterator++)
-	  (*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	drawFlames();
   }
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur(m_flames);

@@ -1,11 +1,11 @@
 #include "DPengine.hpp"
+#include "../interface/GLFlameCanvas.hpp"
 
-DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene)
+DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
 {
   m_width = width;
   m_height = height;
   m_nbLayers = m_nbLayersMax = nbLayers;
-  m_scene = scene;
   
   m_fbo.Initialize(m_width,m_height);
   
@@ -54,8 +54,7 @@ DepthPeelingEngine::~DepthPeelingEngine()
   delete m_sceneDepthTex;
 }
   
-void DepthPeelingEngine::makePeels(const vector <FireSource *>& flames, bool displayFlames, 
-				   bool displayParticles, u_char boundingVolume)
+void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene)
 {
   uint l;
   
@@ -71,7 +70,7 @@ void DepthPeelingEngine::makePeels(const vector <FireSource *>& flames, bool dis
   
   glClear(GL_DEPTH_BUFFER_BIT);
 
-  m_scene->drawSceneWT();
+  scene->drawSceneWT();
   
   glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
   glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
@@ -98,9 +97,7 @@ void DepthPeelingEngine::makePeels(const vector <FireSource *>& flames, bool dis
       m_depthTex[2]->bind();
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
-      for (vector < FireSource* >::const_iterator flamesIterator = flames.begin ();
-	   flamesIterator != flames.end (); flamesIterator++)
-	(*flamesIterator)->drawFlame (displayFlames, displayParticles, boundingVolume);
+      glBuffer->drawFlames();
       glEndList();
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */

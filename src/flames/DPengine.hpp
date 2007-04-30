@@ -1,7 +1,7 @@
 #if !defined(DPENGINE_H)
 #define DPENGINE_H
 
-
+class GLFlameCanvas;
 class DepthPeelingEngine;
 
 #include "flames.hpp"
@@ -10,6 +10,7 @@ class DepthPeelingEngine;
 #include "../scene/camera.hpp"
 
 class ARBFragmentShader
+
 {
 public:
   ARBFragmentShader() { glGenProgramsARB(1, &program); };
@@ -69,7 +70,7 @@ public:
    * @param  indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
-  DepthPeelingEngine(uint width, uint height, uint nbLayers, const Scene* const scene);
+  DepthPeelingEngine(uint width, uint height, uint nbLayers);
   virtual ~DepthPeelingEngine();
   
   /** Epluche les flammes en fonction de leur profondeur en plusieurs calques. Une fois cette méthode appelée,
@@ -80,7 +81,7 @@ public:
    * @param boundingVolume Le cas échéant, volume englobant à afficher à la place des flammes.
    * (le paramètre displayFlames doit tout de même être à <i>true</i> pour les visualiser)
    */
-  void makePeels(const vector <FireSource *>& flames, bool displayFlames, bool displayParticles, u_char boundingVolume);
+  void makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene);
   void render(const vector <FireSource *>& flames);
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};
@@ -101,8 +102,6 @@ private:
   Texture **m_colorTex;
   Texture *m_depthTex[3], *m_sceneDepthTex;
   GLuint m_curDepthTex;
-
-  const Scene *m_scene;
   
   ARBFragmentShader m_peelProgram;
   GLSLProgram m_dpRendererProgram;

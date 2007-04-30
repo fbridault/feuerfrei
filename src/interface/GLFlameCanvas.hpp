@@ -19,6 +19,7 @@ class GLFlameCanvas;
 #include "../flames/glowengine.hpp"
 #include "../flames/DPengine.hpp"
 
+#include "../solvers/fieldThread.hpp"
 #include "../solvers/field3D.hpp"
 #include "../solvers/globalField.hpp"
 
@@ -35,6 +36,7 @@ public:
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
   void drawScene(void);
+  void drawFlames(void);
   
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
@@ -52,6 +54,8 @@ public:
   void InitSolvers(void);
   /** Initialisations relatives à la scène */
   void InitScene();
+  /** Initialisations relatives aux solveurs */
+  void InitThreads(void);
   /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
@@ -144,11 +148,13 @@ private:
   
   DepthPeelingEngine *m_depthPeelingEngine;
   /********* Variables relatives au solveur ******************************/
+  list <FieldThread *> m_threads;
   vector <Field3D *> m_solvers;
   GlobalField *m_globalField;
     
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_flames;
+  list <FieldFlamesAssociation *> m_fieldFlamesAssociations;
   Scene *m_scene;
   GLSLProgram *m_SVProgram;
   GLSLVertexShader *m_SVShader;
@@ -161,5 +167,20 @@ private:
   const static int m_nbIterFlickering = 20;
   DECLARE_EVENT_TABLE()
 };
+
+inline void GLFlameCanvas::drawFlames(void)
+{
+  list < FieldThread* >::iterator threadIterator = m_threads.begin ();
+  /* Dessin de la flamme */
+  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
+       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++, threadIterator++)
+    {
+      (*threadIterator)->Lock();
+      for (list < FireSource* >::iterator flamesIterator = (*ffaIterator)->fireSources.begin ();
+	   flamesIterator != (*ffaIterator)->fireSources.end (); flamesIterator++)
+	(*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+      (*threadIterator)->Unlock();
+    }
+}
 
 #endif

@@ -15,11 +15,14 @@ FieldThread::~FieldThread()
 
 void *FieldThread::Entry()
 { 
-  while(m_run){    
+  wxStopWatch swatch;
+  long time;
+  
+  while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
-    
+    swatch.Start();
     m_fieldAndFlames->field->cleanSources ();
     
     for (list < FireSource* >::iterator flamesIterator = m_fieldAndFlames->fireSources.begin ();
@@ -34,7 +37,12 @@ void *FieldThread::Entry()
 	 flamesIterator != m_fieldAndFlames->fireSources.end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();
+    time = swatch.Time();
     
-    Yield();
+    /** Si le calcul de l'itération passe en dessous des 50Hz, on dort le temps nécessaire */
+    if(time < 20)
+      Sleep(20 - time);
+    
+    //    Yield();
   }
 }

@@ -109,6 +109,9 @@ public:
   /** Destructeur */
   virtual ~CampFire(){};
 };
+
+#include "../solvers/fieldThread.hpp"
+
 /** La classe Torche permet la définition d'une flamme de type torche.
  * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
  * en Wick*. Celle-ci ne sont pas affichées à l'écran. Les objets composant le luminaire 
@@ -131,10 +134,12 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
+  CandlesSet(FlameConfig *flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
 	     const char *lampName, uint index, const GLSLProgram * const program, Point scale);
   /** Destructeur */
-  virtual ~CandlesSet(){}; 
+  virtual ~CandlesSet();
+  
+  virtual void build();
   
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
   {
@@ -188,6 +193,8 @@ public:
   }
 
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
+private:
+  list < FieldFlamesAssociation* > m_fieldFlamesAssociations;
 };
 
 /** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes

@@ -14,14 +14,15 @@
 
 using namespace std;
 
-class Field3D;
+#include "field3D.hpp"
+
 class FireSource;
 
-class FieldFlamesAssociation
+class FieldFiresAssociation
 {
 public:
-  FieldFlamesAssociation(Field3D* f) {field = f; };
-  virtual ~FieldFlamesAssociation() { fireSources.clear(); };
+  FieldFiresAssociation(Field3D* f) {field = f; };
+  virtual ~FieldFiresAssociation() { fireSources.clear(); };
   
   /** Ajout d'une source de feu */
   void addFireSource(FireSource* fireSource) { fireSources.push_back(fireSource); };
@@ -29,11 +30,46 @@ public:
   list <FireSource *> fireSources;
 };
 
-class FieldThread: public wxThread
+class RealFlame;
+
+class FieldFlamesAssociation
 {
 public:
-  FieldThread(FieldFlamesAssociation *fieldAndFlames);
-  virtual ~FieldThread();
+  FieldFlamesAssociation(Field3D* f) {field = f; };
+  virtual ~FieldFlamesAssociation() { delete field; flames.clear(); };
+  
+  /** Ajout d'une source de feu */
+  void addFlameSource(RealFlame* flame) { flames.push_back(flame); };
+  Field3D *field;
+  list <RealFlame *> flames;
+};
+
+
+class FieldFiresThread: public wxThread
+{
+public:
+  FieldFiresThread(FieldFiresAssociation *fieldAndFires);
+  virtual ~FieldFiresThread();
+  
+  /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
+   * avec la méthode Run();
+   */
+  void Stop(){ m_run = false; };
+  void Lock(){ m_mutex.Lock(); };
+  void Unlock(){ m_mutex.Unlock(); };  
+  /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
+  virtual ExitCode Entry();
+private:
+  FieldFiresAssociation *m_fieldAndFires;
+  wxMutex m_mutex;
+  bool m_run;
+};
+
+class FieldFlamesThread: public wxThread
+{
+public:
+  FieldFlamesThread(FieldFlamesAssociation *fieldAndFlames);
+  virtual ~FieldFlamesThread();
   
   /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
    * avec la méthode Run();
@@ -48,5 +84,4 @@ private:
   wxMutex m_mutex;
   bool m_run;
 };
-
 #endif

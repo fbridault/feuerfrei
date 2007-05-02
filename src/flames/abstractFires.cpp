@@ -193,7 +193,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     if(m_dist > 5){
-      cerr << 2000 << endl;
+//       cerr << 2000 << endl;
       setSamplingTolerance(2000);
       if(m_solver->isRealSolver())
 	m_solver->switchToFakeField();
@@ -201,14 +201,14 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
       if(!m_solver->isRealSolver())
 	m_solver->switchToRealSolver();
       if(m_dist > 3){
-  	cerr << 500 << endl;
+//   	cerr << 500 << endl;
 	setSamplingTolerance(500);
       }else
 	if(m_dist > 2){
-  	  cerr << 60 << endl;
+//   	  cerr << 60 << endl;
 	  setSamplingTolerance(40);
 	}else{
-  	  cerr << 25 << endl;
+//   	  cerr << 25 << endl;
 	  setSamplingTolerance(20);
 	}
     }

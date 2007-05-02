@@ -66,7 +66,11 @@ public:
   
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
-  void setRunningState(bool run) { m_run=run; };
+  void setRunningState(bool run) { 
+    m_run=run;
+    if(!m_run) PauseThreads();
+    if(m_run) ResumeThreads();    
+  };
   
   /** Active/Désactive le glow seul */
   void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
@@ -107,9 +111,12 @@ public:
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
   void setGammaCorrection(double gamma) { m_gammaEngine->SetGamma(gamma); };
   void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
+  void DeleteThreads();
 private:
   void WriteFPS ();
   void DrawVelocity (void);
+  void PauseThreads();
+  void ResumeThreads();
   
 //   void cast_shadows_double_multiple();
   void castShadows();
@@ -147,14 +154,18 @@ private:
   GlowEngine *m_glowEngine;
   
   DepthPeelingEngine *m_depthPeelingEngine;
-  /********* Variables relatives au solveur ******************************/
-  list <FieldThread *> m_threads;
+  
+  /** Liste de threads. */
+  list <FieldFiresThread *> m_threads;
+  /** Liste de threads supplémentaires, utilisée pour distinguer les solveurs internes à une source lumineuse.
+   * Ceci est utilisé uniquement typiquement pour les CandlesSet. */
+  list <FieldFlamesThread *> m_extraThreads;
   vector <Field3D *> m_solvers;
   GlobalField *m_globalField;
     
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_flames;
-  list <FieldFlamesAssociation *> m_fieldFlamesAssociations;
+  list <FieldFiresAssociation *> m_fieldFiresAssociations;
   Scene *m_scene;
   GLSLProgram *m_SVProgram;
   GLSLVertexShader *m_SVShader;
@@ -170,10 +181,10 @@ private:
 
 inline void GLFlameCanvas::drawFlames(void)
 {
-  list < FieldThread* >::iterator threadIterator = m_threads.begin ();
+  list < FieldFiresThread* >::iterator threadIterator = m_threads.begin ();
   /* Dessin de la flamme */
-  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
-       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++, threadIterator++)
+  for (list < FieldFiresAssociation* >::iterator ffaIterator = m_fieldFiresAssociations.begin ();
+       ffaIterator != m_fieldFiresAssociations.end (); ffaIterator++, threadIterator++)
     {
       (*threadIterator)->Lock();
       for (list < FireSource* >::iterator flamesIterator = (*ffaIterator)->fireSources.begin ();

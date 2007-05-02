@@ -264,6 +264,7 @@ void FlamesFrame::InitFlamesPanels()
 
 void FlamesFrame::OnClose(wxCloseEvent& event)
 {
+  m_glBuffer->DeleteThreads();
   m_glBuffer->setRunningState(false);
   delete [] m_currentConfig.flames;
   delete [] m_currentConfig.solvers;

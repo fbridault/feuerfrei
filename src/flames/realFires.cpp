@@ -64,7 +64,7 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
     }
 }
 
-CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>& flameSolvers, Scene *scene,
+CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
 		       const char *lampName, uint index, const GLSLProgram * const program, Point scale):
   FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, program, "Lamp")
 {
@@ -80,13 +80,42 @@ CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, vector <Field3D *>&
        objListIterator != objList.end (); objListIterator++, i++)
     {
       Point pt;
+      FieldFlamesAssociation *fieldFlamesAssociation;
+      
+      /* Le field sera supprimé par le destructeur de FieldFlamesAssociation */
       Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
-      flameSolvers.push_back( field );
+      
+      fieldFlamesAssociation = new FieldFlamesAssociation(field);
       m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, (*objListIterator));
       m_flames[i]->buildBoundingSphere( s->getPosition() );
+      fieldFlamesAssociation->addFlameSource(m_flames[i]);    
+      m_fieldFlamesAssociations.push_back(fieldFlamesAssociation);
+      /* Instanciation des threads : 1 solveur = 1 thread */
+      fieldThreads.push_back(new FieldFlamesThread(fieldFlamesAssociation));
     }
 }
 
+CandlesSet::~CandlesSet()
+{
+  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
+       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++)
+    delete (*ffaIterator);
+  m_fieldFlamesAssociations.clear();
+}
+
+void CandlesSet::build()
+{
+  Point averagePos;
+  
+  /* On ne construit pas les flammes, ceci est fait dans des threads séparés. */
+  for (uint i = 0; i < m_nbFlames; i++)
+    averagePos += m_flames[i]->getCenter ();
+  
+  averagePos *= m_solver->getScale();
+  averagePos /= m_nbFlames;
+  averagePos += getPosition();
+  setLightPosition(averagePos);
+}
 
 void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  

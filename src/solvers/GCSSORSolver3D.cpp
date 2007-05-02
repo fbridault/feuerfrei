@@ -44,7 +44,8 @@ GCSSORSolver3D::~GCSSORSolver3D ()
   delete[]m_q;
 }
 
-void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
+void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a,
+			    double diagonal, double omega, uint maxiter)
 {
   double f=omega/diagonal;
   double d=f*a;
@@ -54,221 +55,349 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
   double rho0, rho1, alpha, beta,norm2,normb2,eb2;
   double *sav1, *sav2;
   
+  double * mp,* mpmnx,* mppnx,* mpm1,* mpp1,* mpmn2,* mppn2, * mq;
+  double * mz,* mzmnx,* mzpnx,* mzm1,* mzp1,* mzmn2,* mzpn2, *xx, *mr;
+  const double * mb;
   // calcul du carré de la norme de b
-//   t = t1;
-//   normb2=0.0;
-//   //traiter les couches de voxels de la grille
-//   for (int k = 1; k <= m_nbVoxelsZ; k++){
-//     //traiter une couche de voxels
-//     for (int j = 1; j <= m_nbVoxelsY; j++){
-//       //traiter une ligne de voxels
-//       for (int i = 1; i<= m_nbVoxelsX; i++){
-// 	normb2+=b[t]*b[t];
-// 	t++;
-//       }//for i
-//       t+=2;
-//     }//for j
-//     t+=t2nx;
-//   }//for k
+  //   t = t1;
+  //   normb2=0.0;
+  //   //traiter les couches de voxels de la grille
+  //   for (int k = 1; k <= m_nbVoxelsZ; k++){
+  //     //traiter une couche de voxels
+  //     for (int j = 1; j <= m_nbVoxelsY; j++){
+  //       //traiter une ligne de voxels
+  //       for (int i = 1; i<= m_nbVoxelsX; i++){
+  // 	normb2+=b[t]*b[t];
+  // 	t++;
+  //       }//for i
+  //       t+=2;
+  //     }//for j
+  //     t+=t2nx;
+  //   }//for k
   
-//   // calcul de eb2 le second membre du test d'arrêt
-//   eb2=m_epsilon*normb2;
+  //   // calcul de eb2 le second membre du test d'arrêt
+  //   eb2=m_epsilon*normb2;
 
   // calcul du premier résidu r
   //calcul de r = b - A*x0
-  m_t = m_t1; 
-  
+  // calcul de z tel que Cz=r
+  // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
+  mb=&b[m_t1];
+  mr=&m_r[m_t1];
+  mz=&m_z[m_t1];
+  mzmnx=mz-m_nx;
+  mzm1=mz-1;
+  mzmn2=mz-m_n2;
+  mp=&x0[m_t1];
+  mpmnx=mp-m_nx;
+  mppnx=mp+m_nx;
+  mpm1=mp-1;
+  mpp1=mp+1;
+  mpmn2=mp-m_n2;
+  mppn2=mp+m_n2;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j= 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	m_r[m_t] = b[m_t] - diagonal * x0[m_t] + a * (x0[m_t-m_nx] + x0[m_t+m_nx] + x0[m_t-1] + x0[m_t+1] + x0[m_t-m_n2] + x0[m_t+m_n2]);
-	m_t++;
+	*mr = *mb - diagonal * (*mp) + a * (
+					       (*mpmnx)
+					       + (*mppnx)
+					       + (*mpm1) 
+					       +	(*mpp1)
+					       + (*mpmn2)
+					       + (*mppn2)	
+					       );
+	*mz = e*(*mr)+d*(
+			 (*mzmnx)
+			 +(*mzm1)
+			 +(*mzmn2)
+			 );
+	mb++;
+	mr++;
+	mp++;
+	mpmn2++;
+	mpmnx++;
+	mpm1++;
+	mpp1++;
+	mppnx++;
+	mppn2++;
+	mz++;
+	mzmn2++;
+	mzmnx++;
+	mzm1++;
       }//for i
-      m_t+=2;
+      mb+=2;
+      mr+=2;
+      mp+=2;
+      mpmn2+=2;
+      mpmnx+=2;
+      mpm1+=2;
+      mpp1+=2;
+      mppnx+=2;
+      mppn2+=2;
+      mz+=2;
+      mzmn2+=2;
+      mzmnx+=2;
+      mzm1+=2;
     }//for j
-    m_t+=m_t2nx;
+    mb+=m_t2nx;
+    mr+=m_t2nx;
+    mp+=m_t2nx;
+    mpmn2+=m_t2nx;
+    mpmnx+=m_t2nx;
+    mpm1+=m_t2nx;
+    mpp1+=m_t2nx;
+    mppnx+=m_t2nx;
+    mppn2+=m_t2nx;
+    mz+=m_t2nx;
+    mzmn2+=m_t2nx;
+    mzmnx+=m_t2nx;
+    mzm1+=m_t2nx;
   }// for k  
-
-  // calcul de z tel que Cz=r
   
-  // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-  m_t = m_t1; 
+  // calcul de z tel que (D/w -TL)z=u
+  // pour calcul de z tel que Cz =r    
+  // calcul de z tel que (D/w -TL)z=u
+
+  m_t =IX(m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ) ;
+  mz=&m_z[m_t];
+  mzpnx=mz+m_nx;
+  mzp1=mz+1;
+  mzpn2=mz+m_n2;
+  for ( k = m_nbVoxelsZ; k>= 1 ; k--){
+    for ( j = m_nbVoxelsY; j>=1 ; j--){
+      for ( i = m_nbVoxelsX; i>=1; i--){
+	(*mz) = f*(*mz)+d*(
+			   (*mzpnx)
+			   + (*mzp1)
+			   + (*mzpn2)
+			   );
+	mz--;
+	mzpnx--;
+	mzp1--;
+	mzpn2--;
+      }//for i
+      mz-=2;
+      mzpnx-=2;
+      mzp1-=2;
+      mzpn2-=2;
+    }//for j
+    mz-=m_t2nx;
+    mzpnx-=m_t2nx;
+    mzp1-=m_t2nx;
+    mzpn2-=m_t2nx;
+
+  }//for k
+  // p=z
+  memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
+	
+  // calcul de r.z
+  rho0=0.0;
+  mr=&m_r[m_t1];
+  mz=&m_z[m_t1];
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	m_z[m_t] = e*m_r[m_t]+d*(m_z[m_t-m_nx]+m_z[m_t-1]+m_z[m_t-m_n2]);
-	m_t++;
+	rho0+=(*mr)*(*mz);
+	mr++;
+	mz++;
       }//for i
-      m_t+=2;
+      mr+=2;
+      mz+=2;
     }//for j
-    m_t+=m_t2nx;
-  }//for k
-
-  // calcul de z tel que (D/w -TL)z=u
-
-  m_t=IX(m_nbVoxelsY,m_nbVoxelsX,m_nbVoxelsZ);
-  for ( k = m_nbVoxelsZ; k>= 1 ; k--){
-    for ( j = m_nbVoxelsY; j>=1; j--){
-      for ( i = m_nbVoxelsX; i>=1 ; i--){
-	m_z[m_t] = f*m_z[m_t]+d*(m_z[m_t+m_nx]+m_z[m_t+1]+m_z[m_t+m_n2]);
-	m_t--;
-      }//for i
-      m_t-=2;
-    }//for j
-    m_t-=m_t2nx;
-  }//for k
-	
-  // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
-    
-  // calcul de r.z
-  m_t = m_t1;
-  rho0=0.0;
-  for ( k = 1; k <= m_nbVoxelsZ; k++){   
-    for ( j= 1; j <= m_nbVoxelsY; j++){
-      for ( i = 1; i <= m_nbVoxelsX; i++){
-	rho0+=m_r[m_t]*m_z[m_t];
-	m_t++;
-      }//for i
-      m_t+=2;
-    }//for j
-    m_t+=m_t2nx;
+    mr+=m_t2nx;
+    mz+=m_t2nx;
   }//for k
   
   // début des itérations
   for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
-    m_t = m_t1;
-    for ( k = 1; k <= m_nbVoxelsZ; k++){
-      for ( j = 1; j <= m_nbVoxelsY; j++){
-	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  m_q[m_t] = diagonal * m_p[m_t] - 
-	    a * (m_p[m_t-m_nx] + m_p[m_t+m_nx] +
-		 m_p[m_t-1] + m_p[m_t+1] +
-		 m_p[m_t-m_n2] + m_p[m_t+m_n2]);
-	  m_t++;
-	}//for i
-	m_t+=2;
-      }//for j
-      m_t+=m_t2nx;
-    }//for k
-    
     //calcul du produit scalaire p.q
     alpha=0.0;
-    m_t = m_t1;
-    for ( k = 1; k <= m_nbVoxelsZ; k++){
-      for ( j = 1; j <= m_nbVoxelsY; j++){
-	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  alpha+=m_p[m_t]*m_q[m_t];
-	  m_t++;
+    mq=&m_q[m_t1];
+    mp=&m_p[m_t1];
+    mpmnx=mp-m_nx;
+    mppnx=mp+m_nx;
+    mpm1=mp-1;
+    mpp1=mp+1;
+    mpmn2=mp-m_n2;
+    mppn2=mp+m_n2;
+		
+    for (k = 1; k <= m_nbVoxelsZ; k++){
+      for (j = 1; j <= m_nbVoxelsY; j++){
+	for (i = 1; i <= m_nbVoxelsX; i++){
+	  *mq = diagonal * (*mp)
+	    -	a * (
+		     (*mpmnx)
+		     + (*mppnx)
+		     + (*mpm1)
+		     + (*mpp1)
+		     + (*mpmn2)
+		     + (*mppn2)
+		     );
+	  alpha+=(*mp)*(*mq);
+	  mq++;
+	  mp++;
+	  mpmnx++;
+	  mppnx++;
+	  mpm1++;
+	  mpp1++;
+	  mpmn2++;
+	  mppn2++;
 	}//for i
-	m_t+=2;
+	mq+=2;
+	mp+=2;
+	mpmnx+=2;
+	mppnx+=2;
+	mpm1+=2;
+	mpp1+=2;
+	mpmn2+=2;
+	mppn2+=2;
       }//for j
-      m_t+=m_t2nx;
-    }//for k
-    
+      mq+=m_t2nx;
+      mp+=m_t2nx;
+      mpmnx+=m_t2nx;
+      mppnx+=m_t2nx;
+      mpm1+=m_t2nx;
+      mpp1+=m_t2nx;
+      mpmn2+=m_t2nx;
+      mppn2+=m_t2nx;
+    }//for k   
+  
     //calcul de alpha
     // alpha= rho0/alpha;
     alpha=(alpha) ? rho0/alpha : 0;
-		
     // calcul de x = x + alpha.p
     // calcul de r = r -alpha*q
-    m_t = m_t1;
-    for ( k = 1; k <= m_nbVoxelsZ; k++){
-      for ( j = 1; j <= m_nbVoxelsY; j++){
-	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  x0[m_t]+=alpha*m_p[m_t];
-	  m_r[m_t]-=alpha*m_q[m_t];
-	  m_t++;
-	}//for i
-	m_t+=2;
-      }//for j
-      m_t+=2*m_nx;
-    }//for k
-    
     // calcul du carré de la norme du résidu
-//     norm2=0.0f;
-//     t = t1;
-//     for ( k = 1; k <= m_nbVoxelsZ; k++){
-//       for ( j = 1; j <= m_nbVoxelsY; j++){
-// 	for ( i = 1; i <= m_nbVoxelsX; i++){
-// 	  norm2+=m_r[t]*m_r[t];
-// 	  t++;
-// 	}//for i
-// 	t+=2;
-//       }//for j
-//       t+=t2nx;
-//     }//for k
-
-//     //test d'arrêt
-//     if(norm2 < eb2){
-//       cerr<<"précision atteinte : nbiter = "<<numiter<<endl;
-//       break;
-//     }
-    // calcul de z tel que Cz =r
-
-    // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-    m_t = m_t1;
+    //	norm2=0.0f;
+    xx=&x0[m_t1];
+    mp=&m_p[m_t1];
+    mq=&m_q[m_t1];
+    mr=&m_r[m_t1];
+    mz=&m_z[m_t1];
+    mzmnx=mz-m_nx;
+    mzm1=mz-1;
+    mzmn2=mz-m_n2;
     for ( k = 1; k <= m_nbVoxelsZ; k++){
       for ( j = 1; j <= m_nbVoxelsY; j++){
 	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  m_z[m_t] = e*m_r[m_t]+d*(m_z[m_t-m_nx]+m_z[m_t-1]+m_z[m_t-m_n2]);
-	  m_t++;
+	  (*xx)+=alpha*(*mp);
+	  (*mr)-=alpha*(*mq);
+	  //	norm2+=(*mr)*(*mr);
+	  // pour calcul de z tel que Cz =r
+	  // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
+	  // ce calcul sera fait inutilement une fois quand le critère d'arrêt
+	  // sera satisfait
+	  (*mz) = e*(*mr)+d*(
+			     (*mzmnx)+
+			     (*mzm1)+
+			     (*mzmn2)
+			     );
+	  xx++;
+	  mp++;
+	  mq++;
+	  mr++;
+	  mz++;
+	  mzmnx++;
+	  mzm1++;
+	  mzmn2++;
 	}//for i
-	m_t+=2;
+	xx+=2;
+	mp+=2;
+	mq+=2;
+	mr+=2;
+	mz+=2;
+	mzmnx+=2;
+	mzm1+=2;
+	mzmn2+=2;
       }//for j
-      m_t+=m_t2nx;
+      xx+=m_t2nx;
+      mp+=m_t2nx;
+      mq+=m_t2nx;
+      mr+=m_t2nx;
+      mz+=m_t2nx;
+      mzmnx+=m_t2nx;
+      mzm1+=m_t2nx;
+      mzmn2+=m_t2nx;
     }//for k
-    
+   
+    // calcul de z tel que (D/w -TL)z=u
+    // pour calcul de z tel que Cz =r    
     // calcul de z tel que (D/w -TL)z=u
 
-    m_t =IX(m_nbVoxelsY,m_nbVoxelsX,m_nbVoxelsZ) ;
+    m_t =IX(m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ) ;
+    mz=&m_z[m_t];
+    mzpnx=mz+m_nx;
+    mzp1=mz+1;
+    mzpn2=mz+m_n2;
     for ( k = m_nbVoxelsZ; k>= 1 ; k--){
       for ( j = m_nbVoxelsY; j>=1 ; j--){
 	for ( i = m_nbVoxelsX; i>=1; i--){
-	  m_z[m_t] = f*m_z[m_t]+d*(m_z[m_t+m_nx]+m_z[m_t+1]+m_z[m_t+m_n2]);
-	  m_t--;
+	  (*mz) = f*(*mz) + d*(
+			       (*mzpnx)
+			       + (*mzp1)
+			       + (*mzpn2)
+			       );
+	  mz--;
+	  mzpnx--;
+	  mzp1--;
+	  mzpn2--;
 	}//for i
-	m_t-=2;
+	mz-=2;
+	mzpnx-=2;
+	mzp1-=2;
+	mzpn2-=2;
       }//for j
-      m_t-=m_t2nx;
-    }//for k
+      mz-=m_t2nx;
+      mzpnx-=m_t2nx;
+      mzp1-=m_t2nx;
+      mzpn2-=m_t2nx;
 
+    }//for k
     //calcul de rho1 = r.z
     rho1=0.0;
-    m_t = m_t1;
+    mr=&m_r[m_t1];
+    mz=&m_z[m_t1];
     for ( k = 1; k <= m_nbVoxelsZ; k++){
       for ( j = 1; j <= m_nbVoxelsY; j++){
 	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  rho1+=m_r[m_t]*m_z[m_t];
-	  m_t++;
+	  rho1+=(*mr)*(*mz);
+	  mr++;
+	  mz++;
 	}//for i
-	m_t+=2;
+	mr+=2;
+	mz+=2;
       }//for j
-      m_t+=m_t2nx;
+      mr+=m_t2nx;
+      mz+=m_t2nx;
     }//for k
-    
+
     //calcul de beta =rho1/rho0
     //    beta= rho1/rho0;
     beta=(rho0) ? rho1/rho0 : 0;
 
     rho0=rho1;
+ 
     //calcul de p = z+ beta.p
-    m_t = m_t1;
+    mp=&m_p[m_t1];
+    mz=&m_z[m_t1];
     for ( k = 1; k <= m_nbVoxelsZ; k++){
       for ( j = 1; j <= m_nbVoxelsY; j++){
 	for ( i = 1; i <= m_nbVoxelsX; i++){
-	  m_p[m_t]=m_z[m_t] + beta*m_p[m_t];
-	  m_t++;
+	  (*mp)=(*mz)+beta*(*mp);
+	  mp++;
+	  mz++;
 	}//for i
-	m_t+=2;
+	mp+=2;
+	mz+=2;
       }//for j
-      m_t+=m_t2nx;
+      mp+=m_t2nx;
+      mz+=m_t2nx;
     }//for k
   }//for numiter
-//   if(norm2 > eb2){
-//     cerr<<"précision non atteinte !!!"<<endl;
-//   }
+  //   if(norm2 > eb2){
+  //     cerr<<"précision non atteinte !!!"<<endl;
+  //   }
   
   return;
 }//GCSSOR
@@ -284,15 +413,19 @@ void
 GCSSORSolver3D::project (double *const p, double *const div)
 {
   double h_x = 1.0 / m_nbVoxelsX, 
-		h_y = 1.0 / m_nbVoxelsY, 
-		h_z = 1.0 / m_nbVoxelsZ;
+    h_y = 1.0 / m_nbVoxelsY, 
+    h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
   
   m_t = m_t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	div[m_t] = -0.5 * (h_x * (m_u[m_t+1] - m_u[m_t-1]) + h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) + h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2]));
+	div[m_t] = -0.5 * (
+			   h_x * (m_u[m_t+1] - m_u[m_t-1]) +
+			   h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) +
+			   h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2])
+			   );
 	m_t++;
       }//for i
       m_t+=2;

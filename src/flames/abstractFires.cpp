@@ -312,6 +312,8 @@ void DetachableFireSource::build()
 	ptMin.y = pt.y;
       if(pt.z < ptMin.z)
 	ptMin.z = pt.z;
+      ptMin *= m_solver->getScale();
+      ptMax *= m_solver->getScale();
       m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
       m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0)/2.0;
     }else{
@@ -416,6 +418,8 @@ void DetachableFireSource::drawBoundingBox () const
   if(0.0 < ptMin.z)
     ptMin.z = 0.0;
   
+  ptMin *= m_solver->getScale();
+  ptMax *= m_solver->getScale();
   glPushMatrix();
   glTranslatef(pos.x,pos.y,pos.z);
   GraphicsFn::SolidBox(ptMin,ptMax);

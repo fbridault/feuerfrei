@@ -13,9 +13,9 @@ FlamePanel::FlamePanel(wxWindow* parent, int id, int nbSolvers, const wxPoint& p
   wxString itemName;
   
   m_posLabel = new wxStaticText(this, -1, _("Position"));
-  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0,5"));
+  m_posXTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0.5"));
   m_posYTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0"));
-  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0,5"));
+  m_posZTextCtrl = new DoubleTextCtrl(this, -1, -100, 100, _("0.5"));
   
   m_skeletonsNumberLabel = new wxStaticText(this, -1, _("Skeletons number"));
   m_skeletonsNumberCtrl = new LongTextCtrl(this, -1, 0, 100, _("4"));

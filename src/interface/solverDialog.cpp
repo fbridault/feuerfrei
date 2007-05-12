@@ -26,7 +26,7 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
   m_resLabel = new wxStaticText(this, -1, _("Resolution"));
   m_resXTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
-  m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0,4"));
+  m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0.4"));
 
 #ifdef RTFLAMES_BUILD
   const wxString m_solverTypeRadioBoxChoices[] = {
@@ -60,11 +60,11 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
 					12, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 #endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
-  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
+  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
-  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1,5"));
+  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));
   m_epsilonLabel = new wxStaticText(this, -1, _("Error threshold"));
-  m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0,00001"));
+  m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0.00001"));
   m_nbMaxIterLabel = new wxStaticText(this, -1, _("Max iterations number"));
   m_nbMaxIterTextCtrl = new LongTextCtrl(this, -1, 0, 1000, _("100"));
   

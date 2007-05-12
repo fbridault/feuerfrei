@@ -24,7 +24,6 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_CHAR(GLFlameCanvas::OnKeyPressed)
 END_EVENT_TABLE();
 
-
 GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
 		       long style, const wxString& name, const wxPalette& palette)
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
@@ -199,6 +198,14 @@ void GLFlameCanvas::InitSolvers(void)
 					  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
 					  m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
 					  m_currentConfig->solvers[i].epsilon));
+      break;
+    case LOD_HYBRID_FIELD :
+      m_solvers.push_back( new LODHybridField(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					      m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+					      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					      m_currentConfig->solvers[i].epsilon));
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;

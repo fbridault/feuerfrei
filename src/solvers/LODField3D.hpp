@@ -37,8 +37,8 @@ public:
   {
     return m_currentField->iterate();
   };
-    
-  Point getUVW (const Point& pos, double selfVelocity) const
+  
+  virtual Point getUVW (const Point& pos, double selfVelocity) const
   {
     return m_currentField->getUVW (pos, selfVelocity);
   };
@@ -48,7 +48,7 @@ public:
     m_currentField->addUsrc (pos, value);
   };
   
-  void addVsrc (const Point& pos, double value, double& selfVelocity)
+  virtual void addVsrc (const Point& pos, double value, double& selfVelocity)
   {
     m_currentField->addVsrc (pos, value, selfVelocity);
   };
@@ -58,12 +58,7 @@ public:
     m_currentField->addWsrc (pos, value);
   };
   
-  void setVsrc (const Point& pos, double value)
-  {
-    m_currentField->setVsrc (pos, value);
-  };  
-    
-  void cleanSources ()
+  virtual void cleanSources ()
   {
     m_currentField->cleanSources ();
   };
@@ -112,14 +107,123 @@ public:
   virtual bool isRealSolver () const { return (m_currentField == &m_solver); };
   virtual void switchToRealSolver () { m_currentField = &m_solver; };
   virtual void switchToFakeField () { m_currentField = &m_fakeField; };
-private:
-  virtual void addExternalForces(const Point& position, bool move) {};
   
+protected:
   FakeField3D m_fakeField;
-  HybridSolver3D m_solver;
+  LODHybridSolver3D m_solver;
   /** Pointeur sur le champ de vecteur utilisé. */
   Field3D *m_currentField;
+private:
+  virtual void addExternalForces(const Point& position, bool move) {};
 };
 
+#define NB_STEPS_TO_SWITCH 40
+
+/** @test La classe LODHybridField implémente un champ de vecteur fonctionnant sur la base d'un LODField3D.
+ * La différence intervient lors de la transition entre deux solveurs, une interpolation linéaire est effectuée.
+ */
+class LODHybridField: public LODField3D
+{
+public:
+  /** Constructeur du solveur.
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
+   */
+  LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
+		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  virtual ~LODHybridField () {};
+  
+  /********************* Redéfinition des méthodes héritées *********************/
+  void iterate ()
+  {    
+    if(m_switch)
+      {
+	m_switch--;
+	if(m_switch){
+	  m_fieldWeight += m_fieldIncrement;
+	  m_solverWeight += m_solverIncrement;
+	  m_fakeField.iterate();
+	  m_solver.iterate();
+	}else{
+	  m_currentField = m_fieldToSwitch;
+	  m_currentField->iterate();
+	}
+      }
+    else
+      m_currentField->iterate();
+  };
+  
+  Point getUVW (const Point& pos, double selfVelocity) const
+  {
+    if(m_switch)
+      return (m_fakeField.getUVW (pos, selfVelocity)*m_fieldWeight + m_solver.getUVW (pos, selfVelocity)*m_solverWeight);
+    else
+      return m_currentField->getUVW (pos, selfVelocity);
+  };
+  
+  void addVsrc (const Point& pos, double value, double& selfVelocity)
+  {
+    //if(m_switch)
+    m_solver.addVsrc (pos, value, selfVelocity);
+    m_fakeField.addVsrc (pos, value, selfVelocity);
+    //}else
+    //m_currentField->addVsrc (pos, value, selfVelocity);
+  };
+  
+  void cleanSources ()
+  {
+    //if(m_switch){
+    m_fakeField.cleanSources();
+    m_solver.cleanSources();
+    //}else
+    //m_currentField->cleanSources();
+  };
+  
+  void displayGrid (void)
+  {
+    m_currentField->displayGrid ();
+  };
+  
+  void switchToRealSolver ()
+  {
+    cerr << "real" << endl;
+    m_switch = NB_STEPS_TO_SWITCH;
+    m_fieldWeight = 1;
+    m_solverWeight = 0;
+    m_fieldIncrement = -1/(double)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = 1/(double)NB_STEPS_TO_SWITCH;
+    m_fieldToSwitch = &m_solver; 
+  };
+  
+  void switchToFakeField () 
+  {
+    cerr << "fake" << endl;
+    m_switch = NB_STEPS_TO_SWITCH;
+    m_fieldWeight = 0;
+    m_solverWeight = 1;
+    m_fieldIncrement =   1/(double)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = -1/(double)NB_STEPS_TO_SWITCH;
+    m_fieldToSwitch = &m_fakeField; 
+  };
+  
+  virtual void divideRes () { m_solver.divideRes(); };  
+  virtual void multiplyRes () { m_solver.multiplyRes(); };  
+  virtual void decreaseRes () { m_solver.decreaseRes(); };  
+  virtual void increaseRes () { m_solver.increaseRes(); };
+  virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
+private:
+  Field3D *m_fieldToSwitch;
+  uint m_switch;
+  double m_fieldWeight, m_solverWeight;
+  double m_fieldIncrement, m_solverIncrement;
+};
 
 #endif

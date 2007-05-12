@@ -8,3 +8,10 @@ LODField3D::LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, dou
 {
   m_currentField = &m_solver;
 }
+
+LODHybridField::LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
+			    double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+  LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon)
+{
+  m_switch = 0;
+}

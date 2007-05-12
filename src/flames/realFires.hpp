@@ -27,7 +27,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
-  Candle(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+  Candle(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 	 const GLSLProgram * const program, double rayon);
   /** Destructeur */
   virtual ~Candle(){};
@@ -50,7 +50,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param wickFileName nom du fichier contenant la mèche
    */
-  Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+  Firmalampe(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 	     const GLSLProgram * const program, const char *wickFileName);
   /** Destructeur */
   virtual ~Firmalampe(){};
@@ -74,7 +74,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index, 
+  Torch(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index, 
 	const GLSLProgram * const program);
   /** Destructeur */
   virtual ~Torch(){}; 
@@ -104,7 +104,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
+  CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
 	   const GLSLProgram * const program);
   /** Destructeur */
   virtual ~CampFire(){};
@@ -134,7 +134,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  CandlesSet(FlameConfig *flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
+  CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
 	     const char *lampName, uint index, const GLSLProgram * const program, Point scale);
   /** Destructeur */
   virtual ~CandlesSet();
@@ -214,7 +214,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
-  CandleStick(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+  CandleStick(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 	      const GLSLProgram * const program, double rayon);
   /** Destructeur */
   virtual ~CandleStick();

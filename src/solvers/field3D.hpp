@@ -70,12 +70,6 @@ public:
    */
   virtual void addWsrc (const Point& pos, double value) = 0;
   
-  /** Affectation d'une force externe pour la composante V.
-   * @param pos Position relative de la particule dans le solveur
-   * @param value Valeur de vélocité à ajouter.
-   */
-  virtual void setVsrc (const Point& pos, double value) = 0;
-    
   /** Retourne la dimension sous forme d'un point.
    * @return Dimension.
    */

@@ -35,7 +35,7 @@ void FakeField3D::iterate ()
 	m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
       else
 	m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
-	
+    
     if(m_permanentExternalForces.x < 0)
       if(m_latentForces.x > m_permanentExternalForces.x)
 	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
@@ -60,7 +60,7 @@ void FakeField3D::iterate ()
     if(m_latentForces.x < 0) m_latentForces.x = m_latentForces.x + coef;
     if(m_latentForces.y < 0) m_latentForces.y = m_latentForces.y + coef;
     if(m_latentForces.z < 0) m_latentForces.z = m_latentForces.z + coef;
-   
+    
     if(m_latentForces.x || m_latentForces.y || m_latentForces.z) addExternalForces(m_latentForces,false);
   }
   

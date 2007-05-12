@@ -72,7 +72,7 @@ void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames,  Scene *scene, const char *filename, 
+FireSource::FireSource(FlameConfig* const flameConfig, Field3D* const s, uint nbFlames,  Scene *scene, const char *filename, 
 		       const wxString &texname,  uint index, const GLSLProgram* const program, const char *objName) : 
   FlameLight(scene, index, program, flameConfig->IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
@@ -109,6 +109,8 @@ FireSource::FireSource(const FlameConfig* const flameConfig, Field3D* const s, u
   m_visibility = true;
   m_dist=0;
   buildBoundingSphere();
+  m_flickSave=-1;
+  m_flameConfig = flameConfig;
 }
 
 FireSource::~FireSource()
@@ -193,7 +195,6 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     if(m_dist > 5){
-//       cerr << 2000 << endl;
       setSamplingTolerance(2000);
       if(m_solver->isRealSolver())
 	m_solver->switchToFakeField();
@@ -201,14 +202,11 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
       if(!m_solver->isRealSolver())
 	m_solver->switchToRealSolver();
       if(m_dist > 3){
-//   	cerr << 500 << endl;
 	setSamplingTolerance(500);
       }else
 	if(m_dist > 2){
-//   	  cerr << 60 << endl;
 	  setSamplingTolerance(40);
 	}else{
-//   	  cerr << 25 << endl;
 	  setSamplingTolerance(20);
 	}
     }
@@ -223,7 +221,7 @@ bool FireSource::operator<(const FireSource& other) const{
   return (m_dist < other.m_dist);
 }
 
-DetachableFireSource::DetachableFireSource(const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
+DetachableFireSource::DetachableFireSource(FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
 					   Scene* const scene, const char *filename, const wxString &texname, 
 					   uint index, const GLSLProgram* const program, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
@@ -334,7 +332,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 {  
   bool save=m_visibility;
   double distSave = m_dist;
-  const double INCREMENT=3.0;
+  const double INCREMENT=4.0;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -346,13 +344,31 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     m_differenceDist += m_dist - distSave;
-    
-    if(m_differenceDist > INCREMENT){
-      m_solver->decreaseRes();
-      m_differenceDist -= INCREMENT;
-    }else
-      if(m_differenceDist < -INCREMENT){
-	if(m_dist < m_solver->getNbMaxDiv()*INCREMENT) m_solver->increaseRes();
+    //     cerr << m_differenceDist << " " << m_dist << endl;
+    while(m_differenceDist > INCREMENT)
+      {
+	if(m_dist > (m_solver->getNbMaxDiv()+2)*INCREMENT){
+	  if(getFlickeringMode() != FLICKERING_NOISE){
+	    m_flickSave = getFlickeringMode();
+	    setFlickeringMode(FLICKERING_NOISE);
+	  }
+	  m_solver->switchToFakeField();
+	}else
+	  m_solver->decreaseRes();
+	m_differenceDist -= INCREMENT;
+      }
+    while(m_differenceDist < -INCREMENT)
+      {
+	if(m_dist < (m_solver->getNbMaxDiv())*INCREMENT) 
+	  m_solver->increaseRes();
+	else 
+	  if(m_dist < (m_solver->getNbMaxDiv()+1)*INCREMENT){
+	    if(m_flickSave > -1){
+	      setFlickeringMode(m_flickSave);
+	      m_flickSave = -1;
+	    }	    
+	    m_solver->switchToRealSolver();
+	  }
 	m_differenceDist += INCREMENT;
       }
     if(!save)

@@ -205,6 +205,8 @@ void LODHybridSolver3D::decreaseRes ()
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
+
+  cerr << "Voxels en X : " << m_nbVoxelsX << endl;
 }
 
 void LODHybridSolver3D::multiplyRes ()
@@ -277,4 +279,5 @@ void LODHybridSolver3D::increaseRes ()
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
+  cerr << "Voxels en X : " << m_nbVoxelsX << endl;
 }

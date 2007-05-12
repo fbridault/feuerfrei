@@ -72,17 +72,7 @@ public:
     
     m_wSrc[IX (i, j, k)] += value;
   };
-  
-  void setVsrc (const Point& pos, double value)
-  {
-    uint i,j,k;
     
-    findPointPosition(pos,i,j,k);
-    
-    m_vSrc[IX (i, j, k)] = value;
-  };
-  
-  
   /** Méthode permettant de retrouver les indices (i,j,k) de la cellule où est située la particule.
    * @param p Point dans l'espace.
    * @param i Indice à l'horizontale (x).

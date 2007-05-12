@@ -20,11 +20,12 @@
 #define SIMPLE_FIELD 4
 #define FAKE_FIELD 5
 #define LOD_FIELD 6
+#define LOD_HYBRID_FIELD 7
 /* Spécifiques à rtfluids */
-#define LOGRES_SOLVER 7
-#define LOGRESAVG_SOLVER 8
-#define LOGRESAVGTIME_SOLVER 9
-#define GS_SOLVER2D 10
+#define LOGRES_SOLVER 8
+#define LOGRESAVG_SOLVER 9
+#define LOGRESAVGTIME_SOLVER 10
+#define GS_SOLVER2D 11
 
 #define NB_MAXSOLVERS 10
 #define NB_MAXFLAMMES 100

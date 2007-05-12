@@ -71,7 +71,6 @@ public:
   wxString wickName;
   uint skeletonsNumber;
   double innerForce;
-  /** O non, 1 vertical, 2 vers la gauche */
   char flickering;
   int fdf;
   double samplingTolerance;

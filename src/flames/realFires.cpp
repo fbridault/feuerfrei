@@ -7,14 +7,14 @@
 #define WICK_NAME_PREFIX "Wick"
 #define TORCH_NAME "Torch"
 
-Candle::Candle (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+Candle::Candle (FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 		const GLSLProgram * const program, double rayon):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
 }
 
-Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
+Firmalampe::Firmalampe(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
 		       const GLSLProgram * const program, const char *wickFileName):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, program)
 {
@@ -26,7 +26,7 @@ Firmalampe::Firmalampe(FlameConfig *flameConfig, Field3D * s, Scene *scene, cons
     m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, (*objList.begin()), 0.01);
 }
 
-Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
+Torch::Torch(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
 	     const GLSLProgram * const program):
   DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, program, TORCH_NAME)
 {
@@ -45,7 +45,7 @@ Torch::Torch(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *to
     }
 }
 
-CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
+CampFire::CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
 		   const GLSLProgram * const program):
   DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, program, TORCH_NAME)
 {
@@ -64,7 +64,7 @@ CampFire::CampFire(FlameConfig *flameConfig, Field3D * s, Scene *scene, const ch
     }
 }
 
-CandlesSet::CandlesSet(FlameConfig *flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
+CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
 		       const char *lampName, uint index, const GLSLProgram * const program, Point scale):
   FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, program, "Lamp")
 {
@@ -141,7 +141,7 @@ void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
 }
   
 
-CandleStick::CandleStick (FlameConfig *flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+CandleStick::CandleStick (FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  const GLSLProgram * const program, double rayon):
   FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
 {

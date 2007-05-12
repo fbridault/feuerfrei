@@ -60,10 +60,6 @@ public:
     m_src.z += value;
   };
   
-  void setVsrc (const Point& pos, double value)
-  {
-    m_src.y = value;
-  };
   void cleanSources ();
   
   void displayVelocityField (void);

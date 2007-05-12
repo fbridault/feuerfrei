@@ -169,6 +169,14 @@ void GLFluidsCanvas::InitSolvers(void)
 				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
 				    m_currentConfig->solvers[i].epsilon);
       break;
+    case LOD_HYBRID_FIELD :
+      m_solvers[i] = new LODHybridField(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
+					m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
+					m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
+					m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+					m_currentConfig->solvers[i].epsilon);
+      break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
       ::wxExit();

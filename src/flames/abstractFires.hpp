@@ -171,7 +171,7 @@ public:
    * @param program Pointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  FireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
+  FireSource (FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
 	      const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
   /** Destructeur */
   virtual ~FireSource ();
@@ -301,6 +301,12 @@ public:
       m_flames[i]->setForces(value);
   }
   
+  /** Modifie le type de flickering sur les flammes. */  
+  void setFlickeringMode(char mode){ m_flameConfig->flickering = mode; };
+
+  /** Modifie le type de flickering sur les flammes. */  
+  char getFlickeringMode(){ return m_flameConfig->flickering; };
+  
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state)
   {
@@ -382,6 +388,12 @@ protected:
   bool m_visibility;
   /** Distance par rapport à la caméra */
   double m_dist;
+
+  /** Dernière valeur du flickering connue avant que la gestion du LOD ne la modifie */
+  char m_flickSave;
+  
+  /** Configuration de la flamme */
+  FlameConfig *m_flameConfig;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -402,7 +414,7 @@ public:
    * @param program Pointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  DetachableFireSource (const FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
+  DetachableFireSource (FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
 			const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
   virtual ~DetachableFireSource();
   

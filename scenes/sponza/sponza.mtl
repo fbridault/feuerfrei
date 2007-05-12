@@ -1,0 +1,154 @@
+# 
+# Wavefront material file
+# Converted by the DEEP Exploration  3.5.7.1088
+# Right Hemisphere, LTD
+# http://www.righthemisphere.com/
+# 
+
+newmtl sp_00_pod
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd KAMEN.jpg
+map_bump KAMEN.jpg
+bump KAMEN.jpg
+
+newmtl sp_00_stup_kapitel
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd sp_00_stup_kapitel.jpg
+map_bump sp_00_stup_kapitel.jpg
+bump sp_00_stup_kapitel.jpg
+
+newmtl sp_vijenac_ploha
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd sp_luk.jpg
+map_bump sp_luk.jpg
+bump sp_luk.jpg
+
+newmtl sp_02_prozor
+Ka 0 0 0
+Kd 0.627451 0.627451 0.627451
+Ks 0 0 0
+illum 2
+Ns 8
+
+newmtl sp_00_luk_mali
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd sp_luk.jpg
+map_bump sp_luk.jpg
+bump sp_luk.jpg
+
+newmtl sp_01_stup_baza
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd SP_01_STUP_baza.jpg
+map_bump SP_01_STUP_baza.jpg
+bump SP_01_STUP_baza.jpg
+
+newmtl sp_01_stup
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd sp_01_stup.jpg
+
+newmtl sp_01_stup_kapitel
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd SP_01_STUP_kapitel.jpg
+
+newmtl sp_00_stup
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd SP_01_STUB.jpg
+map_bump SP_01_STUB.jpg
+bump SP_01_STUB.jpg
+
+newmtl sp_01_stub_kapitel
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd SP_01_STUB_kapitel.jpg
+
+newmtl sp_01_stub_baza
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd SP_01_STUP_baza.jpg
+map_bump SP_01_STUP_baza.jpg
+bump SP_01_STUP_baza.jpg
+
+newmtl sp_00_prozor
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd prozor1.jpg
+map_bump prozor1.jpg
+bump prozor1.jpg
+
+newmtl sp_00_vrata_krug
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd vrata_krug.jpg
+map_bump vrata_krug.jpg
+bump vrata_krug.jpg
+
+newmtl sp_00_vrata_kocka
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd vrata_kocka.jpg
+map_bump vrata_kocka.jpg
+bump vrata_kocka.jpg
+
+newmtl sp_02_reljef
+Ka 0 0 0
+Kd 0.784314 0.784314 0.784314
+Ks 0 0 0
+illum 2
+Ns 8
+map_Kd reljef.jpg
+map_bump reljef.jpg
+bump reljef.jpg
+
+newmtl sp_00_svod
+Ka 0 0 0
+Kd 0.89803 0.756855 0.521563
+Ks 0 0 0
+illum 2
+Ns 8

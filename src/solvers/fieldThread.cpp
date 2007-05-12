@@ -37,6 +37,7 @@ void *FieldFiresThread::Entry()
 	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();
+
     time = swatch.Time();
     
     /** Si le calcul de l'itération passe en dessous des 50Hz, on dort le temps nécessaire */

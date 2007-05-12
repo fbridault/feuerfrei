@@ -95,6 +95,8 @@ public:
 
   void breakCheck();
   
+  //  void setDetachedFlamesWidth(
+
   /** Méthode permettant de générer des étincelles dans le feu.
    * @todo Cette méthode n'est pas encore terminée.
    */

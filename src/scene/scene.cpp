@@ -101,6 +101,8 @@ void Scene::computeVisibility(const Camera &view)
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
        flamesIterator != m_flames->end (); flamesIterator++)
     (*flamesIterator)->computeVisibility(view);
+  // On trie les flammes en fonction de leur distance pour éviter les problèmes
+  // de transparence avec le glow
   sort(m_flames->begin(),m_flames->end(),FireSource::cmp);
 }
 

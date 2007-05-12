@@ -1,5 +1,5 @@
 #include "glowengine.hpp"
-
+#include "../interface/GLFlameCanvas.hpp"
 
 GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
 {
@@ -110,7 +110,7 @@ void GlowEngine::computeWeights(uint index, double sigma)
   }
 }
 
-void GlowEngine::blur(vector <FireSource *>& flames)
+void GlowEngine::blur(GLFlameCanvas* const glBuffer)
 {
   glDepthFunc (GL_LEQUAL);
   
@@ -126,9 +126,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   m_firstPassTex[0]->bind();
   
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox ();
+  glBuffer->drawFlamesBoundingBoxes();
   
   m_programY.enable();
   m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
@@ -139,9 +137,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_firstPassFBOs[0].Activate();
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   m_secondPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox();
+  glBuffer->drawFlamesBoundingBoxes();
   
   /* Blur à une résolution inférieure */
   m_secondPassFBOs[1].Activate();
@@ -159,9 +155,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_programX.setUniform1f("divide",m_divide[1]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox();
+  glBuffer->drawFlamesBoundingBoxes();
   
   /* Partie X [0;bandwidth/2] du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
@@ -169,9 +163,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_programX.setUniform1f("divide",m_divide[2]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   m_firstPassTex[0]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox();
+  glBuffer->drawFlamesBoundingBoxes();
     
   /* Partie Y [-bandwidth/2;0] du filtre */
   m_programY.enable();
@@ -184,9 +176,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
   m_secondPassTex[1]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox();
+  glBuffer->drawFlamesBoundingBoxes();
   
   /* Partie Y [0;bandwidth/2] du filtre */
   m_programY.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
@@ -195,9 +185,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
   m_secondPassTex[1]->bind();
-  for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-       flamesIterator != flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox();
+  glBuffer->drawFlamesBoundingBoxes();
   
   m_programY.disable();
   glDisable(GL_BLEND);
@@ -207,7 +195,7 @@ void GlowEngine::blur(vector <FireSource *>& flames)
   glDepthFunc (GL_LESS);
 }
 
-void GlowEngine::drawBlur(vector <FireSource *>& flames)
+void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer)
 {
   glDepthFunc (GL_LEQUAL);
   glEnable (GL_BLEND);
@@ -221,9 +209,7 @@ void GlowEngine::drawBlur(vector <FireSource *>& flames)
   for(int i=0; i < GLOW_LEVELS; i++){
     m_blurRendererProgram.setUniform1f("scale",1/(double)m_scaleFactor[i]);
     m_firstPassTex[i]->bind();
-    for (vector < FireSource* >::iterator flamesIterator = flames.begin ();
-	 flamesIterator != flames.end (); flamesIterator++)
-      (*flamesIterator)->drawBoundingBox();
+    glBuffer->drawFlamesBoundingBoxes();
   }
 
   m_blurRendererProgram.disable();

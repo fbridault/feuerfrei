@@ -384,23 +384,24 @@ void DetachableFireSource::drawBoundingBox () const
   Point pt;
   Point pos(m_solver->getPosition());
   
-  for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-       flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
-    pt = (*flamesIterator)->getTop();
-    if(pt.x > ptMax.x)
-      ptMax.x = pt.x;
-    if(pt.y > ptMax.y)
-      ptMax.y = pt.y;
-    if(pt.z > ptMax.z)
-      ptMax.z = pt.z;
-    pt = (*flamesIterator)->getBottom();
-    if(pt.x < ptMin.x)
-      ptMin.x = pt.x;
-    if(pt.y < ptMin.y)
-      ptMin.y = pt.y;
-    if(pt.z < ptMin.z)
-      ptMin.z = pt.z;
-  }
+  if( m_detachedFlamesList.size () )
+    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+      pt = (*flamesIterator)->getTop();
+      if(pt.x > ptMax.x)
+	ptMax.x = pt.x;
+      if(pt.y > ptMax.y)
+	ptMax.y = pt.y;
+      if(pt.z > ptMax.z)
+	ptMax.z = pt.z;
+      pt = (*flamesIterator)->getBottom();
+      if(pt.x < ptMin.x)
+	ptMin.x = pt.x;
+      if(pt.y < ptMin.y)
+	ptMin.y = pt.y;
+      if(pt.z < ptMin.z)
+	ptMin.z = pt.z;
+    }
   pt = m_solver->getDim();
   if(pt.x > ptMax.x)
     ptMax.x = pt.x;

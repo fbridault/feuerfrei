@@ -13,6 +13,8 @@ class GlowEngine;
 #define GLOW_LEVELS 2
 #define FILTER_SIZE 8
 
+class GLFlameCanvas;
+
 /** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
  * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
  * glowEngine.activate();<br>
@@ -63,9 +65,9 @@ public:
   };
 
   /** Effectue le blur en trois passes */
-  void blur(vector <FireSource *>& flames);
+  void blur(GLFlameCanvas* const glBuffer);
   /** Plaque le blur à l'écran */
-  void drawBlur(vector <FireSource *>& flames);
+  void drawBlur(GLFlameCanvas* const glBuffer);
 
   void setGaussSigma(uint index, double sigma)
   {

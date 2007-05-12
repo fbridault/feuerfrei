@@ -115,7 +115,7 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
   glDeleteLists(m_flamesDisplayList,1);
 }
 
-void DepthPeelingEngine::render(const vector <FireSource *>& flames)
+void DepthPeelingEngine::render(GLFlameCanvas* const glBuffer)
 {   
   glDepthFunc (GL_LEQUAL);
   glEnable (GL_BLEND);
@@ -128,9 +128,7 @@ void DepthPeelingEngine::render(const vector <FireSource *>& flames)
   m_dpRendererProgram.setUniform1i("text",0);
   for(int l=m_nbLayers; l >= 0 ; l--){
     m_colorTex[l]->bind();
-    for (vector < FireSource* >::const_iterator flamesIterator = flames.begin ();
-	 flamesIterator != flames.end (); flamesIterator++)
-      (*flamesIterator)->drawBoundingBox();
+    glBuffer->drawFlamesBoundingBoxes();
   }
   m_dpRendererProgram.disable();
     

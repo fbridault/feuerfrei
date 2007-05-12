@@ -352,7 +352,10 @@ public:
   double getDistance() { return m_dist; };
 
   virtual bool operator<(const FireSource& other) const;
-  
+
+  /** Opérateur de comparaison des flammes basées sur leur distance par rapport
+   * à la caméra. On est obligé de définir cet opérateur car on utilise des
+   * vecteurs de pointeurs pour stocker les flammes. */
   static bool cmp( const FireSource* a, const FireSource* b ) {
     return a->m_dist < b->m_dist;
   }

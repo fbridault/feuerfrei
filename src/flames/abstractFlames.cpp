@@ -417,7 +417,7 @@ bool RealFlame::build ()
   if (m_vknots[m_vorder] > m_vknots[m_vorder + 1])
     for (j = m_vorder + 1; j < m_vknotsCount; j++)
       m_vknots[j] += 1;
-
+  
   return true;
 }
 

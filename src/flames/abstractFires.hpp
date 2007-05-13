@@ -124,9 +124,9 @@ protected:
   double m_intensity;
   /** Coefficient pondérateur de l'intensité de la source. */
   double m_intensityCoef;
-private:
   /** Indice de la lumière pour OpenGL. */
   short m_light;
+private:
   
   /** Pointeur sur la scène. */
   const Scene *m_scene;

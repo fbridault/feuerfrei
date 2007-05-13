@@ -495,8 +495,8 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     {      
     case WXK_LEFT: m_camera->moveOnSides(step); break;
     case WXK_RIGHT: m_camera->moveOnSides(-step); break;
-    case WXK_UP: m_camera->moveOnFrontOrBehind(-step*10); break;
-    case WXK_DOWN: m_camera->moveOnFrontOrBehind(step*10); break;
+    case WXK_UP: m_camera->moveOnFrontOrBehind(-step); break;
+    case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':

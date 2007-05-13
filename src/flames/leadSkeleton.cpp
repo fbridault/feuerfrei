@@ -50,7 +50,6 @@ void LeadSkeleton::addForces ()
   int fdf = m_flameConfig->fdf;
   
   m_selfVelocity = 0;
-  
   switch(fdf){
   case FDF_LINEAR :
     m_lastAppliedForce = innerForce * (m_u + 1);

@@ -130,6 +130,8 @@ void FireSource::build()
 {
   Point averagePos;
   
+  if(!m_visibility) return;
+  
   for (uint i = 0; i < m_nbFlames; i++){
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
@@ -184,7 +186,7 @@ void FireSource::buildBoundingSphere ()
 
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
-  bool save=m_visibility;
+  bool vis_save=m_visibility;
   
   if(forceSpheresBuild) buildBoundingSphere();
   
@@ -192,6 +194,8 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   m_visibility = (m_dist);
   
   if(m_visibility){
+    if(!vis_save)
+      m_solver->setRunningState(true);
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     if(m_dist > 5){
@@ -210,10 +214,8 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 	  setSamplingTolerance(20);
 	}
     }
-    if(!save)
-      m_solver->setRunningState(true);
   }else
-    if(!m_visibility && save)
+    if(vis_save)
       m_solver->setRunningState(false);
 }
 
@@ -266,11 +268,17 @@ void DetachableFireSource::build()
   Point averagePos, tmp;
   DetachedFlame* flame;
   
+  if(!m_visibility) return;
+  
   for (uint i = 0; i < m_nbFlames; i++){
     m_flames[i]->breakCheck();
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
   }
+  averagePos *= m_solver->getScale();
+  averagePos /= m_nbFlames;
+  averagePos += getPosition();
+  setLightPosition(averagePos);
   /* Destruction des flammes détachées en fin de vie */
   list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
   while( flamesIterator != m_detachedFlamesList.end()){
@@ -281,10 +289,6 @@ void DetachableFireSource::build()
     }else
       flamesIterator++;
   }
-  averagePos *= m_solver->getScale();
-  averagePos /= m_nbFlames;
-  averagePos += getPosition();
-  setLightPosition(averagePos);
 
   Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   Point pt;
@@ -332,7 +336,7 @@ void DetachableFireSource::setSmoothShading (bool state)
 
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
-  bool save=m_visibility;
+  bool vis_save=m_visibility;
   double distSave = m_dist;
   const double INCREMENT=4.0;
   
@@ -343,6 +347,10 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
   m_visibility = (m_dist) || m_boundingSphereForDetachedFlames.isVisible(view);
   
   if(m_visibility){
+    if(!vis_save){
+      cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+      m_solver->setRunningState(true);
+    }
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     m_differenceDist += m_dist - distSave;
@@ -373,11 +381,11 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	  }
 	m_differenceDist += INCREMENT;
       }
-    if(!save)
-      m_solver->setRunningState(true);
   }else
-    if(save)
+    if(vis_save){
+      cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
       m_solver->setRunningState(false);
+    }
 }
 
 void DetachableFireSource::drawBoundingBox () const

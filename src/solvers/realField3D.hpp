@@ -42,7 +42,7 @@ public:
     uint i,j,k,n;
     
     findPointPosition(pos,i,j,k); n=IX (i, j, k);
-    
+
     return Point(m_u[n], m_v[n], m_w[n]);
   };
   

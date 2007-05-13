@@ -23,28 +23,29 @@ void *FieldFiresThread::Entry()
     if(TestDestroy())
       break;
     swatch.Start();
-    m_fieldAndFires->field->cleanSources ();
     
+    /** Ajouter les forces externes des FDFs */
     for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
 	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
       (*flamesIterator)->addForces ();
     
     m_fieldAndFires->field->iterate ();
     
-    /* Il faut protéger l'accès aux flammes */
+    /* Il faut protéger l'accès aux flammes lors de la construction */
     Lock();
     for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
 	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();
 
+    /** Nettoyer les sources de forces externes */
+    m_fieldAndFires->field->cleanSources ();
+    Yield();
     time = swatch.Time();
     
     /** Si le calcul de l'itération passe en dessous des 50Hz, on dort le temps nécessaire */
     if(time < 20)
       Sleep(20 - time);
-    
-    //    Yield();
   }
 }
 

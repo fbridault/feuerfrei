@@ -1,6 +1,11 @@
-#Produced by Art of Illusion 2.4, Thu Mar 29 15:29:43 CEST 2007
-newmtl Default_Texture
-Kd 1 1 1
+#Produced by Art of Illusion 2.4, Mon May 14 01:42:49 CEST 2007
+newmtl Lampe
+Kd 0.8 0.59664 0.552
+Ks 0 0 0
+Ka 0 0 0
+illum 1
+newmtl Noire
+Kd 0 0 0
 Ks 0 0 0
 Ka 0 0 0
 illum 1

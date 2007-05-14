@@ -41,24 +41,11 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
   
   /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++)
-    m_offsets[0][j] = j-FILTER_SIZE/2+1;  
+    m_offsets[0][j] = j-FILTER_SIZE/2+1;
   /* Offsets gauches pour taille texture en entrée > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[1][j] = (j-FILTER_SIZE+1)*(int)(m_scaleFactor[1]);
+    m_offsets[1][j] = (j-FILTER_SIZE/2+1)*(int)(m_scaleFactor[1]);
   }  
-  /* Offsets droits pour taille texture en entrée > taille texture en sortie */
-  for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[2][j] = j*(int)(m_scaleFactor[1]);
-  }  
-  /* Offsets gauches pour taille texture en entrée = taille texture en sortie */
-  for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[3][j] = (j-FILTER_SIZE+1);
-  }  
-  /* Offsets droits pour taille texture en entrée = taille texture en sortie */
-  for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[4][j] = j;
-  }
-  
   m_secondPassFBOs[GLOW_LEVELS-1].Deactivate();
 }
 
@@ -123,9 +110,9 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   
   m_secondPassFBOs[0].Activate();
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   m_firstPassTex[0]->bind();
   
+  /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
   glBuffer->drawFlamesBoundingBoxes();
   
   m_programY.enable();
@@ -149,27 +136,19 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   glViewport (0, 0, m_width[1], m_height[1]);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
-  /* Partie X [-bandwidth/2;0] du filtre */
+  /* Partie X du filtre */
   m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
-  m_programX.setUniform1f("divide",m_divide[1]);
+  m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[0]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   m_firstPassTex[0]->bind();
   glBuffer->drawFlamesBoundingBoxes();
   
-  /* Partie X [0;bandwidth/2] du filtre */
-  m_programX.setUniform1fv("offsets",m_offsets[2],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
-  m_programX.setUniform1f("divide",m_divide[2]);
-  m_programX.setUniform1f("scale",m_scaleFactor[1]);
-  m_firstPassTex[0]->bind();
-  glBuffer->drawFlamesBoundingBoxes();
-    
-  /* Partie Y [-bandwidth/2;0] du filtre */
+  /* Partie Y du filtre */
   m_programY.enable();
-  m_programY.setUniform1fv("offsets",m_offsets[3],FILTER_SIZE);
-  m_programY.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
-  m_programY.setUniform1f("divide",m_divide[1]);
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1f("divide",m_divide[0]);
   m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
   m_firstPassFBOs[1].Activate();
@@ -177,12 +156,6 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   
   m_secondPassTex[1]->bind();
   glBuffer->drawFlamesBoundingBoxes();
-  
-  /* Partie Y [0;bandwidth/2] du filtre */
-  m_programY.setUniform1fv("offsets",m_offsets[4],FILTER_SIZE);
-  m_programY.setUniform1fv("weights",m_weights[2],FILTER_SIZE);
-  m_programY.setUniform1f("divide",m_divide[2]);
-  m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
   m_secondPassTex[1]->bind();
   glBuffer->drawFlamesBoundingBoxes();

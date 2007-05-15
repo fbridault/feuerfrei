@@ -52,18 +52,11 @@ void FreeSkeleton::removeParticle(uint n)
 //   }
 }
 
-void FreeSkeleton::updateParticle(uint i, const Point* const pt)
-{
-  m_queue[i] = *pt;
-  m_queue[i].decreaseLife();
-}
-
 void FreeSkeleton::swap(uint i, uint j)
 {
   Particle tmp(m_queue[i]);
   
-  m_queue[i] = m_queue[j];
-  
+  m_queue[i] = m_queue[j];  
   m_queue[j] = tmp;
 }
 
@@ -90,24 +83,22 @@ void FreeSkeleton::move ()
   
 }
 
-bool FreeSkeleton::moveParticle (Particle * const pos)
+bool FreeSkeleton::moveParticle (Particle * const particle)
 {
-  Point tmp(*pos);
-  
-  if (pos->isDead ())
+  if (particle->isDead ())
     return false;
   
   /* Si la particule sort de la grille, elle prend la vélocité du bord */
-  if ( tmp.x >= m_solver->getDimX() )
-    tmp.x = m_solver->getDimX() - EPSILON;
-  if ( tmp.y >= m_solver->getDimY() )
-    tmp.y = m_solver->getDimY() - EPSILON;
-  if ( tmp.z >= m_solver->getDimZ() )
-    tmp.z = m_solver->getDimZ() - EPSILON;
+  if ( particle->x >= m_solver->getDimX() )
+    particle->x = m_solver->getDimX() - EPSILON;
+  if ( particle->y >= m_solver->getDimY() )
+    particle->y = m_solver->getDimY() - EPSILON;
+  if ( particle->z >= m_solver->getDimZ() )
+    particle->z = m_solver->getDimZ() - EPSILON;
   
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  *pos += m_solver->getUVW (tmp, m_selfVelocity);
+  m_solver->moveParticle(*particle, m_selfVelocity);
   
   return true;
 }
@@ -170,7 +161,7 @@ void Skeleton::moveRoot ()
 {
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
-  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_root, m_selfVelocity);
+  m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_rootSave, m_selfVelocity);
   
   return;
 }
@@ -202,18 +193,17 @@ void Skeleton::move ()
     }	/* for */
 }
 
-bool Skeleton::moveParticle (Particle * const pos)
+bool Skeleton::moveParticle (Particle * const particle)
 {
-  if (pos->isDead ())
+  if (particle->isDead ())
     return false;
   
-  /* Retrouver les quatres cellules adjacentes autour de la particule */
-  *pos += m_solver->getUVW(*pos, m_selfVelocity);
+  m_solver->moveParticle(*particle, m_selfVelocity);
   
   /* Si la particule sort de la grille, elle est éliminée */
-  if (pos->x < 0 || pos->x > m_solver->getDimX()
-      || pos->y < 0 || pos->y > m_solver->getDimY()
-      || pos->z < 0 || pos->z > m_solver->getDimZ())
+  if (   particle->x < 0 || particle->x > m_solver->getDimX()
+      || particle->y < 0 || particle->y > m_solver->getDimY()
+      || particle->z < 0 || particle->z > m_solver->getDimZ())
     return false;
   
   return true;

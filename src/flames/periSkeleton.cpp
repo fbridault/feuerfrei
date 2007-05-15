@@ -34,8 +34,8 @@ FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadS
 
 void PeriSkeleton::addForces ()
 {
-  double fake;
-  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), fake);
+  double dummy;
+  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), dummy);
 }
 
 void PeriSkeleton::addParticle(const Point* const pt)
@@ -50,18 +50,18 @@ void PeriSkeleton::addParticle(const Point* const pt)
   m_queue[m_headIndex].birth(m_flameConfig->periLifeSpan);
 }
 
-bool PeriSkeleton::moveParticle (Particle * const pos)
+bool PeriSkeleton::moveParticle (Particle * const particle)
 {
-  if (pos->isDead ())
+  if (particle->isDead ())
     return false;
   
   /* Déplacement de la particule */
-  *pos += m_solver->getUVW(*pos, m_lead->getLastAppliedForce()/1.1);
+  m_solver->moveParticle(*particle, m_lead->getSelfVelocity()/1.1);
   
   /* Si la particule sort de la grille, elle est éliminée */
-  if (   pos->x < 0 || pos->x > m_solver->getDimX()
-      || pos->y < 0 || pos->y > m_solver->getDimY()
-      || pos->z < 0 || pos->z > m_solver->getDimZ())
+  if (   particle->x < 0 || particle->x > m_solver->getDimX()
+      || particle->y < 0 || particle->y > m_solver->getDimY()
+      || particle->z < 0 || particle->z > m_solver->getDimZ())
     return false;
   
   return true;

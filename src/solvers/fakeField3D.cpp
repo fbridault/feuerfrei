@@ -7,6 +7,8 @@ FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, d
 			  double timeStep, double buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
+  m_forceCoef = 3;
+  m_coef = m_dt * m_dt * m_forceCoef;
 }
 
 FakeField3D::~FakeField3D ()
@@ -15,7 +17,7 @@ FakeField3D::~FakeField3D ()
 
 void FakeField3D::iterate ()
 {
-  double coef=.1;
+  double coef=.5;
   if(!m_run)
     return;
   
@@ -93,7 +95,7 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
     m_position=position;
   }else{
     force = position;
-    strength = position * .1;
+    strength = position * .025;
   }
   
   /* Ajouter des forces externes */

@@ -174,7 +174,7 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0,2), flameConfig, 0, .5, 0, .1));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), flameConfig, 0, .5, 0, .025));
   
   /* On créé les squelettes en cercle */
   angle = 0;

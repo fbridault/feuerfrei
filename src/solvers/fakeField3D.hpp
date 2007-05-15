@@ -37,12 +37,22 @@ public:
   {
     Point value;
     
-//     value.x += m_dt * m_forceCoef * m_src.x * (m_src.x < 0 ? pos.x/m_dim.x : (m_dim.x-pos.x/m_dim.x)) * (pos.y+.1)/m_dim.y;
-//     value.z += m_dt * m_forceCoef * m_src.z * (m_src.z < 0 ? pos.z/m_dim.z : (m_dim.z-pos.z/m_dim.z)) * (pos.y+.1)/m_dim.y;
-    value.x += m_dt * m_forceCoef * m_src.x * ((pos.y/m_dim.y)+.1);
-    value.z += m_dt * m_forceCoef * m_src.z * ((pos.y/m_dim.y)+.1);
-    value.y += (m_dt * m_forceCoef) * (m_buoyancy * ((pos.y/m_dim.y)+.1) + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
+    value.x = m_dt * m_forceCoef * m_src.x * ((pos.y/m_dim.y)+.1);
+    value.z = m_dt * m_forceCoef * m_src.z * ((pos.y/m_dim.y)+.1);
+    value.y = m_dt * m_forceCoef * (m_buoyancy * ((pos.y/m_dim.y)+.1) + selfVelocity) - 2*(fabs(value.x) + fabs(value.z));
     return value;
+  };
+
+  void moveParticle (Particle& particle, double selfVelocity) const
+  {
+    double coef;
+    /** Sauvegarde de la position à t-1 */
+    particle.xprev = particle.x; particle.yprev = particle.y; particle.zprev = particle.z;
+    
+    /* Pour indication, m_coef = m_dt * m_dt * m_forceCoef (calculé dans le constructeur) */
+    particle.x = 2*particle.x - particle.xprev + m_coef * m_src.x; 
+    particle.y = 2*particle.y - particle.yprev + m_coef * (m_buoyancy * ((1-particle.y)/m_dim.y) + selfVelocity - 2*(fabs(m_src.x) + fabs(m_src.z)));
+    particle.z = 2*particle.z - particle.zprev + m_coef * m_src.z;
   };
   
   void addUsrc (const Point& pos, double value)
@@ -52,7 +62,7 @@ public:
   
   void addVsrc (const Point& pos, double value, double& selfVelocity)
   {
-    selfVelocity += value;
+    selfVelocity += value*5.0;
   };
   
   void addWsrc (const Point& pos, double value)
@@ -75,6 +85,7 @@ protected:
   /** Coefficients pour les forces externes. */
   Point m_src;
   Point m_latentForces;
+  double m_coef;
 };
 
 #endif

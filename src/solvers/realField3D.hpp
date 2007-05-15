@@ -46,6 +46,15 @@ public:
     return Point(m_u[n], m_v[n], m_w[n]);
   };
   
+  void moveParticle (Particle& particle, double selfVelocity) const
+  {
+    uint i,j,k,n;
+    
+    findPointPosition(particle,i,j,k); n=IX (i, j, k);
+
+    particle.x += m_u[n]; particle.y += m_v[n]; particle.z += m_w[n];
+  };
+  
   void addUsrc (const Point& pos, double value)
   {
     uint i,j,k;

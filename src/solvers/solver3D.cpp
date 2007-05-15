@@ -169,22 +169,22 @@ void Solver3D::iterate ()
   if(!m_run)
     return;
   /* Cellule(s) génératrice(s) */
+  
+//   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+//     for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
+//       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0;
 
-  for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-    for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-      m_vSrc[IX(i,1,k)] += m_buoyancy/20.0;
-
-//   m_t=m_t1;
-//   for (uint k = 1; k <= m_nbVoxelsZ; k++){
-//     for (uint j = 1; j <= m_nbVoxelsY; j++){
-//       for (uint i = 1; i <= m_nbVoxelsX; i++){
-// 	m_vSrc[m_t] += m_buoyancy/10.0; // / (double) (m_nbVoxelsY-j+1);
-// 	m_t++;
-//       }//for i
-//       m_t+=2;
-//     }//for j
-//     m_t+=m_t2nx;
-//   }//for k
+  m_t=m_t1;
+  for (uint k = 1; k <= m_nbVoxelsZ; k++){
+    for (uint j = 1; j <= m_nbVoxelsY; j++){
+      for (uint i = 1; i <= m_nbVoxelsX; i++){
+	m_vSrc[m_t] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+	m_t++;
+      }//for i
+      m_t+=2;
+    }//for j
+    m_t+=m_t2nx;
+  }//for k
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
@@ -210,7 +210,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = strength.z = .2;  
+    strength.x = strength.y = strength.z = .2;
     m_position=position;
   }else{
     force = position;
@@ -220,7 +220,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     strength.z = fabs(strength.z);  
   }
   
-  findPointPosition(m_dim-Point(.05,.1,.05),widthx,widthy,widthz);
+  findPointPosition(m_dim-Point(.1,.3,.1),widthx,widthy,widthz);
   findPointPosition(Point(0,0,0),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */

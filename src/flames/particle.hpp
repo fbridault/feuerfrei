@@ -12,10 +12,12 @@ class Particle : public Point
 public:
   /** Durée de vie de la particule. */
   uint m_lifespan;
+  /** Coordonnées à t-1 */
+  double xprev, yprev, zprev;
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */
-  Particle():Point(){m_lifespan=0;};
+  Particle():Point(){m_lifespan=0; xprev=yprev=zprev=0.0;};
   
   /** Ce constructeur prend un point de l'espace comme base.
    * @param P point dans l'espace
@@ -23,6 +25,8 @@ public:
    */
   Particle(const Point& P, uint lifespan):Point(P)
   {
+    xprev=yprev=zprev=0.0;
+    m_lifespan=lifespan;
   };
   
   /** Constructeur par recopie 
@@ -31,6 +35,9 @@ public:
   Particle(const Particle& P):Point(P)
   {
     m_lifespan=P.m_lifespan;
+    xprev = P.xprev;
+    yprev = P.yprev;
+    zprev = P.zprev;
   };
   
   /** Décrémente la durée de vie de la particule. */
@@ -49,12 +56,21 @@ public:
   /** Surchage de l'opérateur =
    * @param P particule source
    */
-  virtual Particle& operator= (const Particle& P){x=P.x; y=P.y; z=P.z; m_lifespan=P.m_lifespan; return *this;};
+  virtual Particle& operator= (const Particle& P){
+    x=P.x; y=P.y; z=P.z; 
+    xprev = P.xprev; yprev = P.yprev; zprev = P.zprev;
+    m_lifespan=P.m_lifespan; 
+    return *this;
+  };
   
   /** Surchage de l'opérateur =
    * @param P point dans l'espace
    */
-  virtual Particle& operator= (const Point& P){x=P.x; y=P.y; z=P.z; return *this;};
+  virtual Particle& operator= (const Point& P){
+    x=P.x; y=P.y; z=P.z;
+    xprev = 0.0; yprev = 0.0; zprev = 0.0;
+    return *this;
+  };
 };
 
 

@@ -67,7 +67,7 @@ void LeadSkeleton::addForces ()
     m_lastAppliedForce = innerForce * rand()/((double)RAND_MAX);
     break;
   }
-
+  
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if (m_perturbateCount >= 2)
@@ -80,6 +80,7 @@ void LeadSkeleton::addForces ()
     break;
     
   case FLICKERING_RIGHT :
+    /* Utilisé auparavant pour faire des benchs sur le solveur, plus d'utilité pour le moment */
     //     if(m_perturbateCount>=24)
     //       m_perturbateCount = 0;
     //     else{

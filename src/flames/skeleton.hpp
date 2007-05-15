@@ -95,7 +95,7 @@ public:
   /** Déplace une particule dans le champ de vélocité.
    * @param pos position de la particule
    */
-  virtual bool moveParticle(Particle* const pos);
+  virtual bool moveParticle(Particle* const particle);
 
 protected:
   /** Echange deux particules dans la file.
@@ -113,7 +113,11 @@ protected:
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
-  void updateParticle(uint i, const Point* const pt);
+  void updateParticle(uint i, const Point* const pt)
+  {
+    m_queue[i] = *pt;
+    m_queue[i].decreaseLife();
+  }
   
   /** Dessine les particules du squelettes 
    * @param particle Particule à dessiner.
@@ -165,7 +169,7 @@ public:
    * suppression des particules mortes.
    */
   void move();
-  virtual bool moveParticle(Particle* const pos);
+  virtual bool moveParticle(Particle* const particle);
   
   /** Déplacement de l'origine du squelette. */
   void moveRoot ();

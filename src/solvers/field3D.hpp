@@ -51,6 +51,8 @@ public:
    */
   virtual Point getUVW (const Point& pos, double selfVelocity) const = 0;
   
+  virtual void moveParticle (Particle& particle, double selfVelocity) const = 0;
+  
   /** Ajout d'une force externe pour la composante U.
    * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.

@@ -353,8 +353,8 @@ void GLFlameCanvas::DeleteThreads()
        threadsIterator != m_extraThreads.end (); threadsIterator++)
     (*threadsIterator)->Stop();
   
+  m_scheduler->forceEnd();
   m_scheduler->Wait();
-  //   m_scheduler->forceUnlock();
   
   for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)

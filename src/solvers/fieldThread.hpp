@@ -31,23 +31,22 @@ public:
   virtual ExitCode Entry();
   
   void Stop(){ m_run = false; };
-  void singleExecLock() { m_singleExecMutex.Lock(); };
-  void forceUnlock() { m_singleExecCondition.Broadcast(); };
+  void forceEnd() { 
+    m_schedulerSem.Post();
+  };
   void signalWorkEnd() {
-    m_schedulerMutex.Lock();
+    m_remainingThreadsMutex.Lock();
     m_remainingThreads--;
-    m_schedulerCondition.Signal();
-    m_schedulerMutex.Unlock();
-    m_singleExecCondition.Wait();
-    m_singleExecMutex.Unlock();
+    m_remainingThreadsMutex.Unlock();
+    m_schedulerSem.Post();
   };
 private:
   list <FieldFiresThread *> m_threads;
   list <FieldFlamesThread *> m_extraThreads;
   uint m_remainingThreads;
   uint m_nbThreads;
-  wxMutex m_singleExecMutex, m_schedulerMutex;
-  wxCondition m_singleExecCondition, m_schedulerCondition;
+  wxMutex m_remainingThreadsMutex;
+  wxSemaphore m_schedulerSem;
   bool m_run;
 };
 
@@ -89,13 +88,15 @@ public:
    */
   void Stop(){ m_run = false; };
   void Lock(){ m_mutex.Lock(); };
-  void Unlock(){ m_mutex.Unlock(); };  
+  void Unlock(){ m_mutex.Unlock(); };
+  void AskExecAuthorization(){ m_singleExecMutex.Lock(); };
+  void GiveExecAuthorization(){ m_singleExecMutex.Unlock(); };
   /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
 private:
   FieldFiresAssociation *m_fieldAndFires;
   FieldThreadsScheduler *m_scheduler;
-  wxMutex m_mutex;
+  wxMutex m_mutex, m_singleExecMutex;
   bool m_run;
 };
 
@@ -110,13 +111,15 @@ public:
    */
   void Stop(){ m_run = false; };
   void Lock(){ m_mutex.Lock(); };
-  void Unlock(){ m_mutex.Unlock(); };  
+  void Unlock(){ m_mutex.Unlock(); };
+  void AskExecAuthorization(){ m_singleExecMutex.Lock(); };
+  void GiveExecAuthorization(){ m_singleExecMutex.Unlock(); };
   /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
 private:
   FieldFlamesAssociation *m_fieldAndFlames;
   FieldThreadsScheduler *m_scheduler;
-  wxMutex m_mutex;
+  wxMutex m_mutex, m_singleExecMutex;
   bool m_run;
 };
 #endif

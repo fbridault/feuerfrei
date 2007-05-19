@@ -4,12 +4,9 @@
 #include "../flames/abstractFires.hpp"
 
 FieldThreadsScheduler::FieldThreadsScheduler()
-  : wxThread(wxTHREAD_JOINABLE), m_singleExecMutex(wxMUTEX_DEFAULT), m_schedulerMutex(wxMUTEX_DEFAULT),
-    m_singleExecCondition(m_singleExecMutex), m_schedulerCondition(m_schedulerMutex)
+  : wxThread(wxTHREAD_JOINABLE)
 {
   m_run = true;
-  /* On bloque pour éviter le Signal() dans les threads avant le Wait() */
-  m_schedulerMutex.Lock();
 }
 
 FieldThreadsScheduler::~FieldThreadsScheduler()
@@ -36,12 +33,11 @@ void *FieldThreadsScheduler::Entry()
     if(TestDestroy())
       break;
 
-    /* Déverrouille m_schedulerMutex et se met en attente */
-    m_schedulerCondition.Wait();
-    m_schedulerMutex.Unlock();    
-
-    m_schedulerMutex.Lock();
+    /* Endort le scheduler tant qu'aucun thread n'a terminé */
+    m_schedulerSem.Wait();
+    
     /* On teste si tous les threads ont terminé */
+    m_remainingThreadsMutex.Lock();
     if(!m_remainingThreads){
       time = swatch.Time();
       /* Si le calcul de l'itération passe en dessous des 50Hz, on dort le temps nécessaire */
@@ -50,13 +46,18 @@ void *FieldThreadsScheduler::Entry()
       
       swatch.Start();
       m_remainingThreads = m_nbThreads;
-      /* Verrouillage de la condition pour être sûr que tous les threads sont en attente */
-      m_singleExecMutex.Lock();
-      /* On réveille tous les threads en attente */
-      m_singleExecCondition.Broadcast();
-      /* Déverrouillage manuel (broadcast ne déverrouille pas le mutex associé) */
-      m_singleExecMutex.Unlock();
-    }
+      m_remainingThreadsMutex.Unlock();
+      
+      /* Relance tous les threads */
+      for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+	   threadsIterator != m_threads.end (); threadsIterator++)
+	(*threadsIterator)->GiveExecAuthorization();
+      
+      for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
+	   threadsIterator != m_extraThreads.end (); threadsIterator++)
+	(*threadsIterator)->GiveExecAuthorization();
+    }else
+      m_remainingThreadsMutex.Unlock();
   }
 }
 
@@ -76,12 +77,14 @@ void *FieldFiresThread::Entry()
 { 
   wxStopWatch swatch;
   long time;
+
+  /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
+  AskExecAuthorization();
   
   while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
-    m_scheduler->singleExecLock();
     
     /* Ajouter les forces externes des FDFs */
     for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
@@ -100,8 +103,10 @@ void *FieldFiresThread::Entry()
     /* Nettoyer les sources de forces externes */
     m_fieldAndFires->field->cleanSources ();
     
-    /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
+    /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
+    AskExecAuthorization();
+    Yield();
   }
 }
 
@@ -122,11 +127,13 @@ void *FieldFlamesThread::Entry()
   wxStopWatch swatch;
   long time;
   
+  /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
+  AskExecAuthorization();
+  
   while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
-    m_scheduler->singleExecLock();
     
     for (list < RealFlame* >::iterator flamesIterator = m_fieldAndFlames->flames.begin ();
 	 flamesIterator != m_fieldAndFlames->flames.end (); flamesIterator++)
@@ -147,5 +154,7 @@ void *FieldFlamesThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
     m_scheduler->signalWorkEnd();
+    AskExecAuthorization();
+    Yield();
   }
 }

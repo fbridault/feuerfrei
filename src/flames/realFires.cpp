@@ -64,7 +64,8 @@ CampFire::CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, co
     }
 }
 
-CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
+CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, 
+		       FieldThreadsScheduler* const scheduler, Scene *scene,
 		       const char *lampName, uint index, const GLSLProgram * const program, Point scale):
   FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, program, "Lamp")
 {
@@ -91,7 +92,7 @@ CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFl
       fieldFlamesAssociation->addFlameSource(m_flames[i]);    
       m_fieldFlamesAssociations.push_back(fieldFlamesAssociation);
       /* Instanciation des threads : 1 solveur = 1 thread */
-      fieldThreads.push_back(new FieldFlamesThread(fieldFlamesAssociation));
+      fieldThreads.push_back(new FieldFlamesThread(fieldFlamesAssociation, scheduler));
     }
 }
 

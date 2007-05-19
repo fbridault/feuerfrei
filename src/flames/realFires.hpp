@@ -134,7 +134,8 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, Scene *scene,
+  CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, 
+	     FieldThreadsScheduler* const scheduler, Scene *scene,
 	     const char *lampName, uint index, const GLSLProgram * const program, Point scale);
   /** Destructeur */
   virtual ~CandlesSet();

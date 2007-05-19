@@ -7,7 +7,7 @@
 
 #if !wxUSE_THREADS
     #error "This class requires thread support!"
-#endif // wxUSE_THREADS
+#endif
 
 #include <wx/thread.h>
 #include <list>
@@ -16,7 +16,40 @@ using namespace std;
 
 #include "field3D.hpp"
 
+class FieldFiresThread;
+class FieldFlamesThread;
 class FireSource;
+
+class FieldThreadsScheduler : public wxThread
+{
+public:
+  FieldThreadsScheduler();		
+  virtual ~FieldThreadsScheduler();
+  
+  void Init(const list <FieldFiresThread *> &threads, const list <FieldFlamesThread *> &extraThreads);
+  /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
+  virtual ExitCode Entry();
+  
+  void Stop(){ m_run = false; };
+  void singleExecLock() { m_singleExecMutex.Lock(); };
+  void forceUnlock() { m_singleExecCondition.Broadcast(); };
+  void signalWorkEnd() {
+    m_schedulerMutex.Lock();
+    m_remainingThreads--;
+    m_schedulerCondition.Signal();
+    m_schedulerMutex.Unlock();
+    m_singleExecCondition.Wait();
+    m_singleExecMutex.Unlock();
+  };
+private:
+  list <FieldFiresThread *> m_threads;
+  list <FieldFlamesThread *> m_extraThreads;
+  uint m_remainingThreads;
+  uint m_nbThreads;
+  wxMutex m_singleExecMutex, m_schedulerMutex;
+  wxCondition m_singleExecCondition, m_schedulerCondition;
+  bool m_run;
+};
 
 class FieldFiresAssociation
 {
@@ -48,7 +81,7 @@ public:
 class FieldFiresThread: public wxThread
 {
 public:
-  FieldFiresThread(FieldFiresAssociation *fieldAndFires);
+  FieldFiresThread(FieldFiresAssociation *fieldAndFires, FieldThreadsScheduler* const scheduler);
   virtual ~FieldFiresThread();
   
   /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
@@ -61,6 +94,7 @@ public:
   virtual ExitCode Entry();
 private:
   FieldFiresAssociation *m_fieldAndFires;
+  FieldThreadsScheduler *m_scheduler;
   wxMutex m_mutex;
   bool m_run;
 };
@@ -68,7 +102,7 @@ private:
 class FieldFlamesThread: public wxThread
 {
 public:
-  FieldFlamesThread(FieldFlamesAssociation *fieldAndFlames);
+  FieldFlamesThread(FieldFlamesAssociation *fieldAndFlames, FieldThreadsScheduler* const scheduler);
   virtual ~FieldFlamesThread();
   
   /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
@@ -81,6 +115,7 @@ public:
   virtual ExitCode Entry();
 private:
   FieldFlamesAssociation *m_fieldAndFlames;
+  FieldThreadsScheduler *m_scheduler;
   wxMutex m_mutex;
   bool m_run;
 };

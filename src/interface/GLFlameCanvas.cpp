@@ -36,7 +36,6 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
   m_intensities = NULL;
-  m_switch = false;
   m_currentConfig = NULL;
   m_globalField = NULL;
   //m_framesCountForSwitch = 0;
@@ -46,7 +45,7 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 GLFlameCanvas::~GLFlameCanvas()
 {
-  DeleteThreads();
+  /* On ne détruit pas les threads, la méthode FlamesFrame::OnClose() s'en occupe */
   DestroyScene();
   delete [] m_pixels;
   if( m_intensities ) delete [] m_intensities;
@@ -81,7 +80,6 @@ void GLFlameCanvas::InitGL()
   
   glShadeModel (GL_SMOOTH);
   glEnable (GL_LINE_SMOOTH);
-  /*glEnable(GL_POLYGON_SMOOTH); */
   
   glEnable (GL_CULL_FACE);
   glCullFace (GL_BACK);
@@ -127,7 +125,7 @@ void GLFlameCanvas::InitFlames(void)
       break;
     case CANDLESSET :
       m_flames.push_back( new CandlesSet (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					  m_extraThreads, m_scene, m_currentConfig->flames[i].wickName.fn_str(),
+					  m_extraThreads, m_scheduler, m_scene, m_currentConfig->flames[i].wickName.fn_str(),
 					  i, m_SVProgram, m_currentConfig->solvers[m_currentConfig->flames[i].solverIndex].scale));
       break;
     case CANDLESTICK :
@@ -220,6 +218,7 @@ void GLFlameCanvas::InitThreads()
   uint i=0;
   FieldFiresAssociation *fieldFiresAssociation;
   
+  m_scheduler = new FieldThreadsScheduler();
   for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
        solversIterator != m_solvers.end (); solversIterator++, i++){
     fieldFiresAssociation = new FieldFiresAssociation(*solversIterator);
@@ -230,8 +229,14 @@ void GLFlameCanvas::InitThreads()
     
     m_fieldFiresAssociations.push_back(fieldFiresAssociation);
     /* Instanciation des threads : 1 solveur = 1 thread */
-    m_threads.push_back(new FieldFiresThread(fieldFiresAssociation));
+    m_threads.push_back(new FieldFiresThread(fieldFiresAssociation, m_scheduler));
   }
+  m_scheduler->Init(m_threads, m_extraThreads);
+  
+  if ( m_scheduler->Create() != wxTHREAD_NO_ERROR )
+    {
+      wxLogError(_("Can't create scheduler thread!"));
+    }
   
   for (list <FieldFiresThread *>::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)    
@@ -248,7 +253,7 @@ void GLFlameCanvas::InitThreads()
       {
 	wxLogError(_("Can't create thread!"));
       }
-  
+  m_scheduler->Run();
   /* Lancement des threads */
   for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
@@ -310,6 +315,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
 
 void GLFlameCanvas::PauseThreads()
 {
+  m_scheduler->Pause();
   for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++){
     (*threadsIterator)->Pause();
@@ -322,6 +328,7 @@ void GLFlameCanvas::PauseThreads()
 
 void GLFlameCanvas::ResumeThreads()
 {
+  m_scheduler->Resume();
   for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++){
     (*threadsIterator)->Resume();
@@ -336,20 +343,37 @@ void GLFlameCanvas::DeleteThreads()
 {
   /* On sort les threads de leur pause si nécessaire, car sinon il serait impossible de les arrêter ! */
   if( !IsRunning() ) setRunningState(true);
+  m_scheduler->Stop();
+  
   for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
-       threadsIterator != m_threads.end (); threadsIterator++){
+       threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Stop();
+
+  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
+       threadsIterator != m_extraThreads.end (); threadsIterator++)
+    (*threadsIterator)->Stop();
+  
+  m_scheduler->Wait();
+  //   m_scheduler->forceUnlock();
+  
+  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Wait();
+  
+  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
+       threadsIterator != m_extraThreads.end (); threadsIterator++)
+    (*threadsIterator)->Wait();
+  
+  /* Tous les threads sont terminés, on peut tout supprimer sans risque */
+  delete m_scheduler;
+  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+       threadsIterator != m_threads.end (); threadsIterator++)
     delete (*threadsIterator);
-  }
   m_threads.clear();
   
   for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++){
-    (*threadsIterator)->Stop();
-    (*threadsIterator)->Wait();
+       threadsIterator != m_extraThreads.end (); threadsIterator++)
     delete (*threadsIterator);
-  }
   m_extraThreads.clear();
   
   for (list < FieldFiresAssociation* >::iterator ffaIterator = m_fieldFiresAssociations.begin ();
@@ -357,7 +381,7 @@ void GLFlameCanvas::DeleteThreads()
     delete (*ffaIterator);
   m_fieldFiresAssociations.clear();
 }
-  
+
 void GLFlameCanvas::Restart (void)
 {
   Disable();
@@ -457,14 +481,6 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
     
 //     if(m_currentConfig->useGlobalField) m_globalField->iterate();
     
-    /********** CONSTRUCTION DES FLAMMES *******************************/
-    //   if(m_framesCountForSwitch){
-    //     if(m_framesCountForSwitch == 6){
-    //       m_switch = false;
-    //       m_framesCountForSwitch = 0;
-    //     }else
-    //       m_framesCountForSwitch++;
-    //   }
   }
   
   /* Force à redessiner */
@@ -500,26 +516,20 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':
-      //       m_framesCountForSwitch = 1;
-//       m_switch = true;
       for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
 	   solversIterator != m_solvers.end (); solversIterator++)
 	(*solversIterator)->decreaseRes ();
       break;
-      
     case 'L': 
-      //       m_framesCountForSwitch = 1;
-      //       m_switch = true;
       for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
 	   solversIterator != m_solvers.end (); solversIterator++)
 	(*solversIterator)->increaseRes ();
       break;
-    case WXK_SPACE : m_run = !m_run; break;
+    case WXK_SPACE : setRunningState(!m_run); ; break;
     }
   event.Skip();
 }
 
-/** Fonction de dessin global */
 void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
   if(!m_init)
@@ -535,7 +545,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   /* Déplacement du camera */
   m_camera->setView();
     
-  if(m_run && !m_switch){
+  if(m_run){
     /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
     m_visibility = false;
     if(m_displayFlame){

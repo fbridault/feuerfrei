@@ -70,7 +70,7 @@ public:
   void setRunningState(bool run) { 
     m_run=run;
     if(!m_run) PauseThreads();
-    if(m_run) ResumeThreads();    
+    if(m_run) ResumeThreads();
   };
   
   /** Active/Désactive le glow seul */
@@ -141,8 +141,6 @@ private:
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;
 
-  //  uint m_framesCountForSwitch;
-  bool m_switch;
   int m_t;
   
   /* Tableau de pixels pour la sauvegarde des images */
@@ -161,6 +159,8 @@ private:
   /** Liste de threads supplémentaires, utilisée pour distinguer les solveurs internes à une source lumineuse.
    * Ceci est utilisé uniquement typiquement pour les CandlesSet. */
   list <FieldFlamesThread *> m_extraThreads;
+  /** Ordonnanceur des threads */
+  FieldThreadsScheduler *m_scheduler;
   vector <Field3D *> m_solvers;
   GlobalField *m_globalField;
     

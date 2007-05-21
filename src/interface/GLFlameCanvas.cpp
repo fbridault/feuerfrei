@@ -218,7 +218,6 @@ void GLFlameCanvas::InitThreads()
   uint i=0;
   FieldFiresAssociation *fieldFiresAssociation;
   
-  m_scheduler = new FieldThreadsScheduler();
   for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
        solversIterator != m_solvers.end (); solversIterator++, i++){
     fieldFiresAssociation = new FieldFiresAssociation(*solversIterator);
@@ -272,6 +271,9 @@ void GLFlameCanvas::InitScene()
   InitSolvers();
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_flames);
+  
+  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
+  m_scheduler = new FieldThreadsScheduler();
   
   InitFlames();
   

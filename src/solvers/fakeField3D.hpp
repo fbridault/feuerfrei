@@ -62,7 +62,7 @@ public:
   
   void addVsrc (const Point& pos, double value, double& selfVelocity)
   {
-    selfVelocity += value*5.0;
+    selfVelocity += value*4.0;
   };
   
   void addWsrc (const Point& pos, double value)

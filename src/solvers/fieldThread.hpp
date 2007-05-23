@@ -32,6 +32,9 @@ public:
   
   void Stop(){ m_run = false; };
   void forceEnd() { 
+    m_remainingThreadsMutex.Lock();
+    m_remainingThreads=0;
+    m_remainingThreadsMutex.Unlock();
     m_schedulerSem.Post();
   };
   void signalWorkEnd() {

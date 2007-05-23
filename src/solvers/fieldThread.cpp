@@ -78,13 +78,14 @@ void *FieldFiresThread::Entry()
   wxStopWatch swatch;
   long time;
 
-  /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
-  AskExecAuthorization();
   
   while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
+    
+    /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
+    AskExecAuthorization();
     
     /* Ajouter les forces externes des FDFs */
     for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
@@ -105,8 +106,7 @@ void *FieldFiresThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
-    AskExecAuthorization();
-    Yield();
+//     Yield();
   }
 }
 
@@ -127,14 +127,14 @@ void *FieldFlamesThread::Entry()
   wxStopWatch swatch;
   long time;
   
-  /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
-  AskExecAuthorization();
-  
   while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
     
+    /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
+    AskExecAuthorization();
+
     for (list < RealFlame* >::iterator flamesIterator = m_fieldAndFlames->flames.begin ();
 	 flamesIterator != m_fieldAndFlames->flames.end (); flamesIterator++)
       (*flamesIterator)->addForces ();
@@ -154,7 +154,6 @@ void *FieldFlamesThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
     m_scheduler->signalWorkEnd();
-    AskExecAuthorization();
-    Yield();
+//     Yield();
   }
 }

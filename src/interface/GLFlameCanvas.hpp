@@ -197,16 +197,9 @@ inline void GLFlameCanvas::drawFlames(void)
 
 inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
 {
-  list < FieldFiresThread* >::iterator threadIterator = m_threads.begin ();
-  /* Dessin de la flamme */
-  for (list < FieldFiresAssociation* >::iterator ffaIterator = m_fieldFiresAssociations.begin ();
-       ffaIterator != m_fieldFiresAssociations.end (); ffaIterator++, threadIterator++)
-    {
-      (*threadIterator)->Lock();
-      for (list < FireSource* >::iterator flamesIterator = (*ffaIterator)->fireSources.begin ();
-	   flamesIterator != (*ffaIterator)->fireSources.end (); flamesIterator++)
-	(*flamesIterator)->drawBoundingBox ();
-      (*threadIterator)->Unlock();
-    }
+  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+       flamesIterator != m_flames.end (); flamesIterator++)
+    (*flamesIterator)->drawBoundingBox ();
 }
+
 #endif

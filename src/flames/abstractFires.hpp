@@ -315,28 +315,11 @@ public:
   }
   
   /** Fonction permettant de récupérer le centre de la flamme dans le repère local */
-  virtual Point getCenter() const
-  {
-    Point averagePt;
-    
-    for (uint i = 0; i < m_nbFlames; i++)
-      averagePt += m_flames[i]->getCenter ();
-    averagePt = averagePt/m_nbFlames;
-    
-    return(averagePt);
-  }
+  virtual Point getCenter() const { return m_center; };
+  
   /** Fonction permettant de récupérer l'orientation principale de la flamme
    */
-  virtual Vector getMainDirection() const
-  {
-    Vector averageVec;
-    
-    for (uint i = 0; i < m_nbFlames; i++)
-      averageVec += m_flames[i]->getMainDirection ();
-    averageVec = averageVec/m_nbFlames;
-    
-    return(averageVec);
-  }
+  virtual Vector getMainDirection() const { return m_direction; };
   
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
@@ -385,7 +368,7 @@ protected:
   /** Texture utilisée pour les flammes */
   Texture m_texture;
   
-  /** Sphère englobante. */
+  /** Sphère englobante utilisée pour vérifier la visibilité de la source. */
   BoundingSphere m_boundingSphere;
   /** Visibilité de la flamme. */
   bool m_visibility;
@@ -397,6 +380,11 @@ protected:
   
   /** Configuration de la flamme */
   FlameConfig *m_flameConfig;
+
+  /** Centre de la flamme, recalculé à chaque itération dans build() */
+  Point m_center;
+  /** Direction principale de la flamme, recalculée à chaque itération dans build() */
+  Vector m_direction;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -424,7 +412,14 @@ public:
   virtual void build();
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
   
-  virtual void drawBoundingBox () const;
+  virtual void drawBoundingBox () const
+  {
+    Point position(getPosition());
+    glPushMatrix();
+    glTranslatef (position.x, position.y, position.z);
+    GraphicsFn::SolidBox(m_BBmin,m_BBmax);
+    glPopMatrix();
+  }
 
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.
@@ -448,11 +443,15 @@ public:
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
 private:
+  /** Construit la bounding box utilisée pour l'affichage */
+  virtual void buildBoundingBox ();
+  
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;
   /** Sphère englobante pour les flammes détachées. */
   BoundingSphere m_boundingSphereForDetachedFlames;
   double m_differenceDist;
+  Point m_BBmin, m_BBmax;
 };
 
 #endif

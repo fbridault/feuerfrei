@@ -129,17 +129,21 @@ FireSource::~FireSource()
 void FireSource::build()
 {
   Point averagePos;
+  Vector averageVec;
   
   if(!m_visibility) return;
   
   for (uint i = 0; i < m_nbFlames; i++){
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
+    averageVec += m_flames[i]->getMainDirection ();
   }
   averagePos *= m_solver->getScale();
-  averagePos /= m_nbFlames;
-  averagePos += getPosition();
+  m_center = averagePos/m_nbFlames;
+  averagePos = m_center + getPosition();
   setLightPosition(averagePos);
+  
+  m_direction = averageVec/m_nbFlames;
 }
 
 void FireSource::computeIntensityPositionAndDirection()
@@ -173,12 +177,15 @@ void FireSource::computeIntensityPositionAndDirection()
 void FireSource::buildBoundingSphere ()
 {
   Point p;
-  double t,k;
+  double t,k,s;
   p = (m_solver->getScale() * m_solver->getDim())/2.0;
   t = p.max();
   k = t*t;
+  s = sqrt(k+k);
   
-  m_boundingSphere.radius = sqrt(k+k);
+  m_boundingSphere.radius = sqrt(s+k);
+  /* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
+//   m_boundingSphere.radius *= 1.1;
   m_boundingSphere.centre = m_solver->getPosition() + p;
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
   //  m_boundingSphere.centre = getCenterSP();
@@ -266,6 +273,7 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
 void DetachableFireSource::build()
 {
   Point averagePos, tmp;
+  Vector averageVec;
   DetachedFlame* flame;
   
   if(!m_visibility) return;
@@ -274,11 +282,15 @@ void DetachableFireSource::build()
     m_flames[i]->breakCheck();
     m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
+    averageVec += m_flames[i]->getMainDirection ();
   }
   averagePos *= m_solver->getScale();
-  averagePos /= m_nbFlames;
-  averagePos += getPosition();
+  m_center = averagePos/m_nbFlames;
+  averagePos = m_center + getPosition();
   setLightPosition(averagePos);
+  
+  m_direction = averageVec/m_nbFlames;
+  
   /* Destruction des flammes détachées en fin de vie */
   list < DetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
   while( flamesIterator != m_detachedFlamesList.end()){
@@ -324,6 +336,8 @@ void DetachableFireSource::build()
     m_boundingSphere.radius = sqrt(k+k);
     m_boundingSphere.centre = m_solver->getPosition() + p;
   }
+  /* Calcul de la bouding box pour affichage */
+  buildBoundingBox ();
 }
 
 void DetachableFireSource::setSmoothShading (bool state)
@@ -388,7 +402,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     }
 }
 
-void DetachableFireSource::drawBoundingBox () const
+void DetachableFireSource::buildBoundingBox ()
 {
   Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   Point pt;
@@ -426,10 +440,6 @@ void DetachableFireSource::drawBoundingBox () const
   if(0.0 < ptMin.z)
     ptMin.z = 0.0;
   
-  ptMin *= m_solver->getScale();
-  ptMax *= m_solver->getScale();
-  glPushMatrix();
-  glTranslatef(pos.x,pos.y,pos.z);
-  GraphicsFn::SolidBox(ptMin,ptMax);
-  glPopMatrix();
+  m_BBmin = ptMin * m_solver->getScale();
+  m_BBmax = ptMax * m_solver->getScale();
 }

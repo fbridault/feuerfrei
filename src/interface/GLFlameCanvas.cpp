@@ -427,6 +427,8 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
   }
   
   InitSolvers();
+  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
+  m_scheduler = new FieldThreadsScheduler();
   InitFlames();
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);

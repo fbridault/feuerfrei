@@ -235,7 +235,9 @@ DetachableFireSource::DetachableFireSource(FlameConfig* const flameConfig, Field
 					   uint index, const GLSLProgram* const program, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
 {
-  m_differenceDist = 0.0;
+  m_moduloSave=0;
+  m_diffDistSave=0.0;
+  m_distSave=0.0;
 }
 
 DetachableFireSource::~DetachableFireSource()
@@ -351,8 +353,11 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  double distSave = m_dist;
-  const double INCREMENT=4.0;
+  double differenceDist;
+  uint modulo, remainder;
+  int mod;
+  bool pass;
+  const uint INCREMENT=4;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -367,34 +372,78 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     }
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
-    m_differenceDist += m_dist - distSave;
-    //     cerr << m_differenceDist << " " << m_dist << endl;
-    while(m_differenceDist > INCREMENT)
-      {
-	if(m_dist > (m_solver->getNbMaxDiv()+2)*INCREMENT){
-	  if(getFlickeringMode() != FLICKERING_NOISE){
-	    m_flickSave = getFlickeringMode();
-	    setFlickeringMode(FLICKERING_NOISE);
-	  }
-	  m_solver->switchToFakeField();
-	}else
-	  m_solver->decreaseRes();
-	m_differenceDist -= INCREMENT;
+    
+    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    if(!remainder){
+      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
+      differenceDist = m_dist - m_distSave;
+      
+      if(modulo != m_moduloSave)
+	pass = true;
+      else
+	if( differenceDist > 0 && m_diffDistSave < 0)
+	  pass = true;
+	else
+	  if( differenceDist < 0 && m_diffDistSave > 0)
+	    pass = true;
+	  else
+	    pass = false;
+      
+//       cerr << differenceDist << " " << m_dist << " " << m_diffDistSave << " " << modulo << " " << m_moduloSave << endl;
+      if(differenceDist > 0 && pass){
+	mod=modulo-m_moduloSave;
+	do
+	  {
+	    /* On change le niveau de détail des solveurs à mi-distance */
+	    if( modulo == 2 ){
+	      cerr << "simplified skeletons" << endl;
+	      for (uint i = 0; i < m_nbFlames; i++)
+		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+	    }
+	    
+	    /* On passe en FakeField */
+	    if( modulo == m_solver->getNbMaxDiv()+2 ){
+	      if(getFlickeringMode() != FLICKERING_NOISE){
+		m_flickSave = getFlickeringMode();
+		setFlickeringMode(FLICKERING_NOISE);
+	      }
+	      m_solver->switchToFakeField();
+	    }else
+	      if( modulo > 1 && modulo < m_solver->getNbMaxDiv()+2)
+		m_solver->decreaseRes();
+	    
+	    mod--;
+	  }while(mod>0);
       }
-    while(m_differenceDist < -INCREMENT)
-      {
-	if(m_dist < (m_solver->getNbMaxDiv())*INCREMENT) 
-	  m_solver->increaseRes();
-	else 
-	  if(m_dist < (m_solver->getNbMaxDiv()+1)*INCREMENT){
-	    if(m_flickSave > -1){
-	      setFlickeringMode(m_flickSave);
-	      m_flickSave = -1;
-	    }	    
-	    m_solver->switchToRealSolver();
-	  }
-	m_differenceDist += INCREMENT;
-      }
+      else
+	if(differenceDist < 0 && pass){
+	  mod=m_moduloSave-modulo;
+	  do
+	    {
+	      /* On change le niveau de détail des solveurs à mi-distance */
+	      if( modulo == 2 ){
+		cerr << "normal skeletons" << endl;
+		for (uint i = 0; i < m_nbFlames; i++)
+		  m_flames[i]->setSkeletonsLOD(NORMAL);
+	      }
+	      
+	      if( modulo < m_solver->getNbMaxDiv()+2 )
+		m_solver->increaseRes();
+	      else
+		if( modulo == m_solver->getNbMaxDiv()+2 ){
+		  if(m_flickSave > -1){
+		    setFlickeringMode(m_flickSave);
+		    m_flickSave = -1;
+		  }
+		  m_solver->switchToRealSolver();
+		}
+	      mod--;
+	    }while(mod>0);
+	}
+      m_diffDistSave=differenceDist;
+      m_distSave=m_dist;
+      m_moduloSave=modulo;
+    }
   }else
     if(vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;

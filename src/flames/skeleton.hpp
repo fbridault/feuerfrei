@@ -52,7 +52,15 @@ public:
    * @param i Indice de la particule.
    * @return Particule à l'indice i.
    */
-  Particle *getParticle(uint i) const{
+  Particle *getInternalParticle(uint i) const{
+    return &m_queue[i];
+  };
+  
+  /** Donne l'élément à l'indice passé en paramètre.
+   * @param i Indice de la particule.
+   * @return Particule à l'indice i.
+   */
+  virtual Particle *getParticle(uint i) const{
     return &m_queue[i];
   };
   
@@ -61,6 +69,13 @@ public:
    */
   Particle *getMiddleParticle() const{
     return &m_queue[m_headIndex/2];
+  };
+  
+  /** Donne la taille du squelette, sans tenir compte éventuellement de l'origine.
+   * @return nombre de particules contenues dans la file du squelette
+   */
+  virtual uint getInternalSize() const{
+    return m_headIndex+1;
   };
   
   /** Donne la taille du squelette, sans tenir compte éventuellement de l'origine.
@@ -136,6 +151,9 @@ protected:
   double m_selfVelocity;
 };
 
+#define NORMAL 0
+#define SIMPLIFIED 1
+
 /** La classe Skeleton est une file de particules gérée avec un vecteur, mais elle 
  * transgresse néanmoins la règle en permettant notamment un accès direct à tous les membres de la file
  * sans les supprimer.
@@ -171,6 +189,14 @@ public:
   void move();
   virtual bool moveParticle(Particle* const particle);
   
+  virtual Particle *getParticle(uint i) const{
+    return &m_queue[(m_lod) ? i*2 : i];
+  };
+  
+  virtual uint getSize() const{
+    return ( (m_lod) ? (m_headIndex >> 1)+1 : m_headIndex+1);
+  };
+  
   /** Déplacement de l'origine du squelette. */
   void moveRoot ();
   
@@ -180,6 +206,11 @@ public:
   Point *getRoot(){
     return &m_root;
   };
+  
+  /* Change la valeur du niveau de détail du squelette 
+   * @param value valeur parmi {NORMAL détaillé, SIMPLIFIED grossier (on considère une particule sur 2)}
+   */
+  void setLOD(u_char value){ m_lod = value; };
   
 protected:
   /** Insère une particule en queue de file.
@@ -204,6 +235,8 @@ private:
    * que les origines se déplacent différemment.
    */
   Point m_rootMoveFactor;
+  /** Variable correspondant au niveau de détail : NORMAL détaillé, SIMPLIFIED grossier (on considère une particule sur 2) */
+  u_char m_lod;
 };
 
 #endif

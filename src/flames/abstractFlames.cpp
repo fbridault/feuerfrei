@@ -243,6 +243,9 @@ bool RealFlame::build ()
   vtex = -0.5;
   
   if(!m_visibility) return false;
+
+  /* Si un changement de niveau de détail a été demandé, l'effectue maintenant */
+  if(m_lodSkelChanged) changeSkeletonsLOD();
   
   /* Déplacement des squelettes guides */
   for (i = 0; i < m_nbLeadSkeletons; i++)

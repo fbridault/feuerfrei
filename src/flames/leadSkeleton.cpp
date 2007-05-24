@@ -143,9 +143,9 @@ FreeLeadSkeleton::~FreeLeadSkeleton ()
 
 FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
 {
-  FreePeriSkeleton *copy = new FreePeriSkeleton(getSize (), m_solver, this);
+  FreePeriSkeleton *copy = new FreePeriSkeleton(getInternalSize (), m_solver, this);
   
-  for (uint i = 0; i < getSize (); i++){
+  for (uint i = 0; i < getInternalSize (); i++){
     copy->m_queue[i] = m_queue[i] + offset;
     copy->m_queue[i].m_lifespan += m_queue[i].m_lifespan;
   }

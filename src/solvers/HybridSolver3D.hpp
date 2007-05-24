@@ -10,6 +10,7 @@ class BenchSolver3D;
 
 #define NB_DIFF_LOGS 6
 #define NB_PROJ_LOGS 4
+#define RESOLUTION_MIN 6
 
 class GSSolver3D;
 class GCSSORSolver3D;

@@ -67,16 +67,16 @@ void FreeSkeleton::move ()
   
   /* Déplacement des particules */
   /* Boucle de parcours : du haut vers le bas */
-  for (i = 0; i < getSize (); i++)
+  for (i = 0; i < getInternalSize (); i++)
     {
-      tmp = getParticle (i);
+      tmp = getInternalParticle (i);
 
       if (moveParticle (tmp))
 	  updateParticle (i, tmp);
       else
 	{
 	  removeParticle (i);
-	  if (i < getSize () - 1)
+	  if (i < getInternalSize () - 1)
 	    i--;
 	}
     }	/* for */
@@ -134,6 +134,7 @@ Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMov
   m_root = m_rootSave = position;
   m_flameConfig = flameConfig;
   m_selfVelocity=0;
+  m_lod=NORMAL;
 }
 
 void Skeleton::draw () const
@@ -173,21 +174,21 @@ void Skeleton::move ()
   
   moveRoot ();
   
-  if (getSize () < NB_PARTICLES_MAX - 1)
+  if (getInternalSize () < NB_PARTICLES_MAX - 1)
       addParticle (&m_root);
   
   /* Déplacement des particules */
   /* Boucle de parcours : du haut vers le bas */
-  for (i = 0; i < getSize (); i++)
+  for (i = 0; i < getInternalSize (); i++)
     {
-      tmp = getParticle (i);
+      tmp = getInternalParticle (i);
 
       if (moveParticle (tmp))
 	  updateParticle (i, tmp);
       else
 	{
 	  removeParticle (i);
-	  if (i < getSize () - 1)
+	  if (i < getInternalSize () - 1)
 	    i--;
 	}
     }	/* for */

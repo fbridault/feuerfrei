@@ -65,8 +65,8 @@ LineFlame::~LineFlame ()
 void LineFlame::breakCheck()
 {
   double split,proba;
-  uint threshold=4;
-  double detachThreshold=.95;
+  uint threshold=3;
+  double detachThreshold=.9;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -74,7 +74,7 @@ void LineFlame::breakCheck()
   FreePeriSkeleton **periSkeletonsArray;
   
   for ( i = 0; i < m_nbLeadSkeletons; i++){
-    if(m_leadSkeletons[i]->getSize() < threshold)
+    if(m_leadSkeletons[i]->getInternalSize() < threshold)
       return;
     
     proba = (rand()/((double)RAND_MAX));
@@ -88,7 +88,7 @@ void LineFlame::breakCheck()
       
       leadSkeletonsArray = new FreeLeadSkeleton* [1];
       
-      splitHeight = (uint)(split * (m_leadSkeletons[i]->getSize()-1) );
+      splitHeight = (uint)(split * (m_leadSkeletons[i]->getInternalSize()-1) );
       leadSkeletonsArray[0] = m_leadSkeletons[i]->split(splitHeight);
       
       periSkeletonsArray = new FreePeriSkeleton* [4];
@@ -96,13 +96,13 @@ void LineFlame::breakCheck()
       offset.x=-m_detachedFlamesWidth * split;
       periSkeletonsArray[0] = leadSkeletonsArray[0]->dup(offset);
       
-      splitHeight = (uint)(split * (m_periSkeletons[i+1]->getSize()-1));
+      splitHeight = (uint)(split * (m_periSkeletons[i+1]->getInternalSize()-1));
       periSkeletonsArray[1] = m_periSkeletons[i+1]->split(splitHeight, leadSkeletonsArray[0]);
       
       offset.x=m_detachedFlamesWidth * split;
       periSkeletonsArray[2] = leadSkeletonsArray[0]->dup(offset);
       
-      splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getSize()-1));
+      splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getInternalSize()-1));
       periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
       
       m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_smoothShading));

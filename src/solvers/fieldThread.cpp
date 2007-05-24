@@ -32,7 +32,7 @@ void *FieldThreadsScheduler::Entry()
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
-
+    Yield();
     /* Endort le scheduler tant qu'aucun thread n'a terminé */
     m_schedulerSem.Wait();
     
@@ -84,6 +84,7 @@ void *FieldFiresThread::Entry()
     if(TestDestroy())
       break;
     
+    Yield();
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
     
@@ -106,7 +107,6 @@ void *FieldFiresThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
-//     Yield();
   }
 }
 
@@ -132,6 +132,7 @@ void *FieldFlamesThread::Entry()
     if(TestDestroy())
       break;
     
+    Yield();
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
 
@@ -154,6 +155,5 @@ void *FieldFlamesThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
     m_scheduler->signalWorkEnd();
-//     Yield();
   }
 }

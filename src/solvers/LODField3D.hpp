@@ -229,7 +229,9 @@ public:
     m_solverWeight = 1;
     m_fieldIncrement =   1/(double)NB_STEPS_TO_SWITCH;
     m_solverIncrement = -1/(double)NB_STEPS_TO_SWITCH;
-    m_fieldToSwitch = &m_fakeField; 
+    m_fieldToSwitch = &m_fakeField;
+    while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
+      m_solver.decreaseRes();
   };
   
   virtual void divideRes () { m_solver.divideRes(); };  

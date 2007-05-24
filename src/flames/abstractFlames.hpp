@@ -342,6 +342,20 @@ public:
       m_leadSkeletons[i]->draw();
   };
   
+  /** Affiche les particules de tous les squelettes composants la flamme. */
+  void setSkeletonsLOD(u_char value) { m_lodSkel = value; m_lodSkelChanged = true; };
+  
+  /** Affiche les particules de tous les squelettes composants la flamme. */
+  void changeSkeletonsLOD()
+  {
+    uint i;
+    for (i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->setLOD(m_lodSkel);
+    for (i = 0; i < m_nbLeadSkeletons; i++)
+      m_leadSkeletons[i]->setLOD(m_lodSkel);
+    m_lodSkelChanged = false;
+  };
+  
   virtual bool build();
   
   virtual Vector getMainDirection() const = 0;  
@@ -391,6 +405,8 @@ protected:
   bool m_visibility;
   /** Distance par rapport à la caméra */
   double m_dist;
+  u_char m_lodSkel;
+  bool m_lodSkelChanged;
 };
 
 #endif

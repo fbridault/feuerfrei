@@ -354,8 +354,6 @@ protected:
   /** Index de la display list contenant le luminaire */
   GLuint m_luminaryDL;
   
-  uint m_nbObjLuminary;
-  
   /** Est-ce que la source possède un luminaire */
   bool m_hasLuminary;
 
@@ -450,8 +448,9 @@ private:
   list<DetachedFlame *> m_detachedFlamesList;
   /** Sphère englobante pour les flammes détachées. */
   BoundingSphere m_boundingSphereForDetachedFlames;
-  double m_differenceDist;
   Point m_BBmin, m_BBmax;
+  uint m_moduloSave;
+  double m_diffDistSave,m_distSave;
 };
 
 #endif

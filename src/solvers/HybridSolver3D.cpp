@@ -6,8 +6,6 @@
 #include <wx/wx.h>
 #endif
 
-#define RESOLUTION_MIN 6
-
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
 HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
 				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 

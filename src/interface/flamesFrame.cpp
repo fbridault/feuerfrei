@@ -798,10 +798,10 @@ void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
   m_glBuffer->setRunningState(true);
 }
 
-void FlamesFrame::SetFPS(int fps)
+void FlamesFrame::SetFPS(int fps, int rps)
 {
   wxString s;
-  s += wxString::Format(_("%d FPS"), fps);
+  s += wxString::Format(_("%d FPS %d RPS"), fps, rps);
   
   SetStatusText(s);
 }

@@ -604,7 +604,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 	drawFlames();
 	glDisable(GL_BLEND);
       }
@@ -647,9 +647,10 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   m_t = m_swatch->Time();
   if (m_t >= 2000){    
-    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
+    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000), m_scheduler->getNbSolved() / (m_t/1000) );
     m_swatch->Start();
     m_framesCount = 0;
+    m_scheduler->resetNbSolved();
   }
   
   if(m_saveImages){

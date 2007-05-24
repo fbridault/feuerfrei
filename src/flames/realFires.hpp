@@ -259,7 +259,7 @@ public:
   }
   
   virtual void toggleSmoothShading (bool state);  
-  virtual void setSamplingTolerance(double value){
+  virtual void setSamplingTolerance(u_char value){
     FireSource::setSamplingTolerance(value);
     for (uint i = 0; i < m_nbCloneFlames; i++)
       m_cloneFlames[i]->setSamplingTolerance(value);

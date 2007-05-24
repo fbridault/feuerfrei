@@ -158,10 +158,10 @@ void LODHybridSolver3D::divideRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-  glDeleteLists(m_baseDisplayList,1);
-  glDeleteLists(m_gridDisplayList,1);
-  buildDLBase ();
-  buildDLGrid ();
+//   glDeleteLists(m_baseDisplayList,1);
+//   glDeleteLists(m_gridDisplayList,1);
+//   buildDLBase ();
+//   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -190,10 +190,10 @@ void LODHybridSolver3D::decreaseRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-  glDeleteLists(m_baseDisplayList,1);
-  glDeleteLists(m_gridDisplayList,1);
-  buildDLBase ();
-  buildDLGrid ();
+//   glDeleteLists(m_baseDisplayList,1);
+//   glDeleteLists(m_gridDisplayList,1);
+//   buildDLBase ();
+//   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -232,10 +232,10 @@ void LODHybridSolver3D::multiplyRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   
   /* Reconstruction des display lists */
-  glDeleteLists(m_baseDisplayList,1);
-  glDeleteLists(m_gridDisplayList,1);
-  buildDLBase ();
-  buildDLGrid ();
+//   glDeleteLists(m_baseDisplayList,1);
+//   glDeleteLists(m_gridDisplayList,1);
+//   buildDLBase ();
+//   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -264,10 +264,10 @@ void LODHybridSolver3D::increaseRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-  glDeleteLists(m_baseDisplayList,1);
-  glDeleteLists(m_gridDisplayList,1);
-  buildDLBase ();
-  buildDLGrid ();
+//   glDeleteLists(m_baseDisplayList,1);
+//   glDeleteLists(m_gridDisplayList,1);
+//   buildDLBase ();
+//   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -279,3 +279,55 @@ void LODHybridSolver3D::increaseRes ()
   m_t2nx = 2*m_nx;
   cerr << "Voxels en X : " << m_nbVoxelsX << endl;
 }
+
+/** Fonction de dessin de la grille */
+void LODHybridSolver3D::displayGrid ()
+{
+  double interx = m_dim.x / (double) m_nbVoxelsX;
+  double intery = m_dim.y / (double) m_nbVoxelsY;
+  double interz = m_dim.z / (double) m_nbVoxelsZ;
+  double i, j;
+  
+  glBegin (GL_LINES);
+  
+  glColor4f (0.5, 0.5, 0.5, 0.5);
+  
+  for (j = 0.0; j <= m_dim.z; j += interz)
+    {
+      for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
+	{
+	  glVertex3d (i, 0.0, j);
+	  glVertex3d (i, m_dim.y, j);
+	}
+      for (i = 0.0; i <= m_dim.y + intery / 2; i += intery)
+	{
+	  glVertex3d (0.0, i, j);
+	  glVertex3d (m_dim.x, i, j);
+	}
+    }
+  glEnd ();
+}
+
+/** Fonction de dessin du repère de base */
+void LODHybridSolver3D::displayBase (){
+  double interx = m_dim.x / (double) m_nbVoxelsX;
+  double interz = m_dim.z / (double) m_nbVoxelsZ;
+  double i;
+  
+  glBegin (GL_LINES);
+  
+  glLineWidth (1.0);
+  glColor4f (0.5, 0.5, 0.5, 0.5);
+  for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
+    {
+      glVertex3d (i, 0.0, 0.0);
+      glVertex3d (i, 0.0, m_dim.z);
+    }
+  for (i = 0.0; i <= m_dim.z + interz / 2; i += interz)
+    {
+      glVertex3d (0.0, 0.0, i);
+      glVertex3d (m_dim.x, 0.0, i);
+    }
+  glEnd ();
+};
+  

@@ -148,7 +148,17 @@ public:
   
   /********************* Redéfinition des méthodes héritées *********************/
   void iterate ()
-  {    
+  {
+    /* Adaptation de la taille de la grille */
+    while(m_decreaseCount > 0){
+      m_solver.decreaseRes();
+      m_decreaseCount--;
+    }
+    while(m_increaseCount > 0){
+      m_solver.increaseRes();
+      m_increaseCount--;
+    }
+    
     if(m_switch)
       {
 	m_switch--;
@@ -230,20 +240,21 @@ public:
     m_fieldIncrement =   1/(double)NB_STEPS_TO_SWITCH;
     m_solverIncrement = -1/(double)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_fakeField;
-    while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
-      m_solver.decreaseRes();
+//     while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
+//       m_solver.decreaseRes();
   };
   
   virtual void divideRes () { m_solver.divideRes(); };  
   virtual void multiplyRes () { m_solver.multiplyRes(); };  
-  virtual void decreaseRes () { m_solver.decreaseRes(); };  
-  virtual void increaseRes () { m_solver.increaseRes(); };
+  virtual void decreaseRes () { m_decreaseCount++; };  
+  virtual void increaseRes () { m_increaseCount++; };
   virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
 private:
   Field3D *m_fieldToSwitch;
   uint m_switch;
   double m_fieldWeight, m_solverWeight;
   double m_fieldIncrement, m_solverIncrement;
+  uint m_decreaseCount, m_increaseCount;
 };
 
 #endif

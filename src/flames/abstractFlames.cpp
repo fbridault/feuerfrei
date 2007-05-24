@@ -29,22 +29,17 @@ NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, u
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;
   
-  m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, flameConfig->samplingTolerance);
-  gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  gluNurbsProperty(m_nurbs, GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR);
-  /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
-  gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
+  initNurbs(&m_accurateNurbs);
+  gluNurbsProperty(m_accurateNurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
+  gluNurbsProperty(m_accurateNurbs, GLU_PARAMETRIC_TOLERANCE, 10);
+  initNurbs(&m_roughNurbs);
+  gluNurbsProperty(m_roughNurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
+  gluNurbsProperty(m_roughNurbs, GLU_U_STEP, 1);
+  gluNurbsProperty(m_roughNurbs, GLU_V_STEP, 1);
   
-  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN_DATA, (void(*)())NurbsBegin);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_VERTEX, (void(*)())NurbsVertex);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_NORMAL, (void(*)())NurbsNormal);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
+  m_nurbs = m_accurateNurbs;
   
   m_smoothShading=true;
-  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_smoothShading);
   
   m_position=flameConfig->position;
   
@@ -76,22 +71,17 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;
   
-  m_nurbs = gluNewNurbsRenderer();
-  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, source->m_flameConfig->samplingTolerance);
-  gluNurbsProperty(m_nurbs, GLU_DISPLAY_MODE, GLU_FILL);
-  gluNurbsProperty(m_nurbs, GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR);
-  /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
-  gluNurbsProperty(m_nurbs, GLU_CULLING, GL_TRUE);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
+  initNurbs(&m_accurateNurbs);
+  gluNurbsProperty(m_accurateNurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
+  gluNurbsProperty(m_accurateNurbs, GLU_PARAMETRIC_TOLERANCE, 10);
+  initNurbs(&m_roughNurbs);
+  gluNurbsProperty(m_roughNurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
+  gluNurbsProperty(m_roughNurbs, GLU_U_STEP, 1);
+  gluNurbsProperty(m_roughNurbs, GLU_V_STEP, 1);
   
-  gluNurbsCallback(m_nurbs, GLU_NURBS_BEGIN_DATA, (void(*)())NurbsBegin);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_VERTEX, (void(*)())NurbsVertex);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_NORMAL, (void(*)())NurbsNormal);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
-  gluNurbsCallback(m_nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
+  m_nurbs = m_accurateNurbs;
   
   m_smoothShading=true;
-  gluNurbsCallbackData(m_nurbs,(GLvoid *)&m_smoothShading);
   
   m_position=source->m_position;
 
@@ -100,13 +90,33 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
 
 NurbsFlame::~NurbsFlame()
 {
-  gluDeleteNurbsRenderer(m_nurbs);
+  gluDeleteNurbsRenderer(m_accurateNurbs);
+  gluDeleteNurbsRenderer(m_roughNurbs);
   
   delete[]m_ctrlPoints;
   delete[]m_uknots;
   delete[]m_vknots;
   delete[]m_texPoints;
   delete[]m_texTmp;
+}
+
+void NurbsFlame::initNurbs(GLUnurbsObj** nurbs)
+{
+  *nurbs = gluNewNurbsRenderer();
+//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, source->m_flameConfig->samplingTolerance);
+  gluNurbsProperty(*nurbs, GLU_DISPLAY_MODE, GLU_FILL);
+  gluNurbsProperty(*nurbs, GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR);
+  /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
+  gluNurbsProperty(*nurbs, GLU_CULLING, GL_TRUE);
+  gluNurbsCallback(*nurbs, GLU_NURBS_ERROR, (void(*)())nurbsError);
+  
+  gluNurbsCallback(*nurbs, GLU_NURBS_BEGIN_DATA, (void(*)())NurbsBegin);
+  gluNurbsCallback(*nurbs, GLU_NURBS_VERTEX, (void(*)())NurbsVertex);
+  gluNurbsCallback(*nurbs, GLU_NURBS_NORMAL, (void(*)())NurbsNormal);
+  gluNurbsCallback(*nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
+  gluNurbsCallback(*nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
+  
+  gluNurbsCallbackData(*nurbs,(GLvoid *)&m_smoothShading);
 }
 
 void NurbsFlame::drawNurbs () const
@@ -459,39 +469,85 @@ void RealFlame::buildBoundingSphere (const Point& parentSolverPosition)
 
 void RealFlame::computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild)
 {  
-  bool save=m_visibility;
+  bool vis_save=m_visibility;
+  double differenceDist;
+  uint modulo, remainder;
+  int mod;
+  bool pass;
+  const uint INCREMENT=1;
   
   if(forceSpheresBuild) buildBoundingSphere(parentSolverPosition);
-  
+
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);
   
   if(m_visibility){
+    if(!vis_save)
+      m_solver->setRunningState(true);
+    
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
-    if(m_dist > 5){
-//       cerr << 2000 << endl;
-      setSamplingTolerance(2000);
-      if(m_solver->isRealSolver())
-	m_solver->switchToFakeField();
-    }else{
-      if(!m_solver->isRealSolver())
-	m_solver->switchToRealSolver();
-      if(m_dist > 3){
-//  	cerr << 500 << endl;
-	setSamplingTolerance(500);
-      }else
-	if(m_dist > 2){
-//  	  cerr << 60 << endl;
-	  setSamplingTolerance(40);
-	}else{
-//  	  cerr << 25 << endl;
-	  setSamplingTolerance(20);
+    
+    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    if(!remainder){
+      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
+      differenceDist = m_dist - m_distSave;
+      
+      if(modulo != m_moduloSave)
+	pass = true;
+      else
+	if( differenceDist > 0 && m_diffDistSave < 0)
+	  pass = true;
+	else
+	  if( differenceDist < 0 && m_diffDistSave > 0)
+	    pass = true;
+	  else
+	    pass = false;
+      
+      if(differenceDist > 0 && pass){
+	mod=modulo-m_moduloSave;
+	do
+	  {
+	    /* On change le niveau de détail des solveurs à mi-distance */
+	    if( modulo == 2 ){
+	      cerr << "simplified skeletons" << endl;
+	      setSkeletonsLOD(SIMPLIFIED);
+	      setSamplingTolerance(1);
+	    }
+	    
+	    /* On passe en FakeField */
+	    if( modulo == 4 ){
+	      m_solver->switchToFakeField();
+	      setSamplingTolerance(2);
+	    }
+	    mod--;
+	    
+	  }while(mod>0);
+      }
+      else
+	if(differenceDist < 0 && pass){
+	  mod=m_moduloSave-modulo;
+	  do
+	    {
+	      /* On change le niveau de détail des solveurs à mi-distance */
+	      if( modulo == 2 ){
+		cerr << "normal skeletons" << endl;
+		setSkeletonsLOD(NORMAL);
+		setSamplingTolerance(0);
+	      }
+	      
+	      if( modulo == 4 ){
+		m_solver->switchToRealSolver();
+		setSamplingTolerance(1);
+	      }
+	      mod--;
+	    }while(mod>0);
 	}
+      m_diffDistSave=differenceDist;
+      m_distSave=m_dist;
+      m_moduloSave=modulo;
     }
-    if(!save)
-      m_solver->setRunningState(true);
   }else
-    if(!m_visibility && save)
+    if(vis_save)
       m_solver->setRunningState(false);
 }

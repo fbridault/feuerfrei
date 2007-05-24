@@ -81,11 +81,18 @@ public:
 		   double buoyancy, double omegaDiff, double omegaProj, double epsilon);
   virtual ~LODHybridSolver3D ();
   
-  virtual void divideRes ();  
-  virtual void multiplyRes ();  
-  virtual void decreaseRes ();  
+  virtual void divideRes ();
+  virtual void multiplyRes ();
+  virtual void decreaseRes ();
   virtual void increaseRes ();
   virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
+
+  /** Fonction de dessin de la grille */
+  virtual void displayGrid ();
+  
+  /** Fonction de dessin du repère de base */
+  virtual void displayBase ();
+  
 private:
   double *m_uTmp, *m_vTmp, *m_wTmp;
 

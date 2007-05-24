@@ -194,36 +194,92 @@ void FireSource::buildBoundingSphere ()
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
+  double differenceDist;
+  uint modulo, remainder;
+  int mod;
+  bool pass;
+  const uint INCREMENT=2;
   
-  if(forceSpheresBuild) buildBoundingSphere();
+  if(forceSpheresBuild)
+    buildBoundingSphere();
   
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);
   
   if(m_visibility){
-    if(!vis_save)
+    if(!vis_save){
+      cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
       m_solver->setRunningState(true);
+    }
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
-    if(m_dist > 5){
-      setSamplingTolerance(2000);
-      if(m_solver->isRealSolver())
-	m_solver->switchToFakeField();
-    }else{
-      if(!m_solver->isRealSolver())
-	m_solver->switchToRealSolver();
-      if(m_dist > 3){
-	setSamplingTolerance(500);
-      }else
-	if(m_dist > 2){
-	  setSamplingTolerance(40);
-	}else{
-	  setSamplingTolerance(20);
+    
+    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    if(!remainder){
+      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
+      differenceDist = m_dist - m_distSave;
+      
+      if(modulo != m_moduloSave)
+	pass = true;
+      else
+	if( differenceDist > 0 && m_diffDistSave < 0)
+	  pass = true;
+	else
+	  if( differenceDist < 0 && m_diffDistSave > 0)
+	    pass = true;
+	  else
+	    pass = false;
+      
+      if(differenceDist > 0 && pass){
+	mod=modulo-m_moduloSave;
+	do
+	  {
+	    /* On change le niveau de détail des solveurs à mi-distance */
+	    if( modulo == 2 ){
+	      cerr << "simplified skeletons" << endl;
+	      for (uint i = 0; i < m_nbFlames; i++)
+		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+	      setSamplingTolerance(1);
+	    }
+	    
+	    /* On passe en FakeField */
+	    if( modulo == 4 ){
+	      m_solver->switchToFakeField();
+	      setSamplingTolerance(2);
+	    }
+	    mod--;
+	    
+	  }while(mod>0);
+      }
+      else
+	if(differenceDist < 0 && pass){
+	  mod=m_moduloSave-modulo;
+	  do
+	    {
+	      /* On change le niveau de détail des solveurs à mi-distance */
+	      if( modulo == 2 ){
+		cerr << "normal skeletons" << endl;
+		for (uint i = 0; i < m_nbFlames; i++)
+		  m_flames[i]->setSkeletonsLOD(NORMAL);
+		setSamplingTolerance(0);
+	      }
+	      
+	      if( modulo == 4 ){
+		m_solver->switchToRealSolver();
+		setSamplingTolerance(1);
+	      }
+	      mod--;
+	    }while(mod>0);
 	}
+      m_diffDistSave=differenceDist;
+      m_distSave=m_dist;
+      m_moduloSave=modulo;
     }
   }else
-    if(vis_save)
+    if(vis_save){
+      cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
       m_solver->setRunningState(false);
+    }
 }
 
 bool FireSource::operator<(const FireSource& other) const{
@@ -357,7 +413,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
   uint modulo, remainder;
   int mod;
   bool pass;
-  const uint INCREMENT=4;
+  const uint INCREMENT=3;
   
   if(forceSpheresBuild)
     buildBoundingSphere();

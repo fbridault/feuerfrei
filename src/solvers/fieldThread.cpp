@@ -20,6 +20,7 @@ void FieldThreadsScheduler::Init(const list <FieldFiresThread *> &threads,
   m_extraThreads = extraThreads;
   m_nbThreads = m_threads.size()+m_extraThreads.size();
   m_remainingThreads = m_nbThreads;
+  m_nbSolved = 0;
 }
 
 void *FieldThreadsScheduler::Entry()
@@ -80,11 +81,6 @@ void *FieldFiresThread::Entry()
 
   
   while(m_run){
-    /* Permet de prendre en compte Pause() et Delete() */
-    if(TestDestroy())
-      break;
-    
-    Yield();
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
     
@@ -101,12 +97,17 @@ void *FieldFiresThread::Entry()
 	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();
-
+    
     /* Nettoyer les sources de forces externes */
     m_fieldAndFires->field->cleanSources ();
     
     /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
+
+    Yield();
+    /* Permet de prendre en compte Pause() et Delete() */
+    if(TestDestroy())
+      break;
   }
 }
 
@@ -128,11 +129,6 @@ void *FieldFlamesThread::Entry()
   long time;
   
   while(m_run){
-    /* Permet de prendre en compte Pause() et Delete() */
-    if(TestDestroy())
-      break;
-    
-    Yield();
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
 
@@ -155,5 +151,10 @@ void *FieldFlamesThread::Entry()
     
     /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
     m_scheduler->signalWorkEnd();
+    
+    Yield();
+    /* Permet de prendre en compte Pause() et Delete() */
+    if(TestDestroy())
+      break;
   }
 }

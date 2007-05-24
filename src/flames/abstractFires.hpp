@@ -179,7 +179,7 @@ public:
   /** Ajuste la valeur d'échantillonnage de la NURBS.
    * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
    */
-  virtual void setSamplingTolerance(double value){ 
+  virtual void setSamplingTolerance(u_char value){ 
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
   };
@@ -383,6 +383,9 @@ protected:
   Point m_center;
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
+
+  uint m_moduloSave;
+  double m_diffDistSave,m_distSave;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -449,8 +452,6 @@ private:
   /** Sphère englobante pour les flammes détachées. */
   BoundingSphere m_boundingSphereForDetachedFlames;
   Point m_BBmin, m_BBmax;
-  uint m_moduloSave;
-  double m_diffDistSave,m_distSave;
 };
 
 #endif

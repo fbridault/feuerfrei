@@ -54,6 +54,7 @@ public:
   NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   virtual ~NurbsFlame ();
   
+  void initNurbs(GLUnurbsObj** nurbs);
     /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
@@ -82,7 +83,21 @@ public:
   /** Ajuste la valeur d'échantillonnage de la NURBS.
    * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
    */
-  virtual void setSamplingTolerance(double value) const{ gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, value); };
+  virtual void setSamplingTolerance(u_char value){
+    switch(value){
+    case 0:
+      m_nurbs = m_accurateNurbs;
+      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 10);
+      break;
+    case 1:
+      m_nurbs = m_accurateNurbs;
+      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 5);
+      break;
+    case 2:
+      m_nurbs = m_roughNurbs;
+      break;
+    }
+  };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state) { m_smoothShading = state; };
@@ -91,10 +106,7 @@ public:
   
   /** Retourne le nombre de squelettes */
   uint getNbSkeletons() const { return m_nbSkeletons; };
-  
-//   void setRenderMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
-//   void setTesselateMode() { gluNurbsProperty(m_nurbs,GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR); };
-  
+    
   /** Retourne le nombre de points fixes, autrement dit le nombre de racines dans la flamme */
   unsigned short getNbFixedPoints() const{ return m_nbFixedPoints; };
   
@@ -206,9 +218,6 @@ protected:
   
   /** Nombre de points fixes pour chaque direction v, par exemple origine des squelettes, sommet du guide */
   unsigned short m_nbFixedPoints;
-    
-  /** Objet OpenGL permettant de définir la NURBS */
-  GLUnurbsObj *m_nurbs;
   
   uint m_size;
   bool m_smoothShading;  
@@ -221,6 +230,9 @@ protected:
   
   /** Configuration de la flamme */
   const FlameConfig *m_flameConfig;
+private:
+  /** Objet OpenGL permettant de définir la NURBS */
+  GLUnurbsObj *m_nurbs,*m_accurateNurbs,*m_roughNurbs;
 };
 
 
@@ -407,6 +419,9 @@ protected:
   double m_dist;
   u_char m_lodSkel;
   bool m_lodSkelChanged;
+private:
+  uint m_moduloSave;
+  double m_diffDistSave,m_distSave;
 };
 
 #endif

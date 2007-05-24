@@ -103,7 +103,7 @@ public:
   };
   void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
   void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
-  void setFlameSamplingTolerance(int index, double value){ m_flames[index]->setSamplingTolerance(value); };
+  void setFlameSamplingTolerance(int index, u_char value){ m_flames[index]->setSamplingTolerance(value); };
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   

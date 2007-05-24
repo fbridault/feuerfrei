@@ -29,6 +29,12 @@ public:
   void Init(const list <FieldFiresThread *> &threads, const list <FieldFlamesThread *> &extraThreads);
   /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
+  uint getNbSolved() const { return m_nbSolved; };
+  void resetNbSolved() { 
+    m_remainingThreadsMutex.Lock();
+    m_nbSolved=0;
+    m_remainingThreadsMutex.Unlock();
+  };
   
   void Stop(){ m_run = false; };
   void forceEnd() { 
@@ -40,6 +46,7 @@ public:
   void signalWorkEnd() {
     m_remainingThreadsMutex.Lock();
     m_remainingThreads--;
+    m_nbSolved++;
     m_remainingThreadsMutex.Unlock();
     m_schedulerSem.Post();
   };
@@ -51,6 +58,7 @@ private:
   wxMutex m_remainingThreadsMutex;
   wxSemaphore m_schedulerSem;
   bool m_run;
+  uint m_nbSolved;
 };
 
 class FieldFiresAssociation

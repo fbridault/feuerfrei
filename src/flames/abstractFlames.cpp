@@ -242,6 +242,9 @@ RealFlame::RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ush
   m_innerForce = flameConfig->innerForce;
   m_visibility = true;
   m_dist=0;
+  m_moduloSave=0;
+  m_diffDistSave=0.0;
+  m_distSave=0.0;
 }
 
 bool RealFlame::build ()

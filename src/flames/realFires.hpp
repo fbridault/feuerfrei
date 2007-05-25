@@ -164,7 +164,8 @@ public:
 	    glPushMatrix();
 	    glTranslatef (pt.x, pt.y, pt.z);
 	    glScalef (scale.x, scale.y, scale.z);
-	    m_flames[i]->drawFlame(display, displayParticle);
+ 	    m_flames[i]->drawFlame(display, displayParticle);
+//  	    m_flames[i]->getSolver()->displayGrid();
 	    glPopMatrix();
 	  }
 	  glPopMatrix();
@@ -182,7 +183,6 @@ public:
       }
   }
 
-  
   virtual void drawBoundingBox() const
   {
     Point pt;

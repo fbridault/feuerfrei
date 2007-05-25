@@ -189,11 +189,15 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
     }
   
   m_wick = wick;
-  if(m_wick){
+  if(m_wick){    
     m_wick->buildVBO();
     m_wick->buildBoundingSpheres();
     /* On décale pour que le centre du solveur soit calé avec la mèche ( et non pas le coin inférieur gauche) */
-    s->setPosition(m_wick->getPosition() - m_position * s->getScale());
+    
+    Point pt(m_wick->getPosition());
+    pt = pt - m_position * s->getScale();
+//     pt.y += s->getDimY()/4.0 * s->getScale().y;
+    s->setPosition(pt);
   }
 }
 

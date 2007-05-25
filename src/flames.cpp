@@ -50,6 +50,8 @@
  * Classe principale chargée de l'analyse des arguments de la ligne de commande et du lancement
  * de la fenêtre principale de l'application.
 */
+wxApp *thisApp;
+
 class FlamesApp : public wxApp
 {
   /** Méthode d'initialisation de l'application 
@@ -108,7 +110,6 @@ bool FlamesApp::OnInit()
   frame->Show(TRUE);
 
   SetTopWindow(frame);
- 
   frame->InitGLBuffer();
 	
   return true;

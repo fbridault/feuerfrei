@@ -84,10 +84,10 @@ CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFl
       FieldFlamesAssociation *fieldFlamesAssociation;
       
       /* Le field sera supprimé par le destructeur de FieldFlamesAssociation */
-      Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.08,.08,.08), .4, 0.3);
+      Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.15,.15,.15), .4, .1);
       
       fieldFlamesAssociation = new FieldFlamesAssociation(field);
-      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .4, scene, (*objListIterator));
+      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .125, scene, (*objListIterator));
       m_flames[i]->buildBoundingSphere( s->getPosition() );
       fieldFlamesAssociation->addFlameSource(m_flames[i]);    
       m_fieldFlamesAssociations.push_back(fieldFlamesAssociation);
@@ -107,15 +107,21 @@ CandlesSet::~CandlesSet()
 void CandlesSet::build()
 {
   Point averagePos;
+  Vector averageVec;
   
-  /* On ne construit pas les flammes, ceci est fait dans des threads séparés. */
-  for (uint i = 0; i < m_nbFlames; i++)
+  if(!m_visibility) return;
+  
+  for (uint i = 0; i < m_nbFlames; i++){
+    m_flames[i]->build();
     averagePos += m_flames[i]->getCenter ();
-  
+    averageVec += m_flames[i]->getMainDirection ();
+  }
   averagePos *= m_solver->getScale();
-  averagePos /= m_nbFlames;
-  averagePos += getPosition();
+  m_center = averagePos/m_nbFlames;
+  averagePos = m_center + getPosition();
   setLightPosition(averagePos);
+  
+  m_direction = averageVec/m_nbFlames;
 }
 
 void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)

@@ -489,7 +489,6 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
   
   /* Force à redessiner */
   this->Refresh();
-  
   //event.RequestMore();
 }
 

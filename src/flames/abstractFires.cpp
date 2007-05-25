@@ -111,6 +111,9 @@ FireSource::FireSource(FlameConfig* const flameConfig, Field3D* const s, uint nb
   buildBoundingSphere();
   m_flickSave=-1;
   m_flameConfig = flameConfig;
+  m_moduloSave=0;
+  m_diffDistSave=0.0;
+  m_distSave=0.0;
 }
 
 FireSource::~FireSource()
@@ -198,7 +201,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   uint modulo, remainder;
   int mod;
   bool pass;
-  const uint INCREMENT=2;
+  const uint INCREMENT=4;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -291,9 +294,6 @@ DetachableFireSource::DetachableFireSource(FlameConfig* const flameConfig, Field
 					   uint index, const GLSLProgram* const program, const char *objName) : 
   FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
 {
-  m_moduloSave=0;
-  m_diffDistSave=0.0;
-  m_distSave=0.0;
 }
 
 DetachableFireSource::~DetachableFireSource()

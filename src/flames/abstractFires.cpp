@@ -455,6 +455,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	      cerr << "simplified skeletons" << endl;
 	      for (uint i = 0; i < m_nbFlames; i++)
 		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+	      setSamplingTolerance(2);
 	    }
 	    
 	    /* On passe en FakeField */
@@ -481,6 +482,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 		cerr << "normal skeletons" << endl;
 		for (uint i = 0; i < m_nbFlames; i++)
 		  m_flames[i]->setSkeletonsLOD(NORMAL);
+		setSamplingTolerance(1);
 	      }
 	      
 	      if( modulo < m_solver->getNbMaxDiv()+2 )

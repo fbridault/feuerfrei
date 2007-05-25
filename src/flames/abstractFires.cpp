@@ -217,6 +217,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     
+    cerr << m_dist << endl;
     remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
     if(!remainder){
       modulo = ((uint)nearbyint(m_dist))/INCREMENT;
@@ -445,7 +446,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	  else
 	    pass = false;
       
-//       cerr << differenceDist << " " << m_dist << " " << m_diffDistSave << " " << modulo << " " << m_moduloSave << endl;
+      //cerr << differenceDist << " " << m_dist << " " << m_diffDistSave << " " << modulo << " " << m_moduloSave << endl;
       if(differenceDist > 0 && pass){
 	mod=modulo-m_moduloSave;
 	do

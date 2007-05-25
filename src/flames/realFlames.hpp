@@ -92,7 +92,12 @@ public:
   
   Point getTop() const { return top; };  
   Point getBottom() const { return bottom; };
-
+  
+  virtual void setSamplingTolerance(u_char value){
+    NurbsFlame::setSamplingTolerance(value);
+    m_samplingMethod = value;
+  };
+  
   void breakCheck();
   
   //  void setDetachedFlamesWidth(
@@ -115,6 +120,8 @@ private:
   double m_detachedFlamesWidth;
 
   Point top, bottom;
+  
+  u_char m_samplingMethod;
 };
 
 /**********************************************************************************************************************/
@@ -195,7 +202,8 @@ public:
    * @param tex Pointeur vers la texture à utiliser.
    */
   DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-		uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, bool smoothShading);
+		uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, 
+		bool smoothShading, u_char samplingMethod);
   
   /** Destructeur*/
   virtual ~DetachedFlame ();

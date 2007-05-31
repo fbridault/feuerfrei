@@ -233,8 +233,8 @@ void GLFluidsCanvas::OnIdle(wxIdleEvent& event)
 {
   if(m_run)
     for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
-      m_solvers[i]->cleanSources();
       m_solvers[i]->iterate ();
+      m_solvers[i]->cleanSources();
     }
   
   this->Refresh();

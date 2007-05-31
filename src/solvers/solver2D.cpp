@@ -156,9 +156,9 @@ void Solver2D::vel_step ()
 void Solver2D::iterate ()
 { 
   /* Cellule(s) génératrice(s) */
-  for (uint i = 1; i < m_nbVoxelsX + 1; i++)
-    for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-	m_vSrc[IX(i, j)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+//   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
+//     for (uint j = 1; j < m_nbVoxelsY + 1; j++)
+// 	m_vSrc[IX(i, j)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y)
     addExternalForces(m_permanentExternalForces,false);
@@ -166,13 +166,11 @@ void Solver2D::iterate ()
   vel_step ();
   dens_step();
   
-  m_nbIter++;
-  
-  cleanSources ();
+  m_nbIter++;  
 //   set_bnd (0, m_u);
 //   set_bnd (0, m_v);
 //   set_bnd (0, m_w);
-  
+  cleanSources ();  
 }
 
 void Solver2D::cleanSources ()
@@ -340,9 +338,9 @@ void Solver2D::addExternalForces(const Point& position, bool move)
 void Solver2D::addDensity(int id)
 {
   switch(id){
-  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.0001); break;
-  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.0001); break;
-  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.0001); break;
-  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.0001); break;
+  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.001); break;
+  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.001); break;
+  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.001); break;
+  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.001); break;
   }
 }

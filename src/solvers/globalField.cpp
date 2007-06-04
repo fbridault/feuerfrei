@@ -5,15 +5,14 @@
 #include "LODField3D.hpp"
 #include "../scene/scene.hpp"
 #include "../interface/interface.hpp"
+#include "fieldThread.hpp"
 
-GlobalField::GlobalField(const vector < Field3D* > &localFields, Scene* const scene, char type, uint n,
+GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene, char type, uint n,
 			 double timeStep, double omegaDiff, double omegaProj, double epsilon)
 {
   Point max, min, width, position, scale(1,1,1);
   uint n_x, n_y, n_z;
   double dim, buoyancy=0.0;
-  
-  m_localFields = localFields; 
   
   scene->computeBoundingBox(max,min);
   width = max - min;
@@ -67,6 +66,12 @@ GlobalField::GlobalField(const vector < Field3D* > &localFields, Scene* const sc
       m_field = new LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
       break;
   }
+  
+  /* A cet instant, la liste des processus ne contient pas encore le thread du solveur global, */
+  /* on peut donc tous les ajouter à la liste des solveurs sous influence. */
+  for (list < FieldThread* >::const_iterator threadIterator = threads.begin ();
+       threadIterator != threads.end (); threadIterator++)
+    m_localFields.push_back( (*threadIterator)->getSolver() );
 }
 
 void GlobalField::shareForces()

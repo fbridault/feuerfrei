@@ -26,7 +26,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig, double u,
+  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls, double u,
 	       float noiseIncrement, float noiseMin, float noiseMax);
   
   /** Destructeur. */
@@ -41,7 +41,7 @@ public:
   
   virtual void drawRoot () const;
   
-  void addForces ();
+  void addForces (int fdf, double innerForce, char perturbate);
   double getLastAppliedForce () const { return m_lastAppliedForce; };
   
 private:

@@ -22,13 +22,13 @@ public:
    * @param flameConfig Configuration de la flamme.
    * @param s Pointeur sur le solveur de fluides.
    * @param scene Pointeur sur la scène.
-   * @param filename Nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
+   * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
-  Candle(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-	 const GLSLProgram * const program, double rayon);
+  Candle(const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
+	 const GLSLProgram * const program, double rayon, Object *wick=NULL);
   /** Destructeur */
   virtual ~Candle(){};
 };
@@ -45,12 +45,11 @@ public:
    * @param flameConfig Configuration de la flamme.
    * @param s Pointeur sur le solveur de fluides.
    * @param scene Pointeur sur la scène.
-   * @param filename nom du fichier contenant le luminaire.
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param wickFileName nom du fichier contenant la mèche
    */
-  Firmalampe(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+  Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene, uint index, 
 	     const GLSLProgram * const program, const char *wickFileName);
   /** Destructeur */
   virtual ~Firmalampe(){};
@@ -74,7 +73,7 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  Torch(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index, 
+  Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index, 
 	const GLSLProgram * const program);
   /** Destructeur */
   virtual ~Torch(){}; 
@@ -104,98 +103,10 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
-  CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
+  CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
 	   const GLSLProgram * const program);
   /** Destructeur */
   virtual ~CampFire(){};
-};
-
-#include "../solvers/fieldThread.hpp"
-
-/** La classe Torche permet la définition d'une flamme de type torche.
- * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
- * en Wick*. Celle-ci ne sont pas affichées à l'écran. Les objets composant le luminaire 
- * doivent s'appeler Torch.*
- *
- * @author	Flavien Bridault
- */
-class CandlesSet : public FireSource
-{
-public:
-  /** Constructeur d'un ensemble de bougies. A la base, cette classe a été créée pour permettre
-   * de modéliser la lampe "tour" vue au Cyprus Museum de Nicosie. La particularité de cette source de feu
-   * qu'elle crée elle même une liste de solveurs. En effet, à la lecture du fichier OBJ contenant le luminaire,
-   * chaque objet nommé "Wick*" donne naissance à une bougie, qui chacune a besoin d'un solveur.
-   * @param flameConfig Configuration de la flamme.
-   * @param s Pointeur sur le solveur de fluides.
-   * @param flameSolvers Liste des solveurs créés.
-   * @param scene Pointeur sur la scène.
-   * @param lampName nom du fichier contenant le luminaire.
-   * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param program pointeur sur le program chargé de la construction des shadow volumes.
-   */
-  CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, 
-	     FieldThreadsScheduler* const scheduler, Scene *scene,
-	     const char *lampName, uint index, const GLSLProgram * const program, Point scale);
-  /** Destructeur */
-  virtual ~CandlesSet();
-  
-  virtual void build();
-  
-  virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
-  {
-    switch(boundingVolume){
-    case BOUNDING_SPHERE : drawBoundingSphere(); break;
-    case BOUNDING_BOX : drawBoundingBox(); break;
-    default : 
-      if(m_visibility)
-	{
-	  Point pt(m_solver->getPosition());
-	  Point scale(m_solver->getScale());	
-	  pt = getPosition();
-	  scale = m_solver->getScale();
-	  glPushMatrix();
-	  glTranslatef (pt.x, pt.y, pt.z);
-	  glScalef (scale.x, scale.y, scale.z);
-	  
-	  for (uint i = 0; i < m_nbFlames; i++){
-	    pt = m_flames[i]->getSolver()->getPosition();
-	    scale =  m_flames[i]->getSolver()->getScale();
-	    glPushMatrix();
-	    glTranslatef (pt.x, pt.y, pt.z);
-	    glScalef (scale.x, scale.y, scale.z);
- 	    m_flames[i]->drawFlame(display, displayParticle);
-//  	    m_flames[i]->getSolver()->displayGrid();
-	    glPopMatrix();
-	  }
-	  glPopMatrix();
-	}
-    }
-  };
-  
-  virtual void drawBoundingSphere() const
-  {
-    Point pt;
-    if(m_visibility)
-      for (uint i = 0; i < m_nbFlames; i++){
-	pt = m_flames[i]->getSolver()->getPosition();
-	m_flames[i]->drawBoundingSphere();
-      }
-  }
-
-  virtual void drawBoundingBox() const
-  {
-    Point pt;
-    if(m_visibility)
-      for (uint i = 0; i < m_nbFlames; i++){
-	pt = m_flames[i]->getSolver()->getPosition();
-	m_flames[i]->drawBoundingSphere();
-      }
-  }
-
-  virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
-private:
-  list < FieldFlamesAssociation* > m_fieldFlamesAssociations;
 };
 
 /** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
@@ -215,7 +126,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
    */
-  CandleStick(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+  CandleStick(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 	      const GLSLProgram * const program, double rayon);
   /** Destructeur */
   virtual ~CandleStick();

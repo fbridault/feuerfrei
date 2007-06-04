@@ -1,7 +1,6 @@
 #include "flamesFrame.hpp"
 
-#include "solverDialog.hpp"
-#include "flameDialog.hpp"
+#include "luminaryDialog.hpp"
 #include "shadowsDialog.hpp"
 #include "GLFlameCanvas.hpp"
 
@@ -31,8 +30,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_MENU(IDM_FBDB, FlamesFrame::OnFBDBMenu)
   EVT_MENU(IDM_Wired, FlamesFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, FlamesFrame::OnShadedMenu)
-  EVT_MENU(IDM_SolversSettings, FlamesFrame::OnSolversMenu)
-  EVT_MENU(IDM_FlamesSettings, FlamesFrame::OnFlamesMenu)
+  EVT_MENU(IDM_Settings, FlamesFrame::OnSettingsMenu)
   EVT_MENU(IDM_ShadowVolumesSettings, FlamesFrame::OnShadowVolumesSettingsMenu)
   EVT_CHECKBOX(IDCHK_BS, FlamesFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Shadows, FlamesFrame::OnCheckShadows)
@@ -82,6 +80,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 				      wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
   
+  m_luminariesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   
@@ -103,63 +102,68 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 
 void FlamesFrame::DoLayout()
 {
-  wxStaticBoxSizer *m_lightingSizer, *m_globalSizer,*m_multiSizer,*m_solversSizer, *m_flamesSizer, *m_gammaSizer;  
-  wxBoxSizer *m_leftSizer, *m_bottomSizer, *m_rightSizer, *m_lightingBottomSizer, *m_multiTopSizer, *m_globalTopSizer;
+  wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;  
+  wxBoxSizer *leftSizer, *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *globalTopSizer;
   
   /* Réglages globaux */
-  m_globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_globalTopSizer->Add(m_buttonRun, 0, 0, 0);
-  m_globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
+  globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
+  globalTopSizer->Add(m_buttonRun, 0, 0, 0);
+  globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
   
-  m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
-  m_globalSizer->Add(m_globalTopSizer, 0, 0, 0);
-  m_globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
-  
-  /* Réglages de l'éclairage */
-  m_lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_lightingBottomSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
-  m_lightingBottomSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
-  
-  m_lightingSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Lighting"));
-  m_lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
-  m_lightingSizer->Add(m_lightingBottomSizer, 1, 0, 0);
-  
-  m_gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
-  m_gammaSizer->Add(m_gammaCheckBox, 0, wxEXPAND, 0);
-  m_gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
-  
-  m_bottomSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_bottomSizer->Add(m_globalSizer, 1, wxEXPAND, 0);
-  m_bottomSizer->Add(m_lightingSizer, 1, wxEXPAND, 0);
-  m_bottomSizer->Add(m_gammaSizer, 1, wxEXPAND, 0);
+  globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
+  globalSizer->Add(globalTopSizer, 0, 0, 0);
+  globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
   
   /* Réglages du glow */
-  m_multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
-  m_multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
-  m_multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
-  m_multiSizer->Add(m_multiTopSizer, 0, 0, 0);
-  m_multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
+  multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
+  multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
+  multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
+  multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
+  multiSizer->Add(multiTopSizer, 0, 0, 0);
+  multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
     
-  m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
-  m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
+  /* Réglages de l'éclairage */
+  lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+  lightingBottomSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
+  lightingBottomSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
+  
+  lightingSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Lighting"));
+  lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
+  lightingSizer->Add(lightingBottomSizer, 1, 0, 0);
+  
+  /* Réglages de la correction Gamma */
+  gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
+  gammaSizer->Add(m_gammaCheckBox, 0, wxEXPAND, 0);
+  gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
+  
+  bottomSizer = new wxBoxSizer(wxHORIZONTAL);
+  bottomSizer->Add(globalSizer, 1, wxEXPAND, 0);
+  bottomSizer->Add(multiSizer, 1, wxEXPAND, 0);
+  bottomSizer->Add(lightingSizer, 1, wxEXPAND, 0);
+  bottomSizer->Add(gammaSizer, 1, wxEXPAND, 0);
+  
+  luminariesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Luminaries settings"));
+  luminariesSizer->Add(m_luminariesNotebook, 1, wxEXPAND, 0);
+  
+  solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
+  solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
 
-  m_flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
-  m_flamesSizer->Add(m_flamesNotebook, 1, wxEXPAND, 0);
+  flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
+  flamesSizer->Add(m_flamesNotebook, 1, wxEXPAND, 0);
   
   /* Placement des sizers principaux */
-  m_rightSizer = new wxBoxSizer(wxVERTICAL);
-  m_rightSizer->Add(m_multiSizer, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
-  m_rightSizer->Add(m_flamesSizer, 0, wxEXPAND, 0);  
+  rightSizer = new wxBoxSizer(wxVERTICAL);
+  rightSizer->Add(luminariesSizer, 0, wxEXPAND, 0);
+  rightSizer->Add(solversSizer, 0, wxEXPAND, 0);
+  rightSizer->Add(flamesSizer, 0, wxEXPAND, 0);  
   
-  m_leftSizer = new wxBoxSizer(wxVERTICAL);
-  m_leftSizer->Add(m_glBuffer, 0, 0, 0);
-  m_leftSizer->Add(m_bottomSizer, 1, 0, 0);
+  leftSizer = new wxBoxSizer(wxVERTICAL);
+  leftSizer->Add(m_glBuffer, 0, 0, 0);
+  leftSizer->Add(bottomSizer, 1, 0, 0);
 
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_mainSizer->Add(m_leftSizer, 0, 0, 0);
-  m_mainSizer->Add(m_rightSizer, 1, 0, 0);
+  m_mainSizer->Add(leftSizer, 0, 0, 0);
+  m_mainSizer->Add(rightSizer, 1, 0, 0);
   
   SetSizerAndFit(m_mainSizer);
 }
@@ -197,8 +201,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuDisplay->AppendCheckItem( IDM_BDS, _("&Bounding spheres"));
   
   m_menuSettings = new wxMenu;
-  m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
-  m_menuSettings->Append( IDM_FlamesSettings, _("&Flames..."));
+  m_menuSettings->Append( IDM_Settings, _("&Settings..."));
   m_menuSettings->Append( IDM_ShadowVolumesSettings, _("S&hadows..."));
   
   m_menuBar = new wxMenuBar;
@@ -221,9 +224,26 @@ void FlamesFrame::InitGLBuffer()
   m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig);
   m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
+  
   m_mainSizer->Fit(this);
   m_mainSizer->SetSizeHints(this);
   Layout();
+}
+
+void FlamesFrame::InitLuminariesPanels()
+{
+  wxString tabName;
+  char type=0;
+  
+  m_luminariesNotebook->DeleteAllPages();
+  
+  for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
+    {
+      m_luminaryPanels[i+type] = new LuminaryMainPanel(m_luminariesNotebook, -1, &m_currentConfig.luminaries[i], 
+						       i, m_glBuffer);
+      tabName.Printf(_("Luminary #%d"),i+1);
+      m_luminariesNotebook->AddPage(m_luminaryPanels[i+type], tabName);
+    }
 }
 
 void FlamesFrame::InitSolversPanels()
@@ -235,18 +255,18 @@ void FlamesFrame::InitSolversPanels()
   
   if(m_currentConfig.useGlobalField)
     {
-      m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.globalField, -1, m_glBuffer, -1);
+      m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.globalField.buoyancy, -1, m_glBuffer);
       m_solversNotebook->AddPage(m_solverPanels[0], _("Global Field"));
       type = 1;
     }
-  for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
+  for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      m_solverPanels[i+type] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer, type);
+      m_solverPanels[i+type] = new SolverMainPanel(m_solversNotebook, -1, 
+						   m_currentConfig.luminaries[i].fields[0].buoyancy, i, m_glBuffer);
       tabName.Printf(_("Solver #%d"),i+1);
       m_solversNotebook->AddPage(m_solverPanels[i+type], tabName);
     }
 }
-
 
 void FlamesFrame::InitFlamesPanels()
 {
@@ -254,9 +274,9 @@ void FlamesFrame::InitFlamesPanels()
   
   m_flamesNotebook->DeleteAllPages();
   
-  for(int unsigned i=0; i < m_currentConfig.nbFlames; i++)
+  for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.flames[i], i, m_glBuffer);     
+      m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.luminaries[i].fires[0], i, m_glBuffer);
       tabName.Printf(_("Flame #%d"),i+1);       
       m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
@@ -266,8 +286,12 @@ void FlamesFrame::OnClose(wxCloseEvent& event)
 {
   m_glBuffer->DeleteThreads();
   m_glBuffer->setRunningState(false);
-  delete [] m_currentConfig.flames;
-  delete [] m_currentConfig.solvers;
+  for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
+    {
+      delete [] m_currentConfig.luminaries[i].fires;
+      delete [] m_currentConfig.luminaries[i].fields;
+    }
+  delete [] m_currentConfig.luminaries;
   delete m_config;
   
   Destroy();
@@ -402,8 +426,13 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
       
-      delete [] m_currentConfig.flames;
-      delete [] m_currentConfig.solvers;
+      for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
+	{
+	  delete [] m_currentConfig.luminaries[i].fires;
+	  delete [] m_currentConfig.luminaries[i].fields;
+	}
+      delete [] m_currentConfig.luminaries;
+      
       m_flamesNotebook->DeleteAllPages();      
       m_solversNotebook->DeleteAllPages();
 
@@ -417,14 +446,13 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
   }
 }
 
+/**************************************************************************************************/
+/****************** METHODES DE CHARGEMENT DES PARAMETRES DE LA SIMULATION ************************/
+/**************************************************************************************************/
 
 void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
-  m_config->Read(groupName + _("Type"), (int *) &solverConfig.type, 1);
-  
-  m_config->Read(groupName + _("Pos.x"), &solverConfig.position.x, 0.0);
-  m_config->Read(groupName + _("Pos.y"), &solverConfig.position.y, 0.0);
-  m_config->Read(groupName + _("Pos.z"), &solverConfig.position.z, 0.0);
+  m_config->Read(groupName + _("FieldType"), (int *) &solverConfig.type, HYBRID_SOLVER);
   
   solverConfig.resx = m_config->Read(groupName + _("X_res"), 15);
   solverConfig.resy = m_config->Read(groupName + _("Y_res"), 15);
@@ -442,6 +470,24 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
   m_config->Read(groupName + _("omegaProj"),&solverConfig.omegaProj, 1.5);
   m_config->Read(groupName + _("epsilon"),&solverConfig.epsilon, 0.00001);
   solverConfig.nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
+}
+
+void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
+{
+  m_config->Read(groupName + _("Type"), (int *) &fireConfig.type, CANDLE);
+  if(fireConfig.type != CANDLE){
+    m_config->Read(groupName + _("SkeletonsNumber"), (int *) &fireConfig.skeletonsNumber, 5);
+    m_config->Read(groupName + _("InnerForce"), &fireConfig.innerForce, 0.005);
+  }else{
+    m_config->Read(groupName + _("SkeletonsNumber"), (int *) &fireConfig.skeletonsNumber, 4);
+    m_config->Read(groupName + _("InnerForce"), &fireConfig.innerForce, 0.04);
+  }
+  m_config->Read(groupName + _("Flickering"), (int *) &fireConfig.flickering, 0);
+  m_config->Read(groupName + _("FDF"), (int *) &fireConfig.fdf, 0);
+  m_config->Read(groupName + _("SamplingTolerance"), &fireConfig.samplingTolerance, 100);
+  m_config->Read(groupName + _("nbLeadParticles"), (int *) &fireConfig.leadLifeSpan, 8);
+  m_config->Read(groupName + _("nbPeriParticles"), (int *) &fireConfig.periLifeSpan, 6);
+  fireConfig.IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
 }
 
 void FlamesFrame::LoadSettings (void)
@@ -473,49 +519,38 @@ void FlamesFrame::LoadSettings (void)
   m_currentConfig.fatness[3] = 0.0f;
   m_currentConfig.extrudeDist[3] = 0.0f;
   
-  m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
-  m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
-  m_nbSolversMax = m_currentConfig.nbSolvers;
-  
   m_config->Read(_("/GlobalField/Enabled"), &m_currentConfig.useGlobalField, 0);
   groupName << _("/GlobalField/");
   LoadSolverSettings(groupName,m_currentConfig.globalField);
-
-  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
-    {
-      groupName.Printf(_("/Solver%d/"), i);
-      LoadSolverSettings(groupName, m_currentConfig.solvers[i]);
-    }
-  InitSolversPanels();
   
-  m_currentConfig.nbFlames = m_config->Read(_("/Flames/Number"), 1);
-  m_currentConfig.flames = new FlameConfig[m_currentConfig.nbFlames];
-  m_nbFlamesMax = m_currentConfig.nbFlames;
+  m_currentConfig.nbLuminaries = m_config->Read(_("/Luminaries/Number"), 1);
+  m_currentConfig.luminaries = new LuminaryConfig[m_currentConfig.nbLuminaries];
+  m_nbLuminariesMax = m_currentConfig.nbLuminaries;
   
-  for(uint i=0; i < m_currentConfig.nbFlames; i++)
+  for(uint i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      groupName.Printf(_("/Flame%d/"),i);
+      groupName.Printf(_("/Luminary%d/"), i);
+      m_currentConfig.luminaries[i].fileName = m_config->Read(groupName + _("FileName"), _("scenes/bougie.obj"));
       
-      m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.flames[i].type, 1);
-      m_config->Read(groupName + _("Solver"), &m_currentConfig.flames[i].solverIndex, 0);
-      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.flames[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.flames[i].position.y, 0.0);
-      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.flames[i].position.z, 0.0);
-      if(m_currentConfig.flames[i].type != CANDLE){
-	m_currentConfig.flames[i].wickName = m_config->Read(groupName + _("WickFileName"), _("meche2.obj"));
-	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 5);
-	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.005);
-      }else{
-	m_config->Read(groupName + _("SkeletonsNumber"), (int *) &m_currentConfig.flames[i].skeletonsNumber, 4);
-	m_config->Read(groupName + _("InnerForce"), &m_currentConfig.flames[i].innerForce, 0.04);
-      }
-      m_config->Read(groupName + _("Flickering"), (int *) &m_currentConfig.flames[i].flickering, 0);
-      m_config->Read(groupName + _("FDF"), (int *) &m_currentConfig.flames[i].fdf, 0);
-      m_config->Read(groupName + _("SamplingTolerance"), &m_currentConfig.flames[i].samplingTolerance, 100);
-      m_config->Read(groupName + _("nbLeadParticles"), (int *) &m_currentConfig.flames[i].leadLifeSpan, 8);
-      m_config->Read(groupName + _("nbPeriParticles"), (int *) &m_currentConfig.flames[i].periLifeSpan, 6);
-      m_currentConfig.flames[i].IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
+      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.luminaries[i].position.x, 0.0);
+      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.luminaries[i].position.y, 0.0);
+      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.luminaries[i].position.z, 0.0);
+      
+      m_currentConfig.luminaries[i].nbFields = m_config->Read(_("/Luminary%d/NbFields"), 1);
+      m_currentConfig.luminaries[i].fields = new SolverConfig[m_currentConfig.luminaries[i].nbFields];
+      
+      /** A modifier pour prendre en compte la sauvegarde de plusieurs solveurs et flammes par luminaire */
+      groupName.Printf(_("/Luminary%d/Solver0/"), i);
+      LoadSolverSettings(groupName, m_currentConfig.luminaries[i].fields[0]);
+      
+      m_currentConfig.luminaries[i].nbFires = m_config->Read(_("/Luminary%d/NbFires"), 1);
+      m_currentConfig.luminaries[i].fires = new FlameConfig[m_currentConfig.luminaries[i].nbFires];
+      
+      groupName.Printf(_("/Luminary%d/Flame0/"), i);
+      LoadFireSettings(groupName, m_currentConfig.luminaries[i].fires[0]);
     }
+  InitLuminariesPanels();
+  InitSolversPanels();
   InitFlamesPanels();
   
   m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
@@ -545,13 +580,14 @@ void FlamesFrame::LoadSettings (void)
   return;
 }
 
+/**************************************************************************************************/
+/****************** METHODES DE SAUVEGARDE DES PARAMETRES DE LA SIMULATION ************************/
+/**************************************************************************************************/
+
 void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
-  m_config->Write(groupName + _("Type"), (int)solverConfig.type);
-  
-  m_config->Write(groupName + _("Pos.x"),solverConfig.position.x);
-  m_config->Write(groupName + _("Pos.y"),solverConfig.position.y);
-  m_config->Write(groupName + _("Pos.z"),solverConfig.position.z);
+//   solverConfig.buoyancy = ;
+  m_config->Write(groupName + _("FieldType"), (int)solverConfig.type);
   
   m_config->Write(groupName + _("X_res"),(int)solverConfig.resx);
   m_config->Write(groupName + _("Y_res"),(int)solverConfig.resy);
@@ -570,6 +606,19 @@ void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverCo
   m_config->Write(groupName + _("epsilon"),solverConfig.epsilon);
   
   m_config->Write(groupName + _("nbMaxIter"),(int)solverConfig.nbMaxIter);
+}
+
+void FlamesFrame::SaveFireSettings(wxString& groupName, FlameConfig& fireConfig)
+{
+  m_config->Write(groupName + _("Type"), (int )fireConfig.type);
+  m_config->Write(groupName + _("SkeletonsNumber"),(int )fireConfig.skeletonsNumber);
+  m_config->Write(groupName + _("InnerForce"), fireConfig.innerForce);
+  m_config->Write(groupName + _("Flickering"), (int )fireConfig.flickering);
+  m_config->Write(groupName + _("FDF"), (int )fireConfig.fdf);
+  m_config->Write(groupName + _("SamplingTolerance"), fireConfig.samplingTolerance);
+  m_config->Write(groupName + _("nbLeadParticles"), (int )fireConfig.leadLifeSpan);
+  m_config->Write(groupName + _("nbPeriParticles"), (int )fireConfig.periLifeSpan);
+  m_config->Write(groupName + _("IESFileName"),fireConfig.IESFileName);
 }
 
 void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
@@ -594,55 +643,38 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Shadows/ExtrudeDist.y"), (GLfloat)m_currentConfig.extrudeDist[1]);
   m_config->Write(_("/Shadows/ExtrudeDist.z"), (GLfloat)m_currentConfig.extrudeDist[2]);
   
-  m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
+  m_config->Write(_("/Luminaries/Number"), (int)m_currentConfig.nbLuminaries);
 
   m_config->Write(_("/GlobalField/Enabled"), m_currentConfig.useGlobalField);
   groupName << _("/GlobalField/");
   m_config->DeleteGroup(groupName);
   SaveSolverSettings(groupName,m_currentConfig.globalField);
   
-  for(uint i=0; i < m_nbSolversMax; i++)
+  for(uint i=0; i < m_nbLuminariesMax; i++)
     {
-      groupName.Printf(_("/Solver%d/"),i);
+      groupName.Printf(_("/Luminary%d"),i);
 
       m_config->DeleteGroup(groupName);
     }
   
-  for(uint i=0; i < m_currentConfig.nbSolvers; i++)
+  for(uint i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      groupName.Printf(_("/Solver%d/"),i);
+      groupName.Printf(_("/Luminary%d/"),i);
       
-      SaveSolverSettings(groupName,m_currentConfig.solvers[i]);
-    }
-  
-  m_config->Write(_("/Flames/Number"), (int)m_currentConfig.nbFlames);
-  
-  for(uint i=0; i < m_nbFlamesMax; i++)
-    {
-      groupName.Printf(_("/Flame%d/"),i);
-
-      m_config->DeleteGroup(groupName);
-    }
-  
-  for(uint i=0; i < m_currentConfig.nbFlames; i++)
-    {
-      groupName.Printf(_("/Flame%d/"),i);
+      m_config->Write(groupName + _("FileName"),m_currentConfig.luminaries[i].fileName);
+      m_config->Write(groupName + _("Pos.x"),m_currentConfig.luminaries[i].position.x);
+      m_config->Write(groupName + _("Pos.y"),m_currentConfig.luminaries[i].position.y);
+      m_config->Write(groupName + _("Pos.z"),m_currentConfig.luminaries[i].position.z);
       
-      m_config->Write(groupName + _("Type"), (int )m_currentConfig.flames[i].type);
-      m_config->Write(groupName + _("Solver"), m_currentConfig.flames[i].solverIndex);
-      m_config->Write(groupName + _("Pos.x"),m_currentConfig.flames[i].position.x);
-      m_config->Write(groupName + _("Pos.y"),m_currentConfig.flames[i].position.y);
-      m_config->Write(groupName + _("Pos.z"),m_currentConfig.flames[i].position.z);
-      m_config->Write(groupName + _("SkeletonsNumber"),(int )m_currentConfig.flames[i].skeletonsNumber);
-      m_config->Write(groupName + _("InnerForce"), m_currentConfig.flames[i].innerForce);
-      if(m_currentConfig.flames[i].type != CANDLE)
-	m_config->Write(groupName + _("WickFileName"),m_currentConfig.flames[i].wickName);
-      m_config->Write(groupName + _("Flickering"), (int )m_currentConfig.flames[i].flickering);
-      m_config->Write(groupName + _("FDF"), (int )m_currentConfig.flames[i].fdf);
-      m_config->Write(groupName + _("SamplingTolerance"), m_currentConfig.flames[i].samplingTolerance);
-      m_config->Write(groupName + _("nbLeadParticles"), (int )m_currentConfig.flames[i].leadLifeSpan);
-      m_config->Write(groupName + _("nbPeriParticles"), (int )m_currentConfig.flames[i].periLifeSpan);
-      m_config->Write(groupName + _("IESFileName"),m_currentConfig.flames[i].IESFileName);
+      m_config->Write(_("/Luminaries/NbFields"), (int)m_currentConfig.luminaries[i].nbFields);
+      groupName.Printf(_("/Luminary%d/Solver0/"),i);
+      m_solverPanels[i]->getCtrlValues(m_currentConfig.luminaries[i].fields[0]);
+      SaveSolverSettings(groupName,m_currentConfig.luminaries[i].fields[0]);
+      
+      m_config->Write(_("/Luminaries/NbFires"), (int)m_currentConfig.luminaries[i].nbFires);
+      groupName.Printf(_("/Luminary%d/Flame0/"),i);
+      m_flamePanels[i]->getCtrlValues(m_currentConfig.luminaries[i].fires[0]);
+      SaveFireSettings(groupName,m_currentConfig.luminaries[i].fires[0]);  
     }
   
   wxFileOutputStream file( m_configFileName );
@@ -776,22 +808,13 @@ void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
   m_glBuffer->setBoundingVolumesDisplay(false);
 }
 
-void FlamesFrame::OnSolversMenu(wxCommandEvent& event)
+void FlamesFrame::OnSettingsMenu(wxCommandEvent& event)
 {
   m_glBuffer->setRunningState(false);
-  SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
+  LuminaryDialog solverDialog (GetParent(),-1,_("Simulation settings"),&m_currentConfig);
   if(solverDialog.ShowModal() == wxID_OK){
+    InitLuminariesPanels();
     InitSolversPanels();
-    m_glBuffer->ReloadSolversAndFlames();
-  }
-  m_glBuffer->setRunningState(true);
-}
-
-void FlamesFrame::OnFlamesMenu(wxCommandEvent& event)
-{
-  m_glBuffer->setRunningState(false);
-  FlameDialog flameDialog (GetParent(),-1,_("Flames settings"),&m_currentConfig);
-  if(flameDialog.ShowModal() == wxID_OK){
     InitFlamesPanels();
     m_glBuffer->ReloadSolversAndFlames();
   }

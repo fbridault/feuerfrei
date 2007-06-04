@@ -38,12 +38,11 @@ public:
   /** Constructeur de flamme par défaut n'effectuant pas l'allocation des tableaux utilisés pour la génération
    * des points de contrôle. L'allocation doit donc être effectuée par la classe fille, ce que fait par exemple
    * la classe FixedFlame.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
-  NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
+  NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
    * @param source Pointeur sur la flamme qui a généré la flamme courante.
@@ -228,8 +227,6 @@ protected:
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;
   
-  /** Configuration de la flamme */
-  const FlameConfig *m_flameConfig;
 private:
   /** Objet OpenGL permettant de définir la NURBS */
   GLUnurbsObj *m_nurbs,*m_accurateNurbs,*m_roughNurbs;
@@ -252,12 +249,11 @@ class FixedFlame : public NurbsFlame
 {
 public:
   /** Constructeur de flamme par défaut.
-   * @param flameConfig Pointeur sur le configuration de la flamme
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    */
-  FixedFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
+  FixedFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   
   virtual ~FixedFlame ();
   
@@ -323,25 +319,38 @@ class RealFlame : public FixedFlame
 {
 public:
   /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
    * @param nbSkeletons Nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
    * @param s Pointeur vers le solveur.
    */
-  RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex, Field3D* const s);
+  RealFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex, Field3D* const s);
   virtual ~RealFlame ();
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  virtual void addForces ();
+  virtual void addForces (int fdf, double innerForce, char perturbate){
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      (*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
+  }
   
-  /** Affectation de la vélocité induite par la flamme.
-   * @param value Vélocité de la flamme.
+  /** Affectation de la durée de vie des squelettes guides.
+   * @param value Durée de vie en itérations.
    */
-  virtual void setForces(double value){ m_innerForce=value; };
+  virtual void setLeadLifeSpan(uint value) {
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      (*skeletonsIterator)->setLifeSpan(value);
+  };
   
-  virtual Field3D* getSolver () { return m_solver; };
+  /** Affectation de la durée de vie des squelettes périphériques.
+   * @param value Durée de vie en itérations.
+   */
+  virtual void setPeriLifeSpan(uint value) { 
+    for (uint i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->setLifeSpan(value); 
+  };
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
   void drawParticles() const
@@ -379,17 +388,6 @@ public:
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
 
-  /** Construction de la sphère englobante de l'objet. */
-  void buildBoundingSphere (const Point& parentSolverPosition);
-  /** Dessin de la sphère englobante. */
-  void drawBoundingSphere () { m_boundingSphere.draw(); };
-  
-  /** Calcul de la visibilité d'une flamme. */
-  virtual void computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild=false);
-  
-  static bool cmp( const RealFlame* a, const RealFlame* b ) {
-    return a->m_dist < b->m_dist;
-  }
 protected:
   /** Vecteur contenant les squelettes guide. */
   vector < LeadSkeleton * > m_leadSkeletons;
@@ -409,19 +407,9 @@ protected:
    */
   int *m_maxDistancesIndexes;
   
-  double m_innerForce;
-  
-  /** Sphère englobante. */
-  BoundingSphere m_boundingSphere;
-  /** Visibilité de la flamme. */
-  bool m_visibility;
-  /** Distance par rapport à la caméra */
-  double m_dist;
   u_char m_lodSkel;
+  /** Indique qu'un changement de niveau de détail sur les squelettes a été demandé. */
   bool m_lodSkelChanged;
-private:
-  uint m_moduloSave;
-  double m_diffDistSave,m_distSave;
 };
 
 #endif

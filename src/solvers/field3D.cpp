@@ -52,7 +52,10 @@ Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, double di
 }
 
 Field3D::~Field3D ()
-{
+{  
+#ifdef RTFLAMES_BUILD
+  m_fireSources.clear();
+#endif
 }
 
 void Field3D::buildDLGrid ()

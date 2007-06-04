@@ -12,8 +12,8 @@
 /************************************** IMPLEMENTATION DE LA CLASSE PERISKELETON **************************************/
 /**********************************************************************************************************************/
 PeriSkeleton::PeriSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor, 
-			    LeadSkeleton *leadSkeleton, const FlameConfig* const flameConfig) :
-  Skeleton (s, position, rootMoveFactor, flameConfig)
+			    LeadSkeleton *leadSkeleton, uint pls) :
+  Skeleton (s, position, rootMoveFactor, pls)
 {
   this->m_lead = leadSkeleton;
   addParticle(&m_root);
@@ -47,7 +47,7 @@ void PeriSkeleton::addParticle(const Point* const pt)
   m_headIndex++;
   
   m_queue[m_headIndex] = *pt;
-  m_queue[m_headIndex].birth(m_flameConfig->periLifeSpan);
+  m_queue[m_headIndex].birth(m_lifeSpan);
 }
 
 bool PeriSkeleton::moveParticle (Particle * const particle)

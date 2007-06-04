@@ -165,14 +165,12 @@ public:
    * @param nbFlames Nombre de flammes, si = 0 alors le tableau contenant les flammes n'est pas alloué.
    * et ceci doit alors être réalisé par la classe fille.
    * @param scene Pointeur sur la scène.
-   * @param filename Nom du fichier contenant le luminaire.
    * @param texname Nom du fichier contenant le luminaire.
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program Pointeur sur le program chargé de la construction des shadow volumes.
-   * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  FireSource (FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
-	      const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
+  FireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
+	      const wxString &texname, uint index, const GLSLProgram* const program);
   /** Destructeur */
   virtual ~FireSource ();
 
@@ -183,16 +181,6 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
   };
-  
-//   virtual void setRenderMode() {  
-//     for (uint i = 0; i < m_nbFlames; i++)
-//       m_flames[i]->setRenderMode();
-//   };
-
-//   virtual void setTesselateMode() { 
-//     for (uint i = 0; i < m_nbFlames; i++)
-//       m_flames[i]->setTesselateMode();
-//   };
   
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
@@ -266,46 +254,47 @@ public:
     }
   };
   
-  /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
-   * est donc effectuée pour tenir compte du placement du feu dans le monde.
-   */
-  void drawLuminary() const
-  {
-    if(m_hasLuminary){
-      Point position(getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (position.x, position.y, position.z);
-      glScalef (scale.x, scale.y, scale.z);
-      for (list < Object* >::const_iterator luminaryIterator = m_luminary.begin ();
-	   luminaryIterator  != m_luminary.end (); luminaryIterator++)
-	(*luminaryIterator)->draw();
-      glPopMatrix();
-    }
-  }
-  
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
   virtual void addForces ()
   {
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->addForces();
+      m_flames[i]->addForces(m_fdf, m_innerForce, m_perturbate);
   }
   
-  /** Affectation de la vélocité induite par la flamme.
-   * @param value Vélocité de la flamme.
+  /** Affectation du coefficient multiplicateur de la FDF.
+   * @param value Coefficient.
    */
-  virtual void setForces(double value)
-  {
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setForces(value);
-  }
+  virtual void setInnerForce(double value) { m_innerForce=value; };
   
-  /** Modifie le type de flickering sur les flammes. */  
-  void setFlickeringMode(char mode){ m_flameConfig->flickering = mode; };
-
-  /** Modifie le type de flickering sur les flammes. */  
-  char getFlickeringMode(){ return m_flameConfig->flickering; };
+  /** Affectation de la FDF.
+   * @param value FDF.
+   */
+  virtual void setFDF(int value) { m_fdf=value; };
+  
+  /** Affectation de la méthode de perturbation.
+   * @param value Perturbation.
+   */
+  virtual void setPerturbateMode(char value) { m_perturbate=value; };
+  
+  /** Modifie le type de flickering sur les flammes. */
+  char getPerturbateMode() const { return m_perturbate; };
+  
+  /** Affectation de la durée de vie des squelettes guides.
+   * @param value Durée de vie en itérations.
+   */
+  virtual void setLeadLifeSpan(uint value) {
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setLeadLifeSpan(value);
+  };
+  
+  /** Affectation de la durée de vie des squelettes périphériques.
+   * @param value Durée de vie en itérations.
+   */
+  virtual void setPeriLifeSpan(uint value) { 
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setPeriLifeSpan(value); 
+  };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state)
@@ -348,21 +337,9 @@ protected:
   /** Tableau contenant les flammes */
   RealFlame **m_flames;
   
-  /** Luminaire */
-  list <Object *> m_luminary;
-  
-  /** Index de la display list contenant le luminaire */
-  GLuint m_luminaryDL;
-  
-  /** Est-ce que la source possède un luminaire */
-  bool m_hasLuminary;
-
   /** Pointeur sur le solveur de fluides */
   Field3D *m_solver;
   
-  /** Indique si la source produit des flammes détachées */
-  bool m_breakable;
-
   /** Texture utilisée pour les flammes */
   Texture m_texture;
   
@@ -376,9 +353,13 @@ protected:
   /** Dernière valeur du flickering connue avant que la gestion du LOD ne la modifie */
   char m_flickSave;
   
-  /** Configuration de la flamme */
-  FlameConfig *m_flameConfig;
-
+  /** Coefficient de force appliqué sur la FDF. */
+  double m_innerForce;
+  /** Méthode de perturbation appliquée sur la FDF. */
+  char m_perturbate;
+  /** Fonction de distribution de carburant. */
+  int m_fdf;
+  
   /** Centre de la flamme, recalculé à chaque itération dans build() */
   Point m_center;
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
@@ -406,8 +387,8 @@ public:
    * @param program Pointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
-  DetachableFireSource (FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, Scene* const scene, const char *filename,
-			const wxString &texname, uint index, const GLSLProgram* const program, const char *objName=NULL);
+  DetachableFireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
+			const wxString &texname, uint index, const GLSLProgram* const program);
   virtual ~DetachableFireSource();
   
   virtual void build();

@@ -68,8 +68,14 @@ void FakeField3D::iterate ()
   
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
-      addExternalForces(m_temporaryExternalForces,true);
+      addExternalForces(m_temporaryExternalForces,false);
       m_temporaryExternalForces.resetToNull();
+    }
+  
+  if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
+    {
+      addExternalForces(m_movingForces,true);
+      m_movingForces.resetToNull();
     }
   
   m_nbIter++;
@@ -88,11 +94,11 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
   Point force;
   
   if(move){
-    force = position - m_position;
+    force = position;
     strength.x = force.x > 0 ? .2 : -.2;
     strength.y = force.y > 0 ? .2 : -.2;
     strength.z = force.z > 0 ? .2 : -.2;
-    m_position=position;
+    setPosition(m_position + position);
   }else{
     force = position;
     strength = position * .025;
@@ -135,9 +141,9 @@ void FakeField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, c
 				  const Point& TRStrength, const Point& BRStrength)
 {
   switch(face){
-  case LEFT_FACE : m_src.x += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
-  case RIGHT_FACE : m_src.x += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
-  case BACK_FACE : m_src.z += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
-  case FRONT_FACE : m_src.z += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
+  case LEFT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
+  case RIGHT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
+  case BACK_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
+  case FRONT_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
   }
 }

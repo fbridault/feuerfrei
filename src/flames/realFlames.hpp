@@ -28,7 +28,6 @@ class LineFlame : public RealFlame
 public:
   /** Constructeur.
    * @param flameConfig Pointeur vers la configuration de la flamme.
-   * @param scene Pointeur vers la scène.
    * @param tex Pointeur vers la texture à utiliser.
    * @param s Pointeur vers le solveur.
    * @param wickFileName Chaîne de caractère contenant le nom du fichier contenant la mèche.
@@ -36,15 +35,13 @@ public:
    * @param detachedFlamesWidth Largeur des flammes détachées.
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s,
+  LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s,
 	     Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle) const{
-    if(m_visibility){
-      if(displayParticle) drawParticles();
-      if(display) drawLineFlame(); 
-    }
+    if(displayParticle) drawParticles();
+    if(display) drawLineFlame();
   };
   
   virtual void drawWick(bool displayBoxes) const { m_wick->drawWick(displayBoxes); };
@@ -142,20 +139,18 @@ public:
    * @param tex Pointeur vers la texture à utiliser.
    * @param s Pointeur vers le solveur.
    * @param rayon Valeur du rayon du cercle formé par les racines des squelettes.
-   * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
+   * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
-  PointFlame ( const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, double rayon,
-	       Scene* const scene=NULL, Object *wick=NULL);
+  PointFlame ( const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
+	       double rayon, Object *wick=NULL);
   
   /** Destructeur*/
   virtual ~PointFlame();
   
   virtual void drawFlame(bool display, bool displayParticle) const
   {
-    if(m_visibility){
-      if(displayParticle) drawParticles();
-      if(display) drawPointFlame();
-    }
+    if(displayParticle) drawParticles();
+    if(display) drawPointFlame();
   };
   
   virtual void drawWick(bool displayBoxes) const;
@@ -174,8 +169,15 @@ public:
    * Dans le cas d'une PointFlame, cette méthode ne fait rien du tout pour l'instant.
    */
   void breakCheck() {};
-  void addForces ();
-
+  
+  virtual void addForces (int fdf, double innerForce, char perturbate){
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      (*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
+    for (uint i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->addForces ();
+  }
+  
 protected:
   Object *m_wick;
 };

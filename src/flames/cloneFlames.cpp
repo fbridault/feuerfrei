@@ -4,8 +4,8 @@
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE CLONEFLAME ***************************************/
 /**********************************************************************************************************************/
-CloneFlame::CloneFlame(const FlameConfig* const flameConfig, const RealFlame* const source, const Point& offset) :
-  FixedFlame (flameConfig, source->getNbSkeletons(), source->getNbFixedPoints(), source->getTexture())
+CloneFlame::CloneFlame(const FlameConfig& flameConfig, const RealFlame* const source, const Point& offset) :
+  FixedFlame (source->getNbSkeletons(), source->getNbFixedPoints(), source->getTexture())
 {
   m_source = source;
   m_position = offset;
@@ -33,7 +33,7 @@ bool CloneFlame::build()
   return true;
 }
 
-CloneLineFlame::CloneLineFlame(const FlameConfig* const flameConfig, const LineFlame* const source, const Point& offset) :
+CloneLineFlame::CloneLineFlame(const FlameConfig& flameConfig, const LineFlame* const source, const Point& offset) :
   CloneFlame (flameConfig, source, offset)
 {
 }
@@ -42,7 +42,7 @@ CloneLineFlame::~CloneLineFlame()
 {
 }
 
-ClonePointFlame::ClonePointFlame(const FlameConfig* const flameConfig, const PointFlame* const source, const Point& offset) :
+ClonePointFlame::ClonePointFlame(const FlameConfig& flameConfig, const PointFlame* const source, const Point& offset) :
   CloneFlame (flameConfig, source, offset)
 {
 }

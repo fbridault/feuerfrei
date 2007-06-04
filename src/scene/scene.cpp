@@ -4,8 +4,9 @@
 
 #include "material.hpp"
 
-Scene::Scene (const char* const fileName, vector <FireSource *> *flames)
-{  
+Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vector <FireSource *> *flames)
+{
+  m_luminaries = luminaries;
   m_flames = flames;
   
   addMaterial(new Material(this));
@@ -220,6 +221,7 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
   
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
+    cerr << "Can't open file " << fileName << endl;
     throw (ios::failure ("Open scene error"));
     return false;
   }
@@ -460,6 +462,7 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
   getSceneAbsolutePath(fileName);
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
+    cerr << "Can't open file " << fileName << endl;
     throw (ios::failure ("Open error"));
     return false;
   }
@@ -499,6 +502,7 @@ void Scene::importMTL(const char* fileName)
   strcat(buffer,fileName);
   ifstream matFile(buffer, ios::in);
   if (!matFile.is_open ()){
+    cerr << "Can't open file " << fileName << endl;
     throw (ios::failure ("Open error"));
     return;
   }

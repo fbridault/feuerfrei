@@ -4,12 +4,18 @@
 #include "field.hpp"
 #include "../flames/particle.hpp"
 
+#include <list>
+
 enum{
   LEFT_FACE = 1,
   RIGHT_FACE,
   BACK_FACE,
   FRONT_FACE,
 };
+
+#ifdef RTFLAMES_BUILD
+class FireSource;
+#endif
 
 class Field;
 
@@ -47,10 +53,16 @@ public:
     
   /** Récupération de la valeur des trois composantes de la vélocité dans la grille du solveur.
    * @param pos Position relative de la particule dans le solveur
+   * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
    * @return Valeurs de vélocité.
    */
   virtual Point getUVW (const Point& pos, double selfVelocity) const = 0;
   
+  /** Déplacement d'une particule dans le champ de vélocité. Utilisée par les squelettes pour mettre à jour la
+   * position des particules.
+   * @param particle Particule à déplacer.
+   * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
+   */
   virtual void moveParticle (Particle& particle, double selfVelocity) const = 0;
   
   /** Ajout d'une force externe pour la composante U.
@@ -142,6 +154,12 @@ public:
   virtual void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength, 
 			       const Point& TRStrength, const Point& BRStrength) = 0;
   
+#ifdef RTFLAMES_BUILD
+  /** Ajout d'une source de feu */
+  void addFireSource(FireSource* fireSource) { m_fireSources.push_back(fireSource); };
+  list <FireSource *> *getFireSourcesList() { return &m_fireSources; };
+#endif
+  
 protected:  
   /** Fonction de construction de la display list de la grille du solveur */
   void buildDLGrid ();
@@ -166,6 +184,9 @@ protected:
   
   double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
   uint m_nbMaxDiv;
+#ifdef RTFLAMES_BUILD
+  list <FireSource *> m_fireSources;
+#endif
 };
 
 #endif

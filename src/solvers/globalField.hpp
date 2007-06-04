@@ -5,7 +5,9 @@ class GlobalField;
 
 #include "field3D.hpp"
 #include <vector>
+#include <list>
 
+class FieldThread;
 class Field3D;
 class Scene;
 
@@ -28,7 +30,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GlobalField (const vector < Field3D* > &localFields, Scene *const scene, char type, uint n,
+  GlobalField (const list <FieldThread *> &threads, Scene *const scene, char type, uint n,
 	       double timeStep, double omegaDiff, double omegaProj, double epsilon);
   /** Destructeur. */
   virtual ~GlobalField () { delete m_field; };
@@ -43,7 +45,7 @@ public:
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
   void shareForces();
-  
+
   /** Ajoute de façon permanente des forces externes sur une des faces du solveur. Cette méthode
    * est utilisée principalement lorsque que du vent est appliqué sur une flamme.
    * @param forces Intensité de la force en (x,y,z).

@@ -44,8 +44,10 @@ using namespace std;
 /** Configuration d'un solveur de fluide */
 class SolverConfig{
 public:
-  char type;
+#ifdef RTFLUIDS_BUILD
   Point position;
+#endif
+  char type;
   uint resx, resy, resz;
   /* Dimension réelle du solveur, utilisée lors de la résolution */
   double dim;
@@ -58,28 +60,38 @@ public:
   double buoyancy;
 };
 
-/** Configuration d'une source lumineuse de type flamme */
+#ifdef RTFLAMES_BUILD
+
+/* Propriétés des flammes */
 class FlameConfig{
 public:
+  /** Type de flamme utilisé pour le luminaire. */
   char type;
-  int solverIndex;
-  /** La position de la flamme est RELATIVE par rapport au solveur,
-   *  il s'agit d'une fraction de la dimension du solveur 
-   */
-  Point position;
-  /** Nom du fichier représentant la ou les mèches */
-  wxString wickName;
   uint skeletonsNumber;
   double innerForce;
   char flickering;
   int fdf;
   double samplingTolerance;
-  /** Durée de vie des squelettes */
+  /** Durée de vie des squelettes. */
   uint leadLifeSpan, periLifeSpan;
-  /** Chemin vers le fichier IES utilsé pour le soldie photométrique */
+  /** Chemin vers le fichier IES utilsé pour le solide photométrique. */
   wxString IESFileName;
-  /** Indique si le feu peut générer des flammes détachées */
-  bool breakable;
+};
+
+/** Configuration d'un luminaire. Un luminaire est chargé à partir d'un fichier OBJ et contient
+ * éventuellement des mèches. Il détermine donc le placement des champs de vélocité et des flammes.
+ * A chaque luminaire est associé un seul type de champ. Si le luminaire entraîne la création de plusieurs
+ * champs, ils auront tous les mêmes propriétés. Idem pour les flammes.
+ */
+class LuminaryConfig{
+public:
+  Point position;
+  /** Nom du fichier contenant le luminaire et les mèches. */
+  wxString fileName;
+  uint nbFields;
+  SolverConfig *fields;
+  uint nbFires;
+  FlameConfig *fires;
 };
 
 class FlameAppConfig{
@@ -98,16 +110,16 @@ public:
   uint nbDepthPeelingLayers;
   /** IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
   int IPSEnabled, BPSEnabled;
-  uint nbSolvers;
-  SolverConfig *solvers;
+  uint nbLuminaries;
+  LuminaryConfig *luminaries;
   bool useGlobalField;
   SolverConfig globalField;
-  uint nbFlames;
-  FlameConfig *flames;
   GLfloat fatness[4];
   GLfloat extrudeDist[4];
   double gammaCorrection;
 };
+
+#else
 
 class FluidsAppConfig{
 public:
@@ -116,5 +128,7 @@ public:
   uint nbSolvers;
   SolverConfig *solvers;
 };
+
+#endif
 
 #endif

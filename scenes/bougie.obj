@@ -1,6 +1,6 @@
 #Produced by Art of Illusion 2.3, Wed Jan 03 18:29:41 CET 2007
 mtllib bougie.mtl
-g WSVCylinder_3
+g Lamp1
 usemtl Default_Texture
 v 0.50885 -1.0047 0.50884
 v 0.66099 -1.00205 0.5088

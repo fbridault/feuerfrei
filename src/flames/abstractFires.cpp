@@ -22,7 +22,7 @@ FlameLight::FlameLight(const Scene* const scene, uint index, const GLSLProgram* 
   default : m_light = GL_LIGHT0; break;
   }
   
-  m_lightPosition[3] = 1.0;  
+  m_lightPosition[3] = 1.0;
   m_SVProgram = program;  
   m_orientationSPtheta = 0.0;
   
@@ -72,45 +72,21 @@ void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(FlameConfig* const flameConfig, Field3D* const s, uint nbFlames,  Scene *scene, const char *filename, 
-		       const wxString &texname,  uint index, const GLSLProgram* const program, const char *objName) : 
-  FlameLight(scene, index, program, flameConfig->IESFileName.ToAscii()),
+FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
+		       const wxString &texname, uint index, const GLSLProgram* const program) : 
+  FlameLight(scene, index, program, flameConfig.IESFileName.ToAscii()),
   m_texture(texname, GL_CLAMP, GL_REPEAT)
-{  
-  char mtlName[255];
-  
+{ 
   m_solver = s;
   
   m_nbFlames=nbFlames;
   if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
-    
-  if(objName != NULL){
-    if(scene->getMTLFileNameFromOBJ(filename, mtlName))
-      scene->importMTL(mtlName);
-    
-    scene->importOBJ(filename, &m_luminary, NULL, objName);
-    
-    for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
-	 luminaryIterator  != m_luminary.end (); luminaryIterator++)
-      (*luminaryIterator)->buildVBO();
-    m_hasLuminary=true;
-  }
-  else
-    {
-      m_hasLuminary = scene->importOBJ(filename, &m_luminary);
-      if(m_hasLuminary)
-	for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
-	     luminaryIterator  != m_luminary.end (); luminaryIterator++)
-	  (*luminaryIterator)->buildVBO();
-    }
-  m_breakable=flameConfig->breakable;  
   
   m_intensityCoef = 0.3;
   m_visibility = true;
   m_dist=0;
   buildBoundingSphere();
   m_flickSave=-1;
-  m_flameConfig = flameConfig;
   m_moduloSave=0;
   m_diffDistSave=0.0;
   m_distSave=0.0;
@@ -121,12 +97,6 @@ FireSource::~FireSource()
   for (uint i = 0; i < m_nbFlames; i++)
     delete m_flames[i];
   delete[]m_flames;
-  /* On efface le luminaire, il n'appartient pas à la scène */
-  
-  for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
-       luminaryIterator  != m_luminary.end (); luminaryIterator++)
-    delete (*luminaryIterator);
-  m_luminary.clear();
 }
 
 void FireSource::build()
@@ -290,10 +260,14 @@ bool FireSource::operator<(const FireSource& other) const{
   return (m_dist < other.m_dist);
 }
 
-DetachableFireSource::DetachableFireSource(FlameConfig* const flameConfig, Field3D* const s, uint nbFlames, 
-					   Scene* const scene, const char *filename, const wxString &texname, 
-					   uint index, const GLSLProgram* const program, const char *objName) : 
-  FireSource (flameConfig, s, nbFlames, scene, filename, texname, index, program, objName)
+/**********************************************************************************************************************/
+/******************************** IMPLEMENTATION DE LA CLASSE DETACHABLEFIRESOURCE ************************************/
+/**********************************************************************************************************************/
+
+DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, 
+					   Scene* const scene, 
+					   const wxString &texname, uint index, const GLSLProgram* const program) : 
+  FireSource (flameConfig, s, nbFlames, scene, texname, index, program)
 {
 }
 
@@ -461,9 +435,9 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	    
 	    /* On passe en FakeField */
 	    if( modulo == m_solver->getNbMaxDiv()+2 ){
-	      if(getFlickeringMode() != FLICKERING_NOISE){
-		m_flickSave = getFlickeringMode();
-		setFlickeringMode(FLICKERING_NOISE);
+	      if(getPerturbateMode() != FLICKERING_NOISE){
+		m_flickSave = getPerturbateMode();
+		setPerturbateMode(FLICKERING_NOISE);
 	      }
 	      m_solver->switchToFakeField();
 	    }else
@@ -491,7 +465,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	      else
 		if( modulo == m_solver->getNbMaxDiv()+2 ){
 		  if(m_flickSave > -1){
-		    setFlickeringMode(m_flickSave);
+		    setPerturbateMode(m_flickSave);
 		    m_flickSave = -1;
 		  }
 		  m_solver->switchToRealSolver();

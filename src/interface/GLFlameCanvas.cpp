@@ -3,12 +3,6 @@
 #include "flamesFrame.hpp"
 #include <iostream>
 
-#include "../solvers/GSSolver3D.hpp"
-#include "../solvers/GCSSORSolver3D.hpp"
-#include "../solvers/HybridSolver3D.hpp"
-#include "../solvers/fakeField3D.hpp"
-#include "../solvers/LODField3D.hpp"
-
 #include "../flames/solidePhoto.hpp"
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
@@ -102,142 +96,44 @@ void GLFlameCanvas::InitGL()
   
 }
 
-void GLFlameCanvas::InitFlames(void)
+void GLFlameCanvas::InitLuminaries(void)
 {
-  for(uint i=0 ; i < m_currentConfig->nbFlames; i++){
-    switch(m_currentConfig->flames[i].type){
-    case CANDLE :
-      m_flames.push_back( new Candle (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				      m_scene, "scenes/bougie.obj", i, m_SVProgram, 1/ 8.0));
-      break;
-    case FIRMALAMPE :
-      m_flames.push_back( new Firmalampe(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					 m_scene, "scenes/firmalampe.obj", i, m_SVProgram,
-					 m_currentConfig->flames[i].wickName.fn_str()));
-      break;
-    case TORCH :
-      m_flames.push_back( new Torch(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex], 
-				    m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVProgram));
-      break;
-    case CAMPFIRE :
-      m_flames.push_back( new CampFire(&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-				       m_scene, m_currentConfig->flames[i].wickName.fn_str(), i, m_SVProgram));
-      break;
-    case CANDLESSET :
-      m_flames.push_back( new CandlesSet (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					  m_extraThreads, m_scheduler, m_scene, m_currentConfig->flames[i].wickName.fn_str(),
-					  i, m_SVProgram, m_currentConfig->solvers[m_currentConfig->flames[i].solverIndex].scale));
-      break;
-    case CANDLESTICK :
-      m_flames.push_back( new CandleStick (&m_currentConfig->flames[i], m_solvers[m_currentConfig->flames[i].solverIndex],
-					   m_scene, "scenes/bougie.obj", i, m_SVProgram, 1/ 8.0));
-      break;
-    default :
-      cerr << "Unknown flame type : " << (int)m_currentConfig->flames[i].type << endl;
-      ::wxExit();
-    }
-  }
-  prevNbFlames = m_currentConfig->nbFlames;
+  for(uint i=0; i < m_currentConfig->nbLuminaries; i++)
+    m_luminaries.push_back( new Luminary( m_currentConfig->luminaries[i], m_solvers, m_flames, m_scene,
+					  m_SVProgram, m_currentConfig->luminaries[i].fileName.fn_str(), i) );
+  
+//   m_currentConfig->nbFires = m_flames.size(); m_currentConfig->nbFields = m_solvers.size(); 
+  prevNbFlames = m_flames.size(); prevNbSolvers = m_solvers.size();
   
   if( m_intensities ) delete [] m_intensities;
-  m_intensities = new double[m_currentConfig->nbFlames];
-}
-
-void GLFlameCanvas::InitSolvers(void)
-{
-  for(uint i=0 ; i < m_currentConfig->nbSolvers; i++){
-    switch(m_currentConfig->solvers[i].type){
-    case GS_SOLVER :
-      m_solvers.push_back( new GSSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
-      break;
-    case GCSSOR_SOLVER :
-      m_solvers.push_back( new GCSSORSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					      m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
-					      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					      m_currentConfig->solvers[i].epsilon));
-      break;
-    case HYBRID_SOLVER :
-      m_solvers.push_back( new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					      m_currentConfig->solvers[i].timeStep,
-					      m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff,
-					      m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon));
-      break;
-    case LOD_HYBRID_SOLVER :
-      m_solvers.push_back( new LODHybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-						 m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-						 m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-						 m_currentConfig->solvers[i].timeStep,
-						 m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff,
-						 m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon));
-      break;
-    case SIMPLE_FIELD :
-      m_solvers.push_back( new RealField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					   m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
-      break;
-    case FAKE_FIELD :
-      m_solvers.push_back( new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					   m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					   m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					   m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy));
-      break;
-    case LOD_FIELD :
-      m_solvers.push_back( new LODField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					  m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					  m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					  m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
-					  m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					  m_currentConfig->solvers[i].epsilon));
-      break;
-    case LOD_HYBRID_FIELD :
-      m_solvers.push_back( new LODHybridField(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,
-					      m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz,
-					      m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
-					      m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy,
-					      m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
-					      m_currentConfig->solvers[i].epsilon));
-      break;
-    default :
-      cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;
-      ::wxExit();
-    }
-  }
-  prevNbSolvers = m_currentConfig->nbSolvers;
+  m_intensities = new double[m_flames.size()];
 }
 
 void GLFlameCanvas::InitThreads()
 {
   uint i=0;
-  FieldFiresAssociation *fieldFiresAssociation;
   
+  /* Création d'un thread par champ de vélocité. */
   for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++, i++){
-    fieldFiresAssociation = new FieldFiresAssociation(*solversIterator);
-    /* Ajout des flammes concernées par chaque solveur dans le thread correspondant */
-    for(uint j=0 ; j < m_currentConfig->nbFlames; j++)
-      if(m_currentConfig->flames[j].solverIndex == i)
-	fieldFiresAssociation->addFireSource(m_flames[j]);
-    
-    m_fieldFiresAssociations.push_back(fieldFiresAssociation);
-    /* Instanciation des threads : 1 solveur = 1 thread */
-    m_threads.push_back(new FieldFiresThread(fieldFiresAssociation, m_scheduler));
+       solversIterator != m_solvers.end (); solversIterator++, i++)    
+    m_threads.push_back(new FieldFiresThread(*solversIterator, m_scheduler));
+  
+  if(m_currentConfig->useGlobalField){
+    m_globalField = new GlobalField(m_threads, m_scene, m_currentConfig->globalField.type,
+				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
+				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
+				    m_currentConfig->globalField.epsilon);
+    /* Ajout du thread du solveur global le cas échéant */
+    m_threads.push_back(new GlobalFieldThread(m_globalField, m_scheduler));
   }
-  m_scheduler->Init(m_threads, m_extraThreads);
+  m_scheduler->Init(m_threads);
   
   if ( m_scheduler->Create() != wxTHREAD_NO_ERROR )
     {
       wxLogError(_("Can't create scheduler thread!"));
     }
   
-  for (list <FieldFiresThread *>::iterator threadsIterator = m_threads.begin ();
+  for (list <FieldThread *>::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)    
     /* Création proprement dite du thread, il ne reste plus qu'à le lancer avec Run() */
     if ( (*threadsIterator)->Create() != wxTHREAD_NO_ERROR )
@@ -245,22 +141,11 @@ void GLFlameCanvas::InitThreads()
 	wxLogError(_("Can't create thread!"));
       }
   
-  for (list <FieldFlamesThread *>::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++)    
-    /* Création proprement dite du thread, il ne reste plus qu'à le lancer avec Run() */
-    if ( (*threadsIterator)->Create() != wxTHREAD_NO_ERROR )
-      {
-	wxLogError(_("Can't create thread!"));
-      }
+  /* Lancement de l'ordonnanceur */
   m_scheduler->Run();
   /* Lancement des threads */
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
-    (*threadsIterator)->Run();
-  
-  /* Lancement des threads */
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++)
     (*threadsIterator)->Run();
 }
 
@@ -268,20 +153,12 @@ void GLFlameCanvas::InitScene()
 {  
   uint glowScales[2] = { 1, 4 };
   
-  InitSolvers();
+  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_luminaries, &m_flames);
   
-  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_flames);
+  InitLuminaries();  
   
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
-  
-  InitFlames();
-  
-  if(m_currentConfig->useGlobalField)
-    m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,
-				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
-				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
-				    m_currentConfig->globalField.epsilon);
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
   
@@ -318,12 +195,8 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
 void GLFlameCanvas::PauseThreads()
 {
   m_scheduler->Pause();
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++){
-    (*threadsIterator)->Pause();
-  }
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++){
     (*threadsIterator)->Pause();
   }
 }
@@ -331,12 +204,8 @@ void GLFlameCanvas::PauseThreads()
 void GLFlameCanvas::ResumeThreads()
 {
   m_scheduler->Resume();
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++){
-    (*threadsIterator)->Resume();
-  }
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++){
     (*threadsIterator)->Resume();
   }
 }
@@ -347,41 +216,24 @@ void GLFlameCanvas::DeleteThreads()
   if( !IsRunning() ) setRunningState(true);
   m_scheduler->Stop();
   
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Stop();
 
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++)
-    (*threadsIterator)->Stop();
-  
   m_scheduler->forceEnd();
+  m_scheduler->unblock();
   m_scheduler->Wait();
   
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
-    (*threadsIterator)->Wait();
-  
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++)
     (*threadsIterator)->Wait();
   
   /* Tous les threads sont terminés, on peut tout supprimer sans risque */
   delete m_scheduler;
-  for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+  for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
     delete (*threadsIterator);
   m_threads.clear();
-  
-  for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-       threadsIterator != m_extraThreads.end (); threadsIterator++)
-    delete (*threadsIterator);
-  m_extraThreads.clear();
-  
-  for (list < FieldFiresAssociation* >::iterator ffaIterator = m_fieldFiresAssociations.begin ();
-       ffaIterator != m_fieldFiresAssociations.end (); ffaIterator++)
-    delete (*ffaIterator);
-  m_fieldFiresAssociations.clear();
 }
 
 void GLFlameCanvas::Restart (void)
@@ -421,23 +273,21 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
     delete (*solversIterator);
   m_solvers.clear();
   
+  for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
+       luminariesIterator != m_luminaries.end (); luminariesIterator++)
+    delete (*luminariesIterator);
+  m_luminaries.clear();
+  
   if(m_globalField){
     delete m_globalField;
     m_globalField = NULL;
   }
   
-  InitSolvers();
+  InitLuminaries();
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
-  InitFlames();
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
-  
-  if(m_currentConfig->useGlobalField)
-    m_globalField = new GlobalField(m_solvers, m_scene, m_currentConfig->globalField.type,
-				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
-				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
-				    m_currentConfig->globalField.epsilon);
   
   InitThreads();
   m_swatch->Start();
@@ -475,20 +325,18 @@ void GLFlameCanvas::DestroyScene(void)
        solversIterator != m_solvers.end (); solversIterator++)
     delete (*solversIterator);
   m_solvers.clear();
+  
+  for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
+       luminariesIterator != m_luminaries.end (); luminariesIterator++)
+    delete (*luminariesIterator);
+  m_luminaries.clear();
 }
 
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
-  if(m_run && m_init){
-//     if(m_currentConfig->useGlobalField)
-//       m_globalField->cleanSources ();
-    
-//     if(m_currentConfig->useGlobalField) m_globalField->iterate();
-    
-  }
-  
   /* Force à redessiner */
   this->Refresh();
+//   thisApp->Yield();
   //event.RequestMore();
 }
 
@@ -666,6 +514,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
       cerr << "Image saving error !!" << endl;
   }
+  m_scheduler->unblock();
 }
 
 void GLFlameCanvas::drawScene()

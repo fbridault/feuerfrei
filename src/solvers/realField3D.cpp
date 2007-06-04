@@ -62,6 +62,12 @@ void RealField3D::iterate ()
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
+  
+  if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
+    {
+      addExternalForces(m_movingForces,true);
+      m_movingForces.resetToNull();
+    }
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
       addExternalForces(m_temporaryExternalForces,true);
@@ -86,9 +92,9 @@ void RealField3D::addExternalForces(const Point& position, bool move)
   Point force;
   
   if(move){
-    force = position - m_position;
+    force = position;
     strength.x = strength.y = strength.z = 1;
-    m_position=position;
+    setPosition(m_position + position);
   }else{
     force = position;
     strength = position * .1;

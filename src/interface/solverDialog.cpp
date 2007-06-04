@@ -28,20 +28,6 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0.4"));
 
-#ifdef RTFLAMES_BUILD
-  const wxString m_solverTypeRadioBoxChoices[] = {
-    _("Gauss-Seidel"),
-    _("Preconditioned Conjugated Gradient"),
-    _("Hybrid"),
-    _("LOD Hybrid"),
-    _("Simple field"),
-    _("Fake field"),
-    _("LOD field"),
-    _("LOD multi-res field ")
-  };
-  m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					8, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
-#else
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
@@ -58,7 +44,6 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
 					12, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
-#endif
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
@@ -168,7 +153,7 @@ void SolverPanel::doLayout()
   SetSizerAndFit(m_panelSizer);
 }
 
-void SolverPanel::setCtrlValues(SolverConfig& solverConfig)
+void SolverPanel::setCtrlValues(const SolverConfig& solverConfig)
 {
   wxString tmp;
   
@@ -315,33 +300,17 @@ BEGIN_EVENT_TABLE(SolverDialog, wxDialog)
   EVT_BUTTON(IDB_Delete, SolverDialog::OnClickButtonDelete)
   EVT_BUTTON(IDB_OK, SolverDialog::OnOK)
   EVT_BUTTON(IDB_Cancel, SolverDialog::OnCancel)
-#ifdef RTFLAMES_BUILD
-  EVT_CHECKBOX(IDCHK_GS, SolverDialog::OnCheckActivateGlobalSolver)
-#endif
   EVT_NOTEBOOK_PAGE_CHANGING(IDNB_Solvers, SolverDialog::OnPageChanging)
 END_EVENT_TABLE();
 
 
-#ifdef RTFLAMES_BUILD
-SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  FlameAppConfig *config, 
-			   const wxPoint& pos, const wxSize& size, long style):
-#else
 SolverDialog::SolverDialog(wxWindow* parent, int id, const wxString& title,  FluidsAppConfig *config, 
 			   const wxPoint& pos, const wxSize& size, long style):
-#endif
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
   m_solverNotebook = new wxNotebook(this, IDNB_Solvers, wxDefaultPosition, wxDefaultSize, 0);
   m_currentConfig = config;
   m_nbPanels = m_currentConfig->nbSolvers;
-#ifdef RTFLAMES_BUILD
-  /* Solveur global */
-  m_activateGlobalSolverCheckBox = new wxCheckBox(this,IDCHK_GS,_("Activate Global Field"));
-  m_activateGlobalSolverCheckBox->SetValue(m_currentConfig->useGlobalField);
-  
-  m_globalSolverPanel = new SolverPanel(m_solverNotebook, -1, false);
-  m_globalSolverPanel->setCtrlValues(m_currentConfig->globalField);
-#endif
   /* Solveurs locaux */
   for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
@@ -363,12 +332,6 @@ void SolverDialog::doLayout()
 {
   wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   
-#ifdef RTFLAMES_BUILD
-  sizer->Add(m_activateGlobalSolverCheckBox, 0, 0, 0);
-  m_solverNotebook->AddPage(m_globalSolverPanel, _("Global Solver"));
-  if(!m_currentConfig->useGlobalField)
-    m_globalSolverPanel->Disable();
-#endif
   for(uint i = 0; i < m_currentConfig->nbSolvers; i++)
     {
       wxString tabName(_("Solver #")); tabName << i+1;
@@ -402,56 +365,22 @@ void SolverDialog::OnClickButtonAdd(wxCommandEvent& event)
 void SolverDialog::OnClickButtonDelete(wxCommandEvent& event)
 {
   int sel = m_solverNotebook->GetSelection();
-#ifdef RTFLAMES_BUILD
-  /* On ne peut pas supprimer le globalField */
-  if(sel > 0){
-#else
   if(sel > -1){
-#endif
     m_solverNotebook->DeletePage(sel);
     m_nbPanels--;
     /* Décalage vers la gauche pour combler le trou dans le tableau */
     for(int i=sel; i < m_nbPanels; i++)
       m_solverPanels[i] = m_solverPanels[i+1];
-#ifdef RTFLAMES_BUILD
-    /* Réindexage des index des solveurs des flammes en conséquence */
-    for(uint i = 0; i < m_currentConfig->nbFlames; i++)
-      if( m_currentConfig->flames[i].solverIndex > sel)
-	m_currentConfig->flames[i].solverIndex--;
-#endif
   }
 }
-
-#ifdef RTFLAMES_BUILD
-void SolverDialog::OnCheckActivateGlobalSolver(wxCommandEvent& event)
-{
-  if(event.IsChecked())
-    m_globalSolverPanel->Enable();
-  else
-    m_globalSolverPanel->Disable();
-}
-#endif
 
 void SolverDialog::OnOK(wxCommandEvent& event)
 { 
   SolverConfig* newConfig;
-#ifdef RTFLAMES_BUILD
-  SolverConfig newGlobalConfig;
-#endif
   uint newNb;
   
   newNb = m_nbPanels;  
   newConfig = new SolverConfig[newNb];
-#ifdef RTFLAMES_BUILD
-  if(!m_globalSolverPanel->getCtrlValues(newGlobalConfig))
-    return;
-  else{
-    m_currentConfig->globalField = newGlobalConfig;
-    m_currentConfig->useGlobalField = m_activateGlobalSolverCheckBox->GetValue();
-    m_currentConfig->globalField.buoyancy=0;
-    
-  }
-#endif
   for(uint i = 0; i < newNb; i++)
     {
       if(!m_solverPanels[i]->getCtrlValues(newConfig[i])){
@@ -483,14 +412,5 @@ void SolverDialog::OnPageChanging(wxNotebookEvent& event)
 
 void SolverDialog::checkSolverUsage(int solverIndex)
 {
-#ifdef RTFLAMES_BUILD
-  for(uint i = 0; i < m_currentConfig->nbFlames; i++)
-    {
-      if(m_currentConfig->flames[i].solverIndex == solverIndex){
-	m_deleteSolverButton->Disable();
-	return;
-      }
-    }
-#endif
   m_deleteSolverButton->Enable();
 }

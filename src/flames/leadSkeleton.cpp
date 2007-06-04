@@ -10,9 +10,9 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
-LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig,
-			    double u, float noiseIncrement, float noiseMin, float noiseMax) :
-  Skeleton (s, position, rootMoveFactor, flameConfig),
+LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor,
+			    uint pls, double u, float noiseIncrement, float noiseMin, float noiseMax) :
+  Skeleton (s, position, rootMoveFactor,pls),
   m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
 {
   m_u = u;
@@ -42,13 +42,8 @@ void LeadSkeleton::drawRoot () const
   glPopMatrix ();
 }
 
-void LeadSkeleton::addForces ()
+void LeadSkeleton::addForces (int fdf, double innerForce, char perturbate)
 { 
-  /* Recopie pour améliorer la lisibilité du code - optimisé par le compilateur de toute façon... */
-  double innerForce = m_flameConfig->innerForce;
-  char perturbate = m_flameConfig->flickering;
-  int fdf = m_flameConfig->fdf;
-  
   m_selfVelocity = 0;
   switch(fdf){
   case FDF_LINEAR :
@@ -116,7 +111,7 @@ void LeadSkeleton::addParticle(const Point* const pt)
   m_headIndex++;
   
   m_queue[m_headIndex] = *pt;
-  m_queue[m_headIndex].birth(m_flameConfig->leadLifeSpan);
+  m_queue[m_headIndex].birth(m_lifeSpan);
 }
 
 FreeLeadSkeleton* LeadSkeleton::split (uint splitHeight)

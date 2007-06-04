@@ -56,18 +56,15 @@ enum
   };
 #endif
 
+#ifdef RTFLAMES_BUILD
 /** Panneau pour les onglets des solveurs dans la fenêtre principale */
-class SolverMainPanel: public wxPanel 
+class LuminaryMainPanel: public wxPanel 
 {
 public:
-#ifdef RTFLAMES_BUILD
-  SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFlameCanvas* const glBuffer, 
- 		  char type=0, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-#else
-  SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, GLFluidsCanvas* const glBuffer, 
- 		  char type=0, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-#endif
-  virtual ~SolverMainPanel(){};
+  LuminaryMainPanel(wxWindow* parent, int id, LuminaryConfig* const luminaryConfig, int index, GLFlameCanvas* const glBuffer, 
+		    const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+
+  virtual ~LuminaryMainPanel(){};
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnFXAPMINEnter(wxCommandEvent& event);
@@ -76,15 +73,9 @@ private:
   void OnFYAPMAXEnter(wxCommandEvent& event);
   void OnFZAPMINEnter(wxCommandEvent& event);
   void OnFZAPMAXEnter(wxCommandEvent& event);
-  void SetSlidersValues(char type);
-  void OnCheckMove(wxCommandEvent& event);
-#ifdef RTFLUIDS_BUILD
-  void OnClickDensities(wxCommandEvent& event);
-#endif
+  void SetSlidersValues();
   
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
-  wxSlider *m_buoyancySlider;
-  wxStaticText *m_buoyancyLabel;
   
   wxTextCtrl *m_solverXAxisPositionSliderMax, *m_solverYAxisPositionSliderMax, *m_solverZAxisPositionSliderMax,
     *m_solverXAxisPositionSliderMin, *m_solverYAxisPositionSliderMin, *m_solverZAxisPositionSliderMin;
@@ -93,15 +84,52 @@ private:
   wxBoxSizer *m_panelSizer, *m_forcesSizer;
   wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
   wxBoxSizer *m_solversXAxisPositionRangeSizer, *m_solversYAxisPositionRangeSizer, *m_solversZAxisPositionRangeSizer;
-  wxCheckBox *m_moveCheckBox;
   
-  SolverConfig *m_solverConfig;
+  LuminaryConfig *m_luminaryConfig;
+  /** Index du solveur */
+  int m_index;
+  GLFlameCanvas *m_glBuffer;
+  
+  double SLIDER_SENSIBILITY;
+  double FORCE_SENSIBILITY;
+  int SLIDER_RANGE;
+  
+  DECLARE_EVENT_TABLE()
+};
+#endif
+
+/** Panneau pour les onglets des solveurs dans la fenêtre principale */
+class SolverMainPanel: public wxPanel 
+{
+public:
+#ifdef RTFLAMES_BUILD
+  SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFlameCanvas* const glBuffer, 
+ 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+#else
+  SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFluidsCanvas* const glBuffer, 
+ 		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
+#endif
+  virtual ~SolverMainPanel(){};
+  void getCtrlValues(SolverConfig& solverConfig);
+  
+private:
+  void OnScrollPosition(wxScrollEvent& event);
+#ifdef RTFLUIDS_BUILD
+  void OnClickDensities(wxCommandEvent& event);
+#endif
+  
+  wxStaticText *m_solverXAxisPositionLabel, *m_solverYAxisPositionLabel, *m_solverZAxisPositionLabel;
+  wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
+  wxSlider *m_buoyancySlider;
+  wxStaticText *m_buoyancyLabel;
+  
+  wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
+  wxBoxSizer *m_panelSizer, *m_forcesSizer;
+  
   /** Index du solveur */
   int m_index;
 #ifdef RTFLAMES_BUILD
   GLFlameCanvas *m_glBuffer;
-  /** 0 si l'on peut bouger et appliquer des forces, -1 pour uniquement les forces, 1 pour uniquement le déplacement */
-  char m_type;
 #else
   GLFluidsCanvas *m_glBuffer;
   wxStaticBoxSizer *m_densitiesSizer;
@@ -125,6 +153,8 @@ public:
   FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flameConfig, int index, GLFlameCanvas* const glBuffer, 
 		 const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
   virtual ~FlameMainPanel(){};
+  void getCtrlValues(FlameConfig& flameConfig);
+
 private:
   void OnScrollPosition(wxScrollEvent& event);
   void OnSelectType(wxCommandEvent& event);
@@ -144,7 +174,7 @@ private:
   wxFlexGridSizer *m_slidersSizer;
   wxRadioBox *m_flickeringRadioBox, *m_FDFRadioBox;
   
-  FlameConfig *m_flameConfig;
+  LuminaryConfig *m_luminaryConfig;
   /* Index du solveur */
   int m_index;
   GLFlameCanvas *m_glBuffer;

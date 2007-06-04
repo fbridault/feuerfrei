@@ -4,31 +4,28 @@
 #include "../scene/scene.hpp"
 #include "../solvers/fakeField3D.hpp"
 
-#define WICK_NAME_PREFIX "Wick"
-#define TORCH_NAME "Torch"
-
-Candle::Candle (FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-		const GLSLProgram * const program, double rayon):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
+Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
+		const GLSLProgram * const program, double rayon, Object *wick):
+  FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
-  m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
+  m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, wick);
 }
 
-Firmalampe::Firmalampe(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
+Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene, uint index,
 		       const GLSLProgram * const program, const char *wickFileName):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/firmalampe.png"), index, program)
+  FireSource (flameConfig, s, 1, scene, _("textures/firmalampe.png"), index, program)
 {
   list<Wick *> objList;
   
   scene->importOBJ(wickFileName, NULL, &objList);
   
   if(objList.size() > 0)
-    m_flames[0] = new LineFlame( flameConfig, scene, &m_texture, s, (*objList.begin()), 0.01);
+    m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.01);
 }
 
-Torch::Torch(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
+Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
 	     const GLSLProgram * const program):
-  DetachableFireSource (flameConfig, s, 0, scene, torchName, _("textures/torch6.png"), index, program, TORCH_NAME)
+  DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"), index, program)
 {
   list<Wick *> objList;
   int i=0;
@@ -41,13 +38,13 @@ Torch::Torch(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const ch
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame( flameConfig, scene, &m_texture, s, (*objListIterator), 0.1, this);
+      m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.1, this);
     }
 }
 
-CampFire::CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
+CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
 		   const GLSLProgram * const program):
-  DetachableFireSource (flameConfig, s, 0, scene, fireName, _("textures/torch4.png"), index, program, TORCH_NAME)
+  DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"), index, program)
 {
   list<Wick *> objList;
   int i=0;
@@ -60,97 +57,13 @@ CampFire::CampFire(FlameConfig* const flameConfig, Field3D * s, Scene *scene, co
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(flameConfig, scene, &m_texture, s, (*objListIterator), 0.04, this);
+      m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.04, this);
     }
 }
 
-CandlesSet::CandlesSet(FlameConfig* const flameConfig, Field3D *s, list <FieldFlamesThread *>& fieldThreads, 
-		       FieldThreadsScheduler* const scheduler, Scene *scene,
-		       const char *lampName, uint index, const GLSLProgram * const program, Point scale):
-  FireSource (flameConfig, s, 0, scene, lampName, _("textures/bougie2.png"), index, program, "Lamp")
-{
-  list<Object *> objList;
-  int i=0;
-  
-  scene->importOBJ(lampName, &objList, NULL, WICK_NAME_PREFIX);
-  
-  m_nbFlames = objList.size();
-  m_flames = new RealFlame* [m_nbFlames];
-  
-  for (list < Object *>::iterator objListIterator = objList.begin ();
-       objListIterator != objList.end (); objListIterator++, i++)
-    {
-      Point pt;
-      FieldFlamesAssociation *fieldFlamesAssociation;
-      
-      /* Le field sera supprimé par le destructeur de FieldFlamesAssociation */
-      Field3D *field =  new FakeField3D(pt, 10, 10, 10, 1.0, Point(.15,.15,.15), .4, .1);
-      
-      fieldFlamesAssociation = new FieldFlamesAssociation(field);
-      m_flames[i] = new PointFlame( flameConfig, &m_texture, field, .125, scene, (*objListIterator));
-      m_flames[i]->buildBoundingSphere( s->getPosition() );
-      fieldFlamesAssociation->addFlameSource(m_flames[i]);    
-      m_fieldFlamesAssociations.push_back(fieldFlamesAssociation);
-      /* Instanciation des threads : 1 solveur = 1 thread */
-      fieldThreads.push_back(new FieldFlamesThread(fieldFlamesAssociation, scheduler));
-    }
-}
-
-CandlesSet::~CandlesSet()
-{
-  for (list < FieldFlamesAssociation* >::iterator ffaIterator = m_fieldFlamesAssociations.begin ();
-       ffaIterator != m_fieldFlamesAssociations.end (); ffaIterator++)
-    delete (*ffaIterator);
-  m_fieldFlamesAssociations.clear();
-}
-
-void CandlesSet::build()
-{
-  Point averagePos;
-  Vector averageVec;
-  
-  if(!m_visibility) return;
-  
-  for (uint i = 0; i < m_nbFlames; i++){
-    m_flames[i]->build();
-    averagePos += m_flames[i]->getCenter ();
-    averageVec += m_flames[i]->getMainDirection ();
-  }
-  averagePos *= m_solver->getScale();
-  m_center = averagePos/m_nbFlames;
-  averagePos = m_center + getPosition();
-  setLightPosition(averagePos);
-  
-  m_direction = averageVec/m_nbFlames;
-}
-
-void CandlesSet::computeVisibility(const Camera &view, bool forceSpheresBuild)
-{  
-  //  bool save=m_visibility;
-  
-  /* Si la flamme n'est pas visible, il ne faut pas recalculer la sphère car le solveur est arrêté ! */
-  /* On est assuré de calculer la sphère la première fois car m_visibility est initialisé à true */
-  // if(m_visibility || forceSpheresBuild) buildBoundingSphere();
-  
-//   m_dist=m_boundingSphere.visibleDistance(view);
-//   m_visibility = (m_dist);
-  
-//   if(m_visibility){
-//     if(!save)
-//       m_solver->setRunningState(true);
-//   }else
-//     if(!m_visibility && save)
-//       m_solver->setRunningState(false);
-  for (uint i = 0; i < m_nbFlames; i++)
-    m_flames[i]->computeVisibility(view, m_solver->getPosition(), forceSpheresBuild);
-  
-  sort(m_flames,m_flames+m_nbFlames,RealFlame::cmp);
-}
-  
-
-CandleStick::CandleStick (FlameConfig* const flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  const GLSLProgram * const program, double rayon):
-  FireSource (flameConfig, s, 1, scene, filename, _("textures/bougie2.png"), index, program)
+  FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
 

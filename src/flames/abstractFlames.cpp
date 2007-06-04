@@ -6,13 +6,13 @@
 /************************************** IMPLEMENTATION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
 
-NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex)
+NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex)
 {
   m_nbSkeletons = nbSkeletons;
   m_nbFixedPoints = nbFixedPoints;
   
   m_uorder = 4;
-  m_vorder = 4;  
+  m_vorder = 4;
   
   /* Allocation des tableaux à la taille maximale pour les NURBS, */
   /* ceci afin d'éviter des réallocations trop nombreuses */
@@ -41,9 +41,7 @@ NurbsFlame::NurbsFlame(const FlameConfig* const flameConfig, uint nbSkeletons, u
   
   m_smoothShading=true;
   
-  m_position=flameConfig->position;
-  
-  m_flameConfig = flameConfig;
+  m_position=Point(.5,0,.5);
   
   m_tex = tex;
 }
@@ -103,7 +101,6 @@ NurbsFlame::~NurbsFlame()
 void NurbsFlame::initNurbs(GLUnurbsObj** nurbs)
 {
   *nurbs = gluNewNurbsRenderer();
-//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, source->m_flameConfig->samplingTolerance);
   gluNurbsProperty(*nurbs, GLU_DISPLAY_MODE, GLU_FILL);
   gluNurbsProperty(*nurbs, GLU_NURBS_MODE,GLU_NURBS_TESSELLATOR);
   /* Important : ne fait pas la facettisation si la NURBS n'est pas dans le volume de vision */
@@ -155,8 +152,8 @@ void NurbsFlame::drawLineFlame () const
 /************************************** IMPLEMENTATION DE LA CLASSE FIXEDFLAME ****************************************/
 /**********************************************************************************************************************/
 
-FixedFlame::FixedFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex) :
-  NurbsFlame(flameConfig, nbSkeletons, nbFixedPoints, tex)
+FixedFlame::FixedFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex) :
+  NurbsFlame(nbSkeletons, nbFixedPoints, tex)
 {
 }
 
@@ -227,9 +224,9 @@ void FixedFlame::drawPointFlame () const
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-RealFlame::RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ushort nbFixedPoints, 
+RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints, 
 		     const Texture* const tex, Field3D* const s) :
-  FixedFlame (flameConfig, nbSkeletons, nbFixedPoints, tex)
+  FixedFlame (nbSkeletons, nbFixedPoints, tex)
 {  
   m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
@@ -239,12 +236,6 @@ RealFlame::RealFlame(const FlameConfig* const flameConfig, uint nbSkeletons, ush
     m_periSkeletons[i]=NULL;
   
   m_solver = s;
-  m_innerForce = flameConfig->innerForce;
-  m_visibility = true;
-  m_dist=0;
-  m_moduloSave=0;
-  m_diffDistSave=0.0;
-  m_distSave=0.0;
 }
 
 bool RealFlame::build ()
@@ -254,8 +245,6 @@ bool RealFlame::build ()
   double dist_max;
   m_maxParticles = 0;
   vtex = -0.5;
-  
-  if(!m_visibility) return false;
 
   /* Si un changement de niveau de détail a été demandé, l'effectue maintenant */
   if(m_lodSkelChanged) changeSkeletonsLOD();
@@ -437,13 +426,6 @@ bool RealFlame::build ()
   return true;
 }
 
-void RealFlame::addForces ()
-{
-  for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-       skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-    (*skeletonsIterator)->addForces ();
-}
-
 RealFlame::~RealFlame()
 {
   for (uint i = 0; i < m_nbSkeletons; i++)
@@ -457,100 +439,4 @@ RealFlame::~RealFlame()
   
   delete[]m_distances;
   delete[]m_maxDistancesIndexes;
-}
-
-void RealFlame::buildBoundingSphere (const Point& parentSolverPosition)
-{
-  Point p;
-  double t,k;
-  p = (m_solver->getScale() * m_solver->getDim())/2.0;
-  t = p.max();
-  k = t*t;
-  m_boundingSphere.radius = sqrt(k+k);
-  m_boundingSphere.centre = m_solver->getPosition() + parentSolverPosition + p;
-}
-
-void RealFlame::computeVisibility(const Camera &view, const Point& parentSolverPosition, bool forceSpheresBuild)
-{  
-  bool vis_save=m_visibility;
-  double differenceDist;
-  uint modulo, remainder;
-  int mod;
-  bool pass;
-  const uint INCREMENT=1;
-  
-  if(forceSpheresBuild) buildBoundingSphere(parentSolverPosition);
-
-  m_dist=m_boundingSphere.visibleDistance(view);
-  m_visibility = (m_dist);
-  
-  if(m_visibility){
-    if(!vis_save)
-      m_solver->setRunningState(true);
-    
-    /* Il faut prendre en compte la taille de l'objet */
-    m_dist = m_dist - m_boundingSphere.radius;
-    
-    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
-    if(!remainder){
-      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
-      differenceDist = m_dist - m_distSave;
-      
-      if(modulo != m_moduloSave)
-	pass = true;
-      else
-	if( differenceDist > 0 && m_diffDistSave < 0)
-	  pass = true;
-	else
-	  if( differenceDist < 0 && m_diffDistSave > 0)
-	    pass = true;
-	  else
-	    pass = false;
-      
-      if(differenceDist > 0 && pass){
-	mod=modulo-m_moduloSave;
-	do
-	  {
-	    /* On change le niveau de détail des solveurs à mi-distance */
-	    if( modulo == 2 ){
-	      cerr << "simplified skeletons" << endl;
-	      setSkeletonsLOD(SIMPLIFIED);
-	      setSamplingTolerance(1);
-	    }
-	    
-	    /* On passe en FakeField */
-	    if( modulo == 4 ){
-	      m_solver->switchToFakeField();
-	      setSamplingTolerance(2);
-	    }
-	    mod--;
-	    
-	  }while(mod>0);
-      }
-      else
-	if(differenceDist < 0 && pass){
-	  mod=m_moduloSave-modulo;
-	  do
-	    {
-	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( modulo == 2 ){
-		cerr << "normal skeletons" << endl;
-		setSkeletonsLOD(NORMAL);
-		setSamplingTolerance(0);
-	      }
-	      
-	      if( modulo == 4 ){
-		m_solver->switchToRealSolver();
-		setSamplingTolerance(1);
-	      }
-	      mod--;
-	    }while(mod>0);
-	}
-      m_diffDistSave=differenceDist;
-      m_distSave=m_dist;
-      m_moduloSave=modulo;
-    }
-  }else
-    if(vis_save)
-      m_solver->setRunningState(false);
 }

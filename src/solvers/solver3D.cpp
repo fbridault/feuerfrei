@@ -188,10 +188,17 @@ void Solver3D::iterate ()
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
+
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
-      addExternalForces(m_temporaryExternalForces,true);
+      addExternalForces(m_temporaryExternalForces,false);
       m_temporaryExternalForces.resetToNull();
+    }
+  
+  if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
+    {
+      addExternalForces(m_movingForces,true);
+      m_movingForces.resetToNull();
     }
   
   vel_step ();
@@ -209,9 +216,9 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   //  double factor = m_dim.y/(m_nbVoxelsY - 1);
   
   if(move){
-    force = position - m_position;
+    force = position;
     strength.x = strength.y = strength.z = .2;
-    m_position=position;
+    setPosition(m_position + position);
   }else{
     force = position;
     strength = position * .1;

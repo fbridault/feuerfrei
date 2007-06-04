@@ -1,16 +1,15 @@
 #include "realFlames.hpp"
 
 #include "../scene/graphicsFn.hpp"
-#include "../scene/scene.hpp"
 #include "abstractFires.hpp"
 
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const Texture* const tex, Field3D* const s, 
+LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
 		      Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire ) :
-  RealFlame (flameConfig, (flameConfig->skeletonsNumber+2)*2 + 2, 3, tex, s)
+  RealFlame ((flameConfig.skeletonsNumber+2)*2 + 2, 3, tex, s)
 {
   Point pt;
   double largeur = .03;
@@ -31,7 +30,7 @@ LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const 
     {
       pt = *m_leadSkeletons[i - 1]->getRoot();
       pt.z -= (largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i - 1], flameConfig);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i - 1], flameConfig.periLifeSpan);
     }
   
   /* Génération de l'autre côté des squelettes périphériques */
@@ -39,18 +38,18 @@ LineFlame::LineFlame (const FlameConfig* const flameConfig, Scene *scene, const 
     {
       pt = *m_leadSkeletons[j - 1]->getRoot();
       pt.z += (largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j - 1], flameConfig);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j - 1], flameConfig.periLifeSpan);
     }
   
   /* Ajout des extrémités */
   pt = *m_leadSkeletons[0]->getRoot();
   pt.x -= (largeur / 2.0);
-  m_periSkeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[0], flameConfig);
+  m_periSkeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[0], flameConfig.periLifeSpan);
   
   pt = *m_leadSkeletons[m_nbLeadSkeletons - 1]->getRoot();
   pt.x += (largeur / 2.0);
   m_periSkeletons[m_nbLeadSkeletons + 1] = 
-    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], flameConfig);
+    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], flameConfig.periLifeSpan);
   
   m_parentFire = parentFire;
 
@@ -166,16 +165,16 @@ void LineFlame::breakCheck()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* const tex, Field3D* const s, 
-			double rayon, Scene* const scene, Object *wick):
-  RealFlame ( flameConfig, flameConfig->skeletonsNumber, 3, tex, s)
+PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
+			double rayon, Object *wick):
+  RealFlame ( flameConfig.skeletonsNumber, 3, tex, s)
 {
   uint i;
   double angle;
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), flameConfig, 0, .5, 0, .025));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), flameConfig.leadLifeSpan, 0, .5, 0, .025));
   
   /* On créé les squelettes en cercle */
   angle = 0;
@@ -185,21 +184,11 @@ PointFlame::PointFlame (const FlameConfig* const flameConfig, const Texture* con
 	(m_solver, 
 	 Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
 	 Point(1,.75,1),
-	 m_leadSkeletons[0], flameConfig);
+	 m_leadSkeletons[0], flameConfig.periLifeSpan);
       angle += 2 * PI / m_nbSkeletons;
     }
   
   m_wick = wick;
-  if(m_wick){    
-    m_wick->buildVBO();
-    m_wick->buildBoundingSpheres();
-    /* On décale pour que le centre du solveur soit calé avec la mèche ( et non pas le coin inférieur gauche) */
-    
-    Point pt(m_wick->getPosition());
-    pt = pt - m_position * s->getScale();
-//     pt.y += s->getDimY()/4.0 * s->getScale().y;
-    s->setPosition(pt);
-  }
 }
 
 PointFlame::~PointFlame ()
@@ -225,15 +214,6 @@ void PointFlame::drawWick (bool displayBoxes) const
   }else{
     m_wick->draw();
   }
-}
-
-void PointFlame::addForces ()
-{
-  for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-       skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-    (*skeletonsIterator)->addForces ();
-  for (uint i = 0; i < m_nbSkeletons; i++)
-    m_periSkeletons[i]->addForces ();
 }
 
 /**********************************************************************************************************************/

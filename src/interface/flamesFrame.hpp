@@ -61,8 +61,7 @@ enum
     IDM_FBDB,
     IDM_Wired,
     IDM_Shaded,
-    IDM_SolversSettings,
-    IDM_FlamesSettings,
+    IDM_Settings,
     IDM_ShadowVolumesSettings,
   };
 
@@ -75,7 +74,10 @@ public:
   void LoadSettings (void);
   void LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig);
   void SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig);
+  void LoadFireSettings(wxString& groupName, FlameConfig& solverConfig);
+  void SaveFireSettings(wxString& groupName, FlameConfig& fireConfig);
   void InitGLBuffer ();
+  void InitLuminariesPanels();
   void InitSolversPanels();
   void InitFlamesPanels();
   void DoLayout();
@@ -107,8 +109,7 @@ public:
   void OnFBDBMenu(wxCommandEvent &event);
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);
-  void OnSolversMenu(wxCommandEvent& event);
-  void OnFlamesMenu(wxCommandEvent& event);
+  void OnSettingsMenu(wxCommandEvent& event);
   void OnShadowsMenu(wxCommandEvent& event);
   void OnShadowVolumesMenu(wxCommandEvent& event);
   void OnShadowVolumesSettingsMenu(wxCommandEvent& event);
@@ -147,19 +148,18 @@ private:
   wxSlider *m_depthPeelingSlider, *m_gammaSlider;
   wxBoxSizer *m_mainSizer;
   
+  /** \todo Supprimer la limite codée en dur du nombre max de luminaires,... */
+  LuminaryMainPanel* m_luminaryPanels[NB_MAXLUMINARIES];
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
   FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];
   
-  wxNotebook *m_solversNotebook, *m_flamesNotebook;
+  wxNotebook *m_luminariesNotebook, *m_solversNotebook, *m_flamesNotebook;
   
   FlameAppConfig m_currentConfig;
   
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
-  uint m_nbSolversMax;
-  /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
-  /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
-  uint m_nbFlamesMax;
+  uint m_nbLuminariesMax;
   
   DECLARE_EVENT_TABLE()
 };

@@ -26,6 +26,7 @@ FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
   /* Recopie des particules en fonction de la hauteur de coupe */
   for( i=0; i <= splitHeight; i++){
     m_queue[i] = src->m_queue[i];
+    /* Extension de la durée de vie !! */
     m_queue[i].m_lifespan +=5;
   }
   m_headIndex = splitHeight;
@@ -127,14 +128,14 @@ void FreeSkeleton::drawParticle (Particle * const particle) const
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig) : 
+Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls) : 
   FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
 {  
   m_root = m_rootSave = position;
-  m_flameConfig = flameConfig;
   m_selfVelocity=0;
   m_lod=NORMAL;
+  m_lifeSpan = pls;
 }
 
 void Skeleton::draw () const

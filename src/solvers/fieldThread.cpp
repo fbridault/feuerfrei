@@ -13,12 +13,10 @@ FieldThreadsScheduler::~FieldThreadsScheduler()
 {
 }
 
-void FieldThreadsScheduler::Init(const list <FieldFiresThread *> &threads, 
-			    const list <FieldFlamesThread *> &extraThreads)
+void FieldThreadsScheduler::Init(const list <FieldThread *> &threads)
 {
   m_threads = threads;
-  m_extraThreads = extraThreads;
-  m_nbThreads = m_threads.size()+m_extraThreads.size();
+  m_nbThreads = m_threads.size();
   m_remainingThreads = m_nbThreads;
   m_nbSolved = 0;
 }
@@ -29,11 +27,12 @@ void *FieldThreadsScheduler::Entry()
   long time;
   
   swatch.Start();
+  m_singleMutex.Lock();
   while(m_run){
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
-    Yield();
+//     Yield();
     /* Endort le scheduler tant qu'aucun thread n'a terminé */
     m_schedulerSem.Wait();
     
@@ -49,110 +48,86 @@ void *FieldThreadsScheduler::Entry()
       m_remainingThreads = m_nbThreads;
       m_remainingThreadsMutex.Unlock();
       
+      m_singleMutex.Lock();
       /* Relance tous les threads */
-      for (list < FieldFiresThread* >::iterator threadsIterator = m_threads.begin ();
+      for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
 	   threadsIterator != m_threads.end (); threadsIterator++)
-	(*threadsIterator)->GiveExecAuthorization();
-      
-      for (list < FieldFlamesThread* >::iterator threadsIterator = m_extraThreads.begin ();
-	   threadsIterator != m_extraThreads.end (); threadsIterator++)
 	(*threadsIterator)->GiveExecAuthorization();
     }else
       m_remainingThreadsMutex.Unlock();
   }
 }
 
-FieldFiresThread::FieldFiresThread(FieldFiresAssociation *fieldAndFires, 
-				   FieldThreadsScheduler* const scheduler) : wxThread(wxTHREAD_JOINABLE)
+
+FieldThread::FieldThread(FieldThreadsScheduler* const scheduler) : wxThread(wxTHREAD_JOINABLE)
 { 
-  m_fieldAndFires = fieldAndFires;
   m_scheduler = scheduler;
   m_run = true;
 }
 
-FieldFiresThread::~FieldFiresThread()
-{
+GlobalFieldThread::GlobalFieldThread(GlobalField *globalField, 
+				     FieldThreadsScheduler* const scheduler) : FieldThread(scheduler)
+{ 
+  m_field = globalField;
 }
 
-void *FieldFiresThread::Entry()
+void *GlobalFieldThread::Entry()
 { 
   wxStopWatch swatch;
-  long time;
-
   
   while(m_run){
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
     
-    /* Ajouter les forces externes des FDFs */
-    for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
-	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
-      (*flamesIterator)->addForces ();
-    
-    m_fieldAndFires->field->iterate ();
-    
-    /* Il faut protéger l'accès aux flammes lors de la construction */
-    Lock();
-    for (list < FireSource* >::iterator flamesIterator = m_fieldAndFires->fireSources.begin ();
-	 flamesIterator != m_fieldAndFires->fireSources.end (); flamesIterator++)
-      (*flamesIterator)->build();
-    Unlock();
+    m_field->iterate ();
     
     /* Nettoyer les sources de forces externes */
-    m_fieldAndFires->field->cleanSources ();
+    m_field->cleanSources ();
     
     /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
 
-    Yield();
+//     Yield();
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;
   }
 }
 
-FieldFlamesThread::FieldFlamesThread(FieldFlamesAssociation *fieldAndFlames, 
-				     FieldThreadsScheduler* const scheduler) : wxThread(wxTHREAD_JOINABLE)
+FieldFiresThread::FieldFiresThread(Field3D *field, FieldThreadsScheduler* const scheduler) : FieldThread(scheduler)
 { 
-  m_fieldAndFlames = fieldAndFlames;
-  m_scheduler = scheduler;
-  m_run = true;
+  m_field = field;
 }
 
-FieldFlamesThread::~FieldFlamesThread()
-{
-}
-
-void *FieldFlamesThread::Entry()
+void *FieldFiresThread::Entry()
 { 
   wxStopWatch swatch;
-  long time;
   
   while(m_run){
     /* On verrouille le mutex pour ne permettre qu'une seule exécution à la fois */
     AskExecAuthorization();
-
-    for (list < RealFlame* >::iterator flamesIterator = m_fieldAndFlames->flames.begin ();
-	 flamesIterator != m_fieldAndFlames->flames.end (); flamesIterator++)
+    
+    /* Ajouter les forces externes des FDFs */
+    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
       (*flamesIterator)->addForces ();
     
-    m_fieldAndFlames->field->iterate ();
+    m_field->iterate ();
     
-    /* Il faut protéger l'accès aux flammes */
+    /* Il faut protéger l'accès aux flammes lors de la construction */
     Lock();
-    for (list < RealFlame* >::iterator flamesIterator = m_fieldAndFlames->flames.begin ();
-	 flamesIterator != m_fieldAndFlames->flames.end (); flamesIterator++)
+    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();
-    time = swatch.Time();
     
     /* Nettoyer les sources de forces externes */
-    m_fieldAndFlames->field->cleanSources ();
+    m_field->cleanSources ();
     
-    /* Indique l'achèvement du travail au scheduler, le réveille et s'endort en attendant le signal */
+    /* Indique l'achèvement du travail au scheduler */
     m_scheduler->signalWorkEnd();
-    
-    Yield();
+
+//     Yield();
     /* Permet de prendre en compte Pause() et Delete() */
     if(TestDestroy())
       break;

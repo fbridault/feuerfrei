@@ -52,8 +52,8 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a,
   double e=2.0-omega;
   uint i,j,k;
   
-  double rho0, rho1, alpha, beta,norm2,normb2,eb2;
-  double *sav1, *sav2;
+  double rho0, rho1, alpha, beta;//,norm2,normb2,eb2;
+  //double *sav1, *sav2;
   
   double * mp,* mpmnx,* mppnx,* mpm1,* mpp1,* mpmn2,* mppn2, * mq;
   double * mz,* mzmnx,* mzpnx,* mzm1,* mzp1,* mzmn2,* mzpn2, *xx, *mr;

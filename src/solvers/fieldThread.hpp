@@ -14,10 +14,10 @@
 
 using namespace std;
 
-#include "field3D.hpp"
+#include "globalField.hpp"
+#include "../flames/abstractFires.hpp"
 
 class FieldFiresThread;
-class FieldFlamesThread;
 class FireSource;
 
 class FieldThreadsScheduler : public wxThread
@@ -26,7 +26,7 @@ public:
   FieldThreadsScheduler();		
   virtual ~FieldThreadsScheduler();
   
-  void Init(const list <FieldFiresThread *> &threads, const list <FieldFlamesThread *> &extraThreads);
+  void Init(const list <FieldThread *> &threads);
   /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
   uint getNbSolved() const { return m_nbSolved; };
@@ -50,87 +50,78 @@ public:
     m_remainingThreadsMutex.Unlock();
     m_schedulerSem.Post();
   };
+  void unblock() { m_singleMutex.Unlock(); };
 private:
-  list <FieldFiresThread *> m_threads;
-  list <FieldFlamesThread *> m_extraThreads;
+  list <FieldThread *> m_threads;
   uint m_remainingThreads;
   uint m_nbThreads;
   wxMutex m_remainingThreadsMutex;
+  wxMutex m_singleMutex;
   wxSemaphore m_schedulerSem;
   bool m_run;
   uint m_nbSolved;
 };
 
-class FieldFiresAssociation
+/** Classe de base pour gérer le processus de calcul d'un champ de vélocité. */
+class FieldThread: public wxThread
 {
 public:
-  FieldFiresAssociation(Field3D* f) {field = f; };
-  virtual ~FieldFiresAssociation() { fireSources.clear(); };
+  FieldThread(FieldThreadsScheduler* const scheduler);
+  virtual ~FieldThread(){};
   
-  /** Ajout d'une source de feu */
-  void addFireSource(FireSource* fireSource) { fireSources.push_back(fireSource); };
-  Field3D *field;
-  list <FireSource *> fireSources;
-};
-
-class RealFlame;
-
-class FieldFlamesAssociation
-{
-public:
-  FieldFlamesAssociation(Field3D* f) {field = f; };
-  virtual ~FieldFlamesAssociation() { delete field; flames.clear(); };
-  
-  /** Ajout d'une source de feu */
-  void addFlameSource(RealFlame* flame) { flames.push_back(flame); };
-  Field3D *field;
-  list <RealFlame *> flames;
-};
-
-
-class FieldFiresThread: public wxThread
-{
-public:
-  FieldFiresThread(FieldFiresAssociation *fieldAndFires, FieldThreadsScheduler* const scheduler);
-  virtual ~FieldFiresThread();
-  
-  /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
-   * avec la méthode Run();
-   */
   void Stop(){ m_run = false; };
   void Lock(){ m_mutex.Lock(); };
   void Unlock(){ m_mutex.Unlock(); };
   void AskExecAuthorization(){ m_singleExecMutex.Lock(); };
   void GiveExecAuthorization(){ m_singleExecMutex.Unlock(); };
-  /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
-  virtual ExitCode Entry();
-private:
-  FieldFiresAssociation *m_fieldAndFires;
+  /** Point d'entrée du Thread lorsque la méthode Run() est appelée */
+  virtual ExitCode Entry() = 0;
+  /** Retourne le solveur contenu dans le thread. */ 
+  virtual Field3D *getSolver() const = 0;
+  virtual void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes) = 0;
+protected:
+  /** Pointeur sur l'ordonnanceur. */
   FieldThreadsScheduler *m_scheduler;
-  wxMutex m_mutex, m_singleExecMutex;
   bool m_run;
+private:
+  /** Mutex permettant principalement de verrouiller l'accès aux flammes. */
+  wxMutex m_mutex;
+  /** Mutex de synchronisation de manière à ce que tous les champs ne calculent
+   * qu'une seule itération chacun sur un pas de temps.
+   */
+  wxMutex m_singleExecMutex;
 };
 
-class FieldFlamesThread: public wxThread
+class GlobalFieldThread: public FieldThread
 {
 public:
-  FieldFlamesThread(FieldFlamesAssociation *fieldAndFlames, FieldThreadsScheduler* const scheduler);
-  virtual ~FieldFlamesThread();
+  GlobalFieldThread(GlobalField *globalField, FieldThreadsScheduler* const scheduler);
+  virtual ~GlobalFieldThread(){};
   
-  /** Ajout d'une source de feu à gérer par le thread. A appeler avant de lancer le thread
-   * avec la méthode Run();
-   */
-  void Stop(){ m_run = false; };
-  void Lock(){ m_mutex.Lock(); };
-  void Unlock(){ m_mutex.Unlock(); };
-  void AskExecAuthorization(){ m_singleExecMutex.Lock(); };
-  void GiveExecAuthorization(){ m_singleExecMutex.Unlock(); };
-  /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
+  /** Implémentée mais elle n'est a priori jamais appelée, car cette méthode est seulement appelée *
+   * dans le constructeur du solveur global, pour identifier les solveurs locaux. */
+  Field3D *getSolver() const { cerr << "error GlobalFieldThread::getSolver()" << endl; return NULL; };
+  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes) {} ;
 private:
-  FieldFlamesAssociation *m_fieldAndFlames;
-  FieldThreadsScheduler *m_scheduler;
-  wxMutex m_mutex, m_singleExecMutex;
-  bool m_run;
+  GlobalField *m_field;
 };
+
+class FieldFiresThread: public FieldThread
+{
+public:
+  FieldFiresThread(Field3D *field, FieldThreadsScheduler* const scheduler);
+  virtual ~FieldFiresThread(){};
+  
+  virtual ExitCode Entry();
+  Field3D *getSolver() const { return m_field; };
+  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes){
+    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
+      (*flamesIterator)->drawFlame (displayFlame, displayParticles, displayFlamesBoundingVolumes);
+  }
+private:
+  Field3D *m_field;
+};
+
 #endif

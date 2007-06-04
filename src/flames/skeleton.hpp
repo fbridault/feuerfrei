@@ -177,7 +177,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, const FlameConfig* const flameConfig);
+  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls);
   /** Destructeur. */
   virtual ~Skeleton(){};
   
@@ -212,6 +212,8 @@ public:
    */
   void setLOD(u_char value){ m_lod = value; };
   
+  void setLifeSpan(uint lifeSpan) { m_lifeSpan = lifeSpan; };
+  
 protected:
   /** Insère une particule en queue de file.
    * @param pt position de la particule
@@ -226,9 +228,7 @@ protected:
   
   /** Origine initiale du squelette. */
   Point m_rootSave;
-  
-  /** Pointeur vers la configuration. Nécessaire pour le nombre de particules par squelette, la fdf ou les perturbations. */
-  const FlameConfig *m_flameConfig;
+  uint m_lifeSpan;
 private:  
   /** Contient trois facteurs correctifs pour le déplacement de l'origine
    * des squelettes. Selon le type de flamme, il est en effet nécessaire

@@ -29,7 +29,7 @@ public:
    * @param pls Durée de vie initiale d'une particule.
    */
   PeriSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, 
-	       LeadSkeleton *leadSkeleton, const FlameConfig* const flameConfig);
+	       LeadSkeleton *leadSkeleton, uint pls);
   /** Destructeur. */
   virtual ~PeriSkeleton();
   

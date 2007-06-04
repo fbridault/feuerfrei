@@ -8,38 +8,27 @@
   #include "GLFluidsCanvas.hpp"
 #endif
 
-BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
-  EVT_SCROLL(SolverMainPanel::OnScrollPosition)
-  EVT_TEXT_ENTER(IDT_FXAPMIN, SolverMainPanel::OnFXAPMINEnter)
-  EVT_TEXT_ENTER(IDT_FXAPMAX, SolverMainPanel::OnFXAPMAXEnter)
-  EVT_TEXT_ENTER(IDT_FYAPMIN, SolverMainPanel::OnFYAPMINEnter)
-  EVT_TEXT_ENTER(IDT_FYAPMAX, SolverMainPanel::OnFYAPMAXEnter)
-  EVT_TEXT_ENTER(IDT_FZAPMIN, SolverMainPanel::OnFZAPMINEnter)
-  EVT_TEXT_ENTER(IDT_FZAPMAX, SolverMainPanel::OnFZAPMAXEnter)
-  EVT_CHECKBOX(IDCHK_MOVE, SolverMainPanel::OnCheckMove)
-#ifdef RTFLUIDS_BUILD
-  EVT_BUTTON(IDB_LEFT, SolverMainPanel::OnClickDensities)
-  EVT_BUTTON(IDB_RIGHT, SolverMainPanel::OnClickDensities)
-  EVT_BUTTON(IDB_TOP, SolverMainPanel::OnClickDensities)
-  EVT_BUTTON(IDB_BOTTOM, SolverMainPanel::OnClickDensities)
-#endif
-END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
-				 GLFlameCanvas* const glBuffer, char type, const wxPoint& pos, 
-				 const wxSize& size, long style):
-#else
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const solverConfig, int index, 
-				 GLFluidsCanvas* const glBuffer, char type,  const wxPoint& pos, const wxSize& size, long style):
-#endif
+BEGIN_EVENT_TABLE(LuminaryMainPanel, wxPanel)
+  EVT_SCROLL(LuminaryMainPanel::OnScrollPosition)
+  EVT_TEXT_ENTER(IDT_FXAPMIN, LuminaryMainPanel::OnFXAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FXAPMAX, LuminaryMainPanel::OnFXAPMAXEnter)
+  EVT_TEXT_ENTER(IDT_FYAPMIN, LuminaryMainPanel::OnFYAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FYAPMAX, LuminaryMainPanel::OnFYAPMAXEnter)
+  EVT_TEXT_ENTER(IDT_FZAPMIN, LuminaryMainPanel::OnFZAPMINEnter)
+  EVT_TEXT_ENTER(IDT_FZAPMAX, LuminaryMainPanel::OnFZAPMAXEnter)
+END_EVENT_TABLE();
+
+LuminaryMainPanel::LuminaryMainPanel(wxWindow* parent, int id, LuminaryConfig* const luminaryConfig, int index, 
+				     GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=100.0;
   FORCE_SENSIBILITY=100.0;
   SLIDER_RANGE=500;
   
-  m_solverConfig = solverConfig;
+  m_luminaryConfig = luminaryConfig;
   m_index = index;
   m_glBuffer = glBuffer;
   
@@ -64,12 +53,6 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
 						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
   m_solverZAxisPositionSliderMax = new wxTextCtrl(this,IDT_FZAPMAX,_(""),
 						  wxDefaultPosition,wxSize(45,22),wxTE_PROCESS_ENTER);
-  
-  m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,2*SLIDER_RANGE/10, wxDefaultPosition, 
-				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  
-  m_buoyancySlider->SetValue((int)(m_solverConfig->buoyancy*FORCE_SENSIBILITY));
   
   (*m_solverXAxisPositionSliderMin) << -SLIDER_RANGE;
   (*m_solverXAxisPositionSliderMax) << SLIDER_RANGE;
@@ -104,29 +87,169 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
   m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
-    
-  m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
-  m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
-
-#ifdef RTFLUIDS_BUILD
-  m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
-  m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);
-#else
-  m_type = type;
-  if(!m_type){
-    m_moveCheckBox = new wxCheckBox(this,IDCHK_MOVE,_("Moving mode"));
-    m_panelSizer->Add(m_moveCheckBox, 0, wxEXPAND, 0);
-  }
-#endif
+  
   m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversXAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversYAxisPositionRangeSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionRangeSizer, 0, wxEXPAND, 0);
+  
+  SetSlidersValues();
+  
+  SetSizerAndFit(m_panelSizer);
+}
+
+void LuminaryMainPanel::SetSlidersValues()
+{ 
+  long val1, val2;
+  
+  m_solverXAxisPositionSliderMin->Clear();
+  m_solverXAxisPositionSliderMax->Clear();
+  m_solverYAxisPositionSliderMin->Clear();
+  m_solverYAxisPositionSliderMax->Clear();
+  m_solverZAxisPositionSliderMin->Clear();
+  m_solverZAxisPositionSliderMax->Clear();
+  
+  (*m_solverXAxisPositionSliderMin) << m_luminaryConfig->position.x*SLIDER_SENSIBILITY-SLIDER_RANGE;
+  (*m_solverXAxisPositionSliderMax) << m_luminaryConfig->position.x*SLIDER_SENSIBILITY+SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMin) << m_luminaryConfig->position.y*SLIDER_SENSIBILITY-SLIDER_RANGE;
+  (*m_solverYAxisPositionSliderMax) << m_luminaryConfig->position.y*SLIDER_SENSIBILITY+SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMin) << m_luminaryConfig->position.z*SLIDER_SENSIBILITY-SLIDER_RANGE;
+  (*m_solverZAxisPositionSliderMax) << m_luminaryConfig->position.z*SLIDER_SENSIBILITY+SLIDER_RANGE;
+
+  m_solverXAxisPositionSliderMin->GetValue().ToLong(&val1);
+  m_solverXAxisPositionSliderMax->GetValue().ToLong(&val2);
+  m_solverXAxisPositionSlider->SetRange(val1, val2);
+  m_solverXAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.x*SLIDER_SENSIBILITY));
+  m_solverYAxisPositionSliderMin->GetValue().ToLong(&val1);
+  m_solverYAxisPositionSliderMax->GetValue().ToLong(&val2);
+  m_solverYAxisPositionSlider->SetRange(val1, val2);
+  m_solverYAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.y*SLIDER_SENSIBILITY));
+  m_solverZAxisPositionSliderMin->GetValue().ToLong(&val1);
+  m_solverZAxisPositionSliderMax->GetValue().ToLong(&val2);
+  m_solverZAxisPositionSlider->SetRange(val1, val2);
+  m_solverZAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.z*SLIDER_SENSIBILITY));
+}
+
+void LuminaryMainPanel::OnScrollPosition(wxScrollEvent& event)
+{
+  Point pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	   m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+	   m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+  
+  m_glBuffer->moveLuminary(m_index, pt);
+  m_luminaryConfig->position = pt;
+}
+
+void LuminaryMainPanel::OnFXAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_solverXAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverXAxisPositionSlider->SetRange(val, m_solverXAxisPositionSlider->GetMax());
+}
+
+void LuminaryMainPanel::OnFXAPMAXEnter(wxCommandEvent& event)
+{
+  long val;
+  m_solverXAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverXAxisPositionSlider->SetRange(m_solverXAxisPositionSlider->GetMin(), val);
+}
+
+void LuminaryMainPanel::OnFYAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_solverYAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverYAxisPositionSlider->SetRange(val, m_solverYAxisPositionSlider->GetMax());
+}
+
+void LuminaryMainPanel::OnFYAPMAXEnter(wxCommandEvent& event)
+{
+ long val;
+  m_solverYAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverYAxisPositionSlider->SetRange(m_solverYAxisPositionSlider->GetMin(), val);
+}
+
+void LuminaryMainPanel::OnFZAPMINEnter(wxCommandEvent& event)
+{
+  long val;
+  m_solverZAxisPositionSliderMin->GetValue().ToLong(&val);
+  m_solverZAxisPositionSlider->SetRange(val, m_solverZAxisPositionSlider->GetMax());
+}
+
+void LuminaryMainPanel::OnFZAPMAXEnter(wxCommandEvent& event)
+{
+  long val;
+  m_solverZAxisPositionSliderMax->GetValue().ToLong(&val);
+  m_solverZAxisPositionSlider->SetRange(m_solverZAxisPositionSlider->GetMin(), val);
+}
+#endif
+
+BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
+  EVT_SCROLL(SolverMainPanel::OnScrollPosition)
+#ifdef RTFLUIDS_BUILD
+  EVT_BUTTON(IDB_LEFT, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_RIGHT, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_TOP, SolverMainPanel::OnClickDensities)
+  EVT_BUTTON(IDB_BOTTOM, SolverMainPanel::OnClickDensities)
+#endif
+END_EVENT_TABLE();
+
+#ifdef RTFLAMES_BUILD
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFlameCanvas* const glBuffer, 
+				 const wxPoint& pos, const wxSize& size, long style):
+#else
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFluidsCanvas* const glBuffer, 
+				 const wxPoint& pos, const wxSize& size, long style):
+#endif
+  wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
+{
+  SLIDER_SENSIBILITY=100.0;
+  FORCE_SENSIBILITY=100.0;
+  SLIDER_RANGE=500;
+  
+  m_index = index;
+  m_glBuffer = glBuffer;
+  
+  m_solverXAxisPositionSlider = new wxSlider(this,IDSL_FXAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_solverYAxisPositionSlider = new wxSlider(this,IDSL_FYAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition,
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_solverZAxisPositionSlider = new wxSlider(this,IDSL_FZAP,0,-SLIDER_RANGE,SLIDER_RANGE, wxDefaultPosition, 
+					     wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_solverXAxisPositionLabel = new wxStaticText(this,IDST_FXAP,_("X"));
+  m_solverYAxisPositionLabel = new wxStaticText(this,IDST_FYAP,_("Y"));
+  m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
+  
+  m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,2*SLIDER_RANGE/10, wxDefaultPosition, 
+				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  
+  m_buoyancySlider->SetValue((int)(buoyancy*FORCE_SENSIBILITY));
+  
+  /* Réglages des solveurs */  
+  m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversYAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
+  
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxLEFT, 4);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxLEFT, 4);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 18, 0, 0);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxLEFT, 4);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 18, 0, 0);
+  
+  m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
+  m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
+  m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
+  
+  m_panelSizer = new wxBoxSizer(wxVERTICAL);
+  
+  m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
 #ifdef RTFLUIDS_BUILD
   m_densityLButton = new wxButton(this, IDB_LEFT, _("Left"));
@@ -142,101 +265,20 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, SolverConfig* const s
   m_panelSizer->Add(m_densitiesSizer, 0, 0, 0);
 #endif
   
-  SetSlidersValues(type);
-  
   SetSizerAndFit(m_panelSizer);
-}
-
-void SolverMainPanel::SetSlidersValues(char type)
-{  
-  m_saveSliderValues.x = m_solverConfig->position.x;
-  m_saveSliderValues.y = m_solverConfig->position.y;
-  m_saveSliderValues.z = m_solverConfig->position.z;
-  
-  m_solverXAxisPositionSliderMin->Clear();
-  m_solverXAxisPositionSliderMax->Clear();
-  m_solverYAxisPositionSliderMin->Clear();
-  m_solverYAxisPositionSliderMax->Clear();
-  m_solverZAxisPositionSliderMin->Clear();
-  m_solverZAxisPositionSliderMax->Clear();
-  
-  (*m_solverXAxisPositionSliderMin) << m_saveSliderValues.x-SLIDER_RANGE;
-  (*m_solverXAxisPositionSliderMax) << m_saveSliderValues.x+SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMin) << m_saveSliderValues.y-SLIDER_RANGE;
-  (*m_solverYAxisPositionSliderMax) << m_saveSliderValues.y+SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMin) << m_saveSliderValues.z-SLIDER_RANGE;
-  (*m_solverZAxisPositionSliderMax) << m_saveSliderValues.z+SLIDER_RANGE;
-
-  if(type < 1){
-    m_solverXAxisPositionSliderMin->Disable();
-    m_solverXAxisPositionSliderMax->Disable();
-    m_solverYAxisPositionSliderMin->Disable();
-    m_solverYAxisPositionSliderMax->Disable();
-    m_solverZAxisPositionSliderMin->Disable();
-    m_solverZAxisPositionSliderMax->Disable();
-  }else{
-    m_solverXAxisPositionSlider->SetValue((int)(m_saveSliderValues.x*SLIDER_SENSIBILITY));
-    m_solverYAxisPositionSlider->SetValue((int)(m_saveSliderValues.y*SLIDER_SENSIBILITY));
-    m_solverZAxisPositionSlider->SetValue((int)(m_saveSliderValues.z*SLIDER_SENSIBILITY));
-  }
-}
-
-void SolverMainPanel::OnCheckMove(wxCommandEvent& event)
-{
-  Point oldValues(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-		  m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-		  m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
-
-  m_solverXAxisPositionSlider->SetValue((int)(m_saveSliderValues.x*SLIDER_SENSIBILITY));
-  m_solverYAxisPositionSlider->SetValue((int)(m_saveSliderValues.y*SLIDER_SENSIBILITY));
-  m_solverZAxisPositionSlider->SetValue((int)(m_saveSliderValues.z*SLIDER_SENSIBILITY));
-  
-  m_saveSliderValues = oldValues;
-  
-  if(m_moveCheckBox->IsChecked())
-    {
-      long min, max;
-      
-      m_solverXAxisPositionSliderMin->GetValue().ToLong(&min);
-      m_solverXAxisPositionSliderMax->GetValue().ToLong(&max);
-      m_solverXAxisPositionSlider->SetRange(min, max);
-      m_solverYAxisPositionSliderMin->GetValue().ToLong(&min);
-      m_solverYAxisPositionSliderMax->GetValue().ToLong(&max);
-      m_solverYAxisPositionSlider->SetRange(min, max);
-      m_solverZAxisPositionSliderMin->GetValue().ToLong(&min);
-      m_solverZAxisPositionSliderMax->GetValue().ToLong(&max);
-      m_solverZAxisPositionSlider->SetRange(min, max);
-      
-      m_solverXAxisPositionSliderMin->Enable();
-      m_solverXAxisPositionSliderMax->Enable();
-      m_solverYAxisPositionSliderMin->Enable();
-      m_solverYAxisPositionSliderMax->Enable();
-      m_solverZAxisPositionSliderMin->Enable();
-      m_solverZAxisPositionSliderMax->Enable();
-    }
-  else
-    {
-      m_solverXAxisPositionSliderMin->Disable();
-      m_solverXAxisPositionSliderMax->Disable();
-      m_solverYAxisPositionSliderMin->Disable();
-      m_solverYAxisPositionSliderMax->Disable();
-      m_solverZAxisPositionSliderMin->Disable();
-      m_solverZAxisPositionSliderMax->Disable();
-      
-      m_solverXAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
-      m_solverYAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
-      m_solverZAxisPositionSlider->SetRange(-SLIDER_RANGE, SLIDER_RANGE);
-    }
 }
 
 void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_SF)
     {
-      double value = m_buoyancySlider->GetValue()/(FORCE_SENSIBILITY);
+      double value = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
       
+#ifdef RTFLUIDS_BUILD
       m_glBuffer->setBuoyancy(m_index, value);
-      m_solverConfig->buoyancy = value;
+#else
+      m_glBuffer->setLuminaryBuoyancy(m_index, value);      
+#endif
     }
   else
     {
@@ -244,58 +286,13 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 	       m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
 	       m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
       
-#ifdef RTFLUIDS_BUILD
-      if(m_moveCheckBox->IsChecked()){
-#else
-      if( ( (!m_type) ? m_moveCheckBox->IsChecked() : (m_type > 0)) ){
-#endif
-	m_glBuffer->moveSolver(m_index, pt, true);
-	m_solverConfig->position = pt;
-      }else
-	m_glBuffer->addPermanentExternalForcesToSolver(m_index,pt);
+      m_glBuffer->addPermanentExternalForcesToSolver(m_index,pt);
     }
 }
 
-void SolverMainPanel::OnFXAPMINEnter(wxCommandEvent& event)
+void SolverMainPanel::getCtrlValues(SolverConfig& solverConfig)
 {
-  long val;
-  m_solverXAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_solverXAxisPositionSlider->SetRange(val, m_solverXAxisPositionSlider->GetMax());
-}
-
-void SolverMainPanel::OnFXAPMAXEnter(wxCommandEvent& event)
-{
-  long val;
-  m_solverXAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_solverXAxisPositionSlider->SetRange(m_solverXAxisPositionSlider->GetMin(), val);
-}
-
-void SolverMainPanel::OnFYAPMINEnter(wxCommandEvent& event)
-{
-  long val;
-  m_solverYAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_solverYAxisPositionSlider->SetRange(val, m_solverYAxisPositionSlider->GetMax());
-}
-
-void SolverMainPanel::OnFYAPMAXEnter(wxCommandEvent& event)
-{
- long val;
-  m_solverYAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_solverYAxisPositionSlider->SetRange(m_solverYAxisPositionSlider->GetMin(), val);
-}
-
-void SolverMainPanel::OnFZAPMINEnter(wxCommandEvent& event)
-{
-  long val;
-  m_solverZAxisPositionSliderMin->GetValue().ToLong(&val);
-  m_solverZAxisPositionSlider->SetRange(val, m_solverZAxisPositionSlider->GetMax());
-}
-
-void SolverMainPanel::OnFZAPMAXEnter(wxCommandEvent& event)
-{
-  long val;
-  m_solverZAxisPositionSliderMax->GetValue().ToLong(&val);
-  m_solverZAxisPositionSlider->SetRange(m_solverZAxisPositionSlider->GetMin(), val);
+  solverConfig.buoyancy = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
 }
 
 #ifdef RTFLUIDS_BUILD
@@ -341,7 +338,6 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
   FORCE_SENSIBILITY=500.0;
   SLIDER_RANGE=50;
   
-  m_flameConfig = flameConfig;
   m_index = index;
   m_glBuffer = glBuffer;
   
@@ -374,7 +370,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
 					6, m_flickeringRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   
   m_photoSolidLabel = new wxStaticText(this, -1, _("Ph. Solid"));
-  m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, m_flameConfig->IESFileName,
+  m_photoSolidTextCtrl = new wxTextCtrl(this, IDT_PHOTO, flameConfig->IESFileName,
 					wxDefaultPosition, wxSize(100,22), wxTE_PROCESS_ENTER);
   m_photoSolidBrowseButton = new wxButton(this, IDB_BROWSE, _("Browse..."));
   
@@ -393,17 +389,17 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
     m_FDFRadioBox = new wxRadioBox(this, IDRB_FDF, _("Fuel Distribution Function"), wxDefaultPosition, wxDefaultSize, 
 				   5, m_FDFRadioBoxChoices, 2, wxRA_SPECIFY_ROWS);
   m_panelSizer->Add(m_FDFRadioBox,  0, wxADJUST_MINSIZE, 0);
-  m_FDFRadioBox->SetSelection(m_flameConfig->fdf);
+  m_FDFRadioBox->SetSelection(flameConfig->fdf);
   }
   
   m_panelSizer->Add(m_slidersSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_photoSolidSizer, 0, wxEXPAND, 0);
   
-  m_innerForceSlider->SetValue((int)(m_flameConfig->innerForce*FORCE_SENSIBILITY));
-  m_leadLifeSlider->SetValue((int)(m_flameConfig->leadLifeSpan));
-  m_periLifeSlider->SetValue((int)(m_flameConfig->periLifeSpan));
-  m_flickeringRadioBox->SetSelection(m_flameConfig->flickering);
-  m_samplingToleranceSlider->SetValue((int)(m_flameConfig->samplingTolerance));
+  m_innerForceSlider->SetValue((int)(flameConfig->innerForce*FORCE_SENSIBILITY));
+  m_leadLifeSlider->SetValue((int)(flameConfig->leadLifeSpan));
+  m_periLifeSlider->SetValue((int)(flameConfig->periLifeSpan));
+  m_flickeringRadioBox->SetSelection(flameConfig->flickering);
+  m_samplingToleranceSlider->SetValue((int)(flameConfig->samplingTolerance));
   
   SetSizerAndFit(m_panelSizer);
 }
@@ -415,30 +411,43 @@ void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
   switch(event.GetId()){
   case IDSL_FF :
     val = m_innerForceSlider->GetValue()/FORCE_SENSIBILITY;
-    m_glBuffer->setFlameForces(m_index, val);
-    m_flameConfig->innerForce = val;
+    m_glBuffer->setLuminaryForces(m_index, val);
     break;
   case IDSL_SPTOL:
-    m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
-    m_flameConfig->samplingTolerance = m_samplingToleranceSlider->GetValue();
+    m_glBuffer->setLuminarySamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
     break;
   case IDSL_NLP:
-    m_flameConfig->leadLifeSpan = m_leadLifeSlider->GetValue();
+    m_glBuffer->setLuminaryLeadLifeSpan(m_index, m_leadLifeSlider->GetValue());
     break;
   case IDSL_NPP:
-    m_flameConfig->periLifeSpan = m_periLifeSlider->GetValue();
+    m_glBuffer->setLuminaryPeriLifeSpan(m_index, m_periLifeSlider->GetValue());
     break;
   }
+//   switch(event.GetId()){
+//   case IDSL_FF :
+//     val = m_innerForceSlider->GetValue()/FORCE_SENSIBILITY;
+//     m_glBuffer->setFlameForces(m_index, val);
+//     break;
+//   case IDSL_SPTOL:
+//     m_glBuffer->setFlameSamplingTolerance(m_index, m_samplingToleranceSlider->GetValue());
+//     break;
+//   case IDSL_NLP:
+//     m_glBuffer->setFlameLeadLifeSpan(m_index, m_leadLifeSlider->GetValue());
+//     break;
+//   case IDSL_NPP:
+//     m_glBuffer->setFlamePeriLifeSpan(m_index, m_periLifeSlider->GetValue());
+//     break;
+//   }
 }
 
 void FlameMainPanel::OnSelectType(wxCommandEvent& event)
 {
-  m_flameConfig->flickering = event.GetSelection();
+  m_glBuffer->setLuminaryPerturbateMode(m_index, event.GetSelection());
 }
 
 void FlameMainPanel::OnSelectFDF(wxCommandEvent& event)
 {
-  m_flameConfig->fdf = event.GetSelection();
+  m_glBuffer->setLuminaryFDF(m_index, event.GetSelection());
 }
 
 void FlameMainPanel::OnClickButtonBrowse(wxCommandEvent& event)
@@ -476,10 +485,20 @@ void FlameMainPanel::OnPhotoSolidEnter(wxCommandEvent& event)
     restart = true;
     m_glBuffer->setRunningState(false);
   }
-  m_flameConfig->IESFileName = filename;
   m_glBuffer->RegeneratePhotometricSolids(m_index,filename);
   if(restart)
     m_glBuffer->setRunningState(true);
+}
+
+void FlameMainPanel::getCtrlValues(FlameConfig& flameConfig)
+{
+  flameConfig.innerForce = m_innerForceSlider->GetValue()/FORCE_SENSIBILITY;
+  flameConfig.fdf = (flameConfig.type == CANDLE || flameConfig.type == CANDLESSET) ? 0 : m_FDFRadioBox->GetSelection();
+  flameConfig.samplingTolerance = m_samplingToleranceSlider->GetValue();
+  flameConfig.flickering = m_flickeringRadioBox->GetSelection();
+  flameConfig.leadLifeSpan = m_leadLifeSlider->GetValue();
+  flameConfig.periLifeSpan = m_periLifeSlider->GetValue();
+  flameConfig.IESFileName = m_photoSolidTextCtrl->GetValue();
 }
 
 #endif

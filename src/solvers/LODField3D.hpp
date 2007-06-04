@@ -80,13 +80,19 @@ public:
     m_solver.setPosition(position); 
   };
   
-  void addTemporaryExternalForces(Point& forces)
+  virtual void move(const Point& forces) 
+  {
+    m_fakeField.move(forces);
+    m_solver.move(forces);
+  };
+  
+  void addTemporaryExternalForces(const Point& forces)
   {
     m_fakeField.addTemporaryExternalForces(forces);
     m_solver.addTemporaryExternalForces(forces);
   }
     
-  void addPermanentExternalForces(Point& forces)
+  void addPermanentExternalForces(const Point& forces)
   {
     m_fakeField.addPermanentExternalForces(forces);
     m_solver.addPermanentExternalForces(forces);

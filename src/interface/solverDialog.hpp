@@ -21,7 +21,7 @@ class SolverPanel: public wxPanel
 {
 public:
   SolverPanel(wxWindow* parent, int id, bool localSolver=true, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
-  void setCtrlValues(SolverConfig& solverConfig);
+  void setCtrlValues(const SolverConfig& solverConfig);
   bool getCtrlValues(SolverConfig& solverConfig);
 
   void OnSelectType(wxCommandEvent& event);
@@ -64,12 +64,8 @@ protected:
 class SolverDialog: public wxDialog 
 {
 public:
-#ifdef RTFLAMES_BUILD
-  SolverDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
-#else
   SolverDialog(wxWindow* parent, int id, const wxString& title, FluidsAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
-#endif
-
+  
 private:
   void doLayout();
   void OnClickButtonAdd(wxCommandEvent& event);
@@ -77,9 +73,6 @@ private:
   void OnOK(wxCommandEvent& event);
   void OnCancel(wxCommandEvent& event);
   void OnPageChanging(wxNotebookEvent& event);
-#ifdef RTFLAMES_BUILD
-  void OnCheckActivateGlobalSolver(wxCommandEvent& event);
-#endif
   /** Vérifie si un solveur est utilisé par des flammes.
    * Si c'est le cas, le bouton d'effacement du solveur est désactivé
    * @param solverIndex index du solveur à vérifier
@@ -90,13 +83,7 @@ private:
   SolverPanel *m_solverPanels[NB_MAXSOLVERS];
   wxNotebook *m_solverNotebook;
   wxButton *m_addSolverButton, *m_deleteSolverButton, *m_okButton, *m_cancelButton;
-#ifdef RTFLAMES_BUILD
-  FlameAppConfig *m_currentConfig;
-  SolverPanel *m_globalSolverPanel;
-  wxCheckBox *m_activateGlobalSolverCheckBox;
-#else
   FluidsAppConfig *m_currentConfig;
-#endif
   DECLARE_EVENT_TABLE()
 };
 

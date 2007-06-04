@@ -15,12 +15,11 @@ class GLFlameCanvas;
 #include "../scene/scene.hpp"
 #include "../scene/graphicsFn.hpp"
 
-#include "../flames/realFires.hpp"
+#include "../flames/abstractFires.hpp"
 #include "../flames/glowengine.hpp"
 #include "../flames/DPengine.hpp"
 
 #include "../solvers/fieldThread.hpp"
-#include "../solvers/field3D.hpp"
 #include "../solvers/globalField.hpp"
 
 class PhotometricSolidsRenderer;
@@ -49,10 +48,8 @@ public:
   
   /** Initialisations relatives à l'environnement OpenGL */
   void InitGL();
-  /** Initialisations relatives aux flammes */
-  void InitFlames(void);
-  /** Initialisations relatives aux solveurs */
-  void InitSolvers(void);
+  /** Initialisations des luminaires, qui eux-mêmes créent les champs de vélocité et les flammes. */
+  void InitLuminaries(void);
   /** Initialisations relatives à la scène */
   void InitScene();
   /** Initialisations relatives aux solveurs */
@@ -82,28 +79,43 @@ public:
   void ToggleWickBoxesDisplay(void) { m_displayWickBoxes=!m_displayWickBoxes; };
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
-  void setSmoothShading(bool state) { 
-    for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->setSmoothShading (state);
+  void setSmoothShading(bool state) {
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->setSmoothShading (state);
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void moveSolver(int selectedSolver, Point& pt, bool move){ 
+  void moveLuminary(int selected, Point& pt){ 
     /* On ne peut déplacer que les solveurs locaux */
-    if(selectedSolver >= 0) m_solvers[selectedSolver]->addTemporaryExternalForces(pt);
-    for (uint f = 0; f < m_currentConfig->nbFlames; f++)
-      m_flames[f]->computeVisibility(*m_camera,true);
+    m_luminaries[selected]->move(pt);
+    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
+	 flamesIterator != m_flames.end (); flamesIterator++)
+      (*flamesIterator)->computeVisibility(*m_camera,true);
   };
   void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ 
     if(selectedSolver >= 0) m_solvers[selectedSolver]->addPermanentExternalForces(pt);
     else m_globalField->addPermanentExternalForces(pt);
   };
-  void setBuoyancy(int index, double value){ 
+  void setSolverBuoyancy(int index, double value){ 
     if(index >= 0) m_solvers[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
-  void setFlameForces(int index, double value){ m_flames[index]->setForces(value); };
+  void setFlameForces(int index, double value){ m_flames[index]->setInnerForce(value); };
   void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
   void setFlameSamplingTolerance(int index, u_char value){ m_flames[index]->setSamplingTolerance(value); };
+
+
+  void setLuminaryBuoyancy(int index, double value){ 
+    if(index >= 0) m_solvers[index]->setBuoyancy(value);
+    else m_globalField->setBuoyancy(value);
+  };
+  void setLuminaryForces(int index, double value){ m_luminaries[index]->setInnerForce(value); };
+  void setLuminarySamplingTolerance(int index, u_char value){ m_luminaries[index]->setSamplingTolerance(value); };
+  void setLuminaryFDF(int index, int value) { m_luminaries[index]->setFDF(value); };
+  void setLuminaryPerturbateMode(int index, char value) { m_luminaries[index]->setPerturbateMode(value); };
+  void setLuminaryLeadLifeSpan(int index, uint value) {m_luminaries[index]->setLeadLifeSpan(value); };  
+  void setLuminaryPeriLifeSpan(int index, uint value) { m_luminaries[index]->setPeriLifeSpan(value); };
+  
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
   
@@ -154,11 +166,9 @@ private:
   
   DepthPeelingEngine *m_depthPeelingEngine;
   
+  vector <Luminary *> m_luminaries;
   /** Liste de threads. */
-  list <FieldFiresThread *> m_threads;
-  /** Liste de threads supplémentaires, utilisée pour distinguer les solveurs internes à une source lumineuse.
-   * Ceci est utilisé uniquement typiquement pour les CandlesSet. */
-  list <FieldFlamesThread *> m_extraThreads;
+  list <FieldThread *> m_threads;
   /** Ordonnanceur des threads */
   FieldThreadsScheduler *m_scheduler;
   vector <Field3D *> m_solvers;
@@ -166,7 +176,6 @@ private:
     
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_flames;
-  list <FieldFiresAssociation *> m_fieldFiresAssociations;
   Scene *m_scene;
   GLSLProgram *m_SVProgram;
   GLSLVertexShader *m_SVShader;
@@ -182,15 +191,12 @@ private:
 
 inline void GLFlameCanvas::drawFlames(void)
 {
-  list < FieldFiresThread* >::iterator threadIterator = m_threads.begin ();
   /* Dessin de la flamme */
-  for (list < FieldFiresAssociation* >::iterator ffaIterator = m_fieldFiresAssociations.begin ();
-       ffaIterator != m_fieldFiresAssociations.end (); ffaIterator++, threadIterator++)
+  for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
+       threadIterator != m_threads.end (); threadIterator++)
     {
       (*threadIterator)->Lock();
-      for (list < FireSource* >::iterator flamesIterator = (*ffaIterator)->fireSources.begin ();
-	   flamesIterator != (*ffaIterator)->fireSources.end (); flamesIterator++)
-	(*flamesIterator)->drawFlame (m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+      (*threadIterator)->drawFlames(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
       (*threadIterator)->Unlock();
     }
 }

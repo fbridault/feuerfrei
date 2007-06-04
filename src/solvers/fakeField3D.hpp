@@ -45,7 +45,6 @@ public:
 
   void moveParticle (Particle& particle, double selfVelocity) const
   {
-    double coef;
     /** Sauvegarde de la position à t-1 */
     particle.xprev = particle.x; particle.yprev = particle.y; particle.zprev = particle.z;
     

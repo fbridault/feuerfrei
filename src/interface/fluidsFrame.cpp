@@ -159,7 +159,7 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
       
       tabName.Printf(_("Solver #%d"),i+1);
       
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.solvers[i].buoyancy, i, m_glBuffer);
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
   
@@ -183,7 +183,7 @@ void FluidsFrame::InitSolversPanels()
   
   for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
     {
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, &m_currentConfig.solvers[i], i, m_glBuffer);	
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.solvers[i].buoyancy, i, m_glBuffer);
       tabName.Printf(_("Solver #%d"),i+1);
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }

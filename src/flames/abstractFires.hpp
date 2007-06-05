@@ -366,7 +366,6 @@ protected:
   Vector m_direction;
 
   uint m_moduloSave;
-  double m_diffDistSave,m_distSave;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -430,8 +429,6 @@ private:
   
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;
-  /** Sphère englobante pour les flammes détachées. */
-  BoundingSphere m_boundingSphereForDetachedFlames;
   Point m_BBmin, m_BBmax;
 };
 

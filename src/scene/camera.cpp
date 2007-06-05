@@ -125,7 +125,7 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
       if (m_buttonPressed == wxMOUSE_BTN_MIDDLE)
 	{
 	  moveOnSides( (event.GetX() - m_beginMouseX)  / (m_mouseSensitivity/5) );
-	  moveUpOrDown( (m_beginMouseY - event.GetY() ) / (m_mouseSensitivity/5) );
+	  moveUpOrDown( (m_beginMouseY - event.GetY()) / (m_mouseSensitivity/5) );
 	}
     m_beginMouseX = event.GetX();
     m_beginMouseY = event.GetY();

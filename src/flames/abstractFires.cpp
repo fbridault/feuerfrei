@@ -88,8 +88,6 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
   buildBoundingSphere();
   m_flickSave=-1;
   m_moduloSave=0;
-  m_diffDistSave=0.0;
-  m_distSave=0.0;
 }
 
 FireSource::~FireSource()
@@ -187,66 +185,54 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     
-    cerr << m_dist << endl;
     remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    
     if(!remainder){
-      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
-      differenceDist = m_dist - m_distSave;
+      modulo = ((uint)floor(m_dist))/INCREMENT;
       
-      if(modulo != m_moduloSave)
-	pass = true;
-      else
-	if( differenceDist > 0 && m_diffDistSave < 0)
-	  pass = true;
-	else
-	  if( differenceDist < 0 && m_diffDistSave > 0)
-	    pass = true;
-	  else
-	    pass = false;
-      
-      if(differenceDist > 0 && pass){
-	mod=modulo-m_moduloSave;
-	do
-	  {
-	    /* On change le niveau de détail des solveurs à mi-distance */
-	    if( modulo == 2 ){
-	      cerr << "simplified skeletons" << endl;
-	      for (uint i = 0; i < m_nbFlames; i++)
-		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-	      setSamplingTolerance(1);
-	    }
-	    
-	    /* On passe en FakeField */
-	    if( modulo == 4 ){
-	      m_solver->switchToFakeField();
-	      setSamplingTolerance(2);
-	    }
-	    mod--;
-	    
-	  }while(mod>0);
-      }
-      else
-	if(differenceDist < 0 && pass){
-	  mod=m_moduloSave-modulo;
+      if(modulo > m_moduloSave)
+	{
+	  mod=modulo-m_moduloSave;
 	  do
 	    {
 	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( modulo == 2 ){
-		cerr << "normal skeletons" << endl;
+	      if( (modulo-mod) == 1 ){
+		cerr << "simplified skeletons" << endl;
 		for (uint i = 0; i < m_nbFlames; i++)
-		  m_flames[i]->setSkeletonsLOD(NORMAL);
-		setSamplingTolerance(0);
+		  m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+		setSamplingTolerance(1);
 	      }
 	      
-	      if( modulo == 4 ){
-		m_solver->switchToRealSolver();
-		setSamplingTolerance(1);
+	      /* On passe en FakeField */
+	      if( (modulo-mod) == 3 ){
+		m_solver->switchToFakeField();
+		setSamplingTolerance(2);
 	      }
 	      mod--;
 	    }while(mod>0);
 	}
-      m_diffDistSave=differenceDist;
-      m_distSave=m_dist;
+      else
+	if(modulo < m_moduloSave)
+	  {
+	    mod=m_moduloSave-modulo;
+	    do
+	      {
+		/* On change le niveau de détail des solveurs à mi-distance */
+		if( (m_moduloSave-mod) == 1 ){
+		  cerr << "normal skeletons" << endl;
+		  for (uint i = 0; i < m_nbFlames; i++)
+		    m_flames[i]->setSkeletonsLOD(NORMAL);
+		  setSamplingTolerance(0);
+		}
+	      
+		/* On repasse en solveur */
+		if( (m_moduloSave-mod) == 3 ){
+		  m_solver->switchToRealSolver();
+		  setSamplingTolerance(1);
+		}
+		mod--;
+	      }while(mod>0);
+	  }
       m_moduloSave=modulo;
     }
   }else
@@ -388,13 +374,13 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
   uint modulo, remainder;
   int mod;
   bool pass;
-  const uint INCREMENT=3;
+  const uint INCREMENT=4;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
   
   m_dist=m_boundingSphere.visibleDistance(view);
-  m_visibility = (m_dist) || m_boundingSphereForDetachedFlames.isVisible(view);
+  m_visibility = (m_dist);
   
   if(m_visibility){
     if(!vis_save){
@@ -405,65 +391,56 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     m_dist = m_dist - m_boundingSphere.radius;
     
     remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    
     if(!remainder){
-      modulo = ((uint)nearbyint(m_dist))/INCREMENT;
-      differenceDist = m_dist - m_distSave;
+      modulo = ((uint)floor(m_dist))/INCREMENT;
       
-      if(modulo != m_moduloSave)
-	pass = true;
-      else
-	if( differenceDist > 0 && m_diffDistSave < 0)
-	  pass = true;
-	else
-	  if( differenceDist < 0 && m_diffDistSave > 0)
-	    pass = true;
-	  else
-	    pass = false;
-      
-      //cerr << differenceDist << " " << m_dist << " " << m_diffDistSave << " " << modulo << " " << m_moduloSave << endl;
-      if(differenceDist > 0 && pass){
-	mod=modulo-m_moduloSave;
-	do
-	  {
-	    /* On change le niveau de détail des solveurs à mi-distance */
-	    if( modulo == 2 ){
-	      cerr << "simplified skeletons" << endl;
-	      for (uint i = 0; i < m_nbFlames; i++)
-		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-	      setSamplingTolerance(2);
-	    }
-	    
-	    /* On passe en FakeField */
-	    if( modulo == m_solver->getNbMaxDiv()+2 ){
-	      if(getPerturbateMode() != FLICKERING_NOISE){
-		m_flickSave = getPerturbateMode();
-		setPerturbateMode(FLICKERING_NOISE);
-	      }
-	      m_solver->switchToFakeField();
-	    }else
-	      if( modulo > 1 && modulo < m_solver->getNbMaxDiv()+2)
-		m_solver->decreaseRes();
-	    
-	    mod--;
-	  }while(mod>0);
-      }
-      else
-	if(differenceDist < 0 && pass){
-	  mod=m_moduloSave-modulo;
+      if(modulo > m_moduloSave)
+	{      
+	  cerr << "solver " << m_light - GL_LIGHT0 << " : ";
+	  mod=modulo-m_moduloSave;
 	  do
 	    {
 	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( modulo == 2 ){
+	      if( (modulo-mod) == 1 ){
+		cerr << "simplified skeletons" << endl;
+		for (uint i = 0; i < m_nbFlames; i++)
+		  m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+		setSamplingTolerance(2);
+	      }
+	    
+	      /* On passe en FakeField */
+	      if( (modulo-mod) == m_solver->getNbMaxDiv() ){
+		if(getPerturbateMode() != FLICKERING_NOISE){
+		  m_flickSave = getPerturbateMode();
+		  setPerturbateMode(FLICKERING_NOISE);
+		}
+		m_solver->switchToFakeField();
+	      }else
+		if( (modulo-mod) >= 0 && (modulo-mod) < m_solver->getNbMaxDiv())
+		  m_solver->decreaseRes();
+	    
+	      mod--;
+	    }while(mod>0);
+	}
+      else
+	if(modulo < m_moduloSave){
+	  mod=m_moduloSave-modulo;
+	  cerr << "solver " << m_light - GL_LIGHT0 << " : ";
+	  do
+	    {
+	      /* On change le niveau de détail des solveurs à mi-distance */
+	      if( (modulo+mod) == 2 ){
 		cerr << "normal skeletons" << endl;
 		for (uint i = 0; i < m_nbFlames; i++)
 		  m_flames[i]->setSkeletonsLOD(NORMAL);
 		setSamplingTolerance(1);
 	      }
 	      
-	      if( modulo < m_solver->getNbMaxDiv()+2 )
+	      if( (m_moduloSave-mod) < m_solver->getNbMaxDiv() )
 		m_solver->increaseRes();
 	      else
-		if( modulo == m_solver->getNbMaxDiv()+2 ){
+		if( (m_moduloSave-mod) == m_solver->getNbMaxDiv() ){
 		  if(m_flickSave > -1){
 		    setPerturbateMode(m_flickSave);
 		    m_flickSave = -1;
@@ -473,8 +450,6 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	      mod--;
 	    }while(mod>0);
 	}
-      m_diffDistSave=differenceDist;
-      m_distSave=m_dist;
       m_moduloSave=modulo;
     }
   }else

@@ -66,7 +66,7 @@ public:
   /** Affectation du coefficient multiplicateur de la FDF.
    * @param value Coefficient.
    */
-  virtual void setInnerForce(double value){ 
+  virtual void setInnerForce(float value){ 
     for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
 	 fireIterator != m_fireSources.end (); fireIterator++)
       (*fireIterator)->setInnerForce(value);
@@ -108,7 +108,7 @@ public:
       (*fireIterator)->setPeriLifeSpan(value); 
   };
 
-  virtual void setBuoyancy(double value){
+  virtual void setBuoyancy(float value){
     for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
 	 fieldIterator != m_fields.end (); fieldIterator++)
       (*fieldIterator)->setBuoyancy(value); 

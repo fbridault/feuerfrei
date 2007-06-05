@@ -164,7 +164,7 @@ void Mesh::buildVBO() const
 
 void Mesh::buildBoundingSphere ()
 {
-  double dist;
+  float dist;
   Vertex v;
   uint n=0;
   
@@ -178,7 +178,7 @@ void Mesh::buildBoundingSphere ()
 	{
 	  v = m_parent->getVertex(m_indexArray[i]);
 	  m_parent->addRefInHashTable( m_indexArray[i], i );
-	  m_boundingSphere.centre = (m_boundingSphere.centre*n + Point(v.x, v.y, v.z)) / (double)(n+1);	  
+	  m_boundingSphere.centre = (m_boundingSphere.centre*n + Point(v.x, v.y, v.z)) / (float)(n+1);	  
 	  n++;
 	}
     }

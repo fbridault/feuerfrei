@@ -259,7 +259,7 @@ void GLFluidsCanvas::OnMouseWheel(wxMouseEvent& event)
 
 void GLFluidsCanvas::OnKeyPressed(wxKeyEvent& event)
 {
-  double step=0.3;
+  float step=0.3;
   switch(event.GetKeyCode())
     {
     case WXK_LEFT: m_camera->moveOnSides(step); break;

@@ -26,7 +26,7 @@ public:
    * en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls, double u,
+  LeadSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls, float u,
 	       float noiseIncrement, float noiseMin, float noiseMax);
   
   /** Destructeur. */
@@ -41,19 +41,19 @@ public:
   
   virtual void drawRoot () const;
   
-  void addForces (int fdf, double innerForce, char perturbate);
-  double getLastAppliedForce () const { return m_lastAppliedForce; };
+  void addForces (int fdf, float innerForce, char perturbate);
+  float getLastAppliedForce () const { return m_lastAppliedForce; };
   
 private:
   void drawParticle (Particle * const particle) const;
   
   /** Valeur d'entrée de la fonction de distribution de carburant F(u). */
-  double m_u;
-  double m_lastAppliedForce;
+  float m_u;
+  float m_lastAppliedForce;
   
   /** Générateur de bruit de Perlin. */
   PerlinNoise1D m_noiseGenerator;
-  double m_perturbateCount;
+  float m_perturbateCount;
 };
 
 /** Classe représentant les squelettes guides libres.

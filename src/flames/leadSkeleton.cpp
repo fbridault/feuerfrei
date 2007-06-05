@@ -11,7 +11,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
 LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor,
-			    uint pls, double u, float noiseIncrement, float noiseMin, float noiseMax) :
+			    uint pls, float u, float noiseIncrement, float noiseMin, float noiseMax) :
   Skeleton (s, position, rootMoveFactor,pls),
   m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
 {
@@ -42,7 +42,7 @@ void LeadSkeleton::drawRoot () const
   glPopMatrix ();
 }
 
-void LeadSkeleton::addForces (int fdf, double innerForce, char perturbate)
+void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 { 
   m_selfVelocity = 0;
   switch(fdf){
@@ -59,7 +59,7 @@ void LeadSkeleton::addForces (int fdf, double innerForce, char perturbate)
     m_lastAppliedForce = innerForce*exp(innerForce * 30 -m_u * m_u)/(9.0);
     break;
   case FDF_RANDOM:
-    m_lastAppliedForce = innerForce * rand()/((double)RAND_MAX);
+    m_lastAppliedForce = innerForce * rand()/((float)RAND_MAX);
     break;
   }
   
@@ -90,10 +90,10 @@ void LeadSkeleton::addForces (int fdf, double innerForce, char perturbate)
     //    }
     break;
   case FLICKERING_RANDOM1 :
-    m_lastAppliedForce += rand()/((double)RAND_MAX) - .5;
+    m_lastAppliedForce += rand()/((float)RAND_MAX) - .5;
     break;
   case FLICKERING_RANDOM2 :
-    m_lastAppliedForce += rand()/(10*(double)RAND_MAX);
+    m_lastAppliedForce += rand()/(10*(float)RAND_MAX);
     break;
   case FLICKERING_NOISE :
     m_lastAppliedForce += m_noiseGenerator.getNextValue();

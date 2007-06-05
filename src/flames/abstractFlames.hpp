@@ -329,7 +329,7 @@ public:
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
-  virtual void addForces (int fdf, double innerForce, char perturbate){
+  virtual void addForces (int fdf, float innerForce, char perturbate){
     for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
       (*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
@@ -399,7 +399,7 @@ protected:
   /** Pointeur sur le solveur de fluides */
   Field3D *m_solver;  
   
-  double *m_distances;
+  float *m_distances;
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
    * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 
    * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps 

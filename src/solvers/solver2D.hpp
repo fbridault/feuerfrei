@@ -28,7 +28,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Solver2D (const Point& position, uint n_x, uint n_y, double dim, double timeStep, double buoyancy);
+  Solver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~Solver2D ();
   
@@ -40,7 +40,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getU (uint i, uint j) const
+  float getU (uint i, uint j) const
   {
     return m_u[IX (i, j)];
   };
@@ -50,7 +50,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getV (uint i, uint j) const
+  float getV (uint i, uint j) const
   {
     return m_v[IX (i, j)];
   };
@@ -60,7 +60,7 @@ public:
    * @param j Indice à la verticale (y).
    * @return Valeur de vélocité.
    */   
-  double getDens (uint i, uint j) const
+  float getDens (uint i, uint j) const
   {
     return m_dens[IX (i, j)];
   };
@@ -70,7 +70,7 @@ public:
    * @param j Indice à la verticale (y).
    * @param value Valeur de vélocité à ajouter.
    */
-  void addUsrc (uint i, uint j, double value)
+  void addUsrc (uint i, uint j, float value)
   {
     m_uSrc[IX (i, j)] += value*m_nbVoxelsX;
   };
@@ -79,7 +79,7 @@ public:
    * @param j Indice à la verticale (y).
    * @param value Valeur de vélocité à ajouter.
    */
-  void addVsrc (uint i, uint j, double value)
+  void addVsrc (uint i, uint j, float value)
   {
     m_vSrc[IX (i, j)] += value*m_nbVoxelsY;
   };
@@ -89,7 +89,7 @@ public:
    * @param k Indice en profondeur (z).
    * @param value Valeur de vélocité à ajouter.
    */
-  void addDensSrc (uint i, uint j, double value)
+  void addDensSrc (uint i, uint j, float value)
   {
     m_densSrc[IX (i, j)] += value*m_nbVoxels;
   };
@@ -99,7 +99,7 @@ public:
    * @param j Indice à la verticale (y).
    * @param value Valeur de vélocité à ajouter.
    */
-  void setUsrc (uint i, uint j, double value)
+  void setUsrc (uint i, uint j, float value)
   {
     m_uSrc[IX (i, j)] = value;
   };
@@ -109,7 +109,7 @@ public:
    * @param j Indice à la verticale (y).
    * @param value Valeur de vélocité à ajouter.
    */
-  void setVsrc (uint i, uint j, double value)
+  void setVsrc (uint i, uint j, float value)
   {
     m_vSrc[IX (i, j)] = value;
   };
@@ -193,7 +193,7 @@ protected:
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.
    * @param x Composante de la vélocité {m_u,m_v,m_w} à traiter.
    */
-  void set_bnd (unsigned char b, double *const x);
+  void set_bnd (unsigned char b, float *const x);
   
   /** Pas d'advection => déplacement du fluide sur lui-même.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w
@@ -203,8 +203,8 @@ protected:
    * @param v Vecteur de vélocité en v
    * @param w Vecteur de vélocité en w
    */
-  virtual void advect (unsigned char b, double *const d, const double *const d0,
-		       const double *const u, const double *const v);
+  virtual void advect (unsigned char b, float *const d, const float *const d0,
+		       const float *const u, const float *const v);
   
   /** Pas de résolution de la densité. */
   void dens_step ();
@@ -219,7 +219,7 @@ protected:
    * @param vfin vecteur résultat de la prolongation de taille nx*ny*nz.
    * @author Michel Leblond.
    */
-//   void prolonger(double *const vgros, double *const vfin);
+//   void prolonger(float *const vgros, float *const vfin);
 
   /** Restreindre sur une grille grossière un vecteur défini sur une grille fine.
    * On utilise une moyenne pondérée : schèma en 27 points.
@@ -228,7 +228,7 @@ protected:
    * @param vgros vecteur résultat de la restriction de taille (nx/2)*(ny/2)*(nz/2)
    * @author Michel Leblond.
    */
-//   void restreindre(double *const vfin, double *const vgros);
+//   void restreindre(float *const vfin, float *const vgros);
   
   /** Nombre de voxels en X sur un côté du cube. */
   uint m_nbVoxelsX;
@@ -236,15 +236,15 @@ protected:
   uint m_nbVoxelsY;
   
   /** Dimension du solveur en X. */
-  double m_dimX;
+  float m_dimX;
   /** Dimension du solveur en Y. */
-  double m_dimY;
+  float m_dimY;
 
-  double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY;
+  float m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY;
   uint m_halfNbVoxelsX;
   
-  double *m_u, *m_v, *m_uPrev, *m_vPrev, *m_uSrc, *m_vSrc;
-  double *m_dens, *m_densPrev, *m_densSrc;
+  float *m_u, *m_v, *m_uPrev, *m_vPrev, *m_uSrc, *m_vSrc;
+  float *m_dens, *m_densPrev, *m_densSrc;
 };
 
 #endif

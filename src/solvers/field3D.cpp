@@ -7,7 +7,7 @@ Field3D::Field3D ()
 {
 }
 
-Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy) : 
+Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy) : 
   Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
@@ -60,10 +60,10 @@ Field3D::~Field3D ()
 
 void Field3D::buildDLGrid ()
 {
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double intery = m_dim.y / (double) m_nbVoxelsY;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i, j;
+  float interx = m_dim.x / (float) m_nbVoxelsX;
+  float intery = m_dim.y / (float) m_nbVoxelsY;
+  float interz = m_dim.z / (float) m_nbVoxelsZ;
+  float i, j;
   
   m_gridDisplayList=glGenLists(1);
   glNewList (m_gridDisplayList, GL_COMPILE);
@@ -90,9 +90,9 @@ void Field3D::buildDLGrid ()
 
 void Field3D::buildDLBase ()
 {
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i;
+  float interx = m_dim.x / (float) m_nbVoxelsX;
+  float interz = m_dim.z / (float) m_nbVoxelsZ;
+  float i;
   
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
@@ -116,9 +116,9 @@ void Field3D::buildDLBase ()
 
 void Field3D::displayArrow (const Vector& direction)
 {
-  double norme_vel = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
-  double taille = m_dim.x * m_dim.y * m_dim.z * norme_vel * m_forceRatio;
-  double angle;
+  float norme_vel = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
+  float taille = m_dim.x * m_dim.y * m_dim.z * norme_vel * m_forceRatio;
+  float angle;
   Vector axeRot, axeCone (0.0, 0.0, 1.0), dir(direction);
   
   dir.normalize ();

@@ -28,8 +28,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-		   double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+		   float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODField3D () {};
   
   /********************* Redéfinition des méthodes héritées *********************/
@@ -38,27 +38,27 @@ public:
     return m_currentField->iterate();
   };
   
-  virtual Point getUVW (const Point& pos, double selfVelocity) const
+  virtual Point getUVW (const Point& pos, float selfVelocity) const
   {
     return m_currentField->getUVW (pos, selfVelocity);
   };
   
-  virtual void moveParticle (Particle& particle, double selfVelocity) const
+  virtual void moveParticle (Particle& particle, float selfVelocity) const
   {
     m_currentField->moveParticle (particle, selfVelocity);
   };
   
-  void addUsrc (const Point& pos, double value)
+  void addUsrc (const Point& pos, float value)
   {
     m_currentField->addUsrc (pos, value);
   };
   
-  virtual void addVsrc (const Point& pos, double value, double& selfVelocity)
+  virtual void addVsrc (const Point& pos, float value, float& selfVelocity)
   {
     m_currentField->addVsrc (pos, value, selfVelocity);
   };
   
-  void addWsrc (const Point& pos, double value)
+  void addWsrc (const Point& pos, float value)
   {
     m_currentField->addWsrc (pos, value);
   };
@@ -105,7 +105,7 @@ public:
     m_solver.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
   }
   
-  virtual void setBuoyancy(double value){ 
+  virtual void setBuoyancy(float value){ 
     m_fakeField.setBuoyancy(value);
     m_solver.setBuoyancy(value);
   }
@@ -148,8 +148,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-		double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+		float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODHybridField () {};
   
   /********************* Redéfinition des méthodes héritées *********************/
@@ -182,7 +182,7 @@ public:
       m_currentField->iterate();
   };
   
-  Point getUVW (const Point& pos, double selfVelocity) const
+  Point getUVW (const Point& pos, float selfVelocity) const
   {
     if(m_switch)
       return (m_fakeField.getUVW (pos, selfVelocity)*m_fieldWeight + m_solver.getUVW (pos, selfVelocity)*m_solverWeight);
@@ -190,7 +190,7 @@ public:
       return m_currentField->getUVW (pos, selfVelocity);
   };
   
-  void moveParticle (Particle& pos, double selfVelocity) const
+  void moveParticle (Particle& pos, float selfVelocity) const
   {
     if(m_switch)
       {
@@ -203,7 +203,7 @@ public:
       m_currentField->moveParticle (pos, selfVelocity);
   };
   
-  void addVsrc (const Point& pos, double value, double& selfVelocity)
+  void addVsrc (const Point& pos, float value, float& selfVelocity)
   {
     //if(m_switch)
     m_solver.addVsrc (pos, value, selfVelocity);
@@ -232,8 +232,8 @@ public:
     m_switch = NB_STEPS_TO_SWITCH;
     m_fieldWeight = 1;
     m_solverWeight = 0;
-    m_fieldIncrement = -1/(double)NB_STEPS_TO_SWITCH;
-    m_solverIncrement = 1/(double)NB_STEPS_TO_SWITCH;
+    m_fieldIncrement = -1/(float)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = 1/(float)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_solver; 
   };
   
@@ -243,8 +243,8 @@ public:
     m_switch = NB_STEPS_TO_SWITCH;
     m_fieldWeight = 0;
     m_solverWeight = 1;
-    m_fieldIncrement =   1/(double)NB_STEPS_TO_SWITCH;
-    m_solverIncrement = -1/(double)NB_STEPS_TO_SWITCH;
+    m_fieldIncrement =   1/(float)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = -1/(float)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_fakeField;
 //     while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
 //       m_solver.decreaseRes();
@@ -258,8 +258,8 @@ public:
 private:
   Field3D *m_fieldToSwitch;
   uint m_switch;
-  double m_fieldWeight, m_solverWeight;
-  double m_fieldIncrement, m_solverIncrement;
+  float m_fieldWeight, m_solverWeight;
+  float m_fieldIncrement, m_solverIncrement;
   uint m_decreaseCount, m_increaseCount;
 };
 

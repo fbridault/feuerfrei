@@ -7,9 +7,9 @@
 uint g_objectCount;
 
 #ifdef RTFLAMES_BUILD
-Camera::Camera (int width, int height, double clipping, Scene* const scene ) :
+Camera::Camera (int width, int height, float clipping, Scene* const scene ) :
 #else
-Camera::Camera (int width, int height, double clipping) :
+Camera::Camera (int width, int height, float clipping) :
 #endif
 m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
 {
@@ -45,7 +45,7 @@ m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
 #endif
 }
 
-void Camera::computeView(double x, double y)
+void Camera::computeView(float x, float y)
 {  
   Vector mouseDirection;
   
@@ -77,7 +77,7 @@ void Camera::computeView(double x, double y)
       }
 }
 
-void Camera::rotate(double angle, double x, double y, double z)
+void Camera::rotate(float angle, float x, float y, float z)
 {
   Quaternion temp, quatView, result;
 
@@ -138,16 +138,16 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
 #ifdef RTFLAMES_BUILD
 void Camera::computeFrustrum()
 {
-   double   proj[16];
-   double   modl[16];
-   double   clip[16];
-   double   t;
+   float   proj[16];
+   float   modl[16];
+   float   clip[16];
+   float   t;
    
    /* Get the current PROJECTION matrix from OpenGL */
-   glGetDoublev( GL_PROJECTION_MATRIX, proj );
+   glGetFloatv( GL_PROJECTION_MATRIX, proj );
    
    /* Get the current MODELVIEW matrix from OpenGL */
-   glGetDoublev( GL_MODELVIEW_MATRIX, modl );
+   glGetFloatv( GL_MODELVIEW_MATRIX, modl );
    
    /* Combine the two matrices (multiply projection by modelview) */
    clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];

@@ -44,7 +44,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Field3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
+  Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~Field3D ();
   
@@ -56,33 +56,33 @@ public:
    * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
    * @return Valeurs de vélocité.
    */
-  virtual Point getUVW (const Point& pos, double selfVelocity) const = 0;
+  virtual Point getUVW (const Point& pos, float selfVelocity) const = 0;
   
   /** Déplacement d'une particule dans le champ de vélocité. Utilisée par les squelettes pour mettre à jour la
    * position des particules.
    * @param particle Particule à déplacer.
    * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
    */
-  virtual void moveParticle (Particle& particle, double selfVelocity) const = 0;
+  virtual void moveParticle (Particle& particle, float selfVelocity) const = 0;
   
   /** Ajout d'une force externe pour la composante U.
    * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    */
-  virtual void addUsrc (const Point& pos, double value) = 0;
+  virtual void addUsrc (const Point& pos, float value) = 0;
   
   /** Ajout d'une force externe pour la composante V.
    * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    * @param selfVelocity Valeur de vélocité propre.
    */
-  virtual void addVsrc (const Point& pos, double value, double& selfVelocity) = 0;
+  virtual void addVsrc (const Point& pos, float value, float& selfVelocity) = 0;
   
   /** Ajout d'une force externe pour la composante W.
    * @param pos Position relative de la particule dans le solveur
    * @param value Valeur de vélocité à ajouter.
    */
-  virtual void addWsrc (const Point& pos, double value) = 0;
+  virtual void addWsrc (const Point& pos, float value) = 0;
   
   /** Retourne la dimension sous forme d'un point.
    * @return Dimension.
@@ -92,15 +92,15 @@ public:
   /** Retourne la dimension en X.
    * @return Dimension.
    */
-  double getDimX () const { return m_dim.x; };
+  float getDimX () const { return m_dim.x; };
   /** Retourne la dimension en Y.
    * @return Dimension.
    */
-  double getDimY () const { return m_dim.y; };
+  float getDimY () const { return m_dim.y; };
   /** Retourne la dimension en Z.
    * @return Dimension.
    */
-  double getDimZ () const { return m_dim.z; };
+  float getDimZ () const { return m_dim.z; };
   
   /** Retourne le nombre de voxels en X.
    * @return Nombre de voxels.
@@ -182,7 +182,7 @@ protected:
   /** Facteur d'échelle du solveur */
   Point m_scale;
   
-  double m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
+  float m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
   uint m_nbMaxDiv;
 #ifdef RTFLAMES_BUILD
   list <FireSource *> m_fireSources;

@@ -65,7 +65,7 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
 	  pt = (pt* m_scale + m_position)  - Point(scale.x/2.0,0.0,scale.z/2.0);
 	  //     pt.y += s->getDimY()/4.0 * s->getScale().y;
       
-	  field = new FakeField3D(pt, 10, 10, 10, 1.0, scale, .4, .1);      
+	  field = new FakeField3D(pt, 10, 10, 10, 1.0, scale, .4, .1);
 	  fireSource = new Candle (config.fires[0], field, scene, i, program, .125, *objListIterator);
 	  
 	  fireSource->setInnerForce(config.fires[0].innerForce);

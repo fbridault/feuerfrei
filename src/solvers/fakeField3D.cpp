@@ -3,8 +3,8 @@
 #include <math.h>
 #include "../scene/graphicsFn.hpp"
 
-FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
-			  double timeStep, double buoyancy) : 
+FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
+			  float timeStep, float buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_forceCoef = 3;
@@ -17,7 +17,7 @@ FakeField3D::~FakeField3D ()
 
 void FakeField3D::iterate ()
 {
-  double coef=.5;
+  float coef=.5;
   if(!m_run)
     return;
   
@@ -115,9 +115,9 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
 
 void FakeField3D::displayVelocityField (void)
 {
-  double inc_x = m_dim.x / (double) m_nbVoxelsX;
-  double inc_y = m_dim.y / (double) m_nbVoxelsY;
-  double inc_z = m_dim.z / (double) m_nbVoxelsZ;
+  float inc_x = m_dim.x / (float) m_nbVoxelsX;
+  float inc_y = m_dim.y / (float) m_nbVoxelsY;
+  float inc_z = m_dim.z / (float) m_nbVoxelsZ;
   
   for (uint i = 0; i <= m_nbVoxelsX; i++)
     for (uint j = 0; j <= m_nbVoxelsY; j++)

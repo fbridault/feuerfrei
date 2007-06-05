@@ -170,12 +170,12 @@ void FixedFlame::drawPointFlame () const
     }
   else
     {
-      double angle, angle2, angle4;
+      float angle, angle2, angle4;
       
       /* D�placement de la texture de manière à ce qu'elle reste "en face" de l'observateur */
-      GLdouble m[4][4];
+      GLfloat m[4][4];
       
-      glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
+      glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
       
       /* Position de la bougie = translation dans la matrice courante */
       Vector bougiepos(m[3][0], m[3][1], m[3][2]);
@@ -208,7 +208,7 @@ void FixedFlame::drawPointFlame () const
       glPushMatrix ();
       glLoadIdentity ();
       
-      glTranslatef (0.0, angle4 / (double) (PI), 0.0);
+      glTranslatef (0.0, angle4 / (float) (PI), 0.0);
       
       drawNurbs();
       
@@ -228,7 +228,7 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
 		     const Texture* const tex, Field3D* const s) :
   FixedFlame (nbSkeletons, nbFixedPoints, tex)
 {  
-  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
+  m_distances = new float[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   
   m_periSkeletons = new PeriSkeleton* [m_nbSkeletons];
@@ -241,8 +241,8 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
 bool RealFlame::build ()
 {
   uint i, j, l;
-  double vinc, vtmp, vtex;
-  double dist_max;
+  float vinc, vtmp, vtex;
+  float dist_max;
   m_maxParticles = 0;
   vtex = -0.5;
 
@@ -263,7 +263,7 @@ bool RealFlame::build ()
   
   m_size = m_maxParticles + m_nbFixedPoints;
   
-  vinc = 1.0 / (double)(m_size-1);
+  vinc = 1.0 / (float)(m_size-1);
   vtmp = 0;
   for (i = 0; i < m_size; i++){
     m_texTmp[i] = vtmp;

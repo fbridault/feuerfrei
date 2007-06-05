@@ -75,7 +75,7 @@ public:
   /** Retourne l'intensité globale de la source.
    * @return Coefficient de l'intensité.
    */
-  const double getIntensity(void) const { return m_intensity; };
+  const float getIntensity(void) const { return m_intensity; };
   
   /** Récupération du centre du solide photométrique.
    * @param x Coordonnée x.
@@ -90,13 +90,13 @@ public:
    */
   Point getCenterSP(void) const { return m_centreSP; };
   
-  const double getLazimut() const {return m_iesFile->getLazimut();};
+  const float getLazimut() const {return m_iesFile->getLazimut();};
   
-  const double getLzenith() const {return m_iesFile->getLzenith();};
+  const float getLzenith() const {return m_iesFile->getLzenith();};
   
-  const double getLazimutTEX() const {return m_iesFile->getLazimutTEX();};
+  const float getLazimutTEX() const {return m_iesFile->getLazimutTEX();};
   
-  const double getLzenithTEX() const {return m_iesFile->getLzenithTEX();};
+  const float getLzenithTEX() const {return m_iesFile->getLzenithTEX();};
   
   /** Retourne le nombre de valeurs en zénithal. */
   const uint getIESZenithSize() const {return m_iesFile->getNbzenith();};
@@ -111,19 +111,19 @@ public:
   virtual void computeIntensityPositionAndDirection() = 0;
   
   /** Modifie le coefficient pondérateur de l'intensité. */
-  virtual void setIntensityCoef(double coef) { m_intensityCoef = coef; };
+  virtual void setIntensityCoef(float coef) { m_intensityCoef = coef; };
   
 protected:
   /** Centre du solide photométrique dans l'espace. */
   Point m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation. */
-  double m_orientationSPtheta;
+  float m_orientationSPtheta;
   /** Axe de rotation. */
   Vector m_axeRotation;
   /** Valeur de l'intensité du solide. */
-  double m_intensity;
+  float m_intensity;
   /** Coefficient pondérateur de l'intensité de la source. */
-  double m_intensityCoef;
+  float m_intensityCoef;
   /** Indice de la lumière pour OpenGL. */
   short m_light;
 private:
@@ -265,7 +265,7 @@ public:
   /** Affectation du coefficient multiplicateur de la FDF.
    * @param value Coefficient.
    */
-  virtual void setInnerForce(double value) { m_innerForce=value; };
+  virtual void setInnerForce(float value) { m_innerForce=value; };
   
   /** Affectation de la FDF.
    * @param value FDF.
@@ -321,7 +321,7 @@ public:
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
   bool isVisible() { return m_visibility; };
-  double getDistance() { return m_dist; };
+  float getDistance() { return m_dist; };
 
   virtual bool operator<(const FireSource& other) const;
 
@@ -348,13 +348,13 @@ protected:
   /** Visibilité de la flamme. */
   bool m_visibility;
   /** Distance par rapport à la caméra */
-  double m_dist;
+  float m_dist;
 
   /** Dernière valeur du flickering connue avant que la gestion du LOD ne la modifie */
   char m_flickSave;
   
   /** Coefficient de force appliqué sur la FDF. */
-  double m_innerForce;
+  float m_innerForce;
   /** Méthode de perturbation appliquée sur la FDF. */
   char m_perturbate;
   /** Fonction de distribution de carburant. */

@@ -29,7 +29,7 @@ public:
   /** Affecte la correction gamma.
    * @param gamma Valeur du gamma.
    */
-  void SetGamma(GLdouble gamma){
+  void SetGamma(GLfloat gamma){
     m_gamma = gamma;
   };
   
@@ -73,7 +73,7 @@ public:
   
 private:
   GLSLFragmentShader m_fp;
-  GLdouble m_gamma;
+  GLfloat m_gamma;
   FBO m_fbo;
   Texture *m_renderTex;
   uint m_width, m_height;

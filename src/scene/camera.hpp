@@ -12,7 +12,7 @@
 class Quaternion
 {
 public:
-  double x, y, z, w;
+  float x, y, z, w;
   
   Quaternion()
   {
@@ -29,14 +29,14 @@ public:
   
   ~Quaternion(){};
   
-  double length()
+  float length()
   {
     return sqrt(x * x + y * y + z * z + w * w);
   };
   
   void normalize()
   {
-    double L = length();
+    float L = length();
     
     x /= L;
     y /= L;
@@ -87,21 +87,21 @@ public:
   * @param scene Pointeur sur la scène
   */
 #ifdef RTFLAMES_BUILD
-  Camera(int w, int h, double clipping_value, Scene* const scene);
+  Camera(int w, int h, float clipping_value, Scene* const scene);
 #else
-  Camera(int w, int h, double clipping_value);
+  Camera(int w, int h, float clipping_value);
 #endif
   virtual ~Camera() {};
 
-  // void addCenterX(double value){ centerx+=value; eyex+=value; 
+  // void addCenterX(float value){ centerx+=value; eyex+=value; 
 //       recalculer_matrice_initiale (); };
-//   void addCenterZ(double value){ centerz+=value; eyez+=value;
+//   void addCenterZ(float value){ centerz+=value; eyez+=value;
 //       recalculer_matrice_initiale ();};
   /** Calcul de la rotation de la caméra 
    * @param x position finale de la souris en x
    * @param y position finale de la souris en y
    */
-  void computeView(double x, double y);
+  void computeView(float x, float y);
 
   /** Placement de la caméra. Fonction à appeler au début de chaque tour de la
    * boucle de dessin
@@ -114,7 +114,7 @@ public:
   };  
 
   /** Rotation de la caméra */
-  void rotate(double angle, double x, double y, double z);
+  void rotate(float angle, float x, float y, float z);
   
   void OnMouseClick (wxMouseEvent& event);
   void OnMouseMotion (wxMouseEvent& event);
@@ -124,7 +124,7 @@ public:
    * et on effectue ensuite une translation suivant ce vecteur
    * @param value valeur de la translation
    */
-  void moveOnSides(double value){
+  void moveOnSides(float value){
     Vector axis = m_view ^ m_up;
     m_position = m_position + (axis * value);
   }; 
@@ -132,7 +132,7 @@ public:
    * On effectue ensuite une translation suivant le vecteur de vue
    * @param value valeur de la translation
    */
-  void moveOnFrontOrBehind(double value){
+  void moveOnFrontOrBehind(float value){
     m_position = m_position + (m_view * value);
 #ifdef RTFLAMES_BUILD
     computeFrustrum();
@@ -142,14 +142,14 @@ public:
    * On effectue ensuite une translation suivant le vecteur de vue
    * @param value valeur de la translation
    */
-  void moveUpOrDown(double value){
+  void moveUpOrDown(float value){
     m_position = m_position + (m_up * value);
   };
   
 #ifdef RTFLAMES_BUILD
   void computeFrustrum();
   
-  const double* getFrustum(uint side) const { return m_frustum[side]; };
+  const float* getFrustum(uint side) const { return m_frustum[side]; };
 #endif
   
 private:
@@ -160,26 +160,26 @@ private:
   /** Bouton de la souris actuellement appuyé */
   int m_buttonPressed;
   /** Angle d'ouverture de la caméra en degrés */
-  GLdouble m_ouverture;
+  GLfloat m_ouverture;
   /** Variables temporaires pour savoir à partir de quel endroit le glissement de la
    * souris a commencé 
    */
   int m_beginMouseX, m_beginMouseY;
   /** Valeur de clipping de la caméra */
-  double m_clipping_value;
+  float m_clipping_value;
   /** Rotation actuelle autour de l'axe X */
-  double m_currentRotationX;  
+  float m_currentRotationX;  
   /** Angle de rotation maximal autour de l'axe X en radians */
-  double m_maxAngleX;
+  float m_maxAngleX;
   /** Variable temporaire indiquant qu'un mouvement a lieu avec la souris */
   bool m_move;
   /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
-  double m_mouseSensitivity;
+  float m_mouseSensitivity;
   /** Largeur et hauteur de la vue de la caméra */
   int m_width, m_height;
 #ifdef RTFLAMES_BUILD
   /** Plans du frustrum */
-  double m_frustum[6][4];
+  float m_frustum[6][4];
   Scene *m_scene;
 #endif
 };

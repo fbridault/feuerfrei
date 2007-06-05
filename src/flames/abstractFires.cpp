@@ -41,7 +41,7 @@ void FlameLight::switchOff()
 
 void FlameLight::switchOn()
 {  
-  double coef = 1.5*m_intensity;
+  float coef = 1.5*m_intensity;
 //   GLfloat val_diffuse[]={1,1,1,1.0};
   GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
@@ -119,7 +119,7 @@ void FireSource::build()
 
 void FireSource::computeIntensityPositionAndDirection()
 {
-  //  double r,y;
+  //  float r,y;
   
   Vector o = getMainDirection();
   
@@ -138,7 +138,7 @@ void FireSource::computeIntensityPositionAndDirection()
   
 //   // l'angle de rotation theta est la coordonnée sphérique correspondante
 //   y=o.y;
-//   r = (double)o.length();
+//   r = (float)o.length();
 //   if(r - fabs(y) < EPSILON)
 //     m_orientationSPtheta = 0.0;
 //   else
@@ -148,7 +148,7 @@ void FireSource::computeIntensityPositionAndDirection()
 void FireSource::buildBoundingSphere ()
 {
   Point p;
-  double t,k,s;
+  float t,k,s;
   p = (m_solver->getScale() * m_solver->getDim())/2.0;
   t = p.max();
   k = t*t;
@@ -165,7 +165,7 @@ void FireSource::buildBoundingSphere ()
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  double differenceDist;
+  float differenceDist;
   uint modulo, remainder;
   int mod;
   bool pass;
@@ -324,7 +324,7 @@ void DetachableFireSource::build()
   Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
   Point pt;
   Point p;
-  double t,k;
+  float t,k;
   p = (m_solver->getScale() * m_solver->getDim())/2.0;
   t = p.max();
   k = t*t;
@@ -370,7 +370,7 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  double differenceDist;
+  float differenceDist;
   uint modulo, remainder;
   int mod;
   bool pass;

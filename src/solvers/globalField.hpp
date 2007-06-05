@@ -31,7 +31,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   GlobalField (const list <FieldThread *> &threads, Scene *const scene, char type, uint n,
-	       double timeStep, double omegaDiff, double omegaProj, double epsilon);
+	       float timeStep, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~GlobalField () { delete m_field; };
 
@@ -61,7 +61,7 @@ public:
   /** Modifie la force de flottabilité dans le solveur
    * @param value Nouvelle valeur.
    */
-  virtual void setBuoyancy(double value){ m_field->setBuoyancy(value); };
+  virtual void setBuoyancy(float value){ m_field->setBuoyancy(value); };
   
   /** Fonction de dessin du champ de vélocité */
   void displayVelocityField (void) { /*m_field->displayVelocityField();*/ };

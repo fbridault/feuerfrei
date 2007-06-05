@@ -69,12 +69,12 @@ public:
   /** Plaque le blur à l'écran */
   void drawBlur(GLFlameCanvas* const glBuffer);
 
-  void setGaussSigma(uint index, double sigma)
+  void setGaussSigma(uint index, float sigma)
   {
     computeWeights(index,sigma);
   };
 
-  void computeWeights(uint index, double sigma);
+  void computeWeights(uint index, float sigma);
   
 private: 
   /** Dimensions de la texture */

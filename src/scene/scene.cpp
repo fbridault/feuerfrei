@@ -201,7 +201,7 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
   int nbVertex=0, nbNormals=0, nbTexCoords=0;
   int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
   int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
-  double x, y, z;
+  float x, y, z;
   
   Vertex currentVertex;
   Object* currentObject=NULL;
@@ -507,7 +507,7 @@ void Scene::importMTL(const char* fileName)
     return;
   }
   
-  double Kd[3], Ka[3], Ks[3], alpha, shini;
+  float Kd[3], Ka[3], Ks[3], alpha, shini;
   
   /* Problème: selon l'exportateur, les champs ne sont pas écrits dans le même ordre */
   /* On est donc sûr d'avoir lu tous les champs d'un matériau que lorsque l'on arrive */
@@ -525,7 +525,7 @@ void Scene::importMTL(const char* fileName)
 	    {
 	    case 'd':
 	      {
-		double R, G, B;
+		float R, G, B;
 		matFile >> R >> G >> B;
 		Kd[0] = R;
 		Kd[1] = G;
@@ -534,7 +534,7 @@ void Scene::importMTL(const char* fileName)
 	      break;
 	    case 'a':
 	      {
-		double R, G, B;
+		float R, G, B;
 		matFile >> R >> G >> B;
 		Ka[0] = R;
 		Ka[1] = G;
@@ -543,7 +543,7 @@ void Scene::importMTL(const char* fileName)
 	      break;
 	    case 's':
 	      {
-		double R, G, B;
+		float R, G, B;
 		matFile >> R >> G >> B;
 		Ks[0] = R;
 		Ks[1] = G;

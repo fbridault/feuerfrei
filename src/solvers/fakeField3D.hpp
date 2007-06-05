@@ -26,14 +26,14 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
+  FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~FakeField3D ();
   
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ();
     
-  Point getUVW (const Point& pos, double selfVelocity) const
+  Point getUVW (const Point& pos, float selfVelocity) const
   {
     Point value;
     
@@ -43,7 +43,7 @@ public:
     return value;
   };
 
-  void moveParticle (Particle& particle, double selfVelocity) const
+  void moveParticle (Particle& particle, float selfVelocity) const
   {
     /** Sauvegarde de la position à t-1 */
     particle.xprev = particle.x; particle.yprev = particle.y; particle.zprev = particle.z;
@@ -54,17 +54,17 @@ public:
     particle.z = 2*particle.z - particle.zprev + m_coef * m_src.z;
   };
   
-  void addUsrc (const Point& pos, double value)
+  void addUsrc (const Point& pos, float value)
   {
     m_src.x += value;
   };
   
-  void addVsrc (const Point& pos, double value, double& selfVelocity)
+  void addVsrc (const Point& pos, float value, float& selfVelocity)
   {
     selfVelocity += value*4.0;
   };
   
-  void addWsrc (const Point& pos, double value)
+  void addWsrc (const Point& pos, float value)
   {
     m_src.z += value;
   };
@@ -84,7 +84,7 @@ protected:
   /** Coefficients pour les forces externes. */
   Point m_src;
   Point m_latentForces;
-  double m_coef;
+  float m_coef;
 };
 
 #endif

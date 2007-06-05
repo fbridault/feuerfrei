@@ -1,7 +1,7 @@
 #include "GSSolver3D.hpp"
 
-GSSolver3D::GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
-			double timeStep, double buoyancy) : 
+GSSolver3D::GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+			float timeStep, float buoyancy) : 
   Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
 }
@@ -14,7 +14,7 @@ GSSolver3D::~GSSolver3D ()
 {
 }
 
-void GSSolver3D::GS_solve(unsigned char b, double *const x, const double *const x0, double a, double div, uint nb_steps)
+void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps)
 {
   uint i, j, k, l;
   
@@ -35,14 +35,14 @@ void GSSolver3D::GS_solve(unsigned char b, double *const x, const double *const 
 }//GS_solve
 
 /* Pas de diffusion */
-void GSSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+void GSSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }
 
-void GSSolver3D::project (double *const p, double *const div)
+void GSSolver3D::project (float *const p, float *const div)
 {
-  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
+  float h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
   
   m_t=m_t1;
@@ -63,7 +63,7 @@ void GSSolver3D::project (double *const p, double *const div)
   }// for k
   
   //  set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
+  memset (p, 0, m_nbVoxels * sizeof (float));
   //  set_bnd (0, p);
   
   GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 

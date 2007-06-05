@@ -6,23 +6,23 @@ RealField3D::RealField3D ()
 {
 }
 
-RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
-			  double timeStep, double buoyancy) : 
+RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+			  float timeStep, float buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_u = new double[m_nbVoxels];
-  m_v = new double[m_nbVoxels];
-  m_w = new double[m_nbVoxels];
-  m_uSrc = new double[m_nbVoxels];
-  m_vSrc = new double[m_nbVoxels];
-  m_wSrc = new double[m_nbVoxels];
+  m_u = new float[m_nbVoxels];
+  m_v = new float[m_nbVoxels];
+  m_w = new float[m_nbVoxels];
+  m_uSrc = new float[m_nbVoxels];
+  m_vSrc = new float[m_nbVoxels];
+  m_wSrc = new float[m_nbVoxels];
   
-  memset (m_u, 0, m_nbVoxels * sizeof (double));
-  memset (m_v, 0, m_nbVoxels * sizeof (double));
-  memset (m_w, 0, m_nbVoxels * sizeof (double));
-  memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_u, 0, m_nbVoxels * sizeof (float));
+  memset (m_v, 0, m_nbVoxels * sizeof (float));
+  memset (m_w, 0, m_nbVoxels * sizeof (float));
+  memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_wSrc, 0, m_nbVoxels * sizeof (float));
 }
 
 RealField3D::~RealField3D ()
@@ -45,13 +45,13 @@ void RealField3D::vel_step ()
 
 void RealField3D::iterate ()
 { 
-  double tmp;
+  float tmp;
   
   if(!m_run)
     return;
-  m_u = (double *) memset (m_u, 0, m_nbVoxels * sizeof (double));
-  m_v = (double *) memset (m_v, 0, m_nbVoxels * sizeof (double));
-  m_w = (double *) memset (m_w, 0, m_nbVoxels * sizeof (double));
+  m_u = (float *) memset (m_u, 0, m_nbVoxels * sizeof (float));
+  m_v = (float *) memset (m_v, 0, m_nbVoxels * sizeof (float));
+  m_w = (float *) memset (m_w, 0, m_nbVoxels * sizeof (float));
   /* Cellule(s) génératrice(s) */
   for (uint j = 1; j < m_nbVoxelsY + 1; j++){
     tmp = m_buoyancy * j/m_nbVoxelsY;
@@ -81,9 +81,9 @@ void RealField3D::iterate ()
 
 void RealField3D::cleanSources ()
 {
-  m_uSrc = (double *) memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  m_vSrc = (double *) memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  m_wSrc = (double *) memset (m_wSrc, 0, m_nbVoxels * sizeof (double));
+  m_uSrc = (float *) memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
+  m_vSrc = (float *) memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
+  m_wSrc = (float *) memset (m_wSrc, 0, m_nbVoxels * sizeof (float));
 }
 
 void RealField3D::addExternalForces(const Point& position, bool move)
@@ -105,7 +105,7 @@ void RealField3D::addExternalForces(const Point& position, bool move)
     for (uint i = 1; i < m_nbVoxelsX + 1; i++)
       for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	  m_uSrc[IX(i, j, k)] += strength.x*j/(double)m_nbVoxelsY;
+	  m_uSrc[IX(i, j, k)] += strength.x*j/(float)m_nbVoxelsY;
   if(force.y)
     for (uint i = 1; i < m_nbVoxelsX + 1; i++)
       for (uint j = 1; j < m_nbVoxelsY + 1; j++)
@@ -115,7 +115,7 @@ void RealField3D::addExternalForces(const Point& position, bool move)
     for (uint i = 1; i < m_nbVoxelsX + 1; i++)
       for (uint j = 1; j < m_nbVoxelsY + 1; j++)
 	for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-	  m_wSrc[IX(i, j, k)] += strength.z*j/(double)m_nbVoxelsY;
+	  m_wSrc[IX(i, j, k)] += strength.z*j/(float)m_nbVoxelsY;
 }
 
 void RealField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
@@ -131,9 +131,9 @@ void RealField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, c
 
 void RealField3D::displayVelocityField (void)
 {
-  double inc_x = m_dim.x / (double) m_nbVoxelsX;
-  double inc_y = m_dim.y / (double) m_nbVoxelsY;
-  double inc_z = m_dim.z / (double) m_nbVoxelsZ;
+  float inc_x = m_dim.x / (float) m_nbVoxelsX;
+  float inc_y = m_dim.y / (float) m_nbVoxelsY;
+  float inc_z = m_dim.z / (float) m_nbVoxelsZ;
   
   for (uint i = 0; i <= m_nbVoxelsX; i++)
     for (uint j = 0; j <= m_nbVoxelsY; j++)

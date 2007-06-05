@@ -39,24 +39,24 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-		  double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+		  float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  HybridSolver3D (double omegaDiff, double omegaProj, double epsilon);
+  HybridSolver3D (float omegaDiff, float omegaProj, float epsilon);
   
   /** Desctructeur. */
   virtual ~ HybridSolver3D ();
   
 protected:
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
-  virtual void project (double *const p, double *const div);
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  virtual void project (float *const p, float *const div);
   
-  double m_time;
+  float m_time;
 };
 
 /** @test La classe LODHybridSolver implémente un solveur de classe HybridSolver permettant d'utiliser une grille
@@ -77,8 +77,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-		   double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+		   float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODHybridSolver3D ();
   
   virtual void divideRes ();
@@ -94,7 +94,7 @@ public:
   virtual void displayBase ();
   
 private:
-  double *m_uTmp, *m_vTmp, *m_wTmp;
+  float *m_uTmp, *m_vTmp, *m_wTmp;
 
   /** Nombre de voxels initiaux en X. */
   uint initialNbVoxelsX;

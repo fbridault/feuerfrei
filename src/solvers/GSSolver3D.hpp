@@ -24,7 +24,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
+  GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy);
   /** Desctructeur. */
   virtual ~GSSolver3D ();
   
@@ -39,10 +39,10 @@ protected:
    * et 1/6 pour la projection
    * @param nb_steps Nombre d'itérations à effectuer
    */
-  virtual void GS_solve(unsigned char b, double *const x, const double *const x0, double a, double div, uint nb_steps);
+  virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
-  virtual void project (double *const p, double *const div);  
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  virtual void project (float *const p, float *const div);  
 };
 
 #endif

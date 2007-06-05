@@ -65,7 +65,7 @@ void GLFlameCanvas::InitGL()
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
-  glClearColor (0.0, 0.0, 0.0, 0.0);
+  glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
   /* Restriction de la zone d'affichage */
   glViewport (0, 0, m_width, m_height);
   
@@ -106,7 +106,7 @@ void GLFlameCanvas::InitLuminaries(void)
   prevNbFlames = m_flames.size(); prevNbSolvers = m_solvers.size();
   
   if( m_intensities ) delete [] m_intensities;
-  m_intensities = new double[m_flames.size()];
+  m_intensities = new float[m_flames.size()];
 }
 
 void GLFlameCanvas::InitThreads()
@@ -350,12 +350,12 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 
 void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 {
-  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/1000.0);
+  m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/1000.0f);
 }
 
 void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 {
-  double step=0.1;
+  float step=0.1;
   switch(event.GetKeyCode())
     {      
     case WXK_LEFT: m_camera->moveOnSides(step); break;
@@ -409,8 +409,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   if(m_visibility || m_displayParticles){
     if(m_currentConfig->glowEnabled ){
-      //    GLdouble m[4][4];
-      //    double dist, sigma;
+      //    GLfloat m[4][4];
+      //    float dist, sigma;
     
       /* Adaptation du flou en fonction de la distance */
       /* On module la largeur de la gaussienne */    
@@ -656,8 +656,8 @@ void GLFlameCanvas::castShadows ()
   glBlendFunc (GL_ONE, GL_ONE);
   
   /* Activation de l'éclairage ambiant uniquement */
-  GLfloat val_ambiant[]={1.0,1.0,1.0,1.0};
-  GLfloat null[]={0.0,0.0,0.0,1.0};
+  GLfloat val_ambiant[]={1.0f,1.0f,1.0f,1.0f};
+  GLfloat null[]={0.0f,0.0f,0.0f,1.0f};
   
   glLightfv(GL_LIGHT0,GL_DIFFUSE,null);
   glLightfv(GL_LIGHT0,GL_SPECULAR,null);

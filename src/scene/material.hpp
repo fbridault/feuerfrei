@@ -38,7 +38,7 @@ public:
    * @param specularExponent Indice de tache spéculaire.
    * @param tex Pointeur optionel sur la texture.
    */
-  Material(const Scene* const scene, const string& name, double* const ambientCoefficients, double* const diffuseCoefficients, double* const specularCoefficients, double specularExponent=0.0, int tex=-1);
+  Material(const Scene* const scene, const string& name, float* const ambientCoefficients, float* const diffuseCoefficients, float* const specularCoefficients, float specularExponent=0.0, int tex=-1);
   /** Destructeur par défaut. */
   ~Material(){};
   
@@ -111,7 +111,7 @@ private:
   string m_name;   /** Nom du matériau. */
   Intensity m_Kd;  /** Composante de réflexion diffuse. */
   Intensity m_Ks;  /** Composante de réflexion spéculaire. */
-  double m_Kss;    /** Indice de tache spéculaire. */
+  float m_Kss;    /** Indice de tache spéculaire. */
   Intensity m_Ka;  /** Composante de réflexion ambiante. */
   
   const Scene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */

@@ -13,7 +13,7 @@ public:
   /** Durée de vie de la particule. */
   uint m_lifespan;
   /** Coordonnées à t-1 */
-  double xprev, yprev, zprev;
+  float xprev, yprev, zprev;
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */

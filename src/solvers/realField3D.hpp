@@ -29,7 +29,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, double buoyancy);
+  RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~RealField3D ();
   
@@ -37,7 +37,7 @@ public:
   /** Lance une itération du solveur. */
   virtual void iterate ();
   
-  Point getUVW (const Point& pos, double selfVelocity) const
+  Point getUVW (const Point& pos, float selfVelocity) const
   {
     uint i,j,k,n;
     
@@ -46,7 +46,7 @@ public:
     return Point(m_u[n], m_v[n], m_w[n]);
   };
   
-  void moveParticle (Particle& particle, double selfVelocity) const
+  void moveParticle (Particle& particle, float selfVelocity) const
   {
     uint i,j,k,n;
     
@@ -55,7 +55,7 @@ public:
     particle.x += m_u[n]; particle.y += m_v[n]; particle.z += m_w[n];
   };
   
-  void addUsrc (const Point& pos, double value)
+  void addUsrc (const Point& pos, float value)
   {
     uint i,j,k;
     
@@ -64,7 +64,7 @@ public:
     m_uSrc[IX (i, j, k)] += value;
   };
   
-  void addVsrc (const Point& pos, double value, double& selfVelocity)
+  void addVsrc (const Point& pos, float value, float& selfVelocity)
   {
     uint i,j,k;
     
@@ -73,7 +73,7 @@ public:
     m_vSrc[IX (i, j, k)] += value;
   };
   
-  void addWsrc (const Point& pos, double value)
+  void addWsrc (const Point& pos, float value)
   {
     uint i,j,k;
     
@@ -130,7 +130,7 @@ protected:
     return( (i) + (m_nbVoxelsX/2 + 2) * (j) + (m_nbVoxelsX/2 + 2) * (m_nbVoxelsY/2 + 2) * (k) );
   };
   
-  double *m_u, *m_v, *m_w, *m_uSrc, *m_vSrc, *m_wSrc;
+  float *m_u, *m_v, *m_w, *m_uSrc, *m_vSrc, *m_wSrc;
 };
 
 #endif

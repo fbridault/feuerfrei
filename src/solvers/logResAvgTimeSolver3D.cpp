@@ -7,15 +7,15 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgTimeSolver3D::LogResAvgTimeSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
-					      double timeStep, uint nbTimeSteps, double buoyancy, double omegaDiff, 
-					      double omegaProj, double epsilon) : 
+LogResAvgTimeSolver3D::LogResAvgTimeSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+					      float timeStep, uint nbTimeSteps, float buoyancy, float omegaDiff, 
+					      float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
   LogResAvgSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_times = new double[m_nbAverages];
+  m_times = new float[m_nbAverages];
   
-  memset (m_times, 0, m_nbAverages * sizeof (double));
+  memset (m_times, 0, m_nbAverages * sizeof (float));
 }
 
 LogResAvgTimeSolver3D::~LogResAvgTimeSolver3D ()
@@ -60,14 +60,14 @@ void LogResAvgTimeSolver3D::vel_step ()
     } 
 }
 
-void LogResAvgTimeSolver3D::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
+void LogResAvgTimeSolver3D::GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps)
 {  
-  double t=0;
+  float t=0;
   ::wxStartTimer();
 
   uint i, j, k, l;
-  double diagonal = 1/div;
-  double norm2;
+  float diagonal = 1/div;
+  float norm2;
   
   for (l = 0; l < nb_steps; l++){
     for (i = 1; i <= m_nbVoxelsX; i++)
@@ -100,17 +100,17 @@ void LogResAvgTimeSolver3D::GS_solve(unsigned char b, double *const x, double *c
   //set_bnd (b, x);
 }
 
-void LogResAvgTimeSolver3D::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
+void LogResAvgTimeSolver3D::GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter)
 {
-  double t=0;
+  float t=0;
   ::wxStartTimer();
   
-  double f=omega/diagonal;
-  double d=f*a;
-  double e=2.0-omega;
+  float f=omega/diagonal;
+  float d=f*a;
+  float e=2.0-omega;
   uint i,j,k;
   
-  double rho0, rho1, alpha, beta,norm2,normb2,eb2;
+  float rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
   // calcul du carré de la norme de b
   normb2=0.0;
@@ -147,7 +147,7 @@ void LogResAvgTimeSolver3D::GCSSOR(double *const x0, const double *const b, doub
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
   
   // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
+  memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
   
   // calcul de r.z
   rho0=0.0;
@@ -247,10 +247,10 @@ void LogResAvgTimeSolver3D::GCSSOR(double *const x0, const double *const b, doub
   return;
 }//GCSSOR
 
-void LogResAvgTimeSolver3D::computeAverage (uint iter, double value, double time)
+void LogResAvgTimeSolver3D::computeAverage (uint iter, float value, float time)
 {
   uint i = m_index*m_nbSteps + iter;
   
-  m_averages[i] = (m_averages[i] * m_nbIter + sqrt(value))/(double)(m_nbIter+1);
-  m_times[i] = (m_times[i] * m_nbIter + time)/(double)(m_nbIter+1);
+  m_averages[i] = (m_averages[i] * m_nbIter + sqrt(value))/(float)(m_nbIter+1);
+  m_times[i] = (m_times[i] * m_nbIter + time)/(float)(m_nbIter+1);
 }

@@ -27,9 +27,9 @@ using namespace std;
 class Point  
 {
 public:
-  GLdouble x;/**< Coordonn&eacute;e spatiale en <CODE>x</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
-  GLdouble y;/**< Coordonn&eacute;e spatiale en <CODE>y</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
-  GLdouble z;/**< Coordonn&eacute;e spatiale en <CODE>z</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLfloat x;/**< Coordonn&eacute;e spatiale en <CODE>x</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLfloat y;/**< Coordonn&eacute;e spatiale en <CODE>y</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
+  GLfloat z;/**< Coordonn&eacute;e spatiale en <CODE>z</CODE> &agrave; partir de l'origine du rep&egrave;re global.*/
 public:
   /**
    * Constructeur par d&eacute;faut. Ce constructeur place le point en coordonn&eacute;es <CODE>(0, 0, 0)</CODE> par d&eacute;faut.
@@ -45,7 +45,7 @@ public:
    * @param yp	coordonn&eacute;e en <CODE>y</CODE> du point &agrave; cr&eacute;er.
    * @param zp	coordonn&eacute;e en <CODE>z</CODE> du point &agrave; cr&eacute;er.
    */
-  Point(const GLdouble& xp, const GLdouble& yp, const GLdouble& zp){x=xp; y=yp; z=zp;};
+  Point(const GLfloat& xp, const GLfloat& yp, const GLfloat& zp){x=xp; y=yp; z=zp;};
   /**
    * Destructeur par d&eacute;faut.
    */
@@ -90,9 +90,9 @@ public:
   /**
    * Op&eacute;rateur de distance. Retourne la distance entre deux points.
    * @param P	point distant du point courant.
-   * @return	Constante de type <CODE>double</CODE> repr&eacute;sentant la distance entre les deux points.
+   * @return	Constante de type <CODE>float</CODE> repr&eacute;sentant la distance entre les deux points.
    */
-  GLdouble distance (const Point& P) const
+  GLfloat distance (const Point& P) const
   {
     return(sqrt((x-P.x)*(x-P.x)+ (y-P.y)*(y-P.y)+ (z-P.z)*(z-P.z)));
   };
@@ -102,11 +102,11 @@ public:
    * @param K	facteur multiplicateur.
    * @return	El&eacute;ment de type Cpoint.
    */
-  Point operator*(const GLdouble &K) const
+  Point operator*(const GLfloat &K) const
   {
     return Point(x*K,y*K,z*K);
   };
-  void operator*=(const GLdouble &K)
+  void operator*=(const GLfloat &K)
   {
     x*=K; y*=K; z*=K;
   };
@@ -136,7 +136,7 @@ public:
    * @param nY	nouvelle valeur pour l'attribut <CODE>Y</CODE>.
    * @param nZ	nouvelle valeur pour l'attribut <CODE>Z</CODE>.
    */
-  void set (const GLdouble& nX,const GLdouble& nY,const GLdouble& nZ){x=nX;y=nY;z=nZ;};
+  void set (const GLfloat& nX,const GLfloat& nY,const GLfloat& nZ){x=nX;y=nY;z=nZ;};
   
   /** Afficher les coordonn√©es d'un point */
   friend ostream& operator << (ostream& os,const Point& pt)
@@ -149,7 +149,7 @@ public:
     return Point (x+P.x,y+P.y,z+P.z);
   }//operator+
   
-  Point operator+(const GLdouble &K) const
+  Point operator+(const GLfloat &K) const
   {
     return Point(x+K,y+K,z+K);
   };
@@ -163,14 +163,14 @@ public:
   /** Diviser toutes les composantes par un scalaire.
    * @param div Scalaire.
    */
-  virtual Point operator/(GLdouble div) const{   
+  virtual Point operator/(GLfloat div) const{   
     return Point(x/div,y/div,z/div);
   }
   
   /** Diviser toutes les composantes par un scalaire.
    * @param div Scalaire.
    */
-  virtual void operator/=(GLdouble div){
+  virtual void operator/=(GLfloat div){
     x/=div; y/=div; z/=div;
   }
   
@@ -192,7 +192,7 @@ public:
    * @param pt Position du point.
    * @return La distance au carrÈ entre le point courant et celui passÈ en paramËtre.
    */
-  double squaredDistanceFrom( const Point& pt ) const
+  float squaredDistanceFrom( const Point& pt ) const
   {
     return( (x - pt.x) * (x - pt.x)
 	    + (y - pt.y) * (y - pt.y)
@@ -206,7 +206,7 @@ public:
 	
   void resetToNull(){x=0.0; y=0.0; z=0.0;};
 
-  double max()
+  float max()
   { 
     if(x>y){
       if(x>z)
@@ -249,7 +249,7 @@ public:
    * @param yp	coordonn&eacute;e en <CODE>y</CODE> du vecteur &agrave; cr&eacute;er.
    * @param zp	coordonn&eacute;e en <CODE>z</CODE>du vecteur &agrave; cr&eacute;er.
    */
-  Vector(const GLdouble& xp, const GLdouble& yp, const GLdouble& zp):Point(xp, yp, zp){};
+  Vector(const GLfloat& xp, const GLfloat& yp, const GLfloat& zp):Point(xp, yp, zp){};
   /**
    * Constructeur param&eacute;trique.
    * @param PA	point de d&eacute;part du vecteur &agrave; cr&eacute;er.
@@ -270,9 +270,9 @@ public:
    * <B><CODE>U.V = ||U|| x ||V|| x cos(U,V)</CODE></B>. O&ugrave; <B><CODE>cos(U,V)</CODE></B> est le 
    * cosinus de l'angle entre les deux vecteurs <CODE>U</CODE> et <CODE>V</CODE>.
    * @param V second membre du produit scalaire. 
-   * @return El&eacute;ment de type double, r&eacute;sultat de l'op&eacute;ration.
+   * @return El&eacute;ment de type float, r&eacute;sultat de l'op&eacute;ration.
    */
-  GLdouble operator*(const Vector& V) const
+  GLfloat operator*(const Vector& V) const
   {return (x*V.x + y*V.y + z*V.z);};
   /**
    * Op&eacute;rateur de produit par un scalaire.
@@ -280,7 +280,7 @@ public:
    * @return El&eacute;ment de type Vector correpondant au vecteur d'entr&eacute;e dont 
    * les coordonn&eacute;e ont &eacute;t&eacute; multipli&eacute;es par <CODE>K</CODE>.
    */
-  virtual Vector operator*(const GLdouble& K) const
+  virtual Vector operator*(const GLfloat& K) const
   {return Vector(x*K,y*K,z*K);};
 
   /**
@@ -339,7 +339,7 @@ public:
    * @param P point par lequel passe le plan.
    * @return Composante &agrave; l'origine du plan d&eacute;finit.
    */
-  GLdouble operator*(const Point& P) const
+  GLfloat operator*(const Point& P) const
   {return(x*P.x + y*P.y + z*P.z);};
 
   Vector scaleBy(const Vector& V) const
@@ -350,7 +350,7 @@ public:
    * @return Norme du vecteur courant. R&eacute;sultat diff&eacute;rent de 1 si le vecteur 
    * n'est pas normalis&eacute;.
    */
-  GLdouble length() const
+  GLfloat length() const
   {return (sqrt(x*x + y*y + z*z));};
   /**
    * Normalisation d'un vecteur. Cette fonction <B>modifie</B> le vecteur courant.

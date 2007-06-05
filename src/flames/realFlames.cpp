@@ -8,11 +8,11 @@
 /**********************************************************************************************************************/
 
 LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-		      Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire ) :
+		      Wick *wickObject, float detachedFlamesWidth, DetachableFireSource *parentFire ) :
   RealFlame ((flameConfig.skeletonsNumber+2)*2 + 2, 3, tex, s)
 {
   Point pt;
-  double largeur = .03;
+  float largeur = .03;
   uint i,j;
   
   Point rootMoveFactorP(2,.1,.5);
@@ -64,9 +64,9 @@ LineFlame::~LineFlame ()
 
 void LineFlame::breakCheck()
 {
-  double split,proba;
+  float split,proba;
   uint threshold=3;
-  double detachThreshold=.9;
+  float detachThreshold=.9;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -77,14 +77,14 @@ void LineFlame::breakCheck()
     if(m_leadSkeletons[i]->getInternalSize() < threshold)
       return;
     
-    proba = (rand()/((double)RAND_MAX));
+    proba = (rand()/((float)RAND_MAX));
     
     /* Roulette russe : tirage aléatoire entre 0 et 1 */
     if( proba > detachThreshold){
       Point offset;
       
       /* Tirage entre 0.5 et 1 pour la hauteur du squelette */
-      split = (rand()/(2*(double)RAND_MAX))+.5;
+      split = (rand()/(2*(float)RAND_MAX))+.5;
       
       leadSkeletonsArray = new FreeLeadSkeleton* [1];
       
@@ -116,9 +116,9 @@ void LineFlame::breakCheck()
 //   uint life=30;
   
 //   /* Ajout de particules */
-//   if( (rand()/((double)RAND_MAX)) < .05){
+//   if( (rand()/((float)RAND_MAX)) < .05){
 //     Point pos;
-//     double r = (rand()/((double)RAND_MAX));
+//     float r = (rand()/((float)RAND_MAX));
 //     pos = (m_wick.getLeadPoint(m_wick.getLeadPointsArraySize()-1)->m_pt);
 //     pos = pos * r + m_wick.getLeadPoint(0)->m_pt ;
 //     Particle *spark = new Particle(pos, life);
@@ -148,7 +148,7 @@ void LineFlame::breakCheck()
 //     if ( k >= m_solver->getXRes()  )
 //       k = m_solver->getZRes()-1;
     
-//     double div = 1/(double)life;
+//     float div = 1/(float)life;
 //     (*sparksListIterator)->x += m_solver->getU (i, j, k) * (*sparksListIterator)->m_lifespan*div;
 //     (*sparksListIterator)->y += m_solver->getV (i, j, k) * (*sparksListIterator)->m_lifespan*div;
 //     (*sparksListIterator)->z += m_solver->getW (i, j, k) * (*sparksListIterator)->m_lifespan*div;
@@ -166,15 +166,16 @@ void LineFlame::breakCheck()
 /**********************************************************************************************************************/
 
 PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-			double rayon, Object *wick):
+			float rayon, Object *wick):
   RealFlame ( flameConfig.skeletonsNumber, 3, tex, s)
 {
   uint i;
-  double angle;
+  float angle;
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), flameConfig.leadLifeSpan, 0, .5, 0, .025));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), 
+					       flameConfig.leadLifeSpan, 0, .5, 0, .025));
   
   /* On créé les squelettes en cercle */
   angle = 0;
@@ -200,8 +201,8 @@ PointFlame::~PointFlame ()
 void PointFlame::drawWick (bool displayBoxes) const
 {
   if(!m_wick){
-    double hauteur = 1 / 6.0;
-    double largeur = 1 / 60.0;
+    float hauteur = 1 / 6.0;
+    float largeur = 1 / 60.0;
     /* Affichage de la mèche */
     glPushMatrix ();
     glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);
@@ -225,7 +226,7 @@ DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons
 			     u_char samplingMethod) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {
-  m_distances = new double[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
+  m_distances = new float[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_nbLeadSkeletons = nbLeadSkeletons;
   m_leadSkeletons = leadSkeletons;
@@ -251,8 +252,8 @@ DetachedFlame::~DetachedFlame()
 bool DetachedFlame::build()
 {
   uint i, j, l;
-  double vinc, vtmp, vtex;
-  double dist_max;
+  float vinc, vtmp, vtex;
+  float dist_max;
   m_maxParticles = 0;
   vtex = 0;
   
@@ -271,7 +272,7 @@ bool DetachedFlame::build()
   
   m_size = m_maxParticles+m_nbFixedPoints;
   
-  vinc = 1.0 / (double)(m_size-1);
+  vinc = 1.0 / (float)(m_size-1);
   vtmp = 0;
   for (i = 0; i < m_size; i++){
     m_texTmp[i] = vtmp;
@@ -425,7 +426,7 @@ bool DetachedFlame::build()
 
 // void LineFlame::breakCheck()
 // {
-//   double split,proba=.5;
+//   float split,proba=.5;
 //   uint threshold=4;
 //   uint splitHeight;
 //   uint i,j;
@@ -437,7 +438,7 @@ bool DetachedFlame::build()
 //     if(m_leadSkeletons[i]->getSize() < threshold)
 //       return;
   
-//   split = (rand()/((double)RAND_MAX));
+//   split = (rand()/((float)RAND_MAX));
 //   if( split > proba){
 //     leadSkeletonsArray = new FreeLeadSkeleton* [m_nbLeadSkeletons];
 //     for ( i = 0; i < m_nbLeadSkeletons; i++){

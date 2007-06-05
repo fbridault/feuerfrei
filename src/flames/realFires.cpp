@@ -5,7 +5,7 @@
 #include "../solvers/fakeField3D.hpp"
 
 Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
-		const GLSLProgram * const program, double rayon, Object *wick):
+		const GLSLProgram * const program, float rayon, Object *wick):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, wick);
@@ -62,7 +62,7 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, co
 }
 
 CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-			  const GLSLProgram * const program, double rayon):
+			  const GLSLProgram * const program, float rayon):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
   m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);

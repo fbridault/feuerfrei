@@ -32,7 +32,7 @@ private:
   Point *position;
   Vector *direction;
 
-  double aperture;
+  float aperture;
   lightCategoryType lightCategory;
   int sampling;
 

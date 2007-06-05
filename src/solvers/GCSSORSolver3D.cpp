@@ -1,35 +1,35 @@
 #include "GCSSORSolver3D.hpp"
 
-GCSSORSolver3D::GCSSORSolver3D (double omegaDiff, double omegaProj, double epsilon)
+GCSSORSolver3D::GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon)
 {
-  m_r=new double[m_nbVoxels];
-  m_z=new double[m_nbVoxels];
-  m_p=new double[m_nbVoxels];
-  m_q=new double[m_nbVoxels];
+  m_r=new float[m_nbVoxels];
+  m_z=new float[m_nbVoxels];
+  m_p=new float[m_nbVoxels];
+  m_q=new float[m_nbVoxels];
 
-  memset (m_r, 0, m_nbVoxels * sizeof (double));
-  memset (m_z, 0, m_nbVoxels * sizeof (double));
-  memset (m_p, 0, m_nbVoxels * sizeof (double));
-  memset (m_q, 0, m_nbVoxels * sizeof (double));
+  memset (m_r, 0, m_nbVoxels * sizeof (float));
+  memset (m_z, 0, m_nbVoxels * sizeof (float));
+  memset (m_p, 0, m_nbVoxels * sizeof (float));
+  memset (m_q, 0, m_nbVoxels * sizeof (float));
   
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
   m_epsilon = epsilon;
 }
 
-GCSSORSolver3D::GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
-				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+GCSSORSolver3D::GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_r=new double[m_nbVoxels];
-  m_z=new double[m_nbVoxels];
-  m_p=new double[m_nbVoxels];
-  m_q=new double[m_nbVoxels];
+  m_r=new float[m_nbVoxels];
+  m_z=new float[m_nbVoxels];
+  m_p=new float[m_nbVoxels];
+  m_q=new float[m_nbVoxels];
 
-  memset (m_r, 0, m_nbVoxels * sizeof (double));
-  memset (m_z, 0, m_nbVoxels * sizeof (double));
-  memset (m_p, 0, m_nbVoxels * sizeof (double));
-  memset (m_q, 0, m_nbVoxels * sizeof (double));
+  memset (m_r, 0, m_nbVoxels * sizeof (float));
+  memset (m_z, 0, m_nbVoxels * sizeof (float));
+  memset (m_p, 0, m_nbVoxels * sizeof (float));
+  memset (m_q, 0, m_nbVoxels * sizeof (float));
 
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
@@ -44,20 +44,20 @@ GCSSORSolver3D::~GCSSORSolver3D ()
   delete[]m_q;
 }
 
-void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a,
-			    double diagonal, double omega, uint maxiter)
+void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
+			    float diagonal, float omega, uint maxiter)
 {
-  double f=omega/diagonal;
-  double d=f*a;
-  double e=2.0-omega;
+  float f=omega/diagonal;
+  float d=f*a;
+  float e=2.0-omega;
   uint i,j,k;
   
-  double rho0, rho1, alpha, beta;//,norm2,normb2,eb2;
-  //double *sav1, *sav2;
+  float rho0, rho1, alpha, beta;//,norm2,normb2,eb2;
+  //float *sav1, *sav2;
   
-  double * mp,* mpmnx,* mppnx,* mpm1,* mpp1,* mpmn2,* mppn2, * mq;
-  double * mz,* mzmnx,* mzpnx,* mzm1,* mzp1,* mzmn2,* mzpn2, *xx, *mr;
-  const double * mb;
+  float * mp,* mpmnx,* mppnx,* mpm1,* mpp1,* mpmn2,* mppn2, * mq;
+  float * mz,* mzmnx,* mzpnx,* mzm1,* mzp1,* mzmn2,* mzpn2, *xx, *mr;
+  const float * mb;
   // calcul du carré de la norme de b
   //   t = t1;
   //   normb2=0.0;
@@ -188,7 +188,7 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a,
 
   }//for k
   // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
+  memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
 	
   // calcul de r.z
   rho0=0.0;
@@ -404,15 +404,15 @@ void GCSSORSolver3D::GCSSOR(double *const x0, const double *const b, double a,
 
 /* Pas de diffusion */
 void
-GCSSORSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
   GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
 }
 
 void
-GCSSORSolver3D::project (double *const p, double *const div)
+GCSSORSolver3D::project (float *const p, float *const div)
 {
-  double h_x = 1.0 / m_nbVoxelsX, 
+  float h_x = 1.0 / m_nbVoxelsX, 
     h_y = 1.0 / m_nbVoxelsY, 
     h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
@@ -435,7 +435,7 @@ GCSSORSolver3D::project (double *const p, double *const div)
   }// for k
   
   //set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
+  memset (p, 0, m_nbVoxels * sizeof (float));
   //set_bnd (0, p);
   
   GCSSOR(p,div,1, 6.0, m_omegaProj,100);

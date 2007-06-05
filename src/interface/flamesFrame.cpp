@@ -372,7 +372,7 @@ void FlamesFrame::OnScrollDP(wxScrollEvent& event)
 
 void FlamesFrame::OnScrollGamma(wxScrollEvent& event)
 {
-  m_currentConfig.gammaCorrection = m_gammaSlider->GetValue()/100.0;
+  m_currentConfig.gammaCorrection = m_gammaSlider->GetValue()/100.0f;
   m_glBuffer->setGammaCorrection( m_currentConfig.gammaCorrection );
 }
 
@@ -452,39 +452,55 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 
 void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
+  double tmp;
+  
   m_config->Read(groupName + _("FieldType"), (int *) &solverConfig.type, HYBRID_SOLVER);
   
   solverConfig.resx = m_config->Read(groupName + _("X_res"), 15);
   solverConfig.resy = m_config->Read(groupName + _("Y_res"), 15);
   solverConfig.resz = m_config->Read(groupName + _("Z_res"), 15);
   
-  m_config->Read(groupName + _("Dim"),&solverConfig.dim, 1.0);
-  m_config->Read(groupName + _("Scale.x"),&solverConfig.scale.x,1.0);
-  m_config->Read(groupName + _("Scale.y"),&solverConfig.scale.y,1.0);
-  m_config->Read(groupName + _("Scale.z"),&solverConfig.scale.z,1.0);
+  m_config->Read(groupName + _("Dim"),&tmp, 1.0);
+  solverConfig.dim = (float)tmp;
+  m_config->Read(groupName + _("Scale.x"),&tmp,1.0);
+  solverConfig.scale.x = (float)tmp;
+  m_config->Read(groupName + _("Scale.y"),&tmp,1.0);
+  solverConfig.scale.y = (float)tmp;
+  m_config->Read(groupName + _("Scale.z"),&tmp,1.0);
+  solverConfig.scale.z = (float)tmp;
   
-  m_config->Read(groupName + _("TimeStep"),&solverConfig.timeStep, 0.4);      
-  m_config->Read(groupName + _("Buoyancy"), &solverConfig.buoyancy, 0.02);
+  m_config->Read(groupName + _("TimeStep"), &tmp, 0.4);
+  solverConfig.timeStep = (float)tmp;
+  m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
+  solverConfig.buoyancy = (float)tmp;
   
-  m_config->Read(groupName + _("omegaDiff"),&solverConfig.omegaDiff, 1.5);
-  m_config->Read(groupName + _("omegaProj"),&solverConfig.omegaProj, 1.5);
-  m_config->Read(groupName + _("epsilon"),&solverConfig.epsilon, 0.00001);
+  m_config->Read(groupName + _("omegaDiff"),&tmp, 1.5);
+  solverConfig.omegaDiff = (float)tmp;
+  m_config->Read(groupName + _("omegaProj"),&tmp, 1.5);
+  solverConfig.omegaProj = (float)tmp;
+  m_config->Read(groupName + _("epsilon"),&tmp, 0.00001);
+  solverConfig.epsilon = (float)tmp;
   solverConfig.nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
 }
 
 void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
 {
+  double tmp;
+  
   m_config->Read(groupName + _("Type"), (int *) &fireConfig.type, CANDLE);
   if(fireConfig.type != CANDLE){
     m_config->Read(groupName + _("SkeletonsNumber"), (int *) &fireConfig.skeletonsNumber, 5);
-    m_config->Read(groupName + _("InnerForce"), &fireConfig.innerForce, 0.005);
+    m_config->Read(groupName + _("InnerForce"), &tmp, 0.005f);
+    fireConfig.innerForce = (float)tmp;
   }else{
     m_config->Read(groupName + _("SkeletonsNumber"), (int *) &fireConfig.skeletonsNumber, 4);
-    m_config->Read(groupName + _("InnerForce"), &fireConfig.innerForce, 0.04);
+    m_config->Read(groupName + _("InnerForce"), &tmp, 0.04f);
+    fireConfig.innerForce = (float)tmp;
   }
   m_config->Read(groupName + _("Flickering"), (int *) &fireConfig.flickering, 0);
   m_config->Read(groupName + _("FDF"), (int *) &fireConfig.fdf, 0);
-  m_config->Read(groupName + _("SamplingTolerance"), &fireConfig.samplingTolerance, 100);
+  m_config->Read(groupName + _("SamplingTolerance"), &tmp, 100);
+  fireConfig.samplingTolerance = (float)tmp;
   m_config->Read(groupName + _("nbLeadParticles"), (int *) &fireConfig.leadLifeSpan, 8);
   m_config->Read(groupName + _("nbPeriParticles"), (int *) &fireConfig.periLifeSpan, 6);
   fireConfig.IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
@@ -493,7 +509,7 @@ void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
 void FlamesFrame::LoadSettings (void)
 {
   wxString groupName;
-  
+  double tmp;
   wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
   
@@ -508,14 +524,20 @@ void FlamesFrame::LoadSettings (void)
   m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
   m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
   m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
-  m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scene2.obj"));
+  m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scenes/scene2.obj"));
   
-  m_config->Read(_("/Shadows/Fatness.x"), (double *)&m_currentConfig.fatness[0], -.001);
-  m_config->Read(_("/Shadows/Fatness.y"), (double *)&m_currentConfig.fatness[1], -.001);
-  m_config->Read(_("/Shadows/Fatness.z"), (double *)&m_currentConfig.fatness[2], -.001);
-  m_config->Read(_("/Shadows/ExtrudeDist.x"), (double *)&m_currentConfig.extrudeDist[0], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.y"), (double *)&m_currentConfig.extrudeDist[1], 5);
-  m_config->Read(_("/Shadows/ExtrudeDist.z"), (double *)&m_currentConfig.extrudeDist[2], 5);
+  m_config->Read(_("/Shadows/Fatness.x"), &tmp, -.001);
+  m_currentConfig.fatness[0] = (float)tmp;
+  m_config->Read(_("/Shadows/Fatness.y"), &tmp, -.001);
+  m_currentConfig.fatness[1] = (float)tmp;
+  m_config->Read(_("/Shadows/Fatness.z"), &tmp, -.001);
+  m_currentConfig.fatness[2] = (float)tmp;
+  m_config->Read(_("/Shadows/ExtrudeDist.x"), &tmp, 5);
+  m_currentConfig.extrudeDist[0] = (float)tmp;
+  m_config->Read(_("/Shadows/ExtrudeDist.y"), &tmp, 5);
+  m_currentConfig.extrudeDist[1] = (float)tmp;
+  m_config->Read(_("/Shadows/ExtrudeDist.z"), &tmp, 5);
+  m_currentConfig.extrudeDist[2] = (float)tmp;
   m_currentConfig.fatness[3] = 0.0f;
   m_currentConfig.extrudeDist[3] = 0.0f;
   
@@ -532,9 +554,12 @@ void FlamesFrame::LoadSettings (void)
       groupName.Printf(_("/Luminary%d/"), i);
       m_currentConfig.luminaries[i].fileName = m_config->Read(groupName + _("FileName"), _("scenes/bougie.obj"));
       
-      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.luminaries[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.luminaries[i].position.y, 0.0);
-      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.luminaries[i].position.z, 0.0);
+      m_config->Read(groupName + _("Pos.x"), &tmp, 0.0);
+      m_currentConfig.luminaries[i].position.x = (float)tmp;
+      m_config->Read(groupName + _("Pos.y"), &tmp, 0.0);
+      m_currentConfig.luminaries[i].position.y = (float)tmp;
+      m_config->Read(groupName + _("Pos.z"), &tmp, 0.0);
+      m_currentConfig.luminaries[i].position.z = (float)tmp;
       
       m_currentConfig.luminaries[i].nbFields = m_config->Read(_("/Luminary%d/NbFields"), 1);
       m_currentConfig.luminaries[i].fields = new SolverConfig[m_currentConfig.luminaries[i].nbFields];
@@ -549,7 +574,9 @@ void FlamesFrame::LoadSettings (void)
       groupName.Printf(_("/Luminary%d/Flame0/"), i);
       LoadFireSettings(groupName, m_currentConfig.luminaries[i].fires[0]);
     }
+  cerr << "boienr" << endl;
   InitLuminariesPanels();
+  cerr << "boienrz" << endl;
   InitSolversPanels();
   InitFlamesPanels();
   

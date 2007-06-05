@@ -26,15 +26,15 @@ public:
   /** Retourne le nombre d'intensités total (zénithal*azimuthal) */
   float* getIntensities() const {return m_intensites;};
   
-  const double getLazimut() const {return m_lazimut;};
+  const float getLazimut() const {return m_lazimut;};
   
-  const double getLzenith() const {return m_lzenith;};
+  const float getLzenith() const {return m_lzenith;};
   
-  const double getLazimutTEX() const {return m_lazimutTEX;};
+  const float getLazimutTEX() const {return m_lazimutTEX;};
   
-  const double getLzenithTEX() const {return m_lzenithTEX;};
+  const float getLzenithTEX() const {return m_lzenithTEX;};
   
-  const double getDenom() const {return m_denom;};
+  const float getDenom() const {return m_denom;};
     
 private:
   /** Nombre de valeurs en zénithal et en azimuthal */
@@ -43,10 +43,10 @@ private:
   float *m_intensites;
   
   /** Intervalle en valeur d'angle entre chaque valeur sur l'azimuth */
-  double m_lazimut,m_lazimutTEX;
+  float m_lazimut,m_lazimutTEX;
   /** Intervalle en valeur d'angle entre chaque valeur sur le zenith */
-  double m_lzenith,m_lzenithTEX;
-  double m_denom;
+  float m_lzenith,m_lzenithTEX;
+  float m_denom;
 };
 
 #endif

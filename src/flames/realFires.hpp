@@ -28,7 +28,7 @@ public:
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   Candle(const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
-	 const GLSLProgram * const program, double rayon, Object *wick=NULL);
+	 const GLSLProgram * const program, float rayon, Object *wick=NULL);
   /** Destructeur */
   virtual ~Candle(){};
 };
@@ -127,7 +127,7 @@ public:
    * @param rayon Rayon de la flamme.
    */
   CandleStick(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
-	      const GLSLProgram * const program, double rayon);
+	      const GLSLProgram * const program, float rayon);
   /** Destructeur */
   virtual ~CandleStick();
   

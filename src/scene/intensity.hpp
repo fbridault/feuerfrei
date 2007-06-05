@@ -21,7 +21,7 @@ class Intensity;
 class Intensity
 {
 private:
-  double color[COMPOSANTES];
+  float color[COMPOSANTES];
   /**< Tableaux d'intensité. Chaque longueur d'onde
    * a une intensité lumineuse propre de type réelle.
    * Une intensité lumineuse est la combinaison de ces 
@@ -47,9 +47,9 @@ public:
   /**
    * Constructeur paramétrique. 
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
-   * éléments de type <CODE>double</CODE>
+   * éléments de type <CODE>float</CODE>
    */
-  Intensity (double* c){
+  Intensity (float* c){
     for(int i=0; i<COMPOSANTES; i++) 
       color[i]=c[i];
   }
@@ -69,7 +69,7 @@ public:
    */
   Intensity operator+(const Intensity& I) const
   {
-    double result[COMPOSANTES];
+    float result[COMPOSANTES];
     for(int i=0;i<COMPOSANTES;i++)
       result[i]= (color[i]>0.0?color[i]:0.0) +
 	(I.color[i]>0.0?I.color[i]:0.0);
@@ -82,9 +82,9 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Intensity operator/(const double& K) const
+  Intensity operator/(const float& K) const
   {
-    double result[COMPOSANTES];
+    float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>0.0?color[i]:0.0)/K;
     Intensity intensity(result);
@@ -96,9 +96,9 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Intensity operator*(const double& K) const
+  Intensity operator*(const float& K) const
   {
-    double result[COMPOSANTES];
+    float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>0.0?color[i]:0.0)*K;
     Intensity intensity(result);
@@ -114,7 +114,7 @@ public:
    */
   Intensity operator*(const Intensity& I) const
   {
-    double result[COMPOSANTES];
+    float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=(color[i]>=0.0?color[i]:0.0)*
 	(I.color[i]>=0.0?I.color[i]:0.0);
@@ -153,7 +153,7 @@ public:
    * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
-  Intensity& operator/=(const double& K){
+  Intensity& operator/=(const float& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=(color[i]>0.0?color[i]:0.0)/K;
     return *this;
@@ -165,7 +165,7 @@ public:
    * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
-  Intensity& operator*=(const double& K){
+  Intensity& operator*=(const float& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=(color[i]>0.0?color[i]:0.0)*K;
     return *this;
@@ -196,18 +196,18 @@ public:
   /**
    * Lecture d'une composante de l'intensité lumineuse.
    * @param waveLength indice de la longueur d'onde recherchée.
-   * @return Constante de type <CODE>double</CODE> représentant 
+   * @return Constante de type <CODE>float</CODE> représentant 
    * la valeur d'intensité lumineuse pour cette longueur
    * d'onde.
    */
-  const double& getColor (const int& waveLength) const
+  const float& getColor (const int& waveLength) const
   {
     return color[waveLength];
   }
   int intensity2ColorRVB(){	
-    double red = getColor(RED);
-    double green = getColor(GREEN);
-    double blue= getColor(BLUE);		
+    float red = getColor(RED);
+    float green = getColor(GREEN);
+    float blue= getColor(BLUE);		
     return (
 	    ((int) ((red   <1.0?red   :1.0)*255) << 16) |
 	    ((int) ((green <1.0?green :1.0)*255) << 8)  |

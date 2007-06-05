@@ -30,8 +30,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, 
-		     uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+		     uint nbTimeSteps, float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
@@ -39,24 +39,24 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver3D (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  LogResAvgSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~LogResAvgSolver3D ();
 
 protected:
   virtual void vel_step ();
   
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);
-  virtual void project (double *const p, double *const div);
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  virtual void project (float *const p, float *const div);
   
-  virtual void GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps);
-  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
+  virtual void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);
+  virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
   /** Calcul des moyennes pour une itération de la méthode de résolution de système linéaire.
    * @param iter Numéro de l'itération de lé méthode de résolution.
    * @param value Valeur à ajouter à la moyenne.
    */
-  virtual void computeAverage ( uint iter, double value );
+  virtual void computeAverage ( uint iter, float value );
   
   /** Nombre de valeurs incluses dans la moyenne. */
   uint m_nbAverages;
@@ -73,7 +73,7 @@ protected:
    *    - de 8*m_nbSteps à 9*m_nbSteps :  projection 2 avec GCSSOR
    *    - de 9*m_nbSteps à 10*m_nbSteps : projection 2 avec GCSSOR
    */
-  double *m_averages;
+  float *m_averages;
   
   /** Fichier de log. */
   ofstream m_file;  

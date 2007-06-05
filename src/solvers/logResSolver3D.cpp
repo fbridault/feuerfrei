@@ -1,8 +1,8 @@
 #include "logResSolver3D.hpp"
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResSolver3D::LogResSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-				uint nbTimeSteps, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+LogResSolver3D::LogResSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+				uint nbTimeSteps, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
@@ -54,7 +54,7 @@ void LogResSolver3D::vel_step ()
 }
 
 /* Pas de diffusion */
-void LogResSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+void LogResSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
   m_file = &m_fileDiff[b-1];
   
@@ -68,9 +68,9 @@ void LogResSolver3D::diffuse (unsigned char b, double *const x, double *const x0
 }
 
 
-void LogResSolver3D::project (double *const p, double *const div)
+void LogResSolver3D::project (float *const p, float *const div)
 {
-  double h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
+  float h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY, h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
   
   for (i = 1; i <= m_nbVoxelsX; i++)
@@ -83,7 +83,7 @@ void LogResSolver3D::project (double *const p, double *const div)
 		//p[IX (i, j, k)] = 0;
       }
   set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
+  memset (p, 0, m_nbVoxels * sizeof (float));
   //  set_bnd (0, p);
   
   m_file = &m_fileProj[m_index];
@@ -109,11 +109,11 @@ void LogResSolver3D::project (double *const p, double *const div)
 }
 
 
-void LogResSolver3D::GS_solve(unsigned char b, double *const x, double *const x0, double a, double div, uint nb_steps)
+void LogResSolver3D::GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps)
 {
   uint i, j, k, l;
-  double diagonal = 1/div;
-  double norm2;
+  float diagonal = 1/div;
+  float norm2;
   
   for (l = 0; l < nb_steps; l++){
     for (i = 1; i <= m_nbVoxelsX; i++)
@@ -145,14 +145,14 @@ void LogResSolver3D::GS_solve(unsigned char b, double *const x, double *const x0
   //set_bnd (b, x);
 }
 
-void LogResSolver3D::GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter)
+void LogResSolver3D::GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter)
 {
-  double f=omega/diagonal;
-  double d=f*a;
-  double e=2.0-omega;
+  float f=omega/diagonal;
+  float d=f*a;
+  float e=2.0-omega;
   uint i,j,k;
   
-  double rho0, rho1, alpha, beta,norm2,normb2,eb2;
+  float rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
   // calcul du carré de la norme de b
   normb2=0.0;
@@ -189,7 +189,7 @@ void LogResSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
 	
   // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (double));
+  memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
     
   // calcul de r.z
   rho0=0.0;
@@ -288,7 +288,7 @@ void LogResSolver3D::GCSSOR(double *const x0, const double *const b, double a, d
   return;
 }//GCSSOR
 
-void LogResSolver3D::logResidu (uint iter, double value)
+void LogResSolver3D::logResidu (uint iter, float value)
 {
   *m_file << m_nbIter << " " << iter << " " << sqrt(value) << " " << endl;
 }

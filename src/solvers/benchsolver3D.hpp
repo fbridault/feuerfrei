@@ -39,8 +39,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep,
-		 double buoyancy, uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+		 float buoyancy, uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
@@ -48,20 +48,20 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver3D (uint nbTimeSteps, double omegaDiff, double omegaProj, double epsilon);
+  BenchSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~ BenchSolver3D ();
   
 protected:
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc) = 0;
-  virtual void project (double *const p, double *const div) = 0;  
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc) = 0;
+  virtual void project (float *const p, float *const div) = 0;  
 
   /** Sauvegarde les différentes composantes du solveur pour pouvoir effectuer plusieurs tests sur
    * un même état de la grille de résolution.
    */
-  void saveState (const double *const x, const double *const x2);
+  void saveState (const float *const x, const float *const x2);
   /** Sauvegarde les différentes composantes du solveur comme valeur de référence. */
-  void setPreviousState (double *const x, double *const x2);
+  void setPreviousState (float *const x, float *const x2);
   
   /* Nombre maximum de pas de temps à simuler */
   uint m_nbMaxIter;
@@ -70,7 +70,7 @@ protected:
   unsigned short m_index;
   
 private:
-  double *m_save, *m_save2; /** Permet de sauver une composante. */
+  float *m_save, *m_save2; /** Permet de sauver une composante. */
 };
 
 #endif

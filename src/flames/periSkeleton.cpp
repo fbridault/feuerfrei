@@ -34,7 +34,7 @@ FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadS
 
 void PeriSkeleton::addForces ()
 {
-  double dummy;
+  float dummy;
   m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), dummy);
 }
 

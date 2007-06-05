@@ -1,7 +1,7 @@
 #ifndef FIELD_HPP
 #define FIELD_HPP
 
-#define SWAP(x0,x) {double *tmp=x0;x0=x;x=tmp;}
+#define SWAP(x0,x) {float *tmp=x0;x0=x;x=tmp;}
 // Pour le calcul du dégradé de couleur des pyramides
 #define VELOCITE_MAX .1
 
@@ -28,7 +28,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Field (const Point& position, double timeStep, double buoyancy);
+  Field (const Point& position, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~Field ();
   
@@ -39,7 +39,7 @@ public:
    * @param x Composante à traiter.
    * @param src Composante contenant les forces engendrées par les sources externes.
    */
-  virtual void add_source (double *const x, double *const src)
+  virtual void add_source (float *const x, float *const src)
   {
     uint i;
     for (i = 0; i < m_nbVoxels; i++)
@@ -52,7 +52,7 @@ public:
   /** Retourne le pas de temps.
    * @return Valeur du pas de temps en ms.
    */
-  double getTimeStep() const
+  float getTimeStep() const
   {
     return m_dt;
   };
@@ -60,7 +60,7 @@ public:
   /** Retourne l'itération en cours.
    * @return Numéro de l'itération.
    */
-  double getNbIter() const
+  float getNbIter() const
   {
     return m_nbIter;
   };
@@ -98,7 +98,7 @@ public:
   /** Modifie la force de flottabilité dans le solveur
    * @param value Nouvelle valeur.
    */
-  virtual void setBuoyancy(double value){ m_buoyancy=value; };
+  virtual void setBuoyancy(float value){ m_buoyancy=value; };
   
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () = 0;
@@ -153,12 +153,12 @@ protected:
   /** Taille totale en nombre de voxels */
   uint m_nbVoxels;
   /** Intensité de la force de flottabilité */
-  double m_buoyancy;
+  float m_buoyancy;
 
   /** Nombre d'itérations */
   uint m_nbIter;
   /** Pas de temps. */
-  double m_dt;
+  float m_dt;
   
   /** Display list de la grille du solveur. */
   GLuint m_gridDisplayList;
@@ -172,8 +172,8 @@ protected:
   /** Force externe consécutivé à un déplacement. Elle est ajoutée à la prochaine itération et remise à zéro ensuite. */
   Point m_movingForces;
 
-  double m_forceCoef;
-  double m_forceRatio;
+  float m_forceCoef;
+  float m_forceRatio;
 
   bool m_run;
 };

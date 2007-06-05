@@ -7,14 +7,14 @@
 #endif
 
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
-				double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
+				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
 }
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (double omegaDiff, double omegaProj, double epsilon) : 
+HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) : 
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_time = 0.0;
@@ -25,14 +25,14 @@ HybridSolver3D::~HybridSolver3D ()
 }
 
 /* Pas de diffusion */
-void HybridSolver3D::diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc)
+void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
   GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
 }
 
-void HybridSolver3D::project (double *const p, double *const div)
+void HybridSolver3D::project (float *const p, float *const div)
 {
-  double h_x = 1.0 / m_nbVoxelsX, 
+  float h_x = 1.0 / m_nbVoxelsX, 
     h_y = 1.0 / m_nbVoxelsY,
     h_z = 1.0 / m_nbVoxelsZ;
   uint i, j, k;
@@ -51,7 +51,7 @@ void HybridSolver3D::project (double *const p, double *const div)
   }// for k
   
   //set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (double));
+  memset (p, 0, m_nbVoxels * sizeof (float));
   //set_bnd (0, p);
     
   //GS_solve(0,p,div,1, 1/6.0, 15); 
@@ -86,13 +86,13 @@ void HybridSolver3D::project (double *const p, double *const div)
 // //   set_bnd (0, m_u);
 // //   set_bnd (0, m_v);
 // //   set_bnd (0, m_w);
-//   m_time = (m_time*m_nbIter + ::wxGetElapsedTime (false))/(double) (++m_nbIter);
+//   m_time = (m_time*m_nbIter + ::wxGetElapsedTime (false))/(float) (++m_nbIter);
   
 //   cout << m_time << "      \r"; cout.flush();
 // }
 
-LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, 
-				      double timeStep, double buoyancy, double omegaDiff, double omegaProj, double epsilon) : 
+LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
+				      float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), 
   HybridSolver3D (omegaDiff, omegaProj, epsilon)
 {
@@ -101,13 +101,13 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
   initialNbVoxelsY = n_y;
   initialNbVoxelsZ = n_z;
   
-  m_uTmp = new double[m_nbVoxels];
-  m_vTmp = new double[m_nbVoxels];
-  m_wTmp = new double[m_nbVoxels];
+  m_uTmp = new float[m_nbVoxels];
+  m_vTmp = new float[m_nbVoxels];
+  m_wTmp = new float[m_nbVoxels];
   
-  memset (m_uTmp, 0, m_nbVoxels * sizeof (double));
-  memset (m_vTmp, 0, m_nbVoxels * sizeof (double));
-  memset (m_wTmp, 0, m_nbVoxels * sizeof (double));
+  memset (m_uTmp, 0, m_nbVoxels * sizeof (float));
+  memset (m_vTmp, 0, m_nbVoxels * sizeof (float));
+  memset (m_wTmp, 0, m_nbVoxels * sizeof (float));
 
   /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
   if (m_nbVoxelsX < m_nbVoxelsY){
@@ -283,10 +283,10 @@ void LODHybridSolver3D::increaseRes ()
 /** Fonction de dessin de la grille */
 void LODHybridSolver3D::displayGrid ()
 {
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double intery = m_dim.y / (double) m_nbVoxelsY;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i, j;
+  float interx = m_dim.x / (float) m_nbVoxelsX;
+  float intery = m_dim.y / (float) m_nbVoxelsY;
+  float interz = m_dim.z / (float) m_nbVoxelsZ;
+  float i, j;
   
   glBegin (GL_LINES);
   
@@ -310,9 +310,9 @@ void LODHybridSolver3D::displayGrid ()
 
 /** Fonction de dessin du repère de base */
 void LODHybridSolver3D::displayBase (){
-  double interx = m_dim.x / (double) m_nbVoxelsX;
-  double interz = m_dim.z / (double) m_nbVoxelsZ;
-  double i;
+  float interx = m_dim.x / (float) m_nbVoxelsX;
+  float interz = m_dim.z / (float) m_nbVoxelsZ;
+  float i;
   
   glBegin (GL_LINES);
   

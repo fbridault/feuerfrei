@@ -36,7 +36,7 @@ public:
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
   LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s,
-	     Wick *wickObject, double detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
+	     Wick *wickObject, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle) const{
@@ -64,13 +64,13 @@ public:
       for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
 	top += *((*skeletonsIterator)->getParticle(0));
-      top = top / (double)m_leadSkeletons.size();
+      top = top / (float)m_leadSkeletons.size();
       
       bottom.resetToNull();
       for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
 	bottom += *((*skeletonsIterator)->getRoot());
-      bottom = bottom / (double)m_leadSkeletons.size();
+      bottom = bottom / (float)m_leadSkeletons.size();
       return true;
     }
     return false;
@@ -114,7 +114,7 @@ private:
   DetachableFireSource *m_parentFire;
   
   /** Largeur des flammes détachées */
-  double m_detachedFlamesWidth;
+  float m_detachedFlamesWidth;
 
   Point top, bottom;
   
@@ -142,7 +142,7 @@ public:
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   PointFlame ( const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-	       double rayon, Object *wick=NULL);
+	       float rayon, Object *wick=NULL);
   
   /** Destructeur*/
   virtual ~PointFlame();
@@ -170,7 +170,7 @@ public:
    */
   void breakCheck() {};
   
-  virtual void addForces (int fdf, double innerForce, char perturbate){
+  virtual void addForces (int fdf, float innerForce, char perturbate){
     for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
       (*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
@@ -253,7 +253,7 @@ protected:
   FreePeriSkeleton **m_periSkeletons;
   
   /** Tableau temporaire contenant les distances entre les particules d'un squelette. */
-  double *m_distances;
+  float *m_distances;
   
   /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
    * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois 

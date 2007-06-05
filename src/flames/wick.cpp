@@ -138,7 +138,7 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
   //   glVertex3f(bounds[flameConfig.skeletonsNumber].x,bounds[flameConfig.skeletonsNumber].y,bounds[flameConfig.skeletonsNumber].z);
   //   glEnd();
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++){
-    glColor3f(0.0,i*1.0/(double)flameConfig.skeletonsNumber,1.0);
+    glColor3f(0.0,i*1.0/(float)flameConfig.skeletonsNumber,1.0);
     Point bounds2 = bounds[i]+cellSpan;
     glBegin(GL_LINE_LOOP);
     glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
@@ -204,9 +204,9 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	      barycentre.z += (*pointsIterator)->z;
 	      n++;
 	    }
-	  barycentre = barycentre / (double)n;
+	  barycentre = barycentre / (float)n;
 	  
-	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(double)(flameConfig.skeletonsNumber+1)-1, .5, -.2, .3));
+	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, .5, -.2, .3));
  	}
       else
 	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;

@@ -90,8 +90,8 @@ private:
   int m_index;
   GLFlameCanvas *m_glBuffer;
   
-  double SLIDER_SENSIBILITY;
-  double FORCE_SENSIBILITY;
+  float SLIDER_SENSIBILITY;
+  float FORCE_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()
@@ -103,10 +103,10 @@ class SolverMainPanel: public wxPanel
 {
 public:
 #ifdef RTFLAMES_BUILD
-  SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFlameCanvas* const glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFlameCanvas* const glBuffer, 
  		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #else
-  SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFluidsCanvas* const glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFluidsCanvas* const glBuffer, 
  		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #endif
   virtual ~SolverMainPanel(){};
@@ -137,8 +137,8 @@ private:
 #endif
   Point m_saveSliderValues;
   
-  double SLIDER_SENSIBILITY;
-  double FORCE_SENSIBILITY;
+  float SLIDER_SENSIBILITY;
+  float FORCE_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()
@@ -179,8 +179,8 @@ private:
   int m_index;
   GLFlameCanvas *m_glBuffer;
   
-  double FORCE_SENSIBILITY;
-  double LIGHT_SENSIBILITY;
+  float FORCE_SENSIBILITY;
+  float LIGHT_SENSIBILITY;
   int SLIDER_RANGE;
   
   DECLARE_EVENT_TABLE()

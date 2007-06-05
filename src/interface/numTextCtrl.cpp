@@ -41,7 +41,7 @@ void LongTextCtrl::rangeErrorDialog(wxString& s)
   errorDialog.ShowModal();
 }
 
-DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, double min, double max, const wxString& value, 
+DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, float min, float max, const wxString& value, 
 	      const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
 : NumTextCtrl(parent, id, value, pos, size, style, validator, name)
 {
@@ -49,14 +49,14 @@ DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, double min, doub
   m_max = max;
 }
 
-double DoubleTextCtrl::GetSafelyValue(void)
+float DoubleTextCtrl::GetSafelyValue(void)
 {
   wxString tmp;
-  double val;
+  float val;
     
   tmp = GetValue();
   
-  if( tmp.ToDouble(&val))
+  if( tmp.ToDouble((double *)&val))
     if(val >= m_min && val <= m_max)
       return(val);
     else

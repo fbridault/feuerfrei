@@ -88,7 +88,7 @@ public:
   /** Donne l'élément en tête de file.
    * @return particule en tête de file
    */
-  double getSelfVelocity() const{
+  float getSelfVelocity() const{
     return m_selfVelocity;
   };
   
@@ -148,7 +148,7 @@ protected:
   /** File de particules. */
   Particle *m_queue;
   /** Velocité propre des particules du squelette, utilisée par les FakeFields. */
-  double m_selfVelocity;
+  float m_selfVelocity;
 };
 
 #define NORMAL 0

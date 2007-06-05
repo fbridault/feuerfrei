@@ -96,20 +96,20 @@ public:
     if(selectedSolver >= 0) m_solvers[selectedSolver]->addPermanentExternalForces(pt);
     else m_globalField->addPermanentExternalForces(pt);
   };
-  void setSolverBuoyancy(int index, double value){ 
+  void setSolverBuoyancy(int index, float value){ 
     if(index >= 0) m_solvers[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
-  void setFlameForces(int index, double value){ m_flames[index]->setInnerForce(value); };
-  void setFlameIntensity(int index, double value){ m_flames[index]->setIntensityCoef(value); };
+  void setFlameForces(int index, float value){ m_flames[index]->setInnerForce(value); };
+  void setFlameIntensity(int index, float value){ m_flames[index]->setIntensityCoef(value); };
   void setFlameSamplingTolerance(int index, u_char value){ m_flames[index]->setSamplingTolerance(value); };
 
 
-  void setLuminaryBuoyancy(int index, double value){ 
+  void setLuminaryBuoyancy(int index, float value){ 
     if(index >= 0) m_solvers[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
-  void setLuminaryForces(int index, double value){ m_luminaries[index]->setInnerForce(value); };
+  void setLuminaryForces(int index, float value){ m_luminaries[index]->setInnerForce(value); };
   void setLuminarySamplingTolerance(int index, u_char value){ m_luminaries[index]->setSamplingTolerance(value); };
   void setLuminaryFDF(int index, int value) { m_luminaries[index]->setFDF(value); };
   void setLuminaryPerturbateMode(int index, char value) { m_luminaries[index]->setPerturbateMode(value); };
@@ -122,7 +122,7 @@ public:
   /** Change l'affichage des sphères englobantes. */
   void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
-  void setGammaCorrection(double gamma) { m_gammaEngine->SetGamma(gamma); };
+  void setGammaCorrection(float gamma) { m_gammaEngine->SetGamma(gamma); };
   void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
   void DeleteThreads();
 private:
@@ -131,7 +131,7 @@ private:
   void PauseThreads();
   void ResumeThreads();
   
-//   void cast_shadows_double_multiple();
+//   void cast_shadows_float_multiple();
   void castShadows();
   
   /** Configuration de l'application */
@@ -182,7 +182,7 @@ private:
   GammaEngine *m_gammaEngine;
   wxStopWatch *m_swatch;
   
-  double *m_intensities;
+  float *m_intensities;
   bool m_visibility;
 
   const static int m_nbIterFlickering = 20;

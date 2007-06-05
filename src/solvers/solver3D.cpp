@@ -7,23 +7,23 @@ Solver3D::Solver3D ()
 {
 }
 
-Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale,
-		    double timeStep, double buoyancy) : 
+Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+		    float timeStep, float buoyancy) : 
   RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_uPrev = new double[m_nbVoxels];
-  m_vPrev = new double[m_nbVoxels];
-  m_wPrev = new double[m_nbVoxels];
-  m_dens = new double[m_nbVoxels];
-  m_densPrev = new double[m_nbVoxels];
-  m_densSrc = new double[m_nbVoxels];
+  m_uPrev = new float[m_nbVoxels];
+  m_vPrev = new float[m_nbVoxels];
+  m_wPrev = new float[m_nbVoxels];
+  m_dens = new float[m_nbVoxels];
+  m_densPrev = new float[m_nbVoxels];
+  m_densSrc = new float[m_nbVoxels];
   
-  memset (m_uPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_vPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_wPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_dens, 0, m_nbVoxels * sizeof (double));
-  memset (m_densPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_uPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_vPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_wPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_dens, 0, m_nbVoxels * sizeof (float));
+  memset (m_densPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
   
   m_visc = 0.00000015;
   m_diff = 0.001;
@@ -48,7 +48,7 @@ Solver3D::~Solver3D ()
   delete[]m_densSrc;
 }
 
-void Solver3D::set_bnd (unsigned char b, double *const x)
+void Solver3D::set_bnd (unsigned char b, float *const x)
 {
   uint i, j;
 
@@ -82,12 +82,12 @@ void Solver3D::set_bnd (unsigned char b, double *const x)
     }
 }
 
-void Solver3D::advect (unsigned char b, double *const d, const double *const d0,
-		     const double *const u, const double *const v,
-		     const double *const w)
+void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
+		     const float *const u, const float *const v,
+		     const float *const w)
 {
   uint i0, j0, k0, i1, j1, k1;
-  double x, y, z, r0, s0, t0, r1, s1, t1, dt0_x, dt0_y, dt0_z;
+  float x, y, z, r0, s0, t0, r1, s1, t1, dt0_x, dt0_y, dt0_z;
 
   dt0_x = m_dt * m_nbVoxelsX;
   dt0_y = m_dt * m_nbVoxelsY;
@@ -178,7 +178,7 @@ void Solver3D::iterate ()
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
       for (uint i = 1; i <= m_nbVoxelsX; i++){
-	m_vSrc[m_t] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+	m_vSrc[m_t] += m_buoyancy / (float) (m_nbVoxelsY-j+1);
 	m_t++;
       }//for i
       m_t+=2;
@@ -213,7 +213,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   uint ceilx, ceily, ceilz;
   Point strength;
   Point force;
-  //  double factor = m_dim.y/(m_nbVoxelsY - 1);
+  //  float factor = m_dim.y/(m_nbVoxelsY - 1);
   
   if(move){
     force = position;
@@ -289,7 +289,7 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
   }
 }
 
-void Solver3D::prolonger(double  *const v2h, double *const vh)
+void Solver3D::prolonger(float  *const v2h, float *const vh)
 {
   // on utilise une interpolation bilinéaire
   // récupérer la taille du solveur 
@@ -401,7 +401,7 @@ void Solver3D::prolonger(double  *const v2h, double *const vh)
   }//for k
 }//prolonger
 
-void  Solver3D::restreindre(double *const vh, double *const v2h){
+void  Solver3D::restreindre(float *const vh, float *const v2h){
 
   // schéma en 27 points
   int nx=getXRes()/2;

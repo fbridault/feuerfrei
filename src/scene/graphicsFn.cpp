@@ -17,7 +17,7 @@ initQuadObj (void)
 }
 
 void
-GraphicsFn::SolidSphere (GLdouble radius, GLint slices, GLint stacks)
+GraphicsFn::SolidSphere (GLfloat radius, GLint slices, GLint stacks)
 {
   QUAD_OBJ_INIT ();
   gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -29,7 +29,7 @@ GraphicsFn::SolidSphere (GLdouble radius, GLint slices, GLint stacks)
 }
 
 void
-GraphicsFn::SolidCone (GLdouble base, GLdouble height, GLint slices,
+GraphicsFn::SolidCone (GLfloat base, GLfloat height, GLint slices,
 		       GLint stacks)
 {
   QUAD_OBJ_INIT ();
@@ -42,7 +42,7 @@ GraphicsFn::SolidCone (GLdouble base, GLdouble height, GLint slices,
 }
 
 void
-GraphicsFn::SolidCylinder (GLdouble base, GLdouble height, GLint slices,
+GraphicsFn::SolidCylinder (GLfloat base, GLfloat height, GLint slices,
 			   GLint stacks)
 {
   QUAD_OBJ_INIT ();
@@ -55,7 +55,7 @@ GraphicsFn::SolidCylinder (GLdouble base, GLdouble height, GLint slices,
 }
 
 void
-GraphicsFn::SolidDisk (GLdouble rayon, GLint slices, GLint loops)
+GraphicsFn::SolidDisk (GLfloat rayon, GLint slices, GLint loops)
 {
   QUAD_OBJ_INIT ();
   gluQuadricDrawStyle (quadObj, GLU_FILL);

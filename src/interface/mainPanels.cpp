@@ -24,8 +24,8 @@ LuminaryMainPanel::LuminaryMainPanel(wxWindow* parent, int id, LuminaryConfig* c
 				     GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
-  SLIDER_SENSIBILITY=100.0;
-  FORCE_SENSIBILITY=100.0;
+  SLIDER_SENSIBILITY=100.0f;
+  FORCE_SENSIBILITY=100.0f;
   SLIDER_RANGE=500;
   
   m_luminaryConfig = luminaryConfig;
@@ -119,18 +119,18 @@ void LuminaryMainPanel::SetSlidersValues()
   (*m_solverYAxisPositionSliderMax) << m_luminaryConfig->position.y*SLIDER_SENSIBILITY+SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMin) << m_luminaryConfig->position.z*SLIDER_SENSIBILITY-SLIDER_RANGE;
   (*m_solverZAxisPositionSliderMax) << m_luminaryConfig->position.z*SLIDER_SENSIBILITY+SLIDER_RANGE;
-
+  
   m_solverXAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverXAxisPositionSliderMax->GetValue().ToLong(&val2);
-  m_solverXAxisPositionSlider->SetRange(val1, val2);
+//   m_solverXAxisPositionSlider->SetRange(val1, val2);
   m_solverXAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.x*SLIDER_SENSIBILITY));
   m_solverYAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverYAxisPositionSliderMax->GetValue().ToLong(&val2);
-  m_solverYAxisPositionSlider->SetRange(val1, val2);
+//   m_solverYAxisPositionSlider->SetRange(val1, val2);
   m_solverYAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.y*SLIDER_SENSIBILITY));
   m_solverZAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverZAxisPositionSliderMax->GetValue().ToLong(&val2);
-  m_solverZAxisPositionSlider->SetRange(val1, val2);
+//   m_solverZAxisPositionSlider->SetRange(val1, val2);
   m_solverZAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.z*SLIDER_SENSIBILITY));
 }
 
@@ -198,16 +198,16 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
 END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFlameCanvas* const glBuffer, 
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFlameCanvas* const glBuffer, 
 				 const wxPoint& pos, const wxSize& size, long style):
 #else
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, double buoyancy, int index, GLFluidsCanvas* const glBuffer, 
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFluidsCanvas* const glBuffer, 
 				 const wxPoint& pos, const wxSize& size, long style):
 #endif
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
-  SLIDER_SENSIBILITY=100.0;
-  FORCE_SENSIBILITY=100.0;
+  SLIDER_SENSIBILITY=100.0f;
+  FORCE_SENSIBILITY=100.0f;
   SLIDER_RANGE=500;
   
   m_index = index;
@@ -224,7 +224,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, double buoyancy, int 
   m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
   
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10,2*SLIDER_RANGE/10, wxDefaultPosition, 
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10.0f,2*SLIDER_RANGE/10.0f, wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   m_buoyancySlider->SetValue((int)(buoyancy*FORCE_SENSIBILITY));
@@ -272,7 +272,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_SF)
     {
-      double value = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
+      float value = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
       
 #ifdef RTFLUIDS_BUILD
       m_glBuffer->setBuoyancy(m_index, value);
@@ -334,8 +334,8 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
     _("Random")
   };
   
-  LIGHT_SENSIBILITY=100.0;
-  FORCE_SENSIBILITY=500.0;
+  LIGHT_SENSIBILITY=100.0f;
+  FORCE_SENSIBILITY=500.0f;
   SLIDER_RANGE=50;
   
   m_index = index;
@@ -406,7 +406,7 @@ FlameMainPanel::FlameMainPanel(wxWindow* parent, int id, FlameConfig* const flam
 
 void FlameMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
-  double val;
+  float val;
   
   switch(event.GetId()){
   case IDSL_FF :

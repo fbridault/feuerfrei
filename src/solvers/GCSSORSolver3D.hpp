@@ -25,15 +25,15 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, double dim, const Point& scale, double timeStep, 
-		  double buoyancy, double omegaDiff, double omegaProj, double epsilon);
+  GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+		  float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D (double omegaDiff, double omegaProj, double epsilon);
+  GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~GCSSORSolver3D ();
   
@@ -48,20 +48,20 @@ protected:
   * @param omega Paramètre omega.
   * @param maxiter Nombre d'itérations maximal à effectuer
   */
-  virtual void GCSSOR(double *const x0, const double *const b, double a, double diagonal, double omega, uint maxiter);
+  virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc);  
-  virtual void project (double *const p, double *const div);
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);  
+  virtual void project (float *const p, float *const div);
   
   /** Résidu, pour SSOR, direction de descente et ? */
-  double *m_r, *m_z, *m_p, *m_q;
+  float *m_r, *m_z, *m_p, *m_q;
   
   /** Paramètre omega pour la diffusion */
-  double m_omegaDiff;
+  float m_omegaDiff;
   /** Paramètre omega pour la projection */
-  double m_omegaProj;
+  float m_omegaProj;
   /** Tolérance d'erreur pour GCSSOR. */
-  double m_epsilon;
+  float m_epsilon;
 };
 
 #endif

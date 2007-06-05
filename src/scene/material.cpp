@@ -4,7 +4,7 @@
 
 Material::Material (const Scene* const scene) : m_name("default")
 {
-  double coeff[3] = { 1.0, 1.0, 1.0 };
+  float coeff[3] = { 1.0, 1.0, 1.0 };
  
   m_scene = scene;
   
@@ -16,10 +16,10 @@ Material::Material (const Scene* const scene) : m_name("default")
 }
 
 Material::Material ( const Scene* const scene, const string& name, 
-		     double *const ambientCoefficients,
-		     double *const diffuseCoefficients,
-		     double *const specularCoefficients,
-		     double specularExponent, int tex) : m_name(name)
+		     float *const ambientCoefficients,
+		     float *const diffuseCoefficients,
+		     float *const specularCoefficients,
+		     float specularExponent, int tex) : m_name(name)
 {
   m_scene = scene;
   m_Kss = specularExponent;

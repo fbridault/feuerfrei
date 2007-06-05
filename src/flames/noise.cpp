@@ -15,7 +15,7 @@ PerlinNoise1D::PerlinNoise1D(float increment, float min, float max)
   m_nbOctaves = 8;
   //  m_currentX = 0;
   /* On donne un germe différent pour chaque générateur */
-  m_currentX = 100* (rand()/((double)RAND_MAX));
+  m_currentX = 100* (rand()/((float)RAND_MAX));
 }
 
 float PerlinNoise1D::Noise1(int x)

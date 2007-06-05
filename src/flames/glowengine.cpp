@@ -39,10 +39,10 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
     m_secondPassFBOs[i].RenderBufferAttach();
   }
   
-  /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
+  /* Offsets centrÃ©s pour taille texture en entrÃ©e = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++)
     m_offsets[0][j] = j-FILTER_SIZE/2+1;
-  /* Offsets gauches pour taille texture en entrée > taille texture en sortie */
+  /* Offsets gauches pour taille texture en entrÃ©e > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[1][j] = (j-FILTER_SIZE/2+1)*(int)(m_scaleFactor[1]);
   }  
@@ -57,11 +57,11 @@ GlowEngine::~GlowEngine()
   }
 }
 
-void GlowEngine::computeWeights(uint index, double sigma)
+void GlowEngine::computeWeights(uint index, float sigma)
 {
   int offset;
   //coef = 1/sqrt(2*PI*sigma);
-  m_divide[index] = 0.0;
+  m_divide[index] = 0.0f;
   
     /* Calcul des poids */
   switch(index){
@@ -78,7 +78,7 @@ void GlowEngine::computeWeights(uint index, double sigma)
   case 1:
     offset = FILTER_SIZE-1;
     for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
-      m_weights[index][x+offset] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_weights[index][x+offset] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
       m_divide[index] += m_weights[index][x+offset];
 //        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
     }
@@ -87,7 +87,7 @@ void GlowEngine::computeWeights(uint index, double sigma)
     break;
   case 2:
     for(int x=0 ; x< FILTER_SIZE; x++){
-      m_weights[index][x] = expf(-((x/10.0)*(x/10.0))/(sigma*sigma));
+      m_weights[index][x] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
       m_divide[index] += m_weights[index][x];
 //        cerr << x << " " << m_weights[index][x] << endl;
     }
@@ -101,7 +101,7 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
 {
   glDepthFunc (GL_LEQUAL);
   
-  /* Blur à la résolution de l'écran */
+  /* Blur Ã  la rÃ©solution de l'Ã©cran */
   m_programX.enable();
   m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[0]);
@@ -112,7 +112,7 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   m_firstPassTex[0]->bind();
   
-  /** On dessine seulement les englobants des flammes pour indiquer à quel endroit effectuer le blur */
+  /** On dessine seulement les englobants des flammes pour indiquer Ã  quel endroit effectuer le blur */
   glBuffer->drawFlamesBoundingBoxes();
   
   m_programY.enable();
@@ -126,10 +126,10 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   m_secondPassTex[0]->bind();
   glBuffer->drawFlamesBoundingBoxes();
   
-  /* Blur à une résolution inférieure */
+  /* Blur Ã  une rÃ©solution infÃ©rieure */
   m_secondPassFBOs[1].Activate();
   m_programX.enable();
-  glBlendColor(0.8,0.8,0.8,1.0);
+  glBlendColor(0.8f,0.8f,0.8f,1.0f);
   glEnable (GL_BLEND);
   glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
   
@@ -180,7 +180,7 @@ void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer)
   m_blurRendererProgram.setUniform1i("text",0);
   
   for(int i=0; i < GLOW_LEVELS; i++){
-    m_blurRendererProgram.setUniform1f("scale",1/(double)m_scaleFactor[i]);
+    m_blurRendererProgram.setUniform1f("scale",1/(float)m_scaleFactor[i]);
     m_firstPassTex[i]->bind();
     glBuffer->drawFlamesBoundingBoxes();
   }

@@ -7,7 +7,7 @@ Solver2D::Solver2D ()
 {
 }
 
-Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,double dim, double timeStep, double buoyancy) : 
+Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float timeStep, float buoyancy) : 
   Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
@@ -24,25 +24,25 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,double dim, double
   
   m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2);
   
-  m_u = new double[m_nbVoxels];
-  m_v = new double[m_nbVoxels];
-  m_dens = new double[m_nbVoxels];
-  m_uPrev = new double[m_nbVoxels];
-  m_vPrev = new double[m_nbVoxels];
-  m_densPrev = new double[m_nbVoxels];
-  m_uSrc = new double[m_nbVoxels];
-  m_vSrc = new double[m_nbVoxels];
-  m_densSrc = new double[m_nbVoxels];
+  m_u = new float[m_nbVoxels];
+  m_v = new float[m_nbVoxels];
+  m_dens = new float[m_nbVoxels];
+  m_uPrev = new float[m_nbVoxels];
+  m_vPrev = new float[m_nbVoxels];
+  m_densPrev = new float[m_nbVoxels];
+  m_uSrc = new float[m_nbVoxels];
+  m_vSrc = new float[m_nbVoxels];
+  m_densSrc = new float[m_nbVoxels];
   
-  memset (m_u, 0, m_nbVoxels * sizeof (double));
-  memset (m_v, 0, m_nbVoxels * sizeof (double));
-  memset (m_dens, 0, m_nbVoxels * sizeof (double));
-  memset (m_uPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_vPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_densPrev, 0, m_nbVoxels * sizeof (double));
-  memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
+  memset (m_u, 0, m_nbVoxels * sizeof (float));
+  memset (m_v, 0, m_nbVoxels * sizeof (float));
+  memset (m_dens, 0, m_nbVoxels * sizeof (float));
+  memset (m_uPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_vPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_densPrev, 0, m_nbVoxels * sizeof (float));
+  memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
     
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY;
@@ -81,7 +81,7 @@ Solver2D::~Solver2D ()
   delete[]m_densSrc;
 }
 
-void Solver2D::set_bnd (unsigned char b, double *const x)
+void Solver2D::set_bnd (unsigned char b, float *const x)
 {
   uint i, j;
 
@@ -100,11 +100,11 @@ void Solver2D::set_bnd (unsigned char b, double *const x)
     } 
 }
 
-void Solver2D::advect (unsigned char b, double *const d, const double *const d0,
-		     const double *const u, const double *const v)
+void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
+		     const float *const u, const float *const v)
 {
   uint i, j, i0, j0, i1, j1;
-  double x, y, z, s0, t0, s1, t1, dt0_x, dt0_y;
+  float x, y, z, s0, t0, s1, t1, dt0_x, dt0_y;
 
   dt0_x = m_dt * m_nbVoxelsX;
   dt0_y = m_dt * m_nbVoxelsY;
@@ -158,7 +158,7 @@ void Solver2D::iterate ()
   /* Cellule(s) génératrice(s) */
 //   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
 //     for (uint j = 1; j < m_nbVoxelsY + 1; j++)
-// 	m_vSrc[IX(i, j)] += m_buoyancy / (double) (m_nbVoxelsY-j+1);
+// 	m_vSrc[IX(i, j)] += m_buoyancy / (float) (m_nbVoxelsY-j+1);
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y)
     addExternalForces(m_permanentExternalForces,false);
@@ -175,15 +175,15 @@ void Solver2D::iterate ()
 
 void Solver2D::cleanSources ()
 {
-  m_uSrc = (double *) memset (m_uSrc, 0, m_nbVoxels * sizeof (double));
-  m_vSrc = (double *) memset (m_vSrc, 0, m_nbVoxels * sizeof (double));
-  m_densSrc = (double *) memset (m_densSrc, 0, m_nbVoxels * sizeof (double));
+  m_uSrc = (float *) memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
+  m_vSrc = (float *) memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
+  m_densSrc = (float *) memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
 }
 
 void Solver2D::buildDLGrid ()
 {
-  double interx = m_dimX / (double) m_nbVoxelsX;
-  double intery = m_dimY / (double) m_nbVoxelsY;
+  float interx = m_dimX / (float) m_nbVoxelsX;
+  float intery = m_dimY / (float) m_nbVoxelsY;
   float i;
   
   m_gridDisplayList=glGenLists(1);
@@ -205,8 +205,8 @@ void Solver2D::buildDLGrid ()
 
 void Solver2D::buildDLBase ()
 {
-  double interx = m_dimX / (double) m_nbVoxelsX;
-  double intery = m_dimY / (double) m_nbVoxelsY;
+  float interx = m_dimX / (float) m_nbVoxelsX;
+  float intery = m_dimY / (float) m_nbVoxelsY;
   
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
@@ -223,8 +223,8 @@ void Solver2D::buildDLBase ()
 
 void Solver2D::displayVelocityField (void)
 {
-  double inc_x = m_dimX / (double) m_nbVoxelsX;
-  double inc_y = m_dimY / (double) m_nbVoxelsY;
+  float inc_x = m_dimX / (float) m_nbVoxelsX;
+  float inc_y = m_dimY / (float) m_nbVoxelsY;
   Vector vect;
   
   for (uint i = 1; i <= m_nbVoxelsX; i++)
@@ -249,8 +249,8 @@ void Solver2D::displayVelocityField (void)
 
 void Solver2D::displayDensityField (void)
 {
-  double inc_x = m_dimX / (double) m_nbVoxelsX;
-  double inc_y = m_dimY / (double) m_nbVoxelsY;
+  float inc_x = m_dimX / (float) m_nbVoxelsX;
+  float inc_y = m_dimY / (float) m_nbVoxelsY;
   
   for (uint i = 1; i <= m_nbVoxelsX; i++)
     for (uint j = 1; j <= m_nbVoxelsY; j++)
@@ -267,8 +267,8 @@ void Solver2D::displayDensityField (void)
 
 void Solver2D::displayArrow (const Vector& direction)
 {
-  double norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
-  double taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05;
+  float norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
+  float taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05;
   float angle;
   Vector ref, dir(direction);
   

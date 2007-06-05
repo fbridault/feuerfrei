@@ -50,14 +50,14 @@ public:
   char type;
   uint resx, resy, resz;
   /* Dimension réelle du solveur, utilisée lors de la résolution */
-  double dim;
+  float dim;
   /* Facteur d'échelle */
   Point scale;
-  double timeStep;
-  double omegaDiff, omegaProj;
-  double epsilon;
+  float timeStep;
+  float omegaDiff, omegaProj;
+  float epsilon;
   uint nbMaxIter;
-  double buoyancy;
+  float buoyancy;
 };
 
 #ifdef RTFLAMES_BUILD
@@ -68,10 +68,10 @@ public:
   /** Type de flamme utilisé pour le luminaire. */
   char type;
   uint skeletonsNumber;
-  double innerForce;
+  float innerForce;
   char flickering;
   int fdf;
-  double samplingTolerance;
+  float samplingTolerance;
   /** Durée de vie des squelettes. */
   uint leadLifeSpan, periLifeSpan;
   /** Chemin vers le fichier IES utilsé pour le solide photométrique. */
@@ -97,7 +97,7 @@ public:
 class FlameAppConfig{
 public:
   uint width, height;
-  double clipping;
+  float clipping;
   wxString sceneName;
   /** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
   int lightingMode;
@@ -116,7 +116,7 @@ public:
   SolverConfig globalField;
   GLfloat fatness[4];
   GLfloat extrudeDist[4];
-  double gammaCorrection;
+  float gammaCorrection;
 };
 
 #else
@@ -124,7 +124,7 @@ public:
 class FluidsAppConfig{
 public:
   uint width, height;
-  double clipping;
+  float clipping;
   uint nbSolvers;
   SolverConfig *solvers;
 };

@@ -31,14 +31,14 @@ public:
   Point centre;
   
   /** Rayon de la sphère englobante. */
-  double radius;
+  float radius;
   
   /** Calcule la visibilité de la sphère par rapport au point de vue courant.
    * @param view Référence sur la caméra
    */
   bool isVisible(const Camera &view) const{
     uint i;
-    const double *plan;
+    const float *plan;
     
     // Centre dans le frustrum ?
     //   for( p = 0; p < 6; p++ )
@@ -61,10 +61,10 @@ public:
    * @param view Référence sur la caméra.
    * @return 0 si non visible, distance à la caméra sinon.
    */
-  double visibleDistance(const Camera &view) const{
+  float visibleDistance(const Camera &view) const{
     uint i;
-    const double *plan;
-    double d;
+    const float *plan;
+    float d;
     
     // Sphère dans le frustrum ?
     for( i = 0; i < 6; i++ ){

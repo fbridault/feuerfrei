@@ -25,7 +25,7 @@ protected:
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.
    * @param x Composante de la vélocité {m_u,m_v,m_w} à traiter.
    */
-  virtual void set_bnd (unsigned char b, double *const x) = 0;
+  virtual void set_bnd (unsigned char b, float *const x) = 0;
   
   /** Etape de diffusion.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.
@@ -36,21 +36,21 @@ protected:
    * la résolution de la densité, soit à la viscosité si elle est employée pour la résolution
    * de la vélocité
    */
-  virtual void diffuse (unsigned char b, double *const x, double *const x0, double a, double diff_visc) = 0;
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc) = 0;
   
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection
    * @param p Champ de vélocité.
    * @param div Divergence.
    */
-  virtual void project (double *const p, double *const div) = 0;
+  virtual void project (float *const p, float *const div) = 0;
   
   /** Viscosité cinématique de l'air 15*10E-6. */
-  double m_visc;
+  float m_visc;
   /** Diffusion. */
-  double m_diff;
+  float m_diff;
   
-  double m_aVisc, m_aDiff;
+  float m_aVisc, m_aDiff;
   
   /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
   uint m_nbSteps;

@@ -346,6 +346,7 @@ bool LuminaryPanel::getCtrlValues(SolverConfig& solverConfig)
 {
   try
     {
+      solverConfig.type = m_solverTypeRadioBox->GetSelection();
       solverConfig.resx = m_resXTextCtrl->GetSafelyValue();
       solverConfig.timeStep = m_timeStepTextCtrl->GetSafelyValue();
       solverConfig.omegaDiff = m_omegaDiffTextCtrl->GetSafelyValue();

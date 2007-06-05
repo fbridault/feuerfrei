@@ -111,17 +111,15 @@ void GLFlameCanvas::InitLuminaries(void)
 
 void GLFlameCanvas::InitThreads()
 {
-  uint i=0;
-  
   /* Création d'un thread par champ de vélocité. */
   for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++, i++)    
+       solversIterator != m_solvers.end (); solversIterator++)    
     m_threads.push_back(new FieldFiresThread(*solversIterator, m_scheduler));
   
   if(m_currentConfig->useGlobalField){
     m_globalField = new GlobalField(m_threads, m_scene, m_currentConfig->globalField.type,
 				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
-				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj, 
+				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj,
 				    m_currentConfig->globalField.epsilon);
     /* Ajout du thread du solveur global le cas échéant */
     m_threads.push_back(new GlobalFieldThread(m_globalField, m_scheduler));
@@ -134,7 +132,7 @@ void GLFlameCanvas::InitThreads()
     }
   
   for (list <FieldThread *>::iterator threadsIterator = m_threads.begin ();
-       threadsIterator != m_threads.end (); threadsIterator++)    
+       threadsIterator != m_threads.end (); threadsIterator++)
     /* Création proprement dite du thread, il ne reste plus qu'à le lancer avec Run() */
     if ( (*threadsIterator)->Create() != wxTHREAD_NO_ERROR )
       {

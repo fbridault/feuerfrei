@@ -44,27 +44,29 @@ GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene
     }
     
   switch(type){
-    case GS_SOLVER :
-      m_field = new GSSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
-      break;
-    case GCSSOR_SOLVER :
-      m_field = new GCSSORSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy,omegaDiff, omegaProj, epsilon);
-      break;
-    case HYBRID_SOLVER :
-      m_field = new HybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
-      break;
-    case LOD_HYBRID_SOLVER :
-      m_field = new LODHybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
-      break;
-    case SIMPLE_FIELD :
-      m_field = new RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
-      break;
-    case FAKE_FIELD :
-      m_field = new FakeField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
-      break;
-    case LOD_FIELD :
-      m_field = new LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
-      break;
+  case GS_SOLVER :
+    m_field = new GSSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    break;
+  case GCSSOR_SOLVER :
+    m_field = new GCSSORSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy,omegaDiff, omegaProj, epsilon);
+    break;
+  case HYBRID_SOLVER :
+    m_field = new HybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    break;
+  case LOD_HYBRID_SOLVER :
+    m_field = new LODHybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    break;
+  case SIMPLE_FIELD :
+    m_field = new RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    break;
+  case FAKE_FIELD :
+    m_field = new FakeField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    break;
+  case LOD_FIELD :
+    m_field = new LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    break;
+  default :
+    cerr << "Unknown global solver type : " << (int)type << endl;
   }
   
   /* A cet instant, la liste des processus ne contient pas encore le thread du solveur global, */

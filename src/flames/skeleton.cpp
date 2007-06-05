@@ -86,6 +86,7 @@ void FreeSkeleton::move ()
 
 bool FreeSkeleton::moveParticle (Particle * const particle)
 {
+  Particle copy(*particle),copy2;
   if (particle->isDead ())
     return false;
   
@@ -97,10 +98,12 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
   if ( particle->z >= m_solver->getDimZ() )
     particle->z = m_solver->getDimZ() - EPSILON;
   
+  copy2 = *particle;
   /* Calculer la nouvelle position */
   /* Intégration d'Euler */
   m_solver->moveParticle(*particle, m_selfVelocity);
   
+  *particle = *particle - copy2 + copy;
   return true;
 }
 

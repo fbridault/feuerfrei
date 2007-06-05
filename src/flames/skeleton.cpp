@@ -97,6 +97,14 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
     particle->y = m_solver->getDimY() - EPSILON;
   if ( particle->z >= m_solver->getDimZ() )
     particle->z = m_solver->getDimZ() - EPSILON;
+  /* Si la particule sort de la grille, elle prend la vélocité du bord */
+  if ( particle->x <= 0 )
+    particle->x = EPSILON;
+  if ( particle->y <= 0 )
+    particle->y = EPSILON;
+  if ( particle->z <= 0 )
+    particle->z = EPSILON;
+  
   
   copy2 = *particle;
   /* Calculer la nouvelle position */

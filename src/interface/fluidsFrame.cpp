@@ -132,29 +132,42 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
   wxString groupName,tabName;
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
+      double tmp;
       groupName.Printf(_("/Solver%d/"),i);
       
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
       
-      m_config->Read(groupName + _("Pos.x"), &m_currentConfig.solvers[i].position.x, 0.0);
-      m_config->Read(groupName + _("Pos.y"), &m_currentConfig.solvers[i].position.y, 0.0);
-      m_config->Read(groupName + _("Pos.z"), &m_currentConfig.solvers[i].position.z, 0.0);
+      m_config->Read(groupName + _("Pos.x"), &tmp, 0.0);
+      m_currentConfig.solvers[i].position.x = (float)tmp;
+      m_config->Read(groupName + _("Pos.y"), &tmp, 0.0);
+      m_currentConfig.solvers[i].position.y = (float)tmp;
+      m_config->Read(groupName + _("Pos.z"), &tmp, 0.0);
+      m_currentConfig.solvers[i].position.z = (float)tmp;
       
       m_currentConfig.solvers[i].resx = m_config->Read(groupName + _("X_res"), 15);
       m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
       m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
       
-      m_config->Read(groupName + _("Dim"),&m_currentConfig.solvers[i].dim,1.0);
-      m_config->Read(groupName + _("Scale.x"),&m_currentConfig.solvers[i].scale.x,1.0);
-      m_config->Read(groupName + _("Scale.y"),&m_currentConfig.solvers[i].scale.y,1.0);
-      m_config->Read(groupName + _("Scale.z"),&m_currentConfig.solvers[i].scale.z,1.0);
+      m_config->Read(groupName + _("Dim"),&tmp,1.0);
+      m_currentConfig.solvers[i].dim = (float)tmp;
+      m_config->Read(groupName + _("Scale.x"),&tmp,1.0);
+      m_currentConfig.solvers[i].scale.x = (float)tmp;
+      m_config->Read(groupName + _("Scale.y"),&tmp,1.0);
+      m_currentConfig.solvers[i].scale.y = (float)tmp;
+      m_config->Read(groupName + _("Scale.z"),&tmp,1.0);
+      m_currentConfig.solvers[i].scale.z = (float)tmp;
             
-      m_config->Read(groupName + _("TimeStep"),&m_currentConfig.solvers[i].timeStep,0.4);      
-      m_config->Read(groupName + _("Buoyancy"), &m_currentConfig.solvers[i].buoyancy, 0.02);
+      m_config->Read(groupName + _("TimeStep"),&tmp,0.4);
+      m_currentConfig.solvers[i].timeStep = (float)tmp;
+      m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
+      m_currentConfig.solvers[i].buoyancy = (float)tmp;
       
-      m_config->Read(groupName + _("omegaDiff"),&m_currentConfig.solvers[i].omegaDiff,1.5);
-      m_config->Read(groupName + _("omegaProj"),&m_currentConfig.solvers[i].omegaProj,1.5);
-      m_config->Read(groupName + _("epsilon"),&m_currentConfig.solvers[i].epsilon,0.00001);
+      m_config->Read(groupName + _("omegaDiff"),&tmp,1.5);
+      m_currentConfig.solvers[i].omegaDiff = (float)tmp;
+      m_config->Read(groupName + _("omegaProj"),&tmp,1.5);
+      m_currentConfig.solvers[i].omegaProj = (float)tmp;
+      m_config->Read(groupName + _("epsilon"),&tmp,0.00001);
+      m_currentConfig.solvers[i].epsilon = (float)tmp;
       m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
       
       tabName.Printf(_("Solver #%d"),i+1);

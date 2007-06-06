@@ -53,13 +53,15 @@ float DoubleTextCtrl::GetSafelyValue(void)
 {
   wxString tmp;
   float val;
+  double dval;
     
   tmp = GetValue();
   
-  if( tmp.ToDouble((double *)&val))
-    if(val >= m_min && val <= m_max)
+  if( tmp.ToDouble(&dval))
+    if(dval >= m_min && dval <= m_max){
+      val = (float)dval;
       return(val);
-    else
+    }else
       rangeErrorDialog(tmp);
   else
     nonNumericErrorDialog(tmp);

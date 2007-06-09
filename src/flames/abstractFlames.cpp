@@ -236,6 +236,7 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
     m_periSkeletons[i]=NULL;
   
   m_solver = s;
+  m_lodSkelChanged = false;
 }
 
 bool RealFlame::build ()

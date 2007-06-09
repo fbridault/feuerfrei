@@ -17,7 +17,7 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene
 {
   list<Wick *> objList;
   
-  scene->importOBJ(wickFileName, NULL, &objList);
+  scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
   
   if(objList.size() > 0)
     m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.01);

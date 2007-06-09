@@ -99,22 +99,22 @@ void GLFlameCanvas::InitGL()
 void GLFlameCanvas::InitLuminaries(void)
 {
   for(uint i=0; i < m_currentConfig->nbLuminaries; i++)
-    m_luminaries.push_back( new Luminary( m_currentConfig->luminaries[i], m_solvers, m_flames, m_scene,
+    m_luminaries.push_back( new Luminary( m_currentConfig->luminaries[i], m_fields, m_fires, m_scene,
 					  m_SVProgram, m_currentConfig->luminaries[i].fileName.fn_str(), i) );
   
-//   m_currentConfig->nbFires = m_flames.size(); m_currentConfig->nbFields = m_solvers.size(); 
-  prevNbFlames = m_flames.size(); prevNbSolvers = m_solvers.size();
+//   m_currentConfig->nbFires = m_fires.size(); m_currentConfig->nbFields = m_fields.size(); 
+  prevNbFlames = m_fires.size(); prevNbFields = m_fields.size();
   
   if( m_intensities ) delete [] m_intensities;
-  m_intensities = new float[m_flames.size()];
+  m_intensities = new float[m_fires.size()];
 }
 
 void GLFlameCanvas::InitThreads()
 {
   /* Création d'un thread par champ de vélocité. */
-  for (vector <Field3D *>::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++)    
-    m_threads.push_back(new FieldFiresThread(*solversIterator, m_scheduler));
+  for (vector <Field3D *>::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)    
+    m_threads.push_back(new FieldFiresThread(*fieldsIterator, m_scheduler));
   
   if(m_currentConfig->useGlobalField){
     m_globalField = new GlobalField(m_threads, m_scene, m_currentConfig->globalField.type,
@@ -151,14 +151,14 @@ void GLFlameCanvas::InitScene()
 {  
   uint glowScales[2] = { 1, 4 };
   
-  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_luminaries, &m_flames);
+  m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_luminaries, &m_fires);
   
   InitLuminaries();  
   
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
   m_scene->createVBOs();
   
@@ -254,22 +254,22 @@ void GLFlameCanvas::Restart (void)
   Enable();
 }
 
-void GLFlameCanvas::ReloadSolversAndFlames (void)
+void GLFlameCanvas::ReloadFieldsAndFires (void)
 {
   Disable();
   m_init = false;
   DeleteThreads();
   
   delete m_photoSolid;
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    delete (*flamesIterator);
-  m_flames.clear();
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    delete (*firesIterator);
+  m_fires.clear();
   
-  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++)
-    delete (*solversIterator);
-  m_solvers.clear();
+  for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)
+    delete (*fieldsIterator);
+  m_fields.clear();
   
   for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
        luminariesIterator != m_luminaries.end (); luminariesIterator++)
@@ -285,7 +285,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
   
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_flames);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
   InitThreads();
   m_swatch->Start();
@@ -297,7 +297,7 @@ void GLFlameCanvas::ReloadSolversAndFlames (void)
 
 void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
 {
-  m_flames[flameIndex]->useNewIESFile(IESFileName.ToAscii());
+  m_fires[flameIndex]->useNewIESFile(IESFileName.ToAscii());
   m_photoSolid->deleteTexture();
   m_photoSolid->generateTexture();
 }
@@ -310,19 +310,19 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_scene;
   delete m_photoSolid;
 
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    delete (*flamesIterator);
-  m_flames.clear();
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    delete (*firesIterator);
+  m_fires.clear();
   
   if(m_globalField){
     delete m_globalField;
     m_globalField = NULL;
   }
-  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++)
-    delete (*solversIterator);
-  m_solvers.clear();
+  for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)
+    delete (*fieldsIterator);
+  m_fields.clear();
   
   for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
        luminariesIterator != m_luminaries.end (); luminariesIterator++)
@@ -365,14 +365,14 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
     case 'l':
-      for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-	   solversIterator != m_solvers.end (); solversIterator++)
-	(*solversIterator)->decreaseRes ();
+      for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+	   fieldsIterator != m_fields.end (); fieldsIterator++)
+	(*fieldsIterator)->decreaseRes ();
       break;
     case 'L': 
-      for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-	   solversIterator != m_solvers.end (); solversIterator++)
-	(*solversIterator)->increaseRes ();
+      for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+	   fieldsIterator != m_fields.end (); fieldsIterator++)
+	(*fieldsIterator)->increaseRes ();
       break;
     case WXK_SPACE : setRunningState(!m_run); ; break;
     }
@@ -398,9 +398,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
     m_visibility = false;
     if(m_displayFlame){
-      for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	   flamesIterator != m_flames.end (); flamesIterator++)
-	if((*flamesIterator)->isVisible()){
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	if((*firesIterator)->isVisible()){
 	  m_visibility = true;
 	  break;
 	}
@@ -524,17 +524,17 @@ void GLFlameCanvas::drawScene()
   else
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   /******************* AFFICHAGE DE LA SCENE *******************************/
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawWick (m_displayWickBoxes);
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->drawWick (m_displayWickBoxes);
   
   /**** Affichage de la scène ****/  
   if (m_drawShadowVolumes){
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
     glDisable(GL_BLEND);
   }
    
@@ -545,9 +545,9 @@ void GLFlameCanvas::drawScene()
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
     else{
       glEnable (GL_LIGHTING);
-      for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	   flamesIterator != m_flames.end (); flamesIterator++)
-	(*flamesIterator)->switchOn ();
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	(*firesIterator)->switchOn ();
       m_scene->drawScene();
       glDisable (GL_LIGHTING);
     }
@@ -568,21 +568,21 @@ void GLFlameCanvas::drawScene()
       m_globalField->displayVelocityField();
     glPopMatrix ();
   }
-  for (vector < Field3D* >::iterator solversIterator = m_solvers.begin ();
-       solversIterator != m_solvers.end (); solversIterator++)
+  for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)
     {
-      position = (*solversIterator)->getPosition ();
-      scale =  (*solversIterator)->getScale ();
+      position = (*fieldsIterator)->getPosition ();
+      scale =  (*fieldsIterator)->getScale ();
       
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
       glScalef (scale.x, scale.y, scale.z);
       if (m_displayBase)
-	(*solversIterator)->displayBase();
+	(*fieldsIterator)->displayBase();
       if (m_displayGrid)
-	(*solversIterator)->displayGrid();
+	(*fieldsIterator)->displayGrid();
       if (m_displayVelocity)
-	(*solversIterator)->displayVelocityField();
+	(*fieldsIterator)->displayVelocityField();
       glPopMatrix ();
     }
   glDisable (GL_BLEND);
@@ -608,15 +608,15 @@ void GLFlameCanvas::OnSize(wxSizeEvent& event)
 void GLFlameCanvas::castShadows ()
 {
   glEnable (GL_LIGHTING);
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->switchOff ();
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->switchOff ();
   m_scene->drawSceneWT ();
   
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->switchOn ();
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->switchOn ();
   
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT);
   
@@ -641,9 +641,9 @@ void GLFlameCanvas::castShadows ()
   glStencilMask (~0);
   glStencilFunc (GL_ALWAYS, 0, ~0);
 
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->drawShadowVolume ((float *)m_currentConfig->fatness, (float *)m_currentConfig->extrudeDist);
   
   glPopAttrib ();
   
@@ -672,9 +672,9 @@ void GLFlameCanvas::castShadows ()
   
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
   if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->switchOn ();
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->switchOn ();
     
     m_scene->drawScene ();
     glDisable (GL_LIGHTING);

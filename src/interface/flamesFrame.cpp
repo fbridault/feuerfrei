@@ -843,7 +843,7 @@ void FlamesFrame::OnSettingsMenu(wxCommandEvent& event)
     InitLuminariesPanels();
     InitSolversPanels();
     InitFlamesPanels();
-    m_glBuffer->ReloadSolversAndFlames();
+    m_glBuffer->ReloadFieldsAndFires();
   }
   m_glBuffer->setRunningState(true);
 }

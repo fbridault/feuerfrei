@@ -57,7 +57,7 @@ public:
   /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
-  void ReloadSolversAndFlames (void);
+  void ReloadFieldsAndFires (void);
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(FlameAppConfig *config);
@@ -80,33 +80,33 @@ public:
   void ToggleFlamesDisplay(void) { m_displayFlame=!m_displayFlame; };
   void ToggleShadowVolumesDisplay(void) { m_drawShadowVolumes=!m_drawShadowVolumes; };
   void setSmoothShading(bool state) {
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->setSmoothShading (state);
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->setSmoothShading (state);
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveLuminary(int selected, Point& pt){ 
     /* On ne peut déplacer que les solveurs locaux */
     m_luminaries[selected]->move(pt);
-    for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-	 flamesIterator != m_flames.end (); flamesIterator++)
-      (*flamesIterator)->computeVisibility(*m_camera,true);
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->computeVisibility(*m_camera,true);
   };
-  void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ 
-    if(selectedSolver >= 0) m_solvers[selectedSolver]->addPermanentExternalForces(pt);
+  void addPermanentExternalForcesToField(int selectedField, Point &pt){ 
+    if(selectedField >= 0) m_fields[selectedField]->addPermanentExternalForces(pt);
     else m_globalField->addPermanentExternalForces(pt);
   };
-  void setSolverBuoyancy(int index, float value){ 
-    if(index >= 0) m_solvers[index]->setBuoyancy(value);
+  void setFieldBuoyancy(int index, float value){ 
+    if(index >= 0) m_fields[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
-  void setFlameForces(int index, float value){ m_flames[index]->setInnerForce(value); };
-  void setFlameIntensity(int index, float value){ m_flames[index]->setIntensityCoef(value); };
-  void setFlameSamplingTolerance(int index, u_char value){ m_flames[index]->setSamplingTolerance(value); };
+  void setFlameForces(int index, float value){ m_fires[index]->setInnerForce(value); };
+  void setFlameIntensity(int index, float value){ m_fires[index]->setIntensityCoef(value); };
+  void setFlameSamplingTolerance(int index, u_char value){ m_fires[index]->setSamplingTolerance(value); };
 
 
   void setLuminaryBuoyancy(int index, float value){ 
-    if(index >= 0) m_solvers[index]->setBuoyancy(value);
+    if(index >= 0) m_fields[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
   void setLuminaryForces(int index, float value){ m_luminaries[index]->setInnerForce(value); };
@@ -147,7 +147,7 @@ private:
 
   /********* Variables relatives à la fenêtre d'affichage ****************/
   uint m_width, m_height;
-  uint prevNbSolvers, prevNbFlames;
+  uint prevNbFields, prevNbFlames;
   
   Camera *m_camera;
   /* Pour le compte des frames */
@@ -171,11 +171,11 @@ private:
   list <FieldThread *> m_threads;
   /** Ordonnanceur des threads */
   FieldThreadsScheduler *m_scheduler;
-  vector <Field3D *> m_solvers;
+  vector <Field3D *> m_fields;
   GlobalField *m_globalField;
     
   /********* Variables relatives à la simulation *************************/
-  vector <FireSource *> m_flames;
+  vector <FireSource *> m_fires;
   Scene *m_scene;
   GLSLProgram *m_SVProgram;
   GLSLVertexShader *m_SVShader;
@@ -203,9 +203,9 @@ inline void GLFlameCanvas::drawFlames(void)
 
 inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
 {
-  for (vector < FireSource* >::iterator flamesIterator = m_flames.begin ();
-       flamesIterator != m_flames.end (); flamesIterator++)
-    (*flamesIterator)->drawBoundingBox ();
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->drawBoundingBox ();
 }
 
 #endif

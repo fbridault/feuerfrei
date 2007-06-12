@@ -55,7 +55,7 @@ public:
   void ToggleDensityDisplay(void) { m_displayDensity=!m_displayDensity; };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
   void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addTemporaryExternalForces(pt); };
-  void addPermanentExternalForcesToSolver(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
+  void addPermanentExternalForcesToField(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, float value){ m_solvers[index]->setBuoyancy(value); };
   void addDensityInSolver(int index, int id){ m_solvers[index]->addDensity(id); };
   
@@ -78,6 +78,7 @@ private:
   
   Camera *m_camera;
   /* Pour le compte des frames */
+  wxStopWatch *m_swatch;
   uint m_framesCount, m_globalFramesCount;
 
   uint m_framesCountForSwitch;

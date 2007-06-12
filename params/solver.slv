@@ -5,13 +5,13 @@ Clipping=100
 [Solvers]
 Number=1
 [Solver0]
-Type=8
+Type=9
 Pos.x=0
 Pos.y=0
 Pos.z=0
-X_res=3
-Y_res=3
-Z_res=3
+X_res=15
+Y_res=15
+Z_res=15
 Scale=1
 TimeStep=0.4
 omegaDiff=1.5

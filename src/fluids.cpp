@@ -24,18 +24,12 @@ class FluidsApp : public wxApp
   /** Méthode d'initialisation de l'application 
    */
   virtual bool OnInit();
-  
-  /** Détermine si les shaders Cg sont déjà compilés
-   * @return false si les shaders sont compilés
-   */
-  bool areShadersCompiled();
 };
 
 IMPLEMENT_APP(FluidsApp)
 
 bool FluidsApp::OnInit()
 {
-  bool recompileShaders;
   wxString configFileName;
     
   setlocale(LC_NUMERIC, "C");

@@ -196,7 +196,7 @@ void GLFluidsCanvas::Init (FluidsAppConfig *config)
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
   InitSolvers();  
   
-  ::wxStartTimer();
+  m_swatch = new wxStopWatch();
   
   m_init = true;
   
@@ -215,7 +215,7 @@ void GLFluidsCanvas::Restart (void)
   
   InitUISettings();
   InitSolvers();
-  ::wxStartTimer();
+  m_swatch->Start();
   m_init = true;
   cerr << "Réinitialisation terminée" << endl;
   Enable();
@@ -333,11 +333,10 @@ void GLFluidsCanvas::OnPaint (wxPaintEvent& event)
   m_framesCount++;
   m_globalFramesCount++;
   
-  m_t = ::wxGetElapsedTime (false);
+  m_t = m_swatch->Time();
   if (m_t >= 2000){
     ((FluidsFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
-    
-    ::wxStartTimer();
+    m_swatch->Start();
     m_framesCount = 0;
   }
   

@@ -51,8 +51,8 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   buildDLBase ();
   buildDLGrid ();
 
-  m_visc = 0.00000015;
-  m_diff = 0.01;
+  m_visc = 0.00000015f;
+  m_diff = 0.01f;
   
   m_nbVoxelsXDivDimX = m_dimX * m_nbVoxelsX;
   m_nbVoxelsYDivDimY = m_dimY * m_nbVoxelsY;
@@ -62,7 +62,7 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_nx = m_nbVoxelsX+2;
   m_t1= m_nx +1;
   
-  m_forceCoef = .01;
+  m_forceCoef = .01f;
   m_forceRatio = 1/m_forceCoef;
 }
 
@@ -83,20 +83,20 @@ Solver2D::~Solver2D ()
 
 void Solver2D::set_bnd (unsigned char b, float *const x)
 {
-  uint i, j;
+  uint i;
 
   /* Attention cela ne prend pas en compte les coins et les arêtes entre les coins */
   for (i = 1; i <= m_nbVoxelsY; i++)
     {
-      x[IX (0, i)] = 0;	//x[IX(i,j,1)];
-      x[IX (m_nbVoxelsX + 1, i)] = 0;	//x[IX(i,j,N)];
+      x[IX (0, i)] = 0.0f;	//x[IX(i,j,1)];
+      x[IX (m_nbVoxelsX + 1, i)] = 0.0f;	//x[IX(i,j,N)];
     }
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     {
-      x[IX (i, 0)] = 0;	//x[IX(i, 1, j)];
+      x[IX (i, 0)] = 0.0f;	//x[IX(i, 1, j)];
       //x[IX(i, N+1, j)] = 0;//x[IX(i,N,j)];
-      x[IX (i, m_nbVoxelsY + 1)] = 0;//-- x[IX (i, m_nbVoxelsY, j)];
+      x[IX (i, m_nbVoxelsY + 1)] = 0.0f;//-- x[IX (i, m_nbVoxelsY, j)];
     } 
 }
 
@@ -104,7 +104,7 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
 		     const float *const u, const float *const v)
 {
   uint i, j, i0, j0, i1, j1;
-  float x, y, z, s0, t0, s1, t1, dt0_x, dt0_y;
+  float x, y, s0, t0, s1, t1, dt0_x, dt0_y;
 
   dt0_x = m_dt * m_nbVoxelsX;
   dt0_y = m_dt * m_nbVoxelsY;
@@ -115,12 +115,12 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
 	x = i - dt0_x * u[IX (i, j)];
 	y = j - dt0_y * v[IX (i, j)];
 	
-	if (x < 0.5) x = 0.5;
-	if (x > m_nbVoxelsX + 0.5) x = m_nbVoxelsX + 0.5;
+	if (x < 0.5f) x = 0.5f;
+	if (x > m_nbVoxelsX + 0.5f) x = m_nbVoxelsX + 0.5f;
 	i0 = (uint) x; i1 = i0 + 1;
 	
-	if (y < 0.5) y = 0.5;
-	if (y > m_nbVoxelsY + 0.5) y = m_nbVoxelsY + 0.5;
+	if (y < 0.5f) y = 0.5f;
+	if (y > m_nbVoxelsY + 0.5f) y = m_nbVoxelsY + 0.5f;
 	j0 = (uint) y; j1 = j0 + 1;
 	
 	s1 = x-i0; s0= 1-s1; t1 = y-j0; t0 = 1-t1;
@@ -190,14 +190,14 @@ void Solver2D::buildDLGrid ()
   glNewList (m_gridDisplayList, GL_COMPILE);
 
   glBegin(GL_LINES); 
-  glColor3f(0.5, 0.5, 0.5);
+  glColor3f(0.5f, 0.5f, 0.5f);
   for(i = 0.0 ; i <= m_dimX+interx ; i+= interx){
-    glVertex3f( i, 0.0, 0.0);
-    glVertex3f( i, m_dimY, 0.0);
+    glVertex3f( i, 0.0f, 0.0f);
+    glVertex3f( i, m_dimY, 0.0f);
   }
   for(i = 0.0 ; i <= m_dimY+intery ; i+= intery){
-    glVertex3f(0.0, i,  0.0);
-    glVertex3f(m_dimX, i,  0.0);
+    glVertex3f(0.0f, i,  0.0f);
+    glVertex3f(m_dimX, i,  0.0f);
   }
   glEnd();
   glEndList();
@@ -205,18 +205,15 @@ void Solver2D::buildDLGrid ()
 
 void Solver2D::buildDLBase ()
 {
-  float interx = m_dimX / (float) m_nbVoxelsX;
-  float intery = m_dimY / (float) m_nbVoxelsY;
-  
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
 
   glBegin(GL_LINE_LOOP); 
-  glColor3f(0.5, 0.5, 0.5);
-  glVertex3f( 0.0, 0.0, 0.0);
-  glVertex3f( 0.0, m_dimY, 0.0);
-  glVertex3f( m_dimX, m_dimY,  0.0);
-  glVertex3f( m_dimX, 0.0,  0.0);
+  glColor3f(0.5f, 0.5f, 0.5f);
+  glVertex3f( 0.0f, 0.0f, 0.0f);
+  glVertex3f( 0.0f, m_dimY, 0.0f);
+  glVertex3f( m_dimX, m_dimY,  0.0f);
+  glVertex3f( m_dimX, 0.0f,  0.0f);
   glEnd();
   glEndList();
 }
@@ -233,7 +230,7 @@ void Solver2D::displayVelocityField (void)
 	{
 	  /* Affichage du champ de vélocité */
 	  glPushMatrix();
-	  glTranslatef(inc_x*i-inc_x/2.0,inc_y*j-inc_y/2.0,0.0);
+	  glTranslatef(inc_x*i-inc_x/2.0f,inc_y*j-inc_y/2.0f,0.0f);
 	  //      printf("%vélocité %d %d %f %f\n",i,j,u[IX(i,j)],v[IX(i,j)]);
 	  
 	  vect.x = getU (i, j);  vect.y = getV (i, j);
@@ -254,13 +251,13 @@ void Solver2D::displayDensityField (void)
   
   for (uint i = 1; i <= m_nbVoxelsX; i++)
     for (uint j = 1; j <= m_nbVoxelsY; j++)
-      if(getDens(i,j) > 0.0){	
-	glColor4f(1.0,1.0,1.0,getDens(i,j)*10000);
+      if(getDens(i,j) > 0.0f){	
+	glColor4f(1.0f,1.0f,1.0f,getDens(i,j)*10000);
 	glBegin(GL_QUADS);
-	glVertex3f(inc_x*(i-1),inc_y*(j-1),-0.01);
-	glVertex3f(inc_x*i,inc_y*(j-1),-0.01);
-	glVertex3f(inc_x*i,inc_y*j,-0.01);
-	glVertex3f(inc_x*(i-1),inc_y*j,-0.01);
+	glVertex3f(inc_x*(i-1),inc_y*(j-1),-0.01f);
+	glVertex3f(inc_x*i,inc_y*(j-1),-0.01f);
+	glVertex3f(inc_x*i,inc_y*j,-0.01f);
+	glVertex3f(inc_x*(i-1),inc_y*j,-0.01f);
 	glEnd();
       }
 }
@@ -268,29 +265,29 @@ void Solver2D::displayDensityField (void)
 void Solver2D::displayArrow (const Vector& direction)
 {
   float norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
-  float taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05;
+  float taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05f;
   float angle;
   Vector ref, dir(direction);
   
   dir.normalize ();
   
-  ref.x = 1.0; ref.y=0.0; ref.z =0.0;
+  ref.x = 1.0f; ref.y=0.0f; ref.z =0.0f;
   
   angle = acosf(dir.x*ref.x + dir.y*ref.y);
-  if(dir.y<0.0) angle = -angle;
+  if(dir.y<0.0f) angle = -angle;
 
-  glRotatef(angle*RAD_TO_DEG,0.0,0.0,1.0);
+  glRotatef(angle*RAD_TO_DEG,0.0f,0.0f,1.0f);
 
   glBegin(GL_LINES);
  
   glColor4f(1.0, 0.0, 0.0,1.0);
 
-  glVertex3f(0.0, 0.0, 0.0);
-  glVertex3f(taille, 0.0, 0.0);
-  glVertex3f(taille-taille/4, taille/4, 0.0);
-  glVertex3f(taille, 0.0,  0.0);
-  glVertex3f(taille-taille/4, -taille/4, 0.0);
-  glVertex3f(taille, 0.0,  0.0);
+  glVertex3f(0.0f, 0.0f, 0.0f);
+  glVertex3f(taille, 0.0f, 0.0f);
+  glVertex3f(taille-taille/4, taille/4, 0.0f);
+  glVertex3f(taille, 0.0f,  0.0f);
+  glVertex3f(taille-taille/4, -taille/4, 0.0f);
+  glVertex3f(taille, 0.0f,  0.0f);
 
   glEnd();
 }
@@ -303,11 +300,11 @@ void Solver2D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = .005*m_nbVoxelsX;
+    strength.x = strength.y = .005f*m_nbVoxelsX;
     m_position=position;
   }else{
     force = position;
-    strength = position * .001 * m_nbVoxelsX;
+    strength = position * .001f * m_nbVoxelsX;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
   }
@@ -320,14 +317,14 @@ void Solver2D::addExternalForces(const Point& position, bool move)
   
   /* Ajouter des forces externes */
   if(force.x)
-    if( force.x > 0)
+    if( force.x > 0.0f)
       for (i = ceily; i <= widthy; i++)
 	addUsrc (m_nbVoxelsX - 1, i, -strength.x);
     else
       for (i = ceily; i <= widthy; i++)
 	addUsrc (1, i, strength.x); 
   if(force.y)
-    if( force.y > 0)
+    if( force.y > 0.0f)
       for (i = ceilx; i <= widthx; i++)
 	addVsrc (i, m_nbVoxelsY - 1, -strength.y);
     else
@@ -338,9 +335,9 @@ void Solver2D::addExternalForces(const Point& position, bool move)
 void Solver2D::addDensity(int id)
 {
   switch(id){
-  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.001); break;
-  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.001); break;
-  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.001); break;
-  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.001); break;
+  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.001f); break;
+  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.001f); break;
+  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.001f); break;
+  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.001f); break;
   }
 }

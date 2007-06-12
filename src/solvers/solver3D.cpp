@@ -25,8 +25,8 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   memset (m_densPrev, 0, m_nbVoxels * sizeof (float));
   memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
   
-  m_visc = 0.00000015;
-  m_diff = 0.001;
+  m_visc = 0.00000015f;
+  m_diff = 0.001f;
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
@@ -58,7 +58,7 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
       for (j = 1; j <= m_nbVoxelsZ; j++)
 	{
 	  x[IX (0, i, j)] = 0;	//x[IX(i,j,1)];
-	  x[IX (m_nbVoxelsX + 1, i, j)] = 0;	//x[IX(i,j,N)];
+	  x[IX (m_nbVoxelsX + 1, i, j)] = 0.0f;	//x[IX(i,j,N)];
 	}
     }
 
@@ -66,9 +66,9 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
     {
       for (j = 1; j <= m_nbVoxelsZ; j++)
 	{
-	  x[IX (i, 0, j)] = 0;	//x[IX(i, 1, j)];
+	  x[IX (i, 0, j)] = 0.0f;	//x[IX(i, 1, j)];
 	  //x[IX(i, N+1, j)] = 0;//x[IX(i,N,j)];
-	  x[IX (i, m_nbVoxelsY + 1, j)] = 0;//-- x[IX (i, m_nbVoxelsY, j)];
+	  x[IX (i, m_nbVoxelsY + 1, j)] = 0.0f;//-- x[IX (i, m_nbVoxelsY, j)];
 	}
     }
 
@@ -76,8 +76,8 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
     {
       for (j = 1; j <= m_nbVoxelsY; j++)
 	{
-	  x[IX (i, j, 0)] = 0;	//x[IX(i,j,1)];
-	  x[IX (i, j, m_nbVoxelsZ + 1)] = 0;	//x[IX(i,j,N)];
+	  x[IX (i, j, 0)] = 0.0f;	//x[IX(i,j,1)];
+	  x[IX (i, j, m_nbVoxelsZ + 1)] = 0.0f;	//x[IX(i,j,N)];
 	}
     }
 }
@@ -102,16 +102,16 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 	  y = j - dt0_y * v[m_t];
 	  z = k - dt0_z * w[m_t];
 	  
-	  if (x < 0.5) x = 0.5;
-	  if (x > m_nbVoxelsX + 0.5) x = m_nbVoxelsX + 0.5;
+	  if (x < 0.5f) x = 0.5f;
+	  if (x > m_nbVoxelsX + 0.5f) x = m_nbVoxelsX + 0.5f;
 	  i0 = (uint) x; i1 = i0 + 1;
 	  
-	  if (y < 0.5) y = 0.5;
-	  if (y > m_nbVoxelsY + 0.5) y = m_nbVoxelsY + 0.5;
+	  if (y < 0.5f) y = 0.5f;
+	  if (y > m_nbVoxelsY + 0.5f) y = m_nbVoxelsY + 0.5f;
 	  j0 = (uint) y; j1 = j0 + 1;
 	  
-	  if (z < 0.5) z = 0.5;
-	  if (z > m_nbVoxelsZ + 0.5) z = m_nbVoxelsZ + 0.5;
+	  if (z < 0.5f) z = 0.5f;
+	  if (z > m_nbVoxelsZ + 0.5f) z = m_nbVoxelsZ + 0.5f;
 	  k0 = (uint) z; k1 = k0 + 1;
 
 	  r1 = x - i0;
@@ -172,7 +172,7 @@ void Solver3D::iterate ()
   
 //   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
 //     for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
-//       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0;
+//       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0f;
 
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
@@ -217,18 +217,18 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position;
-    strength.x = strength.y = strength.z = .2;
+    strength.x = strength.y = strength.z = .2f;
     setPosition(m_position + position);
   }else{
     force = position;
-    strength = position * .1;
+    strength = position * .1f;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
     strength.z = fabs(strength.z);  
   }
   
-  findPointPosition(m_dim-Point(.1,.3,.1),widthx,widthy,widthz);
-  findPointPosition(Point(0,0,0),ceilx,ceily,ceilz);
+  findPointPosition(m_dim-Point(.1f,.3f,.1f),widthx,widthy,widthz);
+  findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */
   if(force.x)
@@ -244,11 +244,11 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     if( force.y > 0)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j < widthz; j++)
-	  m_vSrc[IX(i, m_nbVoxelsY, j)] -= strength.y/10.0;
+	  m_vSrc[IX(i, m_nbVoxelsY, j)] -= strength.y/10.0f;
     else
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j <= widthz; j++)
-	  m_vSrc[IX(i, 1, j)] += strength.y/10.0;
+	  m_vSrc[IX(i, 1, j)] += strength.y/10.0f;
   if(force.z)
     if( force.z > 0)
       for (i = ceilx; i <= widthx; i++)
@@ -269,22 +269,22 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
   case LEFT_FACE :
     for (i = 1; i <= m_nbVoxelsZ; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0;
+	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f;
     break;
   case RIGHT_FACE : 
     for (i = 1; i <= m_nbVoxelsZ; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0;
+	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f;
     break;
   case BACK_FACE : 
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0;
+	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f;
     break;
   case FRONT_FACE : 
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0;
+	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f;
     break;
   }
 }
@@ -341,44 +341,44 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	  vh[IX(i,j,k)] = v2h[IX2h(I,J,K)];
 	  break;
 	case 1: // milieu d'une arête
-	  vh[IX(i,j,k)] = 0.5*
+	  vh[IX(i,j,k)] = 0.5f*
 	    (v2h[IX2h(I,J,K)] +
 	     v2h[IX2h(I,J,K+1)]);
 	  break;
 	case 2: // milieu d'une arête
-	  vh[IX(i,j,k)] =  0.5*
+	  vh[IX(i,j,k)] =  0.5f*
 	    (v2h[IX2h(I,J,K)] +
 	     v2h[IX2h(I,J+1,K)]);
 	  break;
 	case 3: // centre d'une face
-	  vh[IX(i,j,k)] = 0.25*
+	  vh[IX(i,j,k)] = 0.25f*
 	    (v2h[IX2h(I,J,K)]+
 	     v2h[IX2h(I,J+1,K)]+
 	     v2h[IX2h(I,J+1,K+1)]+
 	     v2h[IX2h(I,J,K+1)]);
 	  break;
 	case 4: // milieu d'une arête
-	  vh[IX(i,j,k)] = 0.5*
+	  vh[IX(i,j,k)] = 0.5f*
 	    (v2h[IX2h(I,J,K)] + 
 	     v2h[IX2h(I+1,J,K)]);
 	  break;
 
 	case 5: // centre d'une face
-	  vh[IX(i,j,k)] = 0.25*
+	  vh[IX(i,j,k)] = 0.25f*
 	    (v2h[IX2h(I,J,K)]+ 
 	     v2h[IX2h(I+1,J,K)]+
 	     v2h[IX2h(I+1,J,K+1)]+
 	     v2h[IX2h(I,J,K+1)]);
 	  break;
 	case 6: // centre d'une face
-	  vh[IX(i,j,k)] = 0.25*
+	  vh[IX(i,j,k)] = 0.25f*
 	    (v2h[IX2h(I,J,K)]+
 	     v2h[IX2h(I+1,J,K)]+
 	     v2h[IX2h(I+1,J+1,K)]+
 	     v2h[IX2h(I,J+1,K)]);
 	  break;
 	case 7: // centre du cube
-	  vh[IX(i,j,k)] = 0.125*
+	  vh[IX(i,j,k)] = 0.125f*
 	    (v2h[IX2h(I,J,K)]+ 
 	     v2h[IX2h(I+1,J,K)]+
 	     v2h[IX2h(I+1,J,K+1)]+
@@ -439,38 +439,38 @@ void  Solver3D::restreindre(float *const vh, float *const v2h){
 	//                                 v
 
 	v2h[IX2h(i,j,k)] = (
-			    0.125*(
+			    0.125f*(
 				   vh[IX( ii ,jj , kk)]+// coïncident
 				   (vh[IX(iiE,jjS,kk)]+// point  SE
 				    vh[IX(iiE,jjN,kk)]+// point  NE
 				    vh[IX(iiO,jjS,kk)]+// point  SO
-				    vh[IX(iiO,jjN,kk)])*0.25+// point NO
+				    vh[IX(iiO,jjN,kk)])*0.25f+// point NO
 				   (vh[IX(iiE,jj ,kk)]+ // point E
 				    vh[IX(ii ,jjS,kk)]+ // point S
 				    vh[IX(ii ,jjN,kk)]+ // point N
-				    vh[IX(iiO,jj ,kk)])*0.5 // point O
+				    vh[IX(iiO,jj ,kk)])*0.5f // point O
 				   )+
-			    0.0625*(// idem mais pour le plan au-dessus
+			    0.0625f*(// idem mais pour le plan au-dessus
 				    vh[IX( ii ,jj ,kkU)]+
 				    (vh[IX(iiE,jjS,kkU)]+
 				     vh[IX(iiE,jjN,kkU)]+
 				     vh[IX(iiO,jjS,kkU)]+
-				     vh[IX(iiO,jjN,kkU)])*0.25+
+				     vh[IX(iiO,jjN,kkU)])*0.25f+
 				    (vh[IX(iiE,jj ,kkU)]+
 				     vh[IX(ii ,jjS,kkU)]+
 				     vh[IX(ii ,jjN,kkU)]+
-				     vh[IX(iiO,jj ,kkU)])*0.5
+				     vh[IX(iiO,jj ,kkU)])*0.5f
 				    )+
-			    0.0625*(// idem mais pour le plan au-dessous
+			    0.0625f*(// idem mais pour le plan au-dessous
 				    vh[IX( ii ,jj ,kkD)]+
 				    (vh[IX(iiE,jjS,kkD)]+
 				     vh[IX(iiE,jjN,kkD)]+
 				     vh[IX(iiO,jjS,kkD)]+
-				     vh[IX(iiO,jjN,kkD)])*0.25+
+				     vh[IX(iiO,jjN,kkD)])*0.25f+
 				    (vh[IX(iiE,jj ,kkD)]+
 				     vh[IX(ii ,jjS,kkD)]+
 				     vh[IX(ii ,jjN,kkD)]+
-				     vh[IX(iiO,jj ,kkD)])*0.5
+				     vh[IX(iiO,jj ,kkD)])*0.5f
 				    )
 			    );
 

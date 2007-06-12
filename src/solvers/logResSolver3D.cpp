@@ -64,7 +64,7 @@ void LogResSolver3D::diffuse (unsigned char b, float *const x, float *const x0, 
   m_file = &m_fileDiff[b+2];
   
   setPreviousState(x, x0);
-  GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
+  GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,m_nbSteps);
 }
 
 
@@ -94,7 +94,7 @@ void LogResSolver3D::project (float *const p, float *const div)
   m_file = &m_fileProj[m_index+2];
   
   setPreviousState(p, div);  
-  GCSSOR(p,div,1, 6.0, m_omegaProj,100);
+  GCSSOR(p,div,1, 6.0, m_omegaProj,m_nbSteps);
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)

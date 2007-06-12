@@ -97,7 +97,7 @@ void RealField3D::addExternalForces(const Point& position, bool move)
     setPosition(m_position + position);
   }else{
     force = position;
-    strength = position * .1;
+    strength = position * .1f;
   }
     
   /* Ajouter des forces externes */
@@ -142,7 +142,7 @@ void RealField3D::displayVelocityField (void)
 	  uint index = IX(i,j,k);
 	  /* Affichage du champ de vélocité */
 	  glPushMatrix ();
-	  glTranslatef (inc_x * i - inc_x/2.0 , inc_y * j - inc_y/2.0, inc_z * k - inc_z/2.0);
+	  glTranslatef (inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
 	  //SDL_mutexP (lock);
 	  //SDL_mutexV (lock);
 	  displayArrow (Vector (m_u[index], m_v[index], m_w[index]));

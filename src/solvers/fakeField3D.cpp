@@ -22,33 +22,33 @@ void FakeField3D::iterate ()
     return;
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z){
-    if(m_permanentExternalForces.x > 0)
+    if(m_permanentExternalForces.x > 0.0f)
       if(m_latentForces.x < m_permanentExternalForces.x)
 	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
       else
 	m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
-    if(m_permanentExternalForces.y > 0)
+    if(m_permanentExternalForces.y > 0.0f)
       if(m_latentForces.y < m_permanentExternalForces.y)
 	m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
       else
 	m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;	
-    if(m_permanentExternalForces.z > 0)
+    if(m_permanentExternalForces.z > 0.0f)
       if(m_latentForces.z < m_permanentExternalForces.z)
 	m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
       else
 	m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
     
-    if(m_permanentExternalForces.x < 0)
+    if(m_permanentExternalForces.x < 0.0f)
       if(m_latentForces.x > m_permanentExternalForces.x)
 	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
       else
 	m_latentForces.x = m_latentForces.x - m_permanentExternalForces.x * coef;
-    if(m_permanentExternalForces.y < 0)
+    if(m_permanentExternalForces.y < 0.0f)
        if(m_latentForces.y > m_permanentExternalForces.y)
 	 m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
        else
 	 m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;
-    if(m_permanentExternalForces.z < 0)
+    if(m_permanentExternalForces.z < 0.0f)
        if(m_latentForces.z > m_permanentExternalForces.z)
 	 m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
        else
@@ -56,12 +56,12 @@ void FakeField3D::iterate ()
     
     addExternalForces(m_latentForces,false);
   }else{
-    if(m_latentForces.x > 0) m_latentForces.x = m_latentForces.x - coef;
-    if(m_latentForces.y > 0) m_latentForces.y = m_latentForces.y - coef;
-    if(m_latentForces.z > 0) m_latentForces.z = m_latentForces.z - coef;
-    if(m_latentForces.x < 0) m_latentForces.x = m_latentForces.x + coef;
-    if(m_latentForces.y < 0) m_latentForces.y = m_latentForces.y + coef;
-    if(m_latentForces.z < 0) m_latentForces.z = m_latentForces.z + coef;
+    if(m_latentForces.x > 0.0f) m_latentForces.x = m_latentForces.x - coef;
+    if(m_latentForces.y > 0.0f) m_latentForces.y = m_latentForces.y - coef;
+    if(m_latentForces.z > 0.0f) m_latentForces.z = m_latentForces.z - coef;
+    if(m_latentForces.x < 0.0f) m_latentForces.x = m_latentForces.x + coef;
+    if(m_latentForces.y < 0.0f) m_latentForces.y = m_latentForces.y + coef;
+    if(m_latentForces.z < 0.0f) m_latentForces.z = m_latentForces.z + coef;
     
     if(m_latentForces.x || m_latentForces.y || m_latentForces.z) addExternalForces(m_latentForces,false);
   }
@@ -83,9 +83,9 @@ void FakeField3D::iterate ()
 
 void FakeField3D::cleanSources ()
 {
-  m_src.x = 0;
-  m_src.y = 0;
-  m_src.z = 0;
+  m_src.x = 0.0f;
+  m_src.y = 0.0f;
+  m_src.z = 0.0f;
 }
 
 void FakeField3D::addExternalForces(const Point& position, bool move)
@@ -95,13 +95,13 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position;
-    strength.x = force.x > 0 ? .2 : -.2;
-    strength.y = force.y > 0 ? .2 : -.2;
-    strength.z = force.z > 0 ? .2 : -.2;
+    strength.x = force.x > 0.0f ? .2f : -.2f;
+    strength.y = force.y > 0.0f ? .2f : -.2f;
+    strength.z = force.z > 0.0f ? .2f : -.2f;
     setPosition(m_position + position);
   }else{
     force = position;
-    strength = position * .025;
+    strength = position * .025f;
   }
   
   /* Ajouter des forces externes */
@@ -124,7 +124,7 @@ void FakeField3D::displayVelocityField (void)
       for (uint k = 0; k <= m_nbVoxelsZ; k++)
 	{
 	  Vector vect;
-	  Point pt(inc_x * i - inc_x/2.0 , inc_y * j - inc_y/2.0, inc_z * k - inc_z/2.0);
+	  Point pt(inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
 	  
 	  /* Affichage du champ de vélocité */
 	  glPushMatrix ();	  
@@ -141,9 +141,9 @@ void FakeField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, c
 				  const Point& TRStrength, const Point& BRStrength)
 {
   switch(face){
-  case LEFT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
-  case RIGHT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0; break;
-  case BACK_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
-  case FRONT_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0; break;
+  case LEFT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f; break;
+  case RIGHT_FACE : m_temporaryExternalForces.x += 20*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f; break;
+  case BACK_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f; break;
+  case FRONT_FACE : m_temporaryExternalForces.z += 20*(BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f; break;
   }
 }

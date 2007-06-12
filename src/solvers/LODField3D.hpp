@@ -231,7 +231,7 @@ public:
     cerr << "real" << endl;
     m_switch = NB_STEPS_TO_SWITCH;
     m_fieldWeight = 1;
-    m_solverWeight = 0;
+    m_solverWeight = 0.0f;
     m_fieldIncrement = -1/(float)NB_STEPS_TO_SWITCH;
     m_solverIncrement = 1/(float)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_solver; 
@@ -241,7 +241,7 @@ public:
   {
     cerr << "fake" << endl;
     m_switch = NB_STEPS_TO_SWITCH;
-    m_fieldWeight = 0;
+    m_fieldWeight = 0.0f;
     m_solverWeight = 1;
     m_fieldIncrement =   1/(float)NB_STEPS_TO_SWITCH;
     m_solverIncrement = -1/(float)NB_STEPS_TO_SWITCH;

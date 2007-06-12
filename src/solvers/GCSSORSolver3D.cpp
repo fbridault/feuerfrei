@@ -49,7 +49,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 {
   float f=omega/diagonal;
   float d=f*a;
-  float e=2.0-omega;
+  float e=2.0f-omega;
   uint i,j,k;
   
   float rho0, rho1, alpha, beta;//,norm2,normb2,eb2;
@@ -60,7 +60,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
   const float * mb;
   // calcul du carré de la norme de b
   //   t = t1;
-  //   normb2=0.0;
+  //   normb2=0.0f;
   //   //traiter les couches de voxels de la grille
   //   for (int k = 1; k <= m_nbVoxelsZ; k++){
   //     //traiter une couche de voxels
@@ -191,7 +191,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
   memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
 	
   // calcul de r.z
-  rho0=0.0;
+  rho0=0.0f;
   mr=&m_r[m_t1];
   mz=&m_z[m_t1];
   for ( k = 1; k <= m_nbVoxelsZ; k++){
@@ -212,7 +212,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
   for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     //calcul du produit scalaire p.q
-    alpha=0.0;
+    alpha=0.0f;
     mq=&m_q[m_t1];
     mp=&m_p[m_t1];
     mpmnx=mp-m_nx;
@@ -355,7 +355,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 
     }//for k
     //calcul de rho1 = r.z
-    rho1=0.0;
+    rho1=0.0f;
     mr=&m_r[m_t1];
     mz=&m_z[m_t1];
     for ( k = 1; k <= m_nbVoxelsZ; k++){
@@ -406,26 +406,26 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 void
 GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
-  GCSSOR(x,x0,a, (1.0 + 6.0 * a), m_omegaDiff,100);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,100);
 }
 
 void
 GCSSORSolver3D::project (float *const p, float *const div)
 {
-  float h_x = 1.0 / m_nbVoxelsX, 
-    h_y = 1.0 / m_nbVoxelsY, 
-    h_z = 1.0 / m_nbVoxelsZ;
+  float h_x = 1.0f / m_nbVoxelsX, 
+    h_y = 1.0f / m_nbVoxelsY, 
+    h_z = 1.0f / m_nbVoxelsZ;
   uint i, j, k;
   
   m_t = m_t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	div[m_t] = -0.5 * (
-			   h_x * (m_u[m_t+1] - m_u[m_t-1]) +
-			   h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) +
-			   h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2])
-			   );
+	div[m_t] = -0.5f * (
+			    h_x * (m_u[m_t+1] - m_u[m_t-1]) +
+			    h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) +
+			    h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2])
+			    );
 	m_t++;
       }//for i
       m_t+=2;
@@ -438,15 +438,15 @@ GCSSORSolver3D::project (float *const p, float *const div)
   memset (p, 0, m_nbVoxels * sizeof (float));
   //set_bnd (0, p);
   
-  GCSSOR(p,div,1, 6.0, m_omegaProj,100);
+  GCSSOR(p,div,1, 6.0f, m_omegaProj,100);
   
   m_t = m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
-	m_u[m_t] -= 0.5 * (p[m_t+1] - p[m_t-1]) / h_x;
-	m_v[m_t] -= 0.5 * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
-	m_w[m_t] -= 0.5 * (p[m_t+m_n2] - p[m_t-m_n2]) / h_z;
+	m_u[m_t] -= 0.5f * (p[m_t+1] - p[m_t-1]) / h_x;
+	m_v[m_t] -= 0.5f * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
+	m_w[m_t] -= 0.5f * (p[m_t+m_n2] - p[m_t-m_n2]) / h_z;
 	m_t++;
       }// for i
       m_t+=2;

@@ -33,18 +33,18 @@ void GSSolver2D::GS_solve(unsigned char b, float *const x, const float *const x0
 /* Pas de diffusion */
 void GSSolver2D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
-  GS_solve(b,x,x0,a, 1/(1.0 + 6.0 * a), 2);
+  GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 2);
 }
 
 void GSSolver2D::project (float *const p, float *const div)
 {
-  float h_x = 1.0 / m_nbVoxelsX, h_y = 1.0 / m_nbVoxelsY;
+  float h_x = 1.0f / m_nbVoxelsX, h_y = 1.0f / m_nbVoxelsY;
   uint i, j;
   
   m_t=m_t1;
   for (j = 1; j <= m_nbVoxelsY; j++){
     for (i = 1; i <= m_nbVoxelsX; i++){
-      div[m_t] = -0.5 * ( h_x * (m_u[m_t+1] - m_u[m_t-1]) + h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) );
+      div[m_t] = -0.5f * ( h_x * (m_u[m_t+1] - m_u[m_t-1]) + h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) );
       m_t++;
     }//for i
     m_t+=2;
@@ -55,13 +55,13 @@ void GSSolver2D::project (float *const p, float *const div)
   memset (p, 0, m_nbVoxels * sizeof (float));
   //  set_bnd (0, p);
   
-  GS_solve(0,p,div,1, 1/6.0, m_nbSteps); 
+  GS_solve(0,p,div,1, 1/6.0f, m_nbSteps); 
   
   m_t=m_t1;
   for (j = 1; j <= m_nbVoxelsY; j++){
     for (i = 1; i <= m_nbVoxelsX; i++){
-      m_u[m_t] -= 0.5 * (p[m_t+1] - p[m_t-1]) / h_x;
-      m_v[m_t] -= 0.5 * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
+      m_u[m_t] -= 0.5f * (p[m_t+1] - p[m_t-1]) / h_x;
+      m_v[m_t] -= 0.5f * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
       m_t++;
     }//for i
     m_t+=2;

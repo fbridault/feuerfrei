@@ -67,7 +67,7 @@ protected:
   uint m_nbMaxIter;
   
   /** Indice utilisé pour la génération du nom du fichier de log. */
-  unsigned short m_index;
+  unsigned int m_index;
   
 private:
   float *m_save, *m_save2; /** Permet de sauver une composante. */

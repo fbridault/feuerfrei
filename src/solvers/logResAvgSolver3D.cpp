@@ -1,6 +1,5 @@
 #include "logResAvgSolver3D.hpp"
 
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 LogResAvgSolver3D::LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
 				      float timeStep, uint nbTimeSteps, float buoyancy, 
 				      float omegaDiff, float omegaProj, float epsilon) : 
@@ -11,19 +10,17 @@ LogResAvgSolver3D::LogResAvgSolver3D (const Point& position, uint n_x, uint n_y,
   
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*m_nbSteps;
   m_averages = new float[m_nbAverages];
-  memset (m_averages, 0, m_nbAverages * sizeof (float));
+  fill_n(m_averages, m_nbAverages, 0.0f);
 }
 
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 LogResAvgSolver3D::LogResAvgSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon) : 
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
   
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*m_nbSteps;
-  m_averages = new float[m_nbAverages];
-  
-  memset (m_averages, 0, m_nbAverages * sizeof (float));
+  m_averages = new float[m_nbAverages];  
+  fill_n(m_averages, m_nbAverages, 0.0f);
 }
 
 LogResAvgSolver3D::~LogResAvgSolver3D ()
@@ -91,14 +88,14 @@ void LogResAvgSolver3D::project (float *const p, float *const div)
     for (j = 1; j <= m_nbVoxelsY; j++)
       for (k = 1; k <= m_nbVoxelsZ; k++){
 		div[IX (i, j, k)] =
-		  -0.5 * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
-			  h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
-			  h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
+		  -0.5f * (h_x * (m_u[IX (i + 1, j, k)] - m_u[IX (i - 1, j, k)]) +
+			   h_y * (m_v[IX (i, j + 1, k)] - m_v[IX (i, j - 1, k)]) +
+			   h_z * (m_w[IX (i, j, k + 1)] - m_w[IX (i, j, k - 1)]));
 		//p[IX (i, j, k)] = 0;
       }
-  set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (float));
-  //  set_bnd (0, p);
+//   set_bnd (0, div);
+  fill_n(p, m_nbVoxels, 0.0f);
+//   set_bnd (0, p);
   
   saveState(p, div);
   GS_solve(0,p,div,1, 1/6.0f, m_nbSteps);
@@ -110,9 +107,9 @@ void LogResAvgSolver3D::project (float *const p, float *const div)
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)
       for (k = 1; k <= m_nbVoxelsZ; k++){
-		m_u[IX (i, j, k)] -= 0.5 * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
-		m_v[IX (i, j, k)] -= 0.5 * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
-		m_w[IX (i, j, k)] -= 0.5 * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
+		m_u[IX (i, j, k)] -= 0.5f * (p[IX (i + 1, j, k)] - p[IX (i - 1, j, k)]) / h_x;
+		m_v[IX (i, j, k)] -= 0.5f * (p[IX (i, j + 1, k)] - p[IX (i, j - 1, k)]) / h_y;
+		m_w[IX (i, j, k)] -= 0.5f * (p[IX (i, j, k + 1)] - p[IX (i, j, k - 1)]) / h_z;
       }
   //set_bnd (1, u);
   //set_bnd (2, v);
@@ -127,9 +124,9 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, float *const x
   float norm2;
   
   for (l = 0; l < nb_steps; l++){
-    for (i = 1; i <= m_nbVoxelsX; i++)
+    for (k = 1; k <= m_nbVoxelsZ; k++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	for (k = 1; k <= m_nbVoxelsZ; k++)
+	for (i = 1; i <= m_nbVoxelsX; i++)
 	  x[IX (i, j, k)] = (x0[IX (i, j, k)] +
 			     a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +
@@ -139,7 +136,7 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, float *const x
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
-	  m_r[IX (i, j, k)] = x0[IX (i, j, k)] - diagonal * x[IX (i, j, k)] +
+	  m_r[IX (i, j, k)] = x0[IX (i, j, k)] - diagonal * x[IX (i, j, k)] + 
 	    a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 		 x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
 		 x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)]);
@@ -199,7 +196,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
 	
   // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
+  copy(m_z, &m_z[m_nbVoxels], m_p);
     
   // calcul de r.z
   rho0=0.0f;
@@ -228,7 +225,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
     
     //calcul de alpha
 //    alpha= rho0/alpha;
-    alpha=(alpha) ? rho0/alpha : 0;
+    alpha=(alpha) ? rho0/alpha : 0.0f;
     // calcul de x = x + alpha.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -299,6 +296,5 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
 void LogResAvgSolver3D::computeAverage (uint iter, float value)
 {
   int i = m_index*m_nbSteps + iter;
-  cerr << m_index << " "<< value << endl;
   m_averages[i] = (m_averages[i] * m_nbIter + sqrtf(value))/(float)(m_nbIter+1);
 }

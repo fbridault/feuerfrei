@@ -7,10 +7,10 @@ GCSSORSolver3D::GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon)
   m_p=new float[m_nbVoxels];
   m_q=new float[m_nbVoxels];
 
-  memset (m_r, 0, m_nbVoxels * sizeof (float));
-  memset (m_z, 0, m_nbVoxels * sizeof (float));
-  memset (m_p, 0, m_nbVoxels * sizeof (float));
-  memset (m_q, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_r, m_nbVoxels, 0.0f);
+  fill_n(m_z, m_nbVoxels, 0.0f);
+  fill_n(m_p, m_nbVoxels, 0.0f);
+  fill_n(m_q, m_nbVoxels, 0.0f);
   
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
@@ -26,10 +26,10 @@ GCSSORSolver3D::GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint 
   m_p=new float[m_nbVoxels];
   m_q=new float[m_nbVoxels];
 
-  memset (m_r, 0, m_nbVoxels * sizeof (float));
-  memset (m_z, 0, m_nbVoxels * sizeof (float));
-  memset (m_p, 0, m_nbVoxels * sizeof (float));
-  memset (m_q, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_r, m_nbVoxels, 0.0f);
+  fill_n(m_z, m_nbVoxels, 0.0f);
+  fill_n(m_p, m_nbVoxels, 0.0f);
+  fill_n(m_q, m_nbVoxels, 0.0f);
 
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
@@ -188,8 +188,8 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 
   }//for k
   // p=z
-  memcpy (m_p, m_z, m_nbVoxels * sizeof (float));
-	
+  copy(m_z, &m_z[m_nbVoxels], m_p);
+  
   // calcul de r.z
   rho0=0.0f;
   mr=&m_r[m_t1];
@@ -265,7 +265,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
   
     //calcul de alpha
     // alpha= rho0/alpha;
-    alpha=(alpha) ? rho0/alpha : 0;
+    alpha=(alpha) ? rho0/alpha : 0.0f;
     // calcul de x = x + alpha.p
     // calcul de r = r -alpha*q
     // calcul du carré de la norme du résidu
@@ -435,7 +435,7 @@ GCSSORSolver3D::project (float *const p, float *const div)
   }// for k
   
   //set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (float));
+  fill_n(p, m_nbVoxels, 0.0f);
   //set_bnd (0, p);
   
   GCSSOR(p,div,1, 6.0f, m_omegaProj,100);

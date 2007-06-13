@@ -12,7 +12,7 @@ GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene
 {
   Point max, min, width, position, scale(1,1,1);
   uint n_x, n_y, n_z;
-  float dim, buoyancy=0.0;
+  float dim, buoyancy=0.0f;
   
   scene->computeBoundingBox(max,min);
   width = max - min;
@@ -80,7 +80,7 @@ void GlobalField::shareForces()
 {
   Point pt,ldim;
   Point strength[8];
-  float dump=0;
+  float dump=0.0f;
 
   for (vector < Field3D* >::const_iterator solversIterator = m_localFields.begin ();
        solversIterator != m_localFields.end (); solversIterator++)

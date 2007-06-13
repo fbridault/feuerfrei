@@ -51,7 +51,7 @@ void HybridSolver3D::project (float *const p, float *const div)
   }// for k
   
   //set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (float));
+  fill_n(p, m_nbVoxels, 0.0f);
   //set_bnd (0, p);
   
   GCSSOR(p,div,1, 6.0f, m_omegaProj,4);
@@ -104,9 +104,9 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
   m_vTmp = new float[m_nbVoxels];
   m_wTmp = new float[m_nbVoxels];
   
-  memset (m_uTmp, 0, m_nbVoxels * sizeof (float));
-  memset (m_vTmp, 0, m_nbVoxels * sizeof (float));
-  memset (m_wTmp, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_uTmp, m_nbVoxels, 0.0f);
+  fill_n(m_vTmp, m_nbVoxels, 0.0f);
+  fill_n(m_wTmp, m_nbVoxels, 0.0f);
 
   /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
   if (m_nbVoxelsX < m_nbVoxelsY){
@@ -289,7 +289,7 @@ void LODHybridSolver3D::displayGrid ()
   
   glBegin (GL_LINES);
   
-  glColor4f (0.5, 0.5, 0.5, 0.5);
+  glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
   
   for (j = 0.0f; j <= m_dim.z; j += interz)
     {
@@ -316,7 +316,7 @@ void LODHybridSolver3D::displayBase (){
   glBegin (GL_LINES);
   
   glLineWidth (1.0f);
-  glColor4f (0.5, 0.5, 0.5, 0.5);
+  glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
   for (i = 0.0f; i <= m_dim.x + interx / 2; i += interx)
     {
       glVertex3d (i, 0.0f, 0.0f);

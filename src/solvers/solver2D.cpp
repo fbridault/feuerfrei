@@ -34,15 +34,15 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_vSrc = new float[m_nbVoxels];
   m_densSrc = new float[m_nbVoxels];
   
-  memset (m_u, 0, m_nbVoxels * sizeof (float));
-  memset (m_v, 0, m_nbVoxels * sizeof (float));
-  memset (m_dens, 0, m_nbVoxels * sizeof (float));
-  memset (m_uPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_vPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_densPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
-  memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
-  memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_u, m_nbVoxels, 0.0f);
+  fill_n(m_v, m_nbVoxels, 0.0f);
+  fill_n(m_uPrev, m_nbVoxels, 0.0f);
+  fill_n(m_vPrev, m_nbVoxels, 0.0f);
+  fill_n(m_uSrc, m_nbVoxels, 0.0f);
+  fill_n(m_vSrc, m_nbVoxels, 0.0f);
+  fill_n(m_dens, m_nbVoxels, 0.0f);
+  fill_n(m_densPrev, m_nbVoxels, 0.0f);
+  fill_n(m_densSrc, m_nbVoxels, 0.0f);
     
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY;
@@ -175,9 +175,9 @@ void Solver2D::iterate ()
 
 void Solver2D::cleanSources ()
 {
-  m_uSrc = (float *) memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
-  m_vSrc = (float *) memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
-  m_densSrc = (float *) memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_uSrc, m_nbVoxels, 0.0f);
+  fill_n(m_vSrc, m_nbVoxels, 0.0f);
+  fill_n(m_densSrc, m_nbVoxels, 0.0f);
 }
 
 void Solver2D::buildDLGrid ()

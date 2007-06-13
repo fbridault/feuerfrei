@@ -17,12 +17,12 @@ RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
   m_vSrc = new float[m_nbVoxels];
   m_wSrc = new float[m_nbVoxels];
   
-  memset (m_u, 0, m_nbVoxels * sizeof (float));
-  memset (m_v, 0, m_nbVoxels * sizeof (float));
-  memset (m_w, 0, m_nbVoxels * sizeof (float));
-  memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
-  memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
-  memset (m_wSrc, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_u, m_nbVoxels, 0.0f);
+  fill_n(m_v, m_nbVoxels, 0.0f);
+  fill_n(m_w, m_nbVoxels, 0.0f);
+  fill_n(m_uSrc, m_nbVoxels, 0.0f);
+  fill_n(m_vSrc, m_nbVoxels, 0.0f);
+  fill_n(m_wSrc, m_nbVoxels, 0.0f);
 }
 
 RealField3D::~RealField3D ()
@@ -49,9 +49,9 @@ void RealField3D::iterate ()
   
   if(!m_run)
     return;
-  m_u = (float *) memset (m_u, 0, m_nbVoxels * sizeof (float));
-  m_v = (float *) memset (m_v, 0, m_nbVoxels * sizeof (float));
-  m_w = (float *) memset (m_w, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_u, m_nbVoxels, 0.0f);
+  fill_n(m_v, m_nbVoxels, 0.0f);
+  fill_n(m_w, m_nbVoxels, 0.0f);
   /* Cellule(s) génératrice(s) */
   for (uint j = 1; j < m_nbVoxelsY + 1; j++){
     tmp = m_buoyancy * j/m_nbVoxelsY;
@@ -81,9 +81,9 @@ void RealField3D::iterate ()
 
 void RealField3D::cleanSources ()
 {
-  m_uSrc = (float *) memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
-  m_vSrc = (float *) memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
-  m_wSrc = (float *) memset (m_wSrc, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_uSrc, m_nbVoxels, 0.0f);
+  fill_n(m_vSrc, m_nbVoxels, 0.0f);
+  fill_n(m_wSrc, m_nbVoxels, 0.0f);
 }
 
 void RealField3D::addExternalForces(const Point& position, bool move)

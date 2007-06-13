@@ -7,8 +7,8 @@ BenchSolver3D::BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_
   m_save = new float[m_nbVoxels];
   m_save2 = new float[m_nbVoxels];
   
-  memset (m_save, 0, m_nbVoxels * sizeof (float));
-  memset (m_save2, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_save, m_nbVoxels, 0.0f);
+  fill_n(m_save2, m_nbVoxels, 0.0f);
   
   m_nbSteps = 20;
   m_nbMaxIter = nbTimeSteps;
@@ -21,8 +21,8 @@ BenchSolver3D::BenchSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj
   m_save = new float[m_nbVoxels];
   m_save2 = new float[m_nbVoxels];
   
-  memset (m_save, 0, m_nbVoxels * sizeof (float));
-  memset (m_save2, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_save, m_nbVoxels, 0.0f);
+  fill_n(m_save2, m_nbVoxels, 0.0f);
   
   m_nbSteps = 20;
   m_nbMaxIter = nbTimeSteps;
@@ -36,12 +36,12 @@ BenchSolver3D::~BenchSolver3D ()
 
 void BenchSolver3D::saveState (const float *const x, const float *const x2)
 {
-  memcpy (m_save, x, m_nbVoxels * sizeof (float));
-  memcpy (m_save2, x2, m_nbVoxels * sizeof (float));
+  copy(x, &x[m_nbVoxels], m_save);
+  copy(x2, &x2[m_nbVoxels], m_save2);
 }
 
 void BenchSolver3D::setPreviousState (float *const x, float *const x2)
 {
-  memcpy (x, m_save, m_nbVoxels * sizeof (float));
-  memcpy (x2, m_save2, m_nbVoxels * sizeof (float));
+  copy(x, &x[m_nbVoxels], m_save);
+  copy(x2, &x2[m_nbVoxels], m_save2);
 }

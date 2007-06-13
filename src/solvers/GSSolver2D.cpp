@@ -52,7 +52,7 @@ void GSSolver2D::project (float *const p, float *const div)
   //p[IX (i, j, k)] = 0;
   
   //  set_bnd (0, div);
-  memset (p, 0, m_nbVoxels * sizeof (float));
+  fill_n(p, m_nbVoxels, 0.0f);
   //  set_bnd (0, p);
   
   GS_solve(0,p,div,1, 1/6.0f, m_nbSteps); 

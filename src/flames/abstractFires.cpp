@@ -165,10 +165,8 @@ void FireSource::buildBoundingSphere ()
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  float differenceDist;
   uint modulo, remainder;
   int mod;
-  bool pass;
   const uint INCREMENT=4;
   
   if(forceSpheresBuild)
@@ -370,10 +368,8 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  float differenceDist;
   uint modulo, remainder;
   int mod;
-  bool pass;
   const uint INCREMENT=4;
   
   if(forceSpheresBuild)

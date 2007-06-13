@@ -204,6 +204,7 @@ void FluidsFrame::InitSolversPanels()
 
 void FluidsFrame::OnClose(wxCloseEvent& event)
 {
+  m_glBuffer->setRunningState(false);
   delete [] m_currentConfig.solvers;
   delete m_config;
   
@@ -244,6 +245,7 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
     filename = fileDialog.GetPath();
     
     if(!filename.IsEmpty()){
+      m_glBuffer->setRunningState(false);
       /* Récupération le chemin absolu vers la scène */
       filename.Replace(wxGetCwd(),_(""),false);
       /* Suppression du premier slash */
@@ -374,11 +376,13 @@ void FluidsFrame::OnDensityMenu(wxCommandEvent& event)
 
 void FluidsFrame::OnSolversMenu(wxCommandEvent& event)
 {
+  m_glBuffer->setRunningState(false);
   SolverDialog solverDialog (GetParent(),-1,_("Solvers settings"),&m_currentConfig);
   if(solverDialog.ShowModal() == wxID_OK){
     InitSolversPanels();
     m_glBuffer->Restart();
   }
+  m_glBuffer->setRunningState(true);
 }
 
 void FluidsFrame::SetFPS(int fps)

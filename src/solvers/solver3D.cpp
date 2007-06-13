@@ -14,16 +14,16 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_uPrev = new float[m_nbVoxels];
   m_vPrev = new float[m_nbVoxels];
   m_wPrev = new float[m_nbVoxels];
-  m_dens = new float[m_nbVoxels];
-  m_densPrev = new float[m_nbVoxels];
-  m_densSrc = new float[m_nbVoxels];
+//   m_dens = new float[m_nbVoxels];
+//   m_densPrev = new float[m_nbVoxels];
+//   m_densSrc = new float[m_nbVoxels];
   
-  memset (m_uPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_vPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_wPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_dens, 0, m_nbVoxels * sizeof (float));
-  memset (m_densPrev, 0, m_nbVoxels * sizeof (float));
-  memset (m_densSrc, 0, m_nbVoxels * sizeof (float));
+  fill_n(m_uPrev, m_nbVoxels, 0.0f);
+  fill_n(m_vPrev, m_nbVoxels, 0.0f);
+  fill_n(m_wPrev, m_nbVoxels, 0.0f);
+//   fill_n(m_dens, m_nbVoxels, 0.0f);
+//   fill_n(m_densPrev, m_nbVoxels, 0.0f);
+//   fill_n(m_densSrc, m_nbVoxels, 0.0f);
   
   m_visc = 0.00000015f;
   m_diff = 0.001f;
@@ -43,9 +43,9 @@ Solver3D::~Solver3D ()
   delete[]m_vPrev;
   delete[]m_wPrev;
   
-  delete[]m_dens;
-  delete[]m_densPrev;
-  delete[]m_densSrc;
+//   delete[]m_dens;
+//   delete[]m_densPrev;
+//   delete[]m_densSrc;
 }
 
 void Solver3D::set_bnd (unsigned char b, float *const x)
@@ -232,7 +232,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   
   /* Ajouter des forces externes */
   if(force.x)
-    if( force.x > 0)
+    if( force.x > 0.0f)
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)
 	  m_uSrc[IX(m_nbVoxelsX, j, i)] -= strength.x;//*(m_nbVoxelsY - j)*factor;
@@ -241,7 +241,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
 	for (j = ceily; j <= widthy; j++)
 	  m_uSrc[IX(1, j, i)] += strength.x;//*(m_nbVoxelsY - j)*factor;
   if(force.y)
-    if( force.y > 0)
+    if( force.y > 0.0f)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceilz; j < widthz; j++)
 	  m_vSrc[IX(i, m_nbVoxelsY, j)] -= strength.y/10.0f;
@@ -250,7 +250,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
 	for (j = ceilz; j <= widthz; j++)
 	  m_vSrc[IX(i, 1, j)] += strength.y/10.0f;
   if(force.z)
-    if( force.z > 0)
+    if( force.z > 0.0f)
       for (i = ceilx; i <= widthx; i++)
 	for (j = ceily; j <= widthy; j++)
 	  m_wSrc[IX(i, j, m_nbVoxelsZ)] -= strength.z;//*(m_nbVoxelsY - j)*factor;

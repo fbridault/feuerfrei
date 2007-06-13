@@ -32,13 +32,14 @@ GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& p
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
   m_init = false;
-  m_run = 0;
+  m_run = false;
   m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
   m_framesCount = 0;
   /* Pour éviter de faire un calcul pour ajouter des 0... */
   /* Un jour je ferais mieux, promis... */
   m_globalFramesCount = 1000000;
   m_switch = false;
+  m_currentConfig = NULL;
 }
 
 GLFluidsCanvas::~GLFluidsCanvas()
@@ -49,7 +50,6 @@ GLFluidsCanvas::~GLFluidsCanvas()
 
 void GLFluidsCanvas::InitUISettings(void)
 {
-  /* Pour l'affichage */
   m_run = true;
   m_saveImages = false;
   m_displayGrid = false;
@@ -199,6 +199,7 @@ void GLFluidsCanvas::Init (FluidsAppConfig *config)
   m_swatch = new wxStopWatch();
   
   m_init = true;
+  m_run = true;
   
   cerr << "Initialisation terminée" << endl;
 }
@@ -206,6 +207,7 @@ void GLFluidsCanvas::Init (FluidsAppConfig *config)
 void GLFluidsCanvas::Restart (void)
 {
   Disable();
+  m_run = false;
   m_init = false;
   DestroyScene();
 
@@ -217,6 +219,7 @@ void GLFluidsCanvas::Restart (void)
   InitSolvers();
   m_swatch->Start();
   m_init = true;
+  m_run = true;
   cerr << "Réinitialisation terminée" << endl;
   Enable();
 }

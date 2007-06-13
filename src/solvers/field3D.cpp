@@ -69,18 +69,18 @@ void Field3D::buildDLGrid ()
   glNewList (m_gridDisplayList, GL_COMPILE);
   glBegin (GL_LINES);
   
-  glColor4f (0.5, 0.5, 0.5, 0.5);
+  glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
   
-  for (j = 0.0; j <= m_dim.z; j += interz)
+  for (j = 0.0f; j <= m_dim.z; j += interz)
     {
-      for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
+      for (i = 0.0f; i <= m_dim.x + interx / 2; i += interx)
 	{
-	  glVertex3d (i, 0.0, j);
+	  glVertex3d (i, 0.0f, j);
 	  glVertex3d (i, m_dim.y, j);
 	}
       for (i = 0.0; i <= m_dim.y + intery / 2; i += intery)
 	{
-	  glVertex3d (0.0, i, j);
+	  glVertex3d (0.0f, i, j);
 	  glVertex3d (m_dim.x, i, j);
 	}
     }

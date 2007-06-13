@@ -90,7 +90,7 @@ public:
       break;
     case 1:
       m_nurbs = m_accurateNurbs;
-      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 20);
+      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 30);
       break;
     case 2:
       m_nurbs = m_roughNurbs;
@@ -115,13 +115,14 @@ public:
   void cloneNURBSPropertiesFrom(const NurbsFlame& source)
   {
     m_maxParticles = source.m_maxParticles;
-    memcpy(m_ctrlPoints, source.m_ctrlPoints,(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3 * sizeof(GLfloat));
+    
+    copy(source.m_ctrlPoints, &source.m_ctrlPoints[(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3], m_ctrlPoints);
     m_uknotsCount = source.m_uknotsCount;
     m_vknotsCount = source.m_vknotsCount;
-    memcpy(m_uknots, source.m_uknots, m_uknotsCount * sizeof(GLfloat));
-    memcpy(m_vknots, source.m_vknots, m_vknotsCount * sizeof(GLfloat));
-    memcpy(m_texPoints, source.m_texPoints, (m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2 * sizeof(GLfloat));
-    memcpy(m_texTmp, source.m_texTmp, (m_maxParticles + m_nbFixedPoints) * sizeof(GLfloat));
+    copy(source.m_uknots, &source.m_uknots[m_uknotsCount], m_uknots);
+    copy(source.m_vknots, &source.m_vknots[m_vknotsCount], m_vknots);
+    copy(source.m_texPoints, &source.m_texPoints[(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2], m_texPoints);
+    copy(source.m_texTmp, &source.m_texTmp[m_maxParticles + m_nbFixedPoints], m_texTmp);
     m_size = source.m_size;
   }
   

@@ -1,5 +1,5 @@
 #include "solver3D.hpp"
-
+#include "SSE4.hpp"
 #include <math.h>
 #include "../scene/graphicsFn.hpp"
 
@@ -11,9 +11,13 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 		    float timeStep, float buoyancy) : 
   RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_uPrev = new float[m_nbVoxels];
-  m_vPrev = new float[m_nbVoxels];
-  m_wPrev = new float[m_nbVoxels];
+ 
+	m_uPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_vPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_wPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+// 	m_uPrev = new float[m_nbVoxels];
+//   m_vPrev = new float[m_nbVoxels];
+//   m_wPrev = new float[m_nbVoxels];
 //   m_dens = new float[m_nbVoxels];
 //   m_densPrev = new float[m_nbVoxels];
 //   m_densSrc = new float[m_nbVoxels];
@@ -30,8 +34,21 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
-  m_t1 = m_n2 + m_nx +1;
+  m_t1 = m_n2 + m_nx + 1;
   m_t2nx = 2*m_nx;
+	// chercher le premier groupe de 4 contenant le premier voxel
+	// de la grille initiale
+	// m_t1 = 4*q1 + r1 avec 0 <= r1 < 4
+	// q1 est le numéro de ce premier groupe
+	// m_debut = 4*q1 est le numéro du premier élément de ce groupe
+	m_debut= m_t1-m_t1%4;
+	// récupérer le numéro du dernier voxel de la grille initiale
+	m_dernier=IX(m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ);
+	//chercher le nombre de groupes de 4 contenant les voxels de la
+	// grille initiale
+	//m_dernier = 4*q2 + r2 avec 0 <= r2 < 4
+	// m_nbgrps = q2 - q1 + 1 est le nombre cherché
+	m_nbgrps= (m_dernier-m_t1)/4+1;
   
 //   m_forceCoef = 1;
 //   m_forceRatio = 1;
@@ -39,10 +56,12 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 
 Solver3D::~Solver3D ()
 {
-  delete[]m_uPrev;
-  delete[]m_vPrev;
-  delete[]m_wPrev;
-  
+ //  delete[]m_uPrev;
+//   delete[]m_vPrev;
+//   delete[]m_wPrev;
+   _mm_free(m_uPrev);
+	 _mm_free(m_vPrev);
+	 _mm_free(m_wPrev);
 //   delete[]m_dens;
 //   delete[]m_densPrev;
 //   delete[]m_densSrc;

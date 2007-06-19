@@ -13,7 +13,15 @@ Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
   m_nbVoxelsZ = n_z;
-  
+
+  m_hx= 0.5f/n_x;
+	m_hy= 0.5f/n_y;
+	m_hx= 0.5f/n_y;
+
+	m_invhx= 0.5f*n_x;
+	m_invhy= 0.5f*n_y;
+	m_invhz= 0.5f*n_y;
+
   /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
   if (m_nbVoxelsX > m_nbVoxelsY){
     if (m_nbVoxelsX > m_nbVoxelsZ){

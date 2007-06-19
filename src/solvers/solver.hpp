@@ -55,7 +55,7 @@ protected:
   /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
   uint m_nbSteps;
   
-  uint m_t, m_nx, m_t1;
+  uint m_t, m_nx, m_t1,m_debut,m_nbgrps,m_dernier;
 };
 
 #endif

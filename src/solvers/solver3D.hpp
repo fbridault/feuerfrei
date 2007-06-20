@@ -66,7 +66,10 @@ protected:
   
   /** Pas de résolution de la vélocité. */
   virtual void vel_step ();
-  
+
+  /** Ajouter le vorticity confinement */
+	virtual void vorticity_confinement();
+
   /** Prolonger sur une grille fine un vecteur défini sur une grille grossière.
    * On utilise une interpolation bilinéaire.
    * La grille fine est de taille nx*ny*nz

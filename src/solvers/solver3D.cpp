@@ -15,6 +15,10 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 	m_uPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 	m_vPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 	m_wPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_dens     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_densPrev = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_densSrc =  (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+
 // 	m_uPrev = new float[m_nbVoxels];
 //   m_vPrev = new float[m_nbVoxels];
 //   m_wPrev = new float[m_nbVoxels];
@@ -25,9 +29,9 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   fill_n(m_uPrev, m_nbVoxels, 0.0f);
   fill_n(m_vPrev, m_nbVoxels, 0.0f);
   fill_n(m_wPrev, m_nbVoxels, 0.0f);
-//   fill_n(m_dens, m_nbVoxels, 0.0f);
-//   fill_n(m_densPrev, m_nbVoxels, 0.0f);
-//   fill_n(m_densSrc, m_nbVoxels, 0.0f);
+	fill_n(m_dens, m_nbVoxels, 0.0f);
+	fill_n(m_densPrev, m_nbVoxels, 0.0f);
+	fill_n(m_densSrc, m_nbVoxels, 0.0f);
   
   m_visc = 0.00000015f;
   m_diff = 0.001f;
@@ -62,6 +66,9 @@ Solver3D::~Solver3D ()
    _mm_free(m_uPrev);
 	 _mm_free(m_vPrev);
 	 _mm_free(m_wPrev);
+	 _mm_free(m_dens);
+	 _mm_free(m_densPrev);
+	 _mm_free(m_densSrc);
 //   delete[]m_dens;
 //   delete[]m_densPrev;
 //   delete[]m_densSrc;
@@ -161,12 +168,71 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 //   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff, diff);
 //   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
+void Solver3D::vorticity_confinement(){
+
+	uint i,j,k;	
+	float *rotx = m_uPrev, *roty = m_vPrev, *rotz=m_wPrev, *rot=m_densPrev;	
+	float epsh = 0.25f;//epsilon*h
+	float x,y,z;
+	float Nx,Ny,Nz;
+	float normeN;
+	/** Calcul de omega le rotationnel du champ de vélocité (m_u, m_v, m_w) */
+	m_t = m_t1;
+	for (k=1; k<=m_nbVoxelsZ; k++) {
+		for (j=1; j<=m_nbVoxelsY; j++) {
+			for (i=1; i<=m_nbVoxelsX; i++) {
+					// rotx = dm_w/dy - dm_v/dz
+				x = rotx[m_t] = (m_w[m_t+m_nx] - m_w[m_t-m_nx]) * 0.5f -
+					(m_v[m_t+m_n2] - m_v[m_t-m_n2]) * 0.5f;
+
+					// roty = dm_u/dz - dm_w/dx
+				y = roty[m_t] = (m_u[m_t+m_n2] - m_u[m_t-m_n2]) * 0.5f -
+					(m_w[m_t+1] - m_w[m_t-1]) * 0.5f;
+
+					// rotz = dm_v/dx - dm_u/dy
+				z = rotz[m_t] = (m_v[m_t+1] - m_v[m_t-1]) * 0.5f -
+					(m_u[m_t+m_nx] - m_u[m_t-m_nx]) * 0.5f;
+
+					// rot = |rot|
+				rot[m_t] = sqrtf(x*x+y*y+z*z);
+				m_t++;
+			}//for i
+			m_t+=2;
+		}//for j
+		m_t+=m_t2nx;
+	}//for k
+	m_t=m_t1;
+	for (k=1; k<=m_nbVoxelsZ; k++) {
+		for (j=1; j<=m_nbVoxelsY; j++) {
+			for (i=1; i<=m_nbVoxelsZ; i++) {
+				// Calcul du gradient normalisé du rotationnel omega
+				Nx = (rot[m_t+1] - rot[m_t-1]) * 0.5f;
+				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * 0.5f;
+				Nz = (rot[m_t+m_n2] - rot[m_t-m_n2]) * 0.5f;
+				normeN = 1.0f/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.0000001f);
+				Nx *= normeN;
+				Ny *= normeN;
+				Nz *= normeN;
+				//Calcul du produit vectoriel N^omega
+				//Le vecteur est multiplié par epsilon*h
+				//et est ajouté au champ de vélocité
+				m_u[m_t] += (Ny*rotz[m_t] - Nz*roty[m_t]) * epsh;
+				m_v[m_t] += (Nz*rotx[m_t] - Nx*rotz[m_t]) * epsh;
+				m_w[m_t] += (Nx*roty[m_t] - Ny*rotx[m_t]) * epsh;
+				m_t++;
+			}//for i
+			m_t+=2;
+		}//for j
+		m_t+=m_t2nx;
+	}//for k
+}
 
 void Solver3D::vel_step ()
 {
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
+	vorticity_confinement();
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
   SWAP (m_vPrev, m_v);

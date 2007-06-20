@@ -182,16 +182,16 @@ void Solver3D::vorticity_confinement(){
 		for (j=1; j<=m_nbVoxelsY; j++) {
 			for (i=1; i<=m_nbVoxelsX; i++) {
 					// rotx = dm_w/dy - dm_v/dz
-				x = rotx[m_t] = (m_w[m_t+m_nx] - m_w[m_t-m_nx]) * 0.5f -
-					(m_v[m_t+m_n2] - m_v[m_t-m_n2]) * 0.5f;
+				x = rotx[m_t] = (m_w[m_t+m_nx] - m_w[m_t-m_nx]) * m_invhy -
+					(m_v[m_t+m_n2] - m_v[m_t-m_n2]) * m_invhz;
 
 					// roty = dm_u/dz - dm_w/dx
-				y = roty[m_t] = (m_u[m_t+m_n2] - m_u[m_t-m_n2]) * 0.5f -
-					(m_w[m_t+1] - m_w[m_t-1]) * 0.5f;
+				y = roty[m_t] = (m_u[m_t+m_n2] - m_u[m_t-m_n2]) * m_invhz -
+					(m_w[m_t+1] - m_w[m_t-1]) * m_invhx;
 
 					// rotz = dm_v/dx - dm_u/dy
-				z = rotz[m_t] = (m_v[m_t+1] - m_v[m_t-1]) * 0.5f -
-					(m_u[m_t+m_nx] - m_u[m_t-m_nx]) * 0.5f;
+				z = rotz[m_t] = (m_v[m_t+1] - m_v[m_t-1]) * m_invhx -
+					(m_u[m_t+m_nx] - m_u[m_t-m_nx]) * m_invhy;
 
 					// rot = |rot|
 				rot[m_t] = sqrtf(x*x+y*y+z*z);
@@ -206,9 +206,9 @@ void Solver3D::vorticity_confinement(){
 		for (j=1; j<=m_nbVoxelsY; j++) {
 			for (i=1; i<=m_nbVoxelsZ; i++) {
 				// Calcul du gradient normalisé du rotationnel omega
-				Nx = (rot[m_t+1] - rot[m_t-1]) * 0.5f;
-				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * 0.5f;
-				Nz = (rot[m_t+m_n2] - rot[m_t-m_n2]) * 0.5f;
+				Nx = (rot[m_t+1] - rot[m_t-1]) * m_invhx;
+				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * m_invhy;
+				Nz = (rot[m_t+m_n2] - rot[m_t-m_n2]) * m_invhz;
 				normeN = 1.0f/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.0000001f);
 				Nx *= normeN;
 				Ny *= normeN;
@@ -232,7 +232,7 @@ void Solver3D::vel_step ()
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
-	vorticity_confinement();
+	//	vorticity_confinement();
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
   SWAP (m_vPrev, m_v);

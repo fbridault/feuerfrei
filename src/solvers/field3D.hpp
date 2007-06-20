@@ -128,10 +128,10 @@ public:
   /** Multiplie la résolution de la grille par 2 */
   virtual void multiplyRes () {};
   
-  /** Diminue la résolution de la grille de un voxel */
+  /** Diminue la résolution de la grille de deux voxels */
   virtual void decreaseRes () {};
   
-  /** Augmente la résolution de la grille de un voxel */
+  /** Augmente la résolution de la grille de deux voxels */
   virtual void increaseRes () {};
   
   virtual uint getNbMaxDiv () { return 1; };

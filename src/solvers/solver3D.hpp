@@ -68,7 +68,7 @@ protected:
   virtual void vel_step ();
 
   /** Ajouter le vorticity confinement */
-	virtual void addVorticityConfinement( float * const u,  float * const v, float * const w);
+	 void addVorticityConfinement( float * const u,  float * const v, float * const w);
 
   /** Prolonger sur une grille fine un vecteur défini sur une grille grossière.
    * On utilise une interpolation bilinéaire.

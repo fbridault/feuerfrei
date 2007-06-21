@@ -18,9 +18,9 @@ typedef	union{
 		float f[4];
 } SSE4f;
 
-union SSE4d{
-	__m128d m;
-	double f[2];
-};
+// union SSE4d{
+// 	__m128d m;
+// 	double f[2];
+// };
 
 #endif 	    /* !SSE4_HPP */

@@ -170,11 +170,11 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 //   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff, diff);
 //   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
-void Solver3D::addVorticityConfinement(float * u, float * v, float * w){
+void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w){
 
 	uint i,j,k;	
 	float *rotx, *roty , *rotz, *rot;	//vecteurs temporaires
-	float epsh =0.0f;//m_dt*m_forceCoef;//epsilon*h
+	float epsh =m_dt*m_forceCoef;//epsilon*h
 	float x,y,z;
 	float Nx,Ny,Nz;
 	float invNormeN;
@@ -219,7 +219,7 @@ void Solver3D::addVorticityConfinement(float * u, float * v, float * w){
 	m_t=m_t1;
 	for (k=1; k<=m_nbVoxelsZ; k++) {
 		for (j=1; j<=m_nbVoxelsY; j++) {
-			for (i=1; i<=m_nbVoxelsZ; i++) {
+			for (i=1; i<=m_nbVoxelsX; i++) {
 			
 				Nx = (rot[m_t+1] - rot[m_t-1]) * m_invhx;
 				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * m_invhy;

@@ -170,16 +170,23 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 //   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff, diff);
 //   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
-void Solver3D::vorticity_confinement(float *const u,  float *const v,
-											  float *const w){
+void Solver3D::addVorticityConfinement(float * u, float * v, float * w){
 
 	uint i,j,k;	
-	float *rotx = m_uPrev, *roty = m_vPrev, *rotz=m_wPrev, *rot=m_densPrev;	//vecteurs temporaires
-	float epsh = 0.040f;//epsilon*h
+	float *rotx, *roty , *rotz, *rot;	//vecteurs temporaires
+	float epsh =0.0f;//m_dt*m_forceCoef;//epsilon*h
 	float x,y,z;
 	float Nx,Ny,Nz;
-	float normeN;
-	/** Calcul de omega le rotationnel du champ de vélocité (m_u, m_v, m_w) */
+	float invNormeN;
+
+	rotx=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	roty=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	rotz=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	rot=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+
+	/** Calcul de omega le rotationnel du champ de vélocité (m_u, m_v, m_w)
+	 * et de sa norme
+	 */
 	m_t = m_t1;
 	for (k=1; k<=m_nbVoxelsZ; k++) {
 		for (j=1; j<=m_nbVoxelsY; j++) {
@@ -204,21 +211,26 @@ void Solver3D::vorticity_confinement(float *const u,  float *const v,
 		}//for j
 		m_t+=m_t2nx;
 	}//for k
+	/* Calcul du gradient normalisé du rotationnel omega
+	 * Calcul du produit vectoriel N^omega
+	 * Le vecteur est multiplié par epsilon*h
+	 * et est ajouté au champ de vélocité
+	 */
 	m_t=m_t1;
 	for (k=1; k<=m_nbVoxelsZ; k++) {
 		for (j=1; j<=m_nbVoxelsY; j++) {
 			for (i=1; i<=m_nbVoxelsZ; i++) {
-				// Calcul du gradient normalisé du rotationnel omega
+			
 				Nx = (rot[m_t+1] - rot[m_t-1]) * m_invhx;
 				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * m_invhy;
 				Nz = (rot[m_t+m_n2] - rot[m_t-m_n2]) * m_invhz;
-				normeN = 1.0f/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.0000001f);
-				Nx *= normeN;
-				Ny *= normeN;
-				Nz *= normeN;
-				//Calcul du produit vectoriel N^omega
-				//Le vecteur est multiplié par epsilon*h
-				//et est ajouté au champ de vélocité
+			
+				invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.0000001f);
+			
+				Nx *= invNormeN;
+				Ny *= invNormeN;
+				Nz *= invNormeN;
+				
 				u[m_t] += (Ny*rotz[m_t] - Nz*roty[m_t]) * epsh;
 				v[m_t] += (Nz*rotx[m_t] - Nx*rotz[m_t]) * epsh;
 				w[m_t] += (Nx*roty[m_t] - Ny*rotx[m_t]) * epsh;
@@ -228,14 +240,22 @@ void Solver3D::vorticity_confinement(float *const u,  float *const v,
 		}//for j
 		m_t+=m_t2nx;
 	}//for k
-}
+	_mm_free(rotx);
+	_mm_free(roty);
+	_mm_free(rotz);
+	_mm_free(rot);
+// 	delete[]rotx;
+// 	delete[]roty;
+// 	delete[]rotz;
+// 	delete[]rot;
+}//AddVorticityConfinement
 
 void Solver3D::vel_step ()
 {
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
-	//	vorticity_confinement(m_u,m_v,m_w);
+	addVorticityConfinement(m_u,m_v,m_w);
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
   SWAP (m_vPrev, m_v);
@@ -250,6 +270,7 @@ void Solver3D::vel_step ()
   advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
   advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
   project (m_uPrev, m_vPrev);
+
 }
 
 void Solver3D::iterate ()
@@ -266,8 +287,8 @@ void Solver3D::iterate ()
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
       for (uint i = 1; i <= m_nbVoxelsX; i++){
-	m_vSrc[m_t] += m_buoyancy / (float) (m_nbVoxelsY-j+1);
-	m_t++;
+				m_vSrc[m_t] += m_buoyancy / (float) (m_nbVoxelsY-j+1);
+				m_t++;
       }//for i
       m_t+=2;
     }//for j

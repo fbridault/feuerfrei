@@ -90,6 +90,7 @@ protected:
 
   float *m_uPrev, *m_vPrev, *m_wPrev;
   float *m_dens, *m_densPrev, *m_densSrc;
+	float *m_rotx, *m_roty, *m_rotz, *m_rot;
   
   uint m_n2, m_t2nx;
 };

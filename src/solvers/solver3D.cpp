@@ -17,14 +17,12 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 	m_wPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 	m_dens     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 	m_densPrev = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-	m_densSrc =  (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_densSrc  = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_rotx     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_roty     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_rotz     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+	m_rot      = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 
-// 	m_uPrev = new float[m_nbVoxels];
-//   m_vPrev = new float[m_nbVoxels];
-//   m_wPrev = new float[m_nbVoxels];
-//   m_dens = new float[m_nbVoxels];
-//   m_densPrev = new float[m_nbVoxels];
-//   m_densSrc = new float[m_nbVoxels];
   
   fill_n(m_uPrev, m_nbVoxels, 0.0f);
   fill_n(m_vPrev, m_nbVoxels, 0.0f);
@@ -60,18 +58,18 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 
 Solver3D::~Solver3D ()
 {
- //  delete[]m_uPrev;
-//   delete[]m_vPrev;
-//   delete[]m_wPrev;
-   _mm_free(m_uPrev);
-	 _mm_free(m_vPrev);
-	 _mm_free(m_wPrev);
-	 _mm_free(m_dens);
-	 _mm_free(m_densPrev);
-	 _mm_free(m_densSrc);
-//   delete[]m_dens;
-//   delete[]m_densPrev;
-//   delete[]m_densSrc;
+
+	_mm_free(m_uPrev);
+	_mm_free(m_vPrev);
+	_mm_free(m_wPrev);
+	_mm_free(m_dens);
+	_mm_free(m_densPrev);
+	_mm_free(m_densSrc);
+	_mm_free(m_rotx);
+	_mm_free(m_roty);
+	_mm_free(m_rotz);
+	_mm_free(m_rot);
+
 }
 
 void Solver3D::set_bnd (unsigned char b, float *const x)
@@ -173,51 +171,39 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w){
 
 	uint i,j,k;	
-	float *rotx, *roty , *rotz, *rot;	//vecteurs temporaires
 	float epsh =m_dt*m_forceCoef*0.02;//epsilon*h
 	float x,y,z;
 	float Nx,Ny,Nz;
 	float invNormeN;
 
-	// rotx=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-// 	roty=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-// 	rotz=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-// 	rot=(float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-
-	rotx= new float[m_nbVoxels];
-	roty =  new float[m_nbVoxels];
-	rotz=  new float[m_nbVoxels];
-	rot= new float[m_nbVoxels];
-
-	/** Calcul de omega le rotationnel du champ de vélocité (m_u, m_v, m_w)
-	 * et de sa norme
+	/** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v, m_w)
 	 */
 	m_t = m_t1;
 	for (k=1; k<=m_nbVoxelsZ; k++) {
 		for (j=1; j<=m_nbVoxelsY; j++) {
 			for (i=1; i<=m_nbVoxelsX; i++) {
-					// rotx = dm_w/dy - dm_v/dz
-				x = rotx[m_t] = (w[m_t+m_nx] - w[m_t-m_nx]) * m_invhy -
+					// m_rotx = dm_w/dy - dm_v/dz
+				x = m_rotx[m_t] = (w[m_t+m_nx] - w[m_t-m_nx]) * m_invhy -
 					(v[m_t+m_n2] - v[m_t-m_n2]) * m_invhz;
-					// roty = dm_u/dz - dm_w/dx
+					// m_roty = dm_u/dz - dm_w/dx
 	
-				y = roty[m_t] = (u[m_t+m_n2] - u[m_t-m_n2]) * m_invhz -
+				y = m_roty[m_t] = (u[m_t+m_n2] - u[m_t-m_n2]) * m_invhz -
 					(w[m_t+1] - w[m_t-1]) * m_invhx;
 
-					// rotz = dm_v/dx - dm_u/dy
-				z = rotz[m_t] = (v[m_t+1] - v[m_t-1]) * m_invhx -
+					// m_rotz = dm_v/dx - dm_u/dy
+				z = m_rotz[m_t] = (v[m_t+1] - v[m_t-1]) * m_invhx -
 					(u[m_t+m_nx] - u[m_t-m_nx]) * m_invhy;
 
-					// rot = |rot|
-				rot[m_t] = sqrtf(x*x+y*y+z*z);
+					// m_rot = |m_rot|
+				m_rot[m_t] = sqrtf(x*x+y*y+z*z);
 				m_t++;
 			}//for i
 			m_t+=2;
 		}//for j
 		m_t+=m_t2nx;
 	}//for k
-	/* Calcul du gradient normalisé du rotationnel omega
-	 * Calcul du produit vectoriel N^omega
+	/* Calcul du gradient normalisé du rotationnel m_rot
+	 * Calcul du produit vectoriel N^m_rot
 	 * Le vecteur est multiplié par epsilon*h
 	 * et est ajouté au champ de vélocité
 	 */
@@ -226,33 +212,26 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 		for (j=1; j<=m_nbVoxelsY; j++) {
 			for (i=1; i<=m_nbVoxelsX; i++) {
 			
-				Nx = (rot[m_t+1] - rot[m_t-1]) * m_invhx;
-				Ny = (rot[m_t+m_nx] - rot[m_t-m_nx]) * m_invhy;
-				Nz = (rot[m_t+m_n2] - rot[m_t-m_n2]) * m_invhz;
+				Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
+				Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
+				Nz = (m_rot[m_t+m_n2] - m_rot[m_t-m_n2]) * m_invhz;
 			
-				invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.0001f);
+				invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.000001f);
 			
 				Nx *= invNormeN;
 				Ny *= invNormeN;
 				Nz *= invNormeN;
 
-				u[m_t] +=(Ny*rotz[m_t] - Nz*roty[m_t]) * epsh;
-				v[m_t] +=(Nz*rotx[m_t] - Nx*rotz[m_t]) * epsh;
-				w[m_t] +=(Nx*roty[m_t] - Ny*rotx[m_t]) * epsh;
+				u[m_t] +=(Ny*m_rotz[m_t] - Nz*m_roty[m_t]) * epsh;
+				v[m_t] +=(Nz*m_rotx[m_t] - Nx*m_rotz[m_t]) * epsh;
+				w[m_t] +=(Nx*m_roty[m_t] - Ny*m_rotx[m_t]) * epsh;
 				m_t++;
 			}//for i
 			m_t+=2;
 		}//for j
 		m_t+=m_t2nx;
 	}//for k
-// 	_mm_free(rotx);
-// 	_mm_free(roty);
-// 	_mm_free(rotz);
-// 	_mm_free(rot);
-	delete[]rotx;
-	delete[]roty;
-	delete[]rotz;
-	delete[]rot;
+
 }//AddVorticityConfinement
 
 void Solver3D::vel_step ()
@@ -260,7 +239,7 @@ void Solver3D::vel_step ()
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
-	//addVorticityConfinement(m_u,m_v,m_w);
+	addVorticityConfinement(m_u,m_v,m_w);
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
   SWAP (m_vPrev, m_v);

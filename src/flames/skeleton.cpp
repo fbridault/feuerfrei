@@ -176,7 +176,19 @@ void Skeleton::moveRoot ()
   /* Intégration d'Euler */
   m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_rootSave, m_selfVelocity);
   
-  return;
+  /* Si l'origine sort de la grille, on la replace */
+  if ( m_root.x >= m_solver->getDimX() )
+    m_root.x = m_solver->getDimX() - EPSILON;
+  if ( m_root.y >= m_solver->getDimY() )
+    m_root.y = m_solver->getDimY() - EPSILON;
+  if ( m_root.z >= m_solver->getDimZ() )
+    m_root.z = m_solver->getDimZ() - EPSILON;
+  if ( m_root.x <= 0 )
+    m_root.x = EPSILON;
+  if ( m_root.y <= 0 )
+    m_root.y = EPSILON;
+  if ( m_root.z <= 0 )
+    m_root.z = EPSILON;
 }
 
 void Skeleton::move ()

@@ -44,8 +44,7 @@ GCSSORSolver3D::~GCSSORSolver3D ()
   delete[]m_q;
 }
 
-void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
-			    float diagonal, float omega, uint maxiter)
+void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter)
 {
   float f=omega/diagonal;
   float d=f*a;
@@ -406,7 +405,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 void
 GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,100);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,10);
 }
 
 void
@@ -438,7 +437,7 @@ GCSSORSolver3D::project (float *const p, float *const div)
   fill_n(p, m_nbVoxels, 0.0f);
   //set_bnd (0, p);
   
-  GCSSOR(p,div,1, 6.0f, m_omegaProj,100);
+  GCSSOR(p,div,1, 6.0f, m_omegaProj,10);
   
   m_t = m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){

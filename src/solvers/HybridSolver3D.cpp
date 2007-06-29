@@ -11,13 +11,11 @@ HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint 
 				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
-  m_time = 0.0f;
 }
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
 HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) : 
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
-  m_time = 0.0f;
 }
 
 HybridSolver3D::~HybridSolver3D ()
@@ -27,7 +25,8 @@ HybridSolver3D::~HybridSolver3D ()
 /* Pas de diffusion */
 void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
-  GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 2);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,5);
+//   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 10);
 }
 
 void HybridSolver3D::project (float *const p, float *const div)
@@ -74,21 +73,6 @@ void HybridSolver3D::project (float *const p, float *const div)
   //set_bnd (2, v);
   //set_bnd (3, w);
 }
-
-// void HybridSolver3D::iterate ()
-// { 
-//   ::wxStartTimer();
-//   vel_step ();
-//   //  dens_step();
-
-//   cleanSources ();
-// //   set_bnd (0, m_u);
-// //   set_bnd (0, m_v);
-// //   set_bnd (0, m_w);
-//   m_time = (m_time*m_nbIter + ::wxGetElapsedTime (false))/(float) (++m_nbIter);
-  
-//   cout << m_time << "      \r"; cout.flush();
-// }
 
 LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
 				      float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 

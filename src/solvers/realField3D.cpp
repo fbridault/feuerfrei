@@ -1,5 +1,5 @@
 #include "realField3D.hpp"
-
+#include  "SSE4.hpp"
 #include <math.h>
 
 RealField3D::RealField3D ()
@@ -10,30 +10,50 @@ RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
 			  float timeStep, float buoyancy) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
-  m_u = new float[m_nbVoxels];
-  m_v = new float[m_nbVoxels];
-  m_w = new float[m_nbVoxels];
-  m_uSrc = new float[m_nbVoxels];
-  m_vSrc = new float[m_nbVoxels];
-  m_wSrc = new float[m_nbVoxels];
   
-  fill_n(m_u, m_nbVoxels, 0.0f);
-  fill_n(m_v, m_nbVoxels, 0.0f);
-  fill_n(m_w, m_nbVoxels, 0.0f);
-  fill_n(m_uSrc, m_nbVoxels, 0.0f);
-  fill_n(m_vSrc, m_nbVoxels, 0.0f);
-  fill_n(m_wSrc, m_nbVoxels, 0.0f);
+  m_u        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+  m_v        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+  m_w        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+  m_uSrc     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+  m_vSrc     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+  m_wSrc     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
+
+  memset (m_u, 0, m_nbVoxels * sizeof (float));
+  memset (m_v, 0, m_nbVoxels * sizeof (float));
+  memset (m_w, 0, m_nbVoxels * sizeof (float));
+  memset (m_uSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_vSrc, 0, m_nbVoxels * sizeof (float));
+  memset (m_wSrc, 0, m_nbVoxels * sizeof (float));
+  
+  // 	m_u = new float[m_nbVoxels];
+  // 	m_v = new float[m_nbVoxels];
+  // 	m_w = new float[m_nbVoxels];
+  // 	m_uSrc = new float[m_nbVoxels];
+  // 	m_vSrc = new float[m_nbVoxels];
+  // 	m_wSrc = new float[m_nbVoxels];
+  
+  // 	 fill_n(m_u, m_nbVoxels, 0.0f);
+  // 	 fill_n(m_v, m_nbVoxels, 0.0f);
+  // 	 fill_n(m_w, m_nbVoxels, 0.0f);
+  // 	 fill_n(m_uSrc, m_nbVoxels, 0.0f);
+  // 	 fill_n(m_vSrc, m_nbVoxels, 0.0f);
+  // 	 fill_n(m_wSrc, m_nbVoxels, 0.0f);
 }
 
 RealField3D::~RealField3D ()
 {
-  delete[]m_u;
-  delete[]m_v;
-  delete[]m_w;
-
-  delete[]m_uSrc;
-  delete[]m_vSrc;
-  delete[]m_wSrc;
+  //  delete[]m_u;
+  //   delete[]m_v;
+  //   delete[]m_w;
+  //   delete[]m_uSrc;
+  //   delete[]m_vSrc;
+  //   delete[]m_wSrc;
+  _mm_free(m_u);
+  _mm_free(m_v);
+  _mm_free(m_w);
+  _mm_free(m_uSrc);
+  _mm_free(m_vSrc);
+  _mm_free(m_wSrc);
 }
 
 void RealField3D::vel_step ()
@@ -52,7 +72,7 @@ void RealField3D::iterate ()
   fill_n(m_u, m_nbVoxels, 0.0f);
   fill_n(m_v, m_nbVoxels, 0.0f);
   fill_n(m_w, m_nbVoxels, 0.0f);
-  /* Cellule(s) génératrice(s) */
+  /* Cellule(s) gÃ©nÃ©ratrice(s) */
   for (uint j = 1; j < m_nbVoxelsY + 1; j++){
     tmp = m_buoyancy * j/m_nbVoxelsY;
     for (uint i = 1; i < m_nbVoxelsX + 1; i++)
@@ -140,7 +160,7 @@ void RealField3D::displayVelocityField (void)
       for (uint k = 0; k <= m_nbVoxelsZ; k++)
 	{
 	  uint index = IX(i,j,k);
-	  /* Affichage du champ de vélocité */
+	  /* Affichage du champ de vÃ©locitÃ© */
 	  glPushMatrix ();
 	  glTranslatef (inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
 	  //SDL_mutexP (lock);

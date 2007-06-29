@@ -1,12 +1,12 @@
 #include "HybridSolver3D.hpp"
-
+#include "SSE4.hpp"
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
 #include <wx/wx.h>
 #endif
 
-/* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
+/* Le constructeur de GSSolver _mm_free(m_uTmpr);3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
 HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
 				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
@@ -26,21 +26,20 @@ HybridSolver3D::~HybridSolver3D ()
 void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
   GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,5);
-//   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 10);
+  //   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 10);
 }
 
 void HybridSolver3D::project (float *const p, float *const div)
 {
-  float h_x = 1.0f / m_nbVoxelsX, 
-    h_y = 1.0f / m_nbVoxelsY,
-    h_z = 1.0f / m_nbVoxelsZ;
   uint i, j, k;
   
   m_t = m_t1;
   for ( k = 1; k <= m_nbVoxelsZ; k++){
     for ( j = 1; j <= m_nbVoxelsY; j++){
       for ( i = 1; i <= m_nbVoxelsX; i++){
-	div[m_t] = -0.5f * (h_x * (m_u[m_t+1] - m_u[m_t-1]) + h_y * (m_v[m_t+m_nx] - m_v[m_t-m_nx]) + h_z * (m_w[m_t+m_n2] - m_w[m_t-m_n2]));
+	div[m_t] = m_hx * (m_u[m_t-1] - m_u[m_t+1]) +
+	  m_hy * (m_v[m_t-m_nx] - m_v[m_t+m_nx]) + 
+	  m_hz * (m_w[m_t-m_n2] - m_w[m_t+m_n2]);
 	m_t++;
       }//for i
       m_t+=2;
@@ -59,9 +58,9 @@ void HybridSolver3D::project (float *const p, float *const div)
   for (k = 1; k <= m_nbVoxelsZ; k++){
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
-	m_u[m_t] -= 0.5f * (p[m_t+1] - p[m_t-1]) / h_x;
-	m_v[m_t] -= 0.5f * (p[m_t+m_nx] - p[m_t-m_nx]) / h_y;
-	m_w[m_t] -= 0.5f * (p[m_t+m_n2] - p[m_t-m_n2]) / h_z;
+	m_u[m_t] += m_invhx *(p[m_t-1] - p[m_t+1]);
+	m_v[m_t] += m_invhy*(p[m_t-m_nx] - p[m_t+m_nx]);
+	m_w[m_t] += m_invhz* (p[m_t-m_n2] - p[m_t+m_n2]);
 	m_t++;
       }// for i
       m_t+=2;
@@ -84,9 +83,9 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
   initialNbVoxelsY = n_y;
   initialNbVoxelsZ = n_z;
   
-  m_uTmp = new float[m_nbVoxels];
-  m_vTmp = new float[m_nbVoxels];
-  m_wTmp = new float[m_nbVoxels];
+  m_uTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);// new float[m_nbVoxels];
+  m_vTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);// new float[m_nbVoxels];
+  m_wTmp = (float*)_mm_malloc(m_nbVoxels*sizeof(float),16);//new float[m_nbVoxels];
   
   fill_n(m_uTmp, m_nbVoxels, 0.0f);
   fill_n(m_vTmp, m_nbVoxels, 0.0f);
@@ -111,9 +110,9 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
 
 LODHybridSolver3D::~LODHybridSolver3D ()
 {
-  delete[]m_uTmp;
-  delete[]m_vTmp;
-  delete[]m_wTmp;
+  _mm_free(m_uTmp);// delete[]m_uTmp;
+  _mm_free(m_vTmp);//delete[]m_vTmp;
+  _mm_free(m_wTmp);//delete[]m_wTmp;
 }
 
 void LODHybridSolver3D::divideRes ()
@@ -141,10 +140,10 @@ void LODHybridSolver3D::divideRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-//   glDeleteLists(m_baseDisplayList,1);
-//   glDeleteLists(m_gridDisplayList,1);
-//   buildDLBase ();
-//   buildDLGrid ();
+  //   glDeleteLists(m_baseDisplayList,1);
+  //   glDeleteLists(m_gridDisplayList,1);
+  //   buildDLBase ();
+  //   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -173,10 +172,10 @@ void LODHybridSolver3D::decreaseRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-//   glDeleteLists(m_baseDisplayList,1);
-//   glDeleteLists(m_gridDisplayList,1);
-//   buildDLBase ();
-//   buildDLGrid ();
+  //   glDeleteLists(m_baseDisplayList,1);
+  //   glDeleteLists(m_gridDisplayList,1);
+  //   buildDLBase ();
+  //   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -215,10 +214,10 @@ void LODHybridSolver3D::multiplyRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   
   /* Reconstruction des display lists */
-//   glDeleteLists(m_baseDisplayList,1);
-//   glDeleteLists(m_gridDisplayList,1);
-//   buildDLBase ();
-//   buildDLGrid ();
+  //   glDeleteLists(m_baseDisplayList,1);
+  //   glDeleteLists(m_gridDisplayList,1);
+  //   buildDLBase ();
+  //   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
@@ -247,10 +246,10 @@ void LODHybridSolver3D::increaseRes ()
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
     
   /* Reconstruction des display lists */
-//   glDeleteLists(m_baseDisplayList,1);
-//   glDeleteLists(m_gridDisplayList,1);
-//   buildDLBase ();
-//   buildDLGrid ();
+  //   glDeleteLists(m_baseDisplayList,1);
+  //   glDeleteLists(m_gridDisplayList,1);
+  //   buildDLBase ();
+  //   buildDLGrid ();
   
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;

@@ -106,10 +106,10 @@ public:
   /** Multiplie la résolution de la grille par 2 */
   virtual void multiplyRes () = 0;
   
-  /** Diminue la résolution de la grille de un voxel */
+  /** Diminue la résolution de la grille de deux voxels */
   virtual void decreaseRes () = 0;
   
-  /** Augmente la résolution de la grille de un voxel */
+  /** Augmente la résolution de la grille de deux voxels */
   virtual void increaseRes () = 0;
   
   /** Fonction de dessin de la grille */

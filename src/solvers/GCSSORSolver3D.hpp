@@ -1,6 +1,6 @@
 #if !defined(GCSSORSOLVER3D_H)
 #define GCSSORSOLVER3D_H
-
+#include "SSE4.hpp"
 class GCSSORSolver3D;
 
 #include "solver3D.hpp"
@@ -55,13 +55,17 @@ protected:
   
   /** Résidu, pour SSOR, direction de descente et ? */
   float *m_r, *m_z, *m_p, *m_q;
-  
+
+	/** Pointeurs SSE vers m_r, m_z, m_p, m_q */
+  __m128 *m_r_sse, *m_z_sse,*m_p_sse,*m_q_sse;
+
   /** Paramètre omega pour la diffusion */
   float m_omegaDiff;
   /** Paramètre omega pour la projection */
   float m_omegaProj;
   /** Tolérance d'erreur pour GCSSOR. */
   float m_epsilon;
+	
 };
 
 #endif

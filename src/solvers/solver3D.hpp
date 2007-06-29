@@ -66,7 +66,10 @@ protected:
   
   /** Pas de résolution de la vélocité. */
   virtual void vel_step ();
-  
+
+  /** Ajouter le vorticity confinement */
+  void addVorticityConfinement( float * const u,  float * const v, float * const w);
+
   /** Prolonger sur une grille fine un vecteur défini sur une grille grossière.
    * On utilise une interpolation bilinéaire.
    * La grille fine est de taille nx*ny*nz
@@ -87,6 +90,7 @@ protected:
 
   float *m_uPrev, *m_vPrev, *m_wPrev;
   float *m_dens, *m_densPrev, *m_densSrc;
+  float *m_rotx, *m_roty, *m_rotz, *m_rot;
   
   uint m_n2, m_t2nx;
 };

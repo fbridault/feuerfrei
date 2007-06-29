@@ -13,8 +13,16 @@ Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
   m_nbVoxelsZ = n_z;
-  
-  /* Détermination de la taille du solveur de manière à ce que le plus grand côté soit de dimension dim */
+
+  m_hx= 0.5f/n_x;
+  m_hy= 0.5f/n_y;
+  m_hx= 0.5f/n_y;
+
+  m_invhx= 0.5f*n_x;
+  m_invhy= 0.5f*n_y;
+  m_invhz= 0.5f*n_y;
+
+  /* DÃ©termination de la taille du solveur de maniÃ¨re Ã  ce que le plus grand cÃ´tÃ© soit de dimension dim */
   if (m_nbVoxelsX > m_nbVoxelsY){
     if (m_nbVoxelsX > m_nbVoxelsZ){
       m_dim.x = dim;
@@ -123,21 +131,21 @@ void Field3D::displayArrow (const Vector& direction)
   
   dir.normalize ();
   
-  /* On obtient un vecteur perpendiculaire au plan défini par l'axe du cône et la direction souhaitée */
+  /* On obtient un vecteur perpendiculaire au plan dÃ©fini par l'axe du cÃ´ne et la direction souhaitÃ©e */
   axeRot = axeCone ^ dir;
   
-  /* On récupère l'angle de rotation entre les deux vecteurs */
+  /* On rÃ©cupÃ¨re l'angle de rotation entre les deux vecteurs */
   angle = acos (axeCone * dir);
   
   glRotatef (angle * RAD_TO_DEG, axeRot.x, axeRot.y, axeRot.z);
   /***********************************************************************************/
   
-  /* Dégradé de couleur bleu vers rouge */
-  /* Problème : on ne connaît pas l'échelle des valeurs */
+  /* DÃ©gradÃ© de couleur bleu vers rouge */
+  /* ProblÃ¨me : on ne connaÃ®t pas l'Ã©chelle des valeurs */
   /* On va donc tenter de prendre une valeur max suffisamment grande */
-  /* pour pouvoir discerner au mieux les variations de la vélocité */
+  /* pour pouvoir discerner au mieux les variations de la vÃ©locitÃ© */
   
-//  printf("%f\n",norme_vel);
+  //  printf("%f\n",norme_vel);
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
   
   GraphicsFn::SolidCone (taille / 2, taille, 3, 3);

@@ -167,10 +167,8 @@ void GLFlameCanvas::InitScene()
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
   m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX);
   
-  m_swatch = new wxStopWatch();
-  m_swatch->Pause();
-  
   InitThreads();
+  m_swatch = new wxStopWatch();
 }
 
 void GLFlameCanvas::Init (FlameAppConfig *config)
@@ -182,8 +180,6 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
   InitGL();
   
   InitScene();
-  
-  m_swatch->Start();
   
   m_init = true;
   

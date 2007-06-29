@@ -79,10 +79,10 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
   if(!m_wxtex) {
     cout << "Error ";
   }else{
-    cout << "OK" << endl;
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
-    else{
+    else{      
+      cout << "RGB.......OK" << endl;
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
       m_hasAlpha = false;
@@ -108,10 +108,10 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
   if(!m_wxtex) {
     cout << "Error";
   }else{
-    cout << "OK" << endl;
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
     else{
+      cout << "RGB.......OK" << endl;
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
       m_hasAlpha = false;
@@ -135,13 +135,13 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
   if(!m_wxtex) {
-    cout << "Error";
+    cout << "Error" << endl;
   }else{
-    cout << "OK" << endl;    
     if( m_wxtex->HasAlpha() )
-      loadWithAlphaChannel();
+	loadWithAlphaChannel();
     else{
       m_hasAlpha = false;
+      cout << "RGB.......OK" << endl;
       glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
 		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
     }
@@ -180,7 +180,7 @@ Texture::~Texture()
 
 void Texture::loadWithAlphaChannel()
 {
-  cout << "Found alpha channel..." << endl;
+  cout << "RGBA.......OK" << endl;
   m_hasAlpha = true;
   u_char *imgcpy,*tmp;
   tmp = imgcpy = new u_char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];

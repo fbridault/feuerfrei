@@ -574,9 +574,7 @@ void FlamesFrame::LoadSettings (void)
       groupName.Printf(_("/Luminary%d/Flame0/"), i);
       LoadFireSettings(groupName, m_currentConfig.luminaries[i].fires[0]);
     }
-  cerr << "boienr" << endl;
   InitLuminariesPanels();
-  cerr << "boienrz" << endl;
   InitSolversPanels();
   InitFlamesPanels();
   

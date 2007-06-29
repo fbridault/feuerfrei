@@ -280,7 +280,6 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   for(uint i=0; i < m_nbSolversMax; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
-
       m_config->DeleteGroup(groupName);
     }
  
@@ -288,6 +287,7 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
     {
       groupName.Printf(_("/Solver%d/"),i);
       
+      m_solverPanels[i]->getCtrlValues(m_currentConfig.solvers[i]);
       m_config->Write(groupName + _("Type"), (int)m_currentConfig.solvers[i].type);
       
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);

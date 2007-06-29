@@ -33,8 +33,8 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
   
-//   m_forceCoef = 1;
-//   m_forceRatio = 1;
+  m_forceCoef = 1;
+  m_forceRatio = 1;
 }
 
 Solver3D::~Solver3D ()
@@ -57,7 +57,7 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
     {
       for (j = 1; j <= m_nbVoxelsZ; j++)
 	{
-	  x[IX (0, i, j)] = 0;	//x[IX(i,j,1)];
+	  x[IX (0, i, j)] = 0.0f;	//x[IX(i,j,1)];
 	  x[IX (m_nbVoxelsX + 1, i, j)] = 0.0f;	//x[IX(i,j,N)];
 	}
     }
@@ -168,6 +168,7 @@ void Solver3D::iterate ()
 { 
   if(!m_run)
     return;
+  
   /* Cellule(s) génératrice(s) */
   
 //   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
@@ -214,7 +215,6 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   Point strength;
   Point force;
   //  float factor = m_dim.y/(m_nbVoxelsY - 1);
-  
   if(move){
     force = position;
     strength.x = strength.y = strength.z = .2f;

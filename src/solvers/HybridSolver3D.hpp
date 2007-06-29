@@ -55,8 +55,6 @@ public:
 protected:
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
   virtual void project (float *const p, float *const div);
-  
-  float m_time;
 };
 
 /** @test La classe LODHybridSolver implémente un solveur de classe HybridSolver permettant d'utiliser une grille

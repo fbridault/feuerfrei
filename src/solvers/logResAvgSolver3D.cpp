@@ -194,7 +194,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
     for ( j = m_nbVoxelsY; j>=1 ; j--)
       for ( i = m_nbVoxelsX; i>=1; i--)
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
-	
+  
   // p=z
   copy(m_z, &m_z[m_nbVoxels], m_p);
     

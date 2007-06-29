@@ -365,7 +365,7 @@ protected:
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
 
-  uint m_moduloSave;
+  int m_moduloSave;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.

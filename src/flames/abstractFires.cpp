@@ -22,9 +22,9 @@ FlameLight::FlameLight(const Scene* const scene, uint index, const GLSLProgram* 
   default : m_light = GL_LIGHT0; break;
   }
   
-  m_lightPosition[3] = 1.0;
+  m_lightPosition[3] = 1.0f;
   m_SVProgram = program;  
-  m_orientationSPtheta = 0.0;
+  m_orientationSPtheta = 0.0f;
   
   m_iesFile = new IES(IESFilename);
 }
@@ -41,19 +41,19 @@ void FlameLight::switchOff()
 
 void FlameLight::switchOn()
 {  
-  float coef = 1.5*m_intensity;
+  float coef = 1.5f*m_intensity;
 //   GLfloat val_diffuse[]={1,1,1,1.0};
-  GLfloat val_diffuse[]={1*coef,0.5*coef,0.0,1.0};
+  GLfloat val_diffuse[]={1*coef,0.5f*coef,0.0f,1.0f};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
-  GLfloat val_null[]={0.0,0.0,0.0,1.0};
-  GLfloat val_specular[]={.1*coef,.1*coef,.1*coef,1.0};
+  GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
+  GLfloat val_specular[]={.1f*coef,.1f*coef,.1f*coef,1.0f};
   
   /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
   glLightfv(m_light,GL_POSITION,m_lightPosition);
   glLightfv(m_light,GL_DIFFUSE,val_diffuse);
   glLightfv(m_light,GL_SPECULAR,val_specular);
   glLightfv(m_light,GL_AMBIENT,val_null);
-  glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.005);
+  glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.005f);
   glEnable(m_light);
 }
 
@@ -82,7 +82,7 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
   m_nbFlames=nbFlames;
   if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
   
-  m_intensityCoef = 0.3;
+  m_intensityCoef = 0.3f;
   m_visibility = true;
   m_dist=0;
   buildBoundingSphere();
@@ -149,7 +149,7 @@ void FireSource::buildBoundingSphere ()
 {
   Point p;
   float t,k,s;
-  p = (m_solver->getScale() * m_solver->getDim())/2.0;
+  p = (m_solver->getScale() * m_solver->getDim())/2.0f;
   t = p.max();
   k = t*t;
   s = sqrt(k+k);
@@ -165,9 +165,9 @@ void FireSource::buildBoundingSphere ()
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  uint modulo, remainder;
+  int modulo, remainder;
   int mod;
-  const uint INCREMENT=4;
+  const int INCREMENT=4;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -183,10 +183,10 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     
-    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    remainder = ((int)nearbyint(m_dist)) % INCREMENT;
     
     if(!remainder){
-      modulo = ((uint)floor(m_dist))/INCREMENT;
+      modulo = ((int)floor(m_dist))/INCREMENT;
       
       if(modulo > m_moduloSave)
 	{
@@ -323,7 +323,7 @@ void DetachableFireSource::build()
   Point pt;
   Point p;
   float t,k;
-  p = (m_solver->getScale() * m_solver->getDim())/2.0;
+  p = (m_solver->getScale() * m_solver->getDim())/2.0f;
   t = p.max();
   k = t*t;
   
@@ -348,7 +348,7 @@ void DetachableFireSource::build()
       ptMin *= m_solver->getScale();
       ptMax *= m_solver->getScale();
       m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
-      m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0)/2.0;
+      m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
     }else{
     m_boundingSphere.radius = sqrt(k+k);
     m_boundingSphere.centre = m_solver->getPosition() + p;
@@ -368,9 +368,9 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  uint modulo, remainder;
+  int modulo, remainder;
   int mod;
-  const uint INCREMENT=4;
+  const int INCREMENT=4;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -386,10 +386,10 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     /* Il faut prendre en compte la taille de l'objet */
     m_dist = m_dist - m_boundingSphere.radius;
     
-    remainder = ((uint)nearbyint(m_dist)) % INCREMENT;
+    remainder = ((int)nearbyint(m_dist)) % INCREMENT;
     
     if(!remainder){
-      modulo = ((uint)floor(m_dist))/INCREMENT;
+      modulo = ((int)floor(m_dist))/INCREMENT;
       
       if(modulo > m_moduloSave)
 	{      
@@ -486,12 +486,12 @@ void DetachableFireSource::buildBoundingBox ()
     ptMax.y = pt.y;
   if(pt.z > ptMax.z)
     ptMax.z = pt.z;
-  if(0.0 < ptMin.x)
-    ptMin.x = 0.0;
-  if(0.0 < ptMin.y)
-    ptMin.y = 0.0;
-  if(0.0 < ptMin.z)
-    ptMin.z = 0.0;
+  if(0.0f < ptMin.x)
+    ptMin.x = 0.0f;
+  if(0.0f < ptMin.y)
+    ptMin.y = 0.0f;
+  if(0.0f < ptMin.z)
+    ptMin.z = 0.0f;
   
   m_BBmin = ptMin * m_solver->getScale();
   m_BBmax = ptMax * m_solver->getScale();

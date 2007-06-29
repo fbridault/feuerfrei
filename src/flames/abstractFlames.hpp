@@ -99,8 +99,7 @@ public:
   };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
-  virtual void setSmoothShading (bool state) { m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2;
-    cerr << (int)m_shadingType << endl; };
+  virtual void setSmoothShading (bool state) { m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2; };
   
   Point getPosition() const { return m_position; };
   
@@ -163,7 +162,7 @@ protected:
     cerr << "Nurbs error : " << estring << endl;
     exit(0);
   }
-
+  
   static void CALLBACK NurbsBegin(GLenum type, GLvoid *shadingType)
   {
     /* Si on est en mode simplifié */
@@ -195,7 +194,7 @@ protected:
       if( ! (*(char *)shadingType & 1))
 	glPolygonMode(GL_FRONT,GL_FILL);    
   }
-
+  
   static void CALLBACK NurbsVertex ( GLfloat *vertex )
   {
     glVertex3fv(vertex);
@@ -398,21 +397,6 @@ public:
     for (i = 0; i < m_nbLeadSkeletons; i++)
       m_leadSkeletons[i]->setLOD(m_lodSkel);
     m_lodSkelChanged = false;
-    if(m_lodSkel == NORMAL)
-      {
-	m_nbFixedPoints = 3;
-	m_shadingType = m_shadingType & 1;
-	m_uorder = 4;
-	m_vorder = 4;
-      }
-    else
-      {
-	m_nbFixedPoints = 1;
-	m_shadingType = m_shadingType | 2;
-	m_uorder = 3;
-	m_vorder = 3;
-      }
-    cerr << (int)m_shadingType << endl;
   };
   
   virtual bool build();

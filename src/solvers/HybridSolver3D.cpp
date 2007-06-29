@@ -25,7 +25,7 @@ HybridSolver3D::~HybridSolver3D ()
 /* Pas de diffusion */
 void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,5);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,4);
   //   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 10);
 }
 

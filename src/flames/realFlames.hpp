@@ -77,6 +77,29 @@ public:
   
   void breakCheck();
   
+  void changeSkeletonsLOD()
+  {
+    uint i;
+    for (i = 0; i < m_nbSkeletons; i++)
+      m_periSkeletons[i]->setLOD(m_lodSkel);
+    for (i = 0; i < m_nbLeadSkeletons; i++)
+      m_leadSkeletons[i]->setLOD(m_lodSkel);
+    m_lodSkelChanged = false;
+    if(m_lodSkel == NORMAL)
+      {
+	m_nbFixedPoints = 3;
+	m_shadingType = m_shadingType & 1;
+	m_uorder = 4;
+	m_vorder = 4;
+      }
+    else
+      {
+	m_nbFixedPoints = 1;
+	m_shadingType = m_shadingType | 2;
+	m_uorder = 3;
+	m_vorder = 3;
+      }
+  };
   /** Méthode permettant de générer des étincelles dans le feu.
    * @todo Cette méthode n'est pas encore terminée.
    */

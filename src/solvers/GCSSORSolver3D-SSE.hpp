@@ -1,7 +1,7 @@
-#if !defined(GCSSORSOLVER3D_H)
-#define GCSSORSOLVER3D_H
+#if !defined(GCSSORSOLVER3D_SSE_H)
+#define GCSSORSOLVER3D_SSE_H
 #include "SSE4.hpp"
-class GCSSORSolver3D;
+class GCSSORSolver3D_SSE;
 
 #include "solver3D.hpp"
 
@@ -10,7 +10,7 @@ class GCSSORSolver3D;
  * 
  * @author	Flavien Bridault et Michel Leblond
  */
-class GCSSORSolver3D : public virtual Solver3D
+class GCSSORSolver3D_SSE : public virtual Solver3D
 {
 public:
   /** Constructeur du solveur.
@@ -25,7 +25,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+  GCSSORSolver3D_SSE (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
 		  float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
@@ -33,9 +33,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon);
+  GCSSORSolver3D_SSE (float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
-  virtual ~GCSSORSolver3D ();
+  virtual ~GCSSORSolver3D_SSE ();
   
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion

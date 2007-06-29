@@ -7,6 +7,9 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/FindwxWidgets.cmake)
 INCLUDE (${CMAKE_ROOT}/Modules/FindMFC.cmake)
 
+#permettre les calculs SSE
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
+
 # Look for OpenGL
 FIND_PACKAGE(${Package} OpenGL)
 IF(OPENGL_FOUND)
@@ -51,7 +54,7 @@ AUX_SOURCE_DIRECTORY(flames FLAMES_SRCS)
 AUX_SOURCE_DIRECTORY(interface INTERFACE_SRCS)
 AUX_SOURCE_DIRECTORY(scene SCENE_SRCS)
 AUX_SOURCE_DIRECTORY(shaders SHADERS_SRCS)
-SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/HybridSolver3D.cpp solvers/globalField.cpp solvers/fieldThread.cpp)
+SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp solvers/globalField.cpp solvers/fieldThread.cpp)
 SET(INTERFACE_SRCS interface/GLFlameCanvas.cpp interface/luminaryDialog.cpp interface/flamesFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/shadowsDialog.cpp)
 
 SET(RTFLAMES_SRCS flames.cpp ${FLAMES_SRCS} ${INTERFACE_SRCS} ${SCENE_SRCS} ${SHADERS_SRCS} ${SOLVERS_SRCS})
@@ -71,6 +74,3 @@ SET(FLUIDSEXE "rtfluids")
 ADD_EXECUTABLE(${FLUIDSEXE} ${RTFLUIDS_SRCS}) 
 TARGET_LINK_LIBRARIES(${FLUIDSEXE} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES})
 SET_TARGET_PROPERTIES(${FLUIDSEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -DRTFLUIDS_BUILD")
-
-#permettre les calculs SSE
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse")

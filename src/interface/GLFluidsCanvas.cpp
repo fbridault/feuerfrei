@@ -6,6 +6,7 @@
 #include "../solvers/GSSolver2D.hpp"
 #include "../solvers/GSSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D.hpp"
+#include "../solvers/GCSSORSolver3D-SSE.hpp"
 #include "../solvers/HybridSolver3D.hpp"
 #include "../solvers/logResSolver3D.hpp"
 #include "../solvers/logResAvgSolver3D.hpp"
@@ -100,6 +101,14 @@ void GLFluidsCanvas::InitSolvers(void)
 					m_currentConfig->solvers[i].timeStep,
 					m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
 					m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
+      break;
+    case GCSSOR_SOLVER_SSE :
+      m_solvers[i] = new GCSSORSolver3D_SSE(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 
+					    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, 
+					    m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,
+					    m_currentConfig->solvers[i].timeStep,
+					    m_currentConfig->solvers[i].buoyancy, m_currentConfig->solvers[i].omegaDiff, 
+					    m_currentConfig->solvers[i].omegaProj, m_currentConfig->solvers[i].epsilon);
       break;
     case HYBRID_SOLVER :
       m_solvers[i] = new HybridSolver3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx, 

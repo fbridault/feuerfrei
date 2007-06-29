@@ -15,17 +15,18 @@
 /* Communs à rtflames et rtfluids */
 #define GS_SOLVER 0
 #define GCSSOR_SOLVER 1
-#define HYBRID_SOLVER 2
-#define LOD_HYBRID_SOLVER 3
-#define SIMPLE_FIELD 4
-#define FAKE_FIELD 5
-#define LOD_FIELD 6
-#define LOD_HYBRID_FIELD 7
+#define GCSSOR_SOLVER_SSE 2
+#define HYBRID_SOLVER 3
+#define LOD_HYBRID_SOLVER 4
+#define SIMPLE_FIELD 5
+#define FAKE_FIELD 6
+#define LOD_FIELD 7
+#define LOD_HYBRID_FIELD 8
 /* Spécifiques à rtfluids */
-#define LOGRES_SOLVER 8
-#define LOGRESAVG_SOLVER 9
-#define LOGRESAVGTIME_SOLVER 10
-#define GS_SOLVER2D 11
+#define LOGRES_SOLVER 9
+#define LOGRESAVG_SOLVER 10
+#define LOGRESAVGTIME_SOLVER 11
+#define GS_SOLVER2D 12
 
 #define NB_MAXLUMINARIES 20
 #define NB_MAXSOLVERS 150

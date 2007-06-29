@@ -55,6 +55,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
   const wxString m_solverTypeRadioBoxChoices[] = {
     _("Gauss-Seidel"),
     _("Preconditioned Conjugated Gradient"),
+    _("Preconditioned Conjugated Gradient-SSE"),
     _("Hybrid"),
     _("LOD Hybrid"),
     _("Simple field"),
@@ -63,7 +64,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
     _("LOD multi-res field ")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Velocity Field Type"), wxDefaultPosition, wxDefaultSize, 
-					8, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));

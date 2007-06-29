@@ -6,6 +6,7 @@
 
 #include "../solvers/GSSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D.hpp"
+#include "../solvers/GCSSORSolver3D-SSE.hpp"
 #include "../solvers/HybridSolver3D.hpp"
 #include "../solvers/fakeField3D.hpp"
 #include "../solvers/LODField3D.hpp"
@@ -101,6 +102,10 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& posit
     return (new GCSSORSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
 			       fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
 			       fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+  case GCSSOR_SOLVER_SSE :
+    return (new GCSSORSolver3D_SSE(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
+				   fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
+				   fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
   case HYBRID_SOLVER :
     return (new HybridSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
 			       fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,

@@ -59,36 +59,16 @@ public:
 
   virtual bool build()
   {
-    if(RealFlame::build()){
-      top.resetToNull();
-      for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-	top += *((*skeletonsIterator)->getParticle(0));
-      top = top / (float)m_leadSkeletons.size();
-      
-      bottom.resetToNull();
-      for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	   skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-	bottom += *((*skeletonsIterator)->getRoot());
-      bottom = bottom / (float)m_leadSkeletons.size();
-      return true;
-    }
-    return false;
+    if(m_lodSkel == NORMAL)
+      return buildNormal();
+    else
+      return buildSimplified();
   }
   
-  virtual Point getCenter () const
-  {
-    Point averagePos;    
-    for (uint i = 1; i < m_nbLeadSkeletons-1 ; i++)    
-      averagePos += *m_leadSkeletons[i]->getMiddleParticle ();
-    
-    averagePos = averagePos / (m_nbLeadSkeletons-2);
-    
-    return averagePos;
-  }
+  virtual Point getCenter () const { return m_center; };
   
-  Point getTop() const { return top; };  
-  Point getBottom() const { return bottom; };
+  Point getTop() const { return m_top; };  
+  Point getBottom() const { return m_bottom; };
   
   virtual void setSamplingTolerance(u_char value){
     NurbsFlame::setSamplingTolerance(value);
@@ -97,13 +77,45 @@ public:
   
   void breakCheck();
   
-  //  void setDetachedFlamesWidth(
-
   /** Méthode permettant de générer des étincelles dans le feu.
    * @todo Cette méthode n'est pas encore terminée.
    */
 //   virtual void generateAndDrawSparks();
 private:
+  virtual bool buildNormal()
+  {
+    if(RealFlame::build()){
+      computeCenterAndExtremities();
+      return true;
+    }
+    return false;
+  }
+  
+  virtual bool buildSimplified ();
+  
+  virtual void computeCenterAndExtremities()
+  {
+    Point averagePos;
+    
+    /* Calcul des extrémités haute et basse */
+    m_top.resetToNull();
+    m_bottom.resetToNull();
+    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+      {
+	m_top += *((*skeletonsIterator)->getParticle(0));
+	m_bottom += *((*skeletonsIterator)->getRoot());
+      }
+    m_top = m_top / (float)m_leadSkeletons.size();  
+    m_bottom = m_bottom / (float)m_leadSkeletons.size();
+    
+    /* Calcul du centre */
+    for (uint i = 1; i < m_nbLeadSkeletons-1 ; i++)    
+      averagePos += *m_leadSkeletons[i]->getMiddleParticle ();
+    
+    m_center = averagePos / (m_nbLeadSkeletons-2);
+  }
+  
   /** Mèche de la flamme */
   Wick *m_wick;
 
@@ -116,7 +128,7 @@ private:
   /** Largeur des flammes détachées */
   float m_detachedFlamesWidth;
 
-  Point top, bottom;
+  Point m_top, m_bottom, m_center;
   
   u_char m_samplingMethod;
 };

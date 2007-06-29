@@ -99,7 +99,8 @@ public:
   };
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
-  virtual void setSmoothShading (bool state) { m_smoothShading = state; };
+  virtual void setSmoothShading (bool state) { m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2;
+    cerr << (int)m_shadingType << endl; };
   
   Point getPosition() const { return m_position; };
   
@@ -123,7 +124,7 @@ public:
     copy(source.m_vknots, &source.m_vknots[m_vknotsCount], m_vknots);
     copy(source.m_texPoints, &source.m_texPoints[(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2], m_texPoints);
     copy(source.m_texTmp, &source.m_texTmp[m_maxParticles + m_nbFixedPoints], m_texTmp);
-    m_size = source.m_size;
+    m_vsize = source.m_vsize;
   }
   
   const Texture *getTexture() const { return m_tex; };
@@ -151,6 +152,7 @@ protected:
     *m_ctrlPoints++ = pt->z;
     *m_texPoints++ = *m_texTmp++;
     *m_texPoints++ = v;
+    m_count++;
   }
     
   static void CALLBACK nurbsError(GLenum errorCode)
@@ -158,22 +160,40 @@ protected:
     const GLubyte *estring;
   
     estring = gluErrorString(errorCode);
-    fprintf(stderr, "Erreur Nurbs : %s\n", estring);
+    cerr << "Nurbs error : " << estring << endl;
     exit(0);
   }
 
-  static void CALLBACK NurbsBegin(GLenum type, GLvoid *smoothShading)
+  static void CALLBACK NurbsBegin(GLenum type, GLvoid *shadingType)
   {
-    if( ! * (bool *)smoothShading )
-      glPolygonMode(GL_FRONT,GL_LINE);
+    /* Si on est en mode simplifié */
+    if( *(u_char *)shadingType & 2)
+      {
+	glDisable(GL_CULL_FACE);
+	if( (*(u_char *)shadingType & 1))
+	  glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+	else
+	  glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+      }
+    else
+      if( ! (*(u_char *)shadingType & 1))
+	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+      
     glBegin(type);
   }
 
-  static void CALLBACK NurbsEnd(GLvoid *smoothShading)
+  static void CALLBACK NurbsEnd(GLvoid *shadingType)
   {
     glEnd();
-    if( ! * (bool *)smoothShading )
-      glPolygonMode(GL_FRONT,GL_FILL);
+    /* Si on est en mode simplifié */
+    if( *(char *)shadingType & 2)
+      {
+	glEnable(GL_CULL_FACE);
+	glPolygonMode(GL_FRONT,GL_FILL);
+      }
+    else
+      if( ! (*(char *)shadingType & 1))
+	glPolygonMode(GL_FRONT,GL_FILL);    
   }
 
   static void CALLBACK NurbsVertex ( GLfloat *vertex )
@@ -215,12 +235,14 @@ protected:
    */
   uint m_uknotsCount, m_vknotsCount;
   uint m_maxParticles;
-  
+  uint m_count;
   /** Nombre de points fixes pour chaque direction v, par exemple origine des squelettes, sommet du guide */
   unsigned short m_nbFixedPoints;
   
-  uint m_size;
-  bool m_smoothShading;  
+  /** Nombre de points total dans la direction v de la NURBS, soit m_nbFixedPoints+m_maxParticles */
+  uint m_vsize;
+  /** Codage du type de shading : 1er bit à 1 si fil de fer; 2e bit à 1 si front and back */
+  u_char m_shadingType;  
   
   /** Texture de la flamme */
   const Texture *m_tex;
@@ -376,6 +398,21 @@ public:
     for (i = 0; i < m_nbLeadSkeletons; i++)
       m_leadSkeletons[i]->setLOD(m_lodSkel);
     m_lodSkelChanged = false;
+    if(m_lodSkel == NORMAL)
+      {
+	m_nbFixedPoints = 3;
+	m_shadingType = m_shadingType & 1;
+	m_uorder = 4;
+	m_vorder = 4;
+      }
+    else
+      {
+	m_nbFixedPoints = 1;
+	m_shadingType = m_shadingType | 2;
+	m_uorder = 3;
+	m_vorder = 3;
+      }
+    cerr << (int)m_shadingType << endl;
   };
   
   virtual bool build();

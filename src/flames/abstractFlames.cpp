@@ -39,7 +39,7 @@ NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* co
   
   m_nurbs = m_accurateNurbs;
   
-  m_smoothShading=true;
+  m_shadingType=1;
   
   m_position=Point(.5,0,.5);
   
@@ -79,7 +79,7 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   
   m_nurbs = m_accurateNurbs;
   
-  m_smoothShading=true;
+  m_shadingType=1;
   
   m_position=source->m_position;
 
@@ -113,16 +113,16 @@ void NurbsFlame::initNurbs(GLUnurbsObj** nurbs)
   gluNurbsCallback(*nurbs, GLU_NURBS_TEXTURE_COORD, (void(*)())NurbsTexCoord);
   gluNurbsCallback(*nurbs, GLU_NURBS_END_DATA, (void(*)())NurbsEnd);
   
-  gluNurbsCallbackData(*nurbs,(GLvoid *)&m_smoothShading);
+  gluNurbsCallbackData(*nurbs,(GLvoid *)&m_shadingType);
 }
 
 void NurbsFlame::drawNurbs () const
 {
   if(m_uknotsCount){
     gluBeginSurface (m_nurbs);
-    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 2,
+    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, m_vsize * 2,
 		     2, m_texPoints, m_uorder, m_vorder, GL_MAP2_TEXTURE_COORD_2);
-    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, (m_maxParticles + m_nbFixedPoints) * 3,
+    gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, m_vsize * 3,
 		     3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
     gluEndSurface (m_nurbs);
   }
@@ -130,9 +130,9 @@ void NurbsFlame::drawNurbs () const
 
 void NurbsFlame::drawLineFlame () const
 {
-  if (!m_smoothShading)
+  if (! (m_shadingType & 1) )
     {
-      glColor4f (1.0, 1.0, 1.0, 1.0);      
+      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
       drawNurbs ();
     }
   else
@@ -163,9 +163,9 @@ FixedFlame::~FixedFlame()
 
 void FixedFlame::drawPointFlame () const
 {
-  if (!m_smoothShading)
+  if (! (m_shadingType & 1) )
     {
-      glColor4f (1.0, 1.0, 1.0, 1.0);      
+      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);      
       drawNurbs ();
     }
   else
@@ -184,7 +184,7 @@ void FixedFlame::drawPointFlame () const
       /* Attention, ne pas prendre la translation en plus !!!! */
       Vector worldLookAt(m[2][0], m[2][1], m[2][2]);
       Vector worldLookX(m[0][0], m[0][1], m[0][2]);
-      Vector direction(-bougiepos.x, 0.0, -bougiepos.z);
+      Vector direction(-bougiepos.x, 0.0f, -bougiepos.z);
       
       direction.normalize ();
       /* Apparemment, pas besoin de le normaliser, on laisse pour le moment */
@@ -195,7 +195,7 @@ void FixedFlame::drawPointFlame () const
       angle2 = acos (direction * worldLookX);
       
       /****************************************************************************************/
-      angle4 = (angle2 < PI / 2.0) ? -angle : angle;
+      angle4 = (angle2 < PI / 2.0f) ? -angle : angle;
       
       glActiveTextureARB(GL_TEXTURE0_ARB);
       glEnable (GL_TEXTURE_2D);
@@ -208,7 +208,7 @@ void FixedFlame::drawPointFlame () const
       glPushMatrix ();
       glLoadIdentity ();
       
-      glTranslatef (0.0, angle4 / (float) (PI), 0.0);
+      glTranslatef (0.0f, angle4 / (float) (PI), 0.0f);
       
       drawNurbs();
       
@@ -237,6 +237,7 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
   
   m_solver = s;
   m_lodSkelChanged = false;
+  m_lodSkel = NORMAL;
 }
 
 bool RealFlame::build ()
@@ -245,9 +246,10 @@ bool RealFlame::build ()
   float vinc, vtmp, vtex;
   float dist_max;
   m_maxParticles = 0;
-  vtex = -0.5;
+  m_count = 0;
+  vtex = -0.5f;
 
-  /* Si un changement de niveau de détail a été demandé, l'effectue maintenant */
+  /* Si un changement de niveau de détail a été demandé, l'effectuer maintenant */
   if(m_lodSkelChanged) changeSkeletonsLOD();
   
   /* Déplacement des squelettes guides */
@@ -262,11 +264,11 @@ bool RealFlame::build ()
 	m_maxParticles = m_periSkeletons[i]->getSize ();
     }
   
-  m_size = m_maxParticles + m_nbFixedPoints;
+  m_vsize = m_maxParticles + m_nbFixedPoints;
   
-  vinc = 1.0 / (float)(m_size-1);
+  vinc = 1.0f / (float)(m_vsize-1);
   vtmp = 0;
-  for (i = 0; i < m_size; i++){
+  for (i = 0; i < m_vsize; i++){
     m_texTmp[i] = vtmp;
     vtmp += vinc;
   }
@@ -274,7 +276,7 @@ bool RealFlame::build ()
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .5;
+      vtex += .5f;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_periSkeletons[i]->getSize () < m_maxParticles)
@@ -330,6 +332,7 @@ bool RealFlame::build ()
 	  
 	  for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
 	    {
+	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
 	      /* On regarde s'il ne faut pas ajouter un point */
 	      for (l = 0; l < nb_pts_supp; l++)
 		{
@@ -340,7 +343,6 @@ bool RealFlame::build ()
 		      setCtrlPoint (&pt, vtex);
 		    }
 		}
-	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
 	    }
 	  
 	  setCtrlPoint (m_periSkeletons[i]->getLastParticle (), vtex);
@@ -394,35 +396,41 @@ bool RealFlame::build ()
       m_texTmp = m_texTmpSave;
     }
   
-  /* On recopie les m_uorder squelettes pour fermer la NURBS */
+  /* On recopie les (m_uorder-1) squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_size)*3; i++)
+  for (i = 0; i < ((m_uorder-1)*m_vsize)*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   
   GLfloat *startTexPoints = m_texPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_size)*2; i++)
+  for (i = 0; i < ((m_uorder-1)*m_vsize)*2; i++)
     *m_texPoints++ = *startTexPoints++;  
   m_texPoints = m_texPointsSave;
   
   /* Affichage en NURBS */
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
-  m_vknotsCount = m_maxParticles + m_vorder + m_nbFixedPoints;
+  m_vknotsCount = m_vsize + m_vorder;
   
+  /* Vecteur nodal en u strictement croissant ex: 0 1 2 3 4 5... */
   for (i = 0; i < m_uknotsCount; i++)
-    m_uknots[i] = i;
+    m_uknots[i] = (float)i;
   
-  for (j = 0; j < m_vknotsCount; j++)
-    m_vknots[j] = (j < m_vorder) ? 0 : (j - m_vorder + 1);
+  /* Vecteur nodal en v avec noeuds internes strictement croissants ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
+  /* Plus décalage du premier noeuds interne ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
+  for (j = 0; j < m_vorder; j++)
+    m_vknots[j] = 0.0f;
   
-  for (j = m_vknotsCount - m_vorder; j < m_vknotsCount; j++)
-    m_vknots[j] = m_vknots[m_vknotsCount - m_vorder];
+  for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
+    m_vknots[j] = m_vknots[j-1]+1;
+  /* Adoucit la jointure entre le haut des squelettes périphériques et le haut du squelette guide ex: 0 0 0 0 1 2 3 4 5 6 6 6 6*/
+  m_vknots[m_vorder] += .9f;
   
-  m_vknots[m_vorder] += 0.9;
+  m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
+  for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
+    m_vknots[j] = m_vknots[j-1];
   
-  if (m_vknots[m_vorder] > m_vknots[m_vorder + 1])
-    for (j = m_vorder + 1; j < m_vknotsCount; j++)
-      m_vknots[j] += 1;
+  if(m_vsize*m_nbSkeletons != m_count)
+     cerr << "error " << m_vsize*m_nbSkeletons << " " << m_count << endl;
   
   return true;
 }

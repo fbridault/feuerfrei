@@ -105,9 +105,182 @@ void LineFlame::breakCheck()
       splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getInternalSize()-1));
       periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
       
-      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_smoothShading, m_samplingMethod));
+      m_parentFire->addDetachedFlame(new DetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_shadingType, m_samplingMethod));
     }
   }
+}
+
+bool LineFlame::buildSimplified ()
+{
+  uint i, j, l;
+  float vinc, vtmp, vtex;
+  float dist_max;
+  m_maxParticles = 0;
+  m_count = 0;
+  vtex = -0.5f;
+  
+  if(m_lodSkelChanged) changeSkeletonsLOD();
+  
+  /* Déplacement des squelettes guides */
+  for (i = 0; i < m_nbLeadSkeletons; i++){
+    m_leadSkeletons[i]->move ();
+    if (m_leadSkeletons[i]->getSize () > m_maxParticles)
+      m_maxParticles = m_leadSkeletons[i]->getSize ();
+  }
+  
+  /* On rajoute des particules si il n'y en a pas assez pour construire la NURBS) */
+  if(m_maxParticles < m_vorder)
+    m_maxParticles = m_vorder;
+  
+  /* Déplacement des squelettes périphériques et détermination du maximum de particules par squelette */
+  for (i = 0; i < m_nbSkeletons; i++)
+    {
+      m_periSkeletons[i]->move ();
+    }
+  
+  m_vsize = m_maxParticles + m_nbFixedPoints;
+  
+  vinc = 1.0f / (float)(m_vsize-1);
+  vtmp = 0.0f;
+  for (i = 0; i < m_vsize; i++){
+    m_texTmp[i] = vtmp;
+    vtmp += vinc;
+  }
+  
+  /* Direction des u */
+  for (i = 0; i < m_nbLeadSkeletons; i++)
+    {
+      vtex += .5;
+      /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
+      /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
+      if (m_leadSkeletons[i]->getSize () < m_maxParticles)
+	{
+	  // Nombre de points de contrôle supplémentaires
+	  uint nb_pts_supp = m_maxParticles - m_leadSkeletons[i]->getSize ();
+	  Point pt;
+	  
+	  /* On calcule les distances entre les particules successives */
+	  /* On prend également en compte l'origine du squelette */
+	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */	  
+	  for (j = 0; j < m_leadSkeletons[i]->getSize () - 1; j++)
+	    m_distances[j] = 
+	      m_leadSkeletons[i]->getParticle (j)->squaredDistanceFrom(*m_leadSkeletons[i]->getParticle (j + 1));
+	  
+	  m_distances[m_leadSkeletons[i]->getSize () - 1] = 
+	    m_leadSkeletons[i]->getLastParticle ()->squaredDistanceFrom (*m_leadSkeletons[i]->getRoot ());
+	  
+	  /* On cherche les indices des distances max */
+	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
+	  for (l = 0; l < nb_pts_supp; l++)
+	    {
+	      dist_max = 0.0f;
+	      for (j = 0; j < m_leadSkeletons[i]->getSize (); j++)
+		{
+		  if (m_distances[j] > dist_max)
+		    {
+		      m_maxDistancesIndexes[l] = j;
+		      dist_max = m_distances[j];
+		    }
+		}
+	      /* Il n'y a plus de place */
+	      if (dist_max == 0.0f)
+		m_maxDistancesIndexes[l] = -1;
+	      else
+		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
+		m_distances[m_maxDistancesIndexes[l]] = 0;
+	    }
+	  /* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
+	  /* Remplissage des points de contrôle */
+	  
+	  for (j = 0; j < m_leadSkeletons[i]->getSize () - 1; j++)
+	    {
+	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), vtex);
+	      /* On regarde s'il ne faut pas ajouter un point */
+	      for (l = 0; l < nb_pts_supp; l++)
+		{
+		  if (m_maxDistancesIndexes[l] == (int)j)
+		    {
+		      /* On peut référencer j+1 puisque m_maxDistancesIndexes[l] != j si j == m_leadSkeletons[i]->getSize()-1 */
+		      pt = Point::pointBetween(m_leadSkeletons[i]->getParticle (j), m_leadSkeletons[i]->getParticle (j + 1));
+		      setCtrlPoint (&pt, vtex);
+		    }
+		}
+	    }	  
+	  setCtrlPoint (m_leadSkeletons[i]->getLastParticle (), vtex);
+	  
+	  bool prec = false;
+	  for (l = 0; l < nb_pts_supp; l++)
+	    if (m_maxDistancesIndexes[l] == (int)m_leadSkeletons[i]->getSize ()-1)
+	      {
+		pt = Point::pointBetween(m_leadSkeletons[i]->getRoot (), m_leadSkeletons[i]-> getLastParticle ());
+		setCtrlPoint (&pt, vtex);
+		prec = true;
+	      }
+	  
+	  /* Points supplémentaires au cas où il n'y a "plus de place" ailleurs entre les particules */
+	  for (l = 0; l < nb_pts_supp; l++)
+	    if (m_maxDistancesIndexes[l] == -1)
+	      {
+		if (!prec)
+		  {
+		    pt = *m_leadSkeletons[i]-> getRoot ();
+		  }
+		pt = Point::pointBetween (&pt, m_leadSkeletons[i]->getLastParticle ());
+		setCtrlPoint (&pt, vtex);
+		prec = true;
+	      }
+	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), vtex);
+	}
+      else
+	{
+	  /* Cas sans problème */
+	  /* Remplissage des points de contrôle */
+	  for (j = 0; j < m_leadSkeletons[i]->getSize (); j++)
+	    {
+	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), vtex);
+	    }
+	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), vtex);
+	}
+      m_texTmp = m_texTmpSave;
+    }
+  
+  m_ctrlPoints = m_ctrlPointsSave; 
+  m_texPoints = m_texPointsSave;
+  
+  /* Affichage en NURBS */
+  m_uknotsCount = m_nbLeadSkeletons + m_uorder;
+  m_vknotsCount = m_vsize + m_vorder;
+
+  for (i = 0; i < m_uknotsCount; i++)
+    m_uknots[i] = i;
+
+//   for (i = 0; i < m_uorder; i++)
+//     m_uknots[i] = 0;
+  
+//   for (i = m_uorder; i < m_uknotsCount-m_uorder; i++)
+//     m_uknots[i] = m_uknots[i-1]+1;
+  
+//   m_uknots[m_uknotsCount-m_uorder] =  m_uknots[m_uknotsCount-m_uorder-1]+1;
+//   for (i = m_uknotsCount-m_uorder+1; i < m_uknotsCount; i++)
+//     m_uknots[i] = m_uknots[i-1];
+  
+  for (j = 0; j < m_vorder; j++)
+    m_vknots[j] = 0;
+  
+  for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
+    m_vknots[j] = m_vknots[j-1]+1;
+  
+  m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
+  for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
+    m_vknots[j] = m_vknots[j-1];
+  
+  if( m_vsize*m_nbLeadSkeletons != m_count)
+    cerr << "error " << m_vsize*m_nbLeadSkeletons << " " << m_count << endl;
+//   cerr << m_count <<" control points, " << m_uknotsCount << " nodes in u, " << m_vknotsCount << " nodes in v" << endl;
+  
+  computeCenterAndExtremities();
+  
+  return true;
 }
 
 // void LineFlame::generateAndDrawSparks()
@@ -222,7 +395,7 @@ void PointFlame::drawWick (bool displayBoxes) const
 /**********************************************************************************************************************/
 
 DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons, 
-			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, bool smoothShading,
+			     uint nbSkeletons, FreePeriSkeleton **periSkeletons, const Texture* const tex, bool shadingType,
 			     u_char samplingMethod) :
   NurbsFlame (source, nbSkeletons, 2, tex)
 {
@@ -231,7 +404,7 @@ DetachedFlame::DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons
   m_nbLeadSkeletons = nbLeadSkeletons;
   m_leadSkeletons = leadSkeletons;
   m_periSkeletons = periSkeletons;
-  m_smoothShading = smoothShading;
+  m_shadingType = shadingType;
   setSamplingTolerance(samplingMethod);
 }
 
@@ -255,8 +428,8 @@ bool DetachedFlame::build()
   float vinc, vtmp, vtex;
   float dist_max;
   m_maxParticles = 0;
-  vtex = 0;
-  
+  vtex = 0.0f;
+
   for (i = 0; i < m_nbLeadSkeletons; i++)
     m_leadSkeletons[i]->move ();
   
@@ -270,11 +443,11 @@ bool DetachedFlame::build()
 	m_maxParticles = m_periSkeletons[i]->getSize ();
     }
   
-  m_size = m_maxParticles+m_nbFixedPoints;
+  m_vsize = m_maxParticles+m_nbFixedPoints;
   
-  vinc = 1.0 / (float)(m_size-1);
-  vtmp = 0;
-  for (i = 0; i < m_size; i++){
+  vinc = 1.0f / (float)(m_vsize-1);
+  vtmp = 0.0f;
+  for (i = 0; i < m_vsize; i++){
     m_texTmp[i] = vtmp;
     vtmp += vinc;
   }
@@ -282,7 +455,7 @@ bool DetachedFlame::build()
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .15;
+      vtex += .15f;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_periSkeletons[i]->getSize () < m_maxParticles)
@@ -392,37 +565,34 @@ bool DetachedFlame::build()
   
   /* On recopie les m_uorder squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_size)*3; i++)
+  for (i = 0; i < ((m_uorder-1)*m_vsize)*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   
   GLfloat *startTexPoints = m_texPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_size)*2; i++)
+  for (i = 0; i < ((m_uorder-1)*m_vsize)*2; i++)
     *m_texPoints++ = *startTexPoints++;  
   m_texPoints = m_texPointsSave;
   
   /* Affichage en NURBS */
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
-  m_vknotsCount = m_maxParticles + m_vorder + m_nbFixedPoints;
+  m_vknotsCount = m_vsize + m_vorder;
   
   for (i = 0; i < m_uknotsCount; i++)
-    m_uknots[i] = i;
+    m_uknots[i] = (float)i;
   
-  for (j = 0; j < m_vknotsCount; j++)
-    m_vknots[j] = (j < m_vorder) ? 0 : (j - m_vorder + 1);
+  for (j = 0; j < m_vorder; j++)
+    m_vknots[j] = 0.0f;
   
-  for (j = m_vknotsCount - m_vorder; j < m_vknotsCount; j++)
-    m_vknots[j] = m_vknots[m_vknotsCount - m_vorder];
+  for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
+    m_vknots[j] = m_vknots[j-1]+1;
   
-  m_vknots[m_vorder] += 0.9;
-  
-  if (m_vknots[m_vorder] > m_vknots[m_vorder + 1])
-    for (j = m_vorder + 1; j < m_vknotsCount; j++)
-      m_vknots[j] += 1;
+  m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
+  for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
+    m_vknots[j] = m_vknots[j-1];
+
   return true;
 }
-
-
 
 // void LineFlame::breakCheck()
 // {

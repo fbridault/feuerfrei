@@ -26,7 +26,7 @@ bool CloneFlame::build()
     }
   /* On recopie les m_uorder squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (uint i = 0; i < ((m_uorder-1)*m_size)*3; i++)
+  for (uint i = 0; i < ((m_uorder-1)*m_vsize)*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   

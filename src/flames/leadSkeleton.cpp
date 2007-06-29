@@ -26,48 +26,50 @@ LeadSkeleton::~LeadSkeleton ()
 
 void LeadSkeleton::drawParticle (Particle * const particle) const
 {
-  glColor4f (0.1, 1.0, 0.1, 0.8);
+  glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  GraphicsFn::SolidSphere (0.01, 10, 10);
+  GraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
 void LeadSkeleton::drawRoot () const
 {
-  glColor4f (0.0, 0.4, 0.0, 0.8);
+  glColor4f (0.0f, 0.4f, 0.0f, 0.8f);
   glPushMatrix ();
   glTranslatef (m_root.x, m_root.y, m_root.z);
-  GraphicsFn::SolidSphere (0.01, 10, 10);
+  GraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
 void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 { 
-  m_selfVelocity = 0;
+  m_selfVelocity = 0.0f;
   switch(fdf){
   case FDF_LINEAR :
-    m_lastAppliedForce = innerForce * (m_u + 1);
+    m_lastAppliedForce = innerForce * (m_u + 1.0f);
     break;
   case FDF_BILINEAR :
     m_lastAppliedForce = innerForce * m_u * m_u;
     break;
   case FDF_EXPONENTIAL :
-    m_lastAppliedForce = .1 * exp(innerForce * 14 * m_u);
+    m_lastAppliedForce = .1f * exp(innerForce * 14.0f * m_u);
     break;
   case FDF_GAUSS:
-    m_lastAppliedForce = innerForce*exp(innerForce * 30 -m_u * m_u)/(9.0);
+    m_lastAppliedForce = innerForce*exp(innerForce * 30.0f -m_u * m_u)/(9.0f);
     break;
   case FDF_RANDOM:
     m_lastAppliedForce = innerForce * rand()/((float)RAND_MAX);
     break;
+  default:
+    cerr << "(EE) FDF type error !!!" << endl;
   }
   
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if (m_perturbateCount >= 2)
       {
-	m_lastAppliedForce += innerForce*5;
+	m_lastAppliedForce += innerForce*5.0f;
 	m_perturbateCount = 0;
       }
     else
@@ -90,14 +92,18 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
     //    }
     break;
   case FLICKERING_RANDOM1 :
-    m_lastAppliedForce += rand()/((float)RAND_MAX) - .5;
+    m_lastAppliedForce += (rand()/((float)RAND_MAX))/2.0f - .25f;
     break;
   case FLICKERING_RANDOM2 :
-    m_lastAppliedForce += rand()/(10*(float)RAND_MAX);
+    m_lastAppliedForce += rand()/(10.0f*(float)RAND_MAX);
     break;
   case FLICKERING_NOISE :
     m_lastAppliedForce += m_noiseGenerator.getNextValue();
     break;
+  case FLICKERING_NONE :
+    break;
+  default:
+    cerr << "(EE) Flickering type error !!!" << endl;
   }
   m_solver->addVsrc( m_root, m_lastAppliedForce, m_selfVelocity);
 }
@@ -152,9 +158,9 @@ FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
 
 void FreeLeadSkeleton::drawParticle (Particle * const particle) const
 {
-  glColor4f (0.1, 1.0, 0.1, 0.8);
+  glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  GraphicsFn::SolidSphere (0.01, 10, 10);
+  GraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }

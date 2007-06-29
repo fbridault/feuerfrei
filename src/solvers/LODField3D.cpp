@@ -14,6 +14,5 @@ LODHybridField::LODHybridField (const Point& position, uint n_x, uint n_y, uint 
   LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon)
 {
   m_switch = 0;
-  m_increaseCount = 0;
-  m_decreaseCount = 0;
+  m_resCount = 0;
 }

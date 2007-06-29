@@ -35,7 +35,7 @@ public:
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ()
   {
-    return m_currentField->iterate();
+    m_currentField->iterate();
   };
   
   virtual Point getUVW (const Point& pos, float selfVelocity) const
@@ -75,16 +75,17 @@ public:
   
   Point getPosition (void) const { return m_currentField->getPosition(); };
   
-  void setPosition (const Point& position) { 
+  void setPosition (const Point& position) 
+  { 
     m_fakeField.setPosition(position);
     m_solver.setPosition(position); 
-  };
+  }
   
   virtual void move(const Point& forces) 
   {
     m_fakeField.move(forces);
     m_solver.move(forces);
-  };
+  }
   
   void addTemporaryExternalForces(const Point& forces)
   {
@@ -105,12 +106,14 @@ public:
     m_solver.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
   }
   
-  virtual void setBuoyancy(float value){ 
+  virtual void setBuoyancy(float value)
+  { 
     m_fakeField.setBuoyancy(value);
     m_solver.setBuoyancy(value);
   }
   
-  virtual void setRunningState(bool state) { 
+  virtual void setRunningState(bool state)
+  { 
     m_fakeField.setRunningState(state);
     m_solver.setRunningState(state);  
   }
@@ -156,13 +159,13 @@ public:
   void iterate ()
   {
     /* Adaptation de la taille de la grille */
-    while(m_decreaseCount > 0){
+    while(m_resCount < 0){
       m_solver.decreaseRes();
-      m_decreaseCount--;
+      m_resCount++;
     }
-    while(m_increaseCount > 0){
+    while(m_resCount > 0){
       m_solver.increaseRes();
-      m_increaseCount--;
+      m_resCount--;
     }
     
     if(m_switch)
@@ -252,15 +255,15 @@ public:
   
   virtual void divideRes () { m_solver.divideRes(); };  
   virtual void multiplyRes () { m_solver.multiplyRes(); };  
-  virtual void decreaseRes () { m_decreaseCount++; };  
-  virtual void increaseRes () { m_increaseCount++; };
+  virtual void decreaseRes () { m_resCount--; };  
+  virtual void increaseRes () { m_resCount++; };
   virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
 private:
   Field3D *m_fieldToSwitch;
   uint m_switch;
   float m_fieldWeight, m_solverWeight;
   float m_fieldIncrement, m_solverIncrement;
-  uint m_decreaseCount, m_increaseCount;
+  int m_resCount;
 };
 
 #endif

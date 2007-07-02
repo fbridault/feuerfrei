@@ -109,6 +109,7 @@ void GLFlameCanvas::InitLuminaries(void)
   m_intensities = new float[m_fires.size()];
 }
 
+#ifdef MULTITHREADS
 void GLFlameCanvas::InitThreads()
 {
   /* Création d'un thread par champ de vélocité. */
@@ -146,6 +147,7 @@ void GLFlameCanvas::InitThreads()
        threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Run();
 }
+#endif
 
 void GLFlameCanvas::InitScene()
 {  
@@ -167,7 +169,9 @@ void GLFlameCanvas::InitScene()
   m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
   m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX);
   
+#ifdef MULTITHREADS
   InitThreads();
+#endif
   m_swatch = new wxStopWatch();
 }
 
@@ -204,6 +208,7 @@ void GLFlameCanvas::ResumeThreads()
   }
 }
 
+#ifdef MULTITHREADS
 void GLFlameCanvas::DeleteThreads()
 {
   /* On sort les threads de leur pause si nécessaire, car sinon il serait impossible de les arrêter ! */
@@ -229,12 +234,15 @@ void GLFlameCanvas::DeleteThreads()
     delete (*threadsIterator);
   m_threads.clear();
 }
+#endif
 
 void GLFlameCanvas::Restart (void)
 {
   Disable();
   m_init = false;
+#ifdef MULTITHREADS
   DeleteThreads();
+#endif
   DestroyScene();
   
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
@@ -254,7 +262,9 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 {
   Disable();
   m_init = false;
+#ifdef MULTITHREADS
   DeleteThreads();
+#endif
   
   delete m_photoSolid;
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
@@ -283,7 +293,9 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
   
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
+#ifdef MULTITHREADS
   InitThreads();
+#endif
   m_swatch->Start();
   m_run = true;
   m_init = true;
@@ -305,7 +317,7 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
-
+  
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)
     delete (*firesIterator);
@@ -328,6 +340,23 @@ void GLFlameCanvas::DestroyScene(void)
 
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
+#ifndef MULTITHREADS
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->addForces ();
+  
+  for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)
+    (*fieldsIterator)->iterate ();
+  
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->build();
+  
+  for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+       fieldsIterator != m_fields.end (); fieldsIterator++)
+    (*fieldsIterator)->cleanSources ();
+#endif
   /* Force à redessiner */
   this->Refresh();
 //   thisApp->Yield();
@@ -389,7 +418,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   /* Déplacement du camera */
   m_camera->setView();
-    
+  
   if(m_run){
     /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
     m_visibility = false;

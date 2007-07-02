@@ -52,8 +52,10 @@ public:
   void InitLuminaries(void);
   /** Initialisations relatives à la scène */
   void InitScene();
+#ifdef MULTITHREADS
   /** Initialisations relatives aux solveurs */
   void InitThreads(void);
+#endif
   /** Initialisations relatives aux paramètres de visualisation */
   void InitUISettings(void);
   void Restart (void);
@@ -124,7 +126,9 @@ public:
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
   void setGammaCorrection(float gamma) { m_gammaEngine->SetGamma(gamma); };
   void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
+#ifdef MULTITHREADS
   void DeleteThreads();
+#endif
 private:
   void WriteFPS ();
   void DrawVelocity (void);
@@ -192,6 +196,7 @@ private:
 inline void GLFlameCanvas::drawFlames(void)
 {
   /* Dessin de la flamme */
+#ifdef MULTITHREADS
   for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
        threadIterator != m_threads.end (); threadIterator++)
     {
@@ -199,6 +204,11 @@ inline void GLFlameCanvas::drawFlames(void)
       (*threadIterator)->drawFlames(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
       (*threadIterator)->Unlock();
     }
+#else
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    (*firesIterator)->drawFlame(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+#endif
 }
 
 inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)

@@ -142,12 +142,12 @@ void PhotometricSolidsRenderer::draw(u_char color)
     }
   
   /* Affichage du solide seul */
-  if(color == 0){
+  if(!color){
     m_SPProgram1.enable();
     m_SPProgram1.setUniform3fv("centreSP", m_centers, m_flames->size());
     m_SPProgram1.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
     m_SPProgram1.setUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
-    m_SPProgram1.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);
+    m_SPProgram1.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
     
     glActiveTexture(GL_TEXTURE0);
     m_photometricSolidsTex->bind();
@@ -161,7 +161,7 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPProgram2.setUniform3fv("centreSP", m_centers, m_flames->size());
     m_SPProgram2.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
     m_SPProgram2.setUniform2fv("angles", m_lazimuth_lzenith, m_flames->size());
-    m_SPProgram2.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0);    
+    m_SPProgram2.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);    
     m_SPProgram2.setUniform1i("isTextured",1);
     
     glActiveTexture(GL_TEXTURE1);

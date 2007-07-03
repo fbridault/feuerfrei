@@ -224,7 +224,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int i
   m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
   
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,-SLIDER_RANGE/10.0f,2*SLIDER_RANGE/10.0f, wxDefaultPosition, 
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,(int)(-SLIDER_RANGE/10.0f),(int)(2*SLIDER_RANGE/10.0f), wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
   m_buoyancySlider->SetValue((int)(buoyancy*FORCE_SENSIBILITY));

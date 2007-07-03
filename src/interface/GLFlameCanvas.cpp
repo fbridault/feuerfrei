@@ -380,7 +380,7 @@ void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 
 void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 {
-  float step=0.1;
+  float step=0.1f;
   switch(event.GetKeyCode())
     {      
     case WXK_LEFT: m_camera->moveOnSides(step); break;

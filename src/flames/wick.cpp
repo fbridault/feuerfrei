@@ -10,7 +10,7 @@ Wick::Wick (Scene* const scene) : Object(scene)
 void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver )
 {
   Point bounds[flameConfig.skeletonsNumber + 1];
-  Point MinBound (DBL_MAX, DBL_MAX, DBL_MAX), MaxBound (DBL_MIN, DBL_MIN, DBL_MIN);
+  Point MinBound (FLT_MAX, FLT_MAX, FLT_MAX), MaxBound (FLT_MIN, FLT_MIN, FLT_MIN);
   Point midDist, cellSpan;
   vector < Point * >pointsPartitionsArray[flameConfig.skeletonsNumber];
   u_char max; /* 0 -> x, 1 -> y, 2 -> z */
@@ -138,7 +138,7 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
   //   glVertex3f(bounds[flameConfig.skeletonsNumber].x,bounds[flameConfig.skeletonsNumber].y,bounds[flameConfig.skeletonsNumber].z);
   //   glEnd();
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++){
-    glColor3f(0.0,i*1.0/(float)flameConfig.skeletonsNumber,1.0);
+    glColor3f(0.0f,i*1.0f/(float)flameConfig.skeletonsNumber,1.0f);
     Point bounds2 = bounds[i]+cellSpan;
     glBegin(GL_LINE_LOOP);
     glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
@@ -182,10 +182,10 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	pointsPartitionsArray[i].push_back (new Point(vertexIterator->x, vertexIterator->y, vertexIterator->z));
     }
 
-  Point rootMoveFactorL(2,.1,1);
+  Point rootMoveFactorL(2.0f,.1f,1.0f);
   /* Création des leadSkeletons */
   /* On prend simplement le barycentre de chaque partition */
-  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, .5, -.2, .3));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, .5f, -.2f, .3f));
   
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
     {
@@ -206,12 +206,12 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	    }
 	  barycentre = barycentre / (float)n;
 	  
-	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, .5, -.2, .3));
+	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, .5f, -.2f, .3f));
  	}
       else
 	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;
     }
-  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, .5, -.2, .3));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, .5f, -.2f, .3f));
 
   /* Suppression des points */
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++)

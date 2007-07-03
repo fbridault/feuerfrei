@@ -43,7 +43,7 @@ void FlameLight::switchOn()
 {  
   float coef = 1.5f*m_intensity;
 //   GLfloat val_diffuse[]={1,1,1,1.0};
-  GLfloat val_diffuse[]={1*coef,0.5f*coef,0.0f,1.0f};
+  GLfloat val_diffuse[]={1.0f*coef,0.5f*coef,0.0f,1.0f};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
   GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
   GLfloat val_specular[]={.1f*coef,.1f*coef,.1f*coef,1.0f};
@@ -319,7 +319,7 @@ void DetachableFireSource::build()
       flamesIterator++;
   }
 
-  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point pt;
   Point p;
   float t,k;
@@ -406,14 +406,14 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 	      }
 	    
 	      /* On passe en FakeField */
-	      if( (modulo-mod) == m_solver->getNbMaxDiv() ){
+	      if( (modulo-mod) == (int)m_solver->getNbMaxDiv() ){
 		if(getPerturbateMode() != FLICKERING_NOISE){
 		  m_flickSave = getPerturbateMode();
 		  setPerturbateMode(FLICKERING_NOISE);
 		}
 		m_solver->switchToFakeField();
 	      }else
-		if( (modulo-mod) >= 0 && (modulo-mod) < m_solver->getNbMaxDiv())
+		if( (modulo-mod) >= 0 && (modulo-mod) < (int)m_solver->getNbMaxDiv())
 		  m_solver->decreaseRes();
 	    
 	      mod--;
@@ -433,10 +433,10 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 		setSamplingTolerance(1);
 	      }
 	      
-	      if( (m_moduloSave-mod) < m_solver->getNbMaxDiv() )
+	      if( (m_moduloSave-mod) < (int)m_solver->getNbMaxDiv() )
 		m_solver->increaseRes();
 	      else
-		if( (m_moduloSave-mod) == m_solver->getNbMaxDiv() ){
+		if( (m_moduloSave-mod) == (int)m_solver->getNbMaxDiv() ){
 		  if(m_flickSave > -1){
 		    setPerturbateMode(m_flickSave);
 		    m_flickSave = -1;
@@ -457,7 +457,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 
 void DetachableFireSource::buildBoundingBox ()
 {
-  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point pt;
   Point pos(m_solver->getPosition());
   

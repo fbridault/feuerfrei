@@ -28,7 +28,7 @@ Object::~Object ()
 
 void Object::getBoundingBox (Point & max, Point & min)
 {
-  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   /* Création de la bounding box */
   
   for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();

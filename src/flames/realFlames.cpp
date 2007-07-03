@@ -9,13 +9,13 @@
 
 LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
 		      Wick *wickObject, float detachedFlamesWidth, DetachableFireSource *parentFire ) :
-  RealFlame ((flameConfig.skeletonsNumber+2)*2 + 2, 3, tex, s)
+  RealFlame ((flameConfig.skeletonsNumber+2)*2, 3, tex, s)
 {
   Point pt;
-  float largeur = .03;
+  float largeur = .03f;
   uint i,j;
   
-  Point rootMoveFactorP(2,.1,.5);
+  Point rootMoveFactorP(2.0f,.1f,.5f);
   
   m_wick = wickObject;
   m_wick->build(flameConfig, m_leadSkeletons, s);
@@ -26,33 +26,23 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   /* FAIT DANS BASICFLAME DESORMAIS */
   
   /* Génération d'un côté des squelettes périphériques */
-  for (i = 1; i <= m_nbLeadSkeletons; i++)
+  for (i = 0; i < m_nbLeadSkeletons; i++)
     {
-      pt = *m_leadSkeletons[i - 1]->getRoot();
-      pt.z -= (largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i - 1], flameConfig.periLifeSpan);
+      pt = *m_leadSkeletons[i]->getRoot();
+      pt.z -= (largeur / 2.0f);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i], flameConfig.periLifeSpan);
     }
   
   /* Génération de l'autre côté des squelettes périphériques */
-  for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons + 2; j > 0; j--, i++)
+  for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons; j > 0; j--, i++)
     {
-      pt = *m_leadSkeletons[j - 1]->getRoot();
-      pt.z += (largeur / 2.0);
-      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j - 1], flameConfig.periLifeSpan);
+      pt = *m_leadSkeletons[j-1]->getRoot();
+      pt.z += (largeur / 2.0f);
+      m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j-1], flameConfig.periLifeSpan);
     }
   
-  /* Ajout des extrémités */
-  pt = *m_leadSkeletons[0]->getRoot();
-  pt.x -= (largeur / 2.0);
-  m_periSkeletons[0] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[0], flameConfig.periLifeSpan);
-  
-  pt = *m_leadSkeletons[m_nbLeadSkeletons - 1]->getRoot();
-  pt.x += (largeur / 2.0);
-  m_periSkeletons[m_nbLeadSkeletons + 1] = 
-    new PeriSkeleton (m_solver, pt,rootMoveFactorP, m_leadSkeletons[m_nbLeadSkeletons - 1], flameConfig.periLifeSpan);
-  
   m_parentFire = parentFire;
-
+  
   m_detachedFlamesWidth = detachedFlamesWidth;
   m_samplingMethod = 1;
 }
@@ -66,7 +56,7 @@ void LineFlame::breakCheck()
 {
   float split,proba;
   uint threshold=3;
-  float detachThreshold=.9;
+  float detachThreshold=.9f;
   /* Indice de la particule à laquelle un squelette est découpé */
   uint splitHeight;
   uint i;
@@ -84,7 +74,7 @@ void LineFlame::breakCheck()
       Point offset;
       
       /* Tirage entre 0.5 et 1 pour la hauteur du squelette */
-      split = (rand()/(2*(float)RAND_MAX))+.5;
+      split = (rand()/(2.0f*(float)RAND_MAX))+.5f;
       
       leadSkeletonsArray = new FreeLeadSkeleton* [1];
       
@@ -150,7 +140,7 @@ bool LineFlame::buildSimplified ()
   /* Direction des u */
   for (i = 0; i < m_nbLeadSkeletons; i++)
     {
-      vtex += .5;
+      vtex += .5f;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_leadSkeletons[i]->getSize () < m_maxParticles)
@@ -252,7 +242,7 @@ bool LineFlame::buildSimplified ()
   m_vknotsCount = m_vsize + m_vorder;
 
   for (i = 0; i < m_uknotsCount; i++)
-    m_uknots[i] = i;
+    m_uknots[i] = (float)i;
 
 //   for (i = 0; i < m_uorder; i++)
 //     m_uknots[i] = 0;
@@ -265,7 +255,7 @@ bool LineFlame::buildSimplified ()
 //     m_uknots[i] = m_uknots[i-1];
   
   for (j = 0; j < m_vorder; j++)
-    m_vknots[j] = 0;
+    m_vknots[j] = 0.0f;
   
   for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
     m_vknots[j] = m_vknots[j-1]+1;
@@ -276,7 +266,6 @@ bool LineFlame::buildSimplified ()
   
   if( m_vsize*m_nbLeadSkeletons != m_count)
     cerr << "error " << m_vsize*m_nbLeadSkeletons << " " << m_count << endl;
-//   cerr << m_count <<" control points, " << m_uknotsCount << " nodes in u, " << m_vknotsCount << " nodes in v" << endl;
   
   computeCenterAndExtremities();
   
@@ -347,19 +336,19 @@ PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2,0.2,2), 
-					       flameConfig.leadLifeSpan, 0, .5, 0, .025));
+  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2.0f,0.2f,2.0f), 
+					       flameConfig.leadLifeSpan, 0, .5f, 0.0f, .025f));
   
   /* On créé les squelettes en cercle */
-  angle = 0;
+  angle = 0.0f;
   for (i = 0; i < m_nbSkeletons; i++)
     {
       m_periSkeletons[i] = new PeriSkeleton
 	(m_solver, 
 	 Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
-	 Point(1,.75,1),
+	 Point(1.0f,.75f,1.0f),
 	 m_leadSkeletons[0], flameConfig.periLifeSpan);
-      angle += 2 * PI / m_nbSkeletons;
+      angle += 2.0f * PI / m_nbSkeletons;
     }
   
   m_wick = wick;
@@ -374,15 +363,15 @@ PointFlame::~PointFlame ()
 void PointFlame::drawWick (bool displayBoxes) const
 {
   if(!m_wick){
-    float hauteur = 1 / 6.0;
-    float largeur = 1 / 60.0;
+    float hauteur = 1 / 6.0f;
+    float largeur = 1 / 60.0f;
     /* Affichage de la mèche */
     glPushMatrix ();
-    glTranslatef (m_position.x, m_position.y-hauteur/2.0, m_position.z);
-    glRotatef (-90.0, 1.0, 0.0, 0.0);
-    glColor3f (0.0, 0.0, 0.0);
+    glTranslatef (m_position.x, m_position.y-hauteur/2.0f, m_position.z);
+    glRotatef (-90.0f, 1.0f, 0.0f, 0.0f);
+    glColor3f (0.0f, 0.0f, 0.0f);
     GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
-    glTranslatef (0.0, 0.0, hauteur);
+    glTranslatef (0.0f, 0.0f, hauteur);
     GraphicsFn::SolidDisk (largeur, 10, 10);
     glPopMatrix ();
   }else{

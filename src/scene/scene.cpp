@@ -45,7 +45,7 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
 
 void Scene::computeBoundingBox(Point& max, Point& min)
 { 
-  Point ptMax(DBL_MIN, DBL_MIN, DBL_MIN), ptMin(DBL_MAX, DBL_MAX, DBL_MAX);
+  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point objMax, objMin;
   
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();

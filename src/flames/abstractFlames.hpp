@@ -389,7 +389,7 @@ public:
   void setSkeletonsLOD(u_char value) { m_lodSkel = value; m_lodSkelChanged = true; };
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
-  void changeSkeletonsLOD()
+  virtual void changeSkeletonsLOD()
   {
     uint i;
     for (i = 0; i < m_nbSkeletons; i++)

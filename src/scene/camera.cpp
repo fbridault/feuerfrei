@@ -11,7 +11,7 @@ Camera::Camera (int width, int height, float clipping, Scene* const scene ) :
 #else
 Camera::Camera (int width, int height, float clipping) :
 #endif
-m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
+m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
 {
   m_width = width;
   m_height = height;
@@ -20,22 +20,22 @@ m_position(0.0,0.0,-2.0), m_up(0.0,1.0,0.0), m_view(0.0,0.0,-1.0)
   m_move = false;
   m_currentRotationX = 0;
   m_mouseSensitivity = 800;
-  m_maxAngleX = 1.2;
+  m_maxAngleX = 1.2f;
   
   m_clipping_value = clipping;
 
   /* ouverture de la pyramide de vision */
-  m_ouverture = 60.0;
+  m_ouverture = 60.0f;
   
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluPerspective (m_ouverture, 4/3.0, 0.1, m_clipping_value);
+  gluPerspective (m_ouverture, 4/3.0f, 0.1f, m_clipping_value);
 
   /* initialisation du deplacement trackball */
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
   /* La caméra reste toujours centrée en (0,0,0) */
-  gluLookAt (0.0,0.0,0.0,m_view.x, m_view.y, m_view.z, m_up.x, m_up.y, m_up.z);
+  gluLookAt (0.0f,0.0f,0.0f,m_view.x, m_view.y, m_view.z, m_up.x, m_up.y, m_up.z);
   glPushMatrix ();
   glLoadIdentity ();
   

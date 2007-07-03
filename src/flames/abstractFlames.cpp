@@ -227,7 +227,7 @@ void FixedFlame::drawPointFlame () const
 RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints, 
 		     const Texture* const tex, Field3D* const s) :
   FixedFlame (nbSkeletons, nbFixedPoints, tex)
-{  
+{
   m_distances = new float[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
   
@@ -238,6 +238,8 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
   m_solver = s;
   m_lodSkelChanged = false;
   m_lodSkel = NORMAL;
+//   m_lodSkelChanged = true;
+//   m_lodSkel = SIMPLIFIED;
 }
 
 bool RealFlame::build ()

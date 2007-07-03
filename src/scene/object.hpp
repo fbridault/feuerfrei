@@ -26,7 +26,7 @@ public:
 class BoundingSphere
 {
 public:
-  BoundingSphere() : radius(0.0) {};
+  BoundingSphere() : radius(0.0f) {};
   /** Centre de la sphère englobante. */
   Point centre;
   
@@ -79,7 +79,7 @@ public:
   void draw(void) const{
     glPushMatrix();
     glTranslatef(centre.x, centre.y, centre.z);
-    glColor4d(1.0,0.0,0.0,1.0);
+    glColor4f(1.0f,0.0f,0.0f,1.0f);
     GraphicsFn::SolidSphere(radius, 10, 10);
     glPopMatrix();
   }

@@ -98,11 +98,11 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
   if ( particle->z >= m_solver->getDimZ() )
     particle->z = m_solver->getDimZ() - EPSILON;
   /* Si la particule sort de la grille, elle prend la vélocité du bord */
-  if ( particle->x <= 0 )
+  if ( particle->x < 0.0f )
     particle->x = EPSILON;
-  if ( particle->y <= 0 )
+  if ( particle->y < 0.0f )
     particle->y = EPSILON;
-  if ( particle->z <= 0 )
+  if ( particle->z < 0.0f )
     particle->z = EPSILON;
   
   
@@ -127,10 +127,10 @@ void FreeSkeleton::draw () const
 
 void FreeSkeleton::drawParticle (Particle * const particle) const
 {
-  glColor4f (1.0, 1.0, 0.25, 0.8);
+  glColor4f (1.0f, 1.0f, 0.25f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  GraphicsFn::SolidSphere (0.01, 10, 10);
+  GraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -144,7 +144,7 @@ Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMov
   m_rootMoveFactor(rootMoveFactor)
 {  
   m_root = m_rootSave = position;
-  m_selfVelocity=0;
+  m_selfVelocity=0.0f;
   m_lod=NORMAL;
   m_lifeSpan = pls;
 }
@@ -163,10 +163,10 @@ void Skeleton::draw () const
 
 void Skeleton::drawRoot () const
 {
-  glColor4f (1.0, 0.0, 0.25, 0.8);
+  glColor4f (1.0f, 0.0f, 0.25f, 0.8f);
   glPushMatrix ();
   glTranslatef (m_root.x, m_root.y, m_root.z);
-  GraphicsFn::SolidSphere (0.01, 10, 10);
+  GraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -183,11 +183,11 @@ void Skeleton::moveRoot ()
     m_root.y = m_solver->getDimY() - EPSILON;
   if ( m_root.z >= m_solver->getDimZ() )
     m_root.z = m_solver->getDimZ() - EPSILON;
-  if ( m_root.x <= 0 )
+  if ( m_root.x < 0.0f )
     m_root.x = EPSILON;
-  if ( m_root.y <= 0 )
+  if ( m_root.y < 0.0f )
     m_root.y = EPSILON;
-  if ( m_root.z <= 0 )
+  if ( m_root.z < 0.0f )
     m_root.z = EPSILON;
 }
 
@@ -226,9 +226,9 @@ bool Skeleton::moveParticle (Particle * const particle)
   m_solver->moveParticle(*particle, m_selfVelocity);
   
   /* Si la particule sort de la grille, elle est éliminée */
-  if (   particle->x < 0 || particle->x > m_solver->getDimX()
-      || particle->y < 0 || particle->y > m_solver->getDimY()
-      || particle->z < 0 || particle->z > m_solver->getDimZ())
+  if (   particle->x < 0.0f || particle->x > m_solver->getDimX()
+      || particle->y < 0.0f || particle->y > m_solver->getDimY()
+      || particle->z < 0.0f || particle->z > m_solver->getDimZ())
     return false;
   
   return true;

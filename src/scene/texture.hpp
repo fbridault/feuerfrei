@@ -85,17 +85,17 @@ public:
   void drawOnScreen(uint width, uint height) const
   {
     glBindTexture(m_type, m_texName);
-    glColor4f(1.0,1.0,1.0,1.0);
+    glColor4f(1.0f,1.0f,1.0f,1.0f);
     glBegin(GL_QUADS);
     
-    glTexCoord2f(0,0);
-    glVertex3d(-1.0,-1.0,0.0);
-    glTexCoord2f(width,0);
-    glVertex3d(1.0,-1.0,0.0);
+    glTexCoord2f(0.0f,0.0f);
+    glVertex3f(-1.0f,-1.0f,0.0f);
+    glTexCoord2f(width,0.0f);
+    glVertex3f(1.0f,-1.0f,0.0f);
     glTexCoord2f(width,height);
-    glVertex3d(1.0,1.0,0.0);
-    glTexCoord2f(0,height);
-    glVertex3d(-1.0,1.0,0.0);
+    glVertex3f(1.0f,1.0f,0.0f);
+    glTexCoord2f(0.0f,height);
+    glVertex3f(-1.0f,1.0f,0.0f);
     
     glEnd();
   }

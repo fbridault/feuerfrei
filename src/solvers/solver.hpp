@@ -32,11 +32,10 @@ protected:
    * @param x Composante à traiter.
    * @param x0 Composante x au pas de temps précédent.
    * @param a Valeur des coefficients dans la matrice A
-   * @param diff_visc Paramètre correspondant soit à la diffusion si la fonction est utilisée pour
    * la résolution de la densité, soit à la viscosité si elle est employée pour la résolution
    * de la vélocité
    */
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc) = 0;
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a) = 0;
   
   /** Pas de projection pour garantir la conservation de la masse.
    * Les tableaux passés en paramètre sont modifiés ici et ne doivent donc plus servir après l'appel de la projection

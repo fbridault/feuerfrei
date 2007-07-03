@@ -32,6 +32,10 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_visc = 0.00000015f;
   m_diff = 0.001f;
   
+  // Utilisé pour la densité
+  // m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+  m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
+
   m_n2 = (m_nbVoxelsX+2) * (m_nbVoxelsY+2);
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx + 1;
@@ -50,8 +54,8 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   // m_nbgrps = q2 - q1 + 1 est le nombre cherché
   m_nbgrps= (m_dernier-m_t1)/4+1;
   
-  m_forceCoef = 1;
-  m_forceRatio = 1;
+//   m_forceCoef = 1;
+//   m_forceRatio = 1;
 }
 
 Solver3D::~Solver3D ()
@@ -162,7 +166,7 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 // void Solver3D::dens_step()
 // {
 //   add_source ( m_dens, m_densSrc);
-//   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff, diff);
+//   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff);
 //   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
 void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w){
@@ -238,11 +242,11 @@ void Solver3D::vel_step ()
   add_source (m_w, m_wSrc);
   addVorticityConfinement(m_u,m_v,m_w);
   SWAP (m_uPrev, m_u);
-  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);
-  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  diffuse (2, m_v, m_vPrev, m_aVisc);
   SWAP (m_wPrev, m_w);
-  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  diffuse (3, m_w, m_wPrev, m_aVisc);
   project (m_uPrev, m_vPrev);
   SWAP (m_uPrev, m_u);
   SWAP (m_vPrev, m_v);

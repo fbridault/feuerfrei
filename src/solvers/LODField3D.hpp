@@ -129,6 +129,8 @@ protected:
   Field3D *m_currentField;
 private:
   virtual void addExternalForces(const Point& position, bool move) {};
+  virtual void add_source (float *const x, float *const src){};
+  
 };
 
 #define NB_STEPS_TO_SWITCH 40

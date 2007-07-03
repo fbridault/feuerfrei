@@ -133,7 +133,7 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
 void Solver2D::dens_step()
 {
   add_source ( m_dens, m_densSrc);
-  SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, m_aDiff, m_diff);
+  SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, m_aDiff);
   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, m_v);
 }
 
@@ -142,9 +142,9 @@ void Solver2D::vel_step ()
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   SWAP (m_uPrev, m_u);
-  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);
-  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  diffuse (2, m_v, m_vPrev, m_aVisc);
   project (m_uPrev, m_vPrev);
   SWAP (m_uPrev, m_u);
   SWAP (m_vPrev, m_v);

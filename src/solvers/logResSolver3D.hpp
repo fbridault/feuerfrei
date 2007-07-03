@@ -38,7 +38,7 @@ public:
 private:
   void vel_step ();
   
-  void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  void diffuse (unsigned char b, float *const x, float *const x0, float a);
   void project (float *const p, float *const div);
   
   void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);

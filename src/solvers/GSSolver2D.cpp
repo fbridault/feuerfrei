@@ -31,7 +31,7 @@ void GSSolver2D::GS_solve(unsigned char b, float *const x, const float *const x0
 }//GS_solve
 
 /* Pas de diffusion */
-void GSSolver2D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
+void GSSolver2D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 2);
 }

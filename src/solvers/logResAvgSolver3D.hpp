@@ -46,7 +46,7 @@ public:
 protected:
   virtual void vel_step ();
   
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
   
   virtual void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);

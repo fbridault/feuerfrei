@@ -31,11 +31,11 @@ void LogResAvgTimeSolver3D::vel_step ()
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
   SWAP (m_uPrev, m_u);
-  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);
-  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  diffuse (2, m_v, m_vPrev, m_aVisc);
   SWAP (m_wPrev, m_w);
-  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  diffuse (3, m_w, m_wPrev, m_aVisc);
   
   m_index = NB_DIFF_LOGS;
   project (m_uPrev, m_vPrev);

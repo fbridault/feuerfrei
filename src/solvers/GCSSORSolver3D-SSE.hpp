@@ -50,13 +50,13 @@ protected:
   */
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);  
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);  
   virtual void project (float *const p, float *const div);
   
   /** Résidu, pour SSOR, direction de descente et ? */
   float *m_r, *m_z, *m_p, *m_q;
 
-	/** Pointeurs SSE vers m_r, m_z, m_p, m_q */
+  /** Pointeurs SSE vers m_r, m_z, m_p, m_q */
   __m128 *m_r_sse, *m_z_sse,*m_p_sse,*m_q_sse;
 
   /** Paramètre omega pour la diffusion */

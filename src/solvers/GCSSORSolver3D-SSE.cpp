@@ -7,41 +7,41 @@ GCSSORSolver3D_SSE::GCSSORSolver3D_SSE (float omegaDiff, float omegaProj, float 
   m_z=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_p=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_q=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
- 
+  
   fill_n(m_r, m_nbVoxels, 0.0f);
   fill_n(m_z, m_nbVoxels, 0.0f);
   fill_n(m_p, m_nbVoxels, 0.0f);
   fill_n(m_q, m_nbVoxels, 0.0f);
- 
+  
   m_r_sse=(__m128*)(&m_r[m_debut]);
   m_z_sse=(__m128*)(&m_z[m_debut]);
   m_p_sse=(__m128*)(&m_p[m_debut]);
   m_q_sse=(__m128*)(&m_q[m_debut]); 
-
+  
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
   m_epsilon = epsilon;
 }
 
 GCSSORSolver3D_SSE::GCSSORSolver3D_SSE (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
+					float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_r=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_z=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_p=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_q=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
-
+  
   fill_n(m_r, m_nbVoxels, 0.0f);
   fill_n(m_z, m_nbVoxels, 0.0f);
   fill_n(m_p, m_nbVoxels, 0.0f);
   fill_n(m_q, m_nbVoxels, 0.0f);
-	
+  
   m_r_sse=(__m128*)(&m_r[m_debut]);
   m_z_sse=(__m128*)(&m_z[m_debut]);
   m_p_sse=(__m128*)(&m_p[m_debut]);
   m_q_sse=(__m128*)(&m_q[m_debut]);
-
+  
   m_omegaDiff = omegaDiff;
   m_omegaProj = omegaProj;
   m_epsilon = epsilon;
@@ -134,7 +134,7 @@ void GCSSORSolver3D_SSE::GCSSOR(float *const x0, const float *const b, float a, 
   rho0=rho0_sse.f[0]+rho0_sse.f[1]+rho0_sse.f[2]+ rho0_sse.f[3];
 
   // début des itérations
-  for( int numiter=0;numiter<maxiter;numiter++){
+  for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     m_t = m_t1;
     for (k = 1; k <= m_nbVoxelsZ; k++){
@@ -171,9 +171,9 @@ void GCSSORSolver3D_SSE::GCSSOR(float *const x0, const float *const b, float a, 
     r_sse=m_r_sse;
     x_sse=x0_sse;
     for ( i = 0; i < m_nbgrps; i++){
-      *x_sse=_mm_add_ps( *x_sse,_mm_mul_ps(alpha_sse.m,*p_sse));
+      *x_sse=_mm_add_ps(*x_sse,_mm_mul_ps(alpha_sse.m,*p_sse));
       *r_sse=_mm_sub_ps(*r_sse,_mm_mul_ps(alpha_sse.m,*q_sse));
-      //		norme_sse.m=_mm_add_ps(norme_sse.m,_mm_mul_ps(*r_sse,*r_sse));										
+      //		norme_sse.m=_mm_add_ps(norme_sse.m,_mm_mul_ps(*r_sse,*r_sse));
       p_sse++;
       q_sse++;
       r_sse++;
@@ -242,7 +242,7 @@ void GCSSORSolver3D_SSE::GCSSOR(float *const x0, const float *const b, float a, 
 
 /* Pas de diffusion */
 void
-GCSSORSolver3D_SSE::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
+GCSSORSolver3D_SSE::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
   GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,4);
 }

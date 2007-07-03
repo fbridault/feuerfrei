@@ -10,7 +10,7 @@
 GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene, char type, uint n,
 			 float timeStep, float omegaDiff, float omegaProj, float epsilon)
 {
-  Point max, min, width, position, scale(1,1,1);
+  Point max, min, width, position, scale(1.0f,1.0f,1.0f);
   uint n_x, n_y, n_z;
   float dim, buoyancy=0.0f;
   
@@ -95,13 +95,13 @@ void GlobalField::shareForces()
       
       /* Coordonnée de la cellule du coin (0,0,0) dans le solveur global */
       strength[0] = m_field->getUVW(pt,dump);
-      strength[1] = m_field->getUVW(pt+Point(0,ldim.y,0),dump);
-      strength[2] = m_field->getUVW(pt+Point(0,ldim.y,ldim.z),dump);
-      strength[3] = m_field->getUVW(pt+Point(0,0,ldim.z),dump);
-      strength[4] = m_field->getUVW(pt+Point(ldim.x,ldim.y,0),dump);
-      strength[5] = m_field->getUVW(pt+Point(ldim.x,0,0),dump);
+      strength[1] = m_field->getUVW(pt+Point(0.0f,ldim.y,0.0f),dump);
+      strength[2] = m_field->getUVW(pt+Point(0.0f,ldim.y,ldim.z),dump);
+      strength[3] = m_field->getUVW(pt+Point(0.0f,0.0f,ldim.z),dump);
+      strength[4] = m_field->getUVW(pt+Point(ldim.x,ldim.y,0.0f),dump);
+      strength[5] = m_field->getUVW(pt+Point(ldim.x,0.0f,0.0f),dump);
       strength[6] = m_field->getUVW(pt+Point(ldim.x,ldim.y,ldim.z),dump);
-      strength[7] = m_field->getUVW(pt+Point(ldim.x,0,ldim.z),dump);
+      strength[7] = m_field->getUVW(pt+Point(ldim.x,0.0f,ldim.z),dump);
       
       (*solversIterator)->addForcesOnFace(LEFT_FACE,strength[0], strength[1], strength[2], strength[3]);
       (*solversIterator)->addForcesOnFace(BACK_FACE,strength[0], strength[1], strength[4], strength[5]);

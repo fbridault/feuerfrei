@@ -35,11 +35,11 @@ void LogResSolver3D::vel_step ()
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
   SWAP (m_uPrev, m_u);
-  diffuse (1, m_u, m_uPrev, m_aVisc, m_visc);
+  diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);
-  diffuse (2, m_v, m_vPrev, m_aVisc, m_visc);
+  diffuse (2, m_v, m_vPrev, m_aVisc);
   SWAP (m_wPrev, m_w);
-  diffuse (3, m_w, m_wPrev, m_aVisc, m_visc);
+  diffuse (3, m_w, m_wPrev, m_aVisc);
   m_index = 0;
   project (m_uPrev, m_vPrev);
   SWAP (m_uPrev, m_u);
@@ -53,7 +53,7 @@ void LogResSolver3D::vel_step ()
 }
 
 /* Pas de diffusion */
-void LogResSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
+void LogResSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
   m_file = &m_fileDiff[b-1];
   

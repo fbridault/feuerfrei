@@ -53,7 +53,7 @@ public:
   virtual ~ HybridSolver3D ();
   
 protected:
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
 };
 

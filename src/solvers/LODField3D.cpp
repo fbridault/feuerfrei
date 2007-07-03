@@ -10,7 +10,7 @@ LODField3D::LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, flo
 }
 
 LODHybridField::LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-			    float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
+				float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
   LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon)
 {
   m_switch = 0;

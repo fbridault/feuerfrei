@@ -319,7 +319,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
     }//for k
    
     if(norm2 < eb2){
-      cerr << ((a == 1) ? "proj : " : "diff : ") << numiter << endl;
+      //cerr << ((a == 1) ? "proj : " : "diff : ") << numiter << endl;
       return;
     }
     // calcul de z tel que (D/w -TL)z=u
@@ -405,9 +405,9 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 
 /* Pas de diffusion */
 void
-GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
+GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,4);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,20);
 }
 
 void
@@ -439,7 +439,7 @@ GCSSORSolver3D::project (float *const p, float *const div)
   fill_n(p, m_nbVoxels, 0.0f);
   //set_bnd (0, p);
   
-  GCSSOR(p,div,1, 6.0f, m_omegaProj,4);
+  GCSSOR(p,div,1, 6.0f, m_omegaProj,20);
   
   m_t = m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){

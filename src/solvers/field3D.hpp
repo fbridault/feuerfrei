@@ -50,7 +50,7 @@ public:
   
   /** Lance une itération du solveur. */
   virtual void iterate () = 0;
-    
+  
   /** Récupération de la valeur des trois composantes de la vélocité dans la grille du solveur.
    * @param pos Position relative de la particule dans le solveur
    * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
@@ -134,7 +134,7 @@ public:
   /** Augmente la résolution de la grille de deux voxels */
   virtual void increaseRes () {};
   
-  virtual uint getNbMaxDiv () { return 1; };
+  virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
   
   /** Donne le type de solveur courant */
   virtual bool isRealSolver () const { return true; };
@@ -142,11 +142,8 @@ public:
   virtual void switchToRealSolver () {};
   virtual void switchToFakeField () {};
   
-  /** Fonction de dessin du champ de vélocité */
-  void displayVelocityField (void) = 0;
-  
   /** Fonction de dessin du champ de densité */
-  void displayDensityField (void) {};
+  virtual void displayDensityField (void) {};
 
   /** Ajoute des forces externes sur une des six faces du solveur
    * @param face identifiant de la face parmi LEFT_FACE, RIGHT_FACE, FRONT_FACE, BACK_FACE
@@ -162,10 +159,10 @@ public:
   
 protected:  
   /** Fonction de construction de la display list de la grille du solveur */
-  void buildDLGrid ();
+  virtual void buildDLGrid ();
   
   /** Fonction de construction de la display list du repère du solveur */
-  void buildDLBase ();
+  virtual void buildDLBase ();
   
   /** Fonction de dessin de la vélocité d'une cellule */
   void displayArrow (const Vector& direction);
@@ -198,6 +195,10 @@ protected:
   float m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
   uint m_nbMaxDiv;
 #ifdef RTFLAMES_BUILD
+  /** Liste des sources de feu contenus dans le champ de vélocité.
+   * Ceci est utilisé uniquement pour garder une trace des associations champs/feux,
+   * utilisée pour les threads.
+   */
   list <FireSource *> m_fireSources;
 #endif
 };

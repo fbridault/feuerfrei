@@ -53,7 +53,7 @@ public:
   virtual ~ BenchSolver3D ();
   
 protected:
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc) = 0;
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a) = 0;
   virtual void project (float *const p, float *const div) = 0;  
 
   /** Sauvegarde les différentes composantes du solveur pour pouvoir effectuer plusieurs tests sur

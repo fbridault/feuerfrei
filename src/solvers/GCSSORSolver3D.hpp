@@ -50,7 +50,7 @@ protected:
   */
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc);  
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);  
   virtual void project (float *const p, float *const div);
   
   /** Résidu, pour SSOR, direction de descente et ? */

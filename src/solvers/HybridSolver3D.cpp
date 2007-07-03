@@ -16,6 +16,7 @@ HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint 
 HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) : 
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
+  cerr << m_aVisc << endl;
 }
 
 HybridSolver3D::~HybridSolver3D ()
@@ -23,54 +24,14 @@ HybridSolver3D::~HybridSolver3D ()
 }
 
 /* Pas de diffusion */
-void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a, float diff_visc)
+void HybridSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,4);
-  //   GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 10);
+  GCSSORSolver3D::diffuse (b, x, x0, a);
 }
 
 void HybridSolver3D::project (float *const p, float *const div)
 {
-  uint i, j, k;
-  
-  m_t = m_t1;
-  for ( k = 1; k <= m_nbVoxelsZ; k++){
-    for ( j = 1; j <= m_nbVoxelsY; j++){
-      for ( i = 1; i <= m_nbVoxelsX; i++){
-	div[m_t] = m_hx * (m_u[m_t-1] - m_u[m_t+1]) +
-	  m_hy * (m_v[m_t-m_nx] - m_v[m_t+m_nx]) + 
-	  m_hz * (m_w[m_t-m_n2] - m_w[m_t+m_n2]);
-	m_t++;
-      }//for i
-      m_t+=2;
-    }//for j
-    m_t+=m_t2nx;
-    //p[IX (i, j, k)] = 0;
-  }// for k
-  
-  //set_bnd (0, div);
-  fill_n(p, m_nbVoxels, 0.0f);
-  //set_bnd (0, p);
-  
-  GCSSOR(p,div,1, 6.0f, m_omegaProj,4);
-  
-  m_t = m_t1;
-  for (k = 1; k <= m_nbVoxelsZ; k++){
-    for (j = 1; j <= m_nbVoxelsY; j++){
-      for (i = 1; i <= m_nbVoxelsX; i++){
-	m_u[m_t] += m_invhx *(p[m_t-1] - p[m_t+1]);
-	m_v[m_t] += m_invhy*(p[m_t-m_nx] - p[m_t+m_nx]);
-	m_w[m_t] += m_invhz* (p[m_t-m_n2] - p[m_t+m_n2]);
-	m_t++;
-      }// for i
-      m_t+=2;
-    }// for j
-    m_t+=m_t2nx;
-  }//for k
-  
-  //set_bnd (1, u);
-  //set_bnd (2, v);
-  //set_bnd (3, w);
+  GCSSORSolver3D::project(p,div);
 }
 
 LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
@@ -83,9 +44,12 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
   initialNbVoxelsY = n_y;
   initialNbVoxelsZ = n_z;
   
-  m_uTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);// new float[m_nbVoxels];
-  m_vTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);// new float[m_nbVoxels];
-  m_wTmp = (float*)_mm_malloc(m_nbVoxels*sizeof(float),16);//new float[m_nbVoxels];
+//   m_uTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
+//   m_vTmp =(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
+//   m_wTmp = (float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
+  m_uTmp = new float[m_nbVoxels];
+  m_vTmp = new float[m_nbVoxels];
+  m_wTmp = new float[m_nbVoxels];
   
   fill_n(m_uTmp, m_nbVoxels, 0.0f);
   fill_n(m_vTmp, m_nbVoxels, 0.0f);
@@ -110,9 +74,12 @@ LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y,
 
 LODHybridSolver3D::~LODHybridSolver3D ()
 {
-  _mm_free(m_uTmp);// delete[]m_uTmp;
-  _mm_free(m_vTmp);//delete[]m_vTmp;
-  _mm_free(m_wTmp);//delete[]m_wTmp;
+//   _mm_free(m_uTmp);
+//   _mm_free(m_vTmp);
+//   _mm_free(m_wTmp);
+  delete[]m_uTmp;
+  delete[]m_vTmp;
+  delete[]m_wTmp;
 }
 
 void LODHybridSolver3D::divideRes ()
@@ -278,13 +245,13 @@ void LODHybridSolver3D::displayGrid ()
     {
       for (i = 0.0f; i <= m_dim.x + interx / 2; i += interx)
 	{
-	  glVertex3d (i, 0.0f, j);
-	  glVertex3d (i, m_dim.y, j);
+	  glVertex3f (i, 0.0f, j);
+	  glVertex3f (i, m_dim.y, j);
 	}
       for (i = 0.0f; i <= m_dim.y + intery / 2; i += intery)
 	{
-	  glVertex3d (0.0f, i, j);
-	  glVertex3d (m_dim.x, i, j);
+	  glVertex3f (0.0f, i, j);
+	  glVertex3f (m_dim.x, i, j);
 	}
     }
   glEnd ();
@@ -302,13 +269,13 @@ void LODHybridSolver3D::displayBase (){
   glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
   for (i = 0.0f; i <= m_dim.x + interx / 2; i += interx)
     {
-      glVertex3d (i, 0.0f, 0.0f);
-      glVertex3d (i, 0.0f, m_dim.z);
+      glVertex3f (i, 0.0f, 0.0f);
+      glVertex3f (i, 0.0f, m_dim.z);
     }
   for (i = 0.0f; i <= m_dim.z + interz / 2; i += interz)
     {
-      glVertex3d (0.0f, 0.0f, i);
-      glVertex3d (m_dim.x, 0.0f, i);
+      glVertex3f (0.0f, 0.0f, i);
+      glVertex3f (m_dim.x, 0.0f, i);
     }
   glEnd ();
 };

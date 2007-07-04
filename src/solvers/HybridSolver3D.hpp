@@ -76,7 +76,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		   float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		     float buoyancy, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODHybridSolver3D ();
   
   virtual void divideRes ();
@@ -84,7 +84,7 @@ public:
   virtual void decreaseRes ();
   virtual void increaseRes ();
   virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
-
+  
   /** Fonction de dessin de la grille */
   virtual void displayGrid ();
   

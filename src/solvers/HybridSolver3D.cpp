@@ -16,7 +16,6 @@ HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint 
 HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) : 
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
-  cerr << m_aVisc << endl;
 }
 
 HybridSolver3D::~HybridSolver3D ()

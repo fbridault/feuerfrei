@@ -1,5 +1,7 @@
 #include "interface/flamesFrame.hpp"
 
+#include <wx/tooltip.h>
+
 /** \mainpage Index page
  *
  * Bienvenue sur la doc de rtflames et rtfluids !
@@ -106,7 +108,9 @@ bool FlamesApp::OnInit()
   
   /* Teste s'il est nécessaire de recompiler les shaders */
   FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
- 
+  
+  wxToolTip::Enable(true);
+
   frame->Show(TRUE);
 
   SetTopWindow(frame);

@@ -126,6 +126,7 @@ public:
   void OnScrollGamma(wxScrollEvent& event);
   void OnSize(wxSizeEvent& event);
   void SetFPS(int fps, int rps);
+  void SetToolTips();
 
 private:
   wxString m_configFileName;

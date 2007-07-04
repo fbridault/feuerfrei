@@ -87,6 +87,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_gammaCheckBox =  new wxCheckBox(this,IDCHK_Gamma,_("Enable"));
   m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,40,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   
+  SetToolTips();
   DoLayout();
   CreateMenuBar();
   
@@ -98,6 +99,13 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
+}
+
+void FlamesFrame::SetToolTips()
+{
+  m_blendedSolidCheckBox->SetToolTip(_("Click to see the values of the photometric solid mapped on the scene"));
+  m_saveImagesCheckBox->SetToolTip(_("Click to save the simulation as PNG images (stored in the directory captures/)"));
+  m_depthPeelingSlider->SetToolTip(_("Change the number of layers used in the depth peeling process"));
 }
 
 void FlamesFrame::DoLayout()

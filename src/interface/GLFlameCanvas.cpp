@@ -399,7 +399,37 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
 	(*fieldsIterator)->increaseRes ();
       break;
-    case WXK_SPACE : setRunningState(!m_run); ; break;
+    case WXK_SPACE : setRunningState(!m_run); break;
+    case 'R' :
+      /* Fonctionnalité permettant de remettre au maximum le niveau de précision, */
+      /* ceci évidemment à des fins de tests et comparaisons */
+      for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
+	   threadIterator != m_threads.end (); threadIterator++)
+	{
+	  (*threadIterator)->Lock();
+	}
+      /* On remet à la résolution max */
+      for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+	   fieldsIterator != m_fields.end (); fieldsIterator++)
+	{
+	  (*fieldsIterator)->switchToRealSolver();
+	  for(uint i=0; i < (*fieldsIterator)->getNbMaxDiv(); i++)
+	    (*fieldsIterator)->increaseRes ();
+	}
+      
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	{
+	  (*firesIterator)->setSamplingTolerance(0);
+	  (*firesIterator)->setSkeletonsLOD(NORMAL);
+	}
+      
+      for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
+	   threadIterator != m_threads.end (); threadIterator++)
+	{
+	  (*threadIterator)->Unlock();
+	}
+      break;
     }
   event.Skip();
 }

@@ -47,13 +47,13 @@ void main()
   for (int i = 0; i < NBSOURCES; i++) {
     // Calcul de la direction du point3D vers le centre du SP
     direction = centreSP[i] - point3D.xyz;
+    r = length(direction.xyz);
     direction = normalize(direction);
     // - cos de l'angle entre la direction de la source et la normale au point
     cosSN = dot(direction,normal);
     
 /*     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi) */
 /*     // attention y est suppose etre la hauteur et z la profondeur */
-    r = length(direction.xyz);
     //theta = acos(direction.y / r);
     theta=acos(-direction.y );
     //phi=atan(direction.z,direction.x); 
@@ -64,7 +64,7 @@ void main()
 /*     // recuperation de l'intensite du fragment */
     //ColorSP = texture3D(textureSP, texcoordsSP).r;
     // attenuation de l'intensite en fonction de l'angle d'eclairage, de la distance et de la taille
-    attenuation = 1.0/r;
+    attenuation = 3.0/r;
     ColorSP = theta * cosSN * attenuation * fluctuationIntensite[i];
     
     color += ColorSP;

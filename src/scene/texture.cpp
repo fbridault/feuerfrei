@@ -69,8 +69,8 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
  
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
   glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,  GL_MODULATE );
  
   cout << "Chargement texture scene : " << filename.fn_str() << "......";
@@ -83,8 +83,7 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
       loadWithAlphaChannel();
     else{      
       cout << "RGB.......OK" << endl;
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
-		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
       m_hasAlpha = false;
     }
   }
@@ -100,8 +99,8 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
   
   glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
   glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
 
@@ -112,8 +111,7 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
       loadWithAlphaChannel();
     else{
       cout << "RGB.......OK" << endl;
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
-		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
       m_hasAlpha = false;
     }
   }
@@ -129,8 +127,8 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
  
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,wrap_s);
   glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,wrap_t);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
  
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
@@ -142,8 +140,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
     else{
       m_hasAlpha = false;
       cout << "RGB.......OK" << endl;
-      glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
-		    GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData());
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
     }
   }
   /* Semble nécessaire pour éviter un plantage lors de la libération de la wxImage  */
@@ -193,7 +190,6 @@ void Texture::loadWithAlphaChannel()
       *(tmp++) = m_wxtex->GetAlpha(i,j);
     }
   
-  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(), 0, 
-		GL_RGBA, GL_UNSIGNED_BYTE, imgcpy);
+  gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, imgcpy );
   delete [] imgcpy;
 }

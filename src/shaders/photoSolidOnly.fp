@@ -31,10 +31,10 @@ void main()
   for (int i = 0; i < NBSOURCES; i++) {
     // translation inverse du centre du SP
     direction =  centreSP[i] - point3D.xyz;
+    r = length(direction.xyz);
     direction = normalize(direction);
     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
     // attention y est suppose etre la hauteur et z la profondeur
-    r = length(direction.xyz);
     theta = acos(direction.y / r);
     phi = atan(direction.z,direction.x);
     

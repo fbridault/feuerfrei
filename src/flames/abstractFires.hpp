@@ -180,8 +180,19 @@ public:
   virtual void setSamplingTolerance(u_char value){ 
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSamplingTolerance(value);
+    if(value > 0)      
+      for (uint i = 0; i < m_nbFlames; i++)
+	m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+    else
+      for (uint i = 0; i < m_nbFlames; i++)
+	m_flames[i]->setSkeletonsLOD(NORMAL);
   };
   
+  virtual void setSkeletonsLOD(u_char value){ 
+    for (uint i = 0; i < m_nbFlames; i++)
+      m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+  }
+
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
@@ -364,8 +375,8 @@ protected:
   Point m_center;
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
-
-  int m_moduloSave;
+  
+  int m_lodSave;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -422,6 +433,13 @@ public:
   virtual void setSmoothShading (bool state);
   
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
+  
+  virtual void setSamplingTolerance(u_char value){
+    FireSource::setSamplingTolerance(value);
+    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+      (*flamesIterator)->setSamplingTolerance(value);
+  };
   
 private:
   /** Construit la bounding box utilisée pour l'affichage */

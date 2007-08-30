@@ -26,7 +26,7 @@ using namespace std;
 
 #define AS_ERROR(ret,str) {if(ret==-1) perror(str);}
 
-#define PI 3.14159265358979323846
+#define PI 3.14159265358979323846f
 
 #define FLICKERING_NONE 0
 #define FLICKERING_VERTICAL 1

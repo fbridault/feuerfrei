@@ -6,6 +6,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <math.h>
+#include "../common.hpp"
 #include "../vector.hpp"
 #include <wx/event.h>
 
@@ -103,6 +104,16 @@ public:
    */
   void computeView(float x, float y);
 
+  float computeAngles(float input) const
+  {
+    float angleW, angleH;
+    
+    angleW = (input * 180 / PI)/ m_ouverture;
+    angleH = (input * 180 / PI)/ (m_ouverture * m_aspect);
+    cerr << angleW << " " << angleH << endl;
+    return (angleW * angleH);
+  };
+  
   /** Placement de la caméra. Fonction à appeler au début de chaque tour de la
    * boucle de dessin
    */
@@ -127,6 +138,7 @@ public:
   void moveOnSides(float value){
     Vector axis = m_view ^ m_up;
     m_position = m_position + (axis * value);
+    setView();
   }; 
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
    * On effectue ensuite une translation suivant le vecteur de vue
@@ -134,6 +146,7 @@ public:
    */
   void moveOnFrontOrBehind(float value){
     m_position = m_position + (m_view * value);
+    setView();
 #ifdef RTFLAMES_BUILD
     computeFrustrum();
 #endif
@@ -144,12 +157,18 @@ public:
    */
   void moveUpOrDown(float value){
     m_position = m_position + (m_up * value);
+    setView();
   };
   
 #ifdef RTFLAMES_BUILD
   void computeFrustrum();
   
   const float* getFrustum(uint side) const { return m_frustum[side]; };
+  
+  /* Récupère les coordonnées à l'écran d'un point */
+  void getScreenCoordinates(const Point& objPos, Point& screenPos) const;
+  /* Récupère les coordonnées d'une sphère sur l'écran */
+  void getSphereCoordinates(const Point& objPos, float radius, Point& centerScreenPos, Point& periScreenPos ) const;
 #endif
   
 private:
@@ -160,7 +179,10 @@ private:
   /** Bouton de la souris actuellement appuyé */
   int m_buttonPressed;
   /** Angle d'ouverture de la caméra en degrés */
-  GLfloat m_ouverture;
+  float m_ouverture;
+  /** Ratio de la largeur sur la hauteur de la projection */
+  float m_aspect;
+  
   /** Variables temporaires pour savoir à partir de quel endroit le glissement de la
    * souris a commencé 
    */
@@ -175,11 +197,15 @@ private:
   bool m_move;
   /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
   float m_mouseSensitivity;
-  /** Largeur et hauteur de la vue de la caméra */
-  int m_width, m_height;
 #ifdef RTFLAMES_BUILD
   /** Plans du frustrum */
   float m_frustum[6][4];
+  /** Matrice de projection */
+  double m_projMatrix[16];
+  /** Matrice de transformation */
+  double m_modlMatrix[16];
+  /** Viewport */
+  int m_viewPort[4];
   Scene *m_scene;
 #endif
 };

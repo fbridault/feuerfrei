@@ -71,9 +71,21 @@ public:
       plan=view.getFrustum(i);
       d = plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3];
       if( d <= -radius )
-	return 0;
+	return 0.0f;
     }
    return d + radius;
+  }
+  
+  /** Calcule la couverture en pixel de la sphère. 
+   * On projette le centre et un point à la périphérie sur l'écran, puis on calcule
+   * l'aire du disque obtenu.
+   */
+  float getPixelCoverage(const Camera &view) const{
+    Point centerSC, periSC;
+    
+    view.getSphereCoordinates(centre, radius, centerSC, periSC);
+    /* PI.R² */
+    return ( PI* centerSC.squaredDistanceFrom(periSC));
   }
   
   void draw(void) const{

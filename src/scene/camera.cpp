@@ -13,8 +13,12 @@ Camera::Camera (int width, int height, float clipping) :
 #endif
 m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
 {
-  m_width = width;
-  m_height = height;
+  float fH,fW;
+  float zNear=0.1f;
+  
+  m_viewPort[0] = m_viewPort[1] = 0;
+  m_viewPort[2] = width;
+  m_viewPort[3] = height;
   
   m_buttonPressed = 0;
   m_move = false;
@@ -26,11 +30,18 @@ m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
 
   /* ouverture de la pyramide de vision */
   m_ouverture = 60.0f;
+  m_aspect = 4/3.0f;
   
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
-  gluPerspective (m_ouverture, 4/3.0f, 0.1f, m_clipping_value);
+  
+  fH = tan( m_ouverture / 360 * PI ) * zNear;
+  fW = fH * m_aspect;
+  glFrustum( -fW, fW, -fH, fH, zNear, m_clipping_value );
 
+  /* Restriction de la zone d'affichage */
+  glViewport ( m_viewPort[0], m_viewPort[1], m_viewPort[2], m_viewPort[3]);
+  
   /* initialisation du deplacement trackball */
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -39,6 +50,7 @@ m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
   glPushMatrix ();
   glLoadIdentity ();
   
+  setView();
 #ifdef RTFLAMES_BUILD
   m_scene = scene;
   computeFrustrum();
@@ -129,6 +141,7 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
 	}
     m_beginMouseX = event.GetX();
     m_beginMouseY = event.GetY();
+    setView();
 #ifdef RTFLAMES_BUILD
     computeFrustrum();
 #endif
@@ -138,37 +151,51 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
 #ifdef RTFLAMES_BUILD
 void Camera::computeFrustrum()
 {
-   float   proj[16];
-   float   modl[16];
    float   clip[16];
    float   t;
    
    /* Get the current PROJECTION matrix from OpenGL */
-   glGetFloatv( GL_PROJECTION_MATRIX, proj );
+   glGetDoublev( GL_PROJECTION_MATRIX, m_projMatrix );
    
    /* Get the current MODELVIEW matrix from OpenGL */
-   glGetFloatv( GL_MODELVIEW_MATRIX, modl );
+   glGetDoublev( GL_MODELVIEW_MATRIX, m_modlMatrix );
    
    /* Combine the two matrices (multiply projection by modelview) */
-   clip[ 0] = modl[ 0] * proj[ 0] + modl[ 1] * proj[ 4] + modl[ 2] * proj[ 8] + modl[ 3] * proj[12];
-   clip[ 1] = modl[ 0] * proj[ 1] + modl[ 1] * proj[ 5] + modl[ 2] * proj[ 9] + modl[ 3] * proj[13];
-   clip[ 2] = modl[ 0] * proj[ 2] + modl[ 1] * proj[ 6] + modl[ 2] * proj[10] + modl[ 3] * proj[14];
-   clip[ 3] = modl[ 0] * proj[ 3] + modl[ 1] * proj[ 7] + modl[ 2] * proj[11] + modl[ 3] * proj[15];
+   clip[ 0] = m_modlMatrix[ 0] * m_projMatrix[ 0] + m_modlMatrix[ 1] * m_projMatrix[ 4] + 
+     m_modlMatrix[ 2] * m_projMatrix[ 8] + m_modlMatrix[ 3] * m_projMatrix[12];
+   clip[ 1] = m_modlMatrix[ 0] * m_projMatrix[ 1] + m_modlMatrix[ 1] * m_projMatrix[ 5] + 
+     m_modlMatrix[ 2] * m_projMatrix[ 9] + m_modlMatrix[ 3] * m_projMatrix[13];
+   clip[ 2] = m_modlMatrix[ 0] * m_projMatrix[ 2] + m_modlMatrix[ 1] * m_projMatrix[ 6] + 
+     m_modlMatrix[ 2] * m_projMatrix[10] + m_modlMatrix[ 3] * m_projMatrix[14];
+   clip[ 3] = m_modlMatrix[ 0] * m_projMatrix[ 3] + m_modlMatrix[ 1] * m_projMatrix[ 7] + 
+     m_modlMatrix[ 2] * m_projMatrix[11] + m_modlMatrix[ 3] * m_projMatrix[15];
 
-   clip[ 4] = modl[ 4] * proj[ 0] + modl[ 5] * proj[ 4] + modl[ 6] * proj[ 8] + modl[ 7] * proj[12];
-   clip[ 5] = modl[ 4] * proj[ 1] + modl[ 5] * proj[ 5] + modl[ 6] * proj[ 9] + modl[ 7] * proj[13];
-   clip[ 6] = modl[ 4] * proj[ 2] + modl[ 5] * proj[ 6] + modl[ 6] * proj[10] + modl[ 7] * proj[14];
-   clip[ 7] = modl[ 4] * proj[ 3] + modl[ 5] * proj[ 7] + modl[ 6] * proj[11] + modl[ 7] * proj[15];
+   clip[ 4] = m_modlMatrix[ 4] * m_projMatrix[ 0] + m_modlMatrix[ 5] * m_projMatrix[ 4] + 
+     m_modlMatrix[ 6] * m_projMatrix[ 8] + m_modlMatrix[ 7] * m_projMatrix[12];
+   clip[ 5] = m_modlMatrix[ 4] * m_projMatrix[ 1] + m_modlMatrix[ 5] * m_projMatrix[ 5] + 
+     m_modlMatrix[ 6] * m_projMatrix[ 9] + m_modlMatrix[ 7] * m_projMatrix[13];
+   clip[ 6] = m_modlMatrix[ 4] * m_projMatrix[ 2] + m_modlMatrix[ 5] * m_projMatrix[ 6] + 
+     m_modlMatrix[ 6] * m_projMatrix[10] + m_modlMatrix[ 7] * m_projMatrix[14];
+   clip[ 7] = m_modlMatrix[ 4] * m_projMatrix[ 3] + m_modlMatrix[ 5] * m_projMatrix[ 7] + 
+     m_modlMatrix[ 6] * m_projMatrix[11] + m_modlMatrix[ 7] * m_projMatrix[15];
 
-   clip[ 8] = modl[ 8] * proj[ 0] + modl[ 9] * proj[ 4] + modl[10] * proj[ 8] + modl[11] * proj[12];
-   clip[ 9] = modl[ 8] * proj[ 1] + modl[ 9] * proj[ 5] + modl[10] * proj[ 9] + modl[11] * proj[13];
-   clip[10] = modl[ 8] * proj[ 2] + modl[ 9] * proj[ 6] + modl[10] * proj[10] + modl[11] * proj[14];
-   clip[11] = modl[ 8] * proj[ 3] + modl[ 9] * proj[ 7] + modl[10] * proj[11] + modl[11] * proj[15];
+   clip[ 8] = m_modlMatrix[ 8] * m_projMatrix[ 0] + m_modlMatrix[ 9] * m_projMatrix[ 4] + 
+     m_modlMatrix[10] * m_projMatrix[ 8] + m_modlMatrix[11] * m_projMatrix[12];
+   clip[ 9] = m_modlMatrix[ 8] * m_projMatrix[ 1] + m_modlMatrix[ 9] * m_projMatrix[ 5] + 
+     m_modlMatrix[10] * m_projMatrix[ 9] + m_modlMatrix[11] * m_projMatrix[13];
+   clip[10] = m_modlMatrix[ 8] * m_projMatrix[ 2] + m_modlMatrix[ 9] * m_projMatrix[ 6] + 
+     m_modlMatrix[10] * m_projMatrix[10] + m_modlMatrix[11] * m_projMatrix[14];
+   clip[11] = m_modlMatrix[ 8] * m_projMatrix[ 3] + m_modlMatrix[ 9] * m_projMatrix[ 7] + 
+     m_modlMatrix[10] * m_projMatrix[11] + m_modlMatrix[11] * m_projMatrix[15];
 
-   clip[12] = modl[12] * proj[ 0] + modl[13] * proj[ 4] + modl[14] * proj[ 8] + modl[15] * proj[12];
-   clip[13] = modl[12] * proj[ 1] + modl[13] * proj[ 5] + modl[14] * proj[ 9] + modl[15] * proj[13];
-   clip[14] = modl[12] * proj[ 2] + modl[13] * proj[ 6] + modl[14] * proj[10] + modl[15] * proj[14];
-   clip[15] = modl[12] * proj[ 3] + modl[13] * proj[ 7] + modl[14] * proj[11] + modl[15] * proj[15];
+   clip[12] = m_modlMatrix[12] * m_projMatrix[ 0] + m_modlMatrix[13] * m_projMatrix[ 4] + 
+     m_modlMatrix[14] * m_projMatrix[ 8] + m_modlMatrix[15] * m_projMatrix[12];
+   clip[13] = m_modlMatrix[12] * m_projMatrix[ 1] + m_modlMatrix[13] * m_projMatrix[ 5] + 
+     m_modlMatrix[14] * m_projMatrix[ 9] + m_modlMatrix[15] * m_projMatrix[13];
+   clip[14] = m_modlMatrix[12] * m_projMatrix[ 2] + m_modlMatrix[13] * m_projMatrix[ 6] + 
+     m_modlMatrix[14] * m_projMatrix[10] + m_modlMatrix[15] * m_projMatrix[14];
+   clip[15] = m_modlMatrix[12] * m_projMatrix[ 3] + m_modlMatrix[13] * m_projMatrix[ 7] + 
+     m_modlMatrix[14] * m_projMatrix[11] + m_modlMatrix[15] * m_projMatrix[15];
 
    /* Extract the numbers for the RIGHT plane */
    m_frustum[0][0] = clip[ 3] - clip[ 0];
@@ -253,4 +280,35 @@ void Camera::computeFrustrum()
    m_scene->computeVisibility(*this);
 //    cerr << g_objectCount << " objects drawn" << endl;
 }
+
+void Camera::getScreenCoordinates(const Point& objPos, Point& screenPos) const
+{
+  double pos[3];
+  
+  if( gluProject( objPos.x, objPos.y, objPos.z, m_modlMatrix, m_projMatrix, m_viewPort, 
+		  &pos[0], &pos[1], &pos[2]) == GL_FALSE )
+    cerr << "GluProject failed" << endl;
+  screenPos.x = (float)(pos[0]/m_viewPort[2]);
+  screenPos.y = (float)(pos[1]/m_viewPort[3]);
+  //  screenPos.z = (float)pos[2];
+}
+
+void Camera::getSphereCoordinates(const Point& objPos, float radius, Point& centerScreenPos, Point& periScreenPos ) const
+{
+  double pos[3];
+  Point up, tmp;
+  
+  /* Pour obtenir un point à la périphérie, on traite le problème un peu comme celui des billboards. 
+   * On calcule le vecteur Up qui correspond au vecteur vertical local à la sphère. Il suffit ensuite
+   * de translater le centre de radius*up pour obtenir le point au zénith de la sphère.
+   */
+  up.x = m_modlMatrix[1];
+  up.y = m_modlMatrix[5];
+  up.z = m_modlMatrix[9];
+
+  getScreenCoordinates(objPos, centerScreenPos);
+  tmp = objPos+(up*radius);
+  getScreenCoordinates(tmp, periScreenPos);
+}
+
 #endif

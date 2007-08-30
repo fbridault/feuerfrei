@@ -87,7 +87,7 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
   m_dist=0;
   buildBoundingSphere();
   m_flickSave=-1;
-  m_moduloSave=0;
+  m_lodSave=15;
 }
 
 FireSource::~FireSource()
@@ -154,7 +154,7 @@ void FireSource::buildBoundingSphere ()
   k = t*t;
   s = sqrt(k+k);
   
-  m_boundingSphere.radius = sqrt(s+k);
+  m_boundingSphere.radius = sqrt(s+k) * .6;
   /* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
   m_boundingSphere.centre = m_solver->getPosition() + p;
@@ -165,10 +165,8 @@ void FireSource::buildBoundingSphere ()
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  int modulo, remainder;
-  int mod;
-  const int INCREMENT=4;
-  
+  float coverage;
+  int lod;
   if(forceSpheresBuild)
     buildBoundingSphere();
   
@@ -180,59 +178,58 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
       cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
       m_solver->setRunningState(true);
     }
-    /* Il faut prendre en compte la taille de l'objet */
-    m_dist = m_dist - m_boundingSphere.radius;
     
-    remainder = ((int)nearbyint(m_dist)) % INCREMENT;
+    coverage = m_boundingSphere.getPixelCoverage(view);
     
-    if(!remainder){
-      modulo = ((int)floor(m_dist))/INCREMENT;
-      
-      if(modulo > m_moduloSave)
+    /* Fonction obtenue par régression linéaire avec les données
+     * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
+     */
+    lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
+    cerr << "coverage " << coverage << " " << lod << " " << m_lodSave << endl;
+    
+    if(lod < m_lodSave)
+      {
+	do
+	  {
+	    /* On change le niveau de détail des solveurs à mi-distance */
+	    if( lod == 9 ){
+	      cerr << "simplified skeletons" << endl;
+	      for (uint i = 0; i < m_nbFlames; i++)
+		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+	      setSamplingTolerance(1);
+	    }
+	    
+	    /* On passe en FakeField */
+	    if( lod == 5 ){
+	      m_solver->switchToFakeField();
+	      setSamplingTolerance(2);
+	    }
+	    m_lodSave-=1;
+	  }
+	while(lod < m_lodSave);
+      }
+    else
+      if(lod > m_lodSave)
 	{
-	  mod=modulo-m_moduloSave;
 	  do
 	    {
 	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( (modulo-mod) == 1 ){
-		cerr << "simplified skeletons" << endl;
+	      if( lod == 10 ){
+		cerr << "normal skeletons" << endl;
 		for (uint i = 0; i < m_nbFlames; i++)
-		  m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+		  m_flames[i]->setSkeletonsLOD(NORMAL);
+		setSamplingTolerance(0);
+	      }
+	  
+	      /* On repasse en solveur */
+	      if( lod == 6 ){
+		m_solver->switchToRealSolver();
 		setSamplingTolerance(1);
 	      }
-	      
-	      /* On passe en FakeField */
-	      if( (modulo-mod) == 3 ){
-		m_solver->switchToFakeField();
-		setSamplingTolerance(2);
-	      }
-	      mod--;
-	    }while(mod>0);
+	      m_lodSave+=1;
+	    }
+	  while(lod > m_lodSave);
 	}
-      else
-	if(modulo < m_moduloSave)
-	  {
-	    mod=m_moduloSave-modulo;
-	    do
-	      {
-		/* On change le niveau de détail des solveurs à mi-distance */
-		if( (m_moduloSave-mod) == 1 ){
-		  cerr << "normal skeletons" << endl;
-		  for (uint i = 0; i < m_nbFlames; i++)
-		    m_flames[i]->setSkeletonsLOD(NORMAL);
-		  setSamplingTolerance(0);
-		}
-	      
-		/* On repasse en solveur */
-		if( (m_moduloSave-mod) == 3 ){
-		  m_solver->switchToRealSolver();
-		  setSamplingTolerance(1);
-		}
-		mod--;
-	      }while(mod>0);
-	  }
-      m_moduloSave=modulo;
-    }
   }else
     if(vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
@@ -327,34 +324,34 @@ void DetachableFireSource::build()
   t = p.max();
   k = t*t;
   
-  /* Calcul de la bouding sphere pour les flammes détachées */
-  if( m_detachedFlamesList.size () )
-    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
-      pt = (*flamesIterator)->getTop();
-      if(pt.x > ptMax.x)
-	ptMax.x = pt.x;
-      if(pt.y > ptMax.y)
-	ptMax.y = pt.y;
-      if(pt.z > ptMax.z)
-	ptMax.z = pt.z;
-      pt = (*flamesIterator)->getBottom();
-      if(pt.x < ptMin.x)
-      ptMin.x = pt.x;
-      if(pt.y < ptMin.y)
-	ptMin.y = pt.y;
-      if(pt.z < ptMin.z)
-	ptMin.z = pt.z;
-      ptMin *= m_solver->getScale();
-      ptMax *= m_solver->getScale();
-      m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
-      m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
-    }else{
+  /* Calcul de la bounding sphere pour les flammes détachées */
+//   if( m_detachedFlamesList.size () )
+//     for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+// 	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+//       pt = (*flamesIterator)->getTop();
+//       if(pt.x > ptMax.x)
+// 	ptMax.x = pt.x;
+//       if(pt.y > ptMax.y)
+// 	ptMax.y = pt.y;
+//       if(pt.z > ptMax.z)
+// 	ptMax.z = pt.z;
+//       pt = (*flamesIterator)->getBottom();
+//       if(pt.x < ptMin.x)
+//       ptMin.x = pt.x;
+//       if(pt.y < ptMin.y)
+// 	ptMin.y = pt.y;
+//       if(pt.z < ptMin.z)
+// 	ptMin.z = pt.z;
+//       ptMin *= m_solver->getScale();
+//       ptMax *= m_solver->getScale();
+//       m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
+//       m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
+//     }else{
     m_boundingSphere.radius = sqrt(k+k);
     m_boundingSphere.centre = m_solver->getPosition() + p;
-  }
+//   }
   /* Calcul de la bouding box pour affichage */
-  buildBoundingBox ();
+    buildBoundingBox ();
 }
 
 void DetachableFireSource::setSmoothShading (bool state)
@@ -368,9 +365,8 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  int modulo, remainder;
-  int mod;
-  const int INCREMENT=4;
+  int lod;
+  float coverage;
   
   if(forceSpheresBuild)
     buildBoundingSphere();
@@ -383,71 +379,72 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
       cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
       m_solver->setRunningState(true);
     }
-    /* Il faut prendre en compte la taille de l'objet */
-    m_dist = m_dist - m_boundingSphere.radius;
+
+    coverage = m_boundingSphere.getPixelCoverage(view);
     
-    remainder = ((int)nearbyint(m_dist)) % INCREMENT;
+    /* Fonction obtenue par régression linéaire avec les données
+     * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
+     */
+    lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
+    cerr << "coverage " << coverage << " " << lod << " " << endl;
     
-    if(!remainder){
-      modulo = ((int)floor(m_dist))/INCREMENT;
-      
-      if(modulo > m_moduloSave)
-	{      
-	  cerr << "solver " << m_light - GL_LIGHT0 << " : ";
-	  mod=modulo-m_moduloSave;
-	  do
-	    {
-	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( (modulo-mod) == 1 ){
-		cerr << "simplified skeletons" << endl;
-		for (uint i = 0; i < m_nbFlames; i++)
-		  m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-		setSamplingTolerance(2);
+    if(lod < m_lodSave)
+      {
+	do
+	  {
+	    /* On change le niveau de détail des solveurs à mi-distance */
+	    if( lod == 9 ){
+	      cerr << "simplified skeletons" << endl;
+	      for (uint i = 0; i < m_nbFlames; i++)
+		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
+	      setSamplingTolerance(1);
+	    }
+	    
+	    /* On passe en FakeField */
+	    if( lod == 5 ){
+	      if(getPerturbateMode() != FLICKERING_NOISE){
+		m_flickSave = getPerturbateMode();
+		setPerturbateMode(FLICKERING_NOISE);
 	      }
-	    
-	      /* On passe en FakeField */
-	      if( (modulo-mod) == (int)m_solver->getNbMaxDiv() ){
-		if(getPerturbateMode() != FLICKERING_NOISE){
-		  m_flickSave = getPerturbateMode();
-		  setPerturbateMode(FLICKERING_NOISE);
-		}
-		m_solver->switchToFakeField();
-	      }else
-		if( (modulo-mod) >= 0 && (modulo-mod) < (int)m_solver->getNbMaxDiv())
-		  m_solver->decreaseRes();
-	    
-	      mod--;
-	    }while(mod>0);
-	}
-      else
-	if(modulo < m_moduloSave){
-	  mod=m_moduloSave-modulo;
-	  cerr << "solver " << m_light - GL_LIGHT0 << " : ";
+	      m_solver->switchToFakeField();
+	      setSamplingTolerance(2);
+	    }else
+	      if( lod%2 && m_lodSave < 15)
+		m_solver->decreaseRes();
+	    m_lodSave-=1;
+	  }
+	while(lod < m_lodSave);
+      }
+    else
+      if(lod > m_lodSave)
+	{
 	  do
 	    {
 	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( (modulo+mod) == 2 ){
+	      if( lod == 10 ){
 		cerr << "normal skeletons" << endl;
 		for (uint i = 0; i < m_nbFlames; i++)
 		  m_flames[i]->setSkeletonsLOD(NORMAL);
-		setSamplingTolerance(1);
+		setSamplingTolerance(0);
 	      }
-	      
-	      if( (m_moduloSave-mod) < (int)m_solver->getNbMaxDiv() )
-		m_solver->increaseRes();
-	      else
-		if( (m_moduloSave-mod) == (int)m_solver->getNbMaxDiv() ){
+	  
+	      /* On repasse en solveur */
+	      if( lod == 6 )
+		{
 		  if(m_flickSave > -1){
 		    setPerturbateMode(m_flickSave);
 		    m_flickSave = -1;
 		  }
 		  m_solver->switchToRealSolver();
+		  setSamplingTolerance(1);
 		}
-	      mod--;
-	    }while(mod>0);
+	      else
+		if( !(lod%2) )
+		  m_solver->increaseRes();
+	      m_lodSave+=1;
+	    }
+	  while(lod > m_lodSave);
 	}
-      m_moduloSave=modulo;
-    }
   }else
     if(vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;

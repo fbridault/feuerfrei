@@ -90,7 +90,7 @@ public:
       break;
     case 1:
       m_nurbs = m_accurateNurbs;
-      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 30);
+      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 40);
       break;
     case 2:
       m_nurbs = m_roughNurbs;

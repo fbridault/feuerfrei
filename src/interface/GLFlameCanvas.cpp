@@ -66,8 +66,6 @@ void GLFlameCanvas::InitGL()
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   
   glClearColor (0.0f, 0.0f, 0.0f, 0.0f);
-  /* Restriction de la zone d'affichage */
-  glViewport (0, 0, m_width, m_height);
   
   glEnable (GL_DEPTH_TEST);
   glDisable (GL_BLEND);
@@ -445,9 +443,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     return;
   
   SetCurrent();
-  
-  /* Déplacement du camera */
-  m_camera->setView();
   
   if(m_run){
     /********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/

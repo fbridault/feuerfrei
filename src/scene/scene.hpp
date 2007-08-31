@@ -200,7 +200,7 @@ public:
   };
   
   /** Dessin des objets non texturés */
-  void drawSceneWTEX() const
+  void drawSceneWTEX(GLSLProgram *program=NULL) const
   {    
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
@@ -210,13 +210,21 @@ public:
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
-    for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
-	 luminariesIterator != m_luminaries->end (); luminariesIterator++)
-      (*luminariesIterator)->draw();
+    if(program)
+      for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
+	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
+	Point pos=(*luminariesIterator)->getPosition();
+	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
+	(*luminariesIterator)->draw();
+      }
+    else
+      for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
+	   luminariesIterator != m_luminaries->end (); luminariesIterator++)
+	(*luminariesIterator)->draw();
   };
   
   /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
-  void drawSceneWT(void) const
+  void drawSceneWT(GLSLProgram *program=NULL) const
   {    
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
@@ -226,13 +234,21 @@ public:
 	 objectsArrayIterator != m_objectsArray.end ();
 	 objectsArrayIterator++)
       (*objectsArrayIterator)->draw (AMBIENT,false, m_boundingSpheresMode);
-    for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
-	 luminariesIterator != m_luminaries->end (); luminariesIterator++)
-      (*luminariesIterator)->draw();
+    if(program)
+      for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
+	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
+	Point pos=(*luminariesIterator)->getPosition();
+	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
+	(*luminariesIterator)->draw();
+      }
+    else
+      for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
+	   luminariesIterator != m_luminaries->end (); luminariesIterator++)
+	(*luminariesIterator)->draw();
   };
   
   /** Dessin de tous les objets de la scène */
-  void drawScene (void) const
+  void drawScene () const
   {
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();

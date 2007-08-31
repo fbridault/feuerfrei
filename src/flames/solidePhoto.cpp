@@ -22,7 +22,7 @@ PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const
   m_SPProgram2.attachShader(m_SPVertexShaderTex);
   m_SPProgram2.attachShader(m_SPFragmentShader[1]);
   
-  m_SPProgram1.link();  
+  m_SPProgram1.link();
   m_SPProgram2.link();
   
   generateTexture();
@@ -148,12 +148,13 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPProgram1.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
     m_SPProgram1.setUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
     m_SPProgram1.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
+    m_SPProgram1.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
     
     glActiveTexture(GL_TEXTURE0);
     m_photometricSolidsTex->bind();
     m_SPProgram1.setUniform1i("textureSP",0);
     /* Dessin en enlevant toutes les textures si nécessaire */
-    m_scene->drawSceneWT();
+    m_scene->drawSceneWT(&m_SPProgram1);
     m_SPProgram1.disable();
   }else{
     /* Affichage du solide modulé avec la couleur des objets  */
@@ -163,6 +164,7 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPProgram2.setUniform2fv("angles", m_lazimuth_lzenith, m_flames->size());
     m_SPProgram2.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);    
     m_SPProgram2.setUniform1i("isTextured",1);
+    m_SPProgram2.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
     
     glActiveTexture(GL_TEXTURE1);
     m_photometricSolidsTex->bind();
@@ -170,7 +172,7 @@ void PhotometricSolidsRenderer::draw(u_char color)
     m_SPProgram2.setUniform1i("textureObjet",0);
     m_scene->drawSceneTEX();
     m_SPProgram2.setUniform1i("isTextured",0);
-    m_scene->drawSceneWTEX();
+    m_scene->drawSceneWTEX(&m_SPProgram2);
     m_SPProgram2.disable();
   }
 }

@@ -102,6 +102,11 @@ public:
     glUniform1f(glGetUniformLocation(m_program,var), value);
   }
   
+  void setUniform3f(const char* var, GLfloat val1,  GLfloat val2,  GLfloat val3 ) const
+  {
+    glUniform3f(glGetUniformLocation(m_program,var), val1, val2, val3 );
+  }
+  
   void setUniform4f(const char* var, GLfloat value[4]) const
   {
     glUniform4f(glGetUniformLocation(m_program,var), value[0], value[1], value[2], value[3]);

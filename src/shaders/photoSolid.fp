@@ -40,10 +40,10 @@ void main()
   vec3 point,texcoordsSP,direction;
   float result, r, theta, phi, ColorSP, attenuation, cosSN;
   /* Les normales sont normalisées dans le programme grâce à glEnable (GL_NORMALIZE) */
-/*   vec3 normal1 = normalize(normal); */
+  /*   vec3 normal1 = normalize(normal); */
   float color=0.0;
   float rtex=0.0;
-  
+  float c;
   for (int i = 0; i < NBSOURCES; i++) {
     // Calcul de la direction du point3D vers le centre du SP
     direction = centreSP[i] - point3D.xyz;
@@ -56,7 +56,7 @@ void main()
 /*     // attention y est suppose etre la hauteur et z la profondeur */
     //theta = acos(direction.y / r);
     theta=acos(-direction.y );
-    //phi=atan(direction.z,direction.x); 
+    //phi=atan(direction.z,direction.x);
     
     // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
     //texcoordsSP = vec3(phi * angles[i].x, theta * angles[i].y, rtex);

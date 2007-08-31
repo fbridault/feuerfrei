@@ -92,42 +92,32 @@ Luminary::~Luminary ()
   m_luminary.clear();
 }
 
+#define ARGS position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\
+              fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy
+#define ARGS_SLV ARGS, fieldConfig.vorticityConfinement
+#define ARGS_GC ARGS_SLV, fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon
+
 Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& position)
-{;
+{
   switch(fieldConfig.type){
   case GS_SOLVER :
-    return (new GSSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			   fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy));
+    return (new GSSolver3D (ARGS_SLV));
   case GCSSOR_SOLVER :
-    return (new GCSSORSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			       fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-			       fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new GCSSORSolver3D(ARGS_GC));
   case GCSSOR_SOLVER_SSE :
-    return (new GCSSORSolver3D_SSE(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-				   fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-				   fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new GCSSORSolver3D_SSE(ARGS_GC));
   case HYBRID_SOLVER :
-    return (new HybridSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			       fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-			       fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new HybridSolver3D(ARGS_GC));
   case LOD_HYBRID_SOLVER :
-    return (new LODHybridSolver3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-				  fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-				  fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new LODHybridSolver3D(ARGS_GC));
   case SIMPLE_FIELD :
-    return (new RealField3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			    fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy));
+    return (new RealField3D(ARGS));
   case FAKE_FIELD :
-    return (new FakeField3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			    fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy));
+    return (new FakeField3D(ARGS));
   case LOD_FIELD :
-    return (new LODField3D(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			   fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-			   fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new LODField3D(ARGS_GC));
   case LOD_HYBRID_FIELD :
-    return (new LODHybridField(position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,
-			       fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy,
-			       fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon));
+    return (new LODHybridField(ARGS_GC));
   default :
     cerr << "Unknown solver type : " << (int)fieldConfig.type << endl;
     ::wxExit();

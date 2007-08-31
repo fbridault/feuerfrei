@@ -100,9 +100,14 @@ public:
    */
   virtual void setBuoyancy(float value){ m_buoyancy=value; };
   
+  /** Modifie la force de vorticité dans le solveur
+   * @param value Nouvelle valeur.
+   */
+  virtual void setVorticity(float value){ m_vorticityConfinement=value; };
+  
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () = 0;
-
+  
   /** Multiplie la résolution de la grille par 2 */
   virtual void multiplyRes () = 0;
   
@@ -172,6 +177,9 @@ protected:
   /** Force externe consécutivé à un déplacement. Elle est ajoutée à la prochaine itération et remise à zéro ensuite. */
   Point m_movingForces;
 
+  /** Intensité des forces de vorticité */
+  float m_vorticityConfinement;
+  
   float m_forceCoef;
   float m_forceRatio;
 

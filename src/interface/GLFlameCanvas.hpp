@@ -111,6 +111,10 @@ public:
     if(index >= 0) m_fields[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
+  void setLuminaryVorticity(int index, float value){ 
+    if(index >= 0) m_fields[index]->setVorticity(value);
+    else m_globalField->setVorticity(value);
+  };
   void setLuminaryForces(int index, float value){ m_luminaries[index]->setInnerForce(value); };
   void setLuminarySamplingTolerance(int index, u_char value){ m_luminaries[index]->setSamplingTolerance(value); };
   void setLuminaryFDF(int index, int value) { m_luminaries[index]->setFDF(value); };

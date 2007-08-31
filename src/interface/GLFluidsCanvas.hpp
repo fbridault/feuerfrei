@@ -57,6 +57,7 @@ public:
   void moveSolver(int selectedSolver, Point& pt, bool move){ m_solvers[selectedSolver]->addTemporaryExternalForces(pt); };
   void addPermanentExternalForcesToField(int selectedSolver, Point &pt){ m_solvers[selectedSolver]->addPermanentExternalForces(pt); };
   void setBuoyancy(int index, float value){ m_solvers[index]->setBuoyancy(value); };
+  void setVorticity(int index, float value){ m_solvers[index]->setVorticity(value); };
   void addDensityInSolver(int index, int id){ m_solvers[index]->addDensity(id); };
   
 private:

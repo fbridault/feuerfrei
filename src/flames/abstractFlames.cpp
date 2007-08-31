@@ -201,6 +201,7 @@ void FixedFlame::drawPointFlame () const
       glEnable (GL_TEXTURE_2D);
       /****************************************************************************************/
       /* Affichage de la flamme */
+      
       glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
       m_tex->bind();
       
@@ -430,6 +431,10 @@ bool RealFlame::build ()
   m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
   for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
     m_vknots[j] = m_vknots[j-1];
+
+//   for (j = 0; j < m_vknotsCount; j++)
+//     cerr << m_vknots[j] << " ";
+//   cerr << endl;
   
   if(m_vsize*m_nbSkeletons != m_count)
      cerr << "error " << m_vsize*m_nbSkeletons << " " << m_count << endl;

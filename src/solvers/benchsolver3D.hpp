@@ -40,7 +40,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		 float buoyancy, uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
+		 float buoyancy, float vorticityConfinement, uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.

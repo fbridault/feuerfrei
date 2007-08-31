@@ -1,8 +1,8 @@
 #include "GSSolver3D.hpp"
 
 GSSolver3D::GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-			float timeStep, float buoyancy) : 
-  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
+			float timeStep, float buoyancy, float vorticityConfinement) : 
+  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement)
 {
 }
 

@@ -198,11 +198,11 @@ BEGIN_EVENT_TABLE(SolverMainPanel, wxPanel)
 END_EVENT_TABLE();
 
 #ifdef RTFLAMES_BUILD
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFlameCanvas* const glBuffer, 
-				 const wxPoint& pos, const wxSize& size, long style):
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float vorticity, int index, 
+				 GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
 #else
-SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFluidsCanvas* const glBuffer, 
-				 const wxPoint& pos, const wxSize& size, long style):
+SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float vorticity, int index, 
+				 GLFluidsCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
 #endif
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
@@ -226,8 +226,13 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int i
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
   m_buoyancySlider = new wxSlider(this,IDSL_SF,0,(int)(-SLIDER_RANGE/10.0f),(int)(2*SLIDER_RANGE/10.0f), wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_vorticityLabel = new wxStaticText(this,-1,_("Vorticity"));
+  m_vorticitySlider = new wxSlider(this,IDSL_VC,0,(int)(-200),(int)(200), wxDefaultPosition, 
+				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+
   
   m_buoyancySlider->SetValue((int)(buoyancy*FORCE_SENSIBILITY));
+  m_vorticitySlider->SetValue((int)(vorticity*FORCE_SENSIBILITY*10.0f));
   
   /* Réglages des solveurs */  
   m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -245,12 +250,18 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, int i
   m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);
   m_forcesSizer->Add(m_buoyancySlider, 2, wxEXPAND, 0);
   
+  m_vorticitySizer = new wxBoxSizer(wxHORIZONTAL);
+  m_vorticitySizer->Add(m_vorticityLabel, 1, wxTOP|wxLEFT, 4);
+  m_vorticitySizer->Add(m_vorticitySlider, 2, wxEXPAND, 0);
+  
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   
   m_panelSizer->Add(m_solversXAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversYAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_solversZAxisPositionSizer, 0, wxEXPAND, 0);
   m_panelSizer->Add(m_forcesSizer, 0, wxEXPAND, 0);
+  m_panelSizer->Add(m_vorticitySizer, 0, wxEXPAND, 0);
+
 #ifdef RTFLUIDS_BUILD
   m_densityLButton = new wxButton(this, IDB_LEFT, _("Left"));
   m_densityRButton = new wxButton(this, IDB_RIGHT, _("Right"));
@@ -277,22 +288,34 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 #ifdef RTFLUIDS_BUILD
       m_glBuffer->setBuoyancy(m_index, value);
 #else
-      m_glBuffer->setLuminaryBuoyancy(m_index, value);      
+      m_glBuffer->setLuminaryBuoyancy(m_index, value);
 #endif
     }
   else
+    if(event.GetId() == IDSL_VC)
     {
-      Point pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-	       m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
-	       m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+      float value = m_vorticitySlider->GetValue()/(FORCE_SENSIBILITY*10.0f);
       
-      m_glBuffer->addPermanentExternalForcesToField(m_index,pt);
+#ifdef RTFLUIDS_BUILD
+      m_glBuffer->setVorticity(m_index, value);
+#else
+      m_glBuffer->setLuminaryVorticity(m_index, value);
+#endif
     }
+    else
+      {
+	Point pt(m_solverXAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+		 m_solverYAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY,
+		 m_solverZAxisPositionSlider->GetValue()/SLIDER_SENSIBILITY);
+	
+	m_glBuffer->addPermanentExternalForcesToField(m_index,pt);
+      }
 }
 
 void SolverMainPanel::getCtrlValues(SolverConfig& solverConfig)
 {
   solverConfig.buoyancy = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
+  solverConfig.vorticityConfinement = m_vorticitySlider->GetValue()/(FORCE_SENSIBILITY*10.0f);
 }
 
 #ifdef RTFLUIDS_BUILD

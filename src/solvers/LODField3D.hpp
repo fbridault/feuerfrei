@@ -29,7 +29,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		   float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+	      float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODField3D () {};
   
   /********************* Redéfinition des méthodes héritées *********************/
@@ -112,6 +112,12 @@ public:
     m_solver.setBuoyancy(value);
   }
   
+  virtual void setVorticity(float value)
+  { 
+    m_fakeField.setVorticity(value);
+    m_solver.setVorticity(value);
+  }
+  
   virtual void setRunningState(bool state)
   { 
     m_fakeField.setRunningState(state);
@@ -154,7 +160,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODHybridField () {};
   
   /********************* Redéfinition des méthodes héritées *********************/

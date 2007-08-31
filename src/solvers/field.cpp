@@ -15,6 +15,8 @@ Field::Field (const Point& position, float timeStep, float buoyancy) : m_positio
   m_forceCoef = 2;
   m_forceRatio = 1/m_forceCoef;
   m_run = true;
+  /* Affectation surchargée dans Solver3D::Solver3D(...) */
+  m_vorticityConfinement = 0.0f;
 }
 
 Field::~Field ()

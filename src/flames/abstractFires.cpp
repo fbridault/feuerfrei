@@ -185,7 +185,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
      * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
      */
     lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
-    cerr << "coverage " << coverage << " " << lod << " " << m_lodSave << endl;
+//     cerr << "coverage " << coverage << " " << lod << " " << m_lodSave << endl;
     
     if(lod < m_lodSave)
       {
@@ -386,7 +386,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
      * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
      */
     lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
-    cerr << "coverage " << coverage << " " << lod << " " << endl;
+//     cerr << "coverage " << coverage << " " << lod << " " << endl;
     
     if(lod < m_lodSave)
       {

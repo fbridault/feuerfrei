@@ -35,10 +35,7 @@ m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   
-  fH = tan( m_ouverture / 360 * PI ) * zNear;
-  fW = fH * m_aspect;
-  glFrustum( -fW, fW, -fH, fH, zNear, m_clipping_value );
-
+  gluPerspective (m_ouverture, m_aspect, 0.1f, m_clipping_value);
   /* Restriction de la zone d'affichage */
   glViewport ( m_viewPort[0], m_viewPort[1], m_viewPort[2], m_viewPort[3]);
   

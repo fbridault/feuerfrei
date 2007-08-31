@@ -8,8 +8,8 @@
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
 LogResAvgTimeSolver3D::LogResAvgTimeSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-					      float timeStep, uint nbTimeSteps, float buoyancy, float omegaDiff, 
-					      float omegaProj, float epsilon) : 
+					      float timeStep, uint nbTimeSteps, float buoyancy, float vorticityConfinement, 
+					      float omegaDiff, float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
   LogResAvgSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {

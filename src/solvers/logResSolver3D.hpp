@@ -31,7 +31,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LogResSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
-		  uint nbTimeSteps, float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		  uint nbTimeSteps, float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~LogResSolver3D ();
   

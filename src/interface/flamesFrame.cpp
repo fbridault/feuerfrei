@@ -263,14 +263,15 @@ void FlamesFrame::InitSolversPanels()
   
   if(m_currentConfig.useGlobalField)
     {
-      m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.globalField.buoyancy, -1, m_glBuffer);
+      m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.globalField.buoyancy,
+					      m_currentConfig.globalField.vorticityConfinement,-1, m_glBuffer);
       m_solversNotebook->AddPage(m_solverPanels[0], _("Global Field"));
       type = 1;
     }
   for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      m_solverPanels[i+type] = new SolverMainPanel(m_solversNotebook, -1, 
-						   m_currentConfig.luminaries[i].fields[0].buoyancy, i, m_glBuffer);
+      m_solverPanels[i+type] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.luminaries[i].fields[0].buoyancy,
+						   m_currentConfig.luminaries[i].fields[0].vorticityConfinement, i, m_glBuffer);
       tabName.Printf(_("Solver #%d"),i+1);
       m_solversNotebook->AddPage(m_solverPanels[i+type], tabName);
     }
@@ -481,6 +482,8 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
   solverConfig.timeStep = (float)tmp;
   m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
   solverConfig.buoyancy = (float)tmp;
+  m_config->Read(groupName + _("Vorticity"), &tmp, 0.02);
+  solverConfig.vorticityConfinement = (float)tmp;
   
   m_config->Read(groupName + _("omegaDiff"),&tmp, 1.5);
   solverConfig.omegaDiff = (float)tmp;
@@ -632,7 +635,8 @@ void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverCo
   m_config->Write(groupName + _("Scale.z"),solverConfig.scale.z);
   
   m_config->Write(groupName + _("TimeStep"),solverConfig.timeStep);      
-  m_config->Write(groupName + _("Buoyancy"), solverConfig.buoyancy);
+  m_config->Write(groupName + _("Buoyancy"), solverConfig.buoyancy);   
+  m_config->Write(groupName + _("Vorticity"), solverConfig.vorticityConfinement);
   
   m_config->Write(groupName + _("omegaDiff"),solverConfig.omegaDiff);
   m_config->Write(groupName + _("omegaProj"),solverConfig.omegaProj);

@@ -58,6 +58,7 @@ public:
   float epsilon;
   uint nbMaxIter;
   float buoyancy;
+  float vorticityConfinement;
 };
 
 #ifdef RTFLAMES_BUILD

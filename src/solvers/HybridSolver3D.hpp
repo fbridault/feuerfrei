@@ -40,7 +40,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		  float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
@@ -76,7 +76,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		     float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODHybridSolver3D ();
   
   virtual void divideRes ();

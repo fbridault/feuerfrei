@@ -17,6 +17,7 @@ enum
     IDSL_FYAP,
     IDSL_FZAP,
     IDSL_SF,
+    IDSL_VC,
     IDSL_FF,
     IDSL_IC,
     IDSL_NLP,
@@ -103,10 +104,10 @@ class SolverMainPanel: public wxPanel
 {
 public:
 #ifdef RTFLAMES_BUILD
-  SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFlameCanvas* const glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, float buoyancy, float vorticity, int index, GLFlameCanvas* const glBuffer, 
  		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #else
-  SolverMainPanel(wxWindow* parent, int id, float buoyancy, int index, GLFluidsCanvas* const glBuffer, 
+  SolverMainPanel(wxWindow* parent, int id, float buoyancy, float vorticity, int index, GLFluidsCanvas* const glBuffer, 
  		  const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
 #endif
   virtual ~SolverMainPanel(){};
@@ -122,9 +123,11 @@ private:
   wxSlider *m_solverXAxisPositionSlider, *m_solverYAxisPositionSlider, *m_solverZAxisPositionSlider;
   wxSlider *m_buoyancySlider;
   wxStaticText *m_buoyancyLabel;
+  wxSlider *m_vorticitySlider;
+  wxStaticText *m_vorticityLabel;
   
   wxBoxSizer *m_solversXAxisPositionSizer, *m_solversYAxisPositionSizer, *m_solversZAxisPositionSizer;
-  wxBoxSizer *m_panelSizer, *m_forcesSizer;
+  wxBoxSizer *m_panelSizer, *m_forcesSizer, *m_vorticitySizer;
   
   /** Index du solveur */
   int m_index;

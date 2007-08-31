@@ -29,7 +29,7 @@ public:
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
   Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-	    float timeStep, float buoyancy);
+	    float timeStep, float buoyancy, float vorticityConfinement);
   /** Destructeur */
   virtual ~Solver3D ();
   

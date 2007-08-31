@@ -118,8 +118,8 @@ void GLFlameCanvas::InitThreads()
   if(m_currentConfig->useGlobalField){
     m_globalField = new GlobalField(m_threads, m_scene, m_currentConfig->globalField.type,
 				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
-				    m_currentConfig->globalField.omegaDiff, m_currentConfig->globalField.omegaProj,
-				    m_currentConfig->globalField.epsilon);
+				    m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff, 
+				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
     /* Ajout du thread du solveur global le cas échéant */
     m_threads.push_back(new GlobalFieldThread(m_globalField, m_scheduler));
   }
@@ -153,7 +153,7 @@ void GLFlameCanvas::InitScene()
   
   m_scene = new Scene (m_currentConfig->sceneName.fn_str(), &m_luminaries, &m_fires);
   
-  InitLuminaries();  
+  InitLuminaries();
   
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();

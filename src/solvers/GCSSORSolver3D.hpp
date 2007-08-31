@@ -26,7 +26,7 @@ public:
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
-		  float buoyancy, float omegaDiff, float omegaProj, float epsilon);
+		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.

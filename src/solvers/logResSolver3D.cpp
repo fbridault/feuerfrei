@@ -1,7 +1,8 @@
 #include "logResSolver3D.hpp"
 
 LogResSolver3D::LogResSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-				uint nbTimeSteps, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
+				uint nbTimeSteps, float buoyancy, float vorticityConfinement, float omegaDiff, 
+				float omegaProj, float epsilon) : 
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {

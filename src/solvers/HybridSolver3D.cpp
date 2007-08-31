@@ -8,8 +8,10 @@
 
 /* Le constructeur de GSSolver _mm_free(m_uTmpr);3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
 HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
-				float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
+				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff, 
+				float omegaProj, float epsilon) : 
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement), 
+  GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
 }
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
@@ -34,8 +36,9 @@ void HybridSolver3D::project (float *const p, float *const div)
 }
 
 LODHybridSolver3D::LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
-				      float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy), 
+				      float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
+				      float omegaProj, float epsilon) : 
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement), 
   HybridSolver3D (omegaDiff, omegaProj, epsilon)
 {
   /* Attention n_x, n_y et n_z doivent être impairs */

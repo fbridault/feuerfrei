@@ -24,8 +24,9 @@ GCSSORSolver3D_SSE::GCSSORSolver3D_SSE (float omegaDiff, float omegaProj, float 
 }
 
 GCSSORSolver3D_SSE::GCSSORSolver3D_SSE (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-					float timeStep, float buoyancy, float omegaDiff, float omegaProj, float epsilon) : 
-  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
+					float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff, 
+					float omegaProj, float epsilon) : 
+  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement)
 {
   m_r=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);
   m_z=(float*)_mm_malloc(m_nbVoxels*sizeof(float),16);

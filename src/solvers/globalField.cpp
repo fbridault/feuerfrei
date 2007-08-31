@@ -7,8 +7,12 @@
 #include "../interface/interface.hpp"
 #include "fieldThread.hpp"
 
+#define ARGS position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy
+#define ARGS_SLV ARGS, vorticityConfinement
+#define ARGS_GC ARGS_SLV, omegaDiff, omegaProj, epsilon
+
 GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene, char type, uint n,
-			 float timeStep, float omegaDiff, float omegaProj, float epsilon)
+			 float timeStep, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon)
 {
   Point max, min, width, position, scale(1.0f,1.0f,1.0f);
   uint n_x, n_y, n_z;
@@ -45,25 +49,25 @@ GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene
     
   switch(type){
   case GS_SOLVER :
-    m_field = new GSSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    m_field = new GSSolver3D(ARGS_SLV);
     break;
   case GCSSOR_SOLVER :
-    m_field = new GCSSORSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy,omegaDiff, omegaProj, epsilon);
+    m_field = new GCSSORSolver3D(ARGS_GC);
     break;
   case HYBRID_SOLVER :
-    m_field = new HybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    m_field = new HybridSolver3D(ARGS_GC);
     break;
   case LOD_HYBRID_SOLVER :
-    m_field = new LODHybridSolver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    m_field = new LODHybridSolver3D(ARGS_GC);
     break;
   case SIMPLE_FIELD :
-    m_field = new RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    m_field = new RealField3D(ARGS);
     break;
   case FAKE_FIELD :
-    m_field = new FakeField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy);
+    m_field = new FakeField3D(ARGS);
     break;
   case LOD_FIELD :
-    m_field = new LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, omegaDiff, omegaProj, epsilon);
+    m_field = new LODField3D(ARGS_GC);
     break;
   default :
     cerr << "Unknown global solver type : " << (int)type << endl;

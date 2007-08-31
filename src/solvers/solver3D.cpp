@@ -8,7 +8,7 @@ Solver3D::Solver3D ()
 }
 
 Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-		    float timeStep, float buoyancy) : 
+		    float timeStep, float buoyancy, float vorticityConfinement) : 
   RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_uPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
@@ -31,6 +31,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   
   m_visc = 0.00000015f;
   m_diff = 0.001f;
+  m_vorticityConfinement = vorticityConfinement;
   
   // Utilisé pour la densité
   // m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
@@ -169,14 +170,14 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 //   SWAP (m_densPrev, m_dens); diffuse ( 0, m_dens, m_densPrev, a_diff);
 //   SWAP (m_densPrev, m_dens); advect ( 0, m_dens, m_densPrev, m_u, v, w);
 // }
-void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w){
-
+void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w)
+{
   uint i,j,k;	
-  float epsh =m_dt*m_forceCoef*0.02;//epsilon*h
+  float epsh =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon*h
   float x,y,z;
   float Nx,Ny,Nz;
   float invNormeN;
-
+  
   /** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v, m_w)
    */
   m_t = m_t1;

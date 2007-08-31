@@ -9,6 +9,7 @@ FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
 {
   m_forceCoef = 3.0f;
   m_coef = m_dt * m_dt * m_forceCoef;
+  buildDLGrid();
 }
 
 FakeField3D::~FakeField3D ()
@@ -77,7 +78,6 @@ void FakeField3D::iterate ()
       addExternalForces(m_movingForces,true);
       m_movingForces.resetToNull();
     }
-  
   m_nbIter++;
 }
 
@@ -111,6 +111,36 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
     m_src.y -= strength.y;
   if(force.z)
     m_src.z -= strength.z;
+}
+
+void FakeField3D::buildDLGrid ()
+{
+  m_gridDisplayList=glGenLists(1);
+  glNewList (m_gridDisplayList, GL_COMPILE);
+  glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
+  glBegin (GL_LINE_LOOP);
+  glVertex3f (0.0f, 0.0f, 0.0f);
+  glVertex3f (0.0f, m_dim.y, 0.0f);
+  glVertex3f (m_dim.x, m_dim.y, 0.0f);
+  glVertex3f (m_dim.x, 0.0f, 0.0f);
+  glEnd();
+  glBegin (GL_LINE_LOOP);
+  glVertex3f (0.0f, 0.0f, m_dim.z);
+  glVertex3f (0.0f, m_dim.y, m_dim.z);
+  glVertex3f (m_dim.x, m_dim.y, m_dim.z);
+  glVertex3f (m_dim.x, 0.0f, m_dim.z);
+  glEnd();
+  glBegin (GL_LINES);
+  glVertex3f (0.0f, 0.0f, 0.0f);
+  glVertex3f (0.0f, 0.0f, m_dim.z);
+  glVertex3f (0.0f, m_dim.y, 0.0f);
+  glVertex3f (0.0f, m_dim.y, m_dim.z);
+  glVertex3f (m_dim.x, m_dim.y, 0.0f);
+  glVertex3f (m_dim.x, m_dim.y, m_dim.z);
+  glVertex3f (m_dim.x, 0.0f, 0.0f);
+  glVertex3f (m_dim.x, 0.0f, m_dim.z);
+  glEnd();
+  glEndList ();
 }
 
 void FakeField3D::displayVelocityField (void)

@@ -70,7 +70,6 @@ public:
   };
   
   void cleanSources ();
-  
   void displayVelocityField (void);
   
   virtual void addExternalForces(const Point& position, bool move);
@@ -81,6 +80,7 @@ public:
 		       const Point& TRStrength, const Point& BRStrength);
   
 protected:  
+  void buildDLGrid ();
   /** Coefficients pour les forces externes. */
   Point m_src;
   Point m_latentForces;

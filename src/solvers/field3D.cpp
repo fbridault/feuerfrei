@@ -53,7 +53,6 @@ Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim
   
   /* Construction des display lists */
   buildDLBase ();
-  buildDLGrid ();
   
   m_nbMaxDiv = 1;
   m_scale = scale;

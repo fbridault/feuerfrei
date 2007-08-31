@@ -38,6 +38,7 @@ RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
   // 	 fill_n(m_uSrc, m_nbVoxels, 0.0f);
   // 	 fill_n(m_vSrc, m_nbVoxels, 0.0f);
   // 	 fill_n(m_wSrc, m_nbVoxels, 0.0f);
+  buildDLGrid ();
 }
 
 RealField3D::~RealField3D ()

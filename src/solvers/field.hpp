@@ -128,7 +128,7 @@ public:
   };
   
   /** Fonction de dessin du champ de vélocité */
-  virtual void displayVelocityField (void) = 0;
+  virtual void displayVelocityField () = 0;
   
   /** Fonction de dessin du champ de densité */
   virtual void displayDensityField (void) = 0;

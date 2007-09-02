@@ -68,7 +68,7 @@ public:
   virtual void setVorticity(float value){ m_field->setVorticity(value); };
   
   /** Fonction de dessin du champ de vélocité */
-  void displayVelocityField (void) { /*m_field->displayVelocityField();*/ };
+  void displayVelocityField (void) { m_field->displayVelocityField(); };
   
   /** Fonction de dessin de la grille */
   void displayGrid (void){ m_field->displayGrid(); };

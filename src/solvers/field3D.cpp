@@ -124,7 +124,7 @@ void Field3D::buildDLBase ()
 void Field3D::displayArrow (const Vector& direction)
 {
   float norme_vel = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
-  float taille = m_dim.x * m_dim.y * m_dim.z * norme_vel * m_forceRatio;
+  float taille = norme_vel * m_forceRatio;
   float angle;
   Vector axeRot, axeCone (0.0, 0.0, 1.0), dir(direction);
   
@@ -147,5 +147,5 @@ void Field3D::displayArrow (const Vector& direction)
   //  printf("%f\n",norme_vel);
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
   
-  GraphicsFn::SolidCone (taille / 2, taille, 3, 3);
+  GraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
 }

@@ -322,7 +322,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     strength.z = fabs(strength.z);  
   }
   
-  findPointPosition(m_dim-Point(.1f,.3f,.1f),widthx,widthy,widthz);
+  findPointPosition(m_dim-Point(.5f,.5f,.5f),widthx,widthy,widthz);
   findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */

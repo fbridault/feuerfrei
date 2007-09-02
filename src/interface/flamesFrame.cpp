@@ -682,10 +682,14 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   
   m_config->Write(_("/Luminaries/Number"), (int)m_currentConfig.nbLuminaries);
 
-  m_config->Write(_("/GlobalField/Enabled"), m_currentConfig.useGlobalField);
   groupName << _("/GlobalField/");
   m_config->DeleteGroup(groupName);
-  SaveSolverSettings(groupName,m_currentConfig.globalField);
+  
+  m_config->Write(_("/GlobalField/Enabled"), m_currentConfig.useGlobalField);
+  if(m_currentConfig.useGlobalField){
+    m_solverPanels[0]->getCtrlValues(m_currentConfig.globalField);
+    SaveSolverSettings(groupName,m_currentConfig.globalField);
+  }
   
   for(uint i=0; i < m_nbLuminariesMax; i++)
     {
@@ -703,12 +707,14 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.luminaries[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.luminaries[i].position.z);
       
-      m_config->Write(_("/Luminaries/NbFields"), (int)m_currentConfig.luminaries[i].nbFields);
+      groupName.Printf(_("/Luminary%d/NbFields"),i);
+      m_config->Write(groupName, (int)m_currentConfig.luminaries[i].nbFields);
       groupName.Printf(_("/Luminary%d/Solver0/"),i);
-      m_solverPanels[i]->getCtrlValues(m_currentConfig.luminaries[i].fields[0]);
+      m_solverPanels[i+m_currentConfig.useGlobalField]->getCtrlValues(m_currentConfig.luminaries[i].fields[0]);
       SaveSolverSettings(groupName,m_currentConfig.luminaries[i].fields[0]);
       
-      m_config->Write(_("/Luminaries/NbFires"), (int)m_currentConfig.luminaries[i].nbFires);
+      groupName.Printf(_("/Luminary%d/NbFires"),i);
+      m_config->Write(groupName, (int)m_currentConfig.luminaries[i].nbFires);
       groupName.Printf(_("/Luminary%d/Flame0/"),i);
       m_flamePanels[i]->getCtrlValues(m_currentConfig.luminaries[i].fires[0]);
       SaveFireSettings(groupName,m_currentConfig.luminaries[i].fires[0]);  

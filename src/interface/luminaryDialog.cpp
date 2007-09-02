@@ -508,6 +508,7 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
       m_currentConfig->globalField = newGlobalConfig;
       m_currentConfig->useGlobalField = m_activateGlobalSolverCheckBox->GetValue();
       m_currentConfig->globalField.buoyancy=0; 
+      m_currentConfig->globalField.vorticityConfinement=.1; 
     }
   
   for(uint i = 0; i < newNb; i++)
@@ -531,7 +532,8 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].fires[0].flickering = m_currentConfig->luminaries[i].fires[0].flickering;
 	    newConfig[i].fires[0].fdf = m_currentConfig->luminaries[i].fires[0].fdf;
 	    newConfig[i].fires[0].IESFileName = m_currentConfig->luminaries[i].fires[0].IESFileName;
-	    newConfig[i].fields[0].buoyancy = m_currentConfig->luminaries[i].fields[0].buoyancy;	      
+	    newConfig[i].fields[0].buoyancy = m_currentConfig->luminaries[i].fields[0].buoyancy;
+	    newConfig[i].fields[0].vorticityConfinement = m_currentConfig->luminaries[i].fields[0].vorticityConfinement;
 	  }
 	else
 	  {
@@ -543,6 +545,7 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].fires[0].fdf = 0;
 	    newConfig[i].fires[0].IESFileName = _("IES/test.ies");
 	    newConfig[i].fields[0].buoyancy = .2;
+	    newConfig[i].fields[0].vorticityConfinement = .1;
 	  }
       }else{
 	for(uint i = 0; i < newNb; i++){

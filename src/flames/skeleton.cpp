@@ -101,7 +101,7 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
   if ( particle->x < 0.0f )
     particle->x = EPSILON;
   if ( particle->y < 0.0f )
-    particle->y = EPSILON;
+    return false;
   if ( particle->z < 0.0f )
     particle->z = EPSILON;
   

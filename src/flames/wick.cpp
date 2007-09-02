@@ -183,9 +183,12 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
     }
 
   Point rootMoveFactorL(2.0f,.1f,1.0f);
+  float noiseMin=-.1f;
+  float noiseMax=.1f;
+  float noiseInc=.5f;
   /* Création des leadSkeletons */
   /* On prend simplement le barycentre de chaque partition */
-  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, .5f, -.2f, .3f));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, noiseInc, noiseMin, noiseMax));
   
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
     {
@@ -206,12 +209,12 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	    }
 	  barycentre = barycentre / (float)n;
 	  
-	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, .5f, -.2f, .3f));
+	  leadSkeletons.push_back (new LeadSkeleton(solver, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, noiseInc, noiseMin, noiseMax));
  	}
       else
 	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;
     }
-  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, .5f, -.2f, .3f));
+  leadSkeletons.push_back (new LeadSkeleton(solver, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, noiseInc, noiseMin, noiseMax));
 
   /* Suppression des points */
   for (uint i = 0; i < flameConfig.skeletonsNumber; i++)

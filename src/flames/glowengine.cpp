@@ -17,27 +17,19 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
   m_blurRendererProgram.attachShader(m_blurRendererShader);
   m_blurRendererProgram.link();
 
-  setGaussSigma(0,2);
-  setGaussSigma(1,10);
-  setGaussSigma(2,10);
+  computeWeights(0,2);
+  computeWeights(1,10);
+  computeWeights(2,10);
   
   for(int i=0; i < GLOW_LEVELS; i++){
     m_scaleFactor[i] = scaleFactor[i];
     m_width[i] = w/m_scaleFactor[i];
     m_height[i] = h/m_scaleFactor[i];
-    
-    m_firstPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
-    m_firstPassFBOs[i].Activate();
-    m_firstPassFBOs[i].ColorAttach(m_firstPassTex[i]->getTexture(), 0);
-    m_firstPassFBOs[i].RenderBufferAttach();
-    
-    m_secondPassFBOs[i].Initialize(m_width[i], m_height[i]);
-    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
-    m_secondPassFBOs[i].Activate();
-    m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
-    m_secondPassFBOs[i].RenderBufferAttach();
+    m_firstPassFBOs[i].Initialize();    
+    m_secondPassFBOs[i].Initialize();
   }
+  
+  generateTex();
   
   /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++)
@@ -51,9 +43,35 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
 
 GlowEngine::~GlowEngine()
 {
+  deleteTex();
+}
+
+void GlowEngine::deleteTex()
+{
+  for(int i=0; i < GLOW_LEVELS; i++)
+    {
+      delete m_firstPassTex[i];
+      delete m_secondPassTex[i];
+    }
+}
+
+void GlowEngine::generateTex()
+{  
   for(int i=0; i < GLOW_LEVELS; i++){
-    delete m_firstPassTex[i];
-    delete m_secondPassTex[i];
+    m_width[i] = m_initialWidth/m_scaleFactor[i];
+    m_height[i] = m_initialHeight/m_scaleFactor[i];
+    
+    m_firstPassFBOs[i].setSize(m_width[i], m_height[i]);
+    m_firstPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
+    m_firstPassFBOs[i].Activate();
+    m_firstPassFBOs[i].ColorAttach(m_firstPassTex[i]->getTexture(), 0);
+    m_firstPassFBOs[i].RenderBufferAttach();
+    
+    m_secondPassFBOs[i].setSize(m_width[i], m_height[i]);
+    m_secondPassTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_LINEAR, m_width[i], m_height[i]);
+    m_secondPassFBOs[i].Activate();
+    m_secondPassFBOs[i].ColorAttach(m_secondPassTex[i]->getTexture(), 0);
+    m_secondPassFBOs[i].RenderBufferAttach();
   }
 }
 
@@ -173,7 +191,7 @@ void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer)
   glDepthFunc (GL_LEQUAL);
   glEnable (GL_BLEND);
   glBlendFunc (GL_ONE, GL_ONE);
-    
+  
   glActiveTextureARB(GL_TEXTURE0);
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
   m_blurRendererProgram.enable();

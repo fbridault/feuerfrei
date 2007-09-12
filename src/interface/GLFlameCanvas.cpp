@@ -5,6 +5,8 @@
 
 #include "../flames/solidePhoto.hpp"
 
+extern wxApp *thisApp;
+
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_SIZE(GLFlameCanvas::OnSize)
   EVT_PAINT(GLFlameCanvas::OnPaint)
@@ -54,7 +56,7 @@ void GLFlameCanvas::InitUISettings(void)
   m_run = true;
   m_saveImages = false;
   m_glowOnly = false;
-  m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = m_displayWickBoxes = false;
+  m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = m_displayWickBoxes = m_fullscreen = false;
   m_displayFlame = true;
   m_drawShadowVolumes = false;
   m_gammaCorrection = false;
@@ -357,7 +359,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 #endif
   /* Force à redessiner */
   this->Refresh();
-//   thisApp->Yield();
+  //  thisApp->Yield();
   //event.RequestMore();
 }
 
@@ -387,6 +389,10 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case WXK_DOWN: m_camera->moveOnFrontOrBehind(step); break;
     case WXK_HOME: m_camera->moveUpOrDown(-step); break;
     case WXK_END: m_camera->moveUpOrDown(step); break;
+    case 'f':
+    case 'F':
+      m_fullscreen = !m_fullscreen;
+      ((FlamesFrame *)GetParent())->ShowFullScreen(m_fullscreen); break;
     case 'l':
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
@@ -542,7 +548,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   m_t = m_swatch->Time();
   if (m_t >= 2000){    
-    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000), m_scheduler->getNbSolved() / (m_t/1000) );
+    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000), m_scheduler->getNbSolved() / (m_t/1000), m_width, m_height );
     m_swatch->Start();
     m_framesCount = 0;
     m_scheduler->resetNbSolved();
@@ -640,19 +646,25 @@ void GLFlameCanvas::drawScene()
 
 void GLFlameCanvas::OnSize(wxSizeEvent& event)
 {
-    // this is also necessary to update the context on some platforms
-    wxGLCanvas::OnSize(event);
-    
-    // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
-    int w, h;
-    GetClientSize(&w, &h);
+  GLint w,h;
+  // this is also necessary to update the context on some platforms
+  wxGLCanvas::OnSize(event);
+  
+  // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
+  GetSize(&w, &h);
+  m_width = (uint)w;
+  m_height = (uint)h;
 #ifndef __WXMOTIF__
-    if (GetContext())
+  if (GetContext())
 #endif
     {
-        SetCurrent();
-        glViewport(0, 0, (GLint) w, (GLint) h);
+      SetCurrent();
+      glViewport(0, 0, w, h);
+      m_glowEngine->setSize(m_width,m_height);
+      m_depthPeelingEngine->setSize(m_width,m_height);
+      m_gammaEngine->setSize(m_width,m_height);
     }
+  Update();
 }
 
 void GLFlameCanvas::castShadows ()

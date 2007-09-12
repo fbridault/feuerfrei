@@ -4,11 +4,8 @@ FBO::FBO()
 {
 }
 
-void FBO::Initialize(uint width, uint height)
+void FBO::Initialize()
 {
-  m_width = width;
-  m_height = height;
-  
   glGenFramebuffersEXT( 1, &m_frameBuffer );
   glGenRenderbuffersEXT( 1, &m_depthRenderBuffer );
 }

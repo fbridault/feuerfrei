@@ -9,7 +9,7 @@ public:
   FBO();
   ~FBO();
 
-  void Initialize(uint width, uint height);
+  void Initialize();
   
   void DepthAttach(GLuint tex);
   void ColorAttach(GLuint tex, int colorAttachment);
@@ -43,6 +43,9 @@ public:
   
   uint GetHeight()
   { return m_height; }
+  
+  void setSize(float width, float height)
+  { m_width = width; m_height=height; }
   
 private:
   GLuint m_frameBuffer;

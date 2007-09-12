@@ -68,13 +68,18 @@ public:
   void blur(GLFlameCanvas* const glBuffer);
   /** Plaque le blur à l'écran */
   void drawBlur(GLFlameCanvas* const glBuffer);
-
-  void setGaussSigma(uint index, float sigma)
-  {
-    computeWeights(index,sigma);
-  };
-
+  
   void computeWeights(uint index, float sigma);
+  
+  void deleteTex();
+  void generateTex();
+  
+  void setSize(uint width, uint height)
+  {
+    m_initialWidth = width; m_initialHeight = height;
+    deleteTex();
+    generateTex();
+  }
   
 private: 
   /** Dimensions de la texture */
@@ -92,12 +97,12 @@ private:
   GLfloat m_divide[3];
   
   /** FBOs */
-  FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS], m_visibilityFBO;
+  FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS];
   GLSLProgram m_programX, m_programY, m_blurRendererProgram;
   /** Fragment Shader pour le blur */
   GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y, m_blurRendererShader;
   /** Textures servant à réaliser le blur */
-  Texture *m_firstPassTex[GLOW_LEVELS], *m_secondPassTex[GLOW_LEVELS], *m_visibilityTex;
+  Texture *m_firstPassTex[GLOW_LEVELS], *m_secondPassTex[GLOW_LEVELS];
 };
 
 #endif

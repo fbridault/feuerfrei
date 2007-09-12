@@ -62,6 +62,7 @@ enum
     IDM_Wired,
     IDM_Shaded,
     IDM_Settings,
+    IDM_Resolution,
     IDM_ShadowVolumesSettings,
   };
 
@@ -110,6 +111,7 @@ public:
   void OnWiredMenu(wxCommandEvent& event);
   void OnShadedMenu(wxCommandEvent& event);
   void OnSettingsMenu(wxCommandEvent& event);
+  void OnResolutionMenu(wxCommandEvent& event);
   void OnShadowsMenu(wxCommandEvent& event);
   void OnShadowVolumesMenu(wxCommandEvent& event);
   void OnShadowVolumesSettingsMenu(wxCommandEvent& event);
@@ -125,7 +127,7 @@ public:
   void OnScrollDP(wxScrollEvent& event);
   void OnScrollGamma(wxScrollEvent& event);
   void OnSize(wxSizeEvent& event);
-  void SetFPS(int fps, int rps);
+  void SetFPS(int fps, int rps, uint width, uint height);
   void SetToolTips();
 
 private:
@@ -147,7 +149,7 @@ private:
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox, *m_gammaCheckBox;
   wxSlider *m_depthPeelingSlider, *m_gammaSlider;
-  wxBoxSizer *m_mainSizer;
+  wxBoxSizer *m_mainSizer, *m_leftSizer;
   
   /** \todo Supprimer la limite codée en dur du nombre max de luminaires,... */
   LuminaryMainPanel* m_luminaryPanels[NB_MAXLUMINARIES];

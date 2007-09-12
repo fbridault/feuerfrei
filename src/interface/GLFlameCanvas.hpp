@@ -148,7 +148,7 @@ private:
   /* true si la simulation est en cours, 0 sinon */
   bool m_run, m_saveImages;
   bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
-  bool m_drawShadowVolumes, m_glowOnly, m_gammaCorrection;
+  bool m_drawShadowVolumes, m_glowOnly, m_gammaCorrection, m_fullscreen;
   u_char m_displayFlamesBoundingVolumes;
   /** true si l'application est correctement initialisée, false sinon */
   bool m_init;

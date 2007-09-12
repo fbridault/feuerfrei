@@ -7,7 +7,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
   m_height = height;
   m_nbLayers = m_nbLayersMax = nbLayers;
   
-  m_fbo.Initialize(m_width,m_height);
+  m_fbo.Initialize();
   
   char _fp_peel[] = 
     "!!ARBfp1.0\n"
@@ -29,12 +29,7 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
   
   m_peelProgram.load(_fp_peel);
   m_colorTex = new Texture*[m_nbLayers+1];
-  for(uint i=0; i <= m_nbLayers; i++)
-    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_NEAREST, m_width, m_height);
-  m_depthTex[0] = new Texture(m_width, m_height, GL_GREATER, true);
-  m_depthTex[1] = new Texture(m_width, m_height, GL_GREATER, true);
-  m_depthTex[2] = new Texture(m_width, m_height, GL_ALWAYS, true);
-  m_sceneDepthTex = new Texture(m_width, m_height, GL_LESS, true);
+  generateTex();
   
   m_dpRendererShader.load("viewportSizedTex.fp", true);
   m_dpRendererProgram.attachShader(m_dpRendererShader);
@@ -45,15 +40,31 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
 
 DepthPeelingEngine::~DepthPeelingEngine()
 {
+  deleteTex();
+  delete [] m_colorTex;
+}
+
+void DepthPeelingEngine::deleteTex()
+{
   for(uint i=0; i <= m_nbLayers; i++)
     delete m_colorTex[i];
-  delete [] m_colorTex;
   delete m_depthTex[0];
   delete m_depthTex[1];
   delete m_depthTex[2];
   delete m_sceneDepthTex;
 }
-  
+
+void DepthPeelingEngine::generateTex()
+{
+  m_fbo.setSize(m_width, m_height);
+  for(uint i=0; i <= m_nbLayers; i++)
+    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_NEAREST, m_width, m_height);
+  m_depthTex[0] = new Texture(m_width, m_height, GL_GREATER, true);
+  m_depthTex[1] = new Texture(m_width, m_height, GL_GREATER, true);
+  m_depthTex[2] = new Texture(m_width, m_height, GL_ALWAYS, true);
+  m_sceneDepthTex = new Texture(m_width, m_height, GL_LESS, true);
+}
+
 void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene)
 {
   uint l;

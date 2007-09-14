@@ -130,6 +130,8 @@ public:
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
   void setGammaCorrection(float gamma) { m_gammaEngine->SetGamma(gamma); };
   void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
+  void computeGlowWeights(uint index, float sigma) { m_glowEngine->computeWeights(index, sigma); };
+
 #ifdef MULTITHREADS
   void DeleteThreads();
 #endif

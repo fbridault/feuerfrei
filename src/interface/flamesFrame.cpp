@@ -39,6 +39,8 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_CHECKBOX(IDCHK_DP, FlamesFrame::OnCheckDepthPeeling)
   EVT_CHECKBOX(IDCHK_SaveImages, FlamesFrame::OnCheckSaveImages)
   EVT_CHECKBOX(IDCHK_Gamma, FlamesFrame::OnCheckGamma)
+  EVT_COMMAND_SCROLL(IDSL_GLOW1, FlamesFrame::OnScrollGlow)
+  EVT_COMMAND_SCROLL(IDSL_GLOW2, FlamesFrame::OnScrollGlow)
   EVT_COMMAND_SCROLL(IDSL_DP, FlamesFrame::OnScrollDP)
   EVT_COMMAND_SCROLL(IDSL_Gamma, FlamesFrame::OnScrollGamma)
   EVT_CLOSE(FlamesFrame::OnClose)
@@ -76,6 +78,8 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Show PS"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
+  m_glow1Slider = new wxSlider(this,IDSL_GLOW1,30,0,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_glow2Slider = new wxSlider(this,IDSL_GLOW2,100,0,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
   m_depthPeelingSlider = new wxSlider(this,IDSL_DP,0,0,DEPTH_PEELING_LAYERS_MAX, wxDefaultPosition, 
 				      wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
@@ -112,7 +116,7 @@ void FlamesFrame::SetToolTips()
 void FlamesFrame::DoLayout()
 {
   wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;  
-  wxBoxSizer *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *globalTopSizer;
+  wxBoxSizer *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *multiBottomSizer, *globalTopSizer;
   
   /* Réglages globaux */
   globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -123,13 +127,19 @@ void FlamesFrame::DoLayout()
   globalSizer->Add(globalTopSizer, 0, 0, 0);
   globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
   
-  /* Réglages du glow */
+  /* Réglages du glow et du depth peeling */
   multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
   multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
-  multiTopSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
+  multiTopSizer->Add(m_glow1Slider, 1, wxEXPAND, 0);
+  multiTopSizer->Add(m_glow2Slider, 1, wxEXPAND, 0);
+  
+  multiBottomSizer = new wxBoxSizer(wxHORIZONTAL);
+  multiBottomSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
+  multiBottomSizer->Add(m_depthPeelingSlider, 1, wxEXPAND, 0);
+  
   multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
-  multiSizer->Add(multiTopSizer, 0, 0, 0);
-  multiSizer->Add(m_depthPeelingSlider, 0, wxEXPAND, 0);
+  multiSizer->Add(multiTopSizer, 0, wxEXPAND, 0);
+  multiSizer->Add(multiBottomSizer, 0, wxEXPAND, 0);
     
   /* Réglages de l'éclairage */
   lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -210,7 +220,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuDisplay->AppendCheckItem( IDM_BDS, _("&Bounding spheres"));
   
   m_menuSettings = new wxMenu;
-  m_menuSettings->Append( IDM_Settings, _("&Settings..."));
+  m_menuSettings->Append( IDM_Settings, _("&Simulation..."));
   m_menuSettings->Append( IDM_ShadowVolumesSettings, _("S&hadows..."));
   m_menuSettings->Append( IDM_Resolution, _("Screen &resolution..."));
   
@@ -374,6 +384,19 @@ void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
     m_depthPeelingSlider->Enable();
   else
     m_depthPeelingSlider->Disable();
+}
+
+void FlamesFrame::OnScrollGlow(wxScrollEvent& event)
+{  
+  switch (event.GetId())
+    {
+    case IDSL_GLOW1 : 
+      m_glBuffer->computeGlowWeights(0,event.GetPosition()/10.0);
+      break;
+    case IDSL_GLOW2 : 
+      m_glBuffer->computeGlowWeights(1,event.GetPosition()/10.0);
+      break;
+    }    
 }
 
 void FlamesFrame::OnScrollDP(wxScrollEvent& event)

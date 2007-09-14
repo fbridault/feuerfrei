@@ -5,8 +5,6 @@
 
 #include "../flames/solidePhoto.hpp"
 
-extern wxApp *thisApp;
-
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
   EVT_SIZE(GLFlameCanvas::OnSize)
   EVT_PAINT(GLFlameCanvas::OnPaint)
@@ -519,17 +517,17 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   }
   if(m_gammaCorrection)
     m_gammaEngine->enableGamma();
-  if(!m_glowOnly){
-    drawScene();
-    /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-    if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
-      if(m_currentConfig->depthPeelingEnabled)
-	m_depthPeelingEngine->render(this);
-      else
-	drawFlames();
-  }
+
+  drawScene();
+  /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
+  if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
+    if(m_currentConfig->depthPeelingEnabled)
+      m_depthPeelingEngine->render(this);
+    else
+      drawFlames();
+  
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
-    m_glowEngine->drawBlur(this);
+    m_glowEngine->drawBlur(this,m_glowOnly);
   if(m_gammaCorrection)
     m_gammaEngine->disableGamma();
   
@@ -660,9 +658,13 @@ void GLFlameCanvas::OnSize(wxSizeEvent& event)
     {
       SetCurrent();
       glViewport(0, 0, w, h);
+      /* Il faut indiquer à tous les moteurs de rendu post-process la nouvelle taille */
       m_glowEngine->setSize(m_width,m_height);
       m_depthPeelingEngine->setSize(m_width,m_height);
       m_gammaEngine->setSize(m_width,m_height);
+      /* Réallocation du tableau de pixels utilisé pour sauvegarder les images */
+      delete [] m_pixels;
+      m_pixels = new u_char[m_width*m_height*3];
     }
   Update();
 }

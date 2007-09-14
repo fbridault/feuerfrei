@@ -67,7 +67,7 @@ public:
   /** Effectue le blur en trois passes */
   void blur(GLFlameCanvas* const glBuffer);
   /** Plaque le blur à l'écran */
-  void drawBlur(GLFlameCanvas* const glBuffer);
+  void drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly=false);
   
   void computeWeights(uint index, float sigma);
   
@@ -92,7 +92,7 @@ private:
   /** Tableau contenant la largeur du filtre */
   GLfloat m_offsets[6][FILTER_SIZE];
   /** Tableau contenant les poids des pixels du filtre */
-  GLfloat m_weights[3][FILTER_SIZE];
+  GLfloat m_weights[2][FILTER_SIZE];
   /** Diviseur correspondant à la somme des poids */
   GLfloat m_divide[3];
   

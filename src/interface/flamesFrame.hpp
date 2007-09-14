@@ -28,6 +28,8 @@ enum
     IDCHK_DP,
     IDCHK_SaveImages,
     IDCHK_Gamma,
+    IDSL_GLOW1,
+    IDSL_GLOW2,
     IDSL_DP,
     IDSL_Gamma,
   };
@@ -123,7 +125,8 @@ public:
   void OnCheckSaveImages(wxCommandEvent& event);
   void OnCheckGamma(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
-  void OnSelectSolver(wxCommandEvent& event);
+  void OnSelectSolver(wxCommandEvent& event);  
+  void OnScrollGlow(wxScrollEvent& event);
   void OnScrollDP(wxScrollEvent& event);
   void OnScrollGamma(wxScrollEvent& event);
   void OnSize(wxSizeEvent& event);
@@ -148,7 +151,7 @@ private:
   wxCheckBox *m_blendedSolidCheckBox;
   wxCheckBox *m_shadowsEnabledCheckBox, *m_glowEnabledCheckBox;
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox, *m_gammaCheckBox;
-  wxSlider *m_depthPeelingSlider, *m_gammaSlider;
+  wxSlider *m_glow1Slider, *m_glow2Slider, *m_depthPeelingSlider, *m_gammaSlider;
   wxBoxSizer *m_mainSizer, *m_leftSizer;
   
   /** \todo Supprimer la limite codée en dur du nombre max de luminaires,... */

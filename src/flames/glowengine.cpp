@@ -17,7 +17,7 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
   m_blurRendererProgram.attachShader(m_blurRendererShader);
   m_blurRendererProgram.link();
 
-  computeWeights(0,2);
+  computeWeights(0,3);
   computeWeights(1,10);
   computeWeights(2,10);
   
@@ -34,7 +34,7 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
   /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++)
     m_offsets[0][j] = j-FILTER_SIZE/2+1;
-  /* Offsets gauches pour taille texture en entrée > taille texture en sortie */
+  /* Offsets centrés pour taille texture en entrée > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
     m_offsets[1][j] = (j-FILTER_SIZE/2+1)*(int)(m_scaleFactor[1]);
   }  
@@ -94,24 +94,36 @@ void GlowEngine::computeWeights(uint index, float sigma)
     m_divide[index] = 1/m_divide[index];
     break;
   case 1:
-    offset = FILTER_SIZE-1;
-    for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
-      m_weights[index][x+offset] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
-      m_divide[index] += m_weights[index][x+offset];
-//        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
+    offset = FILTER_SIZE/2;
+    for(int x=-offset+1 ; x<=offset-1 ; x++){
+      m_weights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
+      m_divide[index] += m_weights[index][x+offset-1];
+//       cerr << x << " " << x+offset << " " << m_weights[index][x+offset-1] << endl;
     }
-    m_divide[index] = 1/m_divide[index];
 //     cerr << m_divide[index] << endl;
-    break;
-  case 2:
-    for(int x=0 ; x< FILTER_SIZE; x++){
-      m_weights[index][x] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
-      m_divide[index] += m_weights[index][x];
-//        cerr << x << " " << m_weights[index][x] << endl;
-    }
     m_divide[index] = 1/m_divide[index];
-//     cerr << m_divide[index] << endl;
     break;
+//   case 2:
+//     /* Pour la partie gauche d'un filtre */
+//     offset = FILTER_SIZE-1;
+//     for(int x=-FILTER_SIZE+1 ; x<= 0; x++){
+//       m_weights[index][x+offset] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
+//       m_divide[index] += m_weights[index][x+offset];
+// //        cerr << x << " " << x+offset << " " << m_weights[index][x+offset] << endl;
+//     }
+//     m_divide[index] = 1/m_divide[index];
+// //     cerr << m_divide[index] << endl;
+//     break;
+//   case 3:
+//     /* Pour la partie droite d'un filtre */
+//       for(int x=0 ; x< FILTER_SIZE; x++){
+//       m_weights[index][x] = expf(-((x/10.0f)*(x/10.0f))/(sigma*sigma));
+//       m_divide[index] += m_weights[index][x];
+// //        cerr << x << " " << m_weights[index][x] << endl;
+//     }
+//     m_divide[index] = 1/m_divide[index];
+// //     cerr << m_divide[index] << endl;
+//     break;
   }
 }
 
@@ -155,8 +167,9 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
   /* Partie X du filtre */
+  /* Attention, il faut prendre les offsets correspondants à la texture à la résolution normale */
   m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
-  m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
   m_programX.setUniform1f("divide",m_divide[0]);
   m_programX.setUniform1f("scale",m_scaleFactor[1]);
   m_firstPassTex[0]->bind();
@@ -165,7 +178,7 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   /* Partie Y du filtre */
   m_programY.enable();
   m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
-  m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
   m_programY.setUniform1f("divide",m_divide[0]);
   m_programY.setUniform1f("scale",m_scaleFactor[0]);
   
@@ -186,7 +199,7 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   glDepthFunc (GL_LESS);
 }
 
-void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer)
+void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly)
 {
   glDepthFunc (GL_LEQUAL);
   glEnable (GL_BLEND);
@@ -197,7 +210,7 @@ void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer)
   m_blurRendererProgram.enable();
   m_blurRendererProgram.setUniform1i("text",0);
   
-  for(int i=0; i < GLOW_LEVELS; i++){
+  for(int i=glowOnly ? 1 : 0; i < GLOW_LEVELS; i++){
     m_blurRendererProgram.setUniform1f("scale",1/(float)m_scaleFactor[i]);
     m_firstPassTex[i]->bind();
     glBuffer->drawFlamesBoundingBoxes();

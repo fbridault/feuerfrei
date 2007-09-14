@@ -1,7 +1,8 @@
 #include "GSSolver2D.hpp"
 
-GSSolver2D::GSSolver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy) : 
-  Solver2D(position, n_x, n_y, dim, timeStep, buoyancy)
+GSSolver2D::GSSolver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, 
+			float buoyancy, float vorticityConfinement) : 
+  Solver2D(position, n_x, n_y, dim, timeStep, buoyancy, vorticityConfinement)
 {
 }
 
@@ -15,7 +16,7 @@ GSSolver2D::~GSSolver2D ()
 
 void GSSolver2D::GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps)
 {
-  uint i, j, k, l;
+  uint i, j, l;
   
   for (l = 0; l < nb_steps; l++){
     m_t=m_t1;

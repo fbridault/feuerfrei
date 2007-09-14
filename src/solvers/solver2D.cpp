@@ -7,7 +7,8 @@ Solver2D::Solver2D ()
 {
 }
 
-Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float timeStep, float buoyancy) : 
+Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float timeStep, float buoyancy, 
+		    float vorticityConfinement) : 
   Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
@@ -53,7 +54,8 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
 
   m_visc = 0.00000015f;
   m_diff = 0.01f;
-  
+  m_vorticityConfinement = vorticityConfinement;
+
   m_nbVoxelsXDivDimX = m_dimX * m_nbVoxelsX;
   m_nbVoxelsYDivDimY = m_dimY * m_nbVoxelsY;
 
@@ -129,6 +131,60 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
   
   //set_bnd (b, d);
 }
+
+// void Solver2D::addVorticityConfinement( float * const u, float *const  v)
+// {
+//   uint i,j;	
+//   float epsh =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon*h
+//   float x,y;
+//   float Nx,Ny;
+//   float invNormeN;
+  
+//   /** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v)
+//    */
+//   m_t = m_t1;
+//   for (j=1; j<=m_nbVoxelsY; j++) {
+//     for (i=1; i<=m_nbVoxelsX; i++) {
+//       // m_rotx = dm_w/dy - dm_v/dz
+//       x = m_rotx[m_t] = (w[m_t+m_nx] - w[m_t-m_nx]) * m_invhy -
+// 	(v[m_t+m_n2] - v[m_t-m_n2]) * m_invhz;
+//       // m_roty = dm_u/dz - dm_w/dx
+      
+//       y = m_roty[m_t] = (u[m_t+m_n2] - u[m_t-m_n2]) * m_invhz -
+// 	(w[m_t+1] - w[m_t-1]) * m_invhx;
+      
+//       // m_rot = |m_rot|
+//       m_rot[m_t] = sqrtf(x*x+y*y);
+//       m_t++;
+//     }//for i
+//     m_t+=2;
+//   }//for j
+
+//   /* Calcul du gradient normalisé du rotationnel m_rot
+//    * Calcul du produit vectoriel N^m_rot
+//    * Le vecteur est multiplié par epsilon*h
+//    * et est ajouté au champ de vélocité
+//    */
+//   m_t=m_t1;
+//   for (j=1; j<=m_nbVoxelsY; j++) {
+//     for (i=1; i<=m_nbVoxelsX; i++) {
+      
+//       Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
+//       Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
+      
+//       invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny)+0.000001f);
+      
+//       Nx *= invNormeN;
+//       Ny *= invNormeN;
+      
+//       u[m_t] +=(Ny*m_rotz[m_t]) * epsh;
+//       v[m_t] +=(Nx*m_rotz[m_t]) * epsh;
+//       m_t++;
+//       }//for i
+//     m_t+=2;
+//   }//for j
+
+// }//AddVorticityConfinement
 
 void Solver2D::dens_step()
 {

@@ -13,9 +13,6 @@ Camera::Camera (int width, int height, float clipping) :
 #endif
 m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
 {
-  float fH,fW;
-  float zNear=0.1f;
-  
   m_viewPort[0] = m_viewPort[1] = 0;
   m_viewPort[2] = width;
   m_viewPort[3] = height;
@@ -292,7 +289,6 @@ void Camera::getScreenCoordinates(const Point& objPos, Point& screenPos) const
 
 void Camera::getSphereCoordinates(const Point& objPos, float radius, Point& centerScreenPos, Point& periScreenPos ) const
 {
-  double pos[3];
   Point up, tmp;
   
   /* Pour obtenir un point à la périphérie, on traite le problème un peu comme celui des billboards. 

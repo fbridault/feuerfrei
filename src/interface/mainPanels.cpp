@@ -67,26 +67,26 @@ LuminaryMainPanel::LuminaryMainPanel(wxWindow* parent, int id, LuminaryConfig* c
   m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   
   m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 16, 0, 0);
   m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 18, 0, 0);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 16, 0, 0);
   m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 18, 0, 0);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 16, 0, 0);
   
   m_solversXAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);  
-  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMin, 1, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversXAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversXAxisPositionRangeSizer->Add(m_solverXAxisPositionSliderMax, 1, wxADJUST_MINSIZE|wxRIGHT, 5);
   
   m_solversYAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMin, 1, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversYAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversYAxisPositionRangeSizer->Add(m_solverYAxisPositionSliderMax, 1, wxADJUST_MINSIZE|wxRIGHT, 5);
   
   m_solversZAxisPositionRangeSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 0, wxADJUST_MINSIZE|wxLEFT, 15);
+  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMin, 1, wxADJUST_MINSIZE|wxLEFT, 15);
   m_solversZAxisPositionRangeSizer->AddStretchSpacer(1);
-  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 0, wxADJUST_MINSIZE|wxRIGHT, 5);
+  m_solversZAxisPositionRangeSizer->Add(m_solverZAxisPositionSliderMax, 1, wxADJUST_MINSIZE|wxRIGHT, 5);
   
   m_panelSizer = new wxBoxSizer(wxVERTICAL);
   
@@ -240,11 +240,11 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float
   m_solversZAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
   
   m_solversXAxisPositionSizer->Add(m_solverXAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 18, 0, 0);
+  m_solversXAxisPositionSizer->Add(m_solverXAxisPositionSlider, 16, 0, 0);
   m_solversYAxisPositionSizer->Add(m_solverYAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 18, 0, 0);
+  m_solversYAxisPositionSizer->Add(m_solverYAxisPositionSlider, 16, 0, 0);
   m_solversZAxisPositionSizer->Add(m_solverZAxisPositionLabel, 1, wxLEFT, 4);
-  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 18, 0, 0);
+  m_solversZAxisPositionSizer->Add(m_solverZAxisPositionSlider, 16, 0, 0);
   
   m_forcesSizer = new wxBoxSizer(wxHORIZONTAL);
   m_forcesSizer->Add(m_buoyancyLabel, 1, wxTOP|wxLEFT, 4);

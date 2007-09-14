@@ -10,7 +10,8 @@ GammaEngine::GammaEngine(uint width, uint height, bool recompile)
   m_width = width;
   m_height = height;
   
-  m_fbo.Initialize(width, height);
+  m_fbo.Initialize();
+  m_fbo.setSize(width, height);
   m_renderTex = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_NEAREST, width, height);
   m_fbo.Activate();
   m_fbo.ColorAttach(m_renderTex->getTexture(), 0);

@@ -73,6 +73,9 @@ public:
   DepthPeelingEngine(uint width, uint height, uint nbLayers);
   virtual ~DepthPeelingEngine();
   
+  void deleteTex();
+  void generateTex();
+  
   /** Epluche les flammes en fonction de leur profondeur en plusieurs calques. Une fois cette méthode appelée,
    * il faut utiliser la méthode render() pour afficher les flammes.<br>
    * @param flames Vecteur contenant les flammes.
@@ -92,6 +95,13 @@ public:
    * la fonction est appelée par le slider de l'interface qui est borné
    */
   void setNbLayers(uint value) { m_nbLayers=value; };
+  
+  void setSize(uint width, uint height)
+  { 
+    m_width = width; m_height=height; 
+    deleteTex();
+    generateTex();
+  }
   
 private: 
   /** Dimensions de la texture */

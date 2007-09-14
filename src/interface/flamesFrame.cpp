@@ -31,6 +31,7 @@ BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
   EVT_MENU(IDM_Wired, FlamesFrame::OnWiredMenu)
   EVT_MENU(IDM_Shaded, FlamesFrame::OnShadedMenu)
   EVT_MENU(IDM_Settings, FlamesFrame::OnSettingsMenu)
+  EVT_MENU(IDM_Resolution, FlamesFrame::OnResolutionMenu)
   EVT_MENU(IDM_ShadowVolumesSettings, FlamesFrame::OnShadowVolumesSettingsMenu)
   EVT_CHECKBOX(IDCHK_BS, FlamesFrame::OnCheckBS)
   EVT_CHECKBOX(IDCHK_Shadows, FlamesFrame::OnCheckShadows)
@@ -63,7 +64,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   // événement ID_Bt_Click, en consultant, la table des événements
   // on en déduit que c'est la fonction OnClickButton qui sera 
   // appelée lors d'un click sur ce bouton
-  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER);
+  m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(320,240), attributelist, wxSUNKEN_BORDER);
   m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
   
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
@@ -111,7 +112,7 @@ void FlamesFrame::SetToolTips()
 void FlamesFrame::DoLayout()
 {
   wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;  
-  wxBoxSizer *leftSizer, *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *globalTopSizer;
+  wxBoxSizer *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *globalTopSizer;
   
   /* Réglages globaux */
   globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -151,27 +152,27 @@ void FlamesFrame::DoLayout()
   bottomSizer->Add(gammaSizer, 1, wxEXPAND, 0);
   
   luminariesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Luminaries settings"));
-  luminariesSizer->Add(m_luminariesNotebook, 1, wxEXPAND, 0);
+  luminariesSizer->Add(m_luminariesNotebook);
   
   solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
-  solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
+  solversSizer->Add(m_solversNotebook);
 
   flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
-  flamesSizer->Add(m_flamesNotebook, 1, wxEXPAND, 0);
+  flamesSizer->Add(m_flamesNotebook);
   
   /* Placement des sizers principaux */
   rightSizer = new wxBoxSizer(wxVERTICAL);
-  rightSizer->Add(luminariesSizer, 0, wxEXPAND, 0);
-  rightSizer->Add(solversSizer, 0, wxEXPAND, 0);
-  rightSizer->Add(flamesSizer, 0, wxEXPAND, 0);  
+  rightSizer->Add(luminariesSizer);
+  rightSizer->Add(solversSizer);
+  rightSizer->Add(flamesSizer);  
   
-  leftSizer = new wxBoxSizer(wxVERTICAL);
-  leftSizer->Add(m_glBuffer, 0, 0, 0);
-  leftSizer->Add(bottomSizer, 1, 0, 0);
-
+  m_leftSizer = new wxBoxSizer(wxVERTICAL);
+  m_leftSizer->Add(m_glBuffer, 1, wxEXPAND, 0);
+  m_leftSizer->Add(bottomSizer, 0, 0, 0);
+  
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
-  m_mainSizer->Add(leftSizer, 0, 0, 0);
-  m_mainSizer->Add(rightSizer, 1, 0, 0);
+  m_mainSizer->Add(m_leftSizer, 1, wxEXPAND, 0);
+  m_mainSizer->Add(rightSizer, 0, 0, 0);
   
   SetSizerAndFit(m_mainSizer);
 }
@@ -211,6 +212,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_Settings, _("&Settings..."));
   m_menuSettings->Append( IDM_ShadowVolumesSettings, _("S&hadows..."));
+  m_menuSettings->Append( IDM_Resolution, _("Screen &resolution..."));
   
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
@@ -229,13 +231,14 @@ void FlamesFrame::OnSize(wxSizeEvent& event)
 
 void FlamesFrame::InitGLBuffer()
 {
-  m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
   m_glBuffer->Init(&m_currentConfig);
   m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
+  cerr << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
+  m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
   
   m_mainSizer->Fit(this);
   m_mainSizer->SetSizeHints(this);
-  Layout();
+  Layout();  
 }
 
 void FlamesFrame::InitLuminariesPanels()
@@ -864,10 +867,31 @@ void FlamesFrame::OnSettingsMenu(wxCommandEvent& event)
   m_glBuffer->setRunningState(true);
 }
 
-void FlamesFrame::SetFPS(int fps, int rps)
+void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
+{
+  wxString choices[] = {_("800x600"),_("960x720"),_("1024x768"),_("1152x864"),_("1280x1024")};
+  wxString res;
+  res = ::wxGetSingleChoice(_("Choose OpenGL window resolution"), _("Resolution"), 5, choices);
+  
+  if(!res.IsEmpty())
+    {
+      long unsigned int w,h;
+      res.BeforeFirst('x').ToULong(&w);
+      res.AfterLast('x').ToULong(&h);
+      m_currentConfig.width = (uint)w; m_currentConfig.height = (uint)h;
+      cerr << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
+      m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
+      
+      m_mainSizer->Fit(this);
+      m_mainSizer->SetSizeHints(this);
+      Layout();
+    }
+}
+
+void FlamesFrame::SetFPS(int fps, int rps, uint width, uint height)
 {
   wxString s;
-  s += wxString::Format(_("%d FPS %d RPS"), fps, rps);
+  s += wxString::Format(_("%d FPS %d RPS | %dx%d"), fps, rps, width, height);
   
   SetStatusText(s);
 }

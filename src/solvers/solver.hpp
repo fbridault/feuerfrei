@@ -55,6 +55,15 @@ protected:
   uint m_nbSteps;
   
   uint m_t, m_nx, m_t1,m_debut,m_nbgrps,m_dernier;
+  
+  /** Demi-Pas du solveur en X. */
+  float m_hx;
+  /** son inverse */
+  float m_invhx;
+  /** Demi-Pas du solveur en Y. */
+  float m_hy;
+  /** son inverse */
+  float m_invhy;
 };
 
 #endif

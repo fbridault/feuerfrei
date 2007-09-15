@@ -33,6 +33,8 @@ public:
   /** Destructeur */
   virtual ~Solver2D ();
   
+  void addVorticityConfinement(float * const u, float *const  v);
+  
   /** Lance une itération du solveur. */
   virtual void iterate ();
 
@@ -246,6 +248,7 @@ protected:
   
   float *m_u, *m_v, *m_uPrev, *m_vPrev, *m_uSrc, *m_vSrc;
   float *m_dens, *m_densPrev, *m_densSrc;
+  float *m_rot;
 };
 
 #endif

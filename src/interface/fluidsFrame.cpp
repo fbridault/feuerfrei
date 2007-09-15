@@ -161,6 +161,8 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
       m_currentConfig.solvers[i].timeStep = (float)tmp;
       m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
       m_currentConfig.solvers[i].buoyancy = (float)tmp;
+      m_config->Read(groupName + _("Vorticity"), &tmp, 0.02);
+      m_currentConfig.solvers[i].vorticityConfinement = (float)tmp;
       
       m_config->Read(groupName + _("omegaDiff"),&tmp,1.5);
       m_currentConfig.solvers[i].omegaDiff = (float)tmp;
@@ -307,6 +309,7 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
       
       m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);      
       m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
+      m_config->Write(groupName + _("Vorticity"), m_currentConfig.solvers[i].vorticityConfinement);
       
       m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
       m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);

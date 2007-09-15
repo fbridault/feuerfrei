@@ -34,6 +34,7 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_uSrc = new float[m_nbVoxels];
   m_vSrc = new float[m_nbVoxels];
   m_densSrc = new float[m_nbVoxels];
+  m_rot      = new float[m_nbVoxels];
   
   fill_n(m_u, m_nbVoxels, 0.0f);
   fill_n(m_v, m_nbVoxels, 0.0f);
@@ -55,6 +56,12 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_visc = 0.00000015f;
   m_diff = 0.01f;
   m_vorticityConfinement = vorticityConfinement;
+
+  m_hx= 0.5f/n_x;
+  m_hy= 0.5f/n_y;
+
+  m_invhx= 0.5f*n_x;
+  m_invhy= 0.5f*n_y;
 
   m_nbVoxelsXDivDimX = m_dimX * m_nbVoxelsX;
   m_nbVoxelsYDivDimY = m_dimY * m_nbVoxelsY;
@@ -81,6 +88,8 @@ Solver2D::~Solver2D ()
   delete[]m_uSrc;
   delete[]m_vSrc;
   delete[]m_densSrc;
+  
+  delete[]m_rot;
 }
 
 void Solver2D::set_bnd (unsigned char b, float *const x)
@@ -132,59 +141,56 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
   //set_bnd (b, d);
 }
 
-// void Solver2D::addVorticityConfinement( float * const u, float *const  v)
-// {
-//   uint i,j;	
-//   float epsh =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon*h
-//   float x,y;
-//   float Nx,Ny;
-//   float invNormeN;
+void Solver2D::addVorticityConfinement(float * const u, float *const  v)
+{
+  uint i,j;	
+  float epsh =m_dt*m_forceCoef*m_vorticityConfinement*5;//epsilon*h
+  float x,y;
+  float Nx,Ny;
+  float invNormeN;
   
-//   /** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v)
-//    */
-//   m_t = m_t1;
-//   for (j=1; j<=m_nbVoxelsY; j++) {
-//     for (i=1; i<=m_nbVoxelsX; i++) {
-//       // m_rotx = dm_w/dy - dm_v/dz
-//       x = m_rotx[m_t] = (w[m_t+m_nx] - w[m_t-m_nx]) * m_invhy -
-// 	(v[m_t+m_n2] - v[m_t-m_n2]) * m_invhz;
-//       // m_roty = dm_u/dz - dm_w/dx
-      
-//       y = m_roty[m_t] = (u[m_t+m_n2] - u[m_t-m_n2]) * m_invhz -
-// 	(w[m_t+1] - w[m_t-1]) * m_invhx;
-      
-//       // m_rot = |m_rot|
-//       m_rot[m_t] = sqrtf(x*x+y*y);
-//       m_t++;
-//     }//for i
-//     m_t+=2;
-//   }//for j
+  /** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v)
+   */
+  m_t = m_t1;
+  for (j=1; j<=m_nbVoxelsY; j++) {
+    for (i=1; i<=m_nbVoxelsX; i++) {
+      // En 2D le rotationnel est un scalaire = dm_y/dx - dm_x/dy
+      x = m_rot[m_t] = (v[m_t+1] - v[m_t-1]) * m_invhx - (u[m_t+m_nx] - u[m_t-m_nx]) * m_invhy;
+      // m_rot = |m_rot|
+      // La normalisation n'a pas de sens ici
+//    m_rot[m_t] = sqrtf(x*x+y*y);
 
-//   /* Calcul du gradient normalisé du rotationnel m_rot
-//    * Calcul du produit vectoriel N^m_rot
-//    * Le vecteur est multiplié par epsilon*h
-//    * et est ajouté au champ de vélocité
-//    */
-//   m_t=m_t1;
-//   for (j=1; j<=m_nbVoxelsY; j++) {
-//     for (i=1; i<=m_nbVoxelsX; i++) {
-      
-//       Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
-//       Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
-      
-//       invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny)+0.000001f);
-      
-//       Nx *= invNormeN;
-//       Ny *= invNormeN;
-      
-//       u[m_t] +=(Ny*m_rotz[m_t]) * epsh;
-//       v[m_t] +=(Nx*m_rotz[m_t]) * epsh;
-//       m_t++;
-//       }//for i
-//     m_t+=2;
-//   }//for j
+      m_t++;
+    }//for i
+    m_t+=2;
+  }//for j
 
-// }//AddVorticityConfinement
+  /* Calcul du gradient normalisé du rotationnel m_rot
+   * Calcul du produit vectoriel N^m_rot
+   * Le vecteur est multiplié par epsilon*h
+   * et est ajouté au champ de vélocité
+   */
+  m_t=m_t1;
+  for (j=1; j<=m_nbVoxelsY; j++) {
+    for (i=1; i<=m_nbVoxelsX; i++) {
+      
+      Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
+      Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
+      
+      invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny)+0.000001f);
+      
+      Nx *= invNormeN;
+      Ny *= invNormeN;
+      
+      // Le rotationnel d'un champ scalaire N^m_rot est un vecteur 2D = (dmrot/dy,-dmrot/dx)
+      u[m_t] +=(Ny*m_rot[m_t]) * epsh;
+      v[m_t] +=(-Nx*m_rot[m_t]) * epsh;
+      m_t++;
+      }//for i
+    m_t+=2;
+  }//for j
+
+}//AddVorticityConfinement
 
 void Solver2D::dens_step()
 {
@@ -197,6 +203,7 @@ void Solver2D::vel_step ()
 {
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
+  addVorticityConfinement(m_u,m_v);
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);

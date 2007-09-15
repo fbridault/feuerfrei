@@ -173,20 +173,7 @@ protected:
   uint m_nbVoxelsY;
   /** Nombre de voxels en Z sur un côté du cube. */
   uint m_nbVoxelsZ;
-
-  /** Demi-Pas du solveur en X. */
-  float m_hx;
-  /** son inverse */
-  float m_invhx;
-  /** Demi-Pas du solveur en Y. */
-  float m_hy;
-  /** son inverse */
-  float m_invhy;
-  /** Demi-Pas du solveur en Z. */
-  float m_hz;
-  /** son inverse */
-  float m_invhz;
-
+  
   /** Dimensions du solveur */
   Point m_dim;
   /** Facteur d'échelle du solveur */

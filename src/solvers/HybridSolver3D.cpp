@@ -122,6 +122,14 @@ void LODHybridSolver3D::divideRes ()
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
+
+  m_hx= 0.5f/m_nbVoxelsX;
+  m_hy= 0.5f/m_nbVoxelsY;
+  m_hz= 0.5f/m_nbVoxelsZ;
+
+  m_invhx= 0.5f*m_nbVoxelsX;
+  m_invhy= 0.5f*m_nbVoxelsY;
+  m_invhz= 0.5f*m_nbVoxelsZ;
 }
 
 void LODHybridSolver3D::decreaseRes ()
@@ -155,6 +163,14 @@ void LODHybridSolver3D::decreaseRes ()
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
 
+  m_hx= 0.5f/m_nbVoxelsX;
+  m_hy= 0.5f/m_nbVoxelsY;
+  m_hz= 0.5f/m_nbVoxelsZ;
+
+  m_invhx= 0.5f*m_nbVoxelsX;
+  m_invhy= 0.5f*m_nbVoxelsY;
+  m_invhz= 0.5f*m_nbVoxelsZ;
+  
   cerr << "Voxels en X : " << m_nbVoxelsX << endl;
 }
 
@@ -196,6 +212,14 @@ void LODHybridSolver3D::multiplyRes ()
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
+
+  m_hx= 0.5f/m_nbVoxelsX;
+  m_hy= 0.5f/m_nbVoxelsY;
+  m_hz= 0.5f/m_nbVoxelsZ;
+
+  m_invhx= 0.5f*m_nbVoxelsX;
+  m_invhy= 0.5f*m_nbVoxelsY;
+  m_invhz= 0.5f*m_nbVoxelsZ;
 }
 
 void LODHybridSolver3D::increaseRes ()
@@ -228,6 +252,15 @@ void LODHybridSolver3D::increaseRes ()
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx +1;
   m_t2nx = 2*m_nx;
+  
+  m_hx= 0.5f/m_nbVoxelsX;
+  m_hy= 0.5f/m_nbVoxelsY;
+  m_hz= 0.5f/m_nbVoxelsZ;
+
+  m_invhx= 0.5f*m_nbVoxelsX;
+  m_invhy= 0.5f*m_nbVoxelsY;
+  m_invhz= 0.5f*m_nbVoxelsZ;
+  
   cerr << "Voxels en X : " << m_nbVoxelsX << endl;
 }
 

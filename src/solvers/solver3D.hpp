@@ -93,6 +93,11 @@ protected:
   float *m_rotx, *m_roty, *m_rotz, *m_rot;
   
   uint m_n2, m_t2nx;
+  
+  /** Demi-Pas du solveur en Z. */
+  float m_hz;
+  /** son inverse */
+  float m_invhz;
 };
 
 #endif

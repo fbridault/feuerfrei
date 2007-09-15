@@ -33,6 +33,14 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_diff = 0.001f;
   m_vorticityConfinement = vorticityConfinement;
   
+  m_hx= 0.5f/n_x;
+  m_hy= 0.5f/n_y;
+  m_hz= 0.5f/n_z;
+
+  m_invhx= 0.5f*n_x;
+  m_invhy= 0.5f*n_y;
+  m_invhz= 0.5f*n_z;
+  
   // Utilisé pour la densité
   // m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;

@@ -197,6 +197,8 @@ private:
   bool m_move;
   /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
   float m_mouseSensitivity;
+  /** Viewport */
+  int m_viewPort[4];
 #ifdef RTFLAMES_BUILD
   /** Plans du frustrum */
   float m_frustum[6][4];
@@ -204,8 +206,6 @@ private:
   double m_projMatrix[16];
   /** Matrice de transformation */
   double m_modlMatrix[16];
-  /** Viewport */
-  int m_viewPort[4];
   Scene *m_scene;
 #endif
 };

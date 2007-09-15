@@ -82,7 +82,9 @@ void GLFluidsCanvas::InitGL()
   glPolygonMode(GL_FRONT,GL_FILL);
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 }
-
+#define ARGS2D m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,\
+    m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].dim, \
+    m_currentConfig->solvers[i].timeStep, m_currentConfig->solvers[i].buoyancy
 #define ARGS m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].resx,\
     m_currentConfig->solvers[i].resy, m_currentConfig->solvers[i].resz, \
     m_currentConfig->solvers[i].dim, m_currentConfig->solvers[i].scale,	\
@@ -122,7 +124,7 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new LogResAvgTimeSolver3D(ARGS_LOG);
       break;
     case GS_SOLVER2D :
-      m_solvers[i] = new GSSolver2D(ARGS);
+      m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);
       break;
     case SIMPLE_FIELD :
       m_solvers[i] = new RealField3D(ARGS);

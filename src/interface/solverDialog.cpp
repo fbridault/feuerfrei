@@ -20,11 +20,11 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
     m_scaleXTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
     m_scaleYTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
     m_scaleZTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
-    m_resYTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
-    m_resZTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
+    m_resYTextCtrl = new LongTextCtrl(this, -1, 0, 200, _("15"));
+    m_resZTextCtrl = new LongTextCtrl(this, -1, 0, 200, _("15"));
   }
   m_resLabel = new wxStaticText(this, -1, _("Resolution"));
-  m_resXTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
+  m_resXTextCtrl = new LongTextCtrl(this, -1, 0, 200, _("15"));
   m_timeStepLabel = new wxStaticText(this, -1, _("Time step"));
   m_timeStepTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("0.4"));
 
@@ -389,10 +389,13 @@ void SolverDialog::OnOK(wxCommandEvent& event)
 	return;
       }else
 	/* On recopie l'ancienne buoyancy si elle existe */
-	if(m_currentConfig->nbSolvers > i)
+	if(m_currentConfig->nbSolvers > i){
 	  newConfig[i].buoyancy = m_currentConfig->solvers[i].buoyancy;
-	else
+	  newConfig[i].vorticityConfinement = m_currentConfig->solvers[i].vorticityConfinement;
+	}else{
 	  newConfig[i].buoyancy = .2;
+	  newConfig[i].vorticityConfinement = .1;
+	}
     }
   
   delete [] m_currentConfig->solvers;

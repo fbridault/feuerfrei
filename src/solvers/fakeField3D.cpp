@@ -10,6 +10,7 @@ FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
   m_forceCoef = 3.0f;
   m_coef = m_dt * m_dt * m_forceCoef;
   buildDLGrid();
+  m_buoyancy = 20*buoyancy;
 }
 
 FakeField3D::~FakeField3D ()

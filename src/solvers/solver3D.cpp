@@ -29,7 +29,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   fill_n(m_densPrev, m_nbVoxels, 0.0f);
   fill_n(m_densSrc, m_nbVoxels, 0.0f);
   
-  m_visc = 0.00000015f;
+  m_visc = 0.000022f;
   m_diff = 0.001f;
   m_vorticityConfinement = vorticityConfinement;
   
@@ -63,8 +63,8 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   // m_nbgrps = q2 - q1 + 1 est le nombre cherché
   m_nbgrps= (m_dernier-m_t1)/4+1;
   
-//   m_forceCoef = 1;
-//   m_forceRatio = 1;
+//   m_forceCoef = 10;
+//   m_forceRatio = 1/m_forceCoef;
 }
 
 Solver3D::~Solver3D ()
@@ -181,7 +181,7 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w)
 {
   uint i,j,k;	
-  float epsh =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon*h
+  float eps =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon
   float x,y,z;
   float Nx,Ny,Nz;
   float invNormeN;
@@ -232,9 +232,9 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 	Ny *= invNormeN;
 	Nz *= invNormeN;
 
-	u[m_t] +=(Ny*m_rotz[m_t] - Nz*m_roty[m_t]) * epsh;
-	v[m_t] +=(Nz*m_rotx[m_t] - Nx*m_rotz[m_t]) * epsh;
-	w[m_t] +=(Nx*m_roty[m_t] - Ny*m_rotx[m_t]) * epsh;
+	u[m_t] +=(Ny*m_rotz[m_t] - Nz*m_roty[m_t]) * eps * m_hx * 2.0f;
+	v[m_t] +=(Nz*m_rotx[m_t] - Nx*m_rotz[m_t]) * eps * m_hy * 2.0f;
+	w[m_t] +=(Nx*m_roty[m_t] - Ny*m_rotx[m_t]) * eps * m_hz * 2.0f;
 	m_t++;
       }//for i
       m_t+=2;
@@ -278,11 +278,14 @@ void Solver3D::iterate ()
   //     for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
   //       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0f;
 
+  // On normalise !!!
+  float invy = 1/(float)m_nbVoxelsY;
+  
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
       for (uint i = 1; i <= m_nbVoxelsX; i++){
-	m_vSrc[m_t] += m_buoyancy / (float) (m_nbVoxelsY-j+1);
+	m_vSrc[m_t] += m_buoyancy / (float) ((j+1)*invy);
 	m_t++;
       }//for i
       m_t+=2;
@@ -320,17 +323,17 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   //  float factor = m_dim.y/(m_nbVoxelsY - 1);
   if(move){
     force = position;
-    strength.x = strength.y = strength.z = .2f;
+    strength.x = strength.y = strength.z = .1f * m_forceCoef;
     setPosition(m_position + position);
   }else{
     force = position;
-    strength = position * .1f;
+    strength = position * .05f * m_forceCoef;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
     strength.z = fabs(strength.z);  
   }
   
-  findPointPosition(m_dim-Point(.5f,.5f,.5f),widthx,widthy,widthz);
+  findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
   findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
   
   /* Ajouter des forces externes */

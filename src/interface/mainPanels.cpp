@@ -207,6 +207,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   SLIDER_SENSIBILITY=100.0f;
+  BUOYANCY_SENSIBILITY=10000.0f;
   FORCE_SENSIBILITY=100.0f;
   SLIDER_RANGE=500;
   
@@ -227,12 +228,11 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float
   m_buoyancySlider = new wxSlider(this,IDSL_SF,0,(int)(-SLIDER_RANGE/10.0f),(int)(2*SLIDER_RANGE/10.0f), wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_vorticityLabel = new wxStaticText(this,-1,_("Vorticity"));
-  m_vorticitySlider = new wxSlider(this,IDSL_VC,0,(int)(-200),(int)(200), wxDefaultPosition, 
-				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_vorticitySlider = new wxSlider(this,IDSL_VC,0,0,400, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
 
   
-  m_buoyancySlider->SetValue((int)(buoyancy*FORCE_SENSIBILITY));
-  m_vorticitySlider->SetValue((int)(vorticity*FORCE_SENSIBILITY*10.0f));
+  m_buoyancySlider->SetValue((int)(buoyancy*BUOYANCY_SENSIBILITY));
+  m_vorticitySlider->SetValue((int)(vorticity*FORCE_SENSIBILITY));
   
   /* Réglages des solveurs */  
   m_solversXAxisPositionSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -283,7 +283,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 {
   if(event.GetId() == IDSL_SF)
     {
-      float value = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
+      float value = m_buoyancySlider->GetValue()/BUOYANCY_SENSIBILITY;
       
 #ifdef RTFLUIDS_BUILD
       m_glBuffer->setBuoyancy(m_index, value);
@@ -294,7 +294,7 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
   else
     if(event.GetId() == IDSL_VC)
     {
-      float value = m_vorticitySlider->GetValue()/(FORCE_SENSIBILITY*10.0f);
+      float value = m_vorticitySlider->GetValue()/FORCE_SENSIBILITY;
       
 #ifdef RTFLUIDS_BUILD
       m_glBuffer->setVorticity(m_index, value);
@@ -314,8 +314,8 @@ void SolverMainPanel::OnScrollPosition(wxScrollEvent& event)
 
 void SolverMainPanel::getCtrlValues(SolverConfig& solverConfig)
 {
-  solverConfig.buoyancy = m_buoyancySlider->GetValue()/FORCE_SENSIBILITY;
-  solverConfig.vorticityConfinement = m_vorticitySlider->GetValue()/(FORCE_SENSIBILITY*10.0f);
+  solverConfig.buoyancy = m_buoyancySlider->GetValue()/BUOYANCY_SENSIBILITY;
+  solverConfig.vorticityConfinement = m_vorticitySlider->GetValue()/FORCE_SENSIBILITY;
 }
 
 #ifdef RTFLUIDS_BUILD

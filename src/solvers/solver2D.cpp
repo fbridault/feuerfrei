@@ -46,20 +46,21 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   fill_n(m_densPrev, m_nbVoxels, 0.0f);
   fill_n(m_densSrc, m_nbVoxels, 0.0f);
     
+  m_visc = 0.000022f;
+  m_diff = 0.001f;
+  
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY;
-    
+  
   /* Construction des display lists */
   buildDLBase ();
   buildDLGrid ();
 
-  m_visc = 0.00000015f;
-  m_diff = 0.01f;
   m_vorticityConfinement = vorticityConfinement;
 
   m_hx= 0.5f/n_x;
   m_hy= 0.5f/n_y;
-
+  
   m_invhx= 0.5f*n_x;
   m_invhy= 0.5f*n_y;
 
@@ -71,7 +72,7 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_nx = m_nbVoxelsX+2;
   m_t1= m_nx +1;
   
-  m_forceCoef = .01f;
+  m_forceCoef = 2.0f;
   m_forceRatio = 1/m_forceCoef;
 }
 
@@ -99,15 +100,14 @@ void Solver2D::set_bnd (unsigned char b, float *const x)
   /* Attention cela ne prend pas en compte les coins et les arêtes entre les coins */
   for (i = 1; i <= m_nbVoxelsY; i++)
     {
-      x[IX (0, i)] = 0.0f;	//x[IX(i,j,1)];
-      x[IX (m_nbVoxelsX + 1, i)] = 0.0f;	//x[IX(i,j,N)];
+      x[IX (0, i)] = x[IX(1, i)];
+      x[IX (m_nbVoxelsX + 1, i)] = x[IX(m_nbVoxelsX, i)];
     }
   
   for (i = 1; i <= m_nbVoxelsX; i++)
     {
-      x[IX (i, 0)] = 0.0f;	//x[IX(i, 1, j)];
-      //x[IX(i, N+1, j)] = 0;//x[IX(i,N,j)];
-      x[IX (i, m_nbVoxelsY + 1)] = 0.0f;//-- x[IX (i, m_nbVoxelsY, j)];
+      x[IX (i, 0)] = x[IX(i, 1)];
+      x[IX (i, m_nbVoxelsY + 1)] = x[IX (i, m_nbVoxelsY)];
     } 
 }
 
@@ -138,13 +138,13 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
 	d[IX(i,j)] = s0*(t0*d0[IX(i0,j0)]+t1*d0[IX(i0,j1)]) + s1*(t0*d0[IX(i1,j0)]+t1*d0[IX(i1,j1)]);
       }
   
-  //set_bnd (b, d);
+  //  set_bnd (b, d);
 }
 
 void Solver2D::addVorticityConfinement(float * const u, float *const  v)
 {
   uint i,j;	
-  float epsh =m_dt*m_forceCoef*m_vorticityConfinement*5;//epsilon*h
+  float eps =m_dt*m_forceCoef*m_vorticityConfinement*10.0f;//epsilon
   float x,y;
   float Nx,Ny;
   float invNormeN;
@@ -183,8 +183,8 @@ void Solver2D::addVorticityConfinement(float * const u, float *const  v)
       Ny *= invNormeN;
       
       // Le rotationnel d'un champ scalaire N^m_rot est un vecteur 2D = (dmrot/dy,-dmrot/dx)
-      u[m_t] +=(Ny*m_rot[m_t]) * epsh;
-      v[m_t] +=(-Nx*m_rot[m_t]) * epsh;
+      u[m_t] +=(Ny*m_rot[m_t]) * eps * m_hx * 2.0f;
+      v[m_t] +=(-Nx*m_rot[m_t]) * eps * m_hy * 2.0f;
       m_t++;
       }//for i
     m_t+=2;
@@ -229,10 +229,7 @@ void Solver2D::iterate ()
   vel_step ();
   dens_step();
   
-  m_nbIter++;  
-//   set_bnd (0, m_u);
-//   set_bnd (0, m_v);
-//   set_bnd (0, m_w);
+  m_nbIter++;
   cleanSources ();  
 }
 
@@ -328,7 +325,7 @@ void Solver2D::displayDensityField (void)
 void Solver2D::displayArrow (const Vector& direction)
 {
   float norme_vel = sqrt (direction.x * direction.x + direction.y * direction.z);
-  float taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .05f;
+  float taille = m_dimX * m_dimY * norme_vel * m_forceRatio * .01f;
   float angle;
   Vector ref, dir(direction);
   
@@ -363,11 +360,11 @@ void Solver2D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = .005f*m_nbVoxelsX;
+    strength.x = strength.y = .2f*m_nbVoxelsX;
     m_position=position;
   }else{
     force = position;
-    strength = position * .001f * m_nbVoxelsX;
+    strength = position * .1f * m_nbVoxelsX;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
   }
@@ -398,9 +395,9 @@ void Solver2D::addExternalForces(const Point& position, bool move)
 void Solver2D::addDensity(int id)
 {
   switch(id){
-  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.001f); break;
-  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.001f); break;
-  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.001f); break;
-  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.001f); break;
+  case 1 : addDensSrc(1,m_nbVoxelsY/2, 1.0f); break;
+  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 1.0f); break;
+  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 1.0f); break;
+  case 4 : addDensSrc(m_nbVoxelsX/2,1, 1.0f); break;
   }
 }

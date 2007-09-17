@@ -23,7 +23,7 @@ void GSSolver2D::GS_solve(unsigned char b, float *const x, const float *const x0
     for (j = 1; j <= m_nbVoxelsY; j++){
       for (i = 1; i <= m_nbVoxelsX; i++){
 	x[m_t] = ( x0[m_t] + a * (x[m_t-1] + x[m_t+1] + x[m_t-m_nx] + x[m_t+m_nx]) ) * div;
-	//set_bnd (b, x);
+	//	set_bnd (b, x);
 	m_t++;
       }//for i
       m_t+=2;
@@ -68,7 +68,6 @@ void GSSolver2D::project (float *const p, float *const div)
     m_t+=2;
   }//for j
   
-  //set_bnd (1, u);
-  //set_bnd (2, v);
-  //set_bnd (3, w);
+  //  set_bnd (1, m_u);
+  //  set_bnd (2, m_v);
 }//project

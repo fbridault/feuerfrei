@@ -45,6 +45,8 @@ void LeadSkeleton::drawRoot () const
 void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 { 
   m_selfVelocity = 0.0f;
+  
+  /* Applications des FDF */
   switch(fdf){
   case FDF_LINEAR :
     m_lastAppliedForce = innerForce * (m_u + 1.0f);
@@ -53,10 +55,10 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
     m_lastAppliedForce = innerForce * m_u * m_u;
     break;
   case FDF_EXPONENTIAL :
-    m_lastAppliedForce = .1f * exp(innerForce * 14.0f * m_u);
+    m_lastAppliedForce = .1f * innerForce * 10 * exp(m_u);
     break;
   case FDF_GAUSS:
-    m_lastAppliedForce = innerForce*exp(innerForce * 30.0f -m_u * m_u)/(9.0f);
+    m_lastAppliedForce = innerForce * 10 * exp(-m_u * m_u)/(9.0f);
     break;
   case FDF_RANDOM:
     m_lastAppliedForce = innerForce * rand()/((float)RAND_MAX);

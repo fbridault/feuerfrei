@@ -40,7 +40,7 @@ public:
    * @param move Si true, alors le solveur est en plus déplacé à la position passée en paramètre.
    */
   void addExternalForces(const Point& position, bool move);
-
+  
   void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength, 
 		       const Point& TRStrength, const Point& BRStrength);
 protected:
@@ -88,6 +88,9 @@ protected:
    */
   void restreindre(float *const vfin, float *const vgros);
 
+  /** Permet d'ajouter une force périodique venant de la droite. Pour les tests uniquement. */
+  void addRightForce();
+  
   float *m_uPrev, *m_vPrev, *m_wPrev;
   float *m_dens, *m_densPrev, *m_densSrc;
   float *m_rotx, *m_roty, *m_rotz, *m_rot;
@@ -98,6 +101,8 @@ protected:
   float m_hz;
   /** son inverse */
   float m_invhz;
+
+  uint m_perturbateCount;
 };
 
 #endif

@@ -5,7 +5,7 @@ Clipping=100
 [Solvers]
 Number=1
 [Solver0]
-Type=2
+Type=3
 Pos.x=-0.5
 Pos.y=-0.5
 Pos.z=0
@@ -16,10 +16,10 @@ Dim=1
 Scale.x=1
 Scale.y=1
 Scale.z=1
-TimeStep=0.4
+TimeStep=0.5
 Buoyancy=0.0077
-Vorticity=0.02
+Vorticity=0
 omegaDiff=1.5
 omegaProj=1.5
 epsilon=1e-05
-nbMaxIter=50
+nbMaxIter=100

@@ -77,22 +77,6 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
     else
       m_perturbateCount++;
     break;
-    
-  case FLICKERING_RIGHT :
-    /* Utilisé auparavant pour faire des benchs sur le solveur, plus d'utilité pour le moment */
-    //     if(m_perturbateCount>=24)
-    //       m_perturbateCount = 0;
-    //     else{
-    //       if(m_perturbateCount>=20){
-    // 	for (uint i = -m_solver->getZRes() / 4 - 1; i <= m_solver->getZRes () / 4 + 1; i++)
-    // 	  for (uint j = -2 * m_solver->getYRes() / 4; j < -m_solver->getYRes() / 4; j++)
-    // 	    m_solver->setUsrc (m_solver->getXRes(),
-    // 			       ((uint) (ceil (m_solver->getYRes() / 2.0))) + j,
-    // 			       ((uint) (ceil (m_solver->getZRes() / 2.0))) + i, -.1);
-    //       }
-    //       m_perturbateCount++;
-    //    }
-    break;
   case FLICKERING_RANDOM1 :
     m_lastAppliedForce += (rand()/((float)RAND_MAX))/2.0f - .25f;
     break;

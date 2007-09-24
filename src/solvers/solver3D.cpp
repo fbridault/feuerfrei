@@ -65,6 +65,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   
 //   m_forceCoef = 10;
 //   m_forceRatio = 1/m_forceCoef;
+  m_perturbateCount = 0;
 }
 
 Solver3D::~Solver3D ()
@@ -295,7 +296,7 @@ void Solver3D::iterate ()
   
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
-
+  
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
       addExternalForces(m_temporaryExternalForces,false);
@@ -308,8 +309,10 @@ void Solver3D::iterate ()
       m_movingForces.resetToNull();
     }
   
+  //addRightForce();
+  
   vel_step ();
-
+  
   m_nbIter++;
 }
 
@@ -335,7 +338,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
   
   findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
   findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
-  
+    
   /* Ajouter des forces externes */
   if(force.x)
     if( force.x > 0.0f)
@@ -365,6 +368,36 @@ void Solver3D::addExternalForces(const Point& position, bool move)
 	for (j = ceily; j <= widthy; j++)
 	  m_wSrc[IX(i, j, 1)] += strength.z;//*(m_nbVoxelsY - j)*factor;
 }
+
+void Solver3D::addRightForce()
+{
+  uint i,j;
+  uint widthx, widthy, widthz;
+  uint ceilx, ceily, ceilz;
+    
+  findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
+  findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
+  
+  /* Utilisé pour faire des benchs sur le solveur */
+  if(m_perturbateCount>90){
+    m_perturbateCount = 0;
+    m_vorticityConfinement = 0;
+  }else{
+    if(m_perturbateCount>=20 && m_perturbateCount< 30){
+      for (i = ceilz; i <= widthz; i++)
+	for (j = ceily; j <= widthy; j++)
+	  m_uSrc[IX(m_nbVoxelsX, j, i)] -= .5*m_forceCoef;
+    }else
+      if(m_perturbateCount>=50 && m_perturbateCount< 60){
+	for (i = ceilx; i <= widthx; i++)
+	  for (j = ceily; j <= widthy; j++)
+	    m_wSrc[IX(i, j, m_nbVoxelsZ)] -= .5*m_forceCoef;
+      }else
+	if(m_perturbateCount>=80 && m_perturbateCount< 90)
+	  m_vorticityConfinement = 3;	  
+    m_perturbateCount++;
+  }
+}  
 
 void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
 			       const Point& TRStrength, const Point& BRStrength)

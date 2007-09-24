@@ -41,6 +41,7 @@ GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& p
   m_globalFramesCount = 1000000;
   m_switch = false;
   m_currentConfig = NULL;
+  m_benchTime = false;
 }
 
 GLFluidsCanvas::~GLFluidsCanvas()
@@ -122,6 +123,7 @@ void GLFluidsCanvas::InitSolvers(void)
       break;
     case LOGRESAVGTIME_SOLVER :
       m_solvers[i] = new LogResAvgTimeSolver3D(ARGS_LOG);
+      m_benchTime = true;
       break;
     case GS_SOLVER2D :
       m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);
@@ -257,6 +259,8 @@ void GLFluidsCanvas::OnPaint (wxPaintEvent& event)
   if(!m_init)
     return;
   
+  if(m_benchTime)
+    return;
   wxPaintDC dc(this);
   
   if(!GetContext())

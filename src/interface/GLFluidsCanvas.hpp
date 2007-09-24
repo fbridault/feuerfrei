@@ -85,6 +85,10 @@ private:
   uint m_framesCountForSwitch;
   bool m_switch;
   bool m_2DDisplay;
+  /** Indique que l'on cherche à mesurer les performances du solveur, donc on n'affiche rien
+   * pour éviter les parasites
+   */  
+  bool m_benchTime;
   int m_t;
   
   /* Tableau de pixels pour la sauvegarde des images */

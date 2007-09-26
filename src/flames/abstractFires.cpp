@@ -75,7 +75,7 @@ void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
 FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
 		       const wxString &texname, uint index, const GLSLProgram* const program) : 
   FlameLight(scene, index, program, flameConfig.IESFileName.ToAscii()),
-  m_texture(texname, GL_CLAMP, GL_REPEAT)
+  m_texture(texname, GL_REPEAT, GL_REPEAT)
 { 
   m_solver = s;
   
@@ -163,10 +163,11 @@ void FireSource::buildBoundingSphere ()
 }
 
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
-{  
+{
   bool vis_save=m_visibility;
-  float coverage;
   int lod;
+  float coverage;
+  
   if(forceSpheresBuild)
     buildBoundingSphere();
   
@@ -178,14 +179,14 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
       cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
       m_solver->setRunningState(true);
     }
-    
+
     coverage = m_boundingSphere.getPixelCoverage(view);
     
     /* Fonction obtenue par régression linéaire avec les données
      * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
      */
     lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
-//     cerr << "coverage " << coverage << " " << lod << " " << m_lodSave << endl;
+//     cerr << "coverage " << coverage << " " << lod << " " << endl;
     
     if(lod < m_lodSave)
       {
@@ -222,10 +223,11 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 	      }
 	  
 	      /* On repasse en solveur */
-	      if( lod == 6 ){
-		m_solver->switchToRealSolver();
-		setSamplingTolerance(1);
-	      }
+	      if( lod == 6 )
+		{
+		  m_solver->switchToRealSolver();
+		  setSamplingTolerance(1);
+		}
 	      m_lodSave+=1;
 	    }
 	  while(lod > m_lodSave);
@@ -262,6 +264,9 @@ DetachableFireSource::~DetachableFireSource()
 
 void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
 {
+#ifdef COUNT_NURBS_POLYGONS
+  g_count=0;
+#endif
   switch(boundingVolume){
   case 1 : drawBoundingSphere(); break;
   case 2 : drawBoundingBox(); break;
@@ -282,6 +287,9 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
       }
     break;
   }
+#ifdef COUNT_NURBS_POLYGONS
+  cerr << g_count << endl;
+#endif
 }
 
 void DetachableFireSource::build()

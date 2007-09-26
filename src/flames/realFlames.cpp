@@ -44,7 +44,8 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   m_parentFire = parentFire;
   
   m_detachedFlamesWidth = detachedFlamesWidth;
-  m_samplingMethod = 1;
+  m_samplingMethod = 1;  
+  m_vTexInit = 0;
 }
 
 LineFlame::~LineFlame ()
@@ -100,10 +101,29 @@ void LineFlame::breakCheck()
   }
 }
 
+void LineFlame::computeVTexCoords()
+{
+  float vinc, vtmp;
+  uint i;
+  
+  /* Si la flamme a un parent, c'est une flamme détachable, on fait varier la texcoord V dans le temps */
+  if(m_parentFire)
+    m_vTexInit = (m_vTexInit >= 0.85f) ? 0.0f : m_vTexInit + 0.15f;
+  else
+    m_vTexInit = 0.0;
+  vinc = 1.0f / (float)(m_vsize-1);
+  vtmp = m_vTexInit;
+  for (i = 0; i < m_vsize; i++)
+    {
+      m_texTmp[i] = vtmp;
+      vtmp += vinc;
+    }
+}
+
 bool LineFlame::buildSimplified ()
 {
   uint i, j, l;
-  float vinc, vtmp, vtex;
+  float vtex;
   float dist_max;
   m_maxParticles = 0;
   m_count = 0;
@@ -130,13 +150,9 @@ bool LineFlame::buildSimplified ()
   
   m_vsize = m_maxParticles + m_nbFixedPoints;
   
-  vinc = 1.0f / (float)(m_vsize-1);
-  vtmp = 0.0f;
-  for (i = 0; i < m_vsize; i++){
-    m_texTmp[i] = vtmp;
-    vtmp += vinc;
-  }
-  
+  /* On connaît la taille maximale d'un squelette, on peut maintenant déterminer les coordonnées de texture en v */
+  computeVTexCoords();
+
   /* Direction des u */
   for (i = 0; i < m_nbLeadSkeletons; i++)
     {
@@ -411,13 +427,28 @@ DetachedFlame::~DetachedFlame()
   delete[]m_maxDistancesIndexes;
 }
 
+void DetachedFlame::computeVTexCoords()
+{
+  float vinc, vtmp;
+  uint i;
+  
+  vinc = 1.0f / (float)(m_vsize-1);
+  vtmp = 0.0;
+  for (i = 0; i < m_vsize; i++)
+    {
+      m_texTmp[i] = vtmp;
+      vtmp += vinc;
+    }
+}
+
 bool DetachedFlame::build()
 {
   uint i, j, l;
-  float vinc, vtmp, vtex;
+  float utex, utexInc;
   float dist_max;
   m_maxParticles = 0;
-  vtex = 0.0f;
+  utex = -0.5f;
+  utexInc = 2.0f/(float)m_nbSkeletons;
 
   for (i = 0; i < m_nbLeadSkeletons; i++)
     m_leadSkeletons[i]->move ();
@@ -434,17 +465,13 @@ bool DetachedFlame::build()
   
   m_vsize = m_maxParticles+m_nbFixedPoints;
   
-  vinc = 1.0f / (float)(m_vsize-1);
-  vtmp = 0.0f;
-  for (i = 0; i < m_vsize; i++){
-    m_texTmp[i] = vtmp;
-    vtmp += vinc;
-  }
+  /* On connaît la taille maximale d'un squelette, on peut maintenant déterminer les coordonnées de texture en v */
+  computeVTexCoords();
   
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .15f;
+      utex += utexInc;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_periSkeletons[i]->getSize () < m_maxParticles)
@@ -487,13 +514,13 @@ bool DetachedFlame::build()
 	    }
 	  /* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
 	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
 		pt = Point::pointBetween(m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), m_periSkeletons[i]->getParticle (0));
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 	      }
 	  
 	  for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
@@ -505,22 +532,22 @@ bool DetachedFlame::build()
 		    {
 		      /* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
 		      pt = Point::pointBetween(m_periSkeletons[i]->getParticle (j), m_periSkeletons[i]->getParticle (j + 1));
-		      setCtrlPoint (&pt, vtex);
+		      setCtrlPoint (&pt, utex);
 		    }
 		}
-	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), utex);
 	    }
 	  
 	  bool prec = false;
 	  
-	  setCtrlPoint (m_periSkeletons[i]->getLastParticle (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLastParticle (), utex);
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize ())
 	      {
 		pt = Point::pointBetween(m_periSkeletons[i]->getLastParticle (),
 					 m_periSkeletons[i]->getLeadSkeleton()->getLastParticle ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
 	  
@@ -533,21 +560,21 @@ bool DetachedFlame::build()
 		    pt = *m_periSkeletons[i]->getLastParticle ();
 		  }
 		pt = Point::pointBetween (&pt, m_periSkeletons[i]->getLeadSkeleton()->getLastParticle ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), utex);
 	}
       else
 	{
 	  /* Cas sans problème */
 	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
 	  for (j = 0; j < m_periSkeletons[i]->getSize (); j++)
 	    {
-	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), utex);
 	    }
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), utex);
 	}
       m_texTmp = m_texTmpSave;
     }

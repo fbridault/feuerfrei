@@ -25,6 +25,10 @@ class Object;
 class Scene;
 class IES;
 
+#ifdef COUNT_NURBS_POLYGONS
+extern uint g_count;
+#endif
+
 
 /**********************************************************************************************************************/
 /************************************** DEFINITION DE LA CLASSE FLAMELIGHT ********************************************/
@@ -231,23 +235,34 @@ public:
    */
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
   {
-      switch(boundingVolume){
-      case BOUNDING_SPHERE : drawBoundingSphere(); break;
-      case BOUNDING_BOX : drawBoundingBox(); break;
-      default : 
-	if(m_visibility)
-	  {
-	    Point pt(m_solver->getPosition());
-	    Point scale(m_solver->getScale());
-	    glPushMatrix();
-	    glTranslatef (pt.x, pt.y, pt.z);
-	    glScalef (scale.x, scale.y, scale.z);
-	    for (uint i = 0; i < m_nbFlames; i++)
-	      m_flames[i]->drawFlame(display, displayParticle);
-	    glPopMatrix();
-	  }
-	break;
-      }
+#ifdef COUNT_NURBS_POLYGONS
+    g_count=0;
+#endif
+    switch(boundingVolume){
+    case BOUNDING_SPHERE : drawBoundingSphere(); break;
+    case BOUNDING_BOX : drawBoundingBox(); break;
+    default : 
+      if(m_visibility)
+	{
+	  Point pt(m_solver->getPosition());
+	  Point scale(m_solver->getScale());
+	  glPushMatrix();
+	  glTranslatef (pt.x, pt.y, pt.z);
+	  glScalef (scale.x, scale.y, scale.z);
+	  for (uint i = 0; i < m_nbFlames; i++)
+	    m_flames[i]->drawFlame(display, displayParticle);
+	  glPopMatrix();
+	  // Trace une sphère indiquant le centre
+	  // 	    glPushMatrix();
+	  // 	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
+	  // 	    GraphicsFn::SolidSphere (.05, 10, 10);
+	  // 	    glPopMatrix();
+	}
+      break;
+    }
+#ifdef COUNT_NURBS_POLYGONS
+    cerr << g_count << endl;
+#endif
   }
   
   virtual void drawBoundingSphere() const { if(m_visibility) m_boundingSphere.draw(); };

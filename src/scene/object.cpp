@@ -151,7 +151,7 @@ Mesh::Mesh (const Scene* const scene, uint materialIndex, Object* parent)
 
 Mesh::~Mesh ()
 {
-  m_indexArray.clear();  
+  m_indexArray.clear();
   glDeleteBuffers(1, &m_bufferID);
 }
 

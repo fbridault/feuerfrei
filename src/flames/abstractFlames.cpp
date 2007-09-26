@@ -6,6 +6,10 @@
 /************************************** IMPLEMENTATION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
 
+#ifdef COUNT_NURBS_POLYGONS
+uint g_count=0;
+#endif
+
 NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex)
 {
   m_nbSkeletons = nbSkeletons;
@@ -14,8 +18,8 @@ NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* co
   m_uorder = 4;
   m_vorder = 4;
   
-  /* Allocation des tableaux à la taille maximale pour les NURBS, */
-  /* ceci afin d'éviter des réallocations trop nombreuses */
+  /* Allocation des tableaux Ã  la taille maximale pour les NURBS, */
+  /* ceci afin d'Ã©viter des rÃ©allocations trop nombreuses */
   m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 3];
   m_texPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 2];
   m_uknots = new GLfloat[m_uorder + m_nbSkeletons + m_uorder - 1];
@@ -54,8 +58,8 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   m_uorder = 4;
   m_vorder = 4;
   
-  /* Allocation des tableaux à la taille maximale pour les NURBS, */
-  /* ceci afin d'éviter des réallocations trop nombreuses */
+  /* Allocation des tableaux Ã  la taille maximale pour les NURBS, */
+  /* ceci afin d'Ã©viter des rÃ©allocations trop nombreuses */
   m_ctrlPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 3];
   m_texPoints =  new GLfloat[(NB_PARTICLES_MAX + m_nbFixedPoints) * (m_nbSkeletons + m_uorder - 1) * 2];
   m_uknots = new GLfloat[m_uorder + m_nbSkeletons + m_uorder - 1];
@@ -171,19 +175,34 @@ void FixedFlame::drawPointFlame () const
   else
     {
       float angle, angle2, angle4;
+       
+      GLfloat m[16];
       
-      /* Déplacement de la texture de maniÃ¨re Ã  ce qu'elle reste "en face" de l'observateur */
-      GLfloat m[4][4];
+      glGetFloatv (GL_MODELVIEW_MATRIX, m);
       
-      glGetFloatv (GL_MODELVIEW_MATRIX, &m[0][0]);
+//       Vector Transform=Vector(m[0]*(m[12]+.5f) + m[1]*(m[13]) + m[2]*(m[14]-.5f),
+// 			      m[4]*(m[12]+.5f) + m[5]*(m[13]) + m[6]*(m[14]-.5f),
+// 			      m[8]*(m[12]+.5f) + m[9]*(m[13]) + m[10]*(m[14]-.5f));
+      
+//       Vector direction(-Transform.x, 0.0f, -Transform.z);
+//       direction.normalize ();
+//       //cout << direction << endl;
+      
+//       Vector lookAt(0,0,1);
+//       Vector upAux = lookAt^direction;
+//       angle=acos(lookAt*direction);
+//       if(upAux.y < 0) angle = -angle;
+//             cout << angle << " " << angle/PI << endl;
       
       /* Position de la bougie = translation dans la matrice courante */
-      Vector bougiepos(m[3][0], m[3][1], m[3][2]);
+      Vector bougiepos(m[12], m[13], m[14]);
       
-      /* Position de l'axe de regard de bougie dans le repère du monde = axe initial * Matrice de rotation */
+      /* Vecteur Z de l'axe de regard de bougie dans le repÃ¨re du monde = axe initial * Matrice de rotation */
       /* Attention, ne pas prendre la translation en plus !!!! */
-      Vector worldLookAt(m[2][0], m[2][1], m[2][2]);
-      Vector worldLookX(m[0][0], m[0][1], m[0][2]);
+      Vector worldLookAt(m[8], m[9], m[10]);
+      /* Vecteur X local de la bougie */
+      Vector worldLookX(m[0], m[1], m[2]);
+      
       Vector direction(-bougiepos.x, 0.0f, -bougiepos.z);
       
       direction.normalize ();
@@ -193,8 +212,7 @@ void FixedFlame::drawPointFlame () const
       
       angle = -acos (direction * worldLookAt);
       angle2 = acos (direction * worldLookX);
-      
-      /****************************************************************************************/
+            
       angle4 = (angle2 < PI / 2.0f) ? -angle : angle;
       
       glActiveTextureARB(GL_TEXTURE0_ARB);
@@ -209,7 +227,7 @@ void FixedFlame::drawPointFlame () const
       glPushMatrix ();
       glLoadIdentity ();
       
-      glTranslatef (0.0f, angle4 / (float) (PI), 0.0f);
+      glTranslatef (angle4 / PI, 0.0f, 0.0f);
       
       drawNurbs();
       
@@ -239,27 +257,43 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
   m_solver = s;
   m_lodSkelChanged = false;
   m_lodSkel = NORMAL;
+  
 //   m_lodSkelChanged = true;
 //   m_lodSkel = SIMPLIFIED;
+}
+
+void RealFlame::computeVTexCoords()
+{
+  float vinc, vtmp;
+  uint i;
+  
+  vinc = 1.0f / (float)(m_vsize-1);
+  vtmp = 0.0;
+  for (i = 0; i < m_vsize; i++)
+    {
+      m_texTmp[i] = vtmp;
+      vtmp += vinc;
+    }
 }
 
 bool RealFlame::build ()
 {
   uint i, j, l;
-  float vinc, vtmp, vtex;
+  float utex, utexInc;
   float dist_max;
   m_maxParticles = 0;
   m_count = 0;
-  vtex = -0.5f;
-
-  /* Si un changement de niveau de détail a été demandé, l'effectuer maintenant */
+  utex = 0.0f;
+  utexInc = 2.0f/m_nbSkeletons;
+  
+  /* Si un changement de niveau de dÃ©tail a Ã©tÃ© demandÃ©, l'effectuer maintenant */
   if(m_lodSkelChanged) changeSkeletonsLOD();
   
-  /* Déplacement des squelettes guides */
+  /* DÃ©placement des squelettes guides */
   for (i = 0; i < m_nbLeadSkeletons; i++)
     m_leadSkeletons[i]->move ();
   
-  /* Déplacement des squelettes périphériques et détermination du maximum de particules par squelette */
+  /* DÃ©placement des squelettes pÃ©riphÃ©riques et dÃ©termination du maximum de particules par squelette */
   for (i = 0; i < m_nbSkeletons; i++)
     {
       m_periSkeletons[i]->move ();
@@ -269,27 +303,22 @@ bool RealFlame::build ()
   
   m_vsize = m_maxParticles + m_nbFixedPoints;
   
-  vinc = 1.0f / (float)(m_vsize-1);
-  vtmp = 0;
-  for (i = 0; i < m_vsize; i++){
-    m_texTmp[i] = vtmp;
-    vtmp += vinc;
-  }
-  
+  /* On connaÃ®t la taille maximale d'un squelette, on peut maintenant dÃ©terminer les coordonnÃ©es de texture en v */
+  computeVTexCoords();
+ 
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      vtex += .5f;
-      /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
-      /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
+      /* ProblÃ¨me pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
+      /* La solution retenue va ajouter des points de contrÃ´les lÃ  oÃ¹ les points de contrÃ´les sont le plus Ã©loignÃ©s */
       if (m_periSkeletons[i]->getSize () < m_maxParticles)
 	{
-	  // Nombre de points de contrôle supplémentaires
+	  // Nombre de points de contrÃ´le supplÃ©mentaires
 	  uint nb_pts_supp = m_maxParticles - m_periSkeletons[i]->getSize ();
 	  Point pt;
 	  /* On calcule les distances entre les particules successives */
-	  /* On prend également en compte l'origine du squelette ET les extrémités du guide */
-	  /* On laisse les distances au carré pour des raisons évidentes de coût de calcul */	  
+	  /* On prend Ã©galement en compte l'origine du squelette ET les extrÃ©mitÃ©s du guide */
+	  /* On laisse les distances au carrÃ© pour des raisons Ã©videntes de coÃ»t de calcul */	  
 	  m_distances[0] = 
 	    m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (*m_periSkeletons[i]->getParticle (0));
 	  
@@ -303,7 +332,7 @@ bool RealFlame::build ()
 	    m_periSkeletons[i]->getRoot()->squaredDistanceFrom(*m_periSkeletons[i]->getLeadSkeleton ()->getRoot ());
 	  
 	  /* On cherche les indices des distances max */
-	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
+	  /* On n'effectue pas un tri complet car on a seulement besoin de connaÃ®tre les premiers */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
 	      dist_max = FLT_MIN;
@@ -319,45 +348,45 @@ bool RealFlame::build ()
 	      if (dist_max == FLT_MIN)
 		m_maxDistancesIndexes[l] = -1;
 	      else
-		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
+		/* On met Ã  la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
 		m_distances[m_maxDistancesIndexes[l]] = 0;
 	    }
-	  /* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
-	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), vtex);
+	  /* Les particules les plus Ã©cartÃ©es sont maintenant connues, on peut passer Ã  l'affichage */
+	  /* Remplissage des points de contrÃ´le */
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == 0)
 	      {
 		pt = Point::pointBetween(m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), m_periSkeletons[i]->getParticle (0));
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 	      }
 	  
 	  for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
 	    {
-	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), utex);
 	      /* On regarde s'il ne faut pas ajouter un point */
 	      for (l = 0; l < nb_pts_supp; l++)
 		{
 		  if (m_maxDistancesIndexes[l] == (int)j + 1)
 		    {
-		      /* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
+		      /* On peut rÃ©fÃ©rencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
 		      pt = Point::pointBetween(m_periSkeletons[i]->getParticle (j), m_periSkeletons[i]->getParticle (j + 1));
-		      setCtrlPoint (&pt, vtex);
+		      setCtrlPoint (&pt, utex);
 		    }
 		}
 	    }
 	  
-	  setCtrlPoint (m_periSkeletons[i]->getLastParticle (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLastParticle (), utex);
 	  
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize ())
 	      {
 		pt = Point::pointBetween(m_periSkeletons[i]->getRoot (), m_periSkeletons[i]-> getLastParticle ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 	      }
 	  
-	  setCtrlPoint (m_periSkeletons[i]->getRoot (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getRoot (), utex);
 	  
 	  bool prec = false;
 	  
@@ -366,11 +395,11 @@ bool RealFlame::build ()
 	      {
 		pt = Point::pointBetween(m_periSkeletons[i]->getRoot (),
 					 m_periSkeletons[i]->getLeadSkeleton()->getRoot ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
 	  
-	  /* Points supplémentaires au cas où il n'y a "plus de place" ailleurs entre les particules */
+	  /* Points supplÃ©mentaires au cas oÃ¹ il n'y a "plus de place" ailleurs entre les particules */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == -1)
 	      {
@@ -379,35 +408,42 @@ bool RealFlame::build ()
 		    pt = *m_periSkeletons[i]-> getRoot ();
 		  }
 		pt = Point::pointBetween (&pt, m_periSkeletons[i]->getLeadSkeleton()->getRoot ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), utex);
 	}
       else
 	{
-	  /* Cas sans problème */
-	  /* Remplissage des points de contrôle */
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), vtex);
+	  /* Cas sans problÃ¨me */
+	  /* Remplissage des points de contrÃ´le */
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
 	  for (j = 0; j < m_periSkeletons[i]->getSize (); j++)
 	    {
-	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_periSkeletons[i]->getParticle (j), utex);
 	    }
-	  setCtrlPoint (m_periSkeletons[i]->getRoot (), vtex);
-	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), vtex);
+	  setCtrlPoint (m_periSkeletons[i]->getRoot (), utex);
+	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), utex);
 	}
       m_texTmp = m_texTmpSave;
+      utex += utexInc;
     }
   
   /* On recopie les (m_uorder-1) squelettes pour fermer la NURBS */
   GLfloat *startCtrlPoints = m_ctrlPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_vsize)*3; i++)
+  for (i = 0; i < (m_uorder-1)*m_vsize*3; i++)
     *m_ctrlPoints++ = *startCtrlPoints++;
   m_ctrlPoints = m_ctrlPointsSave;
   
-  GLfloat *startTexPoints = m_texPointsSave;
-  for (i = 0; i < ((m_uorder-1)*m_vsize)*2; i++)
-    *m_texPoints++ = *startTexPoints++;  
+  /* Il faut Ã©galement recopier les coordonnÃ©es de texture mais attention le u change ! */
+  for (i = 0; i < m_uorder-1; i++){
+    for (j = 0; j < m_vsize; j++){
+      *m_texPoints++ = utex;
+      *m_texPoints++ = *m_texTmp++;
+    }
+    m_texTmp = m_texTmpSave;
+    utex += utexInc;
+  }
   m_texPoints = m_texPointsSave;
   
   /* Affichage en NURBS */
@@ -419,13 +455,13 @@ bool RealFlame::build ()
     m_uknots[i] = (float)i;
   
   /* Vecteur nodal en v avec noeuds internes strictement croissants ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
-  /* Plus décalage du premier noeuds interne ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
+  /* Plus dÃ©calage du premier noeuds interne ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
   for (j = 0; j < m_vorder; j++)
     m_vknots[j] = 0.0f;
   
   for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
     m_vknots[j] = m_vknots[j-1]+1;
-  /* Adoucit la jointure entre le haut des squelettes périphériques et le haut du squelette guide ex: 0 0 0 0 1 2 3 4 5 6 6 6 6*/
+  /* Adoucit la jointure entre le haut des squelettes pÃ©riphÃ©riques et le haut du squelette guide ex: 0 0 0 0 1 2 3 4 5 6 6 6 6*/
   m_vknots[m_vorder] += .9f;
   
   m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;

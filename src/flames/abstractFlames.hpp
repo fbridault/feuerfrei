@@ -22,6 +22,10 @@ class PeriSkeleton;
 class LeadSkeleton;
 class Field3D;
 
+#ifdef COUNT_NURBS_POLYGONS
+extern uint g_count;
+#endif
+
 /**********************************************************************************************************************/
 /****************************************** DEFINITION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
@@ -54,13 +58,13 @@ public:
   virtual ~NurbsFlame ();
   
   void initNurbs(GLUnurbsObj** nurbs);
-    /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
+  /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules 
    * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
    * des vecteurs de noeuds.
    * @return false si un problème dans la contruction est survenu (pas assez de particules par exemple)
    */
   virtual bool build() = 0;
-      
+  
   virtual void drawLineFlame() const;  
   
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
@@ -144,13 +148,13 @@ protected:
    * @param pt point à affecter dans le tableau
    * @param v valeur de la coordonnée de texture t
    */
-  void setCtrlPoint (const Point * const pt, GLfloat v)
+  void setCtrlPoint (const Point * const pt, GLfloat u)
   {
     *m_ctrlPoints++ = pt->x;
     *m_ctrlPoints++ = pt->y;
     *m_ctrlPoints++ = pt->z;
+    *m_texPoints++ = u;
     *m_texPoints++ = *m_texTmp++;
-    *m_texPoints++ = v;
     m_count++;
   }
     
@@ -165,6 +169,9 @@ protected:
   
   static void CALLBACK NurbsBegin(GLenum type, GLvoid *shadingType)
   {
+#ifdef COUNT_NURBS_POLYGONS
+    g_count++;
+#endif
     /* Si on est en mode simplifié */
     if( *(u_char *)shadingType & 2)
       {
@@ -399,6 +406,11 @@ public:
     m_lodSkelChanged = false;
   };
   
+  /** Fonction chargée de remplir les coordonées de texture dans la direction v. Elles sont
+   * en effet dépendantes du nombre de particules dans les squelettes et il est donc nécessaire
+   * de les recalculer à chaque construction de la NURBS.
+   */
+  virtual void computeVTexCoords();
   virtual bool build();
   
   virtual Vector getMainDirection() const = 0;  

@@ -1,7 +1,8 @@
 set encoding iso_8859_1
 
 #set terminal x11 font "Helvetica,20"
-set terminal png small enhanced
+#set terminal eps small enhanced
+set terminal postscript eps enhanced color 22 lw 2
 
 set view 50,230
 
@@ -27,27 +28,27 @@ set surface
 #set hidden3d
 
 #set title "Erreur RMS commise lors du Gauss-Seidel"
-set xlabel "Simulation time step"
-set ylabel "Resolution step"
-set zlabel "Residu"
+set xlabel "Pas de temps" -2,0,0
+set ylabel "Numéro de l'itération" 4,0,0
+set zlabel "Résidu" 2,4,0
 
-set output 'GSsolverDiff.u.png'
+set output 'GSsolverDiff.u.eps'
 splot "GSsolverDiff.u.log" using 1:2:3 with pm3d
-set output 'GSsolverDiff.v.png'
+set output 'GSsolverDiff.v.eps'
 splot "GSsolverDiff.v.log" using 1:2:3 with pm3d
-set output 'GSsolverDiff.w.png'
+set output 'GSsolverDiff.w.eps'
 splot "GSsolverDiff.w.log" using 1:2:3 with pm3d
-set output 'GCSSORsolverDiff.u.png'
+set output 'GCSSORsolverDiff.u.eps'
 splot "GCSSORsolverDiff.u.log" using 1:2:3 with pm3d
-set output 'GCSSORsolverDiff.v.png'
+set output 'GCSSORsolverDiff.v.eps'
 splot "GCSSORsolverDiff.v.log" using 1:2:3 with pm3d
-set output 'GCSSORsolverDiff.w.png'
+set output 'GCSSORsolverDiff.w.eps'
 splot "GCSSORsolverDiff.w.log" using 1:2:3 with pm3d
-set output 'GSsolverProj1.png'
+set output 'GSsolverProj1.eps'
 splot "GSsolverProj1.log" using 1:2:3 with pm3d
-set output 'GSsolverProj2.png'
+set output 'GSsolverProj2.eps'
 splot "GSsolverProj2.log" using 1:2:3 with pm3d
-set output 'GCSSORsolverProj1.png'
+set output 'GCSSORsolverProj1.eps'
 splot "GCSSORsolverProj1.log" using 1:2:3 with pm3d
-set output 'GCSSORsolverProj2.png'
+set output 'GCSSORsolverProj2.eps'
 splot "GCSSORsolverProj2.log" using 1:2:3 with pm3d

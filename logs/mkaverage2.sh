@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script servant Ã  gÃ©nÃ©rer un graphique contenant toutes les moyennes des rÃ©sidus
-# pour diffÃ©rentes valeurs de omega.
+# Script servant à générer un graphique contenant toutes les moyennes des résidus
+# pour différentes valeurs de omega.
 
 PLOT_CMD1="plot "
 PLOT_CMD2="plot "
@@ -30,6 +30,7 @@ set encoding iso_8859_1
 
 #set terminal x11 font "Helvetica,20"
 set terminal png small enhanced
+set terminal postscript eps enhanced color 22 lw 2
 
 #set time
 set autoscale                        # scale axes automatically
@@ -44,17 +45,17 @@ set xtic auto
 #set hidden3d
 
 #set title "Erreur RMS commise lors du Gauss-Seidel"
-set xlabel "Resolution step"
-set ylabel "Residual"
+set xlabel "Itération"
+set ylabel "Résidu"
 
-set output 'wGCSSORDiff.u.png'
+set output 'wGCSSORDiff.u.eps'
 $PLOT_CMD1
-set output 'wGCSSORDiff.v.png'
+set output 'wGCSSORDiff.v.eps'
 $PLOT_CMD2
-set output 'wGCSSORDiff.w.png'
+set output 'wGCSSORDiff.w.eps'
 $PLOT_CMD3
-set output 'wGCSSORProj1.png'
+set output 'wGCSSORProj1.eps'
 $PLOT_CMD4
-set output 'wGCSSORProj2.png'
+set output 'wGCSSORProj2.eps'
 $PLOT_CMD5
 EOF

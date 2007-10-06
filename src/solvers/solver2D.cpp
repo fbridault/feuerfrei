@@ -145,7 +145,7 @@ void Solver2D::addVorticityConfinement(float * const u, float *const  v)
 {
   uint i,j;	
   float eps =m_dt*m_forceCoef*m_vorticityConfinement*10.0f;//epsilon
-  float x,y;
+  float x;
   float Nx,Ny;
   float invNormeN;
   

@@ -35,6 +35,7 @@ void LogResSolver3D::vel_step ()
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
+  addVorticityConfinement(m_u,m_v,m_w);
   SWAP (m_uPrev, m_u);
   diffuse (1, m_u, m_uPrev, m_aVisc);
   SWAP (m_vPrev, m_v);
@@ -51,6 +52,9 @@ void LogResSolver3D::vel_step ()
   advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
   m_index = 1;
   project (m_uPrev, m_vPrev);
+  
+  if(m_nbIter == m_nbMaxIter)
+    cout << "Simulation over" << endl;
 }
 
 /* Pas de diffusion */
@@ -107,7 +111,7 @@ void LogResSolver3D::project (float *const p, float *const div)
 }
 
 
-void LogResSolver3D::GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps)
+void LogResSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps)
 {
   uint i, j, k, l;
   float diagonal = 1/div;
@@ -185,10 +189,10 @@ void LogResSolver3D::GCSSOR(float *const x0, const float *const b, float a, floa
     for ( j = m_nbVoxelsY; j>=1 ; j--)
       for ( i = m_nbVoxelsX; i>=1; i--)
 	m_z[IX(i,j,k)] = f*m_z[IX(i,j,k)]+d*(m_z[IX(i+1,j,k)]+m_z[IX(i,j+1,k)]+m_z[IX(i,j,k+1)]);
-	
+  
   // p=z
   copy(m_z, &m_z[m_nbVoxels], m_p);
-    
+  
   // calcul de r.z
   rho0=0.0f;
   for ( k = 1; k <= m_nbVoxelsZ; k++)
@@ -235,18 +239,18 @@ void LogResSolver3D::GCSSOR(float *const x0, const float *const b, float a, floa
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
 	  norm2+=m_r[IX(i,j,k)]*m_r[IX(i,j,k)];
-
+    
     logResidu(numiter,norm2);
-
+    
     //test d'arrÃªt
 //     if(norm2 < eb2){
 //       //cerr<<"précision atteinte : nbiter = "<<numiter<<endl;
 //       break;
 //     }
     // calcul de z tel que Cz =r
-
+    
     // calcul de u tel que 1/(2-w)*(D/w-L)D^(-1)w.u=r
-
+    
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
@@ -268,7 +272,7 @@ void LogResSolver3D::GCSSOR(float *const x0, const float *const b, float a, floa
     //calcul de beta =rho1/rho0
     //    beta= rho1/rho0;
     beta=(rho0) ? rho1/rho0 : 0.0f;
-
+    
     rho0=rho1;
     //calcul de p = z+ beta.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)

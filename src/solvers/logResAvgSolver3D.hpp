@@ -50,7 +50,7 @@ protected:
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
   
-  virtual void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);
+  virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
   /** Calcul des moyennes pour une itération de la méthode de résolution de système linéaire.

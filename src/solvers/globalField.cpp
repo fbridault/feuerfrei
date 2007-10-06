@@ -58,7 +58,7 @@ GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene
     m_field = new HybridSolver3D(ARGS_GC);
     break;
   case LOD_HYBRID_SOLVER :
-    m_field = new LODHybridSolver3D(ARGS_GC);
+    m_field = new LODSolver3D(ARGS_GC);
     break;
   case SIMPLE_FIELD :
     m_field = new RealField3D(ARGS);

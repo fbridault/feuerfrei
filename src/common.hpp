@@ -131,4 +131,14 @@ public:
 
 #endif
 
+#define CPU_FREQ 2000000000.0
+
+/* Pour obtenir le temps en s, il faut diviser par la fréquence du processeur */
+__inline__ unsigned long long int rdtsc()
+{
+  unsigned long long int x;
+  __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));     
+  return x;  
+}
+
 #endif

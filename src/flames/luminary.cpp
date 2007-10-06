@@ -109,7 +109,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& posit
   case HYBRID_SOLVER :
     return (new HybridSolver3D(ARGS_GC));
   case LOD_HYBRID_SOLVER :
-    return (new LODHybridSolver3D(ARGS_GC));
+    return (new LODSolver3D(ARGS_GC));
   case SIMPLE_FIELD :
     return (new RealField3D(ARGS));
   case FAKE_FIELD :

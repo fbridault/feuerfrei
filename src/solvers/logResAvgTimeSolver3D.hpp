@@ -40,7 +40,7 @@ public:
 private:
   void vel_step ();
   
-  void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);
+  void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
   void computeAverage ( uint iter, float value, float time );

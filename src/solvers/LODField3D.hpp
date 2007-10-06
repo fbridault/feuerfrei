@@ -130,7 +130,7 @@ public:
   
 protected:
   FakeField3D m_fakeField;
-  LODHybridSolver3D m_solver;
+  LODSolver3D m_solver;
   /** Pointeur sur le champ de vecteur utilisé. */
   Field3D *m_currentField;
 private:

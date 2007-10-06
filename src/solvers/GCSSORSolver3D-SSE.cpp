@@ -161,7 +161,7 @@ void GCSSORSolver3D_SSE::GCSSOR(float *const x0, const float *const b, float a, 
       q_sse++;
     }//for i
     alpha=alpha_sse.f[0]+alpha_sse.f[1]+alpha_sse.f[2]+alpha_sse.f[3];
-    alpha=(alpha) ? rho0/alpha : 0;
+    alpha=(alpha) ? rho0/alpha : 0.0f;
     alpha_sse.m=_mm_set_ps1(alpha);
     // calcul de x = x + alpha.p
     // calcul de r = r -alpha*q
@@ -226,7 +226,7 @@ void GCSSORSolver3D_SSE::GCSSOR(float *const x0, const float *const b, float a, 
     rho1=rho1_sse.f[0]+rho1_sse.f[1]+rho1_sse.f[2]+ rho1_sse.f[3];
     //calcul de beta =rho1/rho0
     //    beta= rho1/rho0;
-    beta=(rho0) ? rho1/rho0 : 0;
+    beta=(rho0) ? rho1/rho0 : 0.0f;
     beta_sse.m=_mm_set_ps1(beta);
     rho0=rho1;
     //calcul de p = z+ beta.p

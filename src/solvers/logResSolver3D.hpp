@@ -41,7 +41,7 @@ private:
   void diffuse (unsigned char b, float *const x, float *const x0, float a);
   void project (float *const p, float *const div);
   
-  void GS_solve(unsigned char b, float *const x, float *const x0, float a, float div, uint nb_steps);
+  void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
   
   /** Ecrit la valeur du résidu dans le fichier de log.

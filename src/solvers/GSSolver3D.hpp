@@ -43,7 +43,9 @@ protected:
   virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
-  virtual void project (float *const p, float *const div);  
+  virtual void project (float *const p, float *const div);
+  
+  float *m_res;
 };
 
 #endif

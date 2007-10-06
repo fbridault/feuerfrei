@@ -15,7 +15,7 @@ class BenchSolver3D;
 class GSSolver3D;
 class GCSSORSolver3D;
 class HybridSolver3D;
-class LODHybridSolver3D;
+class LODSolver3D;
 
 /** La classe HybridSolver sert d'interface pour les classes permettant de loguer les valeurs de résidus
  * des solveurs à base des méthodes itératives de Gauss-Seidel et du gradient conjugué préconditionné avec SSOR.
@@ -24,7 +24,7 @@ class LODHybridSolver3D;
  *
  * @author	Flavien Bridault
  */
-class HybridSolver3D: public GSSolver3D, public GCSSORSolver3D
+class HybridSolver3D: public GCSSORSolver3D, public GSSolver3D 
 {
 public:
   /** Constructeur du solveur.
@@ -57,10 +57,10 @@ protected:
   virtual void project (float *const p, float *const div);
 };
 
-/** @test La classe LODHybridSolver implémente un solveur de classe HybridSolver permettant d'utiliser une grille
+/** @test La classe LODSolver implémente un solveur de classe GCSSORSolver permettant d'utiliser une grille
  * adaptative. La résolution de la grille ne pourra jamais dépasser la résolution initiale passée au constructeur.
  */
-class LODHybridSolver3D: public HybridSolver3D
+class LODSolver3D: public GCSSORSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -75,9 +75,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODHybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  LODSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
 		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
-  virtual ~LODHybridSolver3D ();
+  virtual ~LODSolver3D ();
   
   virtual void divideRes ();
   virtual void multiplyRes ();

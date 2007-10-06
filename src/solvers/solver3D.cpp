@@ -246,7 +246,7 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 }//AddVorticityConfinement
 
 void Solver3D::vel_step ()
-{
+{  
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
@@ -265,8 +265,40 @@ void Solver3D::vel_step ()
   advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
   advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
   project (m_uPrev, m_vPrev);
-
 }
+
+// Affiche le temps passé dans chacune des étapes
+// #define CPU_FREQ 2000000000.0
+// void Solver3D::vel_step ()
+// {  
+//   unsigned long long int start, t, start2, t3;
+//   start2=rdtsc();
+//   add_source (m_u, m_uSrc);
+//   add_source (m_v, m_vSrc);
+//   add_source (m_w, m_wSrc);
+//   addVorticityConfinement(m_u,m_v,m_w);
+//   start=rdtsc();
+//   SWAP (m_uPrev, m_u);
+//   diffuse (1, m_u, m_uPrev, m_aVisc);
+//   SWAP (m_vPrev, m_v);
+//   diffuse (2, m_v, m_vPrev, m_aVisc);
+//   SWAP (m_wPrev, m_w);
+//   diffuse (3, m_w, m_wPrev, m_aVisc);
+//   cout << (rdtsc() - start)/CPU_FREQ << " ";
+//   start=rdtsc();
+//   project (m_uPrev, m_vPrev);
+//   t = rdtsc() - start;
+//   SWAP (m_uPrev, m_u);
+//   SWAP (m_vPrev, m_v);
+//   SWAP (m_wPrev, m_w);
+//   advect (1, m_u, m_uPrev, m_uPrev, m_vPrev, m_wPrev);
+//   advect (2, m_v, m_vPrev, m_uPrev, m_vPrev, m_wPrev);
+//   advect (3, m_w, m_wPrev, m_uPrev, m_vPrev, m_wPrev);
+//   start=rdtsc();
+//   project (m_uPrev, m_vPrev);
+//   t3 = rdtsc();
+//   cout << (t + t3 - start)/CPU_FREQ << " " << (t3 - start2)/CPU_FREQ<< endl;
+// }
 
 void Solver3D::iterate ()
 { 
@@ -309,10 +341,12 @@ void Solver3D::iterate ()
       m_movingForces.resetToNull();
     }
   
-  //addRightForce();
-  
+#ifdef RTFLUIDS_BUILD
+  addRightForce();
+#endif
+
   vel_step ();
-  
+
   m_nbIter++;
 }
 
@@ -369,6 +403,7 @@ void Solver3D::addExternalForces(const Point& position, bool move)
 	  m_wSrc[IX(i, j, 1)] += strength.z;//*(m_nbVoxelsY - j)*factor;
 }
 
+#ifdef RTFLUIDS_BUILD
 void Solver3D::addRightForce()
 {
   uint i,j;
@@ -397,7 +432,8 @@ void Solver3D::addRightForce()
 	  m_vorticityConfinement = 3;	  
     m_perturbateCount++;
   }
-}  
+}
+#endif
 
 void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
 			       const Point& TRStrength, const Point& BRStrength)

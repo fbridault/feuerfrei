@@ -88,8 +88,10 @@ protected:
    */
   void restreindre(float *const vfin, float *const vgros);
 
+#ifdef RTFLUIDS_BUILD
   /** Permet d'ajouter une force périodique venant de la droite. Pour les tests uniquement. */
   void addRightForce();
+#endif
   
   float *m_uPrev, *m_vPrev, *m_wPrev;
   float *m_dens, *m_densPrev, *m_densSrc;

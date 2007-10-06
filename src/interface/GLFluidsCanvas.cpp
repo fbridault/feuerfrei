@@ -113,7 +113,7 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new HybridSolver3D(ARGS_GC);
       break; 
     case LOD_HYBRID_SOLVER :
-      m_solvers[i] = new LODHybridSolver3D(ARGS_GC);
+      m_solvers[i] = new LODSolver3D(ARGS_GC);
       break;
     case LOGRES_SOLVER :
       m_solvers[i] = new LogResSolver3D(ARGS_LOG);

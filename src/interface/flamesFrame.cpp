@@ -511,9 +511,9 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
   m_config->Read(groupName + _("Vorticity"), &tmp, 0.02);
   solverConfig.vorticityConfinement = (float)tmp;
   
-  m_config->Read(groupName + _("omegaDiff"),&tmp, 1.5);
+  m_config->Read(groupName + _("omegaDiff"),&tmp, 1.0);
   solverConfig.omegaDiff = (float)tmp;
-  m_config->Read(groupName + _("omegaProj"),&tmp, 1.5);
+  m_config->Read(groupName + _("omegaProj"),&tmp, 1.6);
   solverConfig.omegaProj = (float)tmp;
   m_config->Read(groupName + _("epsilon"),&tmp, 0.00001);
   solverConfig.epsilon = (float)tmp;

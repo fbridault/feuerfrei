@@ -67,9 +67,9 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
 					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
-  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));
+  m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.0"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));
-  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.5"));
+  m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.6"));
   m_epsilonLabel = new wxStaticText(this, -1, _("Error threshold"));
   m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0.00001"));
   
@@ -106,8 +106,8 @@ void LuminaryPanel::setProperties()
   m_resXTextCtrl->SetMinSize(wxSize(50, 22));
   m_timeStepTextCtrl->SetMinSize(wxSize(60, 22));
   m_solverTypeRadioBox->SetSelection(0);
-  m_omegaDiffTextCtrl->SetMinSize(wxSize(60, 22));
-  m_omegaProjTextCtrl->SetMinSize(wxSize(60, 22));
+  m_omegaDiffTextCtrl->SetMinSize(wxSize(70, 22));
+  m_omegaProjTextCtrl->SetMinSize(wxSize(70, 22));
   m_epsilonTextCtrl->SetMinSize(wxSize(100, 22));
 }
 

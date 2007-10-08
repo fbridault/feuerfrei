@@ -600,8 +600,10 @@ void GLFlameCanvas::drawScene()
     else{
       glEnable (GL_LIGHTING);
       for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	   firesIterator != m_fires.end (); firesIterator++)
+	   firesIterator != m_fires.end (); firesIterator++){
+	(*firesIterator)->computeIntensityPositionAndDirection();
 	(*firesIterator)->switchOn ();
+      }
       m_scene->drawScene();
       glDisable (GL_LIGHTING);
     }

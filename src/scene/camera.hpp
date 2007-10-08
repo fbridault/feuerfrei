@@ -110,7 +110,6 @@ public:
     
     angleW = (input * 180 / PI)/ m_ouverture;
     angleH = (input * 180 / PI)/ (m_ouverture * m_aspect);
-    cerr << angleW << " " << angleH << endl;
     return (angleW * angleH);
   };
   

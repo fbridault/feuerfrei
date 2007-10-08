@@ -72,7 +72,7 @@ public:
 	char *infoLog = new char[infologLength];	    
 	int charsWritten  = 0;
 	glGetProgramInfoLog(m_program, infologLength, &charsWritten, infoLog);
-	cerr << infoLog << endl;
+	//cerr << infoLog << endl;
 	delete [] infoLog;
       }
   }

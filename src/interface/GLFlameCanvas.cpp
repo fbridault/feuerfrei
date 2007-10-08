@@ -185,7 +185,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
   
   m_init = true;
   
-  cerr << "Initialization over" << endl;
+  cout << "Initialization over" << endl;
 }
 
 void GLFlameCanvas::PauseThreads()
@@ -252,7 +252,7 @@ void GLFlameCanvas::Restart (void)
   m_swatch->Start();
   m_run = true;
   m_init = true;
-  cerr << "Initialization over" << endl;
+  cout << "Initialization over" << endl;
   Enable();
 }
 
@@ -297,7 +297,7 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
   m_swatch->Start();
   m_run = true;
   m_init = true;
-  cerr << "Initialization over" << endl;
+  cout << "Initialization over" << endl;
   Enable();
 }
 

@@ -71,7 +71,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
   if(sav != m_tex2DSize[1])
     m_tex2DSize[1] = m_tex2DSize[1] << 1;
   
-  cerr << "Texture 3D size : " << m_tex2DSize[0] << " " << m_tex2DSize[1] << endl;
+  cout << "Texture 3D size : " << m_tex2DSize[0] << " " << m_tex2DSize[1] << endl;
   
   tex3DValues = new GLfloat[m_tex2DSize[0]*m_tex2DSize[1]*m_flames->size()];
   ptrTex = tex3DValues;

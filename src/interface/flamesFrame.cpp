@@ -243,7 +243,7 @@ void FlamesFrame::InitGLBuffer()
 {
   m_glBuffer->Init(&m_currentConfig);
   m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
-  cerr << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
+  cout << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
   m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
   
   m_mainSizer->Fit(this);
@@ -902,7 +902,7 @@ void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
       res.BeforeFirst('x').ToULong(&w);
       res.AfterLast('x').ToULong(&h);
       m_currentConfig.width = (uint)w; m_currentConfig.height = (uint)h;
-      cerr << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
+      cout << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
       m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
       
       m_mainSizer->Fit(this);

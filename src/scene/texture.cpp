@@ -77,7 +77,7 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
   m_wxtex = new wxImage (filename);
 
   if(!m_wxtex) {
-    cout << "Error ";
+    cerr << "Error ";
   }else{
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
@@ -105,7 +105,7 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
   m_wxtex = new wxImage (filename);
 
   if(!m_wxtex) {
-    cout << "Error";
+    cerr << "Error";
   }else{
     if( m_wxtex->HasAlpha() )
       loadWithAlphaChannel();
@@ -133,7 +133,7 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
   cout << "Chargement texture : " << filename.fn_str() << "......";
   m_wxtex = new wxImage (filename);
   if(!m_wxtex) {
-    cout << "Error" << endl;
+    cerr << "Error" << endl;
   }else{
     if( m_wxtex->HasAlpha() )
 	loadWithAlphaChannel();

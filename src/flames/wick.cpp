@@ -224,7 +224,6 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	delete (*pointsIterator);
       pointsPartitionsArray[i].clear();
     }
-  cerr << "Terminé" << endl;
 }
 
 Wick::~Wick ()

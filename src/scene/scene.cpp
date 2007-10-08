@@ -10,7 +10,7 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
   m_flames = flames;
   
   addMaterial(new Material(this));
-  cerr << "Chargement de la scène " << fileName << endl;
+  cout << "Chargement de la scène " << fileName << endl;
   importOBJ(fileName);
   m_boundingSpheresMode=false;
   //sortTransparentObjects();
@@ -165,7 +165,6 @@ void Scene::getSceneAbsolutePath(const char* const fileName)
 {
   bool found=false;
   
-  cerr << fileName << endl;
   if(strlen(fileName) > 255)
     cerr << "Dir string too long" << endl;
   

@@ -44,7 +44,7 @@ public:
   uint GetHeight()
   { return m_height; }
   
-  void setSize(float width, float height)
+  void setSize(uint width, uint height)
   { m_width = width; m_height=height; }
   
 private:

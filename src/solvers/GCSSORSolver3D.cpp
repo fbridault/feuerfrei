@@ -562,7 +562,6 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
     }
     // calcul de z tel que (D/w -TL)z=u
     // pour calcul de z tel que Cz =r    
-    // calcul de z tel que (D/w -TL)z=u
 
     m_t =IX(m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ) ;
     mz=&m_z[m_t]; mzpnx=mz+m_nx; mzp1=mz+1; mzpn2=mz+m_n2;

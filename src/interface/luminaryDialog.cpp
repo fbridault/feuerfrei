@@ -57,11 +57,11 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
     _("Preconditioned Conjugated Gradient"),
     _("Preconditioned Conjugated Gradient-SSE"),
     _("Hybrid"),
-    _("LOD Hybrid"),
+    _("LOD Solver"),
     _("Simple field"),
     _("Fake field"),
     _("LOD field"),
-    _("LOD multi-res field ")
+    _("LOD smooth field ")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Velocity Field Type"), wxDefaultPosition, wxDefaultSize, 
 					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);

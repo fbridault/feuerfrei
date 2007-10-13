@@ -117,7 +117,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& posit
   case LOD_FIELD :
     return (new LODField3D(ARGS_GC));
   case LOD_HYBRID_FIELD :
-    return (new LODHybridField(ARGS_GC));
+    return (new LODSmoothField(ARGS_GC));
   default :
     cerr << "Unknown solver type : " << (int)fieldConfig.type << endl;
     ::wxExit();

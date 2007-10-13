@@ -614,7 +614,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
     }//for k
   }//for numiter
   if(norm2 > eb2){
-    cerr<<"précision non atteinte !!!"<<endl;
+    cerr<<"Bad accuracy in " << ((a == 1) ? "proj : " : "diff : ") << norm2 << " " << eb2 << endl;
   }
   
   return;
@@ -624,7 +624,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 void
 GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,4);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,10);
 }
 
 void
@@ -656,7 +656,7 @@ GCSSORSolver3D::project (float *const p, float *const div)
   fill_n(p, m_nbVoxels, 0.0f);
   //set_bnd (0, p);
   
-  GCSSOR(p,div,1, 6.0f, m_omegaProj,25);
+  GCSSOR(p,div,1, 6.0f, m_omegaProj,100);
   
   m_t = m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){

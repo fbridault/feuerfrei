@@ -89,15 +89,16 @@ public:
   virtual void setSamplingTolerance(u_char value){
     switch(value){
     case 0:
-      m_nurbs = m_accurateNurbs;
-      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 10);
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
       break;
     case 1:
-      m_nurbs = m_accurateNurbs;
-      gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 40);
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
       break;
     case 2:
-      m_nurbs = m_roughNurbs;
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
       break;
     }
   };
@@ -258,7 +259,7 @@ protected:
   
 private:
   /** Objet OpenGL permettant de définir la NURBS */
-  GLUnurbsObj *m_nurbs,*m_accurateNurbs,*m_roughNurbs;
+  GLUnurbsObj *m_nurbs;
 };
 
 

@@ -63,10 +63,10 @@ void FBO::CheckStatus(void)
       cerr << "Error initializing frame buffer object : FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT" << endl;
       exit(0);
       break;  
-    case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT :
-      cerr << "Error initializing frame buffer object : FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT" << endl;
-      exit(0);
-      break;  
+//     case GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT :
+//       cerr << "Error initializing frame buffer object : FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT" << endl;
+//       exit(0);
+//       break; 
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
       cerr << "Error initializing frame buffer object : FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" << endl;
       exit(0);

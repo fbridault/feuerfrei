@@ -1,11 +1,87 @@
 #ifndef LODFIELD3D_HPP
 #define LODFIELD3D_HPP
 
+class LODSolver3D;
 class LODField3D;
 
 #include "fakeField3D.hpp"
-#include "HybridSolver3D.hpp"
+#include "GCSSORSolver3D.hpp"
 
+#define RESOLUTION_MIN 6
+
+/** @test La classe LODSolver implémente un solveur de classe GCSSORSolver permettant d'utiliser une grille
+ * adaptative. La résolution de la grille ne pourra jamais dépasser la résolution initiale passée au constructeur.
+ */
+class LODSolver3D: public GCSSORSolver3D
+{
+public:
+  /** Constructeur du solveur.
+   * @param position Position du solveur de la flamme.
+   * @param n_x Résolution de la grille en x.
+   * @param n_y Résolution de la grille en y.
+   * @param n_z Résolution de la grille en z.
+   * @param dim Dimension du solveur, utilisé pour l'affichage de la flamme.
+   * @param timeStep Pas de temps utilisé pour la simulation.
+   * @param buoyancy Intensité de la force de flottabilité dans le solveur.
+   * @param omegaDiff Paramètre omega pour la diffusion.
+   * @param omegaProj Paramètre omega pour la projection.
+   * @param epsilon Tolérance d'erreur pour GCSSOR.
+   */
+  LODSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+	       float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
+  virtual ~LODSolver3D ();
+  
+  void iterate ()
+  { 
+    /* Adaptation de la taille de la grille */
+    while(m_resCount < 0){
+      decrementRes();
+//       divideRes();
+      m_resCount++;
+    }
+    while(m_resCount > 0){
+      incrementRes();
+//       multiplyRes();
+      m_resCount--;
+    }
+    
+    Solver3D::iterate();
+  }
+
+  virtual void decreaseRes () { m_resCount--; };  
+  virtual void increaseRes () { m_resCount++; };
+  
+  virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
+  
+  /** Fonction de dessin de la grille */
+  virtual void displayGrid ();
+  
+  /** Fonction de dessin du repère de base */
+  virtual void displayBase ();
+  
+private:
+  virtual void recomputeAttributes();
+  
+  virtual void divideRes ();
+  virtual void multiplyRes ();
+  virtual void decrementRes ();
+  virtual void incrementRes ();
+    
+  float *m_tmp;
+
+  /** Nombre de voxels initiaux en X. */
+  uint m_initialNbVoxelsX;
+  /** Nombre de voxels initiaux en Y. */
+  uint m_initialNbVoxelsY;
+  /** Nombre de voxels initiaux en Z. */
+  uint m_initialNbVoxelsZ;
+  /** Variable permettant de mémoriser les changements de grille, qui ne sont effectués réellement
+   * qu'en début d'itération dans iterate().
+   */
+  int m_resCount;
+  /** Niveau dans la grille. Le niveau supérieur est noté 0. */
+  uint m_level;
+};
 
 /** @test La classe LODField3D implémente un champ de vecteur fonctionnant soit comme un solveur de classe HybridSolver 
  * ou un FakeField3D, dans le but de moduler le niveau de détail en fonction de la distance.<br>
@@ -35,6 +111,10 @@ public:
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ()
   {
+    /* Changement de type de champ de vélocité si demandé */
+    if(m_currentField != m_fieldToSwitch)
+      m_currentField = m_fieldToSwitch;
+    
     m_currentField->iterate();
   };
   
@@ -53,9 +133,22 @@ public:
     m_currentField->addUsrc (pos, value);
   };
   
-  virtual void addVsrc (const Point& pos, float value, float& selfVelocity)
+  void addVsrc (const Point& pos, float value, float& selfVelocity)
   {
-    m_currentField->addVsrc (pos, value, selfVelocity);
+    //if(m_switch)
+    m_solver.addVsrc (pos, value, selfVelocity);
+    m_fakeField.addVsrc (pos, value, selfVelocity);
+    //}else
+    //m_currentField->addVsrc (pos, value, selfVelocity);
+  };
+  
+  void cleanSources ()
+  {
+    //if(m_switch){
+    m_fakeField.cleanSources();
+    m_solver.cleanSources();
+    //}else
+    //m_currentField->cleanSources();
   };
   
   void addWsrc (const Point& pos, float value)
@@ -63,16 +156,16 @@ public:
     m_currentField->addWsrc (pos, value);
   };
   
-  virtual void cleanSources ()
-  {
-    m_currentField->cleanSources ();
-  };
-  
   void displayVelocityField (void)
   {
     m_currentField->displayVelocityField ();
   };
   
+  void displayGrid (void)
+  {
+    m_currentField->displayGrid ();
+  };
+    
   Point getPosition (void) const { return m_currentField->getPosition(); };
   
   void setPosition (const Point& position) 
@@ -125,26 +218,29 @@ public:
   }
   
   virtual bool isRealSolver () const { return (m_currentField == &m_solver); };
-  virtual void switchToRealSolver () { m_currentField = &m_solver; };
-  virtual void switchToFakeField () { m_currentField = &m_fakeField; };
-  
+  virtual void switchToRealSolver () { m_fieldToSwitch = &m_solver; };
+  virtual void switchToFakeField () { m_fieldToSwitch = &m_fakeField; };
+    
+  virtual void decreaseRes () { m_solver.decreaseRes(); };
+  virtual void increaseRes () { m_solver.increaseRes(); };
+  virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
 protected:
   FakeField3D m_fakeField;
   LODSolver3D m_solver;
   /** Pointeur sur le champ de vecteur utilisé. */
   Field3D *m_currentField;
+  Field3D *m_fieldToSwitch;
 private:
   virtual void addExternalForces(const Point& position, bool move) {};
   virtual void add_source (float *const x, float *const src){};
-  
 };
 
 #define NB_STEPS_TO_SWITCH 40
 
-/** @test La classe LODHybridField implémente un champ de vecteur fonctionnant sur la base d'un LODField3D.
+/** @test La classe LODSmoothField implémente un champ de vecteur fonctionnant sur la base d'un LODField3D.
  * La différence intervient lors de la transition entre deux solveurs, une interpolation linéaire est effectuée.
  */
-class LODHybridField: public LODField3D
+class LODSmoothField: public LODField3D
 {
 public:
   /** Constructeur du solveur.
@@ -159,23 +255,13 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODHybridField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  LODSmoothField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
 		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
-  virtual ~LODHybridField () {};
+  virtual ~LODSmoothField () {};
   
   /********************* Redéfinition des méthodes héritées *********************/
   void iterate ()
   {
-    /* Adaptation de la taille de la grille */
-    while(m_resCount < 0){
-      m_solver.decreaseRes();
-      m_resCount++;
-    }
-    while(m_resCount > 0){
-      m_solver.increaseRes();
-      m_resCount--;
-    }
-    
     if(m_switch)
       {
 	m_switch--;
@@ -214,37 +300,14 @@ public:
       m_currentField->moveParticle (pos, selfVelocity);
   };
   
-  void addVsrc (const Point& pos, float value, float& selfVelocity)
-  {
-    //if(m_switch)
-    m_solver.addVsrc (pos, value, selfVelocity);
-    m_fakeField.addVsrc (pos, value, selfVelocity);
-    //}else
-    //m_currentField->addVsrc (pos, value, selfVelocity);
-  };
-  
-  void cleanSources ()
-  {
-    //if(m_switch){
-    m_fakeField.cleanSources();
-    m_solver.cleanSources();
-    //}else
-    //m_currentField->cleanSources();
-  };
-  
-  void displayGrid (void)
-  {
-    m_currentField->displayGrid ();
-  };
-  
   void switchToRealSolver ()
   {
     cerr << "real" << endl;
     m_switch = NB_STEPS_TO_SWITCH;
-    m_fieldWeight = 1;
+    m_fieldWeight = 1.0f;
     m_solverWeight = 0.0f;
-    m_fieldIncrement = -1/(float)NB_STEPS_TO_SWITCH;
-    m_solverIncrement = 1/(float)NB_STEPS_TO_SWITCH;
+    m_fieldIncrement = -1.0f/(float)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = 1.0f/(float)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_solver; 
   };
   
@@ -253,25 +316,18 @@ public:
     cerr << "fake" << endl;
     m_switch = NB_STEPS_TO_SWITCH;
     m_fieldWeight = 0.0f;
-    m_solverWeight = 1;
-    m_fieldIncrement =   1/(float)NB_STEPS_TO_SWITCH;
-    m_solverIncrement = -1/(float)NB_STEPS_TO_SWITCH;
+    m_solverWeight = 1.0f;
+    m_fieldIncrement =   1.0f/(float)NB_STEPS_TO_SWITCH;
+    m_solverIncrement = -1.0f/(float)NB_STEPS_TO_SWITCH;
     m_fieldToSwitch = &m_fakeField;
 //     while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
 //       m_solver.decreaseRes();
   };
   
-  virtual void divideRes () { m_solver.divideRes(); };  
-  virtual void multiplyRes () { m_solver.multiplyRes(); };  
-  virtual void decreaseRes () { m_resCount--; };  
-  virtual void increaseRes () { m_resCount++; };
-  virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
 private:
-  Field3D *m_fieldToSwitch;
   uint m_switch;
   float m_fieldWeight, m_solverWeight;
   float m_fieldIncrement, m_solverIncrement;
-  int m_resCount;
 };
 
 #endif

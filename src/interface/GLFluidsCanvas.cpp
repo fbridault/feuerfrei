@@ -138,7 +138,7 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new LODField3D(ARGS_GC);
       break;
     case LOD_HYBRID_FIELD :
-      m_solvers[i] = new LODHybridField(ARGS_GC);
+      m_solvers[i] = new LODSmoothField(ARGS_GC);
       break;
     default :
       cerr << "Unknown solver type : " << (int)m_currentConfig->solvers[i].type << endl;

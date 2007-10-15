@@ -5,7 +5,7 @@ class GCSSORSolver3D;
 
 #include "solver3D.hpp"
 
-/** La classe GCSSSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
+/** La classe GCSSORSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
  * méthode de resolution des systèmes linéaires.
  * 
  * @author	Flavien Bridault et Michel Leblond

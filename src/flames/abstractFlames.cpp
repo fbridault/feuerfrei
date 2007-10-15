@@ -33,15 +33,16 @@ NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* co
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;
   
-  initNurbs(&m_accurateNurbs);
-  gluNurbsProperty(m_accurateNurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
-  gluNurbsProperty(m_accurateNurbs, GLU_PARAMETRIC_TOLERANCE, 10);
-  initNurbs(&m_roughNurbs);
-  gluNurbsProperty(m_roughNurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
-  gluNurbsProperty(m_roughNurbs, GLU_U_STEP, 1);
-  gluNurbsProperty(m_roughNurbs, GLU_V_STEP, 1);
-  
-  m_nurbs = m_accurateNurbs;
+  initNurbs(&m_nurbs);
+//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
+//   gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 10);
+
+//  gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PATH_LENGTH);
+//  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 60);
+
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
+  gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
+  gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
   
   m_shadingType=1;
   
@@ -73,15 +74,13 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   m_texPointsSave = m_texPoints;
   m_texTmpSave = m_texTmp;
   
-  initNurbs(&m_accurateNurbs);
-  gluNurbsProperty(m_accurateNurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
-  gluNurbsProperty(m_accurateNurbs, GLU_PARAMETRIC_TOLERANCE, 10);
-  initNurbs(&m_roughNurbs);
-  gluNurbsProperty(m_roughNurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
-  gluNurbsProperty(m_roughNurbs, GLU_U_STEP, 1);
-  gluNurbsProperty(m_roughNurbs, GLU_V_STEP, 1);
-  
-  m_nurbs = m_accurateNurbs;
+  initNurbs(&m_nurbs);
+//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PATH_LENGTH);
+//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 100);
+
+  gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
+  gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
+  gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
   
   m_shadingType=1;
   
@@ -92,8 +91,7 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
 
 NurbsFlame::~NurbsFlame()
 {
-  gluDeleteNurbsRenderer(m_accurateNurbs);
-  gluDeleteNurbsRenderer(m_roughNurbs);
+  gluDeleteNurbsRenderer(m_nurbs);
   
   delete[]m_ctrlPoints;
   delete[]m_uknots;
@@ -123,12 +121,15 @@ void NurbsFlame::initNurbs(GLUnurbsObj** nurbs)
 void NurbsFlame::drawNurbs () const
 {
   if(m_uknotsCount){
+//     unsigned long long int start;
+//    start = rdtsc();
     gluBeginSurface (m_nurbs);
     gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, m_vsize * 2,
 		     2, m_texPoints, m_uorder, m_vorder, GL_MAP2_TEXTURE_COORD_2);
     gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, m_vsize * 3,
 		     3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
     gluEndSurface (m_nurbs);
+//     cerr << (rdtsc() - start)/CPU_FREQ << endl;
   }
 }
 
@@ -461,16 +462,16 @@ bool RealFlame::build ()
   
   for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
     m_vknots[j] = m_vknots[j-1]+1;
-  /* Adoucit la jointure entre le haut des squelettes périphériques et le haut du squelette guide ex: 0 0 0 0 1 2 3 4 5 6 6 6 6*/
+  /* Adoucit la jointure entre le haut des squelettes périphériques et le haut du squelette guide ex: 0 0 0 0 1.9 2 3 4 5 6 6 6 6*/
   m_vknots[m_vorder] += .9f;
   
   m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
   for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
     m_vknots[j] = m_vknots[j-1];
 
-//   for (j = 0; j < m_vknotsCount; j++)
-//     cerr << m_vknots[j] << " ";
-//   cerr << endl;
+//    for (j = 0; j < m_vknotsCount; j++)
+//      cerr << m_vknots[j] << " ";
+//    cerr << endl;
   
   if(m_vsize*m_nbSkeletons != m_count)
      cerr << "error " << m_vsize*m_nbSkeletons << " " << m_count << endl;

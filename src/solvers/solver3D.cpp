@@ -22,6 +22,17 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_rotz     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
   m_rot      = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
   
+//   m_uPrev    = new float[m_nbVoxels];
+//   m_vPrev    = new float[m_nbVoxels];
+//   m_wPrev    = new float[m_nbVoxels];
+//   m_dens     = new float[m_nbVoxels];
+//   m_densPrev = new float[m_nbVoxels];
+//   m_densSrc  = new float[m_nbVoxels];
+//   m_rotx     = new float[m_nbVoxels];
+//   m_roty     = new float[m_nbVoxels];
+//   m_rotz     = new float[m_nbVoxels];
+//   m_rot      = new float[m_nbVoxels];
+  
   fill_n(m_uPrev, m_nbVoxels, 0.0f);
   fill_n(m_vPrev, m_nbVoxels, 0.0f);
   fill_n(m_wPrev, m_nbVoxels, 0.0f);
@@ -49,6 +60,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx + 1;
   m_t2nx = 2*m_nx;
+  
   // chercher le premier groupe de 4 contenant le premier voxel
   // de la grille initiale
   // m_t1 = 4*q1 + r1 avec 0 <= r1 < 4
@@ -80,7 +92,17 @@ Solver3D::~Solver3D ()
   _mm_free(m_roty);
   _mm_free(m_rotz);
   _mm_free(m_rot);
-
+  
+//   delete [] m_uPrev;
+//   delete [] m_vPrev;
+//   delete [] m_wPrev;
+//   delete [] m_dens;
+//   delete [] m_densPrev;
+//   delete [] m_densSrc;
+//   delete [] m_rotx;
+//   delete [] m_roty;
+//   delete [] m_rotz;
+//   delete [] m_rot;
 }
 
 void Solver3D::set_bnd (unsigned char b, float *const x)
@@ -88,18 +110,18 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
   uint i, j;
 
   /* Attention cela ne prend pas en compte les coins et les arêtes entre les coins */
-  for (i = 1; i <= m_nbVoxelsY; i++)
+  for (i = 0; i <= m_nbVoxelsY+1; i++)
     {
-      for (j = 1; j <= m_nbVoxelsZ; j++)
+      for (j = 0; j <= m_nbVoxelsZ+1; j++)
 	{
 	  x[IX (0, i, j)] = 0.0f;	//x[IX(i,j,1)];
 	  x[IX (m_nbVoxelsX + 1, i, j)] = 0.0f;	//x[IX(i,j,N)];
 	}
     }
 
-  for (i = 1; i <= m_nbVoxelsX; i++)
+  for (i = 0; i <= m_nbVoxelsX+1; i++)
     {
-      for (j = 1; j <= m_nbVoxelsZ; j++)
+      for (j = 0; j <= m_nbVoxelsZ+1; j++)
 	{
 	  x[IX (i, 0, j)] = 0.0f;	//x[IX(i, 1, j)];
 	  //x[IX(i, N+1, j)] = 0;//x[IX(i,N,j)];
@@ -107,9 +129,9 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
 	}
     }
 
-  for (i = 1; i <= m_nbVoxelsX; i++)
+  for (i = 0; i <= m_nbVoxelsX+1; i++)
     {
-      for (j = 1; j <= m_nbVoxelsY; j++)
+      for (j = 0; j <= m_nbVoxelsY+1; j++)
 	{
 	  x[IX (i, j, 0)] = 0.0f;	//x[IX(i,j,1)];
 	  x[IX (i, j, m_nbVoxelsZ + 1)] = 0.0f;	//x[IX(i,j,N)];
@@ -268,7 +290,7 @@ void Solver3D::vel_step ()
 }
 
 // Affiche le temps passé dans chacune des étapes
-// #define CPU_FREQ 2000000000.0
+// 
 // void Solver3D::vel_step ()
 // {  
 //   unsigned long long int start, t, start2, t3;
@@ -312,7 +334,7 @@ void Solver3D::iterate ()
   //       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0f;
 
   // On normalise !!!
-  float invy = 1/(float)m_nbVoxelsY;
+  float invy = 1.0f/(float)m_nbVoxelsY;
   
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
@@ -429,7 +451,7 @@ void Solver3D::addRightForce()
 	    m_wSrc[IX(i, j, m_nbVoxelsZ)] -= .5*m_forceCoef;
       }else
 	if(m_perturbateCount>=80 && m_perturbateCount< 90)
-	  m_vorticityConfinement = 3;	  
+	  m_vorticityConfinement = 3;
     m_perturbateCount++;
   }
 }

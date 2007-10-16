@@ -221,7 +221,7 @@ inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
 {
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)
-    (*firesIterator)->drawBoundingBox ();
+    (*firesIterator)->drawImpostor ();
 }
 
 #endif

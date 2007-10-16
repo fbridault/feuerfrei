@@ -3,7 +3,7 @@
 
 #define NO_BOUNDING_VOLUME 0
 #define BOUNDING_SPHERE 1
-#define BOUNDING_BOX 2
+#define IMPOSTOR 2
 
 class FlameLight;
 class FireSource;
@@ -240,7 +240,7 @@ public:
 #endif
     switch(boundingVolume){
     case BOUNDING_SPHERE : drawBoundingSphere(); break;
-    case BOUNDING_BOX : drawBoundingBox(); break;
+    case IMPOSTOR : drawImpostor(); break;
     default : 
       if(m_visibility)
 	{
@@ -267,18 +267,7 @@ public:
   
   virtual void drawBoundingSphere() const { if(m_visibility) m_boundingSphere.draw(); };
   
-  virtual void drawBoundingBox() const
-  {
-    if(m_visibility){
-      Point position(getPosition());
-      Point scale(m_solver->getScale());
-      glPushMatrix();
-      glTranslatef (position.x, position.y, position.z);
-      glScalef (scale.x, scale.y, scale.z);
-      GraphicsFn::SolidBox(Point(),m_solver->getDim());
-      glPopMatrix();
-    }
-  };
+  virtual void drawImpostor() const;
   
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
    */
@@ -419,14 +408,7 @@ public:
   virtual void build();
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
   
-  virtual void drawBoundingBox () const
-  {
-    Point position(getPosition());
-    glPushMatrix();
-    glTranslatef (position.x, position.y, position.z);
-    GraphicsFn::SolidBox(m_BBmin,m_BBmax);
-    glPopMatrix();
-  }
+  virtual void drawImpostor () const;
 
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.

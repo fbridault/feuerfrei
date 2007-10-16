@@ -161,6 +161,46 @@ void FireSource::buildBoundingSphere ()
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
   //  m_boundingSphere.centre = getCenterSP();
 }
+ 
+void FireSource::drawImpostor() const
+{
+  if(m_visibility)
+    {
+      GLfloat modelview[16];
+            
+      Point pos(m_solver->getPosition());
+      float size=m_solver->getDim().x*1.1;
+      Point a,b,c,d,zero;
+      Vector right,up,offset;//(0.0f,0.0f,0.5f);
+      
+      glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
+      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f;
+		      
+      right.x = modelview[0];
+      right.y = modelview[4];
+      right.z = modelview[8];
+	
+      up.x = modelview[1];
+      up.y = modelview[5];
+      up.z = modelview[9];
+      
+      a = pos - right * (size * 0.5f);
+      b = pos + right * size * 0.5f;
+      c = pos + right * size * 0.5f + up * size;
+      d = pos - right * size * 0.5f + up * size;
+	
+      glPushMatrix();
+      glColor3f(1.0f,1.0f,1.0f);
+      glTranslatef(offset.x,offset.y,offset.z);
+      glBegin(GL_QUADS);
+      glVertex3f(a.x+0.5f, a.y, a.z+0.5f);
+      glVertex3f(b.x+0.5f, b.y, b.z+0.5f);
+      glVertex3f(c.x+0.5f, c.y, c.z+0.5f);
+      glVertex3f(d.x+0.5f, d.y, d.z+0.5f);	
+      glEnd();
+      glPopMatrix();
+    }
+}
 
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {
@@ -269,7 +309,7 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
 #endif
   switch(boundingVolume){
   case 1 : drawBoundingSphere(); break;
-  case 2 : drawBoundingBox(); break;
+  case 2 : drawImpostor(); break;
   default : 
     if(m_visibility)
       {
@@ -358,8 +398,48 @@ void DetachableFireSource::build()
     m_boundingSphere.radius = sqrt(k+k);
     m_boundingSphere.centre = m_solver->getPosition() + p;
 //   }
-  /* Calcul de la bouding box pour affichage */
+    /* Calcul de la bounding box pour affichage */
     buildBoundingBox ();
+}
+
+void DetachableFireSource::drawImpostor() const
+{
+  if(m_visibility)
+    {
+      GLfloat modelview[16];
+            
+      Point pos(m_solver->getPosition());
+      float size=m_solver->getDim().x*1.1;
+      Point a,b,c,d,zero;
+      Vector right,up,offset;//(0.0f,0.0f,0.5f);
+      
+      glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
+      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f;
+		      
+      right.x = modelview[0];
+      right.y = modelview[4];
+      right.z = modelview[8];
+	
+      up.x = modelview[1];
+      up.y = modelview[5];
+      up.z = modelview[9];
+      
+      a = pos - right * (size * 0.5f);
+      b = pos + right * size * 0.5f;
+      c = pos + right * size * 0.5f + up * size;
+      d = pos - right * size * 0.5f + up * size;
+	
+      glPushMatrix();
+      glColor3f(1.0f,1.0f,1.0f);
+      glTranslatef(offset.x,offset.y,offset.z);
+      glBegin(GL_QUADS);
+      glVertex3f(a.x+0.5f, a.y, a.z+0.5f);
+      glVertex3f(b.x+0.5f, b.y, b.z+0.5f);
+      glVertex3f(c.x+0.5f, c.y, c.z+0.5f);
+      glVertex3f(d.x+0.5f, d.y, d.z+0.5f);	
+      glEnd();
+      glPopMatrix();
+    }
 }
 
 void DetachableFireSource::setSmoothShading (bool state)

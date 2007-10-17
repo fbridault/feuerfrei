@@ -108,10 +108,16 @@ public:
       (*fireIterator)->setPeriLifeSpan(value); 
   };
 
-  virtual void setBuoyancy(float value){
+  virtual void setBuoyancy(float value) {
     for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
 	 fieldIterator != m_fields.end (); fieldIterator++)
-      (*fieldIterator)->setBuoyancy(value); 
+      (*fieldIterator)->setBuoyancy(value);
+  }
+  
+  virtual void setVorticity(float value) {
+    for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
+	 fieldIterator != m_fields.end (); fieldIterator++)
+      (*fieldIterator)->setVorticity(value);
   }
   
   /** Déplace le luminaire.

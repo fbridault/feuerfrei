@@ -105,14 +105,13 @@ public:
   void setFlameForces(int index, float value){ m_fires[index]->setInnerForce(value); };
   void setFlameIntensity(int index, float value){ m_fires[index]->setIntensityCoef(value); };
   void setFlameSamplingTolerance(int index, u_char value){ m_fires[index]->setSamplingTolerance(value); };
-
-
+  
   void setLuminaryBuoyancy(int index, float value){ 
-    if(index >= 0) m_fields[index]->setBuoyancy(value);
+    if(index >= 0) m_luminaries[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
   void setLuminaryVorticity(int index, float value){ 
-    if(index >= 0) m_fields[index]->setVorticity(value);
+    if(index >= 0) m_luminaries[index]->setVorticity(value);
     else m_globalField->setVorticity(value);
   };
   void setLuminaryForces(int index, float value){ m_luminaries[index]->setInnerForce(value); };

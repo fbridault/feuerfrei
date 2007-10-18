@@ -77,8 +77,8 @@ void GLFluidsCanvas::InitGL()
   glEnable (GL_CULL_FACE);
   glCullFace (GL_BACK);
   
-  glEnable (GL_AUTO_FULL_SKELETON);
-  glEnable (GL_FULL_SKELETONIZE);
+  glEnable (GL_AUTO_NORMAL);
+  glEnable (GL_NORMALIZE);
 
   glPolygonMode(GL_FRONT,GL_FILL);
   //glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);

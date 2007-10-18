@@ -389,8 +389,9 @@ public:
   {
     uint i;
     /* Déplacement et détermination du maximum */
-    for (i = 0; i < m_nbSkeletons; i++)
-      m_periSkeletons[i]->draw();
+    if(m_lodSkel==NORMAL)
+      for (i = 0; i < m_nbSkeletons; i++)
+	m_periSkeletons[i]->draw();
     for (i = 0; i < m_nbLeadSkeletons; i++)
       m_leadSkeletons[i]->draw();
   };

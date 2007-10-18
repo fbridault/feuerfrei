@@ -854,7 +854,7 @@ void FlamesFrame::OnFBDBMenu(wxCommandEvent& event)
   m_menuDisplayFlames->Check(IDM_Wired,false);
   m_menuDisplayFlames->Check(IDM_FBDB,true);
   m_menuDisplayFlames->Check(IDM_FBDS,false);
-  m_glBuffer->setBoundingVolumesDisplay(BOUNDING_BOX);
+  m_glBuffer->setBoundingVolumesDisplay(IMPOSTOR);
 }
 
 void FlamesFrame::OnWiredMenu(wxCommandEvent& event)

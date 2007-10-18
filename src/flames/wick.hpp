@@ -43,7 +43,7 @@ public:
    * @param position Position de la mèche dans l'espace.
    * @param leadSkeletons Vecteur des squelettes guides.
    */
-  void build(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver);
+  uint build(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver);
   
   /** Affiche la mèche
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.

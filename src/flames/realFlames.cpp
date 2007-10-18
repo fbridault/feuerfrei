@@ -8,17 +8,17 @@
 /**********************************************************************************************************************/
 
 LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-		      Wick *wickObject, float detachedFlamesWidth, DetachableFireSource *parentFire ) :
+		      Wick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire ) :
   RealFlame ((flameConfig.skeletonsNumber+2)*2, 3, tex, s)
 {
   Point pt;
-  float largeur = .03f;
   uint i,j;
+  uint sliceDirection;
   
-  Point rootMoveFactorP(2.0f,.1f,.5f);
+  Point rootMoveFactorP(.5f,.1f,.5f);
   
   m_wick = wickObject;
-  m_wick->build(flameConfig, m_leadSkeletons, s);
+  sliceDirection = m_wick->build(flameConfig, m_leadSkeletons, s);
   m_nbLeadSkeletons = m_leadSkeletons.size();
   
   /** Allocation des squelettes périphériques = deux par squelette périphérique */
@@ -29,7 +29,11 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   for (i = 0; i < m_nbLeadSkeletons; i++)
     {
       pt = *m_leadSkeletons[i]->getRoot();
-      pt.z -= (largeur / 2.0f);
+      switch(sliceDirection){
+      case 0 : pt.z -= (width / 2.0f);
+      case 1 : pt.z -= (width / 2.0f);
+      case 2 : pt.x -= (width / 2.0f);
+      }
       m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i], flameConfig.periLifeSpan);
     }
   
@@ -37,7 +41,11 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons; j > 0; j--, i++)
     {
       pt = *m_leadSkeletons[j-1]->getRoot();
-      pt.z += (largeur / 2.0f);
+      switch(sliceDirection){
+      case 0 : pt.z += (width / 2.0f);
+      case 1 : pt.z += (width / 2.0f);
+      case 2 : pt.x += (width / 2.0f);
+      }
       m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j-1], flameConfig.periLifeSpan);
     }
   
@@ -46,6 +54,8 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   m_detachedFlamesWidth = detachedFlamesWidth;
   m_samplingMethod = 1;  
   m_vTexInit = 0;
+  
+  m_utexInc = 4.0f/(m_nbSkeletons);
 }
 
 LineFlame::~LineFlame ()
@@ -111,7 +121,11 @@ void LineFlame::computeVTexCoords()
     m_vTexInit = (m_vTexInit >= 0.85f) ? 0.0f : m_vTexInit + 0.15f;
   else
     m_vTexInit = 0.0;
-  vinc = 1.0f / (float)(m_vsize-1);
+  if(m_lodSkel == NORMAL)
+    vinc = 1.0f / (float)(m_vsize-1);
+  else
+    vinc = 1.0f / (float)(m_vsize-1);
+    
   vtmp = m_vTexInit;
   for (i = 0; i < m_vsize; i++)
     {
@@ -123,11 +137,11 @@ void LineFlame::computeVTexCoords()
 bool LineFlame::buildSimplified ()
 {
   uint i, j, l;
-  float vtex;
+  float utex;
   float dist_max;
   m_maxParticles = 0;
   m_count = 0;
-  vtex = -0.5f;
+  utex = 0.0f;
   
   if(m_lodSkelChanged) changeSkeletonsLOD();
   
@@ -156,7 +170,6 @@ bool LineFlame::buildSimplified ()
   /* Direction des u */
   for (i = 0; i < m_nbLeadSkeletons; i++)
     {
-      vtex += .5f;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_leadSkeletons[i]->getSize () < m_maxParticles)
@@ -200,7 +213,7 @@ bool LineFlame::buildSimplified ()
 	  
 	  for (j = 0; j < m_leadSkeletons[i]->getSize () - 1; j++)
 	    {
-	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), utex);
 	      /* On regarde s'il ne faut pas ajouter un point */
 	      for (l = 0; l < nb_pts_supp; l++)
 		{
@@ -208,18 +221,18 @@ bool LineFlame::buildSimplified ()
 		    {
 		      /* On peut référencer j+1 puisque m_maxDistancesIndexes[l] != j si j == m_leadSkeletons[i]->getSize()-1 */
 		      pt = Point::pointBetween(m_leadSkeletons[i]->getParticle (j), m_leadSkeletons[i]->getParticle (j + 1));
-		      setCtrlPoint (&pt, vtex);
+		      setCtrlPoint (&pt, utex);
 		    }
 		}
 	    }	  
-	  setCtrlPoint (m_leadSkeletons[i]->getLastParticle (), vtex);
+	  setCtrlPoint (m_leadSkeletons[i]->getLastParticle (), utex);
 	  
 	  bool prec = false;
 	  for (l = 0; l < nb_pts_supp; l++)
 	    if (m_maxDistancesIndexes[l] == (int)m_leadSkeletons[i]->getSize ()-1)
 	      {
 		pt = Point::pointBetween(m_leadSkeletons[i]->getRoot (), m_leadSkeletons[i]-> getLastParticle ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
 	  
@@ -232,10 +245,10 @@ bool LineFlame::buildSimplified ()
 		    pt = *m_leadSkeletons[i]-> getRoot ();
 		  }
 		pt = Point::pointBetween (&pt, m_leadSkeletons[i]->getLastParticle ());
-		setCtrlPoint (&pt, vtex);
+		setCtrlPoint (&pt, utex);
 		prec = true;
 	      }
-	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), vtex);
+	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), utex);
 	}
       else
 	{
@@ -243,11 +256,12 @@ bool LineFlame::buildSimplified ()
 	  /* Remplissage des points de contrôle */
 	  for (j = 0; j < m_leadSkeletons[i]->getSize (); j++)
 	    {
-	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), vtex);
+	      setCtrlPoint (m_leadSkeletons[i]->getParticle (j), utex);
 	    }
-	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), vtex);
+	  setCtrlPoint (m_leadSkeletons[i]->getRoot (), utex);
 	}
       m_texTmp = m_texTmpSave;
+      utex += m_utexInc;
     }
   
   m_ctrlPoints = m_ctrlPointsSave; 
@@ -256,19 +270,16 @@ bool LineFlame::buildSimplified ()
   /* Affichage en NURBS */
   m_uknotsCount = m_nbLeadSkeletons + m_uorder;
   m_vknotsCount = m_vsize + m_vorder;
-
-  for (i = 0; i < m_uknotsCount; i++)
-    m_uknots[i] = (float)i;
-
-//   for (i = 0; i < m_uorder; i++)
-//     m_uknots[i] = 0;
   
-//   for (i = m_uorder; i < m_uknotsCount-m_uorder; i++)
-//     m_uknots[i] = m_uknots[i-1]+1;
+  for (i = 0; i < m_uorder; i++)
+    m_uknots[i] = 0;
   
-//   m_uknots[m_uknotsCount-m_uorder] =  m_uknots[m_uknotsCount-m_uorder-1]+1;
-//   for (i = m_uknotsCount-m_uorder+1; i < m_uknotsCount; i++)
-//     m_uknots[i] = m_uknots[i-1];
+  for (i = m_uorder; i < m_uknotsCount-m_uorder; i++)
+    m_uknots[i] = m_uknots[i-1]+1;
+  
+  m_uknots[m_uknotsCount-m_uorder] =  m_uknots[m_uknotsCount-m_uorder-1]+1;
+  for (i = m_uknotsCount-m_uorder+1; i < m_uknotsCount; i++)
+    m_uknots[i] = m_uknots[i-1];
   
   for (j = 0; j < m_vorder; j++)
     m_vknots[j] = 0.0f;
@@ -368,6 +379,8 @@ PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex
     }
   
   m_wick = wick;
+  
+  m_utexInc = 2.0f/m_nbSkeletons;
 }
 
 PointFlame::~PointFlame ()
@@ -444,11 +457,10 @@ void DetachedFlame::computeVTexCoords()
 bool DetachedFlame::build()
 {
   uint i, j, l;
-  float utex, utexInc;
+  float utex;
   float dist_max;
   m_maxParticles = 0;
-  utex = -0.5f;
-  utexInc = 2.0f/(float)m_nbSkeletons;
+  utex = 0.0f;
 
   for (i = 0; i < m_nbLeadSkeletons; i++)
     m_leadSkeletons[i]->move ();
@@ -471,7 +483,6 @@ bool DetachedFlame::build()
   /* Direction des u */
   for (i = 0; i < m_nbSkeletons; i++)
     {
-      utex += utexInc;
       /* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
       /* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
       if (m_periSkeletons[i]->getSize () < m_maxParticles)
@@ -577,6 +588,7 @@ bool DetachedFlame::build()
 	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), utex);
 	}
       m_texTmp = m_texTmpSave;
+      utex += m_utexInc;
     }
   
   /* On recopie les m_uorder squelettes pour fermer la NURBS */

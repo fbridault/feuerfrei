@@ -151,7 +151,7 @@ public:
   {
     switch(boundingVolume){
     case BOUNDING_SPHERE : drawBoundingSphere(); break;
-    case BOUNDING_BOX : drawBoundingBox(); break;
+    case IMPOSTOR : drawImpostor(); break;
     default : 
       if(m_visibility)
 	{

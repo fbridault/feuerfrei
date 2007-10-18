@@ -36,7 +36,7 @@ public:
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
   LineFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s,
-	     Wick *wickObject, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
+	     Wick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
   virtual ~LineFlame();
   
   virtual void drawFlame(bool display, bool displayParticle) const{
@@ -98,8 +98,8 @@ public:
 //       {
 // 	m_nbFixedPoints = 1;
 // 	m_shadingType = m_shadingType | 2;
-// 	m_uorder = 3;
-// 	m_vorder = 3;
+// // 	m_uorder = 3;
+// // 	m_vorder = 3;
 //       }
   };
   /** Méthode permettant de générer des étincelles dans le feu.

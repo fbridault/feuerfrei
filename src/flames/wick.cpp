@@ -7,7 +7,7 @@ Wick::Wick (Scene* const scene) : Object(scene)
 {
 }
 
-void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver )
+uint Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver )
 {
   Point bounds[flameConfig.skeletonsNumber + 1];
   Point MinBound (FLT_MAX, FLT_MAX, FLT_MAX), MaxBound (FLT_MIN, FLT_MIN, FLT_MIN);
@@ -47,6 +47,7 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
   
   switch(max){
   case 0 : 
+    /* Découpage en x */
     for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
       bounds[i] = bounds[i-1];
       bounds[i].x += midDist.x;
@@ -66,7 +67,7 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
     //       cerr << "Découpe en x" << endl;
     break;
   case 1 :
-    /* Découpage en y */      
+    /* Découpage en y */
     for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
       bounds[i] = bounds[i-1];
       bounds[i].y += midDist.y;
@@ -86,7 +87,7 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
     //       cerr << "Découpe en y" << endl;
     break;
   case 2 :
-    /* Découpage en z */      
+    /* Découpage en z */
     for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
       bounds[i] = bounds[i-1];
       bounds[i].z += midDist.z;
@@ -224,6 +225,8 @@ void Wick::build (const FlameConfig& flameConfig, vector< LeadSkeleton * >& lead
 	delete (*pointsIterator);
       pointsPartitionsArray[i].clear();
     }
+  
+  return (max);
 }
 
 Wick::~Wick ()

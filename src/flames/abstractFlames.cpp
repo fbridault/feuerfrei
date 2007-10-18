@@ -34,12 +34,6 @@ NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* co
   m_texTmpSave = m_texTmp;
   
   initNurbs(&m_nurbs);
-//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PARAMETRIC_ERROR);
-//   gluNurbsProperty(m_nurbs, GLU_PARAMETRIC_TOLERANCE, 10);
-
-//  gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PATH_LENGTH);
-//  gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 60);
-
   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
   gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
   gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
@@ -75,9 +69,6 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   m_texTmpSave = m_texTmp;
   
   initNurbs(&m_nurbs);
-//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_PATH_LENGTH);
-//   gluNurbsProperty(m_nurbs, GLU_SAMPLING_TOLERANCE, 100);
-
   gluNurbsProperty(m_nurbs, GLU_SAMPLING_METHOD, GLU_DOMAIN_DISTANCE);
   gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
   gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
@@ -258,7 +249,6 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
   m_solver = s;
   m_lodSkelChanged = false;
   m_lodSkel = NORMAL;
-  
 //   m_lodSkelChanged = true;
 //   m_lodSkel = SIMPLIFIED;
 }
@@ -280,12 +270,11 @@ void RealFlame::computeVTexCoords()
 bool RealFlame::build ()
 {
   uint i, j, l;
-  float utex, utexInc;
+  float utex;
   float dist_max;
   m_maxParticles = 0;
   m_count = 0;
   utex = 0.0f;
-  utexInc = 2.0f/m_nbSkeletons;
   
   /* Si un changement de niveau de détail a été demandé, l'effectuer maintenant */
   if(m_lodSkelChanged) changeSkeletonsLOD();
@@ -427,7 +416,7 @@ bool RealFlame::build ()
 	  setCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), utex);
 	}
       m_texTmp = m_texTmpSave;
-      utex += utexInc;
+      utex += m_utexInc;
     }
   
   /* On recopie les (m_uorder-1) squelettes pour fermer la NURBS */
@@ -443,7 +432,7 @@ bool RealFlame::build ()
       *m_texPoints++ = *m_texTmp++;
     }
     m_texTmp = m_texTmpSave;
-    utex += utexInc;
+    utex += m_utexInc;
   }
   m_texPoints = m_texPointsSave;
   
@@ -451,18 +440,18 @@ bool RealFlame::build ()
   m_uknotsCount = m_nbSkeletons + m_uorder + m_uorder - 1;
   m_vknotsCount = m_vsize + m_vorder;
   
-  /* Vecteur nodal en u strictement croissant ex: 0 1 2 3 4 5... */
+  /* Vecteur nodal en u strictement croissant pour fermer la NURBS ex: 0 1 2 3 4 5 */
   for (i = 0; i < m_uknotsCount; i++)
     m_uknots[i] = (float)i;
   
-  /* Vecteur nodal en v avec noeuds internes strictement croissants ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
-  /* Plus décalage du premier noeuds interne ex: 0 0 0 0 1 2 3 4 5 6 6 6 6... */
+  /* Vecteur nodal en v uniforme ex: 0 0 0 0 1 2 3 4 5 6 6 6 6 */
   for (j = 0; j < m_vorder; j++)
     m_vknots[j] = 0.0f;
   
   for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
     m_vknots[j] = m_vknots[j-1]+1;
-  /* Adoucit la jointure entre le haut des squelettes périphériques et le haut du squelette guide ex: 0 0 0 0 1.9 2 3 4 5 6 6 6 6*/
+  /* Adoucit la jointure entre le haut des squelettes périphériques et le */
+  /* haut du squelette guide ex: 0 0 0 0 1.9 2 3 4 5 6 6 6 6 */
   m_vknots[m_vorder] += .9f;
   
   m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;

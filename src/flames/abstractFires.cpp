@@ -169,12 +169,13 @@ void FireSource::drawImpostor() const
       GLfloat modelview[16];
             
       Point pos(m_solver->getPosition());
-      float size=m_solver->getDim().x*1.1;
+      float size=m_solver->getScale().x*1.1;
       Point a,b,c,d,zero;
-      Vector right,up,offset;//(0.0f,0.0f,0.5f);
+      Vector right,up,offset;
       
       glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
-      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f;
+      
+      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*m_solver->getScale().x;
 		      
       right.x = modelview[0];
       right.y = modelview[4];
@@ -409,12 +410,12 @@ void DetachableFireSource::drawImpostor() const
       GLfloat modelview[16];
             
       Point pos(m_solver->getPosition());
-      float size=m_solver->getDim().x*1.1;
+      float size=m_solver->getScale().x*1.1;
       Point a,b,c,d,zero;
       Vector right,up,offset;//(0.0f,0.0f,0.5f);
       
-      glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
-      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f;
+      glGetFloatv (GL_MODELVIEW_MATRIX, modelview);      
+      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*size;
 		      
       right.x = modelview[0];
       right.y = modelview[4];

@@ -20,7 +20,7 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene
   scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
   
   if(objList.size() > 0)
-    m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.01f);
+    m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.03f, 0.01f);
 }
 
 Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
@@ -38,7 +38,7 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const ch
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.01f, this);
+      m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.05f, 0.04f, this);
     }
 }
 
@@ -57,7 +57,7 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, co
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     {
-      m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.04f, this);
+      m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.05f, 0.04f, this);
     }
 }
 

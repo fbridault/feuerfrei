@@ -93,12 +93,12 @@ public:
       gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
       break;
     case 1:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
+//       gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
+//       gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
       break;
     case 2:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
+//       gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
+//       gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
       break;
     }
   };
@@ -253,6 +253,8 @@ protected:
   
   /** Texture de la flamme */
   const Texture *m_tex;
+  /* Incrément en u pour la coordonnée de texture */
+  float m_utexInc;
     
   /** Position relative de la flamme dans le feu auquel elle appartient */
   Point m_position;

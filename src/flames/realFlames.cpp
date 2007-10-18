@@ -121,7 +121,7 @@ void LineFlame::computeVTexCoords()
     m_vTexInit = (m_vTexInit >= 0.85f) ? 0.0f : m_vTexInit + 0.15f;
   else
     m_vTexInit = 0.0;
-  if(m_lodSkel == NORMAL)
+  if(m_lodSkel == FULL_SKELETON)
     vinc = 1.0f / (float)(m_vsize-1);
   else
     vinc = 1.0f / (float)(m_vsize-1);
@@ -134,7 +134,7 @@ void LineFlame::computeVTexCoords()
     }
 }
 
-bool LineFlame::buildSimplified ()
+bool LineFlame::buildFlat ()
 {
   uint i, j, l;
   float utex;

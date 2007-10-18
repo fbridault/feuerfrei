@@ -54,13 +54,13 @@ public:
     }
   }
   
-  /** Ajuste la valeur d'échantillonnage de la NURBS.
-   * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
+  /** Ajuste le niveau de détail de la NURBS.
+   * @param value valeur comprise entre 1 et LOD_VALUES.
    */
-  virtual void setSamplingTolerance(u_char value){ 
+  virtual void setLOD(u_char value){ 
     for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
 	 fireIterator != m_fireSources.end (); fireIterator++)
-      (*fireIterator)->setSamplingTolerance(value);
+      (*fireIterator)->setLOD(value);
   };
   
   /** Affectation du coefficient multiplicateur de la FDF.

@@ -422,8 +422,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
 	   firesIterator != m_fires.end (); firesIterator++)
 	{
-	  (*firesIterator)->setSamplingTolerance(0);
-	  (*firesIterator)->setSkeletonsLOD(NORMAL);
+	  (*firesIterator)->setLOD(1);
 	}
       
       for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();

@@ -104,7 +104,7 @@ public:
   };
   void setFlameForces(int index, float value){ m_fires[index]->setInnerForce(value); };
   void setFlameIntensity(int index, float value){ m_fires[index]->setIntensityCoef(value); };
-  void setFlameSamplingTolerance(int index, u_char value){ m_fires[index]->setSamplingTolerance(value); };
+  void setFlameLOD(int index, u_char value){ m_fires[index]->setLOD(value); };
   
   void setLuminaryBuoyancy(int index, float value){ 
     if(index >= 0) m_luminaries[index]->setBuoyancy(value);
@@ -115,7 +115,7 @@ public:
     else m_globalField->setVorticity(value);
   };
   void setLuminaryForces(int index, float value){ m_luminaries[index]->setInnerForce(value); };
-  void setLuminarySamplingTolerance(int index, u_char value){ m_luminaries[index]->setSamplingTolerance(value); };
+  void setLuminaryLOD(int index, u_char value){ m_luminaries[index]->setLOD(value); };
   void setLuminaryFDF(int index, int value) { m_luminaries[index]->setFDF(value); };
   void setLuminaryPerturbateMode(int index, char value) { m_luminaries[index]->setPerturbateMode(value); };
   void setLuminaryLeadLifeSpan(int index, uint value) {m_luminaries[index]->setLeadLifeSpan(value); };  

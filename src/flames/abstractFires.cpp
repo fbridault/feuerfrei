@@ -87,7 +87,8 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
   m_dist=0;
   buildBoundingSphere();
   m_flickSave=-1;
-  m_lodSave=15;
+  m_fluidsLODSave=15;
+  m_nurbsLODSave=-1;
 }
 
 FireSource::~FireSource()
@@ -206,7 +207,7 @@ void FireSource::drawImpostor() const
 void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {
   bool vis_save=m_visibility;
-  int lod;
+  int fluidsLOD, nurbsLOD;
   float coverage;
   
   if(forceSpheresBuild)
@@ -224,55 +225,56 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     coverage = m_boundingSphere.getPixelCoverage(view);
     
     /* Fonction obtenue par régression linéaire avec les données
-     * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
+     * y = [.60 .25 .05 .025 .015 .01 .001] et x = [15 13 11 9 7 5 3]
      */
-    lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
-//     cerr << "coverage " << coverage << " " << lod << " " << endl;
+    fluidsLOD = (int)nearbyint(2.0870203*log(coverage*2399.4418));
     
-    if(lod < m_lodSave)
+    if(coverage > .75f) nurbsLOD = 5;
+    else if(coverage > .2f) nurbsLOD = 4;
+    else if(coverage > .1f) nurbsLOD = 3;
+    else if(coverage > .003f) nurbsLOD = 2;
+    else if(coverage > .0015f) nurbsLOD = 1;
+    else nurbsLOD = 0;
+
+    /* Fonction obtenue par régression linéaire avec les données
+     */
+    //     nurbsLOD = (int)nearbyint(1.116488*log(coverage*68.271493));
+//     cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    
+    // Changement de niveau pour les fluides
+    if(fluidsLOD < m_fluidsLODSave)
       {
 	do
 	  {
-	    /* On change le niveau de détail des solveurs à mi-distance */
-	    if( lod == 9 ){
-	      cerr << "simplified skeletons" << endl;
-	      for (uint i = 0; i < m_nbFlames; i++)
-		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-	      setSamplingTolerance(1);
-	    }
-	    
 	    /* On passe en FakeField */
-	    if( lod == 5 ){
+	    if( fluidsLOD == 5 ){
 	      m_solver->switchToFakeField();
-	      setSamplingTolerance(2);
 	    }
-	    m_lodSave-=1;
+	    m_fluidsLODSave-=1;
 	  }
-	while(lod < m_lodSave);
+	while(fluidsLOD < m_fluidsLODSave);
       }
     else
-      if(lod > m_lodSave)
+      if(fluidsLOD > m_fluidsLODSave)
 	{
 	  do
 	    {
-	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( lod == 10 ){
-		cerr << "normal skeletons" << endl;
-		for (uint i = 0; i < m_nbFlames; i++)
-		  m_flames[i]->setSkeletonsLOD(NORMAL);
-		setSamplingTolerance(0);
-	      }
-	  
 	      /* On repasse en solveur */
-	      if( lod == 6 )
+	      if( fluidsLOD == 6 )
 		{
 		  m_solver->switchToRealSolver();
-		  setSamplingTolerance(1);
 		}
-	      m_lodSave+=1;
+	      m_fluidsLODSave+=1;
 	    }
-	  while(lod > m_lodSave);
+	  while(fluidsLOD > m_fluidsLODSave);
 	}
+    
+    // Changement de niveau pour les NURBS
+    if(nurbsLOD != m_nurbsLODSave)
+      {
+	setLOD(nurbsLOD);
+	m_nurbsLODSave=nurbsLOD;
+      }
   }else
     if(vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
@@ -454,7 +456,7 @@ void DetachableFireSource::setSmoothShading (bool state)
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
-  int lod;
+  int nurbsLOD, fluidsLOD;
   float coverage;
   
   if(forceSpheresBuild)
@@ -472,68 +474,66 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     coverage = m_boundingSphere.getPixelCoverage(view);
     
     /* Fonction obtenue par régression linéaire avec les données
-     * y = [100 25 5 2.5 1.5 1 0.01] et x = [15 13 11 9 7 5 3]
+     * y = [.60 .25 .05 .025 .015 .01 .001] et x = [15 13 11 9 7 5 3]
      */
-    lod = (int)nearbyint(2.0870203*log(coverage*2300.994418));
-//     cerr << "coverage " << coverage << " " << lod << " " << endl;
+    fluidsLOD = (int)nearbyint(2.0870203*log(coverage*2399.4418));
     
-    if(lod < m_lodSave)
+    if(fluidsLOD < 5) fluidsLOD=5;
+    else if(fluidsLOD > 15) fluidsLOD=15;
+    
+    if(coverage > .9f) nurbsLOD = 5;
+    else if(coverage > .5f) nurbsLOD = 4;
+    else if(coverage > .2f) nurbsLOD = 3;
+    else if(coverage > .05f) nurbsLOD = 2;
+    else if(coverage > .01f) nurbsLOD = 1;
+    else nurbsLOD = 0;
+
+    //     nurbsLOD = (int)nearbyint(1.0731832*log(coverage*54.470523));
+//     cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    
+    if(fluidsLOD < m_fluidsLODSave)
       {
-	do
+	int diff = (m_fluidsLODSave - fluidsLOD)/2;
+	while(diff > 0 )
 	  {
-	    /* On change le niveau de détail des solveurs à mi-distance */
-	    if( lod == 9 ){
-	      cerr << "simplified skeletons" << endl;
-	      for (uint i = 0; i < m_nbFlames; i++)
-		m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-	      setSamplingTolerance(1);
-	    }
-	    
 	    /* On passe en FakeField */
-	    if( lod == 5 ){
+	    if( fluidsLOD == 5 && m_fluidsLODSave==7){
 	      if(getPerturbateMode() != FLICKERING_NOISE){
 		m_flickSave = getPerturbateMode();
 		setPerturbateMode(FLICKERING_NOISE);
 	      }
 	      m_solver->switchToFakeField();
-	      setSamplingTolerance(2);
 	    }else
-	      if( lod%2 && m_lodSave < 15)
-		m_solver->decreaseRes();
-	    m_lodSave-=1;
-	  }
-	while(lod < m_lodSave);
+	      m_solver->decreaseRes();
+	    diff--; m_fluidsLODSave-=2;
+	  }	
       }
     else
-      if(lod > m_lodSave)
+      if(fluidsLOD > m_fluidsLODSave)
 	{
-	  do
-	    {
-	      /* On change le niveau de détail des solveurs à mi-distance */
-	      if( lod == 10 ){
-		cerr << "normal skeletons" << endl;
-		for (uint i = 0; i < m_nbFlames; i++)
-		  m_flames[i]->setSkeletonsLOD(NORMAL);
-		setSamplingTolerance(0);
-	      }
+	  int diff = (fluidsLOD - (m_fluidsLODSave-1))/2;
 	  
-	      /* On repasse en solveur */
-	      if( lod == 6 )
-		{
-		  if(m_flickSave > -1){
-		    setPerturbateMode(m_flickSave);
-		    m_flickSave = -1;
-		  }
-		  m_solver->switchToRealSolver();
-		  setSamplingTolerance(1);
+	  while(diff > 0 )
+	    {
+	      /* On passe en FakeField */
+	      if( fluidsLOD == 6 && (m_fluidsLODSave-1)==4){
+		if(m_flickSave > -1){
+		  setPerturbateMode(m_flickSave);
+		  m_flickSave = -1;
 		}
-	      else
-		if( !(lod%2) )
-		  m_solver->increaseRes();
-	      m_lodSave+=1;
+		m_solver->switchToRealSolver();
+	      }else
+		m_solver->increaseRes();
+	      diff--; m_fluidsLODSave+=2;
 	    }
-	  while(lod > m_lodSave);
 	}
+    
+    // Changement de niveau pour les NURBS
+    if(nurbsLOD != m_nurbsLODSave)
+      {
+	setLOD(nurbsLOD);
+	m_nurbsLODSave=nurbsLOD;
+      }
   }else
     if(vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;

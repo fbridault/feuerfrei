@@ -408,7 +408,7 @@ public:
   virtual void build();
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
   
-  virtual void drawImpostor () const;
+//   virtual void drawImpostor () const;
 
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.

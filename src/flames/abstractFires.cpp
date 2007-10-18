@@ -169,14 +169,14 @@ void FireSource::drawImpostor() const
       GLfloat modelview[16];
             
       Point pos(m_solver->getPosition());
-      float size=m_solver->getScale().x*1.1;
+      float size=m_solver->getScale().x*1.1f, halfSize=m_solver->getScale().x*.5f;
       Point a,b,c,d,zero;
       Vector right,up,offset;
       
       glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
       
-      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*m_solver->getScale().x;
-		      
+      offset = Vector(modelview[2], modelview[6], modelview[10])*m_solver->getDim().z*m_solver->getScale().z/2.0f;
+      
       right.x = modelview[0];
       right.y = modelview[4];
       right.z = modelview[8];
@@ -194,10 +194,10 @@ void FireSource::drawImpostor() const
       glColor3f(1.0f,1.0f,1.0f);
       glTranslatef(offset.x,offset.y,offset.z);
       glBegin(GL_QUADS);
-      glVertex3f(a.x+0.5f, a.y, a.z+0.5f);
-      glVertex3f(b.x+0.5f, b.y, b.z+0.5f);
-      glVertex3f(c.x+0.5f, c.y, c.z+0.5f);
-      glVertex3f(d.x+0.5f, d.y, d.z+0.5f);	
+      glVertex3f(a.x+halfSize, a.y, a.z+halfSize);
+      glVertex3f(b.x+halfSize, b.y, b.z+halfSize);
+      glVertex3f(c.x+halfSize, c.y, c.z+halfSize);
+      glVertex3f(d.x+halfSize, d.y, d.z+halfSize);	
       glEnd();
       glPopMatrix();
     }
@@ -403,45 +403,45 @@ void DetachableFireSource::build()
     buildBoundingBox ();
 }
 
-void DetachableFireSource::drawImpostor() const
-{
-  if(m_visibility)
-    {
-      GLfloat modelview[16];
+// void DetachableFireSource::drawImpostor() const
+// {
+//   if(m_visibility)
+//     {
+//       GLfloat modelview[16];
             
-      Point pos(m_solver->getPosition());
-      float size=m_solver->getScale().x*1.1;
-      Point a,b,c,d,zero;
-      Vector right,up,offset;//(0.0f,0.0f,0.5f);
+//       Point pos(m_solver->getPosition());
+//       float size=m_solver->getScale().x*1.1;
+//       Point a,b,c,d,zero;
+//       Vector right,up,offset;//(0.0f,0.0f,0.5f);
       
-      glGetFloatv (GL_MODELVIEW_MATRIX, modelview);      
-      offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*size;
+//       glGetFloatv (GL_MODELVIEW_MATRIX, modelview);      
+//       offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*size;
 		      
-      right.x = modelview[0];
-      right.y = modelview[4];
-      right.z = modelview[8];
+//       right.x = modelview[0];
+//       right.y = modelview[4];
+//       right.z = modelview[8];
 	
-      up.x = modelview[1];
-      up.y = modelview[5];
-      up.z = modelview[9];
+//       up.x = modelview[1];
+//       up.y = modelview[5];
+//       up.z = modelview[9];
       
-      a = pos - right * (size * 0.5f);
-      b = pos + right * size * 0.5f;
-      c = pos + right * size * 0.5f + up * size;
-      d = pos - right * size * 0.5f + up * size;
+//       a = pos - right * (size * 0.5f);
+//       b = pos + right * size * 0.5f;
+//       c = pos + right * size * 0.5f + up * size;
+//       d = pos - right * size * 0.5f + up * size;
 	
-      glPushMatrix();
-      glColor3f(1.0f,1.0f,1.0f);
-      glTranslatef(offset.x,offset.y,offset.z);
-      glBegin(GL_QUADS);
-      glVertex3f(a.x+0.5f, a.y, a.z+0.5f);
-      glVertex3f(b.x+0.5f, b.y, b.z+0.5f);
-      glVertex3f(c.x+0.5f, c.y, c.z+0.5f);
-      glVertex3f(d.x+0.5f, d.y, d.z+0.5f);	
-      glEnd();
-      glPopMatrix();
-    }
-}
+//       glPushMatrix();
+//       glColor3f(1.0f,1.0f,1.0f);
+//       glTranslatef(offset.x,offset.y,offset.z);
+//       glBegin(GL_QUADS);
+//       glVertex3f(a.x+0.5f, a.y, a.z+0.5f);
+//       glVertex3f(b.x+0.5f, b.y, b.z+0.5f);
+//       glVertex3f(c.x+0.5f, c.y, c.z+0.5f);
+//       glVertex3f(d.x+0.5f, d.y, d.z+0.5f);	
+//       glEnd();
+//       glPopMatrix();
+//     }
+// }
 
 void DetachableFireSource::setSmoothShading (bool state)
 {

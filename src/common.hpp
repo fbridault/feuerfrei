@@ -71,7 +71,7 @@ public:
   float innerForce;
   char flickering;
   int fdf;
-  float samplingTolerance;
+  float lod;
   /** Durée de vie des squelettes. */
   uint leadLifeSpan, periLifeSpan;
   /** Chemin vers le fichier IES utilsé pour le solide photométrique. */

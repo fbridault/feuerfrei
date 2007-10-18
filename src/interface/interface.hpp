@@ -37,4 +37,5 @@
 
 #define DEPTH_PEELING_LAYERS_MAX 10
 
+#define LOD_VALUES 5
 #endif

@@ -151,8 +151,8 @@ protected:
   float m_selfVelocity;
 };
 
-#define NORMAL 0
-#define SIMPLIFIED 1
+#define FULL_SKELETON 0
+#define HALF_SKELETON 1
 
 /** La classe Skeleton est une file de particules gérée avec un vecteur, mais elle 
  * transgresse néanmoins la règle en permettant notamment un accès direct à tous les membres de la file
@@ -208,7 +208,7 @@ public:
   };
   
   /* Change la valeur du niveau de détail du squelette 
-   * @param value valeur parmi {NORMAL détaillé, SIMPLIFIED grossier (on considère une particule sur 2)}
+   * @param value valeur parmi {FULL_SKELETON détaillé, HALF_SKELETON grossier (on considère une particule sur 2)}
    */
   void setLOD(u_char value){ m_lod = value; };
   
@@ -235,7 +235,7 @@ private:
    * que les origines se déplacent différemment.
    */
   Point m_rootMoveFactor;
-  /** Variable correspondant au niveau de détail : NORMAL détaillé, SIMPLIFIED grossier (on considère une particule sur 2) */
+  /** Variable correspondant au niveau de détail : FULL_SKELETON détaillé, HALF_SKELETON grossier (on considère une particule sur 2) */
   u_char m_lod;
 };
 

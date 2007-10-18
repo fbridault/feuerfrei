@@ -145,7 +145,7 @@ Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMov
 {  
   m_root = m_rootSave = position;
   m_selfVelocity=0.0f;
-  m_lod=NORMAL;
+  m_lod=FULL_SKELETON;
   m_lifeSpan = pls;
 }
 

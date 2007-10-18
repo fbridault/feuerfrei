@@ -50,7 +50,7 @@ public:
     
     /* Pour indication, m_coef = m_dt * m_dt * m_forceCoef (calculé dans le constructeur) */
     particle.x = 2*particle.x - particle.xprev + m_coef * m_src.x; 
-    particle.y = 2*particle.y - particle.yprev + m_coef * (m_buoyancy * ((1-particle.y)/m_dim.y) + selfVelocity - 2*(fabs(m_src.x) + fabs(m_src.z)));
+    particle.y = 2*particle.y - particle.yprev + m_coef * (m_buoyancy * (particle.y/m_dim.y) + selfVelocity - 2*(fabs(m_src.x) + fabs(m_src.z)));
     particle.z = 2*particle.z - particle.zprev + m_coef * m_src.z;
   };
   
@@ -68,6 +68,8 @@ public:
   {
     m_src.z += value;
   };
+  
+  virtual void setBuoyancy(float value){ m_buoyancy=20*value; };
   
   void cleanSources ();
   void displayVelocityField (void);

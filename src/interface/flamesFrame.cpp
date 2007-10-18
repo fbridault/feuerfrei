@@ -537,7 +537,7 @@ void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
   m_config->Read(groupName + _("Flickering"), (int *) &fireConfig.flickering, 0);
   m_config->Read(groupName + _("FDF"), (int *) &fireConfig.fdf, 0);
   m_config->Read(groupName + _("SamplingTolerance"), &tmp, 100);
-  fireConfig.samplingTolerance = (float)tmp;
+  fireConfig.lod = (float)tmp;
   m_config->Read(groupName + _("nbLeadParticles"), (int *) &fireConfig.leadLifeSpan, 8);
   m_config->Read(groupName + _("nbPeriParticles"), (int *) &fireConfig.periLifeSpan, 6);
   fireConfig.IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
@@ -678,7 +678,7 @@ void FlamesFrame::SaveFireSettings(wxString& groupName, FlameConfig& fireConfig)
   m_config->Write(groupName + _("InnerForce"), fireConfig.innerForce);
   m_config->Write(groupName + _("Flickering"), (int )fireConfig.flickering);
   m_config->Write(groupName + _("FDF"), (int )fireConfig.fdf);
-  m_config->Write(groupName + _("SamplingTolerance"), fireConfig.samplingTolerance);
+  m_config->Write(groupName + _("SamplingTolerance"), fireConfig.lod);
   m_config->Write(groupName + _("nbLeadParticles"), (int )fireConfig.leadLifeSpan);
   m_config->Write(groupName + _("nbPeriParticles"), (int )fireConfig.periLifeSpan);
   m_config->Write(groupName + _("IESFileName"),fireConfig.IESFileName);

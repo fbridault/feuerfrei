@@ -178,25 +178,66 @@ public:
   /** Destructeur */
   virtual ~FireSource ();
 
-  /** Ajuste la valeur d'échantillonnage de la NURBS.
-   * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
+  /** Ajuste le niveau de détail de la NURBS.
+   * @param value Valeur comprise entre 0 et LOD_VALUES. 
    */
-  virtual void setSamplingTolerance(u_char value){ 
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setSamplingTolerance(value);
-    if(value > 0)      
-      for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-    else
-      for (uint i = 0; i < m_nbFlames; i++)
-	m_flames[i]->setSkeletonsLOD(NORMAL);
+  virtual void setLOD(u_char value)
+  { 
+    switch(value)
+      {
+      case 5:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(4);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	break;
+      case 4:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(3);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	break;
+      case 3:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(2);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	break;
+      case 2:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(2);
+	    m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	break;
+      case 1:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(1);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(true);
+	  }
+	break;
+      case 0:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(1);
+	    m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+	    m_flames[i]->setFlatFlame(true);
+	  }
+	break;
+      default:
+	cerr << "Bad NURBS LOD parameter" << endl;
+      }
   };
   
-  virtual void setSkeletonsLOD(u_char value){ 
-    for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setSkeletonsLOD(SIMPLIFIED);
-  }
-
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
@@ -380,7 +421,8 @@ protected:
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
   
-  int m_lodSave;
+  /** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
+  int m_fluidsLODSave, m_nurbsLODSave;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -407,8 +449,65 @@ public:
   
   virtual void build();
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
-  
-  virtual void drawImpostor () const;
+   
+  virtual void setLOD(u_char value)
+  { 
+    u_char tolerance=4;
+    switch(value)
+      {
+      case 5:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(4);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	    tolerance = 4;
+	  }
+	break;
+      case 4:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(3);
+	    m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	    tolerance = 3;
+	  }
+	break;
+      case 3:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(2);
+	    m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	tolerance = 2;
+	break;
+      case 2:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(1);
+	    m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+	    m_flames[i]->setFlatFlame(false);
+	  }
+	tolerance = 1;
+	break;
+      case 1:
+	for (uint i = 0; i < m_nbFlames; i++)
+	  {
+	    m_flames[i]->setSamplingTolerance(1);
+	    m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+	    m_flames[i]->setFlatFlame(true);
+	  }
+	tolerance = 1;
+	break;
+      default:
+	cerr << "Bad NURBS LOD parameter" << endl;
+      }
+    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+      (*flamesIterator)->setSamplingTolerance(tolerance);
+  };
+//   virtual void drawImpostor () const;
 
   /** Ajoute une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.
@@ -430,13 +529,6 @@ public:
   virtual void setSmoothShading (bool state);
   
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
-  
-  virtual void setSamplingTolerance(u_char value){
-    FireSource::setSamplingTolerance(value);
-    for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-      (*flamesIterator)->setSamplingTolerance(value);
-  };
   
 private:
   /** Construit la bounding box utilisée pour l'affichage */

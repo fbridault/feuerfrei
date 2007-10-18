@@ -528,7 +528,7 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].fires[0].innerForce = m_currentConfig->luminaries[i].fires[0].innerForce;
 	    newConfig[i].fires[0].leadLifeSpan = m_currentConfig->luminaries[i].fires[0].leadLifeSpan;
 	    newConfig[i].fires[0].periLifeSpan = m_currentConfig->luminaries[i].fires[0].periLifeSpan;
-	    newConfig[i].fires[0].samplingTolerance = m_currentConfig->luminaries[i].fires[0].samplingTolerance;
+	    newConfig[i].fires[0].lod = m_currentConfig->luminaries[i].fires[0].lod;
 	    newConfig[i].fires[0].flickering = m_currentConfig->luminaries[i].fires[0].flickering;
 	    newConfig[i].fires[0].fdf = m_currentConfig->luminaries[i].fires[0].fdf;
 	    newConfig[i].fires[0].IESFileName = m_currentConfig->luminaries[i].fires[0].IESFileName;
@@ -540,7 +540,7 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
 	    newConfig[i].fires[0].innerForce = 0.005;
 	    newConfig[i].fires[0].leadLifeSpan = 6;
 	    newConfig[i].fires[0].periLifeSpan = 4;
-	    newConfig[i].fires[0].samplingTolerance = 100;
+	    newConfig[i].fires[0].lod = 100;
 	    newConfig[i].fires[0].flickering = 0;
 	    newConfig[i].fires[0].fdf = 0;
 	    newConfig[i].fires[0].IESFileName = _("IES/test.ies");

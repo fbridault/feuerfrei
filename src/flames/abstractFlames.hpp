@@ -84,22 +84,28 @@ public:
   };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
-   * @param value Valeur de sampling, généralement compris dans un intervalle [1;1000]. 
+   * @param value Valeur de sampling, compris dans un intervalle [1;4]. 
    */
   virtual void setSamplingTolerance(u_char value){
     switch(value){
-    case 0:
+    case 4:
       gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
       gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
       break;
-    case 1:
-//       gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
-//       gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
+    case 3:
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 3);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 3);
       break;
     case 2:
-//       gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
-//       gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
       break;
+    case 1:
+      gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
+      gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
+      break;
+    default:
+      cerr << "Bad NURBS step parameter" << endl;
     }
   };
   
@@ -173,7 +179,7 @@ protected:
 #ifdef COUNT_NURBS_POLYGONS
     g_count++;
 #endif
-    /* Si on est en mode simplifié */
+    /* Si on est en mode NURBS plate */
     if( *(u_char *)shadingType & 2)
       {
 	glDisable(GL_CULL_FACE);
@@ -192,8 +198,8 @@ protected:
   static void CALLBACK NurbsEnd(GLvoid *shadingType)
   {
     glEnd();
-    /* Si on est en mode simplifié */
     if( *(char *)shadingType & 2)
+      /* Si on est en mode NURBS plate */
       {
 	glEnable(GL_CULL_FACE);
 	glPolygonMode(GL_FRONT,GL_FILL);
@@ -389,17 +395,20 @@ public:
   {
     uint i;
     /* Déplacement et détermination du maximum */
-    if(m_lodSkel==NORMAL)
+    if(!m_flat)
       for (i = 0; i < m_nbSkeletons; i++)
 	m_periSkeletons[i]->draw();
     for (i = 0; i < m_nbLeadSkeletons; i++)
       m_leadSkeletons[i]->draw();
   };
   
-  /** Affiche les particules de tous les squelettes composants la flamme. */
+  /** Place un marqueur pour ordonner un changement de niveau de
+   *  détail dans les squelettes à la prochaine construction. 
+   * @param value FULL_SKELETON ou HALF_SKELETON
+   */
   void setSkeletonsLOD(u_char value) { m_lodSkel = value; m_lodSkelChanged = true; };
   
-  /** Affiche les particules de tous les squelettes composants la flamme. */
+  /** Effectue le changement de niveau de détail dans les squelettes. */
   virtual void changeSkeletonsLOD()
   {
     uint i;
@@ -409,6 +418,8 @@ public:
       m_leadSkeletons[i]->setLOD(m_lodSkel);
     m_lodSkelChanged = false;
   };
+  
+  void setFlatFlame(bool value) { m_flat = value; };
   
   /** Fonction chargée de remplir les coordonées de texture dans la direction v. Elles sont
    * en effet dépendantes du nombre de particules dans les squelettes et il est donc nécessaire
@@ -445,7 +456,7 @@ protected:
    */
   int *m_maxDistancesIndexes;
   
-  u_char m_lodSkel;
+  u_char m_lodSkel, m_flat;
   /** Indique qu'un changement de niveau de détail sur les squelettes a été demandé. */
   bool m_lodSkelChanged;
 };

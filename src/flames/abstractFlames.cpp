@@ -113,7 +113,7 @@ void NurbsFlame::drawNurbs () const
 {
   if(m_uknotsCount){
 //     unsigned long long int start;
-//    start = rdtsc();
+//     start = rdtsc();
     gluBeginSurface (m_nurbs);
     gluNurbsSurface (m_nurbs, m_uknotsCount, m_uknots, m_vknotsCount, m_vknots, m_vsize * 2,
 		     2, m_texPoints, m_uorder, m_vorder, GL_MAP2_TEXTURE_COORD_2);
@@ -248,9 +248,8 @@ RealFlame::RealFlame(uint nbSkeletons, ushort nbFixedPoints,
   
   m_solver = s;
   m_lodSkelChanged = false;
-  m_lodSkel = NORMAL;
-//   m_lodSkelChanged = true;
-//   m_lodSkel = SIMPLIFIED;
+  m_lodSkel = FULL_SKELETON;
+  m_flat = false;
 }
 
 void RealFlame::computeVTexCoords()

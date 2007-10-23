@@ -121,7 +121,8 @@ void NurbsFlame::drawNurbs () const
 		     3, m_ctrlPoints, m_uorder, m_vorder, GL_MAP2_VERTEX_3);
     gluEndSurface (m_nurbs);
 //     cerr << (rdtsc() - start)/CPU_FREQ << endl;
-  }
+  }else
+    cerr << "Not enough knots to draw flame" << endl;
 }
 
 void NurbsFlame::drawLineFlame () const

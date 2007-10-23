@@ -19,9 +19,12 @@ class GLFlameCanvas;
 #include "../flames/glowengine.hpp"
 #include "../flames/DPengine.hpp"
 
-#include "../solvers/fieldThread.hpp"
 #include "../solvers/globalField.hpp"
 #include "../flames/solidePhoto.hpp"
+
+#ifdef MULTITHREADS
+#include "../solvers/fieldThread.hpp"
+#endif
 
 class PhotometricSolidsRenderer;
 
@@ -69,8 +72,10 @@ public:
   /** Lance/arrête l'animation */
   void setRunningState(bool run) { 
     m_run=run;
+#ifdef MULTITHREADS
     if(!m_run) PauseThreads();
     if(m_run) ResumeThreads();
+#endif
   };
   
   /** Active/Désactive le glow seul */
@@ -138,9 +143,10 @@ public:
 private:
   void WriteFPS ();
   void DrawVelocity (void);
+#ifdef MULTITHREADS
   void PauseThreads();
   void ResumeThreads();
-  
+#endif
 //   void cast_shadows_float_multiple();
   void castShadows();
   
@@ -178,10 +184,12 @@ private:
   DepthPeelingEngine *m_depthPeelingEngine;
   
   vector <Luminary *> m_luminaries;
+#ifdef MULTITHREADS
   /** Liste de threads. */
   list <FieldThread *> m_threads;
   /** Ordonnanceur des threads */
   FieldThreadsScheduler *m_scheduler;
+#endif
   vector <Field3D *> m_fields;
   GlobalField *m_globalField;
     
@@ -211,6 +219,7 @@ inline void GLFlameCanvas::drawFlames(void)
       (*threadIterator)->drawFlames(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
       (*threadIterator)->Unlock();
     }
+      cerr << "couille" << endl;
 #else
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)

@@ -215,7 +215,6 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
   
   m_dist=m_boundingSphere.visibleDistance(view);
   m_visibility = (m_dist);
-  
   if(m_visibility){
     if(!vis_save){
       cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;

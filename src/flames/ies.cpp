@@ -48,8 +48,7 @@ IES::IES(const char* const filename)
 	    m_lazimutTEX = 2*PI/m_nbazimut;
 	    m_lzenith = PI/(m_nbzenith-1);
 	    m_lzenithTEX = PI/m_nbzenith;
-	    m_denom = m_lazimut*m_lzenith;    
-	    cout << "taille : " << m_lazimut << "x"<< m_lzenith << " " << endl;
+	    m_denom = m_lazimut*m_lzenith;
 	  }
 	  else
 	    cout << "Erreur d'allocation des texels" << endl;

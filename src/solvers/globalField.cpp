@@ -11,7 +11,11 @@
 #define ARGS_SLV ARGS, vorticityConfinement
 #define ARGS_GC ARGS_SLV, omegaDiff, omegaProj, epsilon
 
+#ifdef MULTITHREADS
 GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene, char type, uint n,
+#else
+GlobalField::GlobalField(const vector <Field3D *> &fields, Scene* const scene, char type, uint n,
+#endif
 			 float timeStep, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon)
 {
   Point max, min, width, position, scale(1.0f,1.0f,1.0f);
@@ -72,12 +76,17 @@ GlobalField::GlobalField(const list <FieldThread *> &threads, Scene* const scene
   default :
     cerr << "Unknown global solver type : " << (int)type << endl;
   }
-  
+#ifdef MULTITHREADS
   /* A cet instant, la liste des processus ne contient pas encore le thread du solveur global, */
   /* on peut donc tous les ajouter à la liste des solveurs sous influence. */
   for (list < FieldThread* >::const_iterator threadIterator = threads.begin ();
        threadIterator != threads.end (); threadIterator++)
     m_localFields.push_back( (*threadIterator)->getSolver() );
+#else
+  for (vector < Field3D* >::const_iterator solversIterator = fields.begin ();
+       solversIterator != fields.end (); solversIterator++)
+    m_localFields.push_back( (*solversIterator) );
+#endif
 }
 
 void GlobalField::shareForces()

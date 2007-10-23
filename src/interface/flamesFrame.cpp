@@ -308,7 +308,9 @@ void FlamesFrame::InitFlamesPanels()
 
 void FlamesFrame::OnClose(wxCloseEvent& event)
 {
+#ifdef MULTITHREADS
   m_glBuffer->DeleteThreads();
+#endif
   m_glBuffer->setRunningState(false);
   for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {

@@ -30,7 +30,11 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GlobalField (const list <FieldThread *> &threads, Scene *const scene, char type, uint n,
+#ifdef MULTITHREADS
+  GlobalField(const list <FieldThread *> &threads, Scene* const scene, char type, uint n,
+#else
+  GlobalField(const vector <Field3D *> &fields, Scene* const scene, char type, uint n,
+#endif
 	       float timeStep, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~GlobalField () { delete m_field; };

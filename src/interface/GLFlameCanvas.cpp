@@ -156,10 +156,15 @@ void GLFlameCanvas::InitScene()
   InitLuminaries();
   
 #ifdef MULTITHREADS
-  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
+  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets ne soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
+#else
+  if(m_currentConfig->useGlobalField)
+    m_globalField = new GlobalField(m_fields, m_scene, m_currentConfig->globalField.type,
+				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
+				    m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff, 
+				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
 #endif
-  
   m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires);
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
@@ -287,11 +292,19 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
     delete m_globalField;
     m_globalField = NULL;
   }
-  
   InitLuminaries();
-  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
-  m_scheduler = new FieldThreadsScheduler();
   
+  /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
+#ifdef MULTITHREADS
+  m_scheduler = new FieldThreadsScheduler();
+#else
+  if(m_currentConfig->useGlobalField)
+    m_globalField = new GlobalField(m_fields, m_scene, m_currentConfig->globalField.type,
+				    m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
+				    m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff, 
+				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
+#endif
+  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires);
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
 #ifdef MULTITHREADS
@@ -318,6 +331,7 @@ void GLFlameCanvas::DestroyScene(void)
   delete m_camera;
   delete m_scene;
   delete m_photoSolid;
+  delete m_pixelLighting;
   
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)
@@ -408,11 +422,13 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case 'R' :
       /* Fonctionnalité permettant de remettre au maximum le niveau de précision, */
       /* ceci évidemment à des fins de tests et comparaisons */
+#ifdef MULTITHREADS
       for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
 	   threadIterator != m_threads.end (); threadIterator++)
 	{
 	  (*threadIterator)->Lock();
 	}
+#endif
       /* On remet à la résolution max */
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
@@ -428,11 +444,13 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 	  (*firesIterator)->setLOD(1);
 	}
       
+#ifdef MULTITHREADS
       for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
 	   threadIterator != m_threads.end (); threadIterator++)
 	{
 	  (*threadIterator)->Unlock();
 	}
+#endif
       break;
     }
   event.Skip();
@@ -537,7 +555,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   /* La différence n'est pas forcément visible en pratique, cela supprime surtout quelques petits bugs d'affichage */
   /* potentiels, par contre le framerate en prend un sacré coup !! */
   /* Dans l'idéal, je pense donc qu'il serait utile de placer du code CPU ici ! */
-  //glFinish();
+  glFinish();
   SwapBuffers ();
   
   //event.Skip();
@@ -548,10 +566,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   
   m_t = m_swatch->Time();
   if (m_t >= 2000){    
+#ifdef MULTITHREADS
     ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000), m_scheduler->getNbSolved() / (m_t/1000), m_width, m_height );
+    m_scheduler->resetNbSolved();
+#else
+    ((FlamesFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000), m_framesCount / (m_t/1000), m_width, m_height );
+#endif
     m_swatch->Start();
     m_framesCount = 0;
-    m_scheduler->resetNbSolved();
   }
   
   if(m_saveImages){
@@ -568,7 +590,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(!image2.SaveFile(filename,wxBITMAP_TYPE_PNG))
       cerr << "Image saving error !!" << endl;
   }
+#ifdef MULTITHREADS
   m_scheduler->unblock();
+#endif
 }
 
 void GLFlameCanvas::drawScene()

@@ -122,15 +122,15 @@ void LuminaryMainPanel::SetSlidersValues()
   
   m_solverXAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverXAxisPositionSliderMax->GetValue().ToLong(&val2);
-//   m_solverXAxisPositionSlider->SetRange(val1, val2);
+  m_solverXAxisPositionSlider->SetRange(val1, val2);
   m_solverXAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.x*SLIDER_SENSIBILITY));
   m_solverYAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverYAxisPositionSliderMax->GetValue().ToLong(&val2);
-//   m_solverYAxisPositionSlider->SetRange(val1, val2);
+  m_solverYAxisPositionSlider->SetRange(val1, val2);
   m_solverYAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.y*SLIDER_SENSIBILITY));
   m_solverZAxisPositionSliderMin->GetValue().ToLong(&val1);
   m_solverZAxisPositionSliderMax->GetValue().ToLong(&val2);
-//   m_solverZAxisPositionSlider->SetRange(val1, val2);
+  m_solverZAxisPositionSlider->SetRange(val1, val2);
   m_solverZAxisPositionSlider->SetValue((int)(m_luminaryConfig->position.z*SLIDER_SENSIBILITY));
 }
 

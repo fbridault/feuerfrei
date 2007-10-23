@@ -159,9 +159,8 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   /* Blur à une résolution inférieure */
   m_secondPassFBOs[1].Activate();
   m_programX.enable();
-  glBlendColor(0.8f,0.8f,0.8f,1.0f);
   glEnable (GL_BLEND);
-  glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
+  glBlendFunc (GL_ONE, GL_ONE);
   
   glViewport (0, 0, m_width[1], m_height[1]);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -184,9 +183,6 @@ void GlowEngine::blur(GLFlameCanvas* const glBuffer)
   
   m_firstPassFBOs[1].Activate();
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  
-  m_secondPassTex[1]->bind();
-  glBuffer->drawFlamesBoundingBoxes();
   
   m_secondPassTex[1]->bind();
   glBuffer->drawFlamesBoundingBoxes();

@@ -7,7 +7,7 @@ class FBO
 {
 public:
   FBO();
-  ~FBO();
+  virtual ~FBO();
 
   void Initialize();
   

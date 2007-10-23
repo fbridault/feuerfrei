@@ -4,6 +4,12 @@ FBO::FBO()
 {
 }
 
+FBO::~FBO( void )
+{
+  glDeleteFramebuffersEXT( 1, &m_frameBuffer );
+  glDeleteRenderbuffersEXT( 1, &m_depthRenderBuffer );
+}
+
 void FBO::Initialize()
 {
   glGenFramebuffersEXT( 1, &m_frameBuffer );
@@ -88,11 +94,3 @@ void FBO::CheckStatus(void)
       exit(0);
     }
 }
-
-
-FBO::~FBO( void )
-{
-  glDeleteFramebuffersEXT( 1, &m_frameBuffer );
-  glDeleteRenderbuffersEXT( 1, &m_depthRenderBuffer );
-}
-

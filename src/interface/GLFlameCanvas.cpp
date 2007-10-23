@@ -155,9 +155,12 @@ void GLFlameCanvas::InitScene()
   
   InitLuminaries();
   
+#ifdef MULTITHREADS
   /** Il faut initialiser l'ordonnanceur avant que d'éventuels threads de CandleSets soit instanciés */
   m_scheduler = new FieldThreadsScheduler();
+#endif
   
+  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires);
   m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
   
   m_scene->createVBOs();
@@ -188,6 +191,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
   cout << "Initialization over" << endl;
 }
 
+#ifdef MULTITHREADS
 void GLFlameCanvas::PauseThreads()
 {
   m_scheduler->Pause();
@@ -206,17 +210,16 @@ void GLFlameCanvas::ResumeThreads()
   }
 }
 
-#ifdef MULTITHREADS
 void GLFlameCanvas::DeleteThreads()
 {
   /* On sort les threads de leur pause si nécessaire, car sinon il serait impossible de les arrêter ! */
   if( !IsRunning() ) setRunningState(true);
-  m_scheduler->Stop();
   
+  m_scheduler->Stop();
   for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Stop();
-
+  
   m_scheduler->forceEnd();
   m_scheduler->unblock();
   m_scheduler->Wait();
@@ -225,8 +228,8 @@ void GLFlameCanvas::DeleteThreads()
        threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Wait();
   
-  /* Tous les threads sont terminés, on peut tout supprimer sans risque */
   delete m_scheduler;
+  /* Tous les threads sont terminés, on peut tout supprimer sans risque */
   for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
     delete (*threadsIterator);
@@ -594,17 +597,40 @@ void GLFlameCanvas::drawScene()
   if (m_currentConfig->shadowsEnabled)
     castShadows();
   else
-    if(m_currentConfig->lightingMode == LIGHTING_PHOTOMETRIC)
+    switch(m_currentConfig->lightingMode)
+    {
+    case LIGHTING_PIXEL :
+      m_pixelLighting->draw(m_currentConfig->BPSEnabled);
+      break;
+    case LIGHTING_PHOTOMETRIC:
       m_photoSolid->draw(m_currentConfig->BPSEnabled);
-    else{
-      glEnable (GL_LIGHTING);
+      break;
+    case LIGHTING_MULTI:
+      glEnable (GL_LIGHTING);      
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++){
+	(*firesIterator)->computeIntensityPositionAndDirection();
+	(*firesIterator)->switchOnMulti ();
+      }
+      m_scene->drawScene();
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	(*firesIterator)->switchOffMulti ();
+      glDisable (GL_LIGHTING);
+      break;
+    default:
+      glEnable (GL_LIGHTING); 
       for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
 	   firesIterator != m_fires.end (); firesIterator++){
 	(*firesIterator)->computeIntensityPositionAndDirection();
 	(*firesIterator)->switchOn ();
       }
       m_scene->drawScene();
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	(*firesIterator)->switchOff ();
       glDisable (GL_LIGHTING);
+      break;
     }
   
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
@@ -673,15 +699,25 @@ void GLFlameCanvas::OnSize(wxSizeEvent& event)
 void GLFlameCanvas::castShadows ()
 {
   glEnable (GL_LIGHTING);
-  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-       firesIterator != m_fires.end (); firesIterator++)
-    (*firesIterator)->switchOff ();
-  m_scene->drawSceneWT ();
-  
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
+  if(m_currentConfig->lightingMode == LIGHTING_MULTI)
     for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
 	 firesIterator != m_fires.end (); firesIterator++)
-      (*firesIterator)->switchOn ();
+      (*firesIterator)->switchOffMulti ();
+  else
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->switchOff ();
+  m_scene->drawSceneWT ();
+  
+  if(m_currentConfig->lightingMode == LIGHTING_MULTI)
+    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	 firesIterator != m_fires.end (); firesIterator++)
+      (*firesIterator)->switchOnMulti ();
+  else
+    if(m_currentConfig->lightingMode == LIGHTING_STANDARD)
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++)
+	(*firesIterator)->switchOn ();
   
   glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_POLYGON_BIT);
   
@@ -736,16 +772,37 @@ void GLFlameCanvas::castShadows ()
   /* Affichage de la scène en couleur en multipliant avec l'affichage précédent */
   
   glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-  if(m_currentConfig->lightingMode == LIGHTING_STANDARD){
-    for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	 firesIterator != m_fires.end (); firesIterator++)
-      (*firesIterator)->switchOn ();
-    
-    m_scene->drawScene ();
-    glDisable (GL_LIGHTING);
-  }else{
-    glDisable (GL_LIGHTING);
-    m_photoSolid->draw(m_currentConfig->BPSEnabled);
-  }
+  
+  switch(m_currentConfig->lightingMode)
+    {
+    case LIGHTING_PIXEL :
+      glDisable (GL_LIGHTING);
+      m_pixelLighting->draw(m_currentConfig->BPSEnabled);
+      break;
+    case LIGHTING_PHOTOMETRIC:
+      glDisable (GL_LIGHTING);
+      m_photoSolid->draw(m_currentConfig->BPSEnabled);
+      break;
+    case LIGHTING_MULTI:   
+      if(m_currentConfig->lightingMode == LIGHTING_MULTI)
+	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	     firesIterator != m_fires.end (); firesIterator++){
+	  (*firesIterator)->computeIntensityPositionAndDirection();
+	  (*firesIterator)->switchOnMulti ();
+	}
+      m_scene->drawScene();
+      glDisable (GL_LIGHTING);
+      break;
+    default:
+      glEnable (GL_LIGHTING); 
+      for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	   firesIterator != m_fires.end (); firesIterator++){
+	(*firesIterator)->computeIntensityPositionAndDirection();
+	(*firesIterator)->switchOn ();
+      }
+      m_scene->drawScene();
+      glDisable (GL_LIGHTING);
+    }
+  
   glDisable(GL_BLEND);
 }

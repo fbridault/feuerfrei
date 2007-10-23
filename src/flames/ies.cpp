@@ -43,12 +43,13 @@ IES::IES(const char* const filename)
 	    // 	      if(test)
 	    // 		printf("memes donnees sur la premiere et la derniere colonne\n");
 	    
-	    cout << "taille : " << m_nbazimut << "x"<< m_nbzenith << endl;
-	    m_lazimut = 2*M_PI/(m_nbazimut-1);
-	    m_lazimutTEX = 2*M_PI/m_nbazimut;
-	    m_lzenith = M_PI/(m_nbzenith-1);
-	    m_lzenithTEX = M_PI/m_nbzenith;
-	    m_denom = m_lazimut*m_lzenith;	      
+	    cout << "taille : " << m_nbazimut << "x"<< m_nbzenith << " " << endl;
+	    m_lazimut = 2*PI/(m_nbazimut-1);
+	    m_lazimutTEX = 2*PI/m_nbazimut;
+	    m_lzenith = PI/(m_nbzenith-1);
+	    m_lzenithTEX = PI/m_nbzenith;
+	    m_denom = m_lazimut*m_lzenith;    
+	    cout << "taille : " << m_lazimut << "x"<< m_lzenith << " " << endl;
 	  }
 	  else
 	    cout << "Erreur d'allocation des texels" << endl;

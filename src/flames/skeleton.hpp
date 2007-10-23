@@ -194,7 +194,7 @@ public:
   };
   
   virtual uint getSize() const{
-    return ( (m_lod) ? (m_headIndex >> 1)+1 : m_headIndex+1);
+    return ( (m_lod) ? (m_headIndex / 2)+1 : m_headIndex+1);
   };
   
   /** Déplacement de l'origine du squelette. */

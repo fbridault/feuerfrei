@@ -32,7 +32,6 @@ void main()
     // translation inverse du centre du SP
     direction =  centreSP[i] - point3D.xyz;
     r = length(direction.xyz);
-    direction = normalize(direction);
     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
     // attention y est suppose etre la hauteur et z la profondeur
     theta = acos(direction.y / r);
@@ -46,6 +45,7 @@ void main()
     colorSP = texture3D(textureSP, texcoordsSP).r * fluctuationIntensite[i];
     
     // attenuation de l'intensite en fonction de la distance
+    /*    direction = normalize(direction); */
 /*     attenuation = 3.0/r; */
 /*     if(attenuation < 1.0) */
 /*       colorSP *= attenuation; */

@@ -55,7 +55,7 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   m_samplingMethod = 1;  
   m_vTexInit = 0;
   
-  m_utexInc = 4.0f/(m_nbSkeletons);
+  m_utexInc = 2.0f/(m_nbSkeletons);
 }
 
 LineFlame::~LineFlame ()
@@ -406,6 +406,23 @@ void PointFlame::drawWick (bool displayBoxes) const
   }else{
     m_wick->draw();
   }
+}
+
+void PointFlame::getLightPositions (GLfloat lightPositions[8][4], uint& nbLights)
+{
+  Particle *tmp;
+  
+  nbLights=0;
+  for (uint i = 0; i < m_leadSkeletons[0]->getSize () - 1; i++)
+    {
+      tmp = m_leadSkeletons[0]->getParticle (i);
+
+      nbLights++;
+      lightPositions[i][0] = tmp->x;
+      lightPositions[i][1] = tmp->y;
+      lightPositions[i][2] = tmp->z;
+      lightPositions[i][3] = 1.0;
+    }
 }
 
 /**********************************************************************************************************************/

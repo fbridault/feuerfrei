@@ -31,6 +31,18 @@ public:
 	 const GLSLProgram * const program, float rayon, Object *wick=NULL);
   /** Destructeur */
   virtual ~Candle(){};
+  
+  void setLightPosition (const Point& pos);
+  
+  /** Active la source de lumière. */
+  void switchOnMulti ();  
+  /** Eteint la source */
+  void switchOffMulti ();
+  
+private:
+  /** Position de la lumière ponctuelle OpenGL dans l'espace. */
+  GLfloat m_lightPositions[8][4];
+  uint m_nbLights;
 };
 
 

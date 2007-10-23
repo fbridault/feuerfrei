@@ -41,19 +41,19 @@ void FlameLight::switchOff()
 
 void FlameLight::switchOn()
 {  
-  float coef = 1.5f*m_intensity;
+  float coef = 3.0f*m_intensity;
 //   GLfloat val_diffuse[]={1,1,1,1.0};
   GLfloat val_diffuse[]={1.0f*coef,0.5f*coef,0.0f,1.0f};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
   GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
-  GLfloat val_specular[]={.1f*coef,.1f*coef,.1f*coef,1.0f};
+  GLfloat val_specular[]={.9f*coef,.9f*coef,.9f*coef,1.0f};
   
   /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
   glLightfv(m_light,GL_POSITION,m_lightPosition);
   glLightfv(m_light,GL_DIFFUSE,val_diffuse);
   glLightfv(m_light,GL_SPECULAR,val_specular);
   glLightfv(m_light,GL_AMBIENT,val_null);
-  glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.005f);
+  glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.05f);
   glEnable(m_light);
 }
 

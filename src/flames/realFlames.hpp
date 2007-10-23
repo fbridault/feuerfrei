@@ -200,6 +200,7 @@ public:
     for (uint i = 0; i < m_nbSkeletons; i++)
       m_periSkeletons[i]->addForces ();
   }
+  void getLightPositions (GLfloat lightPositions[8][4], uint& nbLights);
   
 protected:
   Object *m_wick;

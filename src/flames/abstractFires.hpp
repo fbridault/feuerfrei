@@ -55,7 +55,7 @@ public:
   /** Déplace la lumière à la position. Ceci déplace en réalité la lumière OpenGL.
    * @param pos Position de la lumière.
    */
-  void setLightPosition (const Point& pos)
+  virtual void setLightPosition (const Point& pos)
   {
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
@@ -70,6 +70,11 @@ public:
   void switchOn ();  
   /** Eteint la source */
   void switchOff ();
+  
+  /** Active la source de lumière. */
+  virtual void switchOnMulti (){};  
+  /** Eteint la source */
+  virtual void switchOffMulti (){};
   
   /** Récupération du tableau des intensités du solide photométrique.
    * @return Pointeur sur les intensités.
@@ -130,6 +135,8 @@ protected:
   float m_intensityCoef;
   /** Indice de la lumière pour OpenGL. */
   short m_light;
+  /** Position de la lumière ponctuelle OpenGL dans l'espace. */
+  GLfloat m_lightPosition[4];
 private:
   
   /** Pointeur sur la scène. */
@@ -138,8 +145,6 @@ private:
   /** Pointeur sur le program générateur de volumes d'ombres. */
   const GLSLProgram *m_SVProgram;
   
-  /** Position de la lumière ponctuelle OpenGL dans l'espace. */
-  GLfloat m_lightPosition[4];
   
   /** Fichier IES utilisé pour le solide photométrique de la source. */
   IES *m_iesFile;
@@ -492,6 +497,7 @@ public:
 	tolerance = 1;
 	break;
       case 1:
+      case 0:
 	for (uint i = 0; i < m_nbFlames; i++)
 	  {
 	    m_flames[i]->setSamplingTolerance(1);

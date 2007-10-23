@@ -232,7 +232,7 @@ void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 	if(!m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture()){
 	  glActiveTextureARB(GL_TEXTURE0_ARB);
 	  glEnable(GL_TEXTURE_2D);
-	  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	  glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	}
 	m_scene->getMaterial(m_materialIndex)->getDiffuseTexture()->bind();
       }else

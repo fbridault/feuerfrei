@@ -15,8 +15,6 @@ uniform sampler2D textureObjet;
 uniform sampler3D textureSP;
 uniform vec3 centreSP[NBSOURCES];
 uniform float fluctuationIntensite[NBSOURCES];
-uniform vec2 angles[NBSOURCES];
-uniform float incr;
 uniform bool isTextured;
 
 void main()
@@ -49,24 +47,19 @@ void main()
     direction = centreSP[i] - point3D.xyz;
     r = length(direction.xyz);
     
-    // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi)
-    // attention y est suppose etre la hauteur et z la profondeur
+/*     // passage des coord. cartesiennes (x,y,z) en coord. spheriques (r,theta,phi) */
+/*     // attention y est suppose etre la hauteur et z la profondeur */
     theta = acos(direction.y / r);
     //theta=acos(-direction.y );
-    phi=atan(direction.z,direction.x);
-    
-    // Les coordonnees de textures doivent etre utilisees en fonction du sens de codage de la texture
-    texcoordsSP = vec3(phi * angles[i].x, theta * angles[i].y, rtex);
     
     direction = normalize(direction);
     // - cos de l'angle entre la direction de la source et la normale au point
     cosSN = dot(direction,normal);
     // attenuation de l'intensite en fonction de l'angle d'eclairage, de la distance et de la taille
-    attenuation = 3.0/r;
-    ColorSP = theta * cosSN * attenuation * fluctuationIntensite[i] * texture3D(textureSP, texcoordsSP).r;
+    attenuation = 2.0/r;
+    ColorSP = theta * cosSN * attenuation * fluctuationIntensite[i];
     
     color += ColorSP;
-    rtex += float(incr);
   }
   color = color / float(NBSOURCES);
   // melange de la couleur de l'objet, de sa texture et de l'intensite

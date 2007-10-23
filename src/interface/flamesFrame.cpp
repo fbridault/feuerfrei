@@ -59,6 +59,8 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   
   const wxString m_lightingChoices[] = {
     _("Standard"),
+    _("Multi-point"),
+    _("Pixel-lighting"),
     _("Photometric Solid")
   };
   /*********************************** Création des contrôles *************************************************/
@@ -70,7 +72,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
   
   m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
-				      2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
+				      4, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
   
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
@@ -348,11 +350,11 @@ void FlamesFrame::OnSelectLighting(wxCommandEvent& event)
   
   switch(m_currentConfig.lightingMode)
     {
-    case LIGHTING_STANDARD :
-      m_blendedSolidCheckBox->Disable();
-      break;
     case LIGHTING_PHOTOMETRIC :
       m_blendedSolidCheckBox->Enable();
+      break;
+    default:
+      m_blendedSolidCheckBox->Disable();
       break;
     }
 }

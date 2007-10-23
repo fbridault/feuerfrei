@@ -17,7 +17,7 @@ for file in sys.argv[1:]:
 	i=0
 	if len(lines) > 1000:
 		for line in lines[0:1000]:
-			if float(line) < 1.0:
+			if float(line) < 100000.0:
 				moyenne = (moyenne*i + float(line))/(i+1)
 				#moyenne = moyenne + float(line)
 				i = i + 1

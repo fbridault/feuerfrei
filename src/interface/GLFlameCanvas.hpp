@@ -21,6 +21,7 @@ class GLFlameCanvas;
 
 #include "../solvers/fieldThread.hpp"
 #include "../solvers/globalField.hpp"
+#include "../flames/solidePhoto.hpp"
 
 class PhotometricSolidsRenderer;
 
@@ -169,6 +170,7 @@ private:
 
   /********* Variables relatives aux solides photométriques **************/
   PhotometricSolidsRenderer *m_photoSolid;
+  PixelLightingRenderer *m_pixelLighting;
 
   /********* Variables relatives au glow *********************************/
   GlowEngine *m_glowEngine;

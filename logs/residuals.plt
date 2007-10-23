@@ -1,8 +1,8 @@
 set encoding iso_8859_1
 
 #set terminal x11 font "Helvetica,20"
-#set terminal eps small enhanced
-set terminal postscript eps enhanced color 22 lw 2
+set terminal png small enhanced
+#set terminal postscript eps enhanced color 22 lw 2
 
 set view 50,230
 

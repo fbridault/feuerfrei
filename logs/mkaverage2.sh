@@ -3,6 +3,7 @@
 # Script servant à générer un graphique contenant toutes les moyennes des résidus
 # pour différentes valeurs de omega.
 
+# On définit une commande pour les u,v,w de la diffusion et les deux projections.
 PLOT_CMD1="plot "
 PLOT_CMD2="plot "
 PLOT_CMD3="plot "
@@ -19,6 +20,7 @@ for FILE in `ls -l`; do
 	fi
 done
 
+# On supprime la dernière virgule inutile
 PLOT_CMD1=${PLOT_CMD1/%,}
 PLOT_CMD2=${PLOT_CMD2/%,}
 PLOT_CMD3=${PLOT_CMD3/%,}
@@ -29,7 +31,7 @@ gnuplot << EOF
 set encoding iso_8859_1
 
 #set terminal x11 font "Helvetica,20"
-set terminal png small enhanced
+#set terminal png small enhanced
 set terminal postscript eps enhanced color 22 lw 2
 
 #set time
@@ -48,12 +50,26 @@ set xtic auto
 set xlabel "Itération"
 set ylabel "Résidu"
 
+
+set style increment user
+set style line 10 lt 2 lc rgb "orange-red"
+set style line 11 lt 3 lc rgb "light-pink"
+set style line 12 lt 4 lc rgb "midnight-blue"
+set style line 13 lt 5 lc rgb "dark-goldenrod"
+set style line 14 lt 6 lc rgb "khaki"
+set style line 15 lt 3 lc rgb "turquoise"
+set style line 16 lt 8 lc rgb "plum"
+set style line 17 lt 1 lc rgb "gold"
+set style line 18 lt 0 lc rgb "dark-violet"
+set style line 19 lt 1 lc rgb "forest-green"
+
 set output 'wGCSSORDiff.u.eps'
 $PLOT_CMD1
 set output 'wGCSSORDiff.v.eps'
 $PLOT_CMD2
 set output 'wGCSSORDiff.w.eps'
 $PLOT_CMD3
+set key left bottom
 set output 'wGCSSORProj1.eps'
 $PLOT_CMD4
 set output 'wGCSSORProj2.eps'

@@ -69,6 +69,11 @@ public:
   /** Plaque le blur à l'écran */
   void drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly=false);
   
+  /** Effectue le blur en trois passes */
+  void blurFS(GLFlameCanvas* const glBuffer);
+  /** Plaque le blur à l'écran */
+  void drawBlurFS(GLFlameCanvas* const glBuffer, bool glowOnly=false);
+  
   void computeWeights(uint index, float sigma);
   
   void deleteTex();

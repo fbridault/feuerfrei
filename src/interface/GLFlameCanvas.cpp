@@ -510,6 +510,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	
 	/* On affiche la superposition des calques que l'on vient de décortiquer */
 	m_depthPeelingEngine->render(this);
+// 	m_depthPeelingEngine->renderFS();
       }else{
 	m_glowEngine->activate();
 	
@@ -528,6 +529,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	glDisable(GL_BLEND);
       }
       m_glowEngine->blur(this);
+//        m_glowEngine->blurFS(this);
       
       m_glowEngine->deactivate();
     }else
@@ -543,11 +545,13 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
     if(m_currentConfig->depthPeelingEnabled)
       m_depthPeelingEngine->render(this);
+//       m_depthPeelingEngine->renderFS();
     else
       drawFlames();
   
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur(this,m_glowOnly);
+//     m_glowEngine->drawBlurFS(this,m_glowOnly);
   if(m_gammaCorrection)
     m_gammaEngine->disableGamma();
   

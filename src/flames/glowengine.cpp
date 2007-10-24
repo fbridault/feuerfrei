@@ -217,3 +217,113 @@ void GlowEngine::drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly)
   glDepthFunc (GL_LESS);
   glDisable (GL_BLEND);
 }
+
+/*******************************************************************************/
+void GlowEngine::blurFS(GLFlameCanvas* const glBuffer)
+{
+  glDisable(GL_DEPTH_TEST);
+
+  glBlendFunc (GL_ONE, GL_ZERO);
+  
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(-1, 1, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  
+  glActiveTextureARB(GL_TEXTURE0_ARB);
+  /* Blur à la résolution de l'écran */
+  m_programX.enable();
+  m_programX.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programX.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[0]);
+  m_programX.setUniform1f("scale",m_scaleFactor[0]);
+  
+  m_secondPassFBOs[0].Activate();
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  m_firstPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
+  
+  m_programY.enable();
+  m_programY.setUniform1fv("weights",m_weights[0],FILTER_SIZE);
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1f("divide",m_divide[0]);
+  m_programY.setUniform1f("scale",m_scaleFactor[0]);
+  
+  m_firstPassFBOs[0].Activate();
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  
+  m_secondPassTex[0]->drawOnScreen(m_width[0], m_height[0]);
+  
+  /* Blur à une résolution inférieure */
+  m_secondPassFBOs[1].Activate();
+  m_programX.enable();
+  glBlendColor(0.8f,0.8f,0.8f,1.0f);
+  glEnable (GL_BLEND);
+  glBlendFunc (GL_CONSTANT_COLOR, GL_ONE);
+  
+  glViewport (0, 0, m_width[1], m_height[1]);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  
+  /* Partie X du filtre */
+  /* Attention, il faut prendre les offsets correspondants à la texture à la résolution normale */
+  m_programX.setUniform1fv("offsets",m_offsets[1],FILTER_SIZE);
+  m_programX.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
+  m_programX.setUniform1f("divide",m_divide[0]);
+  m_programX.setUniform1f("scale",m_scaleFactor[1]);
+  m_firstPassTex[0]->drawOnScreen(m_width[1], m_height[1]);
+  
+  /* Partie Y du filtre */
+  m_programY.enable();
+  m_programY.setUniform1fv("offsets",m_offsets[0],FILTER_SIZE);
+  m_programY.setUniform1fv("weights",m_weights[1],FILTER_SIZE);
+  m_programY.setUniform1f("divide",m_divide[0]);
+  m_programY.setUniform1f("scale",m_scaleFactor[0]);
+  
+  m_firstPassFBOs[1].Activate();
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+  m_secondPassTex[1]->drawOnScreen(m_width[1], m_height[1]);
+    
+  m_programY.disable();
+  glDisable(GL_BLEND);
+  
+  m_firstPassFBOs[1].Deactivate();
+  
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  
+  glEnable(GL_DEPTH_TEST);
+}
+
+void GlowEngine::drawBlurFS(GLFlameCanvas* const glBuffer, bool glowOnly)
+{
+  glDisable (GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc (GL_ONE, GL_ONE);
+  
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(-1, 1, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  
+  glEnable(GL_TEXTURE_RECTANGLE_ARB);
+  
+  glActiveTextureARB(GL_TEXTURE0_ARB);
+  for(int i=0; i < GLOW_LEVELS; i++)
+    m_firstPassTex[i]->drawOnScreen(m_width[i], m_height[i]);
+  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+  
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  
+  glEnable (GL_DEPTH_TEST);
+}

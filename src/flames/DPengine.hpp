@@ -86,6 +86,7 @@ public:
    */
   void makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene);
   void render(GLFlameCanvas* const glBuffer);
+  void renderFS();
   
   void addLayer() { m_nbLayers = (m_nbLayers < m_nbLayersMax) ? m_nbLayers+1 : m_nbLayers;};
   void removeLayer() { m_nbLayers = (m_nbLayers > 0) ? m_nbLayers-1 : m_nbLayers;};

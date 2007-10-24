@@ -219,7 +219,6 @@ inline void GLFlameCanvas::drawFlames(void)
       (*threadIterator)->drawFlames(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
       (*threadIterator)->Unlock();
     }
-      cerr << "couille" << endl;
 #else
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)

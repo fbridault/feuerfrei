@@ -147,3 +147,42 @@ void DepthPeelingEngine::render(GLFlameCanvas* const glBuffer)
   glDisable (GL_BLEND);
   glDepthFunc (GL_LESS);
 }
+
+void DepthPeelingEngine::renderFS()
+{   
+  glShadeModel (GL_FLAT);
+  glDisable (GL_DEPTH_TEST);
+  
+  glBlendFunc (GL_ONE, GL_ONE);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  gluOrtho2D(-1, 1, -1, 1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  
+  glActiveTexture(GL_TEXTURE0_ARB);
+  glEnable(GL_TEXTURE_RECTANGLE_ARB);
+  
+//   for(int l=1; l <= m_nbLayers ; l--){
+  for(int l=m_nbLayers; l >= 0 ; l--){
+    
+    m_colorTex[l]->drawOnScreen(m_width,m_height);
+    
+//     if(l==0)
+//     glColor4f(1.0,1.0,1.0,1.0);
+//     else      
+//      glColor4f(1.0,1.0,1.0,0.6);
+//     glColor4f(1.0,1.0,1.0,0.6);
+  }
+  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+  
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  
+  glEnable (GL_DEPTH_TEST);
+  glShadeModel (GL_SMOOTH);
+}

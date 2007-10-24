@@ -167,6 +167,13 @@ void FireSource::drawImpostor() const
 {
   if(m_visibility)
     {
+//       Point position(getPosition());
+//       Point scale(m_solver->getScale());
+//       glPushMatrix();
+//       glTranslatef (position.x, position.y, position.z);
+//       glScalef (scale.x, scale.y, scale.z);
+//       GraphicsFn::SolidBox(Point(),m_solver->getDim());
+//       glPopMatrix();
       GLfloat modelview[16];
             
       Point pos(m_solver->getPosition());

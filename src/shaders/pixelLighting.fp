@@ -56,7 +56,7 @@ void main()
     // - cos de l'angle entre la direction de la source et la normale au point
     cosSN = dot(direction,normal);
     // attenuation de l'intensite en fonction de l'angle d'eclairage, de la distance et de la taille
-    attenuation = 2.0/r;
+    attenuation = 4.0/r;
     ColorSP = theta * cosSN * attenuation * fluctuationIntensite[i];
     
     color += ColorSP;

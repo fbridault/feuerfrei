@@ -371,7 +371,6 @@ public:
    */
   virtual Vector getMainDirection() const { return m_direction; };
   
-  /** Calcul de l'intensité du centre et de l'orientation du solide photométrique */
   void computeIntensityPositionAndDirection(void);
   
   /** Construction de la sphère englobante de l'objet. */
@@ -536,6 +535,7 @@ public:
   
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
+  void computeIntensityPositionAndDirection(void);
 private:
   /** Construit la bounding box utilisée pour l'affichage */
   virtual void buildBoundingBox ();

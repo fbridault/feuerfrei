@@ -238,7 +238,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     /* Fonction obtenue par régression linéaire avec les données
      */
     //     nurbsLOD = (int)nearbyint(1.116488*log(coverage*68.271493));
-//     cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    //cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
     
     // Changement de niveau pour les fluides
     if(fluidsLOD < m_fluidsLODSave)
@@ -452,6 +452,19 @@ void DetachableFireSource::setSmoothShading (bool state)
     (*flamesIterator)->setSmoothShading(state);
 }
 
+void DetachableFireSource::computeIntensityPositionAndDirection()
+{
+  Vector o = getMainDirection();
+  
+  // l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
+  // et de la taille en y de la grille fois un coeff correcteur
+  m_intensity=o.length()*(m_solver->getScale().y)*m_intensityCoef;
+  
+  /* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
+  m_intensity = sqrt(m_intensity)*2.0f;
+  
+}
+
 void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {  
   bool vis_save=m_visibility;
@@ -488,7 +501,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     else nurbsLOD = 0;
 
     //     nurbsLOD = (int)nearbyint(1.0731832*log(coverage*54.470523));
-//     cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    //cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
     
     if(fluidsLOD < m_fluidsLODSave)
       {

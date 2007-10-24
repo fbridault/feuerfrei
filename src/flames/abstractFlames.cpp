@@ -111,7 +111,7 @@ void NurbsFlame::initNurbs(GLUnurbsObj** nurbs)
 
 void NurbsFlame::drawNurbs () const
 {
-  if(m_uknotsCount){
+  if(m_uknotsCount && m_vknotsCount){
 //     unsigned long long int start;
 //     start = rdtsc();
     gluBeginSurface (m_nurbs);
@@ -122,7 +122,7 @@ void NurbsFlame::drawNurbs () const
     gluEndSurface (m_nurbs);
 //     cerr << (rdtsc() - start)/CPU_FREQ << endl;
   }else
-    cerr << "Not enough knots to draw flame" << endl;
+     cerr << "Not enough knots to draw flame : " << m_uknotsCount << " x " << m_vknotsCount << endl;
 }
 
 void NurbsFlame::drawLineFlame () const

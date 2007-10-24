@@ -11,7 +11,7 @@ void GLSLShader::load(const char* fileName, bool recompile, const char* macro ) 
 {
   GLint infologLength;
   GLchar* source;
-  char *path,dir[]=SHADERS_DIRECTORY;
+  GLchar *path,dir[]=SHADERS_DIRECTORY;
   int compiled;
   
   path = new char[strlen(dir)+strlen(fileName)+1];
@@ -46,7 +46,7 @@ void GLSLShader::load(const char* fileName, bool recompile, const char* macro ) 
 char* GLSLShader::getFileContents(const char* fileName, const char* macro) const
 {
   int length;
-  char* buffer, *buffer2;
+  GLchar* buffer, *buffer2;
   
   ifstream input(fileName);
   

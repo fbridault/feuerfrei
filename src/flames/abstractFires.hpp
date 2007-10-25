@@ -29,6 +29,7 @@ class IES;
 extern uint g_count;
 #endif
 
+#define FILTER_SIZE 8
 
 /**********************************************************************************************************************/
 /************************************** DEFINITION DE LA CLASSE FLAMELIGHT ********************************************/
@@ -122,7 +123,12 @@ public:
   /** Modifie le coefficient pondérateur de l'intensité. */
   virtual void setIntensityCoef(float coef) { m_intensityCoef = coef; };
   
+  const GLfloat* getGlowWeights(uint index) const { return m_glowWeights[index]; };
+  GLfloat getGlowDivide(uint index) const { return m_glowDivide[index]; };
+  
+  void computeGlowWeights(uint index, float sigma);
 protected:
+  
   /** Centre du solide photométrique dans l'espace. */
   Point m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation. */
@@ -137,6 +143,11 @@ protected:
   short m_light;
   /** Position de la lumière ponctuelle OpenGL dans l'espace. */
   GLfloat m_lightPosition[4];
+  
+  /** Tableau contenant les poids des pixels du filtre du glow */
+  GLfloat m_glowWeights[2][FILTER_SIZE];
+  /** Diviseur correspondant à la somme des poids du glow */
+  GLfloat m_glowDivide[2];
 private:
   
   /** Pointeur sur la scène. */

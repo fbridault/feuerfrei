@@ -41,6 +41,7 @@ public:
   void drawScene(void);
   void drawFlames(void);
   void drawFlamesBoundingBoxes(void);
+  void drawFlamesBoundingBoxes(const GLSLProgram& glowProgram, uint index);
   
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
@@ -135,7 +136,11 @@ public:
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
   void setGammaCorrection(float gamma) { m_gammaEngine->SetGamma(gamma); };
   void setGammaCorrectionState(bool state) { m_gammaCorrection=state; };
-  void computeGlowWeights(uint index, float sigma) { m_glowEngine->computeWeights(index, sigma); };
+   void computeGlowWeights(uint index, float sigma) {
+     for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	  firesIterator != m_fires.end (); firesIterator++)
+       (*firesIterator)->computeGlowWeights(index, sigma);
+   }
 
 #ifdef MULTITHREADS
   void DeleteThreads();
@@ -231,6 +236,17 @@ inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)
     (*firesIterator)->drawImpostor ();
+}
+
+inline void GLFlameCanvas::drawFlamesBoundingBoxes(const GLSLProgram& glowProgram, uint index)
+{
+  for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+       firesIterator != m_fires.end (); firesIterator++)
+    {
+      glowProgram.setUniform1f("divide",(*firesIterator)->getGlowDivide(index));
+      glowProgram.setUniform1fv("weights",(*firesIterator)->getGlowWeights(index),FILTER_SIZE);
+      (*firesIterator)->drawImpostor ();
+    }
 }
 
 #endif

@@ -80,8 +80,8 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Show PS"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
-  m_glow1Slider = new wxSlider(this,IDSL_GLOW1,30,0,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  m_glow2Slider = new wxSlider(this,IDSL_GLOW2,100,0,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_glow1Slider = new wxSlider(this,IDSL_GLOW1,30,0,100, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
+  m_glow2Slider = new wxSlider(this,IDSL_GLOW2,100,0,100, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
   m_depthPeelingSlider = new wxSlider(this,IDSL_DP,0,0,DEPTH_PEELING_LAYERS_MAX, wxDefaultPosition, 
 				      wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);

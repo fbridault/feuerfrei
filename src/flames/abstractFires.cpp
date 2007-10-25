@@ -74,10 +74,10 @@ void FlameLight::computeGlowWeights(uint index, float sigma)
   m_glowDivide[index] = 0.0f;
   
   offset = FILTER_SIZE/2;
-  for(int x=-offset+1 ; x<=offset-1 ; x++){
-    m_glowWeights[index][x+offset-1] = expf(-(x*x)/(sigma*sigma));
-    m_glowDivide[index] += m_glowWeights[index][x+offset-1];
-    //       cerr << x << " " << x+offset << " " << m_weights[index][x+offset-1] << endl;
+  for(int x=-offset ; x<=offset ; x++){
+    m_glowWeights[index][x+offset] = expf(-(x*x)/(sigma*sigma));
+    m_glowDivide[index] += m_glowWeights[index][x+offset];
+    //    cerr << x << " " << x+offset << " " << m_glowWeights[index][x+offset] << endl;
   }
   //     cerr << m_divide[index] << endl;
   m_glowDivide[index] = 1/m_glowDivide[index];

@@ -11,7 +11,6 @@ class GlowEngine;
 #include "abstractFires.hpp"
 
 #define GLOW_LEVELS 2
-#define FILTER_SIZE 8
 
 class GLFlameCanvas;
 

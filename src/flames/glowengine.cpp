@@ -29,10 +29,10 @@ GlowEngine::GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS])
   
   /* Offsets centrés pour taille texture en entrée = taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++)
-    m_offsets[0][j] = j-FILTER_SIZE/2+1;
+    m_offsets[0][j] = j-FILTER_SIZE/2;
   /* Offsets centrés pour taille texture en entrée > taille texture en sortie */
   for(int j=0; j < FILTER_SIZE; j++){
-    m_offsets[1][j] = (j-FILTER_SIZE/2+1)*(int)(m_scaleFactor[1]);
+    m_offsets[1][j] = (j-FILTER_SIZE/2)*(int)(m_scaleFactor[1]);
   }  
   m_secondPassFBOs[GLOW_LEVELS-1].Deactivate();
 }

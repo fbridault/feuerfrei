@@ -5,7 +5,7 @@ Clipping=100
 [Solvers]
 Number=1
 [Solver0]
-Type=12
+Type=13
 Pos.x=-0.5
 Pos.y=-0.5
 Pos.z=1.08

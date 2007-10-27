@@ -1,5 +1,4 @@
 #include "HybridSolver3D.hpp"
-#include "SSE4.hpp"
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP

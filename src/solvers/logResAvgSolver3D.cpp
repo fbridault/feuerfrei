@@ -6,8 +6,6 @@ LogResAvgSolver3D::LogResAvgSolver3D (const Point& position, uint n_x, uint n_y,
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
-  
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*(m_nbSteps+1);
   m_averages = new float[m_nbAverages];
   fill_n(m_averages, m_nbAverages, 0.0f);
@@ -16,8 +14,6 @@ LogResAvgSolver3D::LogResAvgSolver3D (const Point& position, uint n_x, uint n_y,
 LogResAvgSolver3D::LogResAvgSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon) : 
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
-  m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
-  
   m_nbAverages = (NB_PROJ_LOGS+NB_DIFF_LOGS)*(m_nbSteps+1);
   m_averages = new float[m_nbAverages];  
   fill_n(m_averages, m_nbAverages, 0.0f);
@@ -26,7 +22,6 @@ LogResAvgSolver3D::LogResAvgSolver3D (uint nbTimeSteps, float omegaDiff, float o
 LogResAvgSolver3D::~LogResAvgSolver3D ()
 {
   delete[]m_averages;
-  m_file.close ();
 }
 
 void LogResAvgSolver3D::vel_step ()
@@ -57,7 +52,9 @@ void LogResAvgSolver3D::vel_step ()
   project (m_uPrev, m_vPrev);
 
   if(m_nbIter == m_nbMaxIter){
+    m_file.open ("logs/residualsAverage.log", ios::out | ios::trunc);
     for(uint i=0; i <= m_nbSteps; i++){
+  
       m_file << i << " ";
       
       for(uint j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
@@ -65,6 +62,7 @@ void LogResAvgSolver3D::vel_step ()
 
       m_file << endl;
     }
+    m_file.close ();
     cout << "Simulation over" << endl;
   }
 }
@@ -126,7 +124,7 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, const float *c
   float diagonal = 1/div;
   float norm2;
   
-  // calcul du résidu initial
+  // calcul du rÃ©sidu initial
   for ( k = 1; k <= m_nbVoxelsZ; k++)
     for ( j = 1; j <= m_nbVoxelsY; j++)
       for ( i = 1; i <= m_nbVoxelsX; i++)
@@ -135,7 +133,7 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, const float *c
 	       x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
 	       x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)]);
 
-  // calcul du carré de la norme du résidu
+  // calcul du carrÃ© de la norme du rÃ©sidu
   norm2=0.0f;
   for ( k = 1; k <= m_nbVoxelsZ; k++)
     for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -153,7 +151,7 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, const float *c
 				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +
 				  x[IX (i, j, k - 1)] +	x[IX (i, j, k + 1)])) * div;
     
-    // calcul du résidu
+    // calcul du rÃ©sidu
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
 	for ( i = 1; i <= m_nbVoxelsX; i++)
@@ -161,7 +159,7 @@ void LogResAvgSolver3D::GS_solve(unsigned char b, float *const x, const float *c
 	    a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 		 x[IX (i, j - 1, k)] + x[IX (i, j + 1, k)] +
 		 x[IX (i, j, k - 1)] + x[IX (i, j, k + 1)]);
-    // calcul du carré de la norme du résidu
+    // calcul du carrÃ© de la norme du rÃ©sidu
     norm2=0.0f;
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -182,16 +180,16 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
   
   float rho0, rho1, alpha, beta,norm2,normb2,eb2;
   
-  // calcul du carré de la norme de b
+  // calcul du carrÃ© de la norme de b
   normb2=0.0f;
   for ( k = 1; k <= m_nbVoxelsZ; k++)
     for ( j = 1; j <= m_nbVoxelsY; j++)
       for ( i = 1; i <= m_nbVoxelsX; i++)
 	normb2+=b[IX(i,j,k)]*b[IX(i,j,k)];
   
-  // calcul de eb2 le second membre du test d'arrêt
+  // calcul de eb2 le second membre du test d'arrÃªt
   eb2=m_epsilon*normb2;
-  // calcul du premier résidu r
+  // calcul du premier rÃ©sidu r
   //calcul de r = b - A*x0
   
   for ( k = 1; k <= m_nbVoxelsZ; k++)
@@ -202,7 +200,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
 	       x0[IX (i, j - 1, k)] + x0[IX (i, j + 1, k)] +
 	       x0[IX (i, j, k - 1)] + x0[IX (i, j, k + 1)]);
   
-  // calcul du carré de la norme du résidu pour stockage
+  // calcul du carrÃ© de la norme du rÃ©sidu pour stockage
   norm2=0.0f;
   for ( k = 1; k <= m_nbVoxelsZ; k++)
     for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -233,7 +231,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
       for ( i = 1; i <= m_nbVoxelsX; i++)
 	rho0+=m_r[IX(i,j,k)]*m_z[IX(i,j,k)];
   
-  // début des itérations
+  // dÃ©but des itÃ©rations
   for( uint numiter=0;numiter<maxiter;numiter++){
     //calcul de q =  A.p
     for ( k = 1; k <= m_nbVoxelsZ; k++)
@@ -266,7 +264,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
 	for ( i = 1; i <= m_nbVoxelsX; i++)
 	  m_r[IX(i,j,k)]-=alpha*m_q[IX(i,j,k)];
     
-    // calcul du carré de la norme du résidu
+    // calcul du carrÃ© de la norme du rÃ©sidu
     norm2=0.0f;
     for ( k = 1; k <= m_nbVoxelsZ; k++)
       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -275,9 +273,9 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
 
     computeAverage(numiter+1,norm2);
 
-    //test d'arrÃªt
+    //test d'arrÃƒÂªt
 //     if(norm2 < eb2){
-//       //cerr<<"précision atteinte : nbiter = "<<numiter<<endl;
+//       //cerr<<"prÃ©cision atteinte : nbiter = "<<numiter<<endl;
 //       break;
 //     }
     // calcul de z tel que Cz =r
@@ -315,7 +313,7 @@ void LogResAvgSolver3D::GCSSOR(float *const x0, const float *const b, float a, f
     
   }//for numiter
   if(norm2 > eb2){
-    cerr<<"précision non atteinte !!!"<<endl;
+    cerr<<"prÃ©cision non atteinte !!!"<<endl;
   }
   
   return;

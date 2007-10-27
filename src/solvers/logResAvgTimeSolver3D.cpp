@@ -51,6 +51,7 @@ void LogResAvgTimeSolver3D::vel_step ()
   project (m_uPrev, m_vPrev);
   
   if(m_nbIter == m_nbMaxIter){
+    m_file.open ("logs/residualsAverageTime.log", ios::out | ios::trunc);
     for(uint i=0; i <= m_nbSteps; i++){
       m_file << i << " ";
       
@@ -59,6 +60,7 @@ void LogResAvgTimeSolver3D::vel_step ()
       
       m_file << endl;
     }
+    m_file.close ();
     cout << "Simulation over" << endl;
   }
 }

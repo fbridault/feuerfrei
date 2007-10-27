@@ -10,6 +10,7 @@
 #include "../solvers/HybridSolver3D.hpp"
 #include "../solvers/logResSolver3D.hpp"
 #include "../solvers/logResAvgSolver3D.hpp"
+#include "../solvers/compResAvgSolver3D.hpp"
 #include "../solvers/logResAvgTimeSolver3D.hpp"
 #include "../solvers/fakeField3D.hpp"
 #include "../solvers/LODField3D.hpp"
@@ -124,6 +125,9 @@ void GLFluidsCanvas::InitSolvers(void)
     case LOGRESAVGTIME_SOLVER :
       m_solvers[i] = new LogResAvgTimeSolver3D(ARGS_LOG);
       m_benchTime = true;
+      break;
+    case COMPRESAVG_SOLVER :
+      m_solvers[i] = new CompResAvgSolver3D(ARGS_LOG);
       break;
     case GS_SOLVER2D :
       m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);

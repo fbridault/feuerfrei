@@ -54,7 +54,7 @@ protected:
   /** Nombre de pas de résolutions dans les méthodes de diffusion et de projection */
   uint m_nbSteps;
   
-  uint m_t, m_nx, m_t1,m_debut,m_nbgrps,m_dernier;
+  uint m_t, m_nx, m_t2nx, m_t1,m_debut,m_nbgrps,m_dernier;
   
   /** Demi-Pas du solveur en X. */
   float m_hx;

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "../solvers/GSSolver2D.hpp"
+#include "../solvers/CGSSORSolver2D.hpp"
 #include "../solvers/GSSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D-SSE.hpp"
@@ -131,6 +132,11 @@ void GLFluidsCanvas::InitSolvers(void)
       break;
     case GS_SOLVER2D :
       m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);
+      break;
+    case CGSSOR_SOLVER2D :
+      m_solvers[i] = new CGSSORSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement, 
+				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+				    m_currentConfig->solvers[i].epsilon);
       break;
     case SIMPLE_FIELD :
       m_solvers[i] = new RealField3D(ARGS);

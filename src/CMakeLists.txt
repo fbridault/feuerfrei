@@ -67,7 +67,7 @@ SET_TARGET_PROPERTIES(${FLAMESEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -D
 SET(INTERFACE_SRCS interface/GLFluidsCanvas.cpp interface/fluidsFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/solverDialog.cpp)
 SET(SCENE_SRCS scene/camera.cpp scene/graphicsFn.cpp)
 
-SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver2D.cpp solvers/solver3D.cpp solvers/GSSolver2D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp  solvers/benchsolver3D.cpp solvers/logResAvgSolver3D.cpp solvers/logResAvgTimeSolver3D.cpp solvers/logResSolver3D.cpp solvers/compResAvgSolver3D.cpp)
+SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver2D.cpp solvers/solver3D.cpp solvers/GSSolver2D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp  solvers/benchsolver3D.cpp solvers/logResAvgSolver3D.cpp solvers/logResAvgTimeSolver3D.cpp solvers/logResSolver3D.cpp solvers/compResAvgSolver3D.cpp solvers/CGSSORSolver2D.cpp)
 SET(RTFLUIDS_SRCS fluids.cpp ${INTERFACE_SRCS} ${SCENE_SRCS} ${SOLVERS_SRCS})
 
 SET(FLUIDSEXE "rtfluids")

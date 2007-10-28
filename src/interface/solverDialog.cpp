@@ -42,10 +42,11 @@ SolverPanel::SolverPanel(wxWindow* parent, int id, bool localSolver, const wxPoi
     _("Both - log residuals averages"),
     _("Both - log residuals averages + time"),
     _("Compare CGSSOR residuals averages"),
-    _("Gauss-Seidel 2D")
+    _("Gauss-Seidel 2D"),
+    _("Preconditioned Conjugated Gradient 2D")
   };
   m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Type"), wxDefaultPosition, wxDefaultSize, 
-					14, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
+					15, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
   m_omegaDiffTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.0"));
   m_omegaProjLabel = new wxStaticText(this, -1, _("Omega in projection"));

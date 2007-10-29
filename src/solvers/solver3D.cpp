@@ -39,6 +39,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   fill_n(m_dens, m_nbVoxels, 0.0f);
   fill_n(m_densPrev, m_nbVoxels, 0.0f);
   fill_n(m_densSrc, m_nbVoxels, 0.0f);
+  fill_n(m_rot, m_nbVoxels, 0.0f);
   
   m_visc = 0.000022f;
   m_diff = 0.001f;
@@ -240,6 +241,7 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
    * Le vecteur est multiplié par epsilon*h
    * et est ajouté au champ de vélocité
    */
+	
   m_t=m_t1;
   for (k=1; k<=m_nbVoxelsZ; k++) {
     for (j=1; j<=m_nbVoxelsY; j++) {
@@ -248,9 +250,9 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 	Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
 	Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
 	Nz = (m_rot[m_t+m_n2] - m_rot[m_t-m_n2]) * m_invhz;
-			
-	invNormeN = 1.0/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.000001f);
-			
+	
+	invNormeN = 1.0f/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.000001f);
+	  
 	Nx *= invNormeN;
 	Ny *= invNormeN;
 	Nz *= invNormeN;
@@ -370,6 +372,9 @@ void Solver3D::iterate ()
   vel_step ();
 
   m_nbIter++;
+  if(m_nbIter == 1000)
+    cerr << "Simulation over" << endl;
+  
 }
 
 void Solver3D::addExternalForces(const Point& position, bool move)

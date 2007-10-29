@@ -97,7 +97,7 @@ protected:
   float *m_dens, *m_densPrev, *m_densSrc;
   float *m_rotx, *m_roty, *m_rotz, *m_rot;
   
-  uint m_n2, m_t2nx;
+  uint m_n2;
   
   /** Demi-Pas du solveur en Z. */
   float m_hz;

@@ -167,16 +167,14 @@ void FireSource::computeIntensityPositionAndDirection()
 void FireSource::buildBoundingSphere ()
 {
   Point p;
-  float t,k,s;
-  p = (m_solver->getScale() * m_solver->getDim())/2.0f;
+  float t;
+  p = (m_solver->getScale() * m_solver->getDim());
   t = p.max();
-  k = t*t;
-  s = sqrt(k+k);
   
-  m_boundingSphere.radius = sqrt(s+k) * .6;
+  m_boundingSphere.radius = sqrtf(3.0f)/2.0f*t;
   /* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
-  m_boundingSphere.centre = m_solver->getPosition() + p;
+  m_boundingSphere.centre = m_solver->getPosition() + p/2.0f;
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
   //  m_boundingSphere.centre = getCenterSP();
 }

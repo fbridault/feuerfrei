@@ -176,6 +176,9 @@ private:
 
   int m_t;
   
+  uint m_nurbsTest;
+  GLint m_flamesDisplayList;
+  
   /* Tableau de pixels pour la sauvegarde des images */
   u_char *m_pixels;
 

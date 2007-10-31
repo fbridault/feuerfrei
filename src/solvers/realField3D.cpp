@@ -155,11 +155,14 @@ void RealField3D::displayVelocityField (void)
 	{
 	  uint index = IX(i,j,k);
 	  /* Affichage du champ de vélocité */
-	  glPushMatrix ();
-	  glTranslatef (inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
-	  //SDL_mutexP (lock);
-	  //SDL_mutexV (lock);
-	  displayArrow (Vector (m_u[index], m_v[index], m_w[index]));
-	  glPopMatrix ();
+	  if( m_u[index] < -EPSILON || m_u[index] > EPSILON  ||
+	      m_v[index] < -EPSILON || m_v[index] > EPSILON  ||
+	      m_w[index] < -EPSILON || m_w[index] > EPSILON  )
+	    {
+	      glPushMatrix ();
+	      glTranslatef (inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
+	      displayArrow (Vector (m_u[index], m_v[index], m_w[index]));
+	      glPopMatrix ();
+	    }
 	}
 }

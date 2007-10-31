@@ -108,7 +108,7 @@ void LODSolver3D::divideRes ()
   
   restreindre(m_uPrev,m_tmp); SWAP(m_uPrev,m_tmp);
   restreindre(m_vPrev,m_tmp); SWAP(m_vPrev,m_tmp);
-  restreindre(m_wPrev,m_tmp); SWAP(m_wPrev,m_tmp); 
+  restreindre(m_wPrev,m_tmp); SWAP(m_wPrev,m_tmp);
     
   m_nbVoxelsX = m_nbVoxelsX/2;
   m_nbVoxelsY = m_nbVoxelsY/2;

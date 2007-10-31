@@ -95,7 +95,7 @@ void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0
 // void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps)
 // {
 //   uint i, j, k, l;
-//   float diagonal = 1/div;
+//   float diagonal = 1.0f/div;
 //   float norm2, eb2;
   
 //   // calcul du carré de la norme de b
@@ -106,7 +106,7 @@ void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0
 // 	norm2+=x0[IX(i,j,k)]*x0[IX(i,j,k)];
   
 //   // calcul de eb2 le second membre du test d'arrêt
-//   eb2=.0001*norm2;
+//   eb2=.0001f*norm2;
   
 //   for (l = 0; l < nb_steps; l++){
 //     for (k = 1; k <= m_nbVoxelsZ; k++)
@@ -116,7 +116,6 @@ void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0
 // 			     a * (x[IX (i - 1, j, k)] + x[IX (i + 1, j, k)] +
 // 				  x[IX (i, j - 1, k)] +	x[IX (i, j + 1, k)] +
 // 				  x[IX (i, j, k - 1)] +	x[IX (i, j, k + 1)])) * div;
-    
 //     // calcul du résidu
 //     for ( k = 1; k <= m_nbVoxelsZ; k++)
 //       for ( j = 1; j <= m_nbVoxelsY; j++)
@@ -138,7 +137,7 @@ void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0
 //     }
 //   }
 //   if(norm2 > eb2){
-//     cerr<<"précision non atteinte : nbiter = "<<l<<endl;
+//     //cerr<<"précision non atteinte : nbiter = "<<l<<endl;
 //   }
 //   //set_bnd (b, x);
 // }
@@ -146,7 +145,7 @@ void GSSolver3D::GS_solve(unsigned char b, float *const x, const float *const x0
 /* Pas de diffusion */
 void GSSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 20);
+  GS_solve(b,x,x0,a, 1.0f/(1.0f + 6.0f * a), 20);
 }
 
 void GSSolver3D::project (float *const p, float *const div)
@@ -175,7 +174,7 @@ void GSSolver3D::project (float *const p, float *const div)
   fill_n(p, m_nbVoxels, 0.0f);
   //  set_bnd (0, p);
   
-  GS_solve(0,p,div,1, 1/6.0f, 100); 
+  GS_solve(0,p,div,1, 1.0f/6.0f, 20); 
   
   m_t=m_t1;
   for (k = 1; k <= m_nbVoxelsZ; k++){

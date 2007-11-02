@@ -70,9 +70,10 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   m_halfNbVoxelsX = m_nbVoxelsX/2;
   
   m_nx = m_nbVoxelsX+2;
-  m_t1= m_nx +1;
+  m_t1= m_nx +1;  
+  m_t2nx = 2*m_nx;
   
-  m_forceCoef = 2.0f;
+  m_forceCoef = 0.01f;
   m_forceRatio = 1/m_forceCoef;
 }
 
@@ -144,7 +145,7 @@ void Solver2D::advect (unsigned char b, float *const d, const float *const d0,
 void Solver2D::addVorticityConfinement(float * const u, float *const  v)
 {
   uint i,j;	
-  float eps =m_dt*m_forceCoef*m_vorticityConfinement*10.0f;//epsilon
+  float eps =m_dt*m_forceCoef*m_vorticityConfinement*100.0f;//epsilon
   float x;
   float Nx,Ny;
   float invNormeN;
@@ -360,11 +361,11 @@ void Solver2D::addExternalForces(const Point& position, bool move)
   
   if(move){
     force = position - m_position;
-    strength.x = strength.y = .2f*m_nbVoxelsX;
+    strength.x = strength.y = .05f*m_nbVoxelsX;
     m_position=position;
   }else{
     force = position;
-    strength = position * .1f * m_nbVoxelsX;
+    strength = position * .01f * m_nbVoxelsX;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
   }
@@ -395,9 +396,9 @@ void Solver2D::addExternalForces(const Point& position, bool move)
 void Solver2D::addDensity(int id)
 {
   switch(id){
-  case 1 : addDensSrc(1,m_nbVoxelsY/2, 1.0f); break;
-  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 1.0f); break;
-  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 1.0f); break;
-  case 4 : addDensSrc(m_nbVoxelsX/2,1, 1.0f); break;
+  case 1 : addDensSrc(1,m_nbVoxelsY/2, 0.01f); break;
+  case 2 : addDensSrc(m_nbVoxelsX,m_nbVoxelsY/2, 0.01f); break;
+  case 3 : addDensSrc(m_nbVoxelsX/2,m_nbVoxelsY, 0.01f); break;
+  case 4 : addDensSrc(m_nbVoxelsX/2,1, 0.01f); break;
   }
 }

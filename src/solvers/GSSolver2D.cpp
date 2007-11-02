@@ -6,10 +6,6 @@ GSSolver2D::GSSolver2D (const Point& position, uint n_x, uint n_y, float dim, fl
 {
 }
 
-GSSolver2D::GSSolver2D ()
-{
-}
-
 GSSolver2D::~GSSolver2D ()
 {
 }
@@ -34,7 +30,7 @@ void GSSolver2D::GS_solve(unsigned char b, float *const x, const float *const x0
 /* Pas de diffusion */
 void GSSolver2D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GS_solve(b,x,x0,a, 1/(1.0f + 6.0f * a), 2);
+  GS_solve(b,x,x0,a, 1/(1.0f + 4.0f * a), 4);
 }
 
 void GSSolver2D::project (float *const p, float *const div)
@@ -56,7 +52,7 @@ void GSSolver2D::project (float *const p, float *const div)
   fill_n(p, m_nbVoxels, 0.0f);
   //  set_bnd (0, p);
   
-  GS_solve(0,p,div,1, 1/6.0f, m_nbSteps); 
+  GS_solve(0,p,div,1, 1/4.0f, m_nbSteps); 
   
   m_t=m_t1;
   for (j = 1; j <= m_nbVoxelsY; j++){

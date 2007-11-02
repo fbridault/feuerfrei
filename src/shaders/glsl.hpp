@@ -97,37 +97,37 @@ public:
     glDetachShader(m_program,shader.getID());
   }
   
-  void setUniform1f(const char* var, GLfloat value) const
+  void setUniform1f(const char* const var, GLfloat value) const
   {
     glUniform1f(glGetUniformLocation(m_program,var), value);
   }
   
-  void setUniform3f(const char* var, GLfloat val1,  GLfloat val2,  GLfloat val3 ) const
+  void setUniform3f(const char* const var, GLfloat val1,  GLfloat val2,  GLfloat val3 ) const
   {
     glUniform3f(glGetUniformLocation(m_program,var), val1, val2, val3 );
   }
   
-  void setUniform4f(const char* var, GLfloat value[4]) const
+  void setUniform4f(const char* const var, GLfloat value[4]) const
   {
     glUniform4f(glGetUniformLocation(m_program,var), value[0], value[1], value[2], value[3]);
   }
   
-  void setUniform1i(const char* var, GLint value) const
+  void setUniform1i(const char* const var, GLint value) const
   {
     glUniform1i(glGetUniformLocation(m_program,var), value);
   }
 
-  void setUniform1fv(const char* var, GLfloat *value, GLsizei count) const
+  void setUniform1fv(const char* const var, const GLfloat* const value, GLsizei count) const
   {
     glUniform1fv(glGetUniformLocation(m_program,var), count, value);
   }
 
-  void setUniform2fv(const char* var, GLfloat *value, GLsizei count) const
+  void setUniform2fv(const char* const var, const GLfloat* const value, GLsizei count) const
   {
     glUniform2fv(glGetUniformLocation(m_program,var), count, value);
   }
   
-  void setUniform3fv(const char* var, GLfloat *value, GLsizei count) const
+  void setUniform3fv(const char* const var, const GLfloat* const value, GLsizei count) const
   {
     glUniform3fv(glGetUniformLocation(m_program,var), count, value);
   }
@@ -142,12 +142,12 @@ public:
     glUniform1i(var, value);
   }
 
-  void setUniform1fv(GLint var, GLfloat *value, GLsizei count) const
+  void setUniform1fv(GLint var, const GLfloat * const value, GLsizei count) const
   {
     glUniform1fv(var, count, value);
   }
   
-  GLint getParameter(const char* var) const { return glGetUniformLocation(m_program,var); };
+  GLint getParameter(const char* const var) const { return glGetUniformLocation(m_program,var); };
   
 private:
   /** ID du programme */

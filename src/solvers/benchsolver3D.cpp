@@ -16,7 +16,7 @@ BenchSolver3D::BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_
   m_nbMaxIter = nbTimeSteps;
 }
 
-/* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
+/* Le constructeur de GSsolver n'a pas de paramÃ¨tre, il n'est donc pas appelÃ© explicitement */
 BenchSolver3D::BenchSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon) : 
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {

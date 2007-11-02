@@ -1,16 +1,16 @@
-#if !defined(GSSOLVER2D_H)
-#define GSSOLVER2D_H
+#if !defined(CGSSORSOLVER2D_H)
+#define CGSSORSOLVER2D_H
 
-class GSsolver2D;
+class CGSSORsolver2D;
 
 #include "solver2D.hpp"
 
-/** La classe GSolver propose d'utiliser la méthode de Gauss-Seidel comme
+/** La classe CGSSORolver propose d'utiliser la méthode du CGSSOR comme
  * méthode de resolution des systèmes linéaires.
  * 
  * @author	Flavien Bridault et Michel Leblond
  */
-class GSSolver2D : public virtual Solver2D
+class CGSSORSolver2D : public virtual Solver2D
 {
 public:
   /** Constructeur du solveur.
@@ -21,9 +21,10 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSSolver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy, float vorticityConfinement);
+  CGSSORSolver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy, 
+		  float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   /** Desctructeur. */
-  virtual ~GSSolver2D ();
+  virtual ~CGSSORSolver2D ();
   
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
@@ -36,10 +37,20 @@ protected:
    * et 1/6 pour la projection
    * @param nb_steps Nombre d'itérations à effectuer
    */
-  virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
+  void CGSSOR(float *x0, float *b, float a, float diagonal, float omega, int maxiter);
   
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);  
+  
+  /** Résidu, pour SSOR, direction de descente et ? */
+  float *m_r, *m_z, *m_p, *m_q;
+  
+  /** Paramètre omega pour la diffusion */
+  float m_omegaDiff;
+  /** Paramètre omega pour la projection */
+  float m_omegaProj;
+  /** Tolérance d'erreur pour GCSSOR. */
+  float m_epsilon;
 };
 
 #endif

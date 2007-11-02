@@ -4,12 +4,14 @@
 #include <iostream>
 
 #include "../solvers/GSSolver2D.hpp"
+#include "../solvers/CGSSORSolver2D.hpp"
 #include "../solvers/GSSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D.hpp"
 #include "../solvers/GCSSORSolver3D-SSE.hpp"
 #include "../solvers/HybridSolver3D.hpp"
 #include "../solvers/logResSolver3D.hpp"
 #include "../solvers/logResAvgSolver3D.hpp"
+#include "../solvers/compResAvgSolver3D.hpp"
 #include "../solvers/logResAvgTimeSolver3D.hpp"
 #include "../solvers/fakeField3D.hpp"
 #include "../solvers/LODField3D.hpp"
@@ -125,8 +127,16 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new LogResAvgTimeSolver3D(ARGS_LOG);
       m_benchTime = true;
       break;
+    case COMPRESAVG_SOLVER :
+      m_solvers[i] = new CompResAvgSolver3D(ARGS_LOG);
+      break;
     case GS_SOLVER2D :
       m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);
+      break;
+    case CGSSOR_SOLVER2D :
+      m_solvers[i] = new CGSSORSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement, 
+				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
+				    m_currentConfig->solvers[i].epsilon);
       break;
     case SIMPLE_FIELD :
       m_solvers[i] = new RealField3D(ARGS);

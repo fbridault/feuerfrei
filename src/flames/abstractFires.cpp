@@ -68,6 +68,21 @@ void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
   m_SVProgram->disable();
 }
 
+void FlameLight::computeGlowWeights(uint index, float sigma)
+{
+  int offset;
+  m_glowDivide[index] = 0.0f;
+  
+  offset = FILTER_SIZE/2;
+  for(int x=-offset ; x<=offset ; x++){
+    m_glowWeights[index][x+offset] = expf(-(x*x)/(sigma*sigma));
+    m_glowDivide[index] += m_glowWeights[index][x+offset];
+    //    cerr << x << " " << x+offset << " " << m_glowWeights[index][x+offset] << endl;
+  }
+  //     cerr << m_divide[index] << endl;
+  m_glowDivide[index] = 1/m_glowDivide[index];
+}
+
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
@@ -89,6 +104,9 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
   m_flickSave=-1;
   m_fluidsLODSave=15;
   m_nurbsLODSave=-1;
+  
+  computeGlowWeights(0,3.0f);
+  computeGlowWeights(1,10.0f);
 }
 
 FireSource::~FireSource()
@@ -215,6 +233,7 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
 {
   bool vis_save=m_visibility;
   int fluidsLOD, nurbsLOD;
+  float glow1LOD, glow2LOD;
   float coverage;
   
   if(forceSpheresBuild)
@@ -242,10 +261,16 @@ void FireSource::computeVisibility(const Camera &view, bool forceSpheresBuild)
     else if(coverage > .0015f) nurbsLOD = 1;
     else nurbsLOD = 0;
 
+    glow1LOD = 0.3134922*log(coverage*11115.586);
+    glow2LOD = 1.5543804*log(coverage*840.01981);
+    
     /* Fonction obtenue par régression linéaire avec les données
      */
     //     nurbsLOD = (int)nearbyint(1.116488*log(coverage*68.271493));
-    //cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    //cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << " " << glow1LOD << " " << glow2LOD << endl;
+    
+    computeGlowWeights(0,glow1LOD);
+    computeGlowWeights(1,glow2LOD);
     
     // Changement de niveau pour les fluides
     if(fluidsLOD < m_fluidsLODSave)
@@ -301,6 +326,8 @@ DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field
 					   const wxString &texname, uint index, const GLSLProgram* const program) : 
   FireSource (flameConfig, s, nbFlames, scene, texname, index, program)
 {
+  computeGlowWeights(0,1.8f);
+  computeGlowWeights(1,2.2f);
 }
 
 DetachableFireSource::~DetachableFireSource()
@@ -476,6 +503,7 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 {  
   bool vis_save=m_visibility;
   int nurbsLOD, fluidsLOD;
+  float glow1LOD, glow2LOD;
   float coverage;
   
   if(forceSpheresBuild)
@@ -507,8 +535,13 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
     else if(coverage > .01f) nurbsLOD = 1;
     else nurbsLOD = 0;
 
+    glow1LOD = 0.3134922*log(coverage*11115.586);
+    glow2LOD = 1.5543804*log(coverage*840.01981);
     //     nurbsLOD = (int)nearbyint(1.0731832*log(coverage*54.470523));
     //cout << "coverage " << coverage << " " << fluidsLOD << " " << nurbsLOD << endl;
+    
+    computeGlowWeights(0,glow1LOD);
+    computeGlowWeights(1,glow2LOD);
     
     if(fluidsLOD < m_fluidsLODSave)
       {

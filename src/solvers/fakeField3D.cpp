@@ -19,7 +19,7 @@ FakeField3D::~FakeField3D ()
 
 void FakeField3D::iterate ()
 {
-  float coef=.5;
+  float coef=0.2f;
   if(!m_run)
     return;
   
@@ -157,14 +157,19 @@ void FakeField3D::displayVelocityField (void)
 	  Vector vect;
 	  Point pt(inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
 	  
-	  /* Affichage du champ de vélocité */
-	  glPushMatrix ();	  
-	  glTranslatef (pt.x, pt.y, pt.z);
-	  //SDL_mutexP (lock);
 	  vect = getUVW (pt,0);
-	  //SDL_mutexV (lock);
-	  displayArrow (vect);
-	  glPopMatrix ();
+	  if( vect.x < -EPSILON || vect.x > EPSILON  ||
+	      vect.y < -EPSILON || vect.y > EPSILON  ||
+	      vect.z < -EPSILON || vect.z > EPSILON  )
+	    {
+	      /* Affichage du champ de vélocité */
+	      glPushMatrix ();	  
+	      glTranslatef (pt.x, pt.y, pt.z);
+	      //SDL_mutexP (lock);
+	      //SDL_mutexV (lock);
+	      displayArrow (vect);
+	      glPopMatrix ();
+	    }
 	}
 }
 

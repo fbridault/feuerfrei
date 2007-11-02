@@ -33,6 +33,8 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
   m_currentConfig = NULL;
   m_globalField = NULL;
   //m_framesCountForSwitch = 0;
+ 
+  m_nurbsTest = 0;
   
   srand(clock());
 }
@@ -418,7 +420,9 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
 	(*fieldsIterator)->increaseRes ();
       break;
-    case WXK_SPACE : setRunningState(!m_run); break;
+    case WXK_SPACE : setRunningState(!m_run);
+      //m_nurbsTest = 1;
+      break;
     case 'R' :
       /* Fonctionnalité permettant de remettre au maximum le niveau de précision, */
       /* ceci évidemment à des fins de tests et comparaisons */
@@ -481,6 +485,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     }
   }
   
+
+  if(!m_nurbsTest)
   if(m_visibility || m_displayParticles){
     if(m_currentConfig->glowEnabled ){
       //    GLfloat m[4][4];
@@ -544,7 +550,19 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
     if(m_currentConfig->depthPeelingEnabled)
       m_depthPeelingEngine->render(this);
     else
-      drawFlames();
+      if(!m_nurbsTest)
+	drawFlames();
+      else
+	if(m_nurbsTest==1)
+	  {
+	    m_flamesDisplayList=glGenLists(1);
+	    glNewList(m_flamesDisplayList,GL_COMPILE);
+	    drawFlames();
+	    glEndList();
+	    m_nurbsTest = 2;
+	  }
+	else
+	  glCallList(m_flamesDisplayList);
   
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur(this,m_glowOnly);

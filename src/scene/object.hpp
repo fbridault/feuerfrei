@@ -89,11 +89,13 @@ public:
   }
   
   void draw(void) const{
+    glEnable(GL_BLEND);
     glPushMatrix();
     glTranslatef(centre.x, centre.y, centre.z);
-    glColor4f(1.0f,0.0f,0.0f,1.0f);
-    GraphicsFn::SolidSphere(radius, 10, 10);
+    glColor4f(1.0f,0.0f,0.0f,0.3f);
+    GraphicsFn::SolidSphere(radius, 30, 30);
     glPopMatrix();
+    glDisable(GL_BLEND);
   }
 };
 

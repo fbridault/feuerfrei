@@ -41,8 +41,8 @@ void *FieldThreadsScheduler::Entry()
     if(!m_remainingThreads){
       time = swatch.Time();
       /* Si le calcul de l'itération passe en dessous des 50Hz, on dort le temps nécessaire */
-      if(time < 20)
-	Sleep(20 - time);
+      if(time < 33)
+	Sleep(33 - time);
       
       swatch.Start();
       m_remainingThreads = m_nbThreads;

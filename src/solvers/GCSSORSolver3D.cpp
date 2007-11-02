@@ -624,7 +624,7 @@ void GCSSORSolver3D::GCSSOR(float *const x0, const float *const b, float a,
 void
 GCSSORSolver3D::diffuse (unsigned char b, float *const x, float *const x0, float a)
 {
-  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,10);
+  GCSSOR(x,x0,a, (1.0f + 6.0f * a), m_omegaDiff,100);
 }
 
 void

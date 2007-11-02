@@ -209,7 +209,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float
   SLIDER_SENSIBILITY=100.0f;
   BUOYANCY_SENSIBILITY=10000.0f;
   FORCE_SENSIBILITY=100.0f;
-  SLIDER_RANGE=500;
+  SLIDER_RANGE=250;
   
   m_index = index;
   m_glBuffer = glBuffer;
@@ -225,7 +225,7 @@ SolverMainPanel::SolverMainPanel(wxWindow* parent, int id, float buoyancy, float
   m_solverZAxisPositionLabel = new wxStaticText(this,IDST_FZAP,_("Z"));
   
   m_buoyancyLabel = new wxStaticText(this,-1,_("Buoyancy"));
-  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,(int)(-SLIDER_RANGE/10.0f),(int)(2*SLIDER_RANGE/10.0f), wxDefaultPosition, 
+  m_buoyancySlider = new wxSlider(this,IDSL_SF,0,(int)(-SLIDER_RANGE/10.0f),(int)(SLIDER_RANGE*.4f), wxDefaultPosition, 
 				  wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_vorticityLabel = new wxStaticText(this,-1,_("Vorticity"));
   m_vorticitySlider = new wxSlider(this,IDSL_VC,0,0,400, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);

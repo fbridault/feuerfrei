@@ -219,10 +219,12 @@ void GLFlameCanvas::ResumeThreads()
 
 void GLFlameCanvas::DeleteThreads()
 {
+  m_init = false;
   /* On sort les threads de leur pause si nécessaire, car sinon il serait impossible de les arrêter ! */
   if( !IsRunning() ) setRunningState(true);
   
   m_scheduler->Stop();
+  
   for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
        threadsIterator != m_threads.end (); threadsIterator++)
     (*threadsIterator)->Stop();
@@ -247,7 +249,6 @@ void GLFlameCanvas::DeleteThreads()
 void GLFlameCanvas::Restart (void)
 {
   Disable();
-  m_init = false;
 #ifdef MULTITHREADS
   DeleteThreads();
 #endif
@@ -269,7 +270,6 @@ void GLFlameCanvas::Restart (void)
 void GLFlameCanvas::ReloadFieldsAndFires (void)
 {
   Disable();
-  m_init = false;
 #ifdef MULTITHREADS
   DeleteThreads();
 #endif
@@ -413,12 +413,12 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case 'l':
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
-	(*fieldsIterator)->decreaseRes ();
+	(*fieldsIterator)->decreaseRes ();      
       break;
     case 'L': 
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
-	(*fieldsIterator)->increaseRes ();
+	(*fieldsIterator)->increaseRes ();      
       break;
     case WXK_SPACE : setRunningState(!m_run);
       //m_nurbsTest = 1;
@@ -429,9 +429,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 #ifdef MULTITHREADS
       for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
 	   threadIterator != m_threads.end (); threadIterator++)
-	{
 	  (*threadIterator)->Lock();
-	}
 #endif
       /* On remet à la résolution max */
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
@@ -444,16 +442,12 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
       
       for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
 	   firesIterator != m_fires.end (); firesIterator++)
-	{
 	  (*firesIterator)->setLOD(1);
-	}
       
 #ifdef MULTITHREADS
       for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
 	   threadIterator != m_threads.end (); threadIterator++)
-	{
 	  (*threadIterator)->Unlock();
-	}
 #endif
       break;
     }

@@ -36,6 +36,7 @@ public:
    * @return Position absolue dans le repère du monde.
    */
   virtual Point getPosition () const { return m_position; };
+  virtual Point getScale () const { return m_scale; };
   
   /** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.

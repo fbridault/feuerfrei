@@ -40,8 +40,6 @@ NurbsFlame::NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* co
   
   m_shadingType=1;
   
-  m_position=Point(.5,0,.5);
-  
   m_tex = tex;
 }
 
@@ -74,8 +72,6 @@ NurbsFlame::NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort 
   gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
   
   m_shadingType=1;
-  
-  m_position=source->m_position;
 
   m_tex = tex;
 }
@@ -325,7 +321,7 @@ bool RealFlame::build ()
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
-	      dist_max = FLT_MIN;
+	      dist_max = -FLT_MAX;
 	      for (j = 0; j < m_periSkeletons[i]->getSize () + 2; j++)
 		{
 		  if (m_distances[j] > dist_max)
@@ -335,7 +331,7 @@ bool RealFlame::build ()
 		    }
 		}
 	      /* Il n'y a plus de place */
-	      if (dist_max == FLT_MIN)
+	      if (dist_max == -FLT_MAX)
 		m_maxDistancesIndexes[l] = -1;
 	      else
 		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */
@@ -448,14 +444,14 @@ bool RealFlame::build ()
   for (j = 0; j < m_vorder; j++)
     m_vknots[j] = 0.0f;
   
-  for (j = m_vorder; j < m_vknotsCount-m_vorder; j++)
+  for (j = m_vorder; j < m_vsize; j++)
     m_vknots[j] = m_vknots[j-1]+1;
   /* Adoucit la jointure entre le haut des squelettes périphériques et le */
   /* haut du squelette guide ex: 0 0 0 0 1.9 2 3 4 5 6 6 6 6 */
   m_vknots[m_vorder] += .9f;
   
   m_vknots[m_vknotsCount-m_vorder] =  m_vknots[m_vknotsCount-m_vorder-1]+1;
-  for (j = m_vknotsCount-m_vorder+1; j < m_vknotsCount; j++)
+  for (j = m_vsize+1; j < m_vknotsCount; j++)
     m_vknots[j] = m_vknots[j-1];
 
 //    for (j = 0; j < m_vknotsCount; j++)

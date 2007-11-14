@@ -233,7 +233,7 @@ void LODSolver3D::displayBase (){
 LODField3D::LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
 			float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon) : 
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
-  m_fakeField(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
+  m_fakeField(position, dim, scale, timeStep, buoyancy),
   m_solver(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement, omegaDiff, omegaProj, epsilon)
 {
   m_currentField = &m_solver;

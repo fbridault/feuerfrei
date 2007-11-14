@@ -142,7 +142,9 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new RealField3D(ARGS);
       break;
     case FAKE_FIELD :
-      m_solvers[i] = new FakeField3D(ARGS);
+      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].dim, 
+				     m_currentConfig->solvers[i].scale, m_currentConfig->solvers[i].timeStep, 
+				     m_currentConfig->solvers[i].buoyancy);
       break;
     case LOD_FIELD :
       m_solvers[i] = new LODField3D(ARGS_GC);

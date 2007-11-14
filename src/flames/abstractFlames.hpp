@@ -11,6 +11,7 @@ class RealFlame;
 #include "../solvers/solver3D.hpp"
 #include "../scene/texture.hpp"
 #include "../scene/object.hpp"
+#include "wick.hpp"
 
 #include <list>
 
@@ -48,7 +49,7 @@ public:
    */
   NurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const Texture* const tex);
   
-  /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
+  /** Constructeur de flamme.
    * @param source Pointeur sur la flamme qui a généré la flamme courante.
    * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
@@ -73,15 +74,6 @@ public:
    * @param displayParticle Affiche ou non les particules.
    */
   virtual void drawFlame(bool display, bool displayParticle) const = 0;
-  
-  /** Dessine la flamme et sa mèche.
-   * @param display Affiche ou non la flamme.
-   * @param displayParticle Affiche ou non les particules.
-   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
-   */
-  void draw(bool display, bool displayParticle, bool displayBoxes) const{
-    drawFlame(display, displayParticle);
-  };
   
   /** Ajuste la valeur d'échantillonnage de la NURBS.
    * @param value Valeur de sampling, compris dans un intervalle [1;4]. 
@@ -111,9 +103,7 @@ public:
   
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state) { m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2; };
-  
-  Point getPosition() const { return m_position; };
-  
+    
   /** Retourne le nombre de squelettes */
   uint getNbSkeletons() const { return m_nbSkeletons; };
     
@@ -261,9 +251,6 @@ protected:
   const Texture *m_tex;
   /* Incrément en u pour la coordonnée de texture */
   float m_utexInc;
-    
-  /** Position relative de la flamme dans le feu auquel elle appartient */
-  Point m_position;
   
 private:
   /** Objet OpenGL permettant de définir la NURBS */
@@ -300,11 +287,6 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const = 0;
   
-  void draw(bool display, bool displayParticle, bool displayBoxes) const{
-    drawWick(displayBoxes);
-    drawFlame(display, displayParticle);
-  };
-    
   /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
    * pour rester en face de l'observateur.
    */
@@ -356,7 +338,7 @@ class DetachedFlame;
 class RealFlame : public FixedFlame
 {
 public:
-  /** Constructeur de flamme. La position de la flamme est définie dans le repère du solveur.
+  /** Constructeur de flamme. 
    * @param nbSkeletons Nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
    * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
    * @param tex Pointeur sur la texture de la flamme.
@@ -389,6 +371,8 @@ public:
     for (uint i = 0; i < m_nbSkeletons; i++)
       m_periSkeletons[i]->setLifeSpan(value); 
   };
+  
+  virtual void drawWick(bool displayBoxes) const { m_wick->drawWick(displayBoxes); }; 
   
   /** Affiche les particules de tous les squelettes composants la flamme. */
   void drawParticles() const
@@ -433,10 +417,10 @@ public:
   
   virtual Point getTop() const = 0;
   virtual Point getBottom() const = 0;
-    
+  
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
-
+  
 protected:
   /** Vecteur contenant les squelettes guide. */
   vector < LeadSkeleton * > m_leadSkeletons;
@@ -459,6 +443,8 @@ protected:
   u_char m_lodSkel, m_flat;
   /** Indique qu'un changement de niveau de détail sur les squelettes a été demandé. */
   bool m_lodSkelChanged;
+  /** Mèche de la flamme */
+  Wick *m_wick;
 };
 
 #endif

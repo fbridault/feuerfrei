@@ -25,10 +25,11 @@ public:
    * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param rayon Rayon de la flamme.
+   * @param wickFileName nom du fichier contenant la mèche. Si NULL, alors wick doit être fourni.
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   Candle(const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
-	 const GLSLProgram * const program, float rayon, Object *wick=NULL);
+	 const GLSLProgram * const program, float rayon, const char *wickFileName, Wick *wick=NULL);
   /** Destructeur */
   virtual ~Candle(){};
   

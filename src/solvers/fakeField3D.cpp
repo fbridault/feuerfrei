@@ -3,9 +3,8 @@
 #include <math.h>
 #include "../scene/graphicsFn.hpp"
 
-FakeField3D::FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
-			  float timeStep, float buoyancy) : 
-  Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
+FakeField3D::FakeField3D (const Point& position, float dim, const Point& scale, float timeStep, float buoyancy) : 
+  Field3D(position, 1, 1, 1, dim, scale, timeStep, buoyancy)
 {
   m_forceCoef = 3.0f;
   m_coef = m_dt * m_dt * m_forceCoef;

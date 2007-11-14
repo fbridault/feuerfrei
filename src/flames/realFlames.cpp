@@ -18,7 +18,7 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
   Point rootMoveFactorP(.5f,.1f,.5f);
   
   m_wick = wickObject;
-  sliceDirection = m_wick->build(flameConfig, m_leadSkeletons, s);
+  sliceDirection = m_wick->buildFDF(flameConfig, m_leadSkeletons, s);
   m_nbLeadSkeletons = m_leadSkeletons.size();
   
   /** Allocation des squelettes périphériques = deux par squelette périphérique */
@@ -80,7 +80,7 @@ void LineFlame::breakCheck()
     
     proba = (rand()/((float)RAND_MAX));
     
-    /* Roulette russe : tirage aléatoire entre 0 et 1 */
+    /* Tirage aléatoire entre 0 et 1 */
     if( proba > detachThreshold){
       Point offset;
       
@@ -354,8 +354,7 @@ bool LineFlame::buildFlat ()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-			float rayon, Object *wick):
+PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, float rayon, Wick *wick):
   RealFlame ( flameConfig.skeletonsNumber, 3, tex, s)
 {
   uint i;
@@ -363,49 +362,29 @@ PointFlame::PointFlame (const FlameConfig& flameConfig, const Texture* const tex
   
   m_nbLeadSkeletons = 1;
   
-  m_leadSkeletons.push_back (new LeadSkeleton (m_solver, m_position, Point(2.0f,0.2f,2.0f), 
-					       flameConfig.leadLifeSpan, 0, .5f, 0.0f, .025f));
+  m_wick = wick;
+  m_wick->buildPointFDF(flameConfig, m_leadSkeletons, s);
   
   /* On créé les squelettes en cercle */
   angle = 0.0f;
+  
+  Point pt=*m_leadSkeletons[0]->getRoot();
   for (i = 0; i < m_nbSkeletons; i++)
     {
       m_periSkeletons[i] = new PeriSkeleton
 	(m_solver, 
-	 Point (cos (angle) * rayon + m_position.x, m_position.y, sin (angle) * rayon + m_position.z),
+	 Point (cos (angle) * rayon + pt.x, pt.y, sin (angle) * rayon + pt.z),
 	 Point(1.0f,.75f,1.0f),
 	 m_leadSkeletons[0], flameConfig.periLifeSpan);
       angle += 2.0f * PI / m_nbSkeletons;
     }
-  
-  m_wick = wick;
   
   m_utexInc = 2.0f/m_nbSkeletons;
 }
 
 PointFlame::~PointFlame ()
 {  
-  if(m_wick)
-    delete m_wick;
-}
-
-void PointFlame::drawWick (bool displayBoxes) const
-{
-  if(!m_wick){
-    float hauteur = 1 / 6.0f;
-    float largeur = 1 / 60.0f;
-    /* Affichage de la mèche */
-    glPushMatrix ();
-    glTranslatef (m_position.x, m_position.y-hauteur/2.0f, m_position.z);
-    glRotatef (-90.0f, 1.0f, 0.0f, 0.0f);
-    glColor3f (0.0f, 0.0f, 0.0f);
-    GraphicsFn::SolidCylinder (largeur, hauteur, 10, 10);
-    glTranslatef (0.0f, 0.0f, hauteur);
-    GraphicsFn::SolidDisk (largeur, 10, 10);
-    glPopMatrix ();
-  }else{
-    m_wick->draw();
-  }
+  delete m_wick;
 }
 
 void PointFlame::getLightPositions (GLfloat lightPositions[8][4], uint& nbLights)
@@ -524,7 +503,7 @@ bool DetachedFlame::build()
 	  /* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
 	  for (l = 0; l < nb_pts_supp; l++)
 	    {
-	      dist_max = FLT_MIN;
+	      dist_max = -FLT_MAX;
 	      for (j = 0; j < m_periSkeletons[i]->getSize () - 1 + m_nbFixedPoints; j++)
 		{
 		  if (m_distances[j] > dist_max)
@@ -534,7 +513,7 @@ bool DetachedFlame::build()
 		    }
 		}
 	      /* Il n'y a plus de place */
-	      if (dist_max == FLT_MIN)
+	      if (dist_max == -FLT_MAX)
 		m_maxDistancesIndexes[l] = -1;
 	      else
 		/* On met à la distance la plus grande pour ne plus la prendre en compte lors de la recherche suivante */

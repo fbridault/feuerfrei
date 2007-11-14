@@ -26,7 +26,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  FakeField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy);
+  FakeField3D (const Point& position, float dim, const Point& scale, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~FakeField3D ();
   

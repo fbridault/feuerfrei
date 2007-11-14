@@ -254,11 +254,15 @@ public:
   
   Vertex getVertex (GLuint i) const { return m_vertexArray[i]; };
   
+  /** Construit l'englobant de l'objet.
+   */
+  void buildBoundingBox ();
+  
   /** Donne l'englobant de l'objet.
    * @param max Retourne le coin supérieur de l'englobant.
    * @param min Retourne le coin inférieur de l'englobant.
    */
-  void getBoundingBox (Point& max, Point& min);
+  void getBoundingBox (Point& max, Point& min) { max=m_max; min=m_min; };
   
   void bindVBO() const 
   { 
@@ -333,13 +337,20 @@ public:
   void drawBoundingSpheres ();
   
   Point getPosition () const { 
-    Point average;
-    for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-	 meshesListIterator != m_meshesList.end ();
-	 meshesListIterator++)
-      average += (*meshesListIterator)->getPosition();
-    return (average/m_meshesList.size());
+    //    Point average;
+//     for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
+// 	 meshesListIterator != m_meshesList.end ();
+// 	 meshesListIterator++)
+//       average += (*meshesListIterator)->getPosition();
+//     return (average/m_meshesList.size());
+    return (m_max+m_min)/2.0f;
   };
+
+  /** Translation en "dur" de l'objet. Toutes les coordonnées de ses points sont modifiées.
+   * @param direction Vecteur de translation.
+   */
+  void translate(const Vector& direction);
+  
 protected:
   /**<Liste des points de l'objet */
   vector <Vertex> m_vertexArray;
@@ -375,6 +386,8 @@ private:
    * <ol>3 pour points, normales et coordonnées de texture.</ol>
    * </li> */
   uint m_attributes;
+
+  Point m_min, m_max;
 };
 
 #endif

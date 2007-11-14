@@ -26,9 +26,9 @@ Object::~Object ()
   delete [] m_hashTable;
 }
 
-void Object::getBoundingBox (Point & max, Point & min)
+void Object::buildBoundingBox ()
 {
-  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   /* Création de la bounding box */
   
   for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
@@ -49,8 +49,7 @@ void Object::getBoundingBox (Point & max, Point & min)
       if ( vertexIterator->z < ptMin.z)
 	ptMin.z = vertexIterator->z;
     }
-  
-  max = ptMax; min = ptMin;
+  m_max = ptMax; m_min = ptMin;
 }
 
 void Object::buildBoundingSpheres ()
@@ -136,6 +135,20 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres) const
       glDisable(GL_TEXTURE_2D);
     }
   }
+}
+
+void Object::translate(const Vector& direction)
+{
+  for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+       vertexIterator != m_vertexArray.end (); vertexIterator++)
+    {
+      vertexIterator->x += direction.x;
+      vertexIterator->y += direction.y;
+      vertexIterator->z += direction.z;
+    }
+  /* On déplace aussi la boîte englobante */
+  m_max += direction;
+  m_min += direction;
 }
 
 /********************************************* Mesh Definition *********************************************/

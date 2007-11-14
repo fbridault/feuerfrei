@@ -45,12 +45,13 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
 
 void Scene::computeBoundingBox(Point& max, Point& min)
 { 
-  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point objMax, objMin;
   
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++){
+    (*objectsArrayIterator)->buildBoundingBox();
     (*objectsArrayIterator)->getBoundingBox(objMax, objMin);
     /* Calcul du max */
     if ( objMax.x > ptMax.x)
@@ -70,6 +71,7 @@ void Scene::computeBoundingBox(Point& max, Point& min)
   for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end();
        objectsArrayIteratorWSV++){
+    (*objectsArrayIteratorWSV)->buildBoundingBox();
     (*objectsArrayIteratorWSV)->getBoundingBox(objMax, objMin);
     /* Calcul du max */
     if ( objMax.x > ptMax.x)

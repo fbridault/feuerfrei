@@ -1,6 +1,8 @@
 #include "LODField3D.hpp"
 #include "SSE4.hpp"
 
+#define GRID_INCREMENT 2
+
 LODSolver3D::LODSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
 				      float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
 				      float omegaProj, float epsilon) :
@@ -158,10 +160,23 @@ void LODSolver3D::decrementRes ()
     cerr << "Minimum grid resolution already reached !" << endl;
     return;
   }
-  
-  m_nbVoxelsX-=2;
-  m_nbVoxelsY-=2;
-  m_nbVoxelsZ-=2;
+
+  trilinearInterpolation(m_u,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_u,m_tmp);
+  trilinearInterpolation(m_v,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_v,m_tmp);
+  trilinearInterpolation(m_w,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_w,m_tmp);
+  trilinearInterpolation(m_uPrev,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_uPrev,m_tmp);
+  trilinearInterpolation(m_vPrev,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_vPrev,m_tmp);
+  trilinearInterpolation(m_wPrev,m_tmp,m_nbVoxelsX-GRID_INCREMENT,m_nbVoxelsY-GRID_INCREMENT,m_nbVoxelsZ-GRID_INCREMENT);
+  SWAP(m_wPrev,m_tmp);
+
+  m_nbVoxelsX-=GRID_INCREMENT;
+  m_nbVoxelsY-=GRID_INCREMENT;
+  m_nbVoxelsZ-=GRID_INCREMENT;
 
   recomputeAttributes();  
 }
@@ -172,9 +187,22 @@ void LODSolver3D::incrementRes ()
     return;
   }
   
-  m_nbVoxelsX+=2;
-  m_nbVoxelsY+=2;
-  m_nbVoxelsZ+=2;
+  trilinearInterpolation(m_u,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_u,m_tmp);
+  trilinearInterpolation(m_v,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_v,m_tmp);
+  trilinearInterpolation(m_w,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_w,m_tmp);
+  trilinearInterpolation(m_uPrev,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_uPrev,m_tmp);
+  trilinearInterpolation(m_vPrev,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_vPrev,m_tmp);
+  trilinearInterpolation(m_wPrev,m_tmp,m_nbVoxelsX+GRID_INCREMENT,m_nbVoxelsY+GRID_INCREMENT,m_nbVoxelsZ+GRID_INCREMENT);
+  SWAP(m_wPrev,m_tmp);
+  
+  m_nbVoxelsX+=GRID_INCREMENT;
+  m_nbVoxelsY+=GRID_INCREMENT;
+  m_nbVoxelsZ+=GRID_INCREMENT;
 
   recomputeAttributes();
 }

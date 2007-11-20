@@ -70,6 +70,9 @@ protected:
   /** Ajouter le vorticity confinement */
   void addVorticityConfinement( float * const u,  float * const v, float * const w);
 
+  float getTrilinearFilteredValue(const Point& pt, uint i, uint j, uint k, float* const v);
+  void trilinearInterpolation( float *const v, float *const v2, uint nx2, uint ny2, uint nz2 );
+  
   /** Prolonger sur une grille fine un vecteur défini sur une grille grossière.
    * On utilise une interpolation bilinéaire.
    * La grille fine est de taille nx*ny*nz

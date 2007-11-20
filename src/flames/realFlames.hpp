@@ -10,8 +10,6 @@ class DetachableFireSource;
 
 #include <list>
 
-#include "wick.hpp"
-
 /**********************************************************************************************************************/
 /**************************************** DEFINITION DE LA CLASSE LINEFLAME **************************************/
 /**********************************************************************************************************************/
@@ -43,8 +41,6 @@ public:
     if(displayParticle) drawParticles();
     if(display) drawLineFlame();
   };
-  
-  virtual void drawWick(bool displayBoxes) const { m_wick->drawWick(displayBoxes); };
   
   virtual Vector getMainDirection() const
   {
@@ -125,9 +121,6 @@ private:
     m_center = averagePos / (m_nbLeadSkeletons-2);
   }
   
-  /** Mèche de la flamme */
-  Wick *m_wick;
-
   /** Liste des particules utilisées pour afficher des étincelles */
   list<Particle *> m_sparksList;
 
@@ -165,7 +158,7 @@ public:
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   PointFlame ( const FlameConfig& flameConfig, const Texture* const tex, Field3D* const s, 
-	       float rayon, Object *wick=NULL);
+	       float rayon, Wick *wick);
   
   /** Destructeur*/
   virtual ~PointFlame();
@@ -175,8 +168,6 @@ public:
     if(displayParticle) drawParticles();
     if(display) drawPointFlame();
   };
-  
-  virtual void drawWick(bool displayBoxes) const;
   
   virtual Vector getMainDirection() const {
     return(*(m_leadSkeletons[0]->getParticle(0)));
@@ -201,9 +192,6 @@ public:
       m_periSkeletons[i]->addForces ();
   }
   void getLightPositions (GLfloat lightPositions[8][4], uint& nbLights);
-  
-protected:
-  Object *m_wick;
 };
 
 

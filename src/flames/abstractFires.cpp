@@ -46,7 +46,7 @@ void FlameLight::switchOn()
   GLfloat val_diffuse[]={1.0f*coef,0.5f*coef,0.0f,1.0f};
   //GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
   GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
-  GLfloat val_specular[]={.9f*coef,.9f*coef,.9f*coef,1.0f};
+  GLfloat val_specular[]={.5f*coef,.5f*coef,.5f*coef,1.0f};
   
   /* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
   glLightfv(m_light,GL_POSITION,m_lightPosition);
@@ -90,11 +90,13 @@ void FlameLight::computeGlowWeights(uint index, float sigma)
 FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
 		       const wxString &texname, uint index, const GLSLProgram* const program) : 
   FlameLight(scene, index, program, flameConfig.IESFileName.ToAscii()),
-  m_texture(texname, GL_REPEAT, GL_REPEAT)
+  m_texture(texname, GL_REPEAT, GL_REPEAT),
+  m_position(0.0f,0.0f,0.0f)
 { 
   m_solver = s;
   
   m_nbFlames=nbFlames;
+  /* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
   if(m_nbFlames) m_flames = new RealFlame* [m_nbFlames];
   
   m_intensityCoef = 0.3f;
@@ -174,7 +176,7 @@ void FireSource::buildBoundingSphere ()
   m_boundingSphere.radius = sqrtf(3.0f)/2.0f*t;
   /* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
-  m_boundingSphere.centre = m_solver->getPosition() + p/2.0f;
+  m_boundingSphere.centre = getPosition() + p/2.0f;
   //  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
   //  m_boundingSphere.centre = getCenterSP();
 }
@@ -192,7 +194,7 @@ void FireSource::drawImpostor() const
 //       glPopMatrix();
       GLfloat modelview[16];
             
-      Point pos(m_solver->getPosition());
+      Point pos(getPosition());
       float size=m_solver->getScale().x*1.1f, halfSize=m_solver->getScale().x*.5f;
       Point a,b,c,d,zero;
       Vector right,up,offset;
@@ -347,7 +349,7 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
   default : 
     if(m_visibility)
       {
-	Point pt(m_solver->getPosition());
+	Point pt(getPosition());
 	Point scale(m_solver->getScale());
 	glPushMatrix();
 	glTranslatef (pt.x, pt.y, pt.z);
@@ -398,7 +400,7 @@ void DetachableFireSource::build()
       flamesIterator++;
   }
 
-  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point pt;
   Point p;
   float t,k;
@@ -430,7 +432,7 @@ void DetachableFireSource::build()
 //       m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
 //     }else{
     m_boundingSphere.radius = sqrt(k+k);
-    m_boundingSphere.centre = m_solver->getPosition() + p;
+    m_boundingSphere.centre = getPosition() + p;
 //   }
     /* Calcul de la bounding box pour affichage */
     buildBoundingBox ();
@@ -593,9 +595,9 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 
 void DetachableFireSource::buildBoundingBox ()
 {
-  Point ptMax(FLT_MIN, FLT_MIN, FLT_MIN), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point pt;
-  Point pos(m_solver->getPosition());
+  Point pos(getPosition());
   
   if( m_detachedFlamesList.size () )
     for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();

@@ -10,10 +10,12 @@
 //     Attention a ne pas prendre en compte les transformations utilisees pour la
 //     visualisation de la scene comme le panorama ou le eyeball.
 
+#version 120
+
 varying vec3 normal;
 varying vec4 point3D;
 uniform vec3 lumTr;
-#version 120
+uniform vec4 scale;
 
 void main()
 {
@@ -23,6 +25,6 @@ void main()
   
   gl_TexCoord[0].xy = gl_MultiTexCoord0.xy;
   
-  point3D = gl_Vertex + vec4(lumTr,0);
+  point3D = gl_Vertex*scale + vec4(lumTr,0);
   normal = gl_Normal;
 } // main end

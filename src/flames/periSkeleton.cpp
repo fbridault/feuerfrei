@@ -56,7 +56,7 @@ bool PeriSkeleton::moveParticle (Particle * const particle)
     return false;
   
   /* Déplacement de la particule */
-  m_solver->moveParticle(*particle, m_lead->getSelfVelocity()/1.1f);
+  m_solver->moveParticle(*particle, m_lead->getSelfVelocity());
   
   /* Si la particule sort de la grille, elle est éliminée */
   if (   particle->x < 0.0f || particle->x > m_solver->getDimX()

@@ -259,7 +259,15 @@ public:
    */
   Point getPosition () const
   {
-    return Point(m_solver->getPosition());
+    return m_solver->getPosition();
+  }
+  
+  /** Retourne la position absolue dans le repère du monde.
+   * @return Position absolue dans le repère du monde.
+   */
+  Point getWickPosition () const
+  {
+    return m_position;
   }
   
   /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
@@ -301,7 +309,7 @@ public:
     default : 
       if(m_visibility)
 	{
-	  Point pt(m_solver->getPosition());
+	  Point pt(getPosition());
 	  Point scale(m_solver->getScale());
 	  glPushMatrix();
 	  glTranslatef (pt.x, pt.y, pt.z);
@@ -310,10 +318,10 @@ public:
 	    m_flames[i]->drawFlame(display, displayParticle);
 	  glPopMatrix();
 	  // Trace une sphère indiquant le centre
-	  // 	    glPushMatrix();
-	  // 	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
-	  // 	    GraphicsFn::SolidSphere (.05, 10, 10);
-	  // 	    glPopMatrix();
+// 	  	    glPushMatrix();
+// 	  	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
+// 	  	    GraphicsFn::SolidSphere (.05, 10, 10);
+// 	  	    glPopMatrix();
 	}
       break;
     }
@@ -438,6 +446,8 @@ protected:
   
   /** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
   int m_fluidsLODSave, m_nurbsLODSave;
+
+  Point m_position;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.

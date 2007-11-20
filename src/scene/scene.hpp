@@ -214,7 +214,9 @@ public:
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
 	Point pos=(*luminariesIterator)->getPosition();
+	Point sc=(*luminariesIterator)->getScale();
 	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
+	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
       }
     else
@@ -238,7 +240,9 @@ public:
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
 	Point pos=(*luminariesIterator)->getPosition();
+	Point sc=(*luminariesIterator)->getScale();
 	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
+	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
       }
     else

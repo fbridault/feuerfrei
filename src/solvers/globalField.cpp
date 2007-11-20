@@ -68,7 +68,7 @@ GlobalField::GlobalField(const vector <Field3D *> &fields, Scene* const scene, c
     m_field = new RealField3D(ARGS);
     break;
   case FAKE_FIELD :
-    m_field = new FakeField3D(ARGS);
+    m_field = new FakeField3D(position, dim, scale, timeStep, buoyancy);
     break;
   case LOD_FIELD :
     m_field = new LODField3D(ARGS_GC);

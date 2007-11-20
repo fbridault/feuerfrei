@@ -37,13 +37,19 @@ public:
   Wick(Scene* const scene);
   virtual ~Wick();
   
-  /* Construction de la mèche *
-   * @param nb_lead_squelettes Nombre de squelettes guides à placer sur la mèche.
+  /* Construction d'une mèche ponctuelle (bougie)
    * @param scene Pointeur sur la scène.
    * @param position Position de la mèche dans l'espace.
    * @param leadSkeletons Vecteur des squelettes guides.
    */
-  uint build(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const solver);
+  uint buildPointFDF(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
+  
+  /* Construction de la mèche
+   * @param scene Pointeur sur la scène.
+   * @param position Position de la mèche dans l'espace.
+   * @param leadSkeletons Vecteur des squelettes guides.
+   */
+  uint buildFDF(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
   
   /** Affiche la mèche
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
@@ -54,6 +60,7 @@ public:
     if(displayBoxes)
       glCallList(m_boxesDisplayList);
   };
+
 };
 
 #endif

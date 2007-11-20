@@ -37,7 +37,7 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const
   {
-    Point diffPos = m_position - m_source->getPosition();
+    Point diffPos = m_position;// - m_source->getPosition();
     glPushMatrix();
     glTranslatef(diffPos.x, diffPos.y, diffPos.z);
     m_source->drawWick(displayBoxes);
@@ -54,6 +54,7 @@ public:
   
 protected:
   const RealFlame *m_source;
+  Point m_position;
 };
 
 /** La classe CloneLineFlame implémente une flamme clone dont la source est une LineFlame.

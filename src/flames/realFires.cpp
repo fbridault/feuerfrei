@@ -5,10 +5,33 @@
 #include "../solvers/fakeField3D.hpp"
 
 Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
-		const GLSLProgram * const program, float rayon, Object *wick):
+		const GLSLProgram * const program, float rayon, const char *wickFileName, Wick *wick):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
-  m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, wick);
+  if(wickFileName)
+    {
+      list<Wick *> objList;
+      
+      scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
+      
+      if(objList.size() > 0){
+	/* Calcul de la position et recentrage de la mèche */
+	(*objList.begin())->buildBoundingBox();
+	m_position = Point(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
+	(*objList.begin())->translate(m_position);
+	m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
+      }else
+	cerr << "Fatal error : no wick !!!" << endl;
+    }
+  else
+    if(wick){
+      /* Calcul de la position et recentrage de la mèche */
+      wick->buildBoundingBox();
+      m_position = Point(0.5f,0.0f,0.5f) - wick->getPosition();
+      wick->translate(m_position);
+      m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, wick);
+    }else
+      cerr << "Error, you must provide either a wick file or a wick object" << endl;
   m_nbLights = 7;
 }
 
@@ -42,7 +65,7 @@ void Candle::switchOffMulti()
 
 void Candle::switchOnMulti()
 {
-  int n,light=0;
+  uint n,light=0;
   double coef;
   
   for( n = 0 ; n < m_nbLights ; n++){
@@ -87,7 +110,16 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene
   scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
   
   if(objList.size() > 0)
-    m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.03f, 0.01f);
+    {
+      /* Calcul de la position et recentrage de la mèche */
+      (*objList.begin())->buildBoundingBox();
+      m_position = Point(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
+      (*objList.begin())->translate(m_position);
+  
+      m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.03f, 0.01f);
+    }
+  else
+    cerr << "Fatal error : no wick !!!" << endl;
 }
 
 Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
@@ -95,18 +127,27 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const ch
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"), index, program)
 {
   list<Wick *> objList;
-  int i=0;
   
   scene->importOBJ(torchName, NULL, &objList, WICK_NAME_PREFIX);
   
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
+
+  /* Calcul de la position et recentrage des mèches */
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
+       objListIterator != objList.end (); objListIterator++){
+    (*objListIterator)->buildBoundingBox();
+    m_position += (*objListIterator)->getPosition();
+  }
+  m_position = Point(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
+       objListIterator != objList.end (); objListIterator++)
+    (*objListIterator)->translate(m_position);
   
+  int i=0;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
-    {
-      m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.03f, 0.04f, this);
-    }
+    m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.03f, 0.04f, this);
 }
 
 CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
@@ -114,26 +155,40 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, co
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"), index, program)
 {
   list<Wick *> objList;
-  int i=0;
   
   scene->importOBJ(fireName, NULL, &objList, WICK_NAME_PREFIX);
-  
+    
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
-  
+
+  /* Calcul de la position et recentrage des mèches */
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
+       objListIterator != objList.end (); objListIterator++){
+    (*objListIterator)->buildBoundingBox();
+    m_position += (*objListIterator)->getPosition();
+  }
+  m_position = Point(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+  for (list <Wick *>::iterator objListIterator = objList.begin ();
+       objListIterator != objList.end (); objListIterator++)
+    (*objListIterator)->translate(m_position);
+      
+  int i=0;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
-    {
-      m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.05f, 0.04f, this);
-    }
+    m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.05f, 0.02f, this);
 }
 
 CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
 			  const GLSLProgram * const program, float rayon):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
-  m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon);
-
+  list<Wick *> objList;
+  
+  scene->importOBJ(filename, NULL, &objList, WICK_NAME_PREFIX);
+  
+  if(objList.size() > 0)
+    m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
+  
   m_nbCloneFlames = 20;
   m_cloneFlames = new ClonePointFlame* [m_nbCloneFlames];
   

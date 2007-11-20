@@ -47,7 +47,7 @@ Solver2D::Solver2D (const Point& position, uint n_x, uint n_y,float dim, float t
   fill_n(m_densSrc, m_nbVoxels, 0.0f);
     
   m_visc = 0.000022f;
-  m_diff = 0.001f;
+  m_diff = 0.0001f;
   
   m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY;

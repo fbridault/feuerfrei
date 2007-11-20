@@ -26,19 +26,14 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
     scene->importMTL(mtlName);
   
   m_hasLuminary = scene->importOBJ(filename, &m_luminary, NULL, LAMP_NAME);
-  
+      
   m_position = config.position;
-  
-  if(m_hasLuminary)
-    for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
-	 luminaryIterator  != m_luminary.end (); luminaryIterator++)
-      (*luminaryIterator)->buildVBO();
-  
   if(config.fires[0].type != CANDLESSET)
     {
-      field = initField( config.fields[0], config.position );
+      field = initField( config.fields[0], m_position );
       fireSource = initFire( config.fires[0], filename, field, scene, index, program );
       field->addFireSource( fireSource );
+      field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
       
       m_fields.push_back( field );
       fields.push_back( field );
@@ -47,33 +42,22 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
     }
   else
     {
-      list<Object *> objList;
+      list<Wick *> objList;
       int i=0;
-  
-      scene->importOBJ(filename, &objList, NULL, WICK_NAME_PREFIX);
-    
-      for (list < Object *>::iterator objListIterator = objList.begin ();
+      
+      scene->importOBJ(filename, NULL, &objList, WICK_NAME_PREFIX);
+      
+      for (list < Wick *>::iterator objListIterator = objList.begin ();
 	   objListIterator != objList.end (); objListIterator++, i++)
 	{
-	  Point scale(.15,.15,.15);
-	  /* Construction du VBO */
-	  (*objListIterator)->buildVBO();
-	  (*objListIterator)->buildBoundingSpheres();
-      
-	  scale *= m_scale;
-	  /* On décale pour que le centre du solveur soit calé avec la mèche ( et non pas le coin inférieur gauche) */
-	  Point pt((*objListIterator)->getPosition());
-	  pt = (pt* m_scale + m_position)  - Point(scale.x/2.0,0.0,scale.z/2.0);
-	  //     pt.y += s->getDimY()/4.0 * s->getScale().y;
-      
-	  field = new FakeField3D(pt, 10, 10, 10, 1.0, scale, .4, .1);
-	  fireSource = new Candle (config.fires[0], field, scene, i, program, .125, *objListIterator);
+	  field = initField( config.fields[0], m_position);
+	  fireSource = new Candle (config.fires[0], field, scene, i, program, .125f, NULL, *objListIterator);
+	  field->addFireSource( fireSource );
+	  field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
 	  
 	  fireSource->setInnerForce(config.fires[0].innerForce);
 	  fireSource->setFDF(config.fires[0].fdf);
-	  fireSource->setPerturbateMode(config.fires[0].flickering);
-	  
-	  field->addFireSource( fireSource );
+	  fireSource->setPerturbateMode(config.fires[0].flickering);	  
 	  
 	  m_fields.push_back( field );
 	  fields.push_back( field );
@@ -81,6 +65,10 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
 	  fireSources.push_back( fireSource );
 	}
     }
+  if(m_hasLuminary)
+    for (list < Object* >::iterator luminaryIterator = m_luminary.begin ();
+	 luminaryIterator  != m_luminary.end (); luminaryIterator++)
+      (*luminaryIterator)->buildVBO();
 }
 
 Luminary::~Luminary ()
@@ -93,7 +81,7 @@ Luminary::~Luminary ()
 }
 
 #define ARGS position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\
-              fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy
+    fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy
 #define ARGS_SLV ARGS, fieldConfig.vorticityConfinement
 #define ARGS_GC ARGS_SLV, fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon
 
@@ -113,7 +101,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& posit
   case SIMPLE_FIELD :
     return (new RealField3D(ARGS));
   case FAKE_FIELD :
-    return (new FakeField3D(ARGS));
+    return (new FakeField3D(position, fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy));
   case LOD_FIELD :
     return (new LODField3D(ARGS_GC));
   case LOD_HYBRID_FIELD :
@@ -132,8 +120,7 @@ FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileN
   FireSource *fire;
   switch(flameConfig.type){
     case CANDLE :
-    case CANDLESSET :
-      fire = new Candle (flameConfig, field, scene, i, SVProgram, 1/ 8.0);
+      fire = new Candle (flameConfig, field, scene, i, SVProgram, .125f, fileName);
       break;
     case FIRMALAMPE :
       fire = new Firmalampe(flameConfig, field, scene, i, SVProgram, fileName);
@@ -145,7 +132,7 @@ FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileN
       fire = new CampFire(flameConfig, field, scene, fileName, i, SVProgram);
       break;
     case CANDLESTICK :
-      fire = new CandleStick (flameConfig, field, scene, "scenes/bougie.obj", i, SVProgram, 1/ 8.0);
+      fire = new CandleStick (flameConfig, field, scene, "scenes/bougie.obj", i, SVProgram, .125f);
       break;
     default :
       cerr << "Unknown flame type : " << (int)flameConfig.type << endl;

@@ -60,6 +60,7 @@ void PixelLightingRenderer::draw(bool color)
   m_SPProgram.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
   m_SPProgram.setUniform1i("isTextured",1);
   m_SPProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+  m_SPProgram.setUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
   
   m_SPProgram.setUniform1i("textureObjet",0);
   m_scene->drawSceneTEX();
@@ -208,6 +209,7 @@ void PhotometricSolidsRenderer::draw(bool color)
     m_SPOnlyProgram.setUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
     m_SPOnlyProgram.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
     m_SPOnlyProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+    m_SPOnlyProgram.setUniform3f("scale", 1.0f, 1.0f, 1.0f);
     
     glActiveTexture(GL_TEXTURE0);
     m_photometricSolidsTex->bind();
@@ -224,6 +226,7 @@ void PhotometricSolidsRenderer::draw(bool color)
     m_SPProgram.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);    
     m_SPProgram.setUniform1i("isTextured",1);
     m_SPProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+    m_SPProgram.setUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
     
     glActiveTexture(GL_TEXTURE1);
     m_photometricSolidsTex->bind();

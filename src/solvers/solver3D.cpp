@@ -53,7 +53,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_invhy= 0.5f*n_y;
   m_invhz= 0.5f*n_z;
   
-  // UtilisÈ pour la densitÈ
+  // Utilis√© pour la densit√©
   // m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
 
@@ -65,15 +65,15 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   // chercher le premier groupe de 4 contenant le premier voxel
   // de la grille initiale
   // m_t1 = 4*q1 + r1 avec 0 <= r1 < 4
-  // q1 est le numÈro de ce premier groupe
-  // m_debut = 4*q1 est le numÈro du premier ÈlÈment de ce groupe
+  // q1 est le num√©ro de ce premier groupe
+  // m_debut = 4*q1 est le num√©ro du premier √©l√©ment de ce groupe
   m_debut= m_t1-m_t1%4;
-  // rÈcupÈrer le numÈro du dernier voxel de la grille initiale
+  // r√©cup√©rer le num√©ro du dernier voxel de la grille initiale
   m_dernier=IX(m_nbVoxelsX,m_nbVoxelsY,m_nbVoxelsZ);
   //chercher le nombre de groupes de 4 contenant les voxels de la
   // grille initiale
   //m_dernier = 4*q2 + r2 avec 0 <= r2 < 4
-  // m_nbgrps = q2 - q1 + 1 est le nombre cherchÈ
+  // m_nbgrps = q2 - q1 + 1 est le nombre cherch√©
   m_nbgrps= (m_dernier-m_t1)/4+1;
   
 //   m_forceCoef = 10;
@@ -110,7 +110,7 @@ void Solver3D::set_bnd (unsigned char b, float *const x)
 {
   uint i, j;
 
-  /* Attention cela ne prend pas en compte les coins et les arÍtes entre les coins */
+  /* Attention cela ne prend pas en compte les coins et les ar√™tes entre les coins */
   for (i = 0; i <= m_nbVoxelsY+1; i++)
     {
       for (j = 0; j <= m_nbVoxelsZ+1; j++)
@@ -210,7 +210,7 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
   float Nx,Ny,Nz;
   float invNormeN;
   
-  /** Calcul de m_rot la norme du rotationnel du champ de vÈlocitÈ (m_u, m_v, m_w)
+  /** Calcul de m_rot la norme du rotationnel du champ de v√©locit√© (m_u, m_v, m_w)
    */
   m_t = m_t1;
   for (k=1; k<=m_nbVoxelsZ; k++) {
@@ -236,10 +236,10 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
     }//for j
     m_t+=m_t2nx;
   }//for k
-  /* Calcul du gradient normalisÈ du rotationnel m_rot
+  /* Calcul du gradient normalis√© du rotationnel m_rot
    * Calcul du produit vectoriel N^m_rot
-   * Le vecteur est multipliÈ par epsilon*h
-   * et est ajoutÈ au champ de vÈlocitÈ
+   * Le vecteur est multipli√© par epsilon*h
+   * et est ajout√© au champ de v√©locit√©
    */
 	
   m_t=m_t1;
@@ -291,7 +291,7 @@ void Solver3D::vel_step ()
   project (m_uPrev, m_vPrev);
 }
 
-// Affiche le temps passÈ dans chacune des Ètapes
+// Affiche le temps pass√© dans chacune des √©tapes
 // 
 // void Solver3D::vel_step ()
 // {  
@@ -329,7 +329,7 @@ void Solver3D::iterate ()
   if(!m_run)
     return;
   
-  /* Cellule(s) gÈnÈratrice(s) */
+  /* Cellule(s) g√©n√©ratrice(s) */
   
   //   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
   //     for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
@@ -342,7 +342,7 @@ void Solver3D::iterate ()
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
       for (uint i = 1; i <= m_nbVoxelsX; i++){
-	m_vSrc[m_t] += m_buoyancy / (float) ((j+1)*invy);
+	m_vSrc[m_t] += m_buoyancy / (float) (j*invy);
 	m_t++;
       }//for i
       m_t+=2;
@@ -440,7 +440,7 @@ void Solver3D::addRightForce()
   findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
   findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
   
-  /* UtilisÈ pour faire des benchs sur le solveur */
+  /* Utilis√© pour faire des benchs sur le solveur */
   if(m_perturbateCount>90){
     m_perturbateCount = 0;
     m_vorticityConfinement = 0;
@@ -491,10 +491,68 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
   }
 }
 
+float Solver3D::getTrilinearFilteredValue(const Point& pt, uint i, uint j, uint k, float *const v)
+{
+  uint xd,yd,zd;
+  float i1, i2, j1, j2, w1, w2;
+  
+  /* Les coordonn√©es de pt sont dans un cube de c√¥t√© 1 */
+  /* on s'arrange pour les mettrent dans un cube de c√¥t√© m_nbVoxels{X,Y,Z} */
+  /* de sorte √† avoir des voxels de largeur 1 n√©cessaires pour l'interpolation */
+  xd = pt.x*m_nbVoxelsX - i;
+  yd = pt.y*m_nbVoxelsY - j;
+  zd = pt.z*m_nbVoxelsZ - k;
+//   cerr << pt << " " << i << " " << j << " " << k << endl;
+//   cerr << xd << " " << yd << " " << zd << endl;
+  /* Interpolation selon z */
+  i1 = v[IX(i,  j,  k)]*(1-zd) + v[IX(i,  j,  k+1)]*zd;
+  i2 = v[IX(i,  j+1,k)]*(1-zd) + v[IX(i,  j+1,k+1)]*zd;
+  j1 = v[IX(i+1,j,  k)]*(1-zd) + v[IX(i+1,j,  k+1)]*zd;
+  j2 = v[IX(i+1,j+1,k)]*(1-zd) + v[IX(i+1,j+1,k+1)]*zd;
+  
+  /* Interpolation selon y */
+  w1 = i1*(1 - yd) + i2*yd;
+  w2 = j1*(1 - yd) + j2*yd;
+
+  /* Interpolation selon x */
+  return (w1*(1 - xd) + w2*xd);
+}
+
+void Solver3D::trilinearInterpolation( float *const v, float *const v2, uint nx2, uint ny2, uint nz2 )
+{
+  uint I,J,K;
+  Point pt;
+  Point inc;
+  uint count=0;
+  inc.x = m_dim.x/nx2; inc.y = m_dim.y/ny2; inc.z = m_dim.z/nz2;
+  pt.z = inc.z/2.0f;
+  for(uint k = 1 ; k <= nx2 ; k++) {
+    //d√©terminer l'indice K du voxel de la grille actuelle
+    K = (uint) floorf(pt.z * m_nbVoxelsZDivDimZ) + 1;
+    pt.y = inc.y/2.0f;
+    for(uint j = 1 ; j <= ny2 ; j++){
+      //d√©terminer l'indice J du voxel de la grille actuelle
+      J = (uint) floorf(pt.y * m_nbVoxelsYDivDimY) + 1;
+      pt.x = inc.x/2.0f;
+      count=0;
+      for(uint i = 1 ; i <= nz2 ; i++){
+	//d√©terminer l'indice I du voxel de la grille actuelle
+	I = (uint) floorf(pt.x * m_nbVoxelsXDivDimX) + 1;
+
+	v2[IX(i,j,k)] = getTrilinearFilteredValue(pt, I, J, K, v);
+	count ++;
+	pt.x += inc.x;
+      }
+      pt.y += inc.y;
+    }
+    pt.z += inc.z;
+  }
+}
+
 void Solver3D::prolonger(float  *const v2h, float *const vh)
 {
-  // on utilise une interpolation bilinÈaire
-  // rÈcupÈrer la taille du solveur 
+  // on utilise une interpolation bilin√©aire
+  // r√©cup√©rer la taille du solveur 
 
   int nx=getXRes();
   int ny=getYRes();
@@ -504,7 +562,7 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
   K=0;
   kr=1;
   for(int k = 1 ; k <= nz ; k++) {
-    //dÈterminer l'indice K du gros voxel
+    //d√©terminer l'indice K du gros voxel
     // k = 2*K + kr
     //	K=k/2;
     //	kr=k%2;
@@ -513,26 +571,26 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
     for(int j = 1 ; j <= ny ; j++){
       I=0;
       ir=1;
-      //dÈterminer l'indice J du gros voxel
+      //d√©terminer l'indice J du gros voxel
       // j = 2*J + jr
       //J=j/2;
       //jr=j%2;
       for(int i = 1 ; i <= nx ; i++){
-	//dÈterminer l'indice I du gros voxel
+	//d√©terminer l'indice I du gros voxel
 	// i = 2*I + ir
 	//	I=i/2;
 	//  ir=i%2;
 			
 			
-	// il y a 8 possibilitÈs
+	// il y a 8 possibilit√©s
 	// i = 2*I ou i = 2*I +1
 	// j = 2*J ou j = 2*J +1
 	// k = 2*K ou k = 2*K +1
-	// Chacune des possibilitÈs est codÈe en positionnant les 3 bits de 
+	// Chacune des possibilit√©s est cod√©e en positionnant les 3 bits de 
 	// poids faible de l'entier code : bit2 = ir, bit1 = jr, bit0 = kr
 	// Le point (i,j,k) de la grille fine est l'un des sommets du "petit"
 	// voxel ayant en commun le point (2I,2J,2K) avec le "gros" voxel 
-	// Le point (i,j,k) est soit le milieu d'une arÍte du "gros" voxel,
+	// Le point (i,j,k) est soit le milieu d'une ar√™te du "gros" voxel,
 	// soit le centre de l'une de ses faces, soit son centre,  
 	// soit le point commun des deux voxels
 				 
@@ -542,12 +600,12 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	case 0: // point commun
 	  vh[IX(i,j,k)] = v2h[IX2h(I,J,K)];
 	  break;
-	case 1: // milieu d'une arÍte
+	case 1: // milieu d'une ar√™te
 	  vh[IX(i,j,k)] = 0.5f*
 	    (v2h[IX2h(I,J,K)] +
 	     v2h[IX2h(I,J,K+1)]);
 	  break;
-	case 2: // milieu d'une arÍte
+	case 2: // milieu d'une ar√™te
 	  vh[IX(i,j,k)] =  0.5f*
 	    (v2h[IX2h(I,J,K)] +
 	     v2h[IX2h(I,J+1,K)]);
@@ -559,7 +617,7 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	     v2h[IX2h(I,J+1,K+1)]+
 	     v2h[IX2h(I,J,K+1)]);
 	  break;
-	case 4: // milieu d'une arÍte
+	case 4: // milieu d'une ar√™te
 	  vh[IX(i,j,k)] = 0.5f*
 	    (v2h[IX2h(I,J,K)] + 
 	     v2h[IX2h(I+1,J,K)]);
@@ -590,7 +648,7 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	     v2h[IX2h(I+1,J+1,K+1)]+
 	     v2h[IX2h(I,J+1,K+1)]);
 	}//switch
-	// prÈparer l'itÈration suivante
+	// pr√©parer l'it√©ration suivante
 	// i = 2*I + ir => i+1 = 2*(I+ir) + (1-ir)
 	I=I+ir;
 	ir=1-ir;
@@ -605,7 +663,7 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 
 void  Solver3D::restreindre(float *const vh, float *const v2h){
 
-  // schÈma en 27 points
+  // sch√©ma en 27 points
   int nx=getXRes()/2;
   int ny=getYRes()/2;
   int nz=getZRes()/2;
@@ -615,17 +673,17 @@ void  Solver3D::restreindre(float *const vh, float *const v2h){
       for(int i = 1 ; i <= nx ; i++){
 	//				v2h[IX2h(i,j,k)] = vh[IX(2*i,2*j,2*k)];
 
-	// Un point de la grille grossiËre reÁoit la somme pondÈrÈe des
-	// valeurs des points voisins de la grille grossiËre.
-	// Un point de la grille grossiËre a 27 voisins.
-	// Les points de la grille fine situÈs dans le plan du point courant
-	// de la grille grossiËre ont respectivement pour poids 1/8, 1/16, 1/32
-	// en fonction de leur distance ‡ ce point.
-	// Les points de la grille fine situÈs dans les plans immÈdiatement 
-	// parallËles au plan contenant le point courant de la grille grossiËre
+	// Un point de la grille grossi√®re re√ßoit la somme pond√©r√©e des
+	// valeurs des points voisins de la grille grossi√®re.
+	// Un point de la grille grossi√®re a 27 voisins.
+	// Les points de la grille fine situ√©s dans le plan du point courant
+	// de la grille grossi√®re ont respectivement pour poids 1/8, 1/16, 1/32
+	// en fonction de leur distance √† ce point.
+	// Les points de la grille fine situ√©s dans les plans imm√©diatement 
+	// parall√®les au plan contenant le point courant de la grille grossi√®re
 	// ont respectivement pour poids 1/16, 1/32, 1/64
-	// en fonction de leur distance ‡ ce point.
-	// La somme des poids est Ègale ‡ 1 :
+	// en fonction de leur distance √† ce point.
+	// La somme des poids est √©gale √† 1 :
 	// (1/8 + 1/16*4 + 1/32*4) *(1 + 2* 1/2) = 1
 	ii=2*i;
 	jj=2*j;
@@ -636,13 +694,13 @@ void  Solver3D::restreindre(float *const vh, float *const v2h){
 	jjS = jj-1;
 	kkU = kk+1;
 	kkD = kk-1;
-	// multiplication par 4 car le problËme n'est pas un problËme de Poisson              
+	// multiplication par 4 car le probl√®me n'est pas un probl√®me de Poisson              
 	//                                 |
 	//                                 v
 
 	v2h[IX2h(i,j,k)] = (
 			    0.125f*(
-				    vh[IX( ii ,jj , kk)]+// coÔncident
+				    vh[IX( ii ,jj , kk)]+// co√Øncident
 				    (vh[IX(iiE,jjS,kk)]+// point  SE
 				     vh[IX(iiE,jjN,kk)]+// point  NE
 				     vh[IX(iiO,jjS,kk)]+// point  SO

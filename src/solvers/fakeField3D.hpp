@@ -69,7 +69,7 @@ public:
     m_src.z += value;
   };
   
-  virtual void setBuoyancy(float value){ m_buoyancy=20*value; };
+  virtual void setBuoyancy(float value){ m_buoyancy=30*value; };
   
   void cleanSources ();
   void displayVelocityField (void);

@@ -1,6 +1,6 @@
-#Produced by Art of Illusion 2.5.1, Mon Nov 12 19:48:18 CET 2007
-newmtl Untitled_1
-Kd 0.5387 0.54 0.5238
+#Produced by Art of Illusion 2.5.1, Wed Nov 21 11:28:02 CET 2007
+newmtl Noire
+Kd 0 0 0
 Ks 0 0 0
 Ka 0 0 0
 illum 1
@@ -9,8 +9,8 @@ Kd 1 1 1
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Noire
-Kd 0 0 0
+newmtl Untitled_1
+Kd 0.5387 0.54 0.5238
 Ks 0 0 0
 Ka 0 0 0
 illum 1

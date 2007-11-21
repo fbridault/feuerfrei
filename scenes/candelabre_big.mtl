@@ -1,16 +1,16 @@
-#Produced by Art of Illusion 2.4, Fri May 25 01:45:14 CEST 2007
+#Produced by Art of Illusion 2.5.1, Wed Nov 21 11:34:27 CET 2007
 newmtl Noire
 Kd 0 0 0
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Untitled_1
-Kd 0.5387 0.54 0.5238
+newmtl Default_Texture
+Kd 1 1 1
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Default_Texture
-Kd 1 1 1
+newmtl Untitled_1
+Kd 0.5387 0.54 0.5238
 Ks 0 0 0
 Ka 0 0 0
 illum 1

@@ -5,6 +5,7 @@ class GLSLProgram;
 
 #include <GL/gl.h>
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 

@@ -89,12 +89,14 @@ uint Wick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& l
       /* Découpage en x */
       max=0;
     else
+      /* Découpage en z */
       max=2;
   else
     if(midDist.y > midDist.z)
       /* Découpage en y */
       max=1;
     else
+      /* Découpage en z */
       max=2;
   
   switch(max){
@@ -251,8 +253,36 @@ uint Wick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& l
 	delete (*pointsIterator);
       pointsPartitionsArray[i].clear();
     }
+  //  buildFDF(field);
   return (max);
 }
+
+// void Wick::buildFDF(Field3D* const field)
+// { 
+//   Point h=field->getDim();
+  
+//   h.x /= field->getXRes();
+//   h.y /= field->getYRes();
+//   h.z /= field->getZRes();
+    
+//   for (uint k = 1; k <= field->getZRes(); k++)
+//     for (uint j = field->getYRes(); j >= 1; j--)
+//       for (uint i = 1; i <= field->getXRes(); i++)
+// 	if(checkPointsInVoxel(h,i,j,k))
+// 	  {
+// 	    if(j==1)
+// 	      {
+// 		cerr << "Voxel " << i << "," << j << "," << k << endl;
+// 		break;
+// 	      }
+// 	    else
+// 	      if(!checkPointsInVoxel(h,i,j-1,k))
+// 		{
+// 		  cerr << "Voxel " << i << "," << j-1 << "," << k << endl;
+// 		  break;
+// 		}
+// 	  }
+// }
 
 Wick::~Wick ()
 {

@@ -10,10 +10,13 @@
 #include "../vector.hpp"
 #include <wx/event.h>
 
-class Quaternion
+/** Classe de base pour la manipulation des quaternions. Ils sont uniquement
+ * utilisés pour les rotations de caméra, d'où leur déclaration dans ce fichier.
+ */
+
+class Quaternion 
 {
 public:
-  float x, y, z, w;
   
   Quaternion()
   {
@@ -63,18 +66,24 @@ public:
     
     return C;
   };
+
+public:
+  float x, y, z, w;
 };
 
 
 class Scene;
 
-/** Classe définissant une caméra subjective à la première personne, qui permet donc 
- * de tourner, de se déplacer et de zoomer autour d'un point quelconque dans
- * l'espace. Elle fournit les fonctions pour les clics de la souris void OnMouseClick (wxMouseEvent& event) 
- * et du mouvement void OnMouseMotion (wxMouseEvent& event)<br>
- * Pour l'utiliser, il suffit de déclarer un objet de type Camera. Dans la fonction de dessin de la scène, il
- * ne reste alors plus qu'à appeler la fonction publique setView() avant de tracer l'objet à visualiser.
- * Cette classe peut donc être utilisée ainsi avec une application wxWidgets quelconque.
+/** Classe définissant une caméra subjective à la première personne, qui permet
+ * donc de tourner, de se déplacer et de zoomer autour d'un point quelconque
+ * dans l'espace. Elle fournit les fonctions pour les clics de la souris void
+ * OnMouseClick (wxMouseEvent& event) et du mouvement void OnMouseMotion
+ * (wxMouseEvent& event).<br> 
+ * Pour l'utiliser, il suffit de déclarer un objet de type Camera. Dans la
+ * fonction de dessin de la scène, il ne reste alors plus qu'à appeler la
+ * fonction publique setView() avant de tracer l'objet à visualiser.  Cette
+ * classe peut donc être utilisée ainsi avec une application wxWidgets
+ * quelconque.
  *
  * @author	Flavien Bridault
  */
@@ -93,25 +102,12 @@ public:
   Camera(int w, int h, float clipping_value);
 #endif
   virtual ~Camera() {};
-
-  // void addCenterX(float value){ centerx+=value; eyex+=value; 
-//       recalculer_matrice_initiale (); };
-//   void addCenterZ(float value){ centerz+=value; eyez+=value;
-//       recalculer_matrice_initiale ();};
+  
   /** Calcul de la rotation de la caméra 
    * @param x position finale de la souris en x
    * @param y position finale de la souris en y
    */
   void computeView(float x, float y);
-
-  float computeAngles(float input) const
-  {
-    float angleW, angleH;
-    
-    angleW = (input * 180 / PI)/ m_ouverture;
-    angleH = (input * 180 / PI)/ (m_ouverture * m_aspect);
-    return (angleW * angleH);
-  };
   
   /** Placement de la caméra. Fonction à appeler au début de chaque tour de la
    * boucle de dessin
@@ -126,7 +122,10 @@ public:
   /** Rotation de la caméra */
   void rotate(float angle, float x, float y, float z);
   
+  /** Action du clic de souris. */
   void OnMouseClick (wxMouseEvent& event);
+  
+  /** Action du déplacement de la souris. */
   void OnMouseMotion (wxMouseEvent& event);
 
   /** Déplacement de la caméra sur les côtés 
@@ -138,7 +137,8 @@ public:
     Vector axis = m_view ^ m_up;
     m_position = m_position + (axis * value);
     setView();
-  }; 
+  };
+  
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
    * On effectue ensuite une translation suivant le vecteur de vue
    * @param value valeur de la translation
@@ -147,9 +147,10 @@ public:
     m_position = m_position + (m_view * value);
     setView();
 #ifdef RTFLAMES_BUILD
-    computeFrustrum();
+    computeFrustum();
 #endif
-  };  
+  };
+  
   /** Déplacement de la caméra vers l'avant ou vers l'arrière 
    * On effectue ensuite une translation suivant le vecteur de vue
    * @param value valeur de la translation
@@ -160,7 +161,8 @@ public:
   };
   
 #ifdef RTFLAMES_BUILD
-  void computeFrustrum();
+  /** Calcul du frustum. Appelé à chaque changement de caméra. */
+  void computeFrustum();
   
   const float* getFrustum(uint side) const { return m_frustum[side]; };
   
@@ -171,40 +173,42 @@ public:
 #endif
   
 private:
-  /** Position de la scène. La caméra reste toujours centrée en (0,0,0) */
+  /** Position de la scène. La caméra reste toujours centrée en (0,0,0). */
   Point m_position;
-  /** Vecteur vers le haut et direction de visée */
+  /** Vecteur vers le haut et direction de visée. */
   Vector m_up, m_view;
-  /** Bouton de la souris actuellement appuyé */
+  /** Bouton de la souris actuellement appuyé. */
   int m_buttonPressed;
-  /** Angle d'ouverture de la caméra en degrés */
+  /** Angle d'ouverture de la caméra en degrés. */
   float m_ouverture;
-  /** Ratio de la largeur sur la hauteur de la projection */
+  /** Ratio de la largeur sur la hauteur de la projection. */
   float m_aspect;
   
   /** Variables temporaires pour savoir à partir de quel endroit le glissement de la
-   * souris a commencé 
+   * souris a commencé.
    */
   int m_beginMouseX, m_beginMouseY;
-  /** Valeur de clipping de la caméra */
+  /** Valeur de clipping de la caméra. */
   float m_clipping_value;
-  /** Rotation actuelle autour de l'axe X */
+  /** Rotation actuelle autour de l'axe X. */
   float m_currentRotationX;  
-  /** Angle de rotation maximal autour de l'axe X en radians */
+  /** Angle de rotation maximal autour de l'axe X en radians. */
   float m_maxAngleX;
-  /** Variable temporaire indiquant qu'un mouvement a lieu avec la souris */
+  /** Variable temporaire indiquant qu'un mouvement a lieu avec la souris. */
   bool m_move;
-  /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000 */
+  /** Sensibilité de la souris - valeurs conseillées entre 50 et 1000. */
   float m_mouseSensitivity;
   /** Viewport */
   int m_viewPort[4];
+
 #ifdef RTFLAMES_BUILD
-  /** Plans du frustrum */
+  /** Plans du frustum. */
   float m_frustum[6][4];
-  /** Matrice de projection */
+  /** Matrice de projection. */
   double m_projMatrix[16];
-  /** Matrice de transformation */
+  /** Matrice de transformation. */
   double m_modlMatrix[16];
+  /** Pointeur sur la scène. */
   Scene *m_scene;
 #endif
 };

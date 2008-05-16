@@ -330,11 +330,14 @@ public:
 #endif
   }
   
+  /** Dessin de la sphère englobante. */
   virtual void drawBoundingSphere() const { if(m_visibility) m_boundingSphere.draw(); };
   
+  /** Dessin d'un imposteur pour le rendu. */
   virtual void drawImpostor() const;
   
-  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
+  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation
+   * thermique de la flamme.
    */
   virtual void addForces ()
   {
@@ -383,13 +386,14 @@ public:
       m_flames[i]->setSmoothShading(state);
   }
   
-  /** Fonction permettant de récupérer le centre de la flamme dans le repère local */
+  /** Fonction permettant de récupérer le centre de la flamme dans le repère local. */
   virtual Point getCenter() const { return m_center; };
   
-  /** Fonction permettant de récupérer l'orientation principale de la flamme
-   */
+  /** Fonction permettant de récupérer l'orientation principale de la flamme. */
   virtual Vector getMainDirection() const { return m_direction; };
   
+  /** Fonction recalculant le centre et la direction de la flamme, en vue de
+   * l'éclairage. Appelée à chaque pas de simulation. */
   void computeIntensityPositionAndDirection(void);
   
   /** Construction de la sphère englobante de l'objet. */
@@ -399,8 +403,12 @@ public:
    * et teste ensuite la visibilité de celle-ci. */
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
   
+  /** Test si la flamme est visible ou non. Le calcul de visibilité proprement
+   * dit se fait à l'aide de la fonction computeVisibility. */
   bool isVisible() { return m_visibility; };
-  float getDistance() { return m_dist; };
+
+  /** Récupération de la distance par rapport à la caméra. */
+  float getDistanceFromCamera() { return m_dist; };
 
   virtual bool operator<(const FireSource& other) const;
 
@@ -424,9 +432,11 @@ protected:
   
   /** Sphère englobante utilisée pour vérifier la visibilité de la source. */
   BoundingSphere m_boundingSphere;
+
   /** Visibilité de la flamme. */
   bool m_visibility;
-  /** Distance par rapport à la caméra */
+  
+  /** Distance par rapport à la caméra. */
   float m_dist;
 
   /** Dernière valeur du flickering connue avant que la gestion du LOD ne la modifie */
@@ -434,19 +444,23 @@ protected:
   
   /** Coefficient de force appliqué sur la FDF. */
   float m_innerForce;
+
   /** Méthode de perturbation appliquée sur la FDF. */
   char m_perturbate;
+
   /** Fonction de distribution de carburant. */
   int m_fdf;
   
   /** Centre de la flamme, recalculé à chaque itération dans build() */
   Point m_center;
+
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
   
   /** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
   int m_fluidsLODSave, m_nurbsLODSave;
 
+  /** Position de la flamme dans le monde. */
   Point m_position;
 };
 

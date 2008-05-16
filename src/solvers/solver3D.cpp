@@ -466,27 +466,27 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
 			       const Point& TRStrength, const Point& BRStrength)
 {
   uint i,j;
-  
+  float coef=.5f;
   switch(face){
   case LEFT_FACE :
     for (i = 1; i <= m_nbVoxelsZ; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f;
+	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)*coef;
     break;
   case RIGHT_FACE : 
     for (i = 1; i <= m_nbVoxelsZ; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f;
+	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)*coef;
     break;
   case BACK_FACE : 
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f;
+	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)*coef;
     break;
   case FRONT_FACE : 
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
-	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)/4.0f;
+	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)*coef;
     break;
   }
 }
@@ -622,7 +622,6 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	    (v2h[IX2h(I,J,K)] + 
 	     v2h[IX2h(I+1,J,K)]);
 	  break;
-
 	case 5: // centre d'une face
 	  vh[IX(i,j,k)] = 0.25f*
 	    (v2h[IX2h(I,J,K)]+ 

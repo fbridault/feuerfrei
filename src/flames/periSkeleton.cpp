@@ -35,13 +35,17 @@ FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadS
 void PeriSkeleton::addForces ()
 {
   float dummy;
-  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), dummy);
-}
+
+  /* Applique une force à la base des squelettes (pour les bougies). Ceci n'a
+   * aucun effet pour les FakeFields, qui comptent eux sur la selfVelocity du
+   * squelette relatif pour transmettre cette force (voir moveParticle() plus
+   * bas). */
+  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), dummy); }
 
 void PeriSkeleton::addParticle(const Point* const pt)
 {
   if(m_headIndex >= NB_PARTICLES_MAX-1){
-    puts("Erreur : trop de particules");
+    puts("(EE) Too many particles in PeriSkeleton::addParticle() !!!");
     return;
   }
   m_headIndex++;
@@ -55,7 +59,9 @@ bool PeriSkeleton::moveParticle (Particle * const particle)
   if (particle->isDead ())
     return false;
   
-  /* Déplacement de la particule */
+  /* Déplacement de la particule. Dans le cas présent, on utilise la
+   * selfVelocity du squelette relatif pour ajouter une force propre au
+   * squelette dans le cas des FakeFields. */
   m_solver->moveParticle(*particle, m_lead->getSelfVelocity());
   
   /* Si la particule sort de la grille, elle est éliminée */

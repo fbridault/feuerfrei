@@ -413,12 +413,12 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
     case 'l':
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
-	(*fieldsIterator)->decreaseRes ();      
+	(*fieldsIterator)->decreaseRes ();
       break;
     case 'L': 
       for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	   fieldsIterator != m_fields.end (); fieldsIterator++)
-	(*fieldsIterator)->increaseRes ();      
+	(*fieldsIterator)->increaseRes ();
       break;
     case WXK_SPACE : setRunningState(!m_run);
       //m_nurbsTest = 1;
@@ -541,22 +541,24 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   drawScene();
   /********************* DESSINS DES FLAMMES SANS GLOW **********************************/
   if((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
-    if(m_currentConfig->depthPeelingEnabled)
-      m_depthPeelingEngine->render(this);
-    else
-      if(!m_nurbsTest)
-	drawFlames();
+    {
+      if(m_currentConfig->depthPeelingEnabled)
+	m_depthPeelingEngine->render(this);
       else
-	if(m_nurbsTest==1)
-	  {
-	    m_flamesDisplayList=glGenLists(1);
-	    glNewList(m_flamesDisplayList,GL_COMPILE);
-	    drawFlames();
-	    glEndList();
-	    m_nurbsTest = 2;
-	  }
+	if(!m_nurbsTest)
+	  drawFlames();
 	else
-	  glCallList(m_flamesDisplayList);
+	  if(m_nurbsTest==1)
+	    {
+	      m_flamesDisplayList=glGenLists(1);
+	      glNewList(m_flamesDisplayList,GL_COMPILE);
+	      drawFlames();
+	      glEndList();
+	      m_nurbsTest = 2;
+	    }
+	  else
+	    glCallList(m_flamesDisplayList);
+    }
   
   if((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
     m_glowEngine->drawBlur(this,m_glowOnly);
@@ -567,7 +569,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
   /* La différence n'est pas forcément visible en pratique, cela supprime surtout quelques petits bugs d'affichage */
   /* potentiels, par contre le framerate en prend un sacré coup !! */
   /* Dans l'idéal, je pense donc qu'il serait utile de placer du code CPU ici ! */
-  glFinish();
+  //glFinish();
   SwapBuffers ();
   
   //event.Skip();

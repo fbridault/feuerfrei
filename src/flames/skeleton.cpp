@@ -6,11 +6,14 @@
 #include "../scene/graphicsFn.hpp"
 #include "../solvers/solver3D.hpp"
 
+#define LIFE_EXTEND 5
+
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREESKELETON **************************************/
 /**********************************************************************************************************************/
 FreeSkeleton::FreeSkeleton(uint size, Field3D* const s)
 {
+  assert (s != NULL);
   m_solver = s;
   m_queue = new Particle[size];
   m_headIndex = -1;
@@ -19,7 +22,9 @@ FreeSkeleton::FreeSkeleton(uint size, Field3D* const s)
 FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
 {
   uint i;
-  
+
+  assert (src != NULL);
+
   m_solver = src->m_solver;
   m_queue = new Particle[splitHeight+1];
   
@@ -27,7 +32,7 @@ FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
   for( i=0; i <= splitHeight; i++){
     m_queue[i] = src->m_queue[i];
     /* Extension de la durée de vie !! */
-    m_queue[i].m_lifespan +=5;
+    m_queue[i].m_lifespan +=LIFE_EXTEND;
   }
   m_headIndex = splitHeight;
   m_selfVelocity = src->m_selfVelocity;
@@ -46,11 +51,7 @@ void FreeSkeleton::removeParticle(uint n)
     m_queue[i] = m_queue[i+1];
   
   m_headIndex--;
-//   if(m_headIndex==-1){
-//     //puts("Erreur : file vide");
-//     addParticle(&m_root);
-//     return;
-//   }
+  assert(m_headIndex>=0);
 }
 
 void FreeSkeleton::swap(uint i, uint j)
@@ -80,13 +81,15 @@ void FreeSkeleton::move ()
 	  if (i < getInternalSize () - 1)
 	    i--;
 	}
-    }	/* for */
-  
+    }
 }
 
 bool FreeSkeleton::moveParticle (Particle * const particle)
 {
-  Particle copy(*particle),copy2;
+  Particle copy(*particle), copy2;
+
+  assert (particle != NULL);
+
   if (particle->isDead ())
     return false;
   
@@ -97,18 +100,17 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
     particle->y = m_solver->getDimY() - EPSILON;
   if ( particle->z >= m_solver->getDimZ() )
     particle->z = m_solver->getDimZ() - EPSILON;
-  /* Si la particule sort de la grille, elle prend la vélocité du bord */
   if ( particle->x < 0.0f )
     particle->x = EPSILON;
-  if ( particle->y < 0.0f )
-    return false;
   if ( particle->z < 0.0f )
     particle->z = EPSILON;
-  
-  
+  /* Cas particulier en y, on supprime la particule si elle passe SOUS la grille
+   * (évite les problèmes de "stagnation" de la flamme) */
+  if ( particle->y < 0.0f )
+    return false;
+
   copy2 = *particle;
-  /* Calculer la nouvelle position */
-  /* Intégration d'Euler */
+  /* Calculer la nouvelle position ( Intégration d'Euler, on prend juste la dérivée première ) */
   m_solver->moveParticle(*particle, m_selfVelocity);
   
   *particle = *particle - copy2 + copy;
@@ -172,8 +174,7 @@ void Skeleton::drawRoot () const
 
 void Skeleton::moveRoot ()
 {
-  /* Calculer la nouvelle position */
-  /* Intégration d'Euler */
+  /* Calculer la nouvelle position ( Intégration d'Euler, on prend juste la dérivée première ) */
   m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_rootSave, m_selfVelocity);
   
   /* Si l'origine sort de la grille, on la replace */
@@ -200,26 +201,14 @@ void Skeleton::move ()
   
   if (getInternalSize () < NB_PARTICLES_MAX - 1)
       addParticle (&m_root);
-  
-  /* Déplacement des particules */
-  /* Boucle de parcours : du haut vers le bas */
-  for (i = 0; i < getInternalSize (); i++)
-    {
-      tmp = getInternalParticle (i);
 
-      if (moveParticle (tmp))
-	  updateParticle (i, tmp);
-      else
-	{
-	  removeParticle (i);
-	  if (i < getInternalSize () - 1)
-	    i--;
-	}
-    }	/* for */
+  FreeSkeleton::move ();
 }
 
 bool Skeleton::moveParticle (Particle * const particle)
 {
+  assert (particle != NULL);
+  
   if (particle->isDead ())
     return false;
   
@@ -228,7 +217,7 @@ bool Skeleton::moveParticle (Particle * const particle)
   /* Si la particule sort de la grille, elle est éliminée */
   if (   particle->x < 0.0f || particle->x > m_solver->getDimX()
       || particle->y < 0.0f || particle->y > m_solver->getDimY()
-      || particle->z < 0.0f || particle->z > m_solver->getDimZ())
+      || particle->z < 0.0f || particle->z > m_solver->getDimZ() )
     return false;
   
   return true;

@@ -82,7 +82,8 @@ Texture::Texture(const wxString& filename) : m_fileName(filename)
       loadWithAlphaChannel();
     else{      
       cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB,
+			 GL_UNSIGNED_BYTE, m_wxtex->GetData() );
       m_hasAlpha = false;
     }
   }
@@ -110,7 +111,8 @@ Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
       loadWithAlphaChannel();
     else{
       cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
+			 GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
       m_hasAlpha = false;
     }
   }
@@ -139,7 +141,8 @@ Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileN
     else{
       m_hasAlpha = false;
       cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
+      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
+			 GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
     }
   }
   /* Semble nécessaire pour éviter un plantage lors de la libération de la wxImage  */
@@ -189,6 +192,7 @@ void Texture::loadWithAlphaChannel()
       *(tmp++) = m_wxtex->GetAlpha(i,j);
     }
   
-  gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, imgcpy );
+  gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
+		     GL_RGBA, GL_UNSIGNED_BYTE, imgcpy );
   delete [] imgcpy;
 }

@@ -51,6 +51,7 @@ public:
    */
   uint buildFDF(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
   
+//   void buildFDF(Field3D* const m_field);
   /** Affiche la mèche
    * @param displayBoxes Affiche ou non le partitionnement de la mèche.
    */
@@ -59,6 +60,17 @@ public:
     draw(ALL,true);
     if(displayBoxes)
       glCallList(m_boxesDisplayList);
+  };
+
+  bool checkPointsInVoxel(const Point& h, uint i, uint j, uint k)
+  {
+    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	 vertexIterator != m_vertexArray.end (); vertexIterator++)
+      if( h.x*(i-1) < vertexIterator->x && vertexIterator->x < h.x*i &&
+	  h.y*(j-1) < vertexIterator->y && vertexIterator->y < h.y*j &&
+	  h.z*(k-1) < vertexIterator->z && vertexIterator->z < h.z*k )
+	return true;
+    return false;
   };
 
 };

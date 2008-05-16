@@ -62,7 +62,7 @@ void main()
     // - cos de l'angle entre la direction de la source et la normale au point
     cosSN = dot(direction,normal);
     // attenuation de l'intensite en fonction de l'angle d'eclairage, de la distance et de la taille
-    attenuation = 4.0/r;
+    attenuation = min(4.0/r,1.0);
     ColorSP = theta * cosSN * attenuation * fluctuationIntensite[i] * texture3D(textureSP, texcoordsSP).r;
     
     color += ColorSP;

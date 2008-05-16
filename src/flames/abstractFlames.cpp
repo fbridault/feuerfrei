@@ -422,7 +422,7 @@ bool RealFlame::build ()
   m_ctrlPoints = m_ctrlPointsSave;
   
   /* Il faut également recopier les coordonnées de texture mais attention le u change ! */
-  for (i = 0; i < m_uorder-1; i++){
+  for (i = 0; i < (uint)m_uorder-1; i++){
     for (j = 0; j < m_vsize; j++){
       *m_texPoints++ = utex;
       *m_texPoints++ = *m_texTmp++;

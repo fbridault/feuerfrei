@@ -10,8 +10,8 @@ class FreeLeadSkeleton;
 
 class Skeleton;
 
-/** Classe reprÈsentant les squelettes pÈriphÈriques, voir la classe Skeleton pour plus de
- * dÈtails. Un squelette pÈriphÈrique se rÈfËre ‡ un squelette guide relatif pour la
+/** Classe repr√©sentant les squelettes p√©riph√©riques, voir la classe Skeleton pour plus de
+ * d√©tails. Un squelette p√©riph√©rique se r√©f√®re √† un squelette guide relatif pour la
  * construction des surfaces NURBS.
  *
  * @author	Flavien Bridault
@@ -19,60 +19,64 @@ class Skeleton;
 class PeriSkeleton : public Skeleton
 {
 public:
-  /** Constructeur de squelette pÈriphÈrique.
+  /** Constructeur de squelette p√©riph√©rique.
    * @param s Pointeur sur le solveur de fluides.
    * @param position Position de la flamme dans l'espace.
-   * @param rootMoveFactor Amplitude du dÈplacement autorisÈ pour l'origine du squelette. Varie
+   * @param rootMoveFactor Amplitude du d√©placement autoris√© pour l'origine du squelette. Varie
    * en fonction du type de flamme.
-   * @param leadSkeleton pointeur sur le squelette guide associÈ (gÈnÈralement le plus proche,
-   * dans le cas de la bougie simple, le problËme est simple puisqu'il n'y en a qu'un seul)
-   * @param pls DurÈe de vie initiale d'une particule.
+   * @param leadSkeleton pointeur sur le squelette guide associ√© (g√©n√©ralement le plus proche,
+   * dans le cas de la bougie simple, le probl√®me est simple puisqu'il n'y en a qu'un seul)
+   * @param pls Dur√©e de vie initiale d'une particule.
    */
   PeriSkeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, 
 	       LeadSkeleton *leadSkeleton, uint pls);
   /** Destructeur. */
   virtual ~PeriSkeleton();
   
-  /** MÈthode de sÈparation d'un squelette.
-   * @param splitHeight hauteur de la dÈcoupe.
+  /** M√©thode de s√©paration d'un squelette.
+   * @param splitHeight hauteur de la d√©coupe.
    * @param leadSkeleton squelette guide relatif.
    */
   FreePeriSkeleton* split (uint splitHeight, FreeLeadSkeleton* leadSkeleton);
   
   void addParticle(const Point* const pt);
+  
   virtual bool moveParticle(Particle* const particle);
   
   /** Retourne un pointeur sur le squelette guide relatif. */
   LeadSkeleton* getLeadSkeleton() const {return m_lead;};
   
+  /** M√©thode d'ajout de forces en utilisant celle du squelette relatif. Ceci
+   * est utilis√© uniquement dans le cas des bougies.
+   */
   void addForces ();
 
 private:  
-  /** Pointeur sur le squelette guide associÈ (gÈnÈralement le plus proche,
-   * dans le cas de la bougie simple, le problËme est simple puisqu'il n'y en a qu'un seul)
+  /** Pointeur sur le squelette guide associ√© (g√©n√©ralement le plus proche,
+   * dans le cas de la bougie simple, le probl√®me est simple puisqu'il n'y en a qu'un seul)
    */
   LeadSkeleton *m_lead;
 };
 
-/** Classe reprÈsentant les squelettes pÈriphÈriques libres.
+/** Classe repr√©sentant les squelettes p√©riph√©riques libres.
  *
  * @author	Flavien Bridault
  */
 class FreePeriSkeleton : public FreeSkeleton
 {
 public:
-  /** Constructeur de squelette pÈriphÈrique libre. Permet de construire un squelette ‡ partir
-   * d'un autre, en dÈcoupant celui en deux ‡ la hauteur passÈe en paramËtre. Le squelette
-   * crÈe sera constituÈ de la partie supÈrieure, donc des particules comprises dans
+  /** Constructeur de squelette p√©riph√©rique libre. Permet de construire un squelette √† partir
+   * d'un autre, en d√©coupant celui en deux √† la hauteur pass√©e en param√®tre. Le squelette
+   * cr√©e sera constitu√© de la partie sup√©rieure, donc des particules comprises dans
    * l'intervalle [0;splitHeight].
    * @param src Pointeur sur le squelette source.
-   * @param src Pointeur sur le squelette pÈriphÈrique initial.
+   * @param src Pointeur sur le squelette p√©riph√©rique initial.
    * @param leadSkeleton Pointeur sur le squelette guide relatif.
-   * @param splitHeight Hauteur de dÈcoupe.
+   * @param splitHeight Hauteur de d√©coupe.
    */
   FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkeleton* const leadSkeleton, uint splitHeight);
   
-  /** Constructeur de squelette pÈriphÈrique libre.
+  /** Constructeur de squelette p√©riph√©rique libre.
    * @param size Nombre de particules maximum du squelette.
    * @param s Pointeur sur le solveur de fluides.
    * @param leadSkeleton Pointeur sur le squelette guide relatif.
@@ -86,8 +90,8 @@ public:
   
   friend class FreeLeadSkeleton;
 private:  
-  /** Pointeur sur le squelette guide associÈ (gÈnÈralement le plus proche,
-   * dans le cas de la bougie simple, le problËme est simple puisqu'il n'y en a qu'un seul)
+  /** Pointeur sur le squelette guide associ√© (g√©n√©ralement le plus proche,
+   * dans le cas de la bougie simple, le probl√®me est simple puisqu'il n'y en a qu'un seul)
    */
   FreeLeadSkeleton *m_lead;
 };

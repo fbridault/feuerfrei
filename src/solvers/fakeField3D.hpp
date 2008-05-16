@@ -59,9 +59,15 @@ public:
     m_src.x += value;
   };
   
-  void addVsrc (const Point& pos, float value, float& selfVelocity)
-  {
-    selfVelocity += value*4.0;
+  /** Ajoute une force verticale dans le champ. La différence ici pour les
+   * FakeFields, puisque qu'il n'existe pas de grille à proprement parler, est
+   * que la force est en réalité transmise via la vélocité propre du
+   * squelette. L'appel de fonction peut donc paraître superflu, mais il permet
+   * ainsi de garder la même interface quelque soit le type de champ.
+   */
+  void addVsrc (const Point& pos, float value, float& selfVelocity) 
+  { 
+    selfVelocity += value*4.0; 
   };
   
   void addWsrc (const Point& pos, float value)

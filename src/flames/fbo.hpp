@@ -28,14 +28,14 @@ public:
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_frameBuffer );
     //glDrawBuffers( 2, buffers );
     //glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, m_depthRenderBuffer );
-    //     CheckStatus();
+    //CheckStatus();
   }
 
   void Deactivate( void )
   {
     glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
     //glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
-//     CheckStatus();
+    //CheckStatus();
   }
 
   uint GetWidth()

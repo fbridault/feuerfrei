@@ -97,7 +97,7 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 void LeadSkeleton::addParticle(const Point* const pt)
 {
   if(m_headIndex >= NB_PARTICLES_MAX-1){
-    puts("Erreur : trop de particules");
+    puts("(EE) Too many particles in LeadSkeleton::addParticle() !!!");
     return;
   }
   m_headIndex++;

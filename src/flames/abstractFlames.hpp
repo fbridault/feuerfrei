@@ -420,7 +420,7 @@ public:
   
   /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
   virtual void breakCheck() = 0;
-  
+
 protected:
   /** Vecteur contenant les squelettes guide. */
   vector < LeadSkeleton * > m_leadSkeletons;

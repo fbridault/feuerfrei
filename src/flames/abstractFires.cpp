@@ -195,7 +195,7 @@ void FireSource::drawImpostor() const
       GLfloat modelview[16];
             
       Point pos(getPosition());
-      float size=m_solver->getScale().x*1.1f, halfSize=m_solver->getScale().x*.5f;
+      float size=m_solver->getScale().x*1.5f, halfSize=m_solver->getScale().x*.5f;
       Point a,b,c,d,zero;
       Vector right,up,offset;
       

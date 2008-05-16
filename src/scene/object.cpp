@@ -5,12 +5,18 @@
 
 extern uint g_objectCount;
 
+/**********************************************************************************************************************/
+/********************************************** DEFINITION DE LA CLASSE OBJECT ****************************************/
+/**********************************************************************************************************************/
+
 Object::Object(const Scene* const scene)
 {
+  assert(scene != NULL);
+  
   m_scene = scene;
   m_attributes = 0;
   glGenBuffers(1, &m_bufferID);
-  m_hashTable = NULL;
+  m_lookupTable = NULL;
 }
 
 Object::~Object ()
@@ -23,7 +29,7 @@ Object::~Object ()
     delete (*meshesListIterator);
   m_meshesList.clear ();
   glDeleteBuffers(1, &m_bufferID);
-  delete [] m_hashTable;
+  delete [] m_lookupTable;
 }
 
 void Object::buildBoundingBox ()
@@ -54,18 +60,19 @@ void Object::buildBoundingBox ()
 
 void Object::buildBoundingSpheres ()
 {
-  /* On réalloue la table de hachage car le tableau peut contenir des nouveaux points depuis l'appel à setUVsAndNormals() */
-  allocHashTable();
+  /* On réalloue la table car le tableau peut contenir des nouveaux points
+     depuis l'appel à setUVsAndNormals() */
+  allocLookupTable();
   for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
     (*meshesListIterator)->buildBoundingSphere();
 }
 
-void Object::drawBoundingSpheres ()
+void Object::drawBoundingSpheres () const
 {
   m_scene->getMaterial(0)->apply();
-  for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
+  for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
     (*meshesListIterator)->drawBoundingSphere();
@@ -151,9 +158,16 @@ void Object::translate(const Vector& direction)
   m_min += direction;
 }
 
-/********************************************* Mesh Definition *********************************************/
+
+/**********************************************************************************************************************/
+/********************************************** DEFINITION DE LA CLASSE MESH ******************************************/
+/**********************************************************************************************************************/
+
 Mesh::Mesh (const Scene* const scene, uint materialIndex, Object* parent)
 {
+  assert(scene  != NULL);
+  assert(parent != NULL);
+  
   m_scene = scene;
   m_attributes = 0;
   m_materialIndex = materialIndex;
@@ -181,16 +195,16 @@ void Mesh::buildBoundingSphere ()
   Vertex v;
   uint n=0;
   
-  /* On initialise la table de hachage */
-  m_parent->initHashTable();
+  /* On initialise la table */
+  m_parent->initLookupTable();
   
   for (uint i = 0; i < m_indexArray.size(); i++)
     {
       /* Il ne faut prendre un même point qu'une seule fois en compte. */
-      if( !m_parent->findRefInHashTable( m_indexArray[i] ) )
+      if( !m_parent->findRefInLookupTable( m_indexArray[i] ) )
 	{
 	  v = m_parent->getVertex(m_indexArray[i]);
-	  m_parent->addRefInHashTable( m_indexArray[i], i );
+	  m_parent->addRefInLookupTable( m_indexArray[i], i );
 	  m_boundingSphere.centre = (m_boundingSphere.centre*n + Point(v.x, v.y, v.z)) / (float)(n+1);	  
 	  n++;
 	}
@@ -210,7 +224,7 @@ void Mesh::buildBoundingSphere ()
   //cerr << "sphere de centre " << m_centre << " et de rayon " << m_radius << endl;
 }
 
-void Mesh::drawBoundingSphere()
+void Mesh::drawBoundingSphere() const
 {
   m_boundingSphere.draw();
 }
@@ -250,12 +264,14 @@ void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 	m_scene->getMaterial(m_materialIndex)->getDiffuseTexture()->bind();
       }else
 	if(m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex){
-	  /* Pas de texture pour le matériau courant, on désactive l'unité de texture car le matériau précédent en avait une */
+	  /* Pas de texture pour le matériau courant, on désactive l'unité de
+	   * texture car le matériau précédent en avait une */
 	  glDisable(GL_TEXTURE_2D);
 	}
       m_scene->getMaterial(m_materialIndex)->apply();
     }
   
+  /* Affichage du VBO */
   m_parent->bindVBO();
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
   
@@ -298,7 +314,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
       for (uint i = 0; i < m_indexArray.size(); i++)
 	{
 	  normal = normalsVector[normalsIndexVector[i]];
-	  if( m_parent->findRefInHashTable( m_indexArray[i] ) )
+	  if( m_parent->findRefInLookupTable( m_indexArray[i] ) )
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
 	    {
 	      v = m_parent->getVertex(m_indexArray[i]);
@@ -314,7 +330,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	      }
 	    }
 	  else
-	    m_parent->addRefInHashTable( m_indexArray[i], i);
+	    m_parent->addRefInLookupTable( m_indexArray[i], i);
 	  /* On affecte les coordonnées de texture et de normale au point courant */
 	  m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, normal.x, normal.y, normal.z);
 	}
@@ -324,7 +340,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	  normal = normalsVector[normalsIndexVector[i]];
 	  texCoord = texCoordsVector[texCoordsIndexVector[i]];
 	  
-	  if( m_parent->findRefInHashTable( m_indexArray[i] ) )
+	  if( m_parent->findRefInLookupTable( m_indexArray[i] ) )
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
 	    {	
 	      v = m_parent->getVertex(m_indexArray[i]);
@@ -341,9 +357,9 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	      }
 	    }
 	  else
-	    m_parent->addRefInHashTable( m_indexArray[i], i);
+	    m_parent->addRefInLookupTable( m_indexArray[i], i);
 	  /* On affecte les coordonnées de texture et de normale au point courant */
 	  m_parent->setVertex( m_indexArray[i], texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
 	}
-//   cerr << dup << " have been duplicated, " << nondup << " untouched" << endl;
+  //   cerr << dup << " have been duplicated, " << nondup << " untouched" << endl;
 }

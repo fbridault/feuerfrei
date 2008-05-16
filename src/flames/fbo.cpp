@@ -19,6 +19,7 @@ void FBO::Initialize()
 void FBO::DepthAttach(GLuint tex)
 {
   glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_RECTANGLE_ARB, tex, 0 );
+//  CheckStatus();
 }
 
 void FBO::ColorAttach(GLuint tex, int attachment)

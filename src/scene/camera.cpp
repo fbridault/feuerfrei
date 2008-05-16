@@ -4,7 +4,7 @@
 #include "scene.hpp"
 #endif
 
-uint g_objectCount;
+//uint g_objectCount;
 
 #ifdef RTFLAMES_BUILD
 Camera::Camera (int width, int height, float clipping, Scene* const scene ) :
@@ -46,8 +46,9 @@ m_position(0.0f,0.0f,-2.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
   
   setView();
 #ifdef RTFLAMES_BUILD
+  assert (scene != NULL);
   m_scene = scene;
-  computeFrustrum();
+  computeFrustum();
 #endif
 }
 
@@ -137,24 +138,21 @@ void Camera::OnMouseMotion (wxMouseEvent& event)
     m_beginMouseY = event.GetY();
     setView();
 #ifdef RTFLAMES_BUILD
-    computeFrustrum();
+    computeFrustum();
 #endif
   }
 }
 
 #ifdef RTFLAMES_BUILD
-void Camera::computeFrustrum()
+void Camera::computeFrustum()
 {
    float   clip[16];
    float   t;
    
-   /* Get the current PROJECTION matrix from OpenGL */
    glGetDoublev( GL_PROJECTION_MATRIX, m_projMatrix );
-   
-   /* Get the current MODELVIEW matrix from OpenGL */
    glGetDoublev( GL_MODELVIEW_MATRIX, m_modlMatrix );
    
-   /* Combine the two matrices (multiply projection by modelview) */
+   /* Combinaison des deux matrices (multiplie la projection par la modelview) */
    clip[ 0] = m_modlMatrix[ 0] * m_projMatrix[ 0] + m_modlMatrix[ 1] * m_projMatrix[ 4] + 
      m_modlMatrix[ 2] * m_projMatrix[ 8] + m_modlMatrix[ 3] * m_projMatrix[12];
    clip[ 1] = m_modlMatrix[ 0] * m_projMatrix[ 1] + m_modlMatrix[ 1] * m_projMatrix[ 5] + 
@@ -191,85 +189,84 @@ void Camera::computeFrustrum()
    clip[15] = m_modlMatrix[12] * m_projMatrix[ 3] + m_modlMatrix[13] * m_projMatrix[ 7] + 
      m_modlMatrix[14] * m_projMatrix[11] + m_modlMatrix[15] * m_projMatrix[15];
 
-   /* Extract the numbers for the RIGHT plane */
+   /* Extract le plan DROIT */
    m_frustum[0][0] = clip[ 3] - clip[ 0];
    m_frustum[0][1] = clip[ 7] - clip[ 4];
    m_frustum[0][2] = clip[11] - clip[ 8];
    m_frustum[0][3] = clip[15] - clip[12];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[0][0] * m_frustum[0][0] + m_frustum[0][1] * m_frustum[0][1] + m_frustum[0][2] * m_frustum[0][2] );
    m_frustum[0][0] /= t;
    m_frustum[0][1] /= t;
    m_frustum[0][2] /= t;
    m_frustum[0][3] /= t;
 
-   /* Extract the numbers for the LEFT plane */
+   /* Extraire le plan GAUCHE */
    m_frustum[1][0] = clip[ 3] + clip[ 0];
    m_frustum[1][1] = clip[ 7] + clip[ 4];
    m_frustum[1][2] = clip[11] + clip[ 8];
    m_frustum[1][3] = clip[15] + clip[12];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[1][0] * m_frustum[1][0] + m_frustum[1][1] * m_frustum[1][1] + m_frustum[1][2] * m_frustum[1][2] );
    m_frustum[1][0] /= t;
    m_frustum[1][1] /= t;
    m_frustum[1][2] /= t;
    m_frustum[1][3] /= t;
 
-   /* Extract the BOTTOM plane */
+   /* Extraire le plan BAS */
    m_frustum[2][0] = clip[ 3] + clip[ 1];
    m_frustum[2][1] = clip[ 7] + clip[ 5];
    m_frustum[2][2] = clip[11] + clip[ 9];
    m_frustum[2][3] = clip[15] + clip[13];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[2][0] * m_frustum[2][0] + m_frustum[2][1] * m_frustum[2][1] + m_frustum[2][2] * m_frustum[2][2] );
    m_frustum[2][0] /= t;
    m_frustum[2][1] /= t;
    m_frustum[2][2] /= t;
    m_frustum[2][3] /= t;
 
-   /* Extract the TOP plane */
+   /* Extraire le plan HAUT */
    m_frustum[3][0] = clip[ 3] - clip[ 1];
    m_frustum[3][1] = clip[ 7] - clip[ 5];
    m_frustum[3][2] = clip[11] - clip[ 9];
    m_frustum[3][3] = clip[15] - clip[13];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[3][0] * m_frustum[3][0] + m_frustum[3][1] * m_frustum[3][1] + m_frustum[3][2] * m_frustum[3][2] );
    m_frustum[3][0] /= t;
    m_frustum[3][1] /= t;
    m_frustum[3][2] /= t;
    m_frustum[3][3] /= t;
 
-   /* Extract the FAR plane */
+   /* Extraire le plan FAR */
    m_frustum[4][0] = clip[ 3] - clip[ 2];
    m_frustum[4][1] = clip[ 7] - clip[ 6];
    m_frustum[4][2] = clip[11] - clip[10];
    m_frustum[4][3] = clip[15] - clip[14];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[4][0] * m_frustum[4][0] + m_frustum[4][1] * m_frustum[4][1] + m_frustum[4][2] * m_frustum[4][2] );
    m_frustum[4][0] /= t;
    m_frustum[4][1] /= t;
    m_frustum[4][2] /= t;
    m_frustum[4][3] /= t;
 
-   /* Extract the NEAR plane */
+   /* Extraire le plan NEAR */
    m_frustum[5][0] = clip[ 3] + clip[ 2];
    m_frustum[5][1] = clip[ 7] + clip[ 6];
    m_frustum[5][2] = clip[11] + clip[10];
    m_frustum[5][3] = clip[15] + clip[14];
 
-   /* Normalize the result */
+   /* Normalisation du résultat */
    t = sqrt( m_frustum[5][0] * m_frustum[5][0] + m_frustum[5][1] * m_frustum[5][1] + m_frustum[5][2] * m_frustum[5][2] );
    m_frustum[5][0] /= t;
    m_frustum[5][1] /= t;
    m_frustum[5][2] /= t;
    m_frustum[5][3] /= t;
    
-   /* Compute objects visibility */
 //    g_objectCount=0;
    m_scene->computeVisibility(*this);
 //    cerr << g_objectCount << " objects drawn" << endl;

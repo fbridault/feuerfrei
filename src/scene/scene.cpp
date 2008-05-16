@@ -1,6 +1,7 @@
 #include "scene.hpp"
 
 #include <fstream>
+#include <algorithm>
 
 #include "material.hpp"
 
@@ -371,9 +372,9 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	    currentMesh->setAttributes(coord_textures + normales);
 	    if(firstMesh){
 	      /* On ne doit allouer la table de hachage qu'une seule fois */
-	      currentObject->allocHashTable();
+	      currentObject->allocLookupTable();
 	      /* On initialise la table de hachage */
-	      currentObject->initHashTable();
+	      currentObject->initLookupTable();
 	    }
 	  }
 	  switch (coord_textures + normales)

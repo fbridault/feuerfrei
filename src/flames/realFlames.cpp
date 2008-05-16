@@ -32,7 +32,7 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
       switch(sliceDirection){
       case 0 : pt.z -= (width / 2.0f);
       case 1 : pt.z -= (width / 2.0f);
-      case 2 : pt.x -= (width / 2.0f);
+      case 2 : pt.x += (width / 2.0f);
       }
       m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i], flameConfig.periLifeSpan);
     }
@@ -44,7 +44,7 @@ LineFlame::LineFlame (const FlameConfig& flameConfig, const Texture* const tex, 
       switch(sliceDirection){
       case 0 : pt.z += (width / 2.0f);
       case 1 : pt.z += (width / 2.0f);
-      case 2 : pt.x += (width / 2.0f);
+      case 2 : pt.x -= (width / 2.0f);
       }
       m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j-1], flameConfig.periLifeSpan);
     }

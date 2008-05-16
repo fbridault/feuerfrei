@@ -27,7 +27,6 @@ void GLSLShader::load(const char* fileName, bool recompile, const char* macro ) 
   glCompileShader(m_shader);
   glGetShaderiv(m_shader, GL_COMPILE_STATUS, &compiled);
   
-  //assert(compiled && "The shader could not be compiled");
   if(compiled)
     cout << "Shader " << fileName << " successfully compiled" << endl;
   else{

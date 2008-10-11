@@ -1,6 +1,7 @@
 #include "interface/flamesFrame.hpp"
 
 #include <wx/tooltip.h>
+#include <ilut.h>
 
 /** \mainpage Index page
  *
@@ -15,7 +16,7 @@
  * make flames
  * Compilation de rtfluids:
  * make fluids
- * 
+ *
  * Compilation des deux cibles:
  * make
  *
@@ -35,11 +36,11 @@
  * il faut recompiler ou non les shaders.
  *
  * Soumission des changements :
- * make clean 
+ * make clean
  * cg-push
  *
  * \section consignes Consignes
- * 
+ *
  * Lorsque vous ajoutez ou modifiez des classes, merci de préfixer toutes les variables membres
  * par 'm_'. Ceci facilite grandement la lecture du code.
  *
@@ -56,10 +57,10 @@ wxApp *thisApp;
 
 class FlamesApp : public wxApp
 {
-  /** Méthode d'initialisation de l'application 
+  /** Méthode d'initialisation de l'application
    */
   virtual bool OnInit();
-  
+
   /** Détermine si les shaders Cg sont déjà compilés
    * @return false si les shaders sont compilés
    */
@@ -90,9 +91,9 @@ bool FlamesApp::OnInit()
   /* Déclaration des handlers pour la gestion des formats d'image */
   wxImage::AddHandler(new wxPNGHandler);
   wxImage::AddHandler(new wxJPEGHandler);
-  
+
   wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
-  
+
   if(argc == 2){
     configFileName = wxString(argv[1]);
   }else
@@ -102,19 +103,23 @@ bool FlamesApp::OnInit()
     cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;
     return false;
   }
-  
+
+  ilInit();
+  iluInit();
+  ilutInit();
+  ilutRenderer(ILUT_OPENGL);
   // Plus utilisé, était nécessaire avec Cg, ne l'est plus avec GLSL
   //  recompileShaders = areShadersCompiled();
-  
+
   /* Teste s'il est nécessaire de recompiler les shaders */
   FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
-  
+
   wxToolTip::Enable(true);
 
   frame->Show(TRUE);
 
   SetTopWindow(frame);
   frame->InitGLBuffer();
-	
+
   return true;
 }

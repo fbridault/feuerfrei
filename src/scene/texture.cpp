@@ -1,198 +1,231 @@
 #include "texture.hpp"
-#include "GL/glu.h"
+#include "ilut.h"
 #include <iostream>
 
 using namespace std;
 
-Texture::Texture(GLenum type, GLenum filter, uint width, uint height)
-{  
-  m_type = type;
-  m_hasAlpha = true;
-  
-  glGenTextures(1, &m_texName);
-  glBindTexture(m_type, m_texName); 
-  
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
-  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
-  
-  glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-  m_wxtex = NULL;
-}
-
-Texture::Texture(GLenum type, GLenum filter, uint width, uint height, bool dummy)
-{  
-  m_type = type;
-  m_hasAlpha = true;
-  
-  glGenTextures(1, &m_texName);
-  glBindTexture(m_type, m_texName); 
-  
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
-  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
-  
-  glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-  m_wxtex = NULL;
-}
-
-Texture::Texture(uint width, uint height, GLenum func, bool dummy)
+/** Constructeur prot√©g√© pour les sous-classes */
+Texture::Texture(GLenum type)
 {
-  m_hasAlpha = false;
-  m_type = GL_TEXTURE_RECTANGLE_ARB;
-  
+  m_type = type;
+
   glGenTextures(1, &m_texName);
   glBindTexture(m_type, m_texName);
-  
-  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
-  glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC_ARB, func);
-//   glTexParameteri(m_type, GL_DEPTH_TEXTURE_MODE_ARB, GL_ALPHA);
-
-  glTexImage2D(m_type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL);
-  m_wxtex = NULL;
+  /** Les param√®tres des textures sont ensuite d√©termin√©es dans le constructeur de la sous-classe */
 }
 
-Texture::Texture(const wxString& filename) : m_fileName(filename)
+Texture::~Texture()
 {
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-  
-  m_type = GL_TEXTURE_2D;
-  
-  glGenTextures(1, &m_texName);
-  glBindTexture(GL_TEXTURE_2D, m_texName);
- 
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
- 
-  cout << "Chargement texture scene : " << filename.fn_str() << "......";
-  m_wxtex = new wxImage (filename);
-
-  if(!m_wxtex) {
-    cerr << "Error ";
-  }else{
-    if( m_wxtex->HasAlpha() )
-      loadWithAlphaChannel();
-    else{      
-      cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(), GL_RGB,
-			 GL_UNSIGNED_BYTE, m_wxtex->GetData() );
-      m_hasAlpha = false;
-    }
-  }
-  m_wxtex->Destroy();
+  glDeleteTextures(1, &m_texName);
 }
 
-Texture::Texture(const wxString& filename, GLenum type) : m_fileName(filename)
-{  
-  m_type = type;
+/************************************************************************************/
+/******************************** Class BitmapTexture *******************************/
+/************************************************************************************/
 
-  glGenTextures(1, &m_texName);
-  glBindTexture(m_type, m_texName); 
-  
+BitmapTexture::BitmapTexture(const string& filename) :
+    Texture(GL_TEXTURE_2D)
+{
+  load(filename);
+  cout << "Loading scene texture : " << filename << "......" << endl;
+}
+
+BitmapTexture::BitmapTexture(const string& filename, GLenum type) :
+    Texture(type)
+{
   glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
   glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+
+  cout << "Loading scene texture : " << filename << "......" << endl;
+  load(filename);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
   glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-  cout << "Chargement texture : " << filename.fn_str() << "......";
-  m_wxtex = new wxImage (filename);
-
-  if(!m_wxtex) {
-    cerr << "Error";
-  }else{
-    if( m_wxtex->HasAlpha() )
-      loadWithAlphaChannel();
-    else{
-      cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
-			 GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
-      m_hasAlpha = false;
-    }
-  }
-  m_wxtex->Destroy();  
 }
 
-Texture::Texture(const wxString& filename, GLint wrap_s, GLint wrap_t) : m_fileName(filename)
+BitmapTexture::BitmapTexture(const string& filename, GLint wrap_s, GLint wrap_t) :
+    Texture(GL_TEXTURE_2D)
 {
-  m_type = GL_TEXTURE_2D;
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,wrap_s);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,wrap_t);
 
-  glGenTextures(1, &m_texName);
-  glBindTexture(GL_TEXTURE_2D, m_texName);
- 
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,wrap_s);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,wrap_t);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
- 
-  cout << "Chargement texture : " << filename.fn_str() << "......";
-  m_wxtex = new wxImage (filename);
-  if(!m_wxtex) {
-    cerr << "Error" << endl;
-  }else{
-    if( m_wxtex->HasAlpha() )
-	loadWithAlphaChannel();
-    else{
-      m_hasAlpha = false;
-      cout << "RGB.......OK" << endl;
-      gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGB, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
-			 GL_RGB, GL_UNSIGNED_BYTE, m_wxtex->GetData() );
-    }
-  }
-  /* Semble nÈcessaire pour Èviter un plantage lors de la libÈration de la wxImage  */
-  /* Toutefois cette fonction plante si on la met dans le destructeur, je la laisse */
-  /* donc ici pour le moment */
-  m_wxtex->Destroy();
+  cout << "Loading texture : " << filename << "......" << endl;
+  load(filename);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
-Texture::Texture(GLsizei x, GLsizei y, GLsizei z, const GLfloat* const texels)
-{  
-  m_wxtex = NULL;
-  m_type = GL_TEXTURE_3D;
+BitmapTexture::~BitmapTexture()
+{
+}
+
+#define isPowerOfTwo(x) ( ((x&(x-1)) == 0) && (x!=0) )
+
+void BitmapTexture::load(const string& filename)
+{
+  uint w,h;
+
+  ILuint ImgId; // image name for DevIL
+
+  ilGenImages(1, &ImgId); // Generate an image name to use.
+  ilBindImage(ImgId); // Bind this image name
+
+  if( !ilLoadImage((char *)filename.c_str()) )
+    cerr << "Error loading texture " << filename << endl;
+
+  w=ilGetInteger(IL_IMAGE_WIDTH);
+  h=ilGetInteger(IL_IMAGE_HEIGHT);
+
+  if(m_type == GL_TEXTURE_2D && (!isPowerOfTwo(w) || !isPowerOfTwo(h)))
+    cerr << "(WW) Bitmap texture " << filename << " size is not a power of 2" << endl;
+
+  m_texName = ilutGLBindMipmaps();
+
+  m_filename = filename;
   m_hasAlpha = false;
-  
-  glGenTextures(1, &m_texName);
-  glBindTexture(GL_TEXTURE_3D, m_texName);
+
+  ilDeleteImages(1, &ImgId);
+}
+
+/************************************************************************************/
+/******************************* Class RenderTexture ********************************/
+/************************************************************************************/
+
+RenderTexture::RenderTexture(GLenum type, GLenum filter, uint width, uint height, char format) :
+    Texture(type)
+{
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
+
+  switch (format)
+  {
+  case 0 :
+    glTexImage2D(m_type, 0, GL_RGB16F_ARB, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+    break;
+  case 1 :
+    glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    break;
+//    case 0 : glTexImage2D(m_type, 0, GL_RGB32F_ARB, width, height, 0, GL_RGBA, GL_FLOAT, NULL); break;
+//    case 1 : glTexImage2D(m_type, 0, GL_FLOAT_RG16_NV, width, height, 0, GL_FLOAT_RG16_NV, GL_UNSIGNED_BYTE, NULL); break;
+//    case 2 : glTexImage2D(m_type, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); break;
+  }
+}
+
+RenderTexture::RenderTexture(GLenum type, GLenum filter, uint width, uint height) :
+    Texture(type)
+{
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
+
+  glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+}
+
+/************************************************************************************/
+/******************************** Class DepthTexture ********************************/
+/************************************************************************************/
+
+DepthTexture::DepthTexture(GLenum type, uint width, uint height, GLenum filter, bool depthComparison) :
+    Texture( type)
+{
+  glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, filter);
+  glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, filter);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  if (depthComparison)
+  {
+    glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+    glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+  }
+  glTexImage2D( m_type, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+}
+
+
+DepthTexture::DepthTexture(GLenum type, uint width, uint height, GLenum filter, GLenum func) :
+    Texture( type)
+{
+  glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER, filter);
+  glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER, filter);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+  glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC, func);
+//   glTexParameteri(m_type, GL_DEPTH_TEXTURE_MODE_ARB, GL_ALPHA);
+
+  glTexImage2D(m_type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+}
+
+/************************************************************************************/
+/********************************* Class CubeTexture ********************************/
+/************************************************************************************/
+
+const GLenum CubeTexture::s_cubeMapTarget[6] =
+{
+  GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+  GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+  GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+  GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+  GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+  GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+};
+CubeTexture::CubeTexture(uint width, uint height) :
+    Texture(GL_TEXTURE_CUBE_MAP)
+{
+  glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+  for (int i = 0; i < 6; i++)
+//    glTexImage2D( s_cubeMapTarget[i], 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+//    glTexImage2D( s_cubeMapTarget[i], 0, GL_FLOAT_R16_NV, width, height, 0, GL_RED, GL_FLOAT, NULL);
+//    glTexImage2D( s_cubeMapTarget[i], 0, GL_FLOAT_R_NV, width, height, 0, GL_RED, GL_FLOAT, NULL);
+    glTexImage2D( s_cubeMapTarget[i], 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+}
+
+CubeTexture::CubeTexture(const string filenames[6]) :
+    Texture(GL_TEXTURE_CUBE_MAP)
+{
+  glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glTexParameteri(m_type, GL_TEXTURE_WRAP_R, GL_CLAMP);
+
+  glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
+  glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
+  glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
+
+  for (int i = 0; i < 6; i++)
+  {
+    ILuint ImgId; // image name for DevIL
+
+    ilGenImages(1, &ImgId); // Generate an image name to use.
+    ilBindImage(ImgId); // Bind this image name
+    if( !ilLoadImage((char *)filenames[i].c_str()) )
+      cerr << "Error loading texture " << filenames[i] << endl;
+
+    ILubyte *pixels = ilGetData();
+
+    glTexImage2D( s_cubeMapTarget[i], 0, ilGetInteger(IL_IMAGE_BYTES_PER_PIXEL), ilGetInteger(IL_IMAGE_WIDTH),
+                  ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), ilGetInteger(IL_IMAGE_TYPE), pixels);
+  }
+}
+
+/************************************************************************************/
+/********************************* Class Texture3D ********************************/
+/************************************************************************************/
+
+Texture3D::Texture3D(GLsizei x, GLsizei y, GLsizei z, const GLfloat* const texels) :
+  Texture(GL_TEXTURE_3D)
+{
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP);
   glTexImage3D(GL_TEXTURE_3D, 0, GL_LUMINANCE, x, y, z, 0, GL_LUMINANCE, GL_FLOAT, texels);
-  
-//   GLenum err=glGetError();
-//   cerr << "gl : " << gluErrorString(err) << endl;
-}
-
-Texture::~Texture()
-{
-  glDeleteTextures(1, &m_texName);
-  if(m_wxtex)
-    delete m_wxtex;
-}
-
-void Texture::loadWithAlphaChannel()
-{
-  cout << "RGBA.......OK" << endl;
-  m_hasAlpha = true;
-  u_char *imgcpy,*tmp;
-  tmp = imgcpy = new u_char[m_wxtex->GetWidth()*m_wxtex->GetHeight()*4];
-  
-  for(int j=0; j < m_wxtex->GetHeight(); j++)
-    for(int i=0; i < m_wxtex->GetWidth(); i++){
-      *(tmp++) = m_wxtex->GetRed(i,j);
-      *(tmp++) = m_wxtex->GetGreen(i,j);
-      *(tmp++) = m_wxtex->GetBlue(i,j);
-      *(tmp++) = m_wxtex->GetAlpha(i,j);
-    }
-  
-  gluBuild2DMipmaps( GL_TEXTURE_2D, GL_RGBA, m_wxtex->GetWidth(), m_wxtex->GetHeight(),
-		     GL_RGBA, GL_UNSIGNED_BYTE, imgcpy );
-  delete [] imgcpy;
 }

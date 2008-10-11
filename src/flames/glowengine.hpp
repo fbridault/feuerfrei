@@ -4,7 +4,7 @@
 class GlowEngine;
 
 #include "flames.hpp"
-#include "fbo.hpp"
+#include "renderTarget.hpp"
 #include "../shaders/glsl.hpp"
 #include "../scene/camera.hpp"
 #include "../scene/texture.hpp"
@@ -32,7 +32,7 @@ class GLFlameCanvas;
  * glBlendFunc (GL_ONE, GL_ONE);<br>
  * glDisable (GL_DEPTH_TEST);<br>
  * glowEngine.drawBlur(1.0);<br>
- * glEnable (GL_DEPTH_TEST); 
+ * glEnable (GL_DEPTH_TEST);
  */
 class GlowEngine
 {
@@ -52,14 +52,14 @@ public:
    */
   void activate(){
     /* On dessine dans le FBO #1 */
-    m_firstPassFBOs[0].Activate();
+    m_firstPassRT[0]->bindTarget();
     /* On prend la résolution la plus grande */
     glViewport (0, 0, m_width[0], m_height[0]);
   }
   /** Désactive le glow, les appels suivants dessineront dans le color buffer */
   void deactivate()
   {
-    m_firstPassFBOs[GLOW_LEVELS].Deactivate();
+    m_firstPassRT[0]->bindDefaultTarget();
     glViewport (0, 0, m_initialWidth, m_initialHeight);
   };
 
@@ -67,35 +67,33 @@ public:
   void blur(GLFlameCanvas* const glBuffer);
   /** Plaque le blur à l'écran */
   void drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly=false);
-  
+
   void deleteTex();
   void generateTex();
-  
+
   void setSize(uint width, uint height)
   {
     m_initialWidth = width; m_initialHeight = height;
     deleteTex();
     generateTex();
   }
-  
-private: 
+
+private:
   /** Dimensions de la texture */
   uint m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
   uint m_initialWidth, m_initialHeight;
-  
+
   /** Rapport d'échelle entre la taille du viewport et de la texture du blur */
   uint m_scaleFactor[GLOW_LEVELS];
-  
+
   /** Tableau contenant la largeur du filtre */
   GLfloat m_offsets[6][FILTER_SIZE];
-  
-  /** FBOs */
-  FBO m_firstPassFBOs[GLOW_LEVELS], m_secondPassFBOs[GLOW_LEVELS];
+
+  /** RenderTarget */
+  RenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
   GLSLProgram m_programX, m_programY, m_blurRendererProgram;
   /** Fragment Shader pour le blur */
   GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y, m_blurRendererShader;
-  /** Textures servant à réaliser le blur */
-  Texture *m_firstPassTex[GLOW_LEVELS], *m_secondPassTex[GLOW_LEVELS];
 };
 
 #endif

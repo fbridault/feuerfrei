@@ -5,17 +5,17 @@
 Material::Material (const Scene* const scene) : m_name("default")
 {
   float coeff[3] = { 1.0, 1.0, 1.0 };
- 
+
   m_scene = scene;
-  
+
   m_Kss = 0;
 
   m_Ka = Intensity (coeff);
-  
+
   m_diffuseTexture = -1;
 }
 
-Material::Material ( const Scene* const scene, const string& name, 
+Material::Material ( const Scene* const scene, const string& name,
 		     float *const ambientCoefficients,
 		     float *const diffuseCoefficients,
 		     float *const specularCoefficients,
@@ -23,7 +23,7 @@ Material::Material ( const Scene* const scene, const string& name,
 {
   m_scene = scene;
   m_Kss = specularExponent;
-  
+
   if (ambientCoefficients != NULL)
     {
       m_Ka = Intensity (ambientCoefficients);
@@ -42,6 +42,7 @@ Material::Material ( const Scene* const scene, const string& name,
 
 const bool Material::isTransparent() const
 {
-  if(m_scene->getTexture(m_diffuseTexture)->hasAlpha()) cerr << m_name << " is transparent" << endl;
-  return (m_scene->getTexture(m_diffuseTexture)->hasAlpha());
+    assert(false);
+//  if(m_scene->getTexture(m_diffuseTexture)->hasAlpha()) cerr << m_name << " is transparent" << endl;
+//  return (m_scene->getTexture(m_diffuseTexture)->hasAlpha());
 }

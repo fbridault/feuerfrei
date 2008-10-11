@@ -1,15 +1,15 @@
 #include "DPengine.hpp"
 #include "../interface/GLFlameCanvas.hpp"
+#include "renderTarget.hpp"
 
 DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
 {
   m_width = width;
   m_height = height;
   m_nbLayers = m_nbLayersMax = nbLayers;
-  
-  m_fbo.Initialize();
-  
-  char _fp_peel[] = 
+  assert(nbLayers <= DEPTH_PEELING_LAYERS_MAX);
+
+  char _fp_peel[] =
     "!!ARBfp1.0\n"
     "OPTION ARB_fragment_program_shadow;\n"
     "TEMP R0;\n"
@@ -26,86 +26,81 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
     "KIL R2.x;\n"
     "MOV result.color, R0;\n"
     "END\n";
-  
+
   m_peelProgram.load(_fp_peel);
-  m_colorTex = new Texture*[m_nbLayers+1];
-  generateTex();
-  
+
   m_dpRendererShader.load("viewportSizedTex.fp", true);
   m_dpRendererProgram.attachShader(m_dpRendererShader);
   m_dpRendererProgram.link();
-
+  generateTex();
   m_flamesDisplayList = glGenLists(1);
 }
 
 DepthPeelingEngine::~DepthPeelingEngine()
 {
   deleteTex();
-  delete [] m_colorTex;
 }
 
 void DepthPeelingEngine::deleteTex()
 {
-  for(uint i=0; i <= m_nbLayers; i++)
-    delete m_colorTex[i];
-  delete m_depthTex[0];
-  delete m_depthTex[1];
-  delete m_depthTex[2];
-  delete m_sceneDepthTex;
+  delete m_renderTarget[0];
+  delete m_renderTarget[1];
+  delete m_sceneDepthRenderTarget;
+  delete m_alwaysTrueDepthTex;
 }
 
 void DepthPeelingEngine::generateTex()
 {
-  m_fbo.setSize(m_width, m_height);
-  for(uint i=0; i <= m_nbLayers; i++)
-    m_colorTex[i] = new Texture(GL_TEXTURE_RECTANGLE_ARB, GL_NEAREST, m_width, m_height);
-  m_depthTex[0] = new Texture(m_width, m_height, GL_GREATER, true);
-  m_depthTex[1] = new Texture(m_width, m_height, GL_GREATER, true);
-  m_depthTex[2] = new Texture(m_width, m_height, GL_ALWAYS, true);
-  m_sceneDepthTex = new Texture(m_width, m_height, GL_LESS, true);
+  m_renderTarget[0] = new RenderTarget(m_width, m_height);
+  m_renderTarget[1] = new RenderTarget(m_width, m_height);
+
+  for(uint i=0; i < m_nbLayers/2; i++)
+  {
+    m_renderTarget[0]->addTarget("color rect rgba nearest",0,i);
+    m_renderTarget[1]->addTarget("color rect rgba nearest",0,i);
+  }
+
+  m_renderTarget[0]->addTarget("color rect rgba nearest",0,m_nbLayers/2);
+
+  m_renderTarget[0]->addTarget("depth rect shadow nearest greater",1);
+  m_renderTarget[1]->addTarget("depth rect shadow nearest greater",1);
+
+  m_sceneDepthRenderTarget = new RenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
+
+  m_alwaysTrueDepthTex = new DepthTexture(GL_TEXTURE_RECTANGLE_ARB, m_width,m_height, GL_NEAREST, GLenum(GL_ALWAYS));
 }
 
 void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene)
 {
   uint l;
-  
-  m_fbo.Activate();
-  
-  /* On désactive l'écriture dans le color buffer */
-  glDrawBuffer(GL_NONE);
-  glReadBuffer(GL_NONE);
+
   /* On stocke la profondeur de la scène dans une texture qui servira */
   /* comme deuxième test de profondeur pour le depth peeling */
   /* Il y a donc en tout trois tests de profondeur */
-  m_fbo.DepthAttach(m_sceneDepthTex->getTexture());
-  
+  m_sceneDepthRenderTarget->bindTarget();
+
   glClear(GL_DEPTH_BUFFER_BIT);
 
   scene->drawSceneWT();
-  
-  glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-  glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
-  
+
   m_curDepthTex = 0;
-  
+
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ZERO);
   for(l=0; l <= m_nbLayers; l++){
     // On effectue le rendu dans le FBO
-    m_fbo.ColorAttach(m_colorTex[l]->getTexture(),0);
-    m_fbo.DepthAttach(m_depthTex[m_curDepthTex]->getTexture());
-    
+    m_renderTarget[m_curDepthTex]->bindTarget();
+    m_renderTarget[m_curDepthTex]->bindChannel(l/2);
+
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    
-    glActiveTextureARB(GL_TEXTURE2_ARB);
-    m_sceneDepthTex->bind();
+
+    m_sceneDepthRenderTarget->bindTexture();
     m_peelProgram.enableShader();
-    
+
     /* Pour le premier layer, on construit la display list */
     /* et le premier test de profondeur est toujours vrai */
-    glActiveTextureARB(GL_TEXTURE1_ARB);
     if( !l ){
-      m_depthTex[2]->bind();
+      m_alwaysTrueDepthTex->bind(1);
       /* Dessin de la flamme */
       glNewList(m_flamesDisplayList,GL_COMPILE_AND_EXECUTE);
       glBuffer->drawFlames();
@@ -113,76 +108,78 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
     }else{
       /* Pour les layers > 0, le premier test de profondeur est effectué avec */
       /* la profondeur de la passe précédente */
-      m_depthTex[1-m_curDepthTex]->bind();
+      m_renderTarget[1-m_curDepthTex]->bindTexture();
       glCallList(m_flamesDisplayList);
     }
     m_peelProgram.disableShader();
-    
+
     m_curDepthTex = 1 - m_curDepthTex;
   }
   glDisable (GL_BLEND);
-  m_fbo.Deactivate();
-  
+  m_renderTarget[0]->bindDefaultTarget();
+
   glDeleteLists(m_flamesDisplayList,1);
 }
 
 void DepthPeelingEngine::render(GLFlameCanvas* const glBuffer)
-{   
+{
   glDepthFunc (GL_LEQUAL);
   glEnable (GL_BLEND);
   glBlendFunc (GL_ONE, GL_ONE);
-  
-  glActiveTexture(GL_TEXTURE0_ARB);
+
   glEnable(GL_TEXTURE_RECTANGLE_ARB);
-  
+
   m_dpRendererProgram.enable();
   m_dpRendererProgram.setUniform1i("text",0);
-  for(int l=m_nbLayers; l >= 0 ; l--){
-    m_colorTex[l]->bind();
+
+  for(int l=m_nbLayers/2-1; l >= 0 ; l--){
+    m_renderTarget[0]->bindTexture(l);
+    glBuffer->drawFlamesBoundingBoxes();
+    m_renderTarget[1]->bindTexture(l);
     glBuffer->drawFlamesBoundingBoxes();
   }
+  m_renderTarget[0]->bindTexture(m_nbLayers/2);
+  glBuffer->drawFlamesBoundingBoxes();
+
   m_dpRendererProgram.disable();
-    
+
   glDisable(GL_TEXTURE_RECTANGLE_ARB);
   glDisable (GL_BLEND);
   glDepthFunc (GL_LESS);
 }
 
-void DepthPeelingEngine::renderFS()
-{   
-  glShadeModel (GL_FLAT);
-  glDisable (GL_DEPTH_TEST);
-  
-  glBlendFunc (GL_ONE, GL_ONE);
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-  gluOrtho2D(-1, 1, -1, 1);
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-  
-  glActiveTexture(GL_TEXTURE0_ARB);
-  glEnable(GL_TEXTURE_RECTANGLE_ARB);
-  
-//   for(int l=1; l <= m_nbLayers ; l--){
-  for(int l=m_nbLayers; l >= 0 ; l--){
-    
-    m_colorTex[l]->drawOnScreen(m_width,m_height);
-    
-//     if(l==0)
-//     glColor4f(1.0,1.0,1.0,1.0);
-//     else      
-//      glColor4f(1.0,1.0,1.0,0.6);
-//     glColor4f(1.0,1.0,1.0,0.6);
-  }
-  glDisable(GL_TEXTURE_RECTANGLE_ARB);
-  
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-  
-  glEnable (GL_DEPTH_TEST);
-  glShadeModel (GL_SMOOTH);
-}
+//void DepthPeelingEngine::renderFS()
+//{
+//  glShadeModel (GL_FLAT);
+//  glDisable (GL_DEPTH_TEST);
+//
+//  glBlendFunc (GL_ONE, GL_ONE);
+//  glMatrixMode(GL_PROJECTION);
+//  glPushMatrix();
+//  glLoadIdentity();
+//  gluOrtho2D(-1, 1, -1, 1);
+//  glMatrixMode(GL_MODELVIEW);
+//  glPushMatrix();
+//  glLoadIdentity();
+//
+//  glEnable(GL_TEXTURE_RECTANGLE_ARB);
+//
+//  for(int l=m_nbLayers/2-1; l >= 0 ; l--){
+//    m_renderTarget[0]->bindTexture(l);
+//    glBuffer->drawFlamesBoundingBoxes();
+//    m_renderTarget[1]->bindTexture(l);
+//    glBuffer->drawFlamesBoundingBoxes();
+//  }
+//  m_renderTarget[0]->bindTexture(m_nbLayers/2);
+//  glBuffer->drawFlamesBoundingBoxes();
+//
+//  glDisable(GL_TEXTURE_RECTANGLE_ARB);
+//
+//  glMatrixMode(GL_PROJECTION);
+//  glPopMatrix();
+//  glMatrixMode(GL_MODELVIEW);
+//  glPopMatrix();
+//
+//  glEnable (GL_DEPTH_TEST);
+//  glShadeModel (GL_SMOOTH);
+//}

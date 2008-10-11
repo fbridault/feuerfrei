@@ -1,11 +1,12 @@
-#Produced by Art of Illusion 2.3, Wed Jan 03 17:53:04 CET 2007
-newmtl Meche
-Kd 0.22 0.22 0.22
+#Produced by Art of Illusion 2.5.1, Tue Dec 11 11:11:29 CET 2007
+newmtl bois2
+Kd 1 1 1
+map_Kd meche41.jpg
 Ks 0 0 0
 Ka 0 0 0
 illum 1
-newmtl Bois
-Kd 0.55 0.38731 0.2695
+newmtl Meche
+Kd 0.22 0.22 0.22
 Ks 0 0 0
 Ka 0 0 0
 illum 1

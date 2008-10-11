@@ -9,7 +9,7 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
 {
   m_luminaries = luminaries;
   m_flames = flames;
-  
+
   addMaterial(new Material(this));
   cout << "Chargement de la scène " << fileName << endl;
   importOBJ(fileName);
@@ -18,37 +18,37 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
 }
 
 // void Scene::sortTransparentObjects()
-// {  
+// {
 //   int i;
 //   int size;
 //   Object* object;
-  
+
 //   size = m_objectsArray.size(); i=0;
 //   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
 //        i < size; i++,objectsArrayIterator++)
 //     if ((*objectsArrayIterator)->isTransparent ())
 //       {
 // 	object = *objectsArrayIterator;
-// 	objectsArrayIterator =  m_objectsArray.erase(objectsArrayIterator); 
+// 	objectsArrayIterator =  m_objectsArray.erase(objectsArrayIterator);
 // 	m_objectsArray.push_back(object);
 //       }
-  
+
 //   size = m_objectsArrayWSV.size(); i=0;
 //   for (vector<Object*>::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin();
 //        i < size; i++,objectsArrayIteratorWSV++)
 //     if ((*objectsArrayIteratorWSV)->isTransparent ())
 //       {
 // 	object = *objectsArrayIteratorWSV;
-// 	objectsArrayIteratorWSV =  m_objectsArrayWSV.erase(objectsArrayIteratorWSV); 
+// 	objectsArrayIteratorWSV =  m_objectsArrayWSV.erase(objectsArrayIteratorWSV);
 // 	m_objectsArrayWSV.push_back(object);
-//       }  
+//       }
 // }
 
 void Scene::computeBoundingBox(Point& max, Point& min)
-{ 
+{
   Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   Point objMax, objMin;
-  
+
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
        objectsArrayIterator++){
@@ -124,7 +124,7 @@ void Scene::createVBOs(void)
     (*objectsArrayIteratorWSV)->buildVBO();
     (*objectsArrayIteratorWSV)->buildBoundingSpheres();
   }
-  
+
   cout << "Terminé" << endl;
   cout << "*******************************************" << endl;
   cout << "Statistiques sur la scène :" << endl;
@@ -141,24 +141,24 @@ Scene::~Scene ()
        objectsArrayIterator++)
     delete (*objectsArrayIterator);
   m_objectsArray.clear ();
-  
+
   for (vector < Object * >::iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
     delete (*objectsArrayIteratorWSV);
   m_objectsArrayWSV.clear ();
-  
+
   for (vector < Source * >::iterator lightSourcesIterator = m_lightSourcesArray.begin ();
        lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
     delete (*lightSourcesIterator);
   m_lightSourcesArray.clear ();
-  
+
   for (vector < Material * >::iterator materialArrayIterator = m_materialArray.begin ();
        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
     delete (*materialArrayIterator);
   m_materialArray.clear ();
-  
-  for (vector < Texture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
+
+  for (vector < BitmapTexture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
        texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
     delete (*texturesArrayIterator);
   m_texturesArray.clear ();
@@ -167,10 +167,10 @@ Scene::~Scene ()
 void Scene::getSceneAbsolutePath(const char* const fileName)
 {
   bool found=false;
-  
+
   if(strlen(fileName) > 255)
     cerr << "Dir string too long" << endl;
-  
+
   /* On parcourt la chaîne en partant de la fin */
   for( int i=strlen(fileName)-1 ; i >= 0 ; i--)
     {
@@ -204,30 +204,30 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
   int nbObjectVertex=0, nbObjectNormals=0, nbObjectTexCoords=0;
   int a, b, c, an, bn, cn, at, bt, ct, matIndex=0;
   float x, y, z;
-  
+
   Vertex currentVertex;
   Object* currentObject=NULL;
   Mesh* currentMesh=NULL;
-  
+
   /**<Liste des normales de l'objet */
   vector < Vector >normalsVector;
   /**<Liste des coordonnées de textures de l'objet */
   vector < Point  >texCoordsVector;
   /**<Liste des indices des normales des facettes */
-  vector < GLuint >normalsIndexVector;  
+  vector < GLuint >normalsIndexVector;
   /**<Liste des indices des coordonnées de textures des facettes */
   vector < GLuint >texCoordsIndexVector;
-  
+
   if(lookForSpecificObjects) prefixlen = strlen(prefix);
   getSceneAbsolutePath(fileName);
-  
+
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
     cerr << "Can't open file " << fileName << endl;
     throw (ios::failure ("Open scene error"));
     return false;
   }
-  
+
   while (!objFile.eof())
     {
       objFile >> lettre;
@@ -252,7 +252,7 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	    normalsVector.clear();
 	    texCoordsVector.clear();
 	  }
-  
+
 	  objFile >> buffer;
 
 	  if(storeObjectsInList || storeWicksInList){
@@ -303,13 +303,13 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	  /* Cependant, on commence d'abord par valider les données du Mesh précédent. */
 	  if(meshCreated){
 	    /* On valide les données du dernier Mesh. */
-	    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);	    
+	    currentMesh->setUVsAndNormals(normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);
 	    normalsIndexVector.clear();
 	    texCoordsIndexVector.clear();
 	    firstMesh = false;
 	  }
-	    
-  
+
+
 	  /* Création du nouveau mesh. */
 	  objFile >> buffer >> buffer;
 	  if(!skip){
@@ -392,7 +392,7 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
-	      
+
 	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
@@ -404,7 +404,7 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
-	      
+
 	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
@@ -416,15 +416,15 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	      currentMesh->addIndex(a - nbObjectVertex - 1);
 	      currentMesh->addIndex(b - nbObjectVertex - 1);
 	      currentMesh->addIndex(c - nbObjectVertex - 1);
-	      
+
 	      normalsIndexVector.push_back(an - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(bn - nbObjectNormals - 1);
 	      normalsIndexVector.push_back(cn - nbObjectNormals - 1);
-	      
+
 	      texCoordsIndexVector.push_back(at - nbObjectTexCoords - 1);
 	      texCoordsIndexVector.push_back(bt - nbObjectTexCoords - 1);
 	      texCoordsIndexVector.push_back(ct - nbObjectTexCoords - 1);
-	      break;	      
+	      break;
 	    default:
 	      cout << "Erreur de chargement : Le fichier " << fileName << " contient des erreurs d'indexation de points.\n";
 	      return false;
@@ -460,7 +460,7 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
 {
   char lettre;
   char buffer[255];
-  
+
   getSceneAbsolutePath(fileName);
   ifstream objFile(fileName, ios::in);
   if (!objFile.is_open ()){
@@ -476,7 +476,7 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
 	case 'm':
 	  /* On évite la définition des matériaux, elle doit être faite au prélable */
 	  objFile >> buffer >> buffer;
-	  
+
 	  strcpy(mtlName,buffer);
 	  objFile.close ();
 	  return true;
@@ -487,7 +487,7 @@ bool Scene::getMTLFileNameFromOBJ(const char* fileName, char* mtlName)
 	}
     }
   objFile.close ();
-  
+
   return false;
 }
 
@@ -499,7 +499,7 @@ void Scene::importMTL(const char* fileName)
   int nouvelle_texture = -1;
   string name_nouvelle_matiere;
   bool newMat=false;
-  
+
   strcpy(buffer,m_currentDir);
   strcat(buffer,fileName);
   ifstream matFile(buffer, ios::in);
@@ -508,21 +508,21 @@ void Scene::importMTL(const char* fileName)
     throw (ios::failure ("Open error"));
     return;
   }
-  
+
   float Kd[3], Ka[3], Ks[3], alpha, shini;
-  
+
   /* Problème: selon l'exportateur, les champs ne sont pas écrits dans le même ordre */
   /* On est donc sûr d'avoir lu tous les champs d'un matériau que lorsque l'on arrive */
   /* au matériau suivant ou à la fin du fichier/ */
   while (!matFile.eof())
     {
       matFile >> lettre;
-      
+
       switch (lettre)
 	{
 	case 'K':
 	  matFile >> lettre2;
-	  
+
 	  switch (lettre2)
 	    {
 	    case 'd':
@@ -593,7 +593,7 @@ void Scene::importMTL(const char* fileName)
 	  strcpy(texturePath, m_currentDir);
 	  strcat(texturePath,buffer);
 	  if( (nouvelle_texture = searchTextureIndexByName(texturePath)) == -1) {
-	    nouvelle_texture = addTexture(new Texture (wxString(texturePath, wxConvUTF8)));
+	    nouvelle_texture = addTexture(new BitmapTexture (string(texturePath)));
 	  }
 	  break;
 	default:
@@ -617,12 +617,12 @@ int Scene::getVertexCount()
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
     nb += (*objectsArrayIteratorWSV)->getVertexArraySize();
-  
+
   for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
     nb += (*objectsArrayIterator)->getVertexArraySize();
-  
+
   return nb;
 }
 
@@ -633,17 +633,17 @@ int Scene::getPolygonsCount()
        objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
        objectsArrayIteratorWSV++)
     nb += (*objectsArrayIteratorWSV)->getPolygonsCount();
-  
+
   for (vector < Object * >::iterator objectsArrayIterator = m_objectsArray.begin ();
        objectsArrayIterator != m_objectsArray.end ();
        objectsArrayIterator++)
     nb += (*objectsArrayIterator)->getPolygonsCount();
-  
+
   return nb;
 }
 
 int Scene::getMaterialIndexByName(const char *name)
-{ 
+{
   int index=0;
   for (vector<Material*>::iterator materialArrayIterator = m_materialArray.begin ();
        materialArrayIterator != m_materialArray.end ();
@@ -652,21 +652,21 @@ int Scene::getMaterialIndexByName(const char *name)
       if ( !(*materialArrayIterator)->getName()->compare (name) ){
 	return index;
       }
-      
+
       index++;
-    } 
+    }
   cerr << "Error loading unknown material " << name << endl;
   return getMaterialIndexByName("default");
 }
 
 int Scene::searchTextureIndexByName(const char *name)
-{ 
+{
   int index=0;
-  for (vector<Texture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
+  for (vector<BitmapTexture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
        texturesArrayIterator != m_texturesArray.end ();
        texturesArrayIterator++)
     {
-      if ( !strcmp((*texturesArrayIterator)->getName().fn_str(), name) ) {
+      if ( !strcmp((*texturesArrayIterator)->getName().c_str(), name) ) {
 	return index;
       }
       index++;

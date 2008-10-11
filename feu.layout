@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Fluids - Release" />
+	<File name="src/common.hpp" open="0" top="0" tabpos="5">
+		<Cursor position="1320" topLine="14" />
+	</File>
+	<File name="src/flames.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="79" topLine="0" />
+	</File>
+	<File name="src/flames/DPengine.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="1064" topLine="0" />
+	</File>
+	<File name="src/flames/DPengine.hpp" open="0" top="0" tabpos="10">
+		<Cursor position="1605" topLine="39" />
+	</File>
+	<File name="src/flames/abstractFires.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="3368" topLine="70" />
+	</File>
+	<File name="src/flames/abstractFires.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="14828" topLine="397" />
+	</File>
+	<File name="src/flames/abstractFlames.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="4996" topLine="100" />
+	</File>
+	<File name="src/flames/glowengine.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="737" topLine="0" />
+	</File>
+	<File name="src/flames/glowengine.hpp" open="0" top="0" tabpos="5">
+		<Cursor position="2790" topLine="51" />
+	</File>
+	<File name="src/flames/periSkeleton.hpp" open="0" top="0" tabpos="3">
+		<Cursor position="1364" topLine="0" />
+	</File>
+	<File name="src/flames/realFlames.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="1357" topLine="0" />
+	</File>
+	<File name="src/flames/realFlames.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="941" topLine="168" />
+	</File>
+	<File name="src/flames/renderTarget.hpp" open="0" top="0" tabpos="7">
+		<Cursor position="2247" topLine="12" />
+	</File>
+	<File name="src/flames/skeleton.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5298" topLine="173" />
+	</File>
+	<File name="src/flames/solidePhoto.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="5276" topLine="108" />
+	</File>
+	<File name="src/flames/solidePhoto.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="2780" topLine="30" />
+	</File>
+	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="4471" topLine="120" />
+	</File>
+	<File name="src/interface/GLFlameCanvas.hpp" open="0" top="0" tabpos="9">
+		<Cursor position="5153" topLine="107" />
+	</File>
+	<File name="src/interface/GLFluidsCanvas.hpp" open="0" top="0" tabpos="7">
+		<Cursor position="1380" topLine="25" />
+	</File>
+	<File name="src/interface/flamesFrame.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="17551" topLine="439" />
+	</File>
+	<File name="src/interface/flamesFrame.hpp" open="0" top="0" tabpos="4">
+		<Cursor position="322" topLine="0" />
+	</File>
+	<File name="src/interface/fluidsFrame.hpp" open="0" top="0" tabpos="0">
+		<Cursor position="2606" topLine="72" />
+	</File>
+	<File name="src/interface/interface.hpp" open="0" top="0" tabpos="13">
+		<Cursor position="1019" topLine="0" />
+	</File>
+	<File name="src/interface/mainPanels.hpp" open="0" top="0" tabpos="6">
+		<Cursor position="1603" topLine="45" />
+	</File>
+	<File name="src/interface/solverDialog.hpp" open="0" top="0" tabpos="10">
+		<Cursor position="949" topLine="43" />
+	</File>
+	<File name="src/scene/camera.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="342" topLine="0" />
+	</File>
+	<File name="src/scene/gammaEngine.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="371" topLine="0" />
+	</File>
+	<File name="src/scene/gammaEngine.hpp" open="0" top="0" tabpos="9">
+		<Cursor position="1330" topLine="21" />
+	</File>
+	<File name="src/scene/material.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="278" topLine="0" />
+	</File>
+	<File name="src/scene/object.hpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="src/scene/scene.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="20160" topLine="629" />
+	</File>
+	<File name="src/scene/scene.hpp" open="0" top="0" tabpos="1">
+		<Cursor position="4186" topLine="90" />
+	</File>
+	<File name="src/scene/texture.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="8912" topLine="185" />
+	</File>
+	<File name="src/scene/texture.hpp" open="0" top="0" tabpos="2">
+		<Cursor position="671" topLine="0" />
+	</File>
+	<File name="src/shaders/glowShaderX.fp" open="0" top="0" tabpos="0">
+		<Cursor position="679" topLine="0" />
+	</File>
+	<File name="src/shaders/glsl.hpp" open="0" top="0" tabpos="2">
+		<Cursor position="939" topLine="16" />
+	</File>
+	<File name="src/solvers/GSSolver2D.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="394" topLine="0" />
+	</File>
+	<File name="src/solvers/fieldThread.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="src/solvers/fieldThread.hpp" open="1" top="0" tabpos="0">
+		<Cursor position="799" topLine="15" />
+	</File>
+	<File name="src/solvers/logResAvgTimeSolver3D.cpp" open="0" top="0" tabpos="11">
+		<Cursor position="779" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

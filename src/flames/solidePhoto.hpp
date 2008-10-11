@@ -11,7 +11,7 @@ class PhotometricSolidsRenderer;
 
 /** Abstraction d'un solide photométrique.<br>
  * Cette classe permet de charger des fichiers IES et de les utiliser ensuite pour éclairer
- * une scène OpenGL en temps-réel. Elle propose d'afficher les données brutes du fichier en 
+ * une scène OpenGL en temps-réel. Elle propose d'afficher les données brutes du fichier en
  * noir et blanc, ces mêmes données interpolées en arc de spirale, ou encore mélangées avec
  * la couleur des matériaux des objets
  */
@@ -29,22 +29,22 @@ public:
   PixelLightingRenderer(const Scene* const s, const vector <FireSource *> *flames, bool dummy);
   /** Destructeur. */
   virtual ~PixelLightingRenderer();
-  
+
   /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique.
    * @param color 0 ou 2 pour mélanger la luminance du solide avec la couleur des matériaux.
    */
   virtual void draw(bool color);
-  
-protected:  
+
+protected:
   /** Pointeur vers la scène 3D. */
   const Scene* m_scene;
   /** Pointeur vers les flammes. */
   const vector <FireSource *> *m_flames;
-  
+
   GLSLProgram m_SPProgram;
   /** Vertex Shader pour les objets texturés. */
   GLSLVertexShader m_SPVertexShaderTex;
-  
+
   /** Tableau contenant le fragment program pour SP interpolé avec couleur des objets */
   GLSLFragmentShader m_SPFragmentShader;
 
@@ -58,7 +58,7 @@ protected:
 
 /** Abstraction d'un solide photométrique.<br>
  * Cette classe permet de charger des fichiers IES et de les utiliser ensuite pour éclairer
- * une scène OpenGL en temps-réel. Elle propose d'afficher les données brutes du fichier en 
+ * une scène OpenGL en temps-réel. Elle propose d'afficher les données brutes du fichier en
  * noir et blanc, ces mêmes données interpolées en arc de spirale, ou encore mélangées avec
  * la couleur des matériaux des objets
  */
@@ -75,27 +75,27 @@ public:
   PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames);
   /** Destructeur. */
   virtual ~PhotometricSolidsRenderer();
-  
+
   /** Méthode de dessin de la scène en utilisant l'éclairage d'un solide photométrique.
    * @param color 0 ou 2 pour mélanger la luminance du solide avec la couleur des matériaux.
    */
   void draw(bool color);
-  
+
   /** Efface la texture. */
   void deleteTexture(void){ delete m_photometricSolidsTex; };
   /** Générer une nouvelle texture pour le solide photométrique. */
   void generateTexture(void);
-  
-private:  
+
+private:
   /** Texture 3D contenant les valeurs de luminance de tous les flammes. */
-  Texture *m_photometricSolidsTex;
-  
+  Texture3D *m_photometricSolidsTex;
+
   /** Tableau contenant le fragment program pour SP interpolé sans couleur des objets */
   GLSLFragmentShader m_SPOnlyFragmentShader;
-  
+
   /** Tableau contenant la taille des textures 2D. */
   uint m_tex2DSize[2];
-  
+
   GLSLProgram m_SPOnlyProgram;
 };
 

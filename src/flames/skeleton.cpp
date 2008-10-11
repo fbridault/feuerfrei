@@ -27,7 +27,7 @@ FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
 
   m_solver = src->m_solver;
   m_queue = new Particle[splitHeight+1];
-  
+
   /* Recopie des particules en fonction de la hauteur de coupe */
   for( i=0; i <= splitHeight; i++){
     m_queue[i] = src->m_queue[i];
@@ -46,10 +46,10 @@ FreeSkeleton::~FreeSkeleton()
 void FreeSkeleton::removeParticle(uint n)
 {
   int i;
-  
+
   for( i=n; i<m_headIndex ; i++)
     m_queue[i] = m_queue[i+1];
-  
+
   m_headIndex--;
   assert(m_headIndex>=0);
 }
@@ -57,8 +57,8 @@ void FreeSkeleton::removeParticle(uint n)
 void FreeSkeleton::swap(uint i, uint j)
 {
   Particle tmp(m_queue[i]);
-  
-  m_queue[i] = m_queue[j];  
+
+  m_queue[i] = m_queue[j];
   m_queue[j] = tmp;
 }
 
@@ -66,7 +66,7 @@ void FreeSkeleton::move ()
 {
   Particle *tmp;
   uint i;
-  
+
   /* Déplacement des particules */
   /* Boucle de parcours : du haut vers le bas */
   for (i = 0; i < getInternalSize (); i++)
@@ -92,7 +92,7 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
 
   if (particle->isDead ())
     return false;
-  
+
   /* Si la particule sort de la grille, elle prend la vélocité du bord */
   if ( particle->x >= m_solver->getDimX() )
     particle->x = m_solver->getDimX() - EPSILON;
@@ -112,7 +112,7 @@ bool FreeSkeleton::moveParticle (Particle * const particle)
   copy2 = *particle;
   /* Calculer la nouvelle position ( Intégration d'Euler, on prend juste la dérivée première ) */
   m_solver->moveParticle(*particle, m_selfVelocity);
-  
+
   *particle = *particle - copy2 + copy;
   return true;
 }
@@ -124,7 +124,7 @@ void FreeSkeleton::draw () const
   glBegin(GL_LINE_STRIP);
   for (uint i = 0; i < getSize (); i++)
     glVertex3f(m_queue[i].x, m_queue[i].y, m_queue[i].z);
-  glEnd();    
+  glEnd();
 }
 
 void FreeSkeleton::drawParticle (Particle * const particle) const
@@ -141,10 +141,10 @@ void FreeSkeleton::drawParticle (Particle * const particle) const
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls) : 
+Skeleton::Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls) :
   FreeSkeleton(NB_PARTICLES_MAX, s),
   m_rootMoveFactor(rootMoveFactor)
-{  
+{
   m_root = m_rootSave = position;
   m_selfVelocity=0.0f;
   m_lod=FULL_SKELETON;
@@ -176,7 +176,7 @@ void Skeleton::moveRoot ()
 {
   /* Calculer la nouvelle position ( Intégration d'Euler, on prend juste la dérivée première ) */
   m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_rootSave, m_selfVelocity);
-  
+
   /* Si l'origine sort de la grille, on la replace */
   if ( m_root.x >= m_solver->getDimX() )
     m_root.x = m_solver->getDimX() - EPSILON;
@@ -194,11 +194,8 @@ void Skeleton::moveRoot ()
 
 void Skeleton::move ()
 {
-  Particle *tmp;
-  uint i;
-  
   moveRoot ();
-  
+
   if (getInternalSize () < NB_PARTICLES_MAX - 1)
       addParticle (&m_root);
 
@@ -208,17 +205,17 @@ void Skeleton::move ()
 bool Skeleton::moveParticle (Particle * const particle)
 {
   assert (particle != NULL);
-  
+
   if (particle->isDead ())
     return false;
-  
+
   m_solver->moveParticle(*particle, m_selfVelocity);
-  
+
   /* Si la particule sort de la grille, elle est éliminée */
   if (   particle->x < 0.0f || particle->x > m_solver->getDimX()
       || particle->y < 0.0f || particle->y > m_solver->getDimY()
       || particle->z < 0.0f || particle->z > m_solver->getDimZ() )
     return false;
-  
+
   return true;
 }

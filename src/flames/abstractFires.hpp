@@ -49,10 +49,10 @@ public:
    * @param IESFilename nom du fichier IES à utiliser
    */
   FlameLight (const Scene* const scene, uint index, const GLSLProgram* const program, const char* const IESFilename);
-  
+
   /** Destructeur */
   virtual ~FlameLight();
-  
+
   /** Déplace la lumière à la position. Ceci déplace en réalité la lumière OpenGL.
    * @param pos Position de la lumière.
    */
@@ -63,72 +63,72 @@ public:
     m_lightPosition[2] = pos.z;
     m_centreSP = pos;
   }
-  
+
   /** Dessine les shadow volumes à partir de la source. */
-  void drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4]);  
-  
+  void drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4]);
+
   /** Active la source de lumière. */
-  void switchOn ();  
+  void switchOn ();
   /** Eteint la source */
   void switchOff ();
-  
+
   /** Active la source de lumière. */
-  virtual void switchOnMulti (){};  
+  virtual void switchOnMulti (){};
   /** Eteint la source */
   virtual void switchOffMulti (){};
-  
+
   /** Récupération du tableau des intensités du solide photométrique.
    * @return Pointeur sur les intensités.
    */
   float *getIntensities(void) const { return m_iesFile->getIntensities(); };
-  
+
   /** Retourne l'intensité globale de la source.
    * @return Coefficient de l'intensité.
    */
   const float getIntensity(void) const { return m_intensity; };
-  
+
   /** Récupération du centre du solide photométrique.
    * @param x Coordonnée x.
    * @param y Coordonnée y.
    * @param z Coordonnée z.
    */
-  void getCenterSP(GLfloat& x, GLfloat& y, GLfloat& z) const { 
+  void getCenterSP(GLfloat& x, GLfloat& y, GLfloat& z) const {
     x = (GLfloat)m_centreSP.x; y = (GLfloat)m_centreSP.y; z = (GLfloat)m_centreSP.z;
   };
-  
+
   /** Récupération du centre.
    */
   Point getCenterSP(void) const { return m_centreSP; };
-  
+
   const float getLazimut() const {return m_iesFile->getLazimut();};
-  
+
   const float getLzenith() const {return m_iesFile->getLzenith();};
-  
+
   const float getLazimutTEX() const {return m_iesFile->getLazimutTEX();};
-  
+
   const float getLzenithTEX() const {return m_iesFile->getLzenithTEX();};
-  
+
   /** Retourne le nombre de valeurs en zénithal. */
   const uint getIESZenithSize() const {return m_iesFile->getNbzenith();};
-  
+
   /** Retourne le nombre de valeurs en azimuthal. */
   const uint getIESAzimuthSize() const {return m_iesFile->getNbazimut();};
-  
+
   /** Supprime le fichier IES courant et en utilise un autre. */
   void useNewIESFile(const char* const IESFilename) { delete m_iesFile; m_iesFile = new IES(IESFilename); };
-  
+
   /** Calcul de l'intensité du centre et de l'orientation du solide photométrique. */
   virtual void computeIntensityPositionAndDirection() = 0;
-  
+
   /** Modifie le coefficient pondérateur de l'intensité. */
   virtual void setIntensityCoef(float coef) { m_intensityCoef = coef; };
-  
+
   const GLfloat* getGlowWeights(uint index) const { return m_glowWeights[index]; };
   GLfloat getGlowDivide(uint index) const { return m_glowDivide[index]; };
-  
+
   void computeGlowWeights(uint index, float sigma);
 protected:
-  
+
   /** Centre du solide photométrique dans l'espace. */
   Point m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation. */
@@ -143,20 +143,20 @@ protected:
   short m_light;
   /** Position de la lumière ponctuelle OpenGL dans l'espace. */
   GLfloat m_lightPosition[4];
-  
+
   /** Tableau contenant les poids des pixels du filtre du glow */
   GLfloat m_glowWeights[2][FILTER_SIZE];
   /** Diviseur correspondant à la somme des poids du glow */
   GLfloat m_glowDivide[2];
 private:
-  
+
   /** Pointeur sur la scène. */
   const Scene *m_scene;
-  
+
   /** Pointeur sur le program générateur de volumes d'ombres. */
   const GLSLProgram *m_SVProgram;
-  
-  
+
+
   /** Fichier IES utilisé pour le solide photométrique de la source. */
   IES *m_iesFile;
 };
@@ -195,10 +195,10 @@ public:
   virtual ~FireSource ();
 
   /** Ajuste le niveau de détail de la NURBS.
-   * @param value Valeur comprise entre 0 et LOD_VALUES. 
+   * @param value Valeur comprise entre 0 et LOD_VALUES.
    */
   virtual void setLOD(u_char value)
-  { 
+  {
     switch(value)
       {
       case 5:
@@ -253,7 +253,7 @@ public:
 	cerr << "Bad NURBS LOD parameter" << endl;
       }
   };
-  
+
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
@@ -261,7 +261,7 @@ public:
   {
     return m_solver->getPosition();
   }
-  
+
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
@@ -269,17 +269,17 @@ public:
   {
     return m_position;
   }
-  
-  /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également 
+
+  /** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également
    * de déterminer la position de la source de lumière.
    */
   virtual void build();
-  
+
   /** Dessine la mèche de la flamme. Les mèches des RealFlame sont définies en (0,0,0), une translation
    * est donc effectuée pour tenir compte du placement du feu dans le monde.
    */
   virtual void drawWick(bool displayBoxes) const
-  {      
+  {
     Point pt(getPosition());
     Point scale(m_solver->getScale());
     glPushMatrix();
@@ -289,7 +289,7 @@ public:
       m_flames[i]->drawWick(displayBoxes);
     glPopMatrix();
   }
-  
+
   /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
    * build() avec le placage de texture. La flamme d'une RealFlame est définie dans le repère du solveur,
    * donc seule une translation correspondant à la position du solveur est effectuée.
@@ -306,7 +306,7 @@ public:
     switch(boundingVolume){
     case BOUNDING_SPHERE : drawBoundingSphere(); break;
     case IMPOSTOR : drawImpostor(); break;
-    default : 
+    default :
       if(m_visibility)
 	{
 	  Point pt(getPosition());
@@ -329,13 +329,13 @@ public:
     cerr << g_count << endl;
 #endif
   }
-  
+
   /** Dessin de la sphère englobante. */
   virtual void drawBoundingSphere() const { if(m_visibility) m_boundingSphere.draw(); };
-  
+
   /** Dessin d'un imposteur pour le rendu. */
   virtual void drawImpostor() const;
-  
+
   /** Fonction appelée par le solveur de fluides pour ajouter l'élévation
    * thermique de la flamme.
    */
@@ -344,25 +344,25 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->addForces(m_fdf, m_innerForce, m_perturbate);
   }
-  
+
   /** Affectation du coefficient multiplicateur de la FDF.
    * @param value Coefficient.
    */
   virtual void setInnerForce(float value) { m_innerForce=value; };
-  
+
   /** Affectation de la FDF.
    * @param value FDF.
    */
   virtual void setFDF(int value) { m_fdf=value; };
-  
+
   /** Affectation de la méthode de perturbation.
    * @param value Perturbation.
    */
   virtual void setPerturbateMode(char value) { m_perturbate=value; };
-  
+
   /** Modifie le type de flickering sur les flammes. */
   char getPerturbateMode() const { return m_perturbate; };
-  
+
   /** Affectation de la durée de vie des squelettes guides.
    * @param value Durée de vie en itérations.
    */
@@ -370,39 +370,39 @@ public:
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setLeadLifeSpan(value);
   };
-  
+
   /** Affectation de la durée de vie des squelettes périphériques.
    * @param value Durée de vie en itérations.
    */
-  virtual void setPeriLifeSpan(uint value) { 
+  virtual void setPeriLifeSpan(uint value) {
     for (uint i = 0; i < m_nbFlames; i++)
-      m_flames[i]->setPeriLifeSpan(value); 
+      m_flames[i]->setPeriLifeSpan(value);
   };
-  
+
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state)
   {
     for (uint i = 0; i < m_nbFlames; i++)
       m_flames[i]->setSmoothShading(state);
   }
-  
+
   /** Fonction permettant de récupérer le centre de la flamme dans le repère local. */
   virtual Point getCenter() const { return m_center; };
-  
+
   /** Fonction permettant de récupérer l'orientation principale de la flamme. */
   virtual Vector getMainDirection() const { return m_direction; };
-  
+
   /** Fonction recalculant le centre et la direction de la flamme, en vue de
    * l'éclairage. Appelée à chaque pas de simulation. */
   void computeIntensityPositionAndDirection(void);
-  
+
   /** Construction de la sphère englobante de l'objet. */
   void buildBoundingSphere ();
-  
-  /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante 
+
+  /** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante
    * et teste ensuite la visibilité de celle-ci. */
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
-  
+
   /** Test si la flamme est visible ou non. Le calcul de visibilité proprement
    * dit se fait à l'aide de la fonction computeVisibility. */
   bool isVisible() { return m_visibility; };
@@ -423,25 +423,25 @@ protected:
   uint m_nbFlames;
   /** Tableau contenant les flammes */
   RealFlame **m_flames;
-  
+
   /** Pointeur sur le solveur de fluides */
   Field3D *m_solver;
-  
+
   /** Texture utilisée pour les flammes */
-  Texture m_texture;
-  
+  BitmapTexture m_texture;
+
   /** Sphère englobante utilisée pour vérifier la visibilité de la source. */
   BoundingSphere m_boundingSphere;
 
   /** Visibilité de la flamme. */
   bool m_visibility;
-  
+
   /** Distance par rapport à la caméra. */
   float m_dist;
 
   /** Dernière valeur du flickering connue avant que la gestion du LOD ne la modifie */
   char m_flickSave;
-  
+
   /** Coefficient de force appliqué sur la FDF. */
   float m_innerForce;
 
@@ -450,13 +450,13 @@ protected:
 
   /** Fonction de distribution de carburant. */
   int m_fdf;
-  
+
   /** Centre de la flamme, recalculé à chaque itération dans build() */
   Point m_center;
 
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
   Vector m_direction;
-  
+
   /** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
   int m_fluidsLODSave, m_nurbsLODSave;
 
@@ -485,12 +485,12 @@ public:
   DetachableFireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
 			const wxString &texname, uint index, const GLSLProgram* const program);
   virtual ~DetachableFireSource();
-  
+
   virtual void build();
   virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
-   
+
   virtual void setLOD(u_char value)
-  { 
+  {
     u_char tolerance=4;
     switch(value)
       {
@@ -556,7 +556,7 @@ public:
   {
     m_detachedFlamesList.push_back(detachedFlame);
   }
-  
+
   /** Supprime une flamme détachée à la source.
    * @param detachedFlame Pointeur sur la flamme détachée à enlever.
    */
@@ -564,17 +564,17 @@ public:
   {
     m_detachedFlamesList.remove(detachedFlame);
   }
-  
+
   /** Active ou désactive l'affichage texturé sur la flamme. */
   virtual void setSmoothShading (bool state);
-  
+
   virtual void computeVisibility(const Camera &view, bool forceSpheresBuild=false);
-  
+
   void computeIntensityPositionAndDirection(void);
 private:
   /** Construit la bounding box utilisée pour l'affichage */
   virtual void buildBoundingBox ();
-  
+
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;
   Point m_BBmin, m_BBmax;

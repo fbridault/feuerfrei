@@ -307,6 +307,10 @@
 		<Unit filename="src/shaders/ShadowVolumeExtrusion.cg">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="src/shaders/depthPeeling.fp">
+			<Option target="Fire - Debug" />
+			<Option target="Fire - Release" />
+		</Unit>
 		<Unit filename="src/shaders/gamma.fp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

@@ -10,53 +10,6 @@ class CRenderTarget;
 #include "../scene/scene.hpp"
 #include "../scene/camera.hpp"
 
-class ARBFragmentShader
-{
-public:
-  ARBFragmentShader() { glGenProgramsARB(1, &program); };
-
-  virtual ~ARBFragmentShader()
-  {
-    glDeleteProgramsARB(1, &program);
-  }
-
-  void enableShader()
-  {
-    glEnable(GL_FRAGMENT_PROGRAM_ARB);
-    glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program);
-  }
-
-  void disableShader()
-  {
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-  }
-
-  void load(const char * prog_text)
-  {
-    enableShader();
-    glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, (GLuint)strlen(prog_text), prog_text);
-    GLint errpos;
-    glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errpos);
-    if(errpos != -1)
-      {
-	fprintf(stderr, "program error:\n");
-	int bgn = errpos - 10;
-
-	const char * c = (const char *)(prog_text + bgn);
-	for(int i = 0; i < 30; i++)
-	  {
-	    if(bgn+i >= int(strlen(prog_text)-1))
-	      break;
-	    fprintf(stderr, "%c", *c++);
-	  }
-	fprintf(stderr, "\n");
-      }
-    disableShader();
-  }
-private:
-  GLuint program;
-
-};
 
 /** Classe regroupant des méthodes implémentant le Depth Peeling.
  */
@@ -110,12 +63,11 @@ private:
 
   uint m_nbLayersMax, m_nbLayers;
   CDepthTexture *m_alwaysTrueDepthTex;
-  CRenderTarget *m_renderTarget[2], *m_sceneDepthCRenderTarget;
+  CRenderTarget *m_renderTarget[2], *m_sceneDepthRenderTarget;
   GLuint m_curDepthTex;
 
-  ARBFragmentShader m_peelProgram;
-  GLSLProgram m_dpRendererProgram;
-  GLSLFragmentShader m_dpRendererShader;
+  GLSLProgram m_dpProgram, m_dpRendererProgram;
+  GLSLFragmentShader m_dpShader, m_dpRendererShader;
 
   GLuint m_flamesDisplayList;
 };

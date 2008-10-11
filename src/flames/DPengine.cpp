@@ -9,25 +9,9 @@ DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
   m_nbLayers = m_nbLayersMax = nbLayers;
   assert(nbLayers <= DEPTH_PEELING_LAYERS_MAX);
 
-  char _fp_peel[] =
-    "!!ARBfp1.0\n"
-    "OPTION ARB_fragment_program_shadow;\n"
-    "TEMP R0;\n"
-    "TEMP R1;\n"
-    "TEMP R2;\n"
-    "TEX R0, fragment.texcoord[0], texture[0], 2D\n;"
-    "TEX R1.x, fragment.position, texture[1], SHADOWRECT;\n"
-    "TEX R2.x, fragment.position, texture[2], SHADOWRECT;\n"
-    // KIL supprime le fragment si une des composantes du vecteur est nulle
-    // On place donc le résultat de {0,1} en {-.5;.5}
-    "ADD R1.x, R1.x, -0.5;\n"
-    "KIL R1.x;\n"
-    "ADD R2.x, R2.x, -0.5;\n"
-    "KIL R2.x;\n"
-    "MOV result.color, R0;\n"
-    "END\n";
-
-  m_peelProgram.load(_fp_peel);
+  m_dpShader.load("depthPeeling.fp", true);
+  m_dpProgram.attachShader(m_dpShader);
+  m_dpProgram.link();
 
   m_dpRendererShader.load("viewportSizedTex.fp", true);
   m_dpRendererProgram.attachShader(m_dpRendererShader);
@@ -45,7 +29,7 @@ void DepthPeelingEngine::deleteTex()
 {
   delete m_renderTarget[0];
   delete m_renderTarget[1];
-  delete m_sceneDepthCRenderTarget;
+  delete m_sceneDepthRenderTarget;
   delete m_alwaysTrueDepthTex;
 }
 
@@ -65,7 +49,7 @@ void DepthPeelingEngine::generateTex()
   m_renderTarget[0]->addTarget("depth rect shadow nearest greater",1);
   m_renderTarget[1]->addTarget("depth rect shadow nearest greater",1);
 
-  m_sceneDepthCRenderTarget = new CRenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
+  m_sceneDepthRenderTarget = new CRenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
 
   m_alwaysTrueDepthTex = new CDepthTexture(GL_TEXTURE_RECTANGLE_ARB, m_width,m_height, GL_NEAREST, GLenum(GL_ALWAYS));
 }
@@ -77,7 +61,7 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
   /* On stocke la profondeur de la scène dans une texture qui servira */
   /* comme deuxième test de profondeur pour le depth peeling */
   /* Il y a donc en tout trois tests de profondeur */
-  m_sceneDepthCRenderTarget->bindTarget();
+  m_sceneDepthRenderTarget->bindTarget();
 
   glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -94,8 +78,11 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    m_sceneDepthCRenderTarget->bindTexture();
-    m_peelProgram.enableShader();
+    m_sceneDepthRenderTarget->bindTexture();
+	m_dpProgram.enable();
+	m_dpProgram.setUniform1i("s_textureObjet",0);
+	m_dpProgram.setUniform1i("s_prevDepth",1);
+	m_dpProgram.setUniform1i("s_sceneDepth",2);
 
     /* Pour le premier layer, on construit la display list */
     /* et le premier test de profondeur est toujours vrai */
@@ -111,7 +98,7 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
       m_renderTarget[1-m_curDepthTex]->bindTexture();
       glCallList(m_flamesDisplayList);
     }
-    m_peelProgram.disableShader();
+    m_dpProgram.disable();
 
     m_curDepthTex = 1 - m_curDepthTex;
   }

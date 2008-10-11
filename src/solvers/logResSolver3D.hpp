@@ -30,32 +30,32 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+  LogResSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps);
   /** Destructeur. */
   virtual ~LogResSolver3D ();
-  
+
 private:
   void vel_step ();
-  
+
   void diffuse (unsigned char b, float *const x, float *const x0, float a);
   void project (float *const p, float *const div);
-  
+
   void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
-  
+
   /** Ecrit la valeur du résidu dans le fichier de log.
    * @param iter Numéro de l'itération de lé méthode de résolution.
    * @param value Valeur à ajouter à la moyenne.
    */
   void logResidu (uint iter, float value);
-  
+
   /** Fichier de log pour la diffusion. */
   ofstream m_fileDiff[NB_DIFF_LOGS];
   /** Fichier de log pour la projection. */
   ofstream m_fileProj[NB_PROJ_LOGS];
-  
-  /** Pointeur sur le fichier courant. */
+
+  /** CPointeur sur le fichier courant. */
   ofstream *m_file;
 };
 

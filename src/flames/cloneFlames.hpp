@@ -3,7 +3,7 @@
 
 class CloneFlame;
 class CloneLineFlame;
-class ClonePointFlame;
+class CloneCPointFlame;
 
 #include "realFlames.hpp"
 
@@ -23,13 +23,13 @@ class CloneFlame : public FixedFlame
 {
 public:
   /** Constructeur.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
-   * @param source Pointeur sur la flamme qui sert de source au clone.
+   * @param flameConfig CPointeur sur le configuration de la flamme.
+   * @param source CPointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneFlame(const FlameConfig& flameConfig, const RealFlame* const source, const Point& offset);
+  CloneFlame(const FlameConfig& flameConfig, const RealFlame* const source, const CPoint& offset);
   virtual ~CloneFlame();
-  
+
   /** Dessine la mèche de la flamme.
    * @param displayBoxes Affiche ou non le partitionnement de la mèche. Ce paramètre
    * est simplement gardé pour des raisons de compatibilité, il est en effet ignoré
@@ -37,24 +37,24 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const
   {
-    Point diffPos = m_position;// - m_source->getPosition();
+    CPoint diffPos = m_position;// - m_source->getPosition();
     glPushMatrix();
     glTranslatef(diffPos.x, diffPos.y, diffPos.z);
     m_source->drawWick(displayBoxes);
     glPopMatrix();
   };
-  
-  virtual Vector getMainDirection() const { return(m_source->getMainDirection()); };  
-  virtual Point getCenter() const { return (m_source->getCenter()); };
-  
+
+  virtual CVector getMainDirection() const { return(m_source->getMainDirection()); };
+  virtual CPoint getCenter() const { return (m_source->getCenter()); };
+
   virtual bool build();
-  
-  Point getTop() const { return m_source->getTop(); };
-  Point getBottom() const { return m_source->getBottom(); };
-  
+
+  CPoint getTop() const { return m_source->getTop(); };
+  CPoint getBottom() const { return m_source->getBottom(); };
+
 protected:
   const RealFlame *m_source;
-  Point m_position;
+  CPoint m_position;
 };
 
 /** La classe CloneLineFlame implémente une flamme clone dont la source est une LineFlame.
@@ -66,14 +66,14 @@ class CloneLineFlame : public CloneFlame
 {
 public:
   /** Constructeur.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
-   * @param source Pointeur sur la flamme qui sert de source au clone.
+   * @param flameConfig CPointeur sur le configuration de la flamme.
+   * @param source CPointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneLineFlame(const FlameConfig& flameConfig, const LineFlame* const source, const Point& offset);
+  CloneLineFlame(const FlameConfig& flameConfig, const LineFlame* const source, const CPoint& offset);
   virtual ~CloneLineFlame();
-  
-  virtual void drawFlame(bool display, bool displayParticle) const{ 
+
+  virtual void drawFlame(bool display, bool displayParticle) const{
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
     if( display) drawLineFlame();
@@ -81,26 +81,26 @@ public:
   };
 };
 
-/** La classe ClonePointFlame implémente une flamme clone dont la source est une PointFlame.
+/** La classe CloneCPointFlame implémente une flamme clone dont la source est une CPointFlame.
  *
  * @author	Flavien Bridault
  * @see         CloneFlame
  */
-class ClonePointFlame : public CloneFlame
+class CloneCPointFlame : public CloneFlame
 {
 public:
   /** Constructeur.
-   * @param flameConfig Pointeur sur le configuration de la flamme.
-   * @param source Pointeur sur la flamme qui sert de source au clone.
+   * @param flameConfig CPointeur sur le configuration de la flamme.
+   * @param source CPointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  ClonePointFlame(const FlameConfig& flameConfig, const PointFlame* const source, const Point& offset);
-  virtual ~ClonePointFlame();
-  
-  virtual void drawFlame(bool display, bool displayParticle) const{ 
+  CloneCPointFlame(const FlameConfig& flameConfig, const CPointFlame* const source, const CPoint& offset);
+  virtual ~CloneCPointFlame();
+
+  virtual void drawFlame(bool display, bool displayParticle) const{
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
-    if( display) drawPointFlame(); 
+    if( display) drawCPointFlame();
     glPopMatrix();
   };
 };

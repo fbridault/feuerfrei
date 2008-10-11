@@ -18,14 +18,14 @@ GlobalField::GlobalField(const vector <Field3D *> &fields, Scene* const scene, c
 #endif
 			 float timeStep, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon)
 {
-  Point max, min, width, position, scale(1.0f,1.0f,1.0f);
+  CPoint max, min, width, position, scale(1.0f,1.0f,1.0f);
   uint n_x, n_y, n_z;
   float dim, buoyancy=0.0f;
-  
+
   scene->computeBoundingBox(max,min);
   width = max - min;
   position = min;
-  
+
   if(width.x > width.y)
     if(width.x > width.z){
       dim = width.x;
@@ -50,7 +50,7 @@ GlobalField::GlobalField(const vector <Field3D *> &fields, Scene* const scene, c
       n_x = (uint)(n*width.x/dim);
       n_y = (uint)(n*width.y/dim);
     }
-    
+
   switch(type){
   case GS_SOLVER :
     m_field = new GSSolver3D(ARGS_SLV);
@@ -91,8 +91,8 @@ GlobalField::GlobalField(const vector <Field3D *> &fields, Scene* const scene, c
 
 void GlobalField::shareForces()
 {
-  Point pt,ldim;
-  Point strength[8];
+  CPoint pt,ldim;
+  CPoint strength[8];
   float dump=0.0f;
 
   for (vector < Field3D* >::const_iterator solversIterator = m_localFields.begin ();
@@ -105,17 +105,17 @@ void GlobalField::shareForces()
       ldim.x *= (*solversIterator)->getScale().x;
       ldim.y *= (*solversIterator)->getScale().y;
       ldim.z *= (*solversIterator)->getScale().z;
-      
+
       /* Coordonnée de la cellule du coin (0,0,0) dans le solveur global */
       strength[0] = m_field->getUVW(pt,dump);
-      strength[1] = m_field->getUVW(pt+Point(0.0f,ldim.y,0.0f),dump);
-      strength[2] = m_field->getUVW(pt+Point(0.0f,ldim.y,ldim.z),dump);
-      strength[3] = m_field->getUVW(pt+Point(0.0f,0.0f,ldim.z),dump);
-      strength[4] = m_field->getUVW(pt+Point(ldim.x,ldim.y,0.0f),dump);
-      strength[5] = m_field->getUVW(pt+Point(ldim.x,0.0f,0.0f),dump);
-      strength[6] = m_field->getUVW(pt+Point(ldim.x,ldim.y,ldim.z),dump);
-      strength[7] = m_field->getUVW(pt+Point(ldim.x,0.0f,ldim.z),dump);
-      
+      strength[1] = m_field->getUVW(pt+CPoint(0.0f,ldim.y,0.0f),dump);
+      strength[2] = m_field->getUVW(pt+CPoint(0.0f,ldim.y,ldim.z),dump);
+      strength[3] = m_field->getUVW(pt+CPoint(0.0f,0.0f,ldim.z),dump);
+      strength[4] = m_field->getUVW(pt+CPoint(ldim.x,ldim.y,0.0f),dump);
+      strength[5] = m_field->getUVW(pt+CPoint(ldim.x,0.0f,0.0f),dump);
+      strength[6] = m_field->getUVW(pt+CPoint(ldim.x,ldim.y,ldim.z),dump);
+      strength[7] = m_field->getUVW(pt+CPoint(ldim.x,0.0f,ldim.z),dump);
+
       (*solversIterator)->addForcesOnFace(LEFT_FACE,strength[0], strength[1], strength[2], strength[3]);
       (*solversIterator)->addForcesOnFace(BACK_FACE,strength[0], strength[1], strength[4], strength[5]);
       (*solversIterator)->addForcesOnFace(FRONT_FACE,strength[3], strength[2], strength[6], strength[7]);

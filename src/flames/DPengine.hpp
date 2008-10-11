@@ -3,7 +3,7 @@
 
 class GLFlameCanvas;
 class DepthPeelingEngine;
-class RenderTarget;
+class CRenderTarget;
 
 #include "flames.hpp"
 #include "fbo.hpp"
@@ -109,8 +109,8 @@ private:
   uint m_width, m_height;
 
   uint m_nbLayersMax, m_nbLayers;
-  DepthTexture *m_alwaysTrueDepthTex;
-  RenderTarget *m_renderTarget[2], *m_sceneDepthRenderTarget;
+  CDepthTexture *m_alwaysTrueDepthTex;
+  CRenderTarget *m_renderTarget[2], *m_sceneDepthCRenderTarget;
   GLuint m_curDepthTex;
 
   ARBFragmentShader m_peelProgram;

@@ -1,7 +1,7 @@
 #include "numTextCtrl.hpp"
 
-LongTextCtrl::LongTextCtrl(wxWindow* parent, wxWindowID id, long min, long max, const wxString& value, 
-	      const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) : 
+LongTextCtrl::LongTextCtrl(wxWindow* parent, wxWindowID id, long min, long max, const wxString& value,
+	      const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name) :
   NumTextCtrl(parent, id, value, pos, size, style, validator, name)
 {
   m_min = min;
@@ -10,20 +10,20 @@ LongTextCtrl::LongTextCtrl(wxWindow* parent, wxWindowID id, long min, long max, 
 
 long LongTextCtrl::GetSafelyValue(void)
 {
-  wxString tmp; 
+  wxString tmp;
   long val;
-    
+
   tmp = GetValue();
   if( tmp.ToLong(&val))
     if(val >= m_min && val <= m_max)
-      return(val); 
+      return(val);
     else
       rangeErrorDialog(tmp);
   else
     nonNumericErrorDialog(tmp);
-    
+
   throw(tmp);
-  return -1;  
+  return -1;
 }
 
 void LongTextCtrl::nonNumericErrorDialog(wxString& s)
@@ -32,7 +32,7 @@ void LongTextCtrl::nonNumericErrorDialog(wxString& s)
 						     _("Error"),wxOK|wxICON_ERROR);
   errorDialog.ShowModal();
 }
-  
+
 void LongTextCtrl::rangeErrorDialog(wxString& s)
 {
   wxString message;
@@ -41,7 +41,7 @@ void LongTextCtrl::rangeErrorDialog(wxString& s)
   errorDialog.ShowModal();
 }
 
-DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, float min, float max, const wxString& value, 
+DoubleTextCtrl::DoubleTextCtrl(wxWindow* parent, wxWindowID id, float min, float max, const wxString& value,
 	      const wxPoint& pos, const wxSize& size, long style, const wxValidator& validator, const wxString& name)
 : NumTextCtrl(parent, id, value, pos, size, style, validator, name)
 {
@@ -54,9 +54,9 @@ float DoubleTextCtrl::GetSafelyValue(void)
   wxString tmp;
   float val;
   double dval;
-    
+
   tmp = GetValue();
-  
+
   if( tmp.ToDouble(&dval))
     if(dval >= m_min && dval <= m_max){
       val = (float)dval;
@@ -65,7 +65,7 @@ float DoubleTextCtrl::GetSafelyValue(void)
       rangeErrorDialog(tmp);
   else
     nonNumericErrorDialog(tmp);
-  
+
   throw(tmp);
   return -1;
 }
@@ -75,7 +75,7 @@ void DoubleTextCtrl::nonNumericErrorDialog(wxString& s)
   wxMessageDialog errorDialog (this,_("\"") + s + _("Not a numeric value"), _("Error"),wxOK|wxICON_ERROR);
   errorDialog.ShowModal();
 }
-  
+
 void DoubleTextCtrl::rangeErrorDialog(wxString& s)
 {
   wxString message;

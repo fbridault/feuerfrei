@@ -1,0 +1,58 @@
+# depslib dependency file v1.0
+1223759792 source:/home/flavien/recherche/git/flames/engine/renderTarget.cpp
+	"renderTarget.hpp"
+	<iostream>
+
+1223759792 /home/flavien/recherche/git/flames/engine/renderTarget.hpp
+	"common.hpp"
+	"texture.hpp"
+	<string>
+	<vector>
+
+1223760020 /home/flavien/recherche/git/flames/engine/common.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"assert.h"
+
+1223759792 /home/flavien/recherche/git/flames/engine/texture.hpp
+	<GL/gl.h>
+	<string>
+
+1223749038 source:/home/flavien/recherche/git/flames/engine/texture.cpp
+	"texture.hpp"
+	"ilut.h"
+	<iostream>
+
+1193480581 /usr/include/IL/ilut.h
+	<IL/il.h>
+	<IL/ilu.h>
+	"config.h"
+	"config.h"
+	<windows.h>
+	<OpenGL/gl.h>
+	<OpenGL/glu.h>
+	<GL/gl.h>
+	<GL/glu.h>
+	<allegro.h>
+	<SDL.h>
+	<windows.h>
+
+1193480581 /usr/include/IL/config.h
+
+1223759792 source:/home/flavien/recherche/git/flames/engine/graphicsFn.cpp
+	"graphicsFn.hpp"
+	<iostream>
+
+1223759792 /home/flavien/recherche/git/flames/engine/graphicsFn.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"pointVector.hpp"
+
+1223759792 /home/flavien/recherche/git/flames/engine/pointVector.hpp
+	<GL/gl.h>
+	<math.h>
+	<iostream>
+
+1223759828 source:/home/flavien/recherche/git/flames/engine/main.cpp
+	<ilut.h>
+

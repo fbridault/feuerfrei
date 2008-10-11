@@ -17,7 +17,7 @@ class HybridSolver3D;
  *
  * @author	Flavien Bridault
  */
-class HybridSolver3D: public GCSSORSolver3D, public GSSolver3D 
+class HybridSolver3D: public GCSSORSolver3D, public GSSolver3D
 {
 public:
   /** Constructeur du solveur.
@@ -32,19 +32,19 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  HybridSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
   HybridSolver3D (float omegaDiff, float omegaProj, float epsilon);
-  
+
   /** Desctructeur. */
   virtual ~ HybridSolver3D ();
-  
+
 protected:
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);

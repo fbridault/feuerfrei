@@ -39,9 +39,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  BenchSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  BenchSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		 float buoyancy, float vorticityConfinement, uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
    * @param omegaDiff Paramètre omega pour la diffusion.
@@ -51,10 +51,10 @@ public:
   BenchSolver3D (uint nbTimeSteps, float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~ BenchSolver3D ();
-  
+
 protected:
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a) = 0;
-  virtual void project (float *const p, float *const div) = 0;  
+  virtual void project (float *const p, float *const div) = 0;
 
   /** Sauvegarde les différentes composantes du solveur pour pouvoir effectuer plusieurs tests sur
    * un même état de la grille de résolution.
@@ -62,13 +62,13 @@ protected:
   void saveState (const float *const x, const float *const x2);
   /** Sauvegarde les différentes composantes du solveur comme valeur de référence. */
   void setPreviousState (float *const x, float *const x2);
-  
+
   /* Nombre maximum de pas de temps à simuler */
   uint m_nbMaxIter;
-  
+
   /** Indice utilisé pour la génération du nom du fichier de log. */
   unsigned int m_index;
-  
+
 private:
   float *m_save, *m_save2; /** Permet de sauver une composante. */
 };

@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "vector.hpp"
+#include <engine/pointVector.hpp>
 
 #include <wx/wxprec.h>
 
@@ -44,14 +44,14 @@ using namespace std;
 class SolverConfig{
 public:
 #ifdef RTFLUIDS_BUILD
-  Point position;
+  CPoint position;
 #endif
   char type;
   uint resx, resy, resz;
   /* Dimension réelle du solveur, utilisée lors de la résolution */
   float dim;
   /* Facteur d'échelle */
-  Point scale;
+  CPoint scale;
   float timeStep;
   float omegaDiff, omegaProj;
   float epsilon;
@@ -85,7 +85,7 @@ public:
  */
 class LuminaryConfig{
 public:
-  Point position;
+  CPoint position;
   /** Nom du fichier contenant le luminaire et les mèches. */
   wxString fileName;
   uint nbFields;
@@ -99,7 +99,7 @@ public:
   uint width, height;
   float clipping;
   wxString sceneName;
-  /** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */ 
+  /** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */
   int lightingMode;
   bool shadowsEnabled;
   /** Activation du glow */
@@ -137,8 +137,8 @@ public:
 __inline__ unsigned long long int rdtsc()
 {
   unsigned long long int x;
-  __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));     
-  return x;  
+  __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
+  return x;
 }
 
 #endif

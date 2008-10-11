@@ -2034,12 +2034,12 @@
 
 1193480581 /usr/include/IL/config.h
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames.cpp
+1223738129 source:/home/flavien/recherche/git/flames/src/flames.cpp
 	"interface/flamesFrame.hpp"
 	<wx/tooltip.h>
 	<ilut.h>
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/flamesFrame.hpp
+1223747447 /home/flavien/recherche/git/flames/src/interface/flamesFrame.hpp
 	<fstream.h>
 	<fstream>
 	<wx/glcanvas.h>
@@ -2050,163 +2050,160 @@
 	"interface.hpp"
 	"mainPanels.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/interface.hpp
+1223744126 /home/flavien/recherche/git/flames/src/interface/interface.hpp
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/mainPanels.hpp
+1223747459 /home/flavien/recherche/git/flames/src/interface/mainPanels.hpp
 	"interface.hpp"
 	"../common.hpp"
 	<wx/spinctrl.h>
 
-1223736240 /home/flavien/recherche/git/flames/src/common.hpp
+1223747371 /home/flavien/recherche/git/flames/src/common.hpp
 	<iostream>
-	"vector.hpp"
+	<engine/pointVector.hpp>
 	<wx/wxprec.h>
 	<wx/wx.h>
 
-1223736242 /home/flavien/recherche/git/flames/src/vector.hpp
+1223738133 /home/flavien/recherche/git/flames/src/vector.hpp
 	<GL/gl.h>
 	<math.h>
 	<iostream>
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/DPengine.cpp
+1223749250 source:/home/flavien/recherche/git/flames/src/flames/DPengine.cpp
 	"DPengine.hpp"
 	"../interface/GLFlameCanvas.hpp"
-	"renderTarget.hpp"
+	<engine/renderTarget.hpp>
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/DPengine.hpp
+1223749250 /home/flavien/recherche/git/flames/src/flames/DPengine.hpp
 	"flames.hpp"
 	"fbo.hpp"
 	"../scene/scene.hpp"
 	"../scene/camera.hpp"
 
-1210865369 /home/flavien/recherche/git/flames/src/flames/flames.hpp
+1223744118 /home/flavien/recherche/git/flames/src/flames/flames.hpp
 	"../common.hpp"
 	<math.h>
 	<values.h>
 	<GL/gl.h>
 	<GL/glext.h>
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/fbo.hpp
+1223738129 /home/flavien/recherche/git/flames/src/flames/fbo.hpp
 	"flames.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/scene.hpp
+1223748738 /home/flavien/recherche/git/flames/src/scene/scene.hpp
 	"object.hpp"
 	"../flames/abstractFires.hpp"
 	"../flames/luminary.hpp"
-	"source.hpp"
 	"camera.hpp"
 	<vector>
 	<list>
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/object.hpp
-	"source.hpp"
+1223749129 /home/flavien/recherche/git/flames/src/scene/object.hpp
+	<engine/graphicsFn.hpp>
 	"camera.hpp"
-	"graphicsFn.hpp"
 	<list>
+	<vector>
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/source.hpp
+1223738132 /home/flavien/recherche/git/flames/src/scene/source.hpp
 	"intensity.hpp"
 	"../vector.hpp"
 	<vector>
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/intensity.hpp
+1223738132 /home/flavien/recherche/git/flames/src/scene/intensity.hpp
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/camera.hpp
+1223748575 /home/flavien/recherche/git/flames/src/scene/camera.hpp
 	<GL/gl.h>
 	<GL/glu.h>
 	<math.h>
-	"../common.hpp"
-	"../vector.hpp"
+	<engine/pointVector.hpp>
 	<wx/event.h>
+	"../common.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/graphicsFn.hpp
+1223738132 /home/flavien/recherche/git/flames/src/scene/graphicsFn.hpp
 	<GL/gl.h>
 	<GL/glu.h>
 	"../vector.hpp"
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/abstractFires.hpp
+1223749129 /home/flavien/recherche/git/flames/src/flames/abstractFires.hpp
 	"flames.hpp"
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../solvers/solver3D.hpp"
 	"../scene/object.hpp"
-	"../scene/texture.hpp"
 	"../shaders/glsl.hpp"
 	"realFlames.hpp"
 	"ies.hpp"
+	<engine/texture.hpp>
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/solver3D.hpp
+1223747376 /home/flavien/recherche/git/flames/src/solvers/solver3D.hpp
 	"realField3D.hpp"
 	"solver.hpp"
 	<math.h>
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/realField3D.hpp
+1223747376 /home/flavien/recherche/git/flames/src/solvers/realField3D.hpp
 	"field3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/field3D.hpp
+1223748575 /home/flavien/recherche/git/flames/src/solvers/field3D.hpp
 	"field.hpp"
 	"../flames/particle.hpp"
 	<list>
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/field.hpp
+1223748575 /home/flavien/recherche/git/flames/src/solvers/field.hpp
 	<GL/gl.h>
 	<math.h>
 	"../common.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/particle.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/particle.hpp
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/solver.hpp
+1223738133 /home/flavien/recherche/git/flames/src/solvers/solver.hpp
 	"../common.hpp"
 
 1223736241 /home/flavien/recherche/git/flames/src/scene/texture.hpp
 	<GL/gl.h>
 	<string>
 
-1223736242 /home/flavien/recherche/git/flames/src/shaders/glsl.hpp
+1223738132 /home/flavien/recherche/git/flames/src/shaders/glsl.hpp
 	<GL/gl.h>
 	<iostream>
 	<string.h>
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/realFlames.hpp
+1223748574 /home/flavien/recherche/git/flames/src/flames/realFlames.hpp
 	"abstractFlames.hpp"
 	<list>
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/abstractFlames.hpp
-	"GL/glu.h"
+1223748574 /home/flavien/recherche/git/flames/src/flames/abstractFlames.hpp
+	<engine/texture.hpp>
 	"periSkeleton.hpp"
 	"leadSkeleton.hpp"
 	"../solvers/solver3D.hpp"
-	"../scene/texture.hpp"
-	"../scene/object.hpp"
 	"wick.hpp"
 	<list>
 	<vector>
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/periSkeleton.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/periSkeleton.hpp
 	"skeleton.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/skeleton.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/skeleton.hpp
 	"flames.hpp"
 	"particle.hpp"
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/leadSkeleton.hpp
+1223747371 /home/flavien/recherche/git/flames/src/flames/leadSkeleton.hpp
 	"skeleton.hpp"
 	"noise.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/noise.hpp
+1223738129 /home/flavien/recherche/git/flames/src/flames/noise.hpp
 	<sys/types.h>
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/wick.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/wick.hpp
 	"../scene/object.hpp"
 	"leadSkeleton.hpp"
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/ies.hpp
+1223738129 /home/flavien/recherche/git/flames/src/flames/ies.hpp
 	"flames.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/luminary.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/luminary.hpp
 	"abstractFires.hpp"
 	"../solvers/field3D.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
+1223747501 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
 	"../common.hpp"
 	"interface.hpp"
 	<wx/glcanvas.h>
@@ -2214,7 +2211,7 @@
 	"../scene/gammaEngine.hpp"
 	"../scene/camera.hpp"
 	"../scene/scene.hpp"
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../flames/abstractFires.hpp"
 	"../flames/glowengine.hpp"
 	"../flames/DPengine.hpp"
@@ -2222,70 +2219,66 @@
 	"../flames/solidePhoto.hpp"
 	"../solvers/fieldThread.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/gammaEngine.hpp
+1223749250 /home/flavien/recherche/git/flames/src/scene/gammaEngine.hpp
 	"../shaders/glsl.hpp"
-	"../flames/renderTarget.hpp"
-	"../scene/texture.hpp"
-	<GL/glu.h>
+	<engine/renderTarget.hpp>
+	<engine/texture.hpp>
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/glowengine.hpp
+1223749251 /home/flavien/recherche/git/flames/src/flames/glowengine.hpp
+	<engine/renderTarget.hpp>
 	"flames.hpp"
-	"renderTarget.hpp"
 	"../shaders/glsl.hpp"
-	"../scene/camera.hpp"
-	"../scene/texture.hpp"
-	"abstractFires.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/globalField.hpp
+1223747375 /home/flavien/recherche/git/flames/src/solvers/globalField.hpp
 	"field3D.hpp"
 	<vector>
 	<list>
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/solidePhoto.hpp
+1223749311 /home/flavien/recherche/git/flames/src/flames/solidePhoto.hpp
 	"flames.hpp"
 	"ies.hpp"
 	"../shaders/glsl.hpp"
 	"../scene/scene.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/fieldThread.hpp
+1223747371 /home/flavien/recherche/git/flames/src/solvers/fieldThread.hpp
 	"wx/wx.h"
 	<wx/thread.h>
 	<list>
 	"globalField.hpp"
 	"../flames/abstractFires.hpp"
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/abstractFires.cpp
+1223749129 source:/home/flavien/recherche/git/flames/src/flames/abstractFires.cpp
 	"abstractFires.hpp"
 	"../scene/scene.hpp"
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/abstractFlames.cpp
+1223748574 source:/home/flavien/recherche/git/flames/src/flames/abstractFlames.cpp
 	"abstractFlames.hpp"
 	<wx/intl.h>
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/cloneFlames.cpp
+1223747371 source:/home/flavien/recherche/git/flames/src/flames/cloneFlames.cpp
 	"cloneFlames.hpp"
 	<wx/intl.h>
 
-1223736240 /home/flavien/recherche/git/flames/src/flames/cloneFlames.hpp
+1223748574 /home/flavien/recherche/git/flames/src/flames/cloneFlames.hpp
 	"realFlames.hpp"
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/glowengine.cpp
+1223749251 source:/home/flavien/recherche/git/flames/src/flames/glowengine.cpp
 	"glowengine.hpp"
 	"../interface/GLFlameCanvas.hpp"
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/ies.cpp
+1223738129 source:/home/flavien/recherche/git/flames/src/flames/ies.cpp
 	"ies.hpp"
 	<fstream>
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/leadSkeleton.cpp
+1223749129 source:/home/flavien/recherche/git/flames/src/flames/leadSkeleton.cpp
 	"leadSkeleton.hpp"
 	<stdlib.h>
 	<math.h>
+	<engine/graphicsFn.hpp>
 	"periSkeleton.hpp"
-	"../scene/graphicsFn.hpp"
 	"../solvers/solver3D.hpp"
 
-1223736240 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
+1223747371 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
 	"luminary.hpp"
 	"../interface/interface.hpp"
 	"../solvers/GSSolver3D.hpp"
@@ -2297,111 +2290,111 @@
 	"realFires.hpp"
 	"../scene/scene.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/GSSolver3D.hpp
+1223747374 /home/flavien/recherche/git/flames/src/solvers/GSSolver3D.hpp
 	"solver3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.hpp
+1223747374 /home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.hpp
 	"solver3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.hpp
+1223747374 /home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.hpp
 	"SSE4.hpp"
 	"solver3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/SSE4.hpp
+1223738133 /home/flavien/recherche/git/flames/src/solvers/SSE4.hpp
 	<xmmintrin.h>
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.hpp
+1223747374 /home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.hpp
 	"GSSolver3D.hpp"
 	"GCSSORSolver3D.hpp"
 	<fstream>
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/fakeField3D.hpp
+1223747375 /home/flavien/recherche/git/flames/src/solvers/fakeField3D.hpp
 	"field3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/LODField3D.hpp
+1223747374 /home/flavien/recherche/git/flames/src/solvers/LODField3D.hpp
 	"fakeField3D.hpp"
 	"GCSSORSolver3D.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
+1223747372 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
 	"abstractFires.hpp"
 	"cloneFlames.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/noise.cpp
+1223738129 source:/home/flavien/recherche/git/flames/src/flames/noise.cpp
 	"noise.hpp"
 	<math.h>
 	<stdlib.h>
 	<iostream>
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/periSkeleton.cpp
+1223747372 source:/home/flavien/recherche/git/flames/src/flames/periSkeleton.cpp
 	"periSkeleton.hpp"
 	<stdlib.h>
 	<math.h>
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../solvers/solver3D.hpp"
 	"leadSkeleton.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
+1223747372 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
 	"realFires.hpp"
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../scene/scene.hpp"
 	"../solvers/fakeField3D.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/realFlames.cpp
+1223749129 source:/home/flavien/recherche/git/flames/src/flames/realFlames.cpp
 	"realFlames.hpp"
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"abstractFires.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/skeleton.cpp
+1223749129 source:/home/flavien/recherche/git/flames/src/flames/skeleton.cpp
 	"skeleton.hpp"
 	<stdlib.h>
 	<math.h>
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../solvers/solver3D.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/solidePhoto.cpp
+1223749311 source:/home/flavien/recherche/git/flames/src/flames/solidePhoto.cpp
 	"solidePhoto.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/flames/wick.cpp
+1223747372 source:/home/flavien/recherche/git/flames/src/flames/wick.cpp
 	"wick.hpp"
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 	"../scene/scene.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.cpp
+1223748574 source:/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.cpp
 	"GLFlameCanvas.hpp"
 	"flamesFrame.hpp"
 	<iostream>
 	"../flames/solidePhoto.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/flamesFrame.cpp
+1223747779 source:/home/flavien/recherche/git/flames/src/interface/flamesFrame.cpp
 	"flamesFrame.hpp"
 	"luminaryDialog.hpp"
 	"shadowsDialog.hpp"
 	"GLFlameCanvas.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/luminaryDialog.hpp
+1223747780 /home/flavien/recherche/git/flames/src/interface/luminaryDialog.hpp
 	"numTextCtrl.hpp"
 	<wx/notebook.h>
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/numTextCtrl.hpp
+1223747780 /home/flavien/recherche/git/flames/src/interface/numTextCtrl.hpp
 	"interface.hpp"
 	"../common.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/shadowsDialog.hpp
+1223747780 /home/flavien/recherche/git/flames/src/interface/shadowsDialog.hpp
 	"interface.hpp"
 	"numTextCtrl.hpp"
 	"GLFlameCanvas.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/luminaryDialog.cpp
+1223747780 source:/home/flavien/recherche/git/flames/src/interface/luminaryDialog.cpp
 	"luminaryDialog.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/mainPanels.cpp
+1223747780 source:/home/flavien/recherche/git/flames/src/interface/mainPanels.cpp
 	"mainPanels.hpp"
 	<wx/gbsizer.h>
 	<wx/file.h>
 	"GLFlameCanvas.hpp"
 	"GLFluidsCanvas.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/interface/GLFluidsCanvas.hpp
+1223747779 /home/flavien/recherche/git/flames/src/interface/GLFluidsCanvas.hpp
 	"../common.hpp"
 	"interface.hpp"
 	<wx/glcanvas.h>
@@ -2409,39 +2402,39 @@
 	"../scene/graphicsFn.hpp"
 	"../solvers/field.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/numTextCtrl.cpp
+1223747780 source:/home/flavien/recherche/git/flames/src/interface/numTextCtrl.cpp
 	"numTextCtrl.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/interface/shadowsDialog.cpp
+1223747780 source:/home/flavien/recherche/git/flames/src/interface/shadowsDialog.cpp
 	"shadowsDialog.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/camera.cpp
+1223748574 source:/home/flavien/recherche/git/flames/src/scene/camera.cpp
 	"camera.hpp"
 	"scene.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/gammaEngine.cpp
+1223749251 source:/home/flavien/recherche/git/flames/src/scene/gammaEngine.cpp
 	"gammaEngine.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/graphicsFn.cpp
+1223738132 source:/home/flavien/recherche/git/flames/src/scene/graphicsFn.cpp
 	"graphicsFn.hpp"
 	<iostream>
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/material.cpp
+1223738132 source:/home/flavien/recherche/git/flames/src/scene/material.cpp
 	"material.hpp"
 
-1223736241 /home/flavien/recherche/git/flames/src/scene/material.hpp
+1223748438 /home/flavien/recherche/git/flames/src/scene/material.hpp
 	<string>
 	<GL/gl.h>
 	"intensity.hpp"
-	"texture.hpp"
+	<engine/texture.hpp>
 	"scene.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/object.cpp
+1223748575 source:/home/flavien/recherche/git/flames/src/scene/object.cpp
 	"object.hpp"
 	"scene.hpp"
 	"material.hpp"
 
-1223736241 source:/home/flavien/recherche/git/flames/src/scene/scene.cpp
+1223748738 source:/home/flavien/recherche/git/flames/src/scene/scene.cpp
 	"scene.hpp"
 	<fstream>
 	<algorithm>
@@ -2455,57 +2448,58 @@
 	"ilut.h"
 	<iostream>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/shaders/glsl.cpp
+1223738132 source:/home/flavien/recherche/git/flames/src/shaders/glsl.cpp
 	"glsl.hpp"
 	<fstream>
 	<assert.h>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.cpp
+1223747374 source:/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.cpp
 	"GCSSORSolver3D-SSE.hpp"
 	"SSE4.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.cpp
+1223747374 source:/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.cpp
 	"GCSSORSolver3D.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/GSSolver3D.cpp
+1223747374 source:/home/flavien/recherche/git/flames/src/solvers/GSSolver3D.cpp
 	"GSSolver3D.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.cpp
+1223747374 source:/home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.cpp
 	"HybridSolver3D.hpp"
 	<wx/wxprec.h>
 	<wx/wx.h>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/LODField3D.cpp
+1223747374 source:/home/flavien/recherche/git/flames/src/solvers/LODField3D.cpp
 	"LODField3D.hpp"
 	"SSE4.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/benchsolver3D.cpp
+1223747375 source:/home/flavien/recherche/git/flames/src/solvers/benchsolver3D.cpp
 	"benchsolver3D.hpp"
 
-1223736242 /home/flavien/recherche/git/flames/src/solvers/benchsolver3D.hpp
+1223747375 /home/flavien/recherche/git/flames/src/solvers/benchsolver3D.hpp
 	"GSSolver3D.hpp"
 	"GCSSORSolver3D.hpp"
 	<fstream>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/fakeField3D.cpp
+1223748575 source:/home/flavien/recherche/git/flames/src/solvers/fakeField3D.cpp
 	"fakeField3D.hpp"
 	<math.h>
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/field.cpp
+1223747375 source:/home/flavien/recherche/git/flames/src/solvers/field.cpp
 	"field.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/field3D.cpp
+1223749129 source:/home/flavien/recherche/git/flames/src/solvers/field3D.cpp
 	"field3D.hpp"
 	<math.h>
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
+	<engine/common.hpp>
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/fieldThread.cpp
+1223742537 source:/home/flavien/recherche/git/flames/src/solvers/fieldThread.cpp
 	"fieldThread.hpp"
 	"solver3D.hpp"
 	"../flames/abstractFires.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/globalField.cpp
+1223747375 source:/home/flavien/recherche/git/flames/src/solvers/globalField.cpp
 	"globalField.hpp"
 	"HybridSolver3D.hpp"
 	"fakeField3D.hpp"
@@ -2514,7 +2508,7 @@
 	"../interface/interface.hpp"
 	"fieldThread.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/realField3D.cpp
+1223748575 source:/home/flavien/recherche/git/flames/src/solvers/realField3D.cpp
 	"realField3D.hpp"
 	"SSE4.hpp"
 	<math.h>
@@ -2522,11 +2516,11 @@
 1210865369 source:/home/flavien/recherche/git/flames/src/solvers/solver.cpp
 	"solver.hpp"
 
-1223736242 source:/home/flavien/recherche/git/flames/src/solvers/solver3D.cpp
+1223747370 source:/home/flavien/recherche/git/flames/src/solvers/solver3D.cpp
 	"solver3D.hpp"
 	"SSE4.hpp"
 	<math.h>
-	"../scene/graphicsFn.hpp"
+	<engine/graphicsFn.hpp>
 
 1210865369 source:/home/flavien/recherche/git/flames/src/flames/fbo.cpp
 	"fbo.hpp"
@@ -2659,4 +2653,59 @@
 
 1223736242 source:/home/flavien/recherche/git/flames/src/solvers/compResAvgSolver3D.cpp
 	"compResAvgSolver3D.hpp"
+
+1223738132 /home/flavien/recherche/git/flames/engine/texture.hpp
+	<GL/gl.h>
+	<string>
+
+1223738792 /home/flavien/recherche/git/flames/engine/renderTarget.hpp
+	"common.hpp"
+	"texture.hpp"
+	<string>
+	<vector>
+
+1223738772 /home/flavien/recherche/git/flames/engine/common.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"assert.h"
+
+1223738132 /home/flavien/recherche/git/flames/engine/graphicsFn.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"../vector.hpp"
+
+1223738133 /home/flavien/recherche/git/flames/engine/vector.hpp
+	<GL/gl.h>
+	<math.h>
+	<iostream>
+
+1223738133 /home/flavien/recherche/git/flames/engine/pointVector.hpp
+	<GL/gl.h>
+	<math.h>
+	<iostream>
+
+1223759792 /home/flavien/recherche/git/flames//engine/pointVector.hpp
+	<GL/gl.h>
+	<math.h>
+	<iostream>
+
+1223760042 /home/flavien/recherche/git/flames//engine/graphicsFn.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"pointVector.hpp"
+
+1223759792 /home/flavien/recherche/git/flames//engine/texture.hpp
+	<GL/gl.h>
+	<string>
+
+1223759792 /home/flavien/recherche/git/flames//engine/renderTarget.hpp
+	"common.hpp"
+	"texture.hpp"
+	<string>
+	<vector>
+
+1223760020 /home/flavien/recherche/git/flames//engine/common.hpp
+	<GL/gl.h>
+	<GL/glu.h>
+	"assert.h"
 

@@ -1,6 +1,6 @@
 #include "DPengine.hpp"
 #include "../interface/GLFlameCanvas.hpp"
-#include "renderTarget.hpp"
+#include <engine/renderTarget.hpp>
 
 DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers)
 {
@@ -45,14 +45,14 @@ void DepthPeelingEngine::deleteTex()
 {
   delete m_renderTarget[0];
   delete m_renderTarget[1];
-  delete m_sceneDepthRenderTarget;
+  delete m_sceneDepthCRenderTarget;
   delete m_alwaysTrueDepthTex;
 }
 
 void DepthPeelingEngine::generateTex()
 {
-  m_renderTarget[0] = new RenderTarget(m_width, m_height);
-  m_renderTarget[1] = new RenderTarget(m_width, m_height);
+  m_renderTarget[0] = new CRenderTarget(m_width, m_height);
+  m_renderTarget[1] = new CRenderTarget(m_width, m_height);
 
   for(uint i=0; i < m_nbLayers/2; i++)
   {
@@ -65,9 +65,9 @@ void DepthPeelingEngine::generateTex()
   m_renderTarget[0]->addTarget("depth rect shadow nearest greater",1);
   m_renderTarget[1]->addTarget("depth rect shadow nearest greater",1);
 
-  m_sceneDepthRenderTarget = new RenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
+  m_sceneDepthCRenderTarget = new CRenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
 
-  m_alwaysTrueDepthTex = new DepthTexture(GL_TEXTURE_RECTANGLE_ARB, m_width,m_height, GL_NEAREST, GLenum(GL_ALWAYS));
+  m_alwaysTrueDepthTex = new CDepthTexture(GL_TEXTURE_RECTANGLE_ARB, m_width,m_height, GL_NEAREST, GLenum(GL_ALWAYS));
 }
 
 void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene)
@@ -77,7 +77,7 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
   /* On stocke la profondeur de la scène dans une texture qui servira */
   /* comme deuxième test de profondeur pour le depth peeling */
   /* Il y a donc en tout trois tests de profondeur */
-  m_sceneDepthRenderTarget->bindTarget();
+  m_sceneDepthCRenderTarget->bindTarget();
 
   glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -94,7 +94,7 @@ void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* c
 
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
-    m_sceneDepthRenderTarget->bindTexture();
+    m_sceneDepthCRenderTarget->bindTexture();
     m_peelProgram.enableShader();
 
     /* Pour le premier layer, on construit la display list */

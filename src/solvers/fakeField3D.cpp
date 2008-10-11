@@ -1,9 +1,9 @@
 #include "fakeField3D.hpp"
 
 #include <math.h>
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
 
-FakeField3D::FakeField3D (const Point& position, float dim, const Point& scale, float timeStep, float buoyancy) : 
+FakeField3D::FakeField3D (const CPoint& position, float dim, const CPoint& scale, float timeStep, float buoyancy) :
   Field3D(position, 1, 1, 1, dim, scale, timeStep, buoyancy)
 {
   m_forceCoef = 3.0f;
@@ -21,7 +21,7 @@ void FakeField3D::iterate ()
   float coef=0.2f;
   if(!m_run)
     return;
-  
+
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z){
     if(m_permanentExternalForces.x > 0.0f)
       if(m_latentForces.x < m_permanentExternalForces.x)
@@ -32,13 +32,13 @@ void FakeField3D::iterate ()
       if(m_latentForces.y < m_permanentExternalForces.y)
 	m_latentForces.y = m_latentForces.y + m_permanentExternalForces.y * coef;
       else
-	m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;	
+	m_latentForces.y = m_latentForces.y - m_permanentExternalForces.y * coef;
     if(m_permanentExternalForces.z > 0.0f)
       if(m_latentForces.z < m_permanentExternalForces.z)
 	m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
       else
 	m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
-    
+
     if(m_permanentExternalForces.x < 0.0f)
       if(m_latentForces.x > m_permanentExternalForces.x)
 	m_latentForces.x = m_latentForces.x + m_permanentExternalForces.x * coef;
@@ -54,7 +54,7 @@ void FakeField3D::iterate ()
 	 m_latentForces.z = m_latentForces.z + m_permanentExternalForces.z * coef;
        else
 	 m_latentForces.z = m_latentForces.z - m_permanentExternalForces.z * coef;
-    
+
     addExternalForces(m_latentForces,false);
   }else{
     if(m_latentForces.x > 0.0f) m_latentForces.x = m_latentForces.x - coef;
@@ -63,16 +63,16 @@ void FakeField3D::iterate ()
     if(m_latentForces.x < 0.0f) m_latentForces.x = m_latentForces.x + coef;
     if(m_latentForces.y < 0.0f) m_latentForces.y = m_latentForces.y + coef;
     if(m_latentForces.z < 0.0f) m_latentForces.z = m_latentForces.z + coef;
-    
+
     if(m_latentForces.x || m_latentForces.y || m_latentForces.z) addExternalForces(m_latentForces,false);
   }
-  
+
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
       addExternalForces(m_temporaryExternalForces,false);
       m_temporaryExternalForces.resetToNull();
     }
-  
+
   if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
     {
       addExternalForces(m_movingForces,true);
@@ -88,11 +88,11 @@ void FakeField3D::cleanSources ()
   m_src.z = 0.0f;
 }
 
-void FakeField3D::addExternalForces(const Point& position, bool move)
+void FakeField3D::addExternalForces(const CPoint& position, bool move)
 {
-  Point strength;
-  Point force;
-  
+  CPoint strength;
+  CPoint force;
+
   if(move){
     force = position;
     strength.x = force.x > 0.0f ? .2f : -.2f;
@@ -103,7 +103,7 @@ void FakeField3D::addExternalForces(const Point& position, bool move)
     force = position;
     strength = position * .025f;
   }
-  
+
   /* Ajouter des forces externes */
   if(force.x)
     m_src.x -= strength.x;
@@ -148,21 +148,21 @@ void FakeField3D::displayVelocityField (void)
   float inc_x = m_dim.x / (float) m_nbVoxelsX;
   float inc_y = m_dim.y / (float) m_nbVoxelsY;
   float inc_z = m_dim.z / (float) m_nbVoxelsZ;
-  
+
   for (uint i = 0; i <= m_nbVoxelsX; i++)
     for (uint j = 0; j <= m_nbVoxelsY; j++)
       for (uint k = 0; k <= m_nbVoxelsZ; k++)
 	{
-	  Vector vect;
-	  Point pt(inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
-	  
+	  CVector vect;
+	  CPoint pt(inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
+
 	  vect = getUVW (pt,0);
 	  if( vect.x < -EPSILON || vect.x > EPSILON  ||
 	      vect.y < -EPSILON || vect.y > EPSILON  ||
 	      vect.z < -EPSILON || vect.z > EPSILON  )
 	    {
 	      /* Affichage du champ de vélocité */
-	      glPushMatrix ();	  
+	      glPushMatrix ();
 	      glTranslatef (pt.x, pt.y, pt.z);
 	      //SDL_mutexP (lock);
 	      //SDL_mutexV (lock);
@@ -172,8 +172,8 @@ void FakeField3D::displayVelocityField (void)
 	}
 }
 
-void FakeField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
-				  const Point& TRStrength, const Point& BRStrength)
+void FakeField3D::addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+				  const CPoint& TRStrength, const CPoint& BRStrength)
 {
   switch(face){
   case LEFT_FACE : m_temporaryExternalForces.x -= 5*(BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)/4.0f; break;

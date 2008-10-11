@@ -1,7 +1,7 @@
 #include "interface/flamesFrame.hpp"
 
 #include <wx/tooltip.h>
-#include <ilut.h>
+#include <engine/init.hpp>
 
 /** \mainpage Index page
  *
@@ -57,69 +57,70 @@ wxApp *thisApp;
 
 class FlamesApp : public wxApp
 {
-  /** Méthode d'initialisation de l'application
-   */
-  virtual bool OnInit();
+	/** Méthode d'initialisation de l'application
+	 */
+	virtual bool OnInit();
 
-  /** Détermine si les shaders Cg sont déjà compilés
-   * @return false si les shaders sont compilés
-   */
-  bool areShadersCompiled();
+	/** Détermine si les shaders Cg sont déjà compilés
+	 * @return false si les shaders sont compilés
+	 */
+	bool areShadersCompiled();
 };
 
 IMPLEMENT_APP(FlamesApp)
 
 bool FlamesApp::areShadersCompiled()
 {
-  if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowX.o"))))
-    if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowY.o"))))
-      if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("fragGlow.o"))))
-	if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("SVExtrude.o"))))
-	  if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vpSPTEX.o"))))
-	    if(wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("gamma.o"))))
-	      return false;
-  cerr << "Cg shaders are not compiled yet, that will be done during this run." << endl;
-  return true;
+	if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowX.o"))))
+		if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowY.o"))))
+			if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("fragGlow.o"))))
+				if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("SVExtrude.o"))))
+					if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vpSPTEX.o"))))
+						if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("gamma.o"))))
+							return false;
+	cerr << "Cg shaders are not compiled yet, that will be done during this run." << endl;
+	return true;
 }
 
 bool FlamesApp::OnInit()
 {
-  //  bool recompileShaders;
-  wxString configFileName;
+	//  bool recompileShaders;
+	wxString configFileName;
 
-  setlocale(LC_NUMERIC, "C");
-  /* Déclaration des handlers pour la gestion des formats d'image */
-  wxImage::AddHandler(new wxPNGHandler);
-  wxImage::AddHandler(new wxJPEGHandler);
+	setlocale(LC_NUMERIC, "C");
+	/* Déclaration des handlers pour la gestion des formats d'image */
+	wxImage::AddHandler(new wxPNGHandler);
+	wxImage::AddHandler(new wxJPEGHandler);
 
-  wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
+	wxIdleEvent::SetMode(wxIDLE_PROCESS_SPECIFIED);
 
-  if(argc == 2){
-    configFileName = wxString(argv[1]);
-  }else
-    configFileName = _("params/param.ini");
+	if (argc == 2)
+		configFileName = wxString(argv[1]);
+	else
+		configFileName = _("params/param.ini");
 
-  if( !wxFile::Exists(configFileName) ){
-    cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;
-    return false;
-  }
+	if ( !wxFile::Exists(configFileName) )
+	{
+		cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;
+		return false;
+	}
 
-  ilInit();
-  iluInit();
-  ilutInit();
-  ilutRenderer(ILUT_OPENGL);
-  // Plus utilisé, était nécessaire avec Cg, ne l'est plus avec GLSL
-  //  recompileShaders = areShadersCompiled();
+	initEngine();
+	// Plus utilisé, était nécessaire avec Cg, ne l'est plus avec GLSL
+	//  recompileShaders = areShadersCompiled();
 
-  /* Teste s'il est nécessaire de recompiler les shaders */
-  FlamesFrame *frame = new FlamesFrame( _("Real-time Animation of small Flames - ")+configFileName, wxDefaultPosition, wxDefaultSize, configFileName );
+	/* Teste s'il est nécessaire de recompiler les shaders */
+	FlamesFrame *frame = new FlamesFrame( 	_("Real-time Animation of small Flames - ")+configFileName,
+																						wxDefaultPosition,
+																						wxDefaultSize,
+																						configFileName );
 
-  wxToolTip::Enable(true);
+	wxToolTip::Enable(true);
 
-  frame->Show(TRUE);
+	frame->Show(TRUE);
 
-  SetTopWindow(frame);
-  frame->InitGLBuffer();
+	SetTopWindow(frame);
+	frame->InitGLBuffer();
 
-  return true;
+	return true;
 }

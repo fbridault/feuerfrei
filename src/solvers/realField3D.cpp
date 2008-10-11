@@ -6,8 +6,8 @@ RealField3D::RealField3D ()
 {
 }
 
-RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-			  float timeStep, float buoyancy) : 
+RealField3D::RealField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+			  float timeStep, float buoyancy) :
   Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_u        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
@@ -23,14 +23,14 @@ RealField3D::RealField3D (const Point& position, uint n_x, uint n_y, uint n_z, f
 //   m_uSrc = new float[m_nbVoxels];
 //   m_vSrc = new float[m_nbVoxels];
 //   m_wSrc = new float[m_nbVoxels];
-  
+
   fill_n(m_u, m_nbVoxels, 0.0f);
   fill_n(m_v, m_nbVoxels, 0.0f);
   fill_n(m_w, m_nbVoxels, 0.0f);
   fill_n(m_uSrc, m_nbVoxels, 0.0f);
   fill_n(m_vSrc, m_nbVoxels, 0.0f);
   fill_n(m_wSrc, m_nbVoxels, 0.0f);
-  
+
   buildDLGrid ();
 }
 
@@ -58,9 +58,9 @@ void RealField3D::vel_step ()
 }
 
 void RealField3D::iterate ()
-{ 
+{
   float tmp;
-  
+
   if(!m_run)
     return;
   fill_n(m_u, m_nbVoxels, 0.0f);
@@ -73,10 +73,10 @@ void RealField3D::iterate ()
       for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
 	m_vSrc[IX(i,j,k)] += tmp;
   }
-  
+
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
-  
+
   if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
     {
       addExternalForces(m_movingForces,true);
@@ -87,9 +87,9 @@ void RealField3D::iterate ()
       addExternalForces(m_temporaryExternalForces,true);
       m_temporaryExternalForces.resetToNull();
     }
-  
+
   vel_step ();
-  
+
   m_nbIter++;
 }
 
@@ -100,11 +100,11 @@ void RealField3D::cleanSources ()
   fill_n(m_wSrc, m_nbVoxels, 0.0f);
 }
 
-void RealField3D::addExternalForces(const Point& position, bool move)
+void RealField3D::addExternalForces(const CPoint& position, bool move)
 {
-  Point strength;
-  Point force;
-  
+  CPoint strength;
+  CPoint force;
+
   if(move){
     force = position;
     strength.x = strength.y = strength.z = 1;
@@ -113,7 +113,7 @@ void RealField3D::addExternalForces(const Point& position, bool move)
     force = position;
     strength = position * .1f;
   }
-    
+
   /* Ajouter des forces externes */
   if(force.x)
     for (uint i = 1; i < m_nbVoxelsX + 1; i++)
@@ -132,8 +132,8 @@ void RealField3D::addExternalForces(const Point& position, bool move)
 	  m_wSrc[IX(i, j, k)] += strength.z*j/(float)m_nbVoxelsY;
 }
 
-void RealField3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
-				  const Point& TRStrength, const Point& BRStrength)
+void RealField3D::addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+				  const CPoint& TRStrength, const CPoint& BRStrength)
 {
   switch(face){
   case LEFT_FACE : ;
@@ -148,7 +148,7 @@ void RealField3D::displayVelocityField (void)
   float inc_x = m_dim.x / (float) m_nbVoxelsX;
   float inc_y = m_dim.y / (float) m_nbVoxelsY;
   float inc_z = m_dim.z / (float) m_nbVoxelsZ;
-  
+
   for (uint i = 0; i <= m_nbVoxelsX; i++)
     for (uint j = 0; j <= m_nbVoxelsY; j++)
       for (uint k = 0; k <= m_nbVoxelsZ; k++)
@@ -161,7 +161,7 @@ void RealField3D::displayVelocityField (void)
 	    {
 	      glPushMatrix ();
 	      glTranslatef (inc_x * i - inc_x/2.0f , inc_y * j - inc_y/2.0f, inc_z * k - inc_z/2.0f);
-	      displayArrow (Vector (m_u[index], m_v[index], m_w[index]));
+	      displayArrow (CVector (m_u[index], m_v[index], m_w[index]));
 	      glPopMatrix ();
 	    }
 	}

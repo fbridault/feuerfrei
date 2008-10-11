@@ -30,10 +30,10 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, 
+  LogResAvgSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj,
 		     float epsilon, uint nbTimeSteps);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
    * @param omegaDiff Paramètre omega pour la diffusion.
@@ -46,22 +46,22 @@ public:
 
 protected:
   virtual void vel_step ();
-  
+
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
-  
+
   virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
-  
+
   /** Calcul des moyennes pour une itération de la méthode de résolution de système linéaire.
    * @param iter Numéro de l'itération de lé méthode de résolution.
    * @param value Valeur à ajouter à la moyenne.
    */
   virtual void computeAverage ( uint iter, float value );
-  
+
   /** Nombre de valeurs incluses dans la moyenne. */
   uint m_nbAverages;
-  
+
   /** Tableau contenant les moyennes. Il est organisé comme ceci :<br>
    *    - de O à m_nbSteps : diffusion en u avec GS
    *    - de m_nbSteps à 2*m_nbSteps : diffusion en v avec GS
@@ -75,9 +75,9 @@ protected:
    *    - de 9*m_nbSteps à 10*m_nbSteps : projection 2 avec GCSSOR
    */
   float *m_averages;
-  
+
   /** Fichier de log. */
-  ofstream m_file;  
+  ofstream m_file;
 };
 
 #endif

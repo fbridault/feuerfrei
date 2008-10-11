@@ -8,7 +8,6 @@ class Scene;
 #include "object.hpp"
 #include "../flames/abstractFires.hpp"
 #include "../flames/luminary.hpp"
-#include "source.hpp"
 #include "camera.hpp"
 #include <vector>
 #include <list>
@@ -89,7 +88,7 @@ public:
   void sortTransparentObjects();
 
   /** Ajoute un objet dans la scène.
-   * @param newObj Pointeur vers l'objet &agrave; ajouter.
+   * @param newObj CPointeur vers l'objet &agrave; ajouter.
    * @param objectWSV True si l'objet projette des ombres, false sinon.
    */
   void addObject(Object* const newObj, bool objectWSV = false)
@@ -101,16 +100,16 @@ public:
   };
 
   /** Ajoute un matériau dans la scène.
-   * @param material Pointeur sur le nouveau matériau à référencer.
+   * @param material CPointeur sur le nouveau matériau à référencer.
    */
   void addMaterial(Material *material)
   { m_materialArray.push_back(material); };
 
   /** Ajoute une texture dans la scène.
-   * @param texture Pointeur sur la nouvelle texture à référencer.
+   * @param texture CPointeur sur la nouvelle texture à référencer.
    * @return Indice OpenGL de la texture.
    */
-  GLuint addTexture(BitmapTexture *texture)
+  GLuint addTexture(CBitmapTexture *texture)
   { m_texturesArray.push_back(texture); return m_texturesArray.size()-1; };
 
   /** Donne l'indice d'un matériau dans la liste des matériaux de la scène.
@@ -128,8 +127,8 @@ public:
   /** Ajoute une source lumineuse à la scène.
    * @param newSource pointeur vers la source lumineuse à ajouter.
    */
-  void addSource(Source* const newSource)
-  { m_lightSourcesArray.push_back(newSource); };
+//  void addSource(Source* const newSource)
+//  { m_lightSourcesArray.push_back(newSource); };
 
   /** Lecture du nombre de points contenus dans la scène.
    * @return Nombre de points.
@@ -150,8 +149,8 @@ public:
   /** Lecture du nombre de sources lumineuses contenus dans la scène.
    * @return Nombre de sources lumineuses.
    */
-  int getSourcesCount() const
-  { return m_lightSourcesArray.size(); };
+//  int getSourcesCount() const
+//  { return m_lightSourcesArray.size(); };
 
   /** Lecture d'un polygone spécifique contenu dans la scène.
    * @param index Indice du polygone à obtenir.
@@ -164,8 +163,8 @@ public:
    * @param index Indice de la source à obtenir.
    * @return Un pointeur vers la source recherchée.
    */
-  Source* getSource(const int index) const
-  { return (m_lightSourcesArray[index]); };
+//  Source* getSource(const int index) const
+//  { return (m_lightSourcesArray[index]); };
 
   /** Lecture d'un matériau spécifique contenue dans la scène.
    * @param index Indice du matériau à obtenir.
@@ -178,7 +177,7 @@ public:
    * @param index Indice de la texture à obtenir.
    * @return Un pointeur vers la texture recherchée.
    */
-  Texture* getTexture(const int index) const
+  ITexture* getTexture(const int index) const
   { return (m_texturesArray[index]); };
 
   /** Change l'affichage des sphères englobantes. */
@@ -213,8 +212,8 @@ public:
     if(program)
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
-	Point pos=(*luminariesIterator)->getPosition();
-	Point sc=(*luminariesIterator)->getScale();
+	CPoint pos=(*luminariesIterator)->getPosition();
+	CPoint sc=(*luminariesIterator)->getScale();
 	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
 	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
@@ -239,8 +238,8 @@ public:
     if(program)
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
-	Point pos=(*luminariesIterator)->getPosition();
-	Point sc=(*luminariesIterator)->getScale();
+	CPoint pos=(*luminariesIterator)->getPosition();
+	CPoint sc=(*luminariesIterator)->getScale();
 	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
 	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
@@ -279,13 +278,13 @@ public:
       (*luminariesIterator)->draw();
   };
 
-  void computeBoundingBox(Point& max, Point& min);
+  void computeBoundingBox(CPoint& max, CPoint& min);
 private:
   vector<Object*> m_objectsArray; /** Liste des objets de la scene ne projetant pas d'ombres. */
   vector<Object*> m_objectsArrayWSV; /** Liste des objets de la scene projetant des ombres. */
-  vector<Source*> m_lightSourcesArray; /** Liste des sources de lumière. */
+//  vector<Source*> m_lightSourcesArray; /** Liste des sources de lumière. */
   vector<Material*> m_materialArray; /** Liste des matériaux.*/
-  vector<BitmapTexture*> m_texturesArray; /** Liste des textures.*/
+  vector<CBitmapTexture*> m_texturesArray; /** Liste des textures.*/
 
   /** Tableaux de flammes. Il s'agit d'un pointeur sur le tableau de flamme créé dans la classe GlFlameCanvas.
    * Celles-ci sont nécessaires pour recalculer la visibilité des flammes dans computeVisibility().

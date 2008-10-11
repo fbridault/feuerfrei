@@ -30,7 +30,7 @@ BEGIN_EVENT_TABLE(GLFluidsCanvas, wxGLCanvas)
 END_EVENT_TABLE();
 
 
-GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList, 
+GLFluidsCanvas::GLFluidsCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList,
 			     long style, const wxString& name, const wxPalette& palette)
   : wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
 {
@@ -63,22 +63,22 @@ void GLFluidsCanvas::InitUISettings(void)
 void GLFluidsCanvas::InitGL()
 {
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
-  
+
   glClearColor (0.0, 0.0, 0.0, 0.0);
   /* Restriction de la zone d'affichage */
   glViewport (0, 0, m_width, m_height);
-  
+
   glEnable (GL_DEPTH_TEST);
   glEnable (GL_BLEND);
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
+
   glShadeModel (GL_SMOOTH);
   glEnable (GL_LINE_SMOOTH);
   /*glEnable(GL_POLYGON_SMOOTH); */
-  
+
   glEnable (GL_CULL_FACE);
   glCullFace (GL_BACK);
-  
+
   glEnable (GL_AUTO_NORMAL);
   glEnable (GL_NORMALIZE);
 
@@ -113,7 +113,7 @@ void GLFluidsCanvas::InitSolvers(void)
       break;
     case HYBRID_SOLVER :
       m_solvers[i] = new HybridSolver3D(ARGS_GC);
-      break; 
+      break;
     case LOD_HYBRID_SOLVER :
       m_solvers[i] = new LODSolver3D(ARGS_GC);
       break;
@@ -134,7 +134,7 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new GSSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement);
       break;
     case CGSSOR_SOLVER2D :
-      m_solvers[i] = new CGSSORSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement, 
+      m_solvers[i] = new CGSSORSolver2D(ARGS2D, m_currentConfig->solvers[i].vorticityConfinement,
 				    m_currentConfig->solvers[i].omegaDiff, m_currentConfig->solvers[i].omegaProj,
 				    m_currentConfig->solvers[i].epsilon);
       break;
@@ -142,8 +142,8 @@ void GLFluidsCanvas::InitSolvers(void)
       m_solvers[i] = new RealField3D(ARGS);
       break;
     case FAKE_FIELD :
-      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].dim, 
-				     m_currentConfig->solvers[i].scale, m_currentConfig->solvers[i].timeStep, 
+      m_solvers[i] = new FakeField3D(m_currentConfig->solvers[i].position, m_currentConfig->solvers[i].dim,
+				     m_currentConfig->solvers[i].scale, m_currentConfig->solvers[i].timeStep,
 				     m_currentConfig->solvers[i].buoyancy);
       break;
     case LOD_FIELD :
@@ -161,21 +161,21 @@ void GLFluidsCanvas::InitSolvers(void)
 }
 
 void GLFluidsCanvas::Init (FluidsAppConfig *config)
-{  
+{
   m_currentConfig = config;
 
   InitUISettings();
   SetCurrent();
   InitGL();
-  
+
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
-  InitSolvers();  
-  
+  InitSolvers();
+
   m_swatch = new wxStopWatch();
-  
+
   m_init = true;
   m_run = true;
-  
+
   cerr << "Initialisation terminée" << endl;
 }
 
@@ -189,7 +189,7 @@ void GLFluidsCanvas::Restart (void)
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   glViewport (0, 0, m_width, m_height);
   m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
-  
+
   InitUISettings();
   InitSolvers();
   m_swatch->Start();
@@ -200,7 +200,7 @@ void GLFluidsCanvas::Restart (void)
 }
 
 void GLFluidsCanvas::DestroyScene(void)
-{ 
+{
   delete m_camera;
    for (uint s = 0; s < prevNbSolvers; s++)
     delete m_solvers[s];
@@ -214,7 +214,7 @@ void GLFluidsCanvas::OnIdle(wxIdleEvent& event)
       m_solvers[i]->iterate ();
       m_solvers[i]->cleanSources();
     }
-  
+
   this->Refresh();
   /*  draw();*/
   //event.RequestMore();
@@ -252,7 +252,7 @@ void GLFluidsCanvas::OnKeyPressed(wxKeyEvent& event)
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
 	m_solvers[i]->decreaseRes ();
       break;
-    case 'L': 
+    case 'L':
       m_framesCountForSwitch = 1;
       m_switch = true;
       for(uint i=0 ; i < m_currentConfig->nbSolvers; i++)
@@ -267,31 +267,31 @@ void GLFluidsCanvas::OnKeyPressed(wxKeyEvent& event)
 void GLFluidsCanvas::OnPaint (wxPaintEvent& event)
 {
   uint s;
-  
+
   if(!m_init)
     return;
-  
+
   if(m_benchTime)
     return;
   wxPaintDC dc(this);
-  
+
   if(!GetContext())
     return;
-  
+
   SetCurrent();
-  
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  
+
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  
+
   /* Déplacement du camera */
   m_camera->setView();
   glDisable(GL_LIGHTING);
   /************ Affichage des outils d'aide à la visu (grille, etc...) *********/
   for (s = 0; s < m_currentConfig->nbSolvers; s++)
     {
-      Point position(m_solvers[s]->getPosition ());
-	
+      CPoint position(m_solvers[s]->getPosition ());
+
       glPushMatrix ();
       glTranslatef (position.x, position.y, position.z);
       if (m_displayBase)
@@ -301,31 +301,31 @@ void GLFluidsCanvas::OnPaint (wxPaintEvent& event)
       if (m_displayDensity)
 	m_solvers[s]->displayDensityField();
       if (m_displayVelocity)
-	m_solvers[s]->displayVelocityField();	
+	m_solvers[s]->displayVelocityField();
       glPopMatrix ();
     }
 
   SwapBuffers ();
-  
+
   //event.Skip();
-  
+
   /******************** CALCUL DU FRAMERATE *************************************/
   m_framesCount++;
   m_globalFramesCount++;
-  
+
   m_t = m_swatch->Time();
   if (m_t >= 2000){
     ((FluidsFrame *)GetParent())->SetFPS( m_framesCount / (m_t/1000) );
     m_swatch->Start();
     m_framesCount = 0;
   }
-  
+
   if(m_saveImages){
     wxString filename;
     wxString zeros;
-    
+
     glReadPixels (0, 0, m_width, m_height, GL_RGB, GL_UNSIGNED_BYTE, m_pixels);
-    
+
     filename << _("captures/capture") << m_globalFramesCount << _(".png");
     /* Création d'une image, le dernier paramètre précise que wxImage ne doit pas détruire */
     /* le tableau de données dans son destructeur */
@@ -340,7 +340,7 @@ void GLFluidsCanvas::OnSize(wxSizeEvent& event)
 {
     // this is also necessary to update the context on some platforms
     wxGLCanvas::OnSize(event);
-    
+
     // set GL viewport (not called by wxGLCanvas::OnSize on all platforms...)
     int w, h;
     GetClientSize(&w, &h);

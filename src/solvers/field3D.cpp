@@ -1,13 +1,14 @@
 #include "field3D.hpp"
 
 #include <math.h>
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
+#include <engine/common.hpp>
 
 Field3D::Field3D ()
 {
 }
 
-Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, float buoyancy) : 
+Field3D::Field3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep, float buoyancy) :
   Field(position, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
@@ -36,22 +37,22 @@ Field3D::Field3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim
       m_dim.y = m_dim.z * m_nbVoxelsY / m_nbVoxelsZ;
     }
   }
-  
+
   m_nbVoxels = (m_nbVoxelsX + 2) * (m_nbVoxelsY + 2) * (m_nbVoxelsZ + 2);
-  
+
   m_nbVoxelsXDivDimX = m_nbVoxelsX / m_dim.x;
   m_nbVoxelsYDivDimY = m_nbVoxelsY / m_dim.y;
   m_nbVoxelsZDivDimZ = m_nbVoxelsZ / m_dim.z;
-  
+
   /* Construction des display lists */
   buildDLBase ();
-  
+
   m_nbMaxDiv = 1;
   m_scale = scale;
 }
 
 Field3D::~Field3D ()
-{  
+{
 #ifdef RTFLAMES_BUILD
   m_fireSources.clear();
 #endif
@@ -63,13 +64,13 @@ void Field3D::buildDLGrid ()
   float intery = m_dim.y / (float) m_nbVoxelsY;
   float interz = m_dim.z / (float) m_nbVoxelsZ;
   float i, j;
-  
+
   m_gridDisplayList=glGenLists(1);
   glNewList (m_gridDisplayList, GL_COMPILE);
   glBegin (GL_LINES);
-  
+
   glColor4f (0.5f, 0.5f, 0.5f, 0.5f);
-  
+
   for (j = 0.0f; j <= m_dim.z; j += interz)
     {
       for (i = 0.0f; i <= m_dim.x + interx / 2; i += interx)
@@ -92,11 +93,11 @@ void Field3D::buildDLBase ()
   float interx = m_dim.x / (float) m_nbVoxelsX;
   float interz = m_dim.z / (float) m_nbVoxelsZ;
   float i;
-  
+
   m_baseDisplayList=glGenLists(1);
   glNewList (m_baseDisplayList, GL_COMPILE);
   glBegin (GL_LINES);
-  
+
   glLineWidth (1.0);
   glColor4f (0.5, 0.5, 0.5, 0.5);
   for (i = 0.0; i <= m_dim.x + interx / 2; i += interx)
@@ -113,31 +114,31 @@ void Field3D::buildDLBase ()
   glEndList ();
 }
 
-void Field3D::displayArrow (const Vector& direction)
+void Field3D::displayArrow (const CVector& direction)
 {
   float norme_vel = direction.x * direction.x + direction.y * direction.y + direction.z * direction.z;
   float taille = norme_vel * m_forceRatio;
   float angle;
-  Vector axeRot, axeCone (0.0, 0.0, 1.0), dir(direction);
-  
+  CVector axeRot, axeCone (0.0, 0.0, 1.0), dir(direction);
+
   dir.normalize ();
-  
+
   /* On obtient un vecteur perpendiculaire au plan défini par l'axe du cône et la direction souhaitée */
   axeRot = axeCone ^ dir;
-  
+
   /* On récupère l'angle de rotation entre les deux vecteurs */
   angle = acos (axeCone * dir);
-  
+
   glRotatef (angle * RAD_TO_DEG, axeRot.x, axeRot.y, axeRot.z);
   /***********************************************************************************/
-  
+
   /* Dégradé de couleur bleu vers rouge */
   /* Problème : on ne connaît pas l'échelle des valeurs */
   /* On va donc tenter de prendre une valeur max suffisamment grande */
   /* pour pouvoir discerner au mieux les variations de la vélocité */
-  
+
   //  printf("%f\n",norme_vel);
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
-  
-  GraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
+
+  CGraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
 }

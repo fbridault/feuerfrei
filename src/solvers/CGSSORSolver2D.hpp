@@ -7,7 +7,7 @@ class CGSSORsolver2D;
 
 /** La classe CGSSORolver propose d'utiliser la méthode du CGSSOR comme
  * méthode de resolution des systèmes linéaires.
- * 
+ *
  * @author	Flavien Bridault et Michel Leblond
  */
 class CGSSORSolver2D : public virtual Solver2D
@@ -21,11 +21,11 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  CGSSORSolver2D (const Point& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy, 
+  CGSSORSolver2D (const CPoint& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy,
 		  float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   /** Desctructeur. */
   virtual ~CGSSORSolver2D ();
-  
+
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
    * et de la projection à l'aide de la méthode itérative de Gauss-Seidel.
@@ -38,13 +38,13 @@ protected:
    * @param nb_steps Nombre d'itérations à effectuer
    */
   void CGSSOR(float *x0, float *b, float a, float diagonal, float omega, int maxiter);
-  
+
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
-  virtual void project (float *const p, float *const div);  
-  
+  virtual void project (float *const p, float *const div);
+
   /** Résidu, pour SSOR, direction de descente et ? */
   float *m_r, *m_z, *m_p, *m_q;
-  
+
   /** Paramètre omega pour la diffusion */
   float m_omegaDiff;
   /** Paramètre omega pour la projection */

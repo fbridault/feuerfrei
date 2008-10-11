@@ -6,21 +6,21 @@
 #endif
 
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
-				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff, 
-				float omegaProj, float epsilon) : 
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement), 
+HybridSolver3D::HybridSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
+				float omegaProj, float epsilon) :
+  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
 }
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) : 
+HybridSolver3D::HybridSolver3D (float omegaDiff, float omegaProj, float epsilon) :
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
 }
 
 HybridSolver3D::~HybridSolver3D ()
-{  
+{
 }
 
 /* Pas de diffusion */

@@ -169,7 +169,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 //      cerr << "Fin 2D" << endl;
 //    }
 
-  m_photometricSolidsTex = new Texture3D((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
+  m_photometricSolidsTex = new CTexture3D((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
 
   uint k=0;
   for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();

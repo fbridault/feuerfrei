@@ -1,25 +1,26 @@
 #include "realFires.hpp"
 
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
+
 #include "../scene/scene.hpp"
 #include "../solvers/fakeField3D.hpp"
 
-Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index, 
+Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index,
 		const GLSLProgram * const program, float rayon, const char *wickFileName, Wick *wick):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
   if(wickFileName)
     {
       list<Wick *> objList;
-      
+
       scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
-      
+
       if(objList.size() > 0){
 	/* Calcul de la position et recentrage de la mèche */
 	(*objList.begin())->buildBoundingBox();
-	m_position = Point(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
+	m_position = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
 	(*objList.begin())->translate(m_position);
-	m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
+	m_flames[0] = new CPointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
       }else
 	cerr << "Fatal error : no wick !!!" << endl;
     }
@@ -27,27 +28,27 @@ Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene,
     if(wick){
       /* Calcul de la position et recentrage de la mèche */
       wick->buildBoundingBox();
-      m_position = Point(0.5f,0.0f,0.5f) - wick->getPosition();
+      m_position = CPoint(0.5f,0.0f,0.5f) - wick->getPosition();
       wick->translate(m_position);
-      m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, wick);
+      m_flames[0] = new CPointFlame(flameConfig, &m_texture, s, rayon, wick);
     }else
       cerr << "Error, you must provide either a wick file or a wick object" << endl;
   m_nbLights = 7;
 }
 
-void Candle::setLightPosition (const Point& pos)
+void Candle::setLightPosition (const CPoint& pos)
 {
   m_lightPosition[0] = pos.x;
   m_lightPosition[1] = pos.y;
   m_lightPosition[2] = pos.z;
   m_centreSP = pos;
-  ((PointFlame *)m_flames[0])->getLightPositions(m_lightPositions, m_nbLights);
+  ((CPointFlame *)m_flames[0])->getLightPositions(m_lightPositions, m_nbLights);
 }
 
 void Candle::switchOffMulti()
 {
   int n,light=0;
-  
+
   for( n = 0 ; n < 8 ; n++){
     switch(n){
     case 0 : light = GL_LIGHT0; break;
@@ -67,7 +68,7 @@ void Candle::switchOnMulti()
 {
   uint n,light=0;
   double coef;
-  
+
   for( n = 0 ; n < m_nbLights ; n++){
     switch(n){
     case 0 : light = GL_LIGHT0; break;
@@ -106,16 +107,16 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene
   FireSource (flameConfig, s, 1, scene, _("textures/firmalampe.png"), index, program)
 {
   list<Wick *> objList;
-  
+
   scene->importOBJ(wickFileName, NULL, &objList, WICK_NAME_PREFIX);
-  
+
   if(objList.size() > 0)
     {
       /* Calcul de la position et recentrage de la mèche */
       (*objList.begin())->buildBoundingBox();
-      m_position = Point(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
+      m_position = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getPosition();
       (*objList.begin())->translate(m_position);
-  
+
       m_flames[0] = new LineFlame( flameConfig, &m_texture, s, (*objList.begin()), 0.03f, 0.01f);
     }
   else
@@ -127,9 +128,9 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const ch
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"), index, program)
 {
   list<Wick *> objList;
-  
+
   scene->importOBJ(torchName, NULL, &objList, WICK_NAME_PREFIX);
-  
+
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
 
@@ -139,25 +140,25 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const ch
     (*objListIterator)->buildBoundingBox();
     m_position += (*objListIterator)->getPosition();
   }
-  m_position = Point(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+  m_position = CPoint(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++)
     (*objListIterator)->translate(m_position);
-  
+
   int i=0;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     m_flames[i] = new LineFlame( flameConfig, &m_texture, s, (*objListIterator), 0.03f, 0.04f, this);
 }
 
-CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index, 
+CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index,
 		   const GLSLProgram * const program):
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"), index, program)
 {
   list<Wick *> objList;
-  
+
   scene->importOBJ(fireName, NULL, &objList, WICK_NAME_PREFIX);
-    
+
   m_nbFlames = objList.size();
   m_flames = new RealFlame* [m_nbFlames];
 
@@ -167,51 +168,51 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, co
     (*objListIterator)->buildBoundingBox();
     m_position += (*objListIterator)->getPosition();
   }
-  m_position = Point(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+  m_position = CPoint(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++)
     (*objListIterator)->translate(m_position);
-      
+
   int i=0;
   for (list <Wick *>::iterator objListIterator = objList.begin ();
        objListIterator != objList.end (); objListIterator++, i++)
     m_flames[i] = new LineFlame(flameConfig, &m_texture, s, (*objListIterator), 0.05f, 0.02f, this);
 }
 
-CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index, 
+CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
 			  const GLSLProgram * const program, float rayon):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, program)
 {
   list<Wick *> objList;
-  
+
   scene->importOBJ(filename, NULL, &objList, WICK_NAME_PREFIX);
-  
+
   if(objList.size() > 0)
-    m_flames[0] = new PointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
-  
+    m_flames[0] = new CPointFlame(flameConfig, &m_texture, s, rayon, (*objList.begin()));
+
   m_nbCloneFlames = 20;
-  m_cloneFlames = new ClonePointFlame* [m_nbCloneFlames];
-  
-  m_cloneFlames[0]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(.5f,0.0f,0.0f));
-  m_cloneFlames[1]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-.5f,0.0f,0.0f));
-  m_cloneFlames[2]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.1f,0.0f,0.5f));
-  m_cloneFlames[3]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.0f,0.0f,-0.5f));
-  m_cloneFlames[4]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(.5f,0.0f,0.5f));
-  m_cloneFlames[5]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-.5f,0.0f,0.4f));
-  m_cloneFlames[6]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.5f,0.0f,-0.5f));
-  m_cloneFlames[7]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-0.3f,0.0f,-0.5f));
-  m_cloneFlames[8]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(1.1f,0.0f,0.0f));
-  m_cloneFlames[9]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-1.0f,0.0f,0.0f));
-  m_cloneFlames[10] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.1f,0.0f,1.1f));
-  m_cloneFlames[11] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-0.14f,0.0f,-1.0f));
-  m_cloneFlames[12]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(1.0f,0.0f,1.0f));
-  m_cloneFlames[13]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-.9f,0.0f,1.3f));
-  m_cloneFlames[14] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(1.0f,0.0f,-1.0f));
-  m_cloneFlames[15] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-1.0f,0.0f,-1.0f));
-  m_cloneFlames[16]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(1.33f,0.0f,0.0f));
-  m_cloneFlames[17]  = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(-1.5f,0.0f,0.0f));
-  m_cloneFlames[18] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.0f,0.0f,1.4f));
-  m_cloneFlames[19] = new ClonePointFlame(flameConfig, (PointFlame *) m_flames[0], Point(0.0f,0.0f,-1.5f));
+  m_cloneFlames = new CloneCPointFlame* [m_nbCloneFlames];
+
+  m_cloneFlames[0]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(.5f,0.0f,0.0f));
+  m_cloneFlames[1]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-.5f,0.0f,0.0f));
+  m_cloneFlames[2]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.1f,0.0f,0.5f));
+  m_cloneFlames[3]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,-0.5f));
+  m_cloneFlames[4]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(.5f,0.0f,0.5f));
+  m_cloneFlames[5]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-.5f,0.0f,0.4f));
+  m_cloneFlames[6]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.5f,0.0f,-0.5f));
+  m_cloneFlames[7]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-0.3f,0.0f,-0.5f));
+  m_cloneFlames[8]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(1.1f,0.0f,0.0f));
+  m_cloneFlames[9]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-1.0f,0.0f,0.0f));
+  m_cloneFlames[10] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.1f,0.0f,1.1f));
+  m_cloneFlames[11] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-0.14f,0.0f,-1.0f));
+  m_cloneFlames[12]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(1.0f,0.0f,1.0f));
+  m_cloneFlames[13]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-.9f,0.0f,1.3f));
+  m_cloneFlames[14] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(1.0f,0.0f,-1.0f));
+  m_cloneFlames[15] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-1.0f,0.0f,-1.0f));
+  m_cloneFlames[16]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(1.33f,0.0f,0.0f));
+  m_cloneFlames[17]  = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(-1.5f,0.0f,0.0f));
+  m_cloneFlames[18] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,1.4f));
+  m_cloneFlames[19] = new CloneCPointFlame(flameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,-1.5f));
 }
 
 CandleStick::~CandleStick()
@@ -223,18 +224,18 @@ CandleStick::~CandleStick()
 
 void CandleStick::build()
 {
-  Point averagePos, tmp;
-  
+  CPoint averagePos, tmp;
+
   for (uint i = 0; i < m_nbFlames; i++){
     averagePos +=  m_flames[i]->getCenter ();
     m_flames[i]->build();
   }
-  
+
   for (uint i = 0; i < m_nbCloneFlames; i++){
     averagePos += m_cloneFlames[i]->getCenter ();
     m_cloneFlames[i]->build();
   }
-  
+
   averagePos = averagePos/(m_nbFlames+m_nbCloneFlames);
   averagePos += getPosition();
   setLightPosition(averagePos);

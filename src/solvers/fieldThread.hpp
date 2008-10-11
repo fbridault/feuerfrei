@@ -23,21 +23,21 @@ class FireSource;
 class FieldThreadsScheduler : public wxThread
 {
 public:
-  FieldThreadsScheduler();		
+  FieldThreadsScheduler();
   virtual ~FieldThreadsScheduler();
-  
+
   void Init(const list <FieldThread *> &threads);
-  /* Point d'entrée du Thread lorsque la méthode Run() est appelée */
+  /* CPoint d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry();
   uint getNbSolved() const { return m_nbSolved; };
-  void resetNbSolved() { 
+  void resetNbSolved() {
     m_remainingThreadsMutex.Lock();
     m_nbSolved=0;
     m_remainingThreadsMutex.Unlock();
   };
-  
+
   void Stop(){ m_run = false; };
-  void forceEnd() { 
+  void forceEnd() {
     m_remainingThreadsMutex.Lock();
     m_remainingThreads=0;
     m_remainingThreadsMutex.Unlock();
@@ -68,19 +68,19 @@ class FieldThread: public wxThread
 public:
   FieldThread(FieldThreadsScheduler* const scheduler);
   virtual ~FieldThread(){};
-  
+
   void Stop(){ m_run = false; };
   void Lock(){ m_mutex.Lock(); };
   void Unlock(){ m_mutex.Unlock(); };
   void AskExecAuthorization(){ m_singleExecMutex.Lock(); };
   void GiveExecAuthorization(){ m_singleExecMutex.Unlock(); };
-  /** Point d'entrée du Thread lorsque la méthode Run() est appelée */
+  /** CPoint d'entrée du Thread lorsque la méthode Run() est appelée */
   virtual ExitCode Entry() = 0;
-  /** Retourne le solveur contenu dans le thread. */ 
+  /** Retourne le solveur contenu dans le thread. */
   virtual Field3D *getSolver() const = 0;
   virtual void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes) = 0;
 protected:
-  /** Pointeur sur l'ordonnanceur. */
+  /** CPointeur sur l'ordonnanceur. */
   FieldThreadsScheduler *m_scheduler;
   bool m_run;
 private:
@@ -97,7 +97,7 @@ class GlobalFieldThread: public FieldThread
 public:
   GlobalFieldThread(GlobalField *globalField, FieldThreadsScheduler* const scheduler);
   virtual ~GlobalFieldThread(){};
-  
+
   virtual ExitCode Entry();
   /** Implémentée mais elle n'est a priori jamais appelée, car cette méthode est seulement appelée *
    * dans le constructeur du solveur global, pour identifier les solveurs locaux. */
@@ -112,7 +112,7 @@ class FieldFiresThread: public FieldThread
 public:
   FieldFiresThread(Field3D *field, FieldThreadsScheduler* const scheduler);
   virtual ~FieldFiresThread(){};
-  
+
   virtual ExitCode Entry();
   Field3D *getSolver() const { return m_field; };
   void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes){

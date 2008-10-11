@@ -7,7 +7,7 @@ class GCSSORSolver3D_SSE;
 
 /** La classe GCSSSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
  * méthode de resolution des systèmes linéaires.
- * 
+ *
  * @author	Flavien Bridault et Michel Leblond
  */
 class GCSSORSolver3D_SSE : public virtual Solver3D
@@ -25,9 +25,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D_SSE (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+  GCSSORSolver3D_SSE (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		      float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
    * @param omegaProj Paramètre omega pour la projection.
@@ -36,7 +36,7 @@ public:
   GCSSORSolver3D_SSE (float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~GCSSORSolver3D_SSE ();
-  
+
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
   * et de la projection à l'aide de la méthode du Gradient Conjugué
@@ -49,14 +49,14 @@ protected:
   * @param maxiter Nombre d'itérations maximal à effectuer
   */
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
-  
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);  
+
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
-  
+
   /** Résidu, pour SSOR, direction de descente et ? */
   float *m_r, *m_z, *m_p, *m_q;
 
-  /** Pointeurs SSE vers m_r, m_z, m_p, m_q */
+  /** CPointeurs SSE vers m_r, m_z, m_p, m_q */
   __m128 *m_r_sse, *m_z_sse,*m_p_sse,*m_q_sse;
 
   /** Paramètre omega pour la diffusion */
@@ -65,7 +65,7 @@ protected:
   float m_omegaProj;
   /** Tolérance d'erreur pour GCSSOR. */
   float m_epsilon;
-	
+
 };
 
 #endif

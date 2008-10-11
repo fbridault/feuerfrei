@@ -2,15 +2,15 @@
 
 #include <stdlib.h>
 #include <math.h>
+#include <engine/graphicsFn.hpp>
 
 #include "periSkeleton.hpp"
-#include "../scene/graphicsFn.hpp"
 #include "../solvers/solver3D.hpp"
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
-LeadSkeleton::LeadSkeleton (Field3D * const s, const Point& position, const Point& rootMoveFactor,
+LeadSkeleton::LeadSkeleton (Field3D * const s, const CPoint& position, const CPoint& rootMoveFactor,
 			    uint pls, float u, float noiseIncrement, float noiseMin, float noiseMax) :
   Skeleton (s, position, rootMoveFactor,pls),
   m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
@@ -29,7 +29,7 @@ void LeadSkeleton::drawParticle (Particle * const particle) const
   glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  GraphicsFn::SolidSphere (0.01f, 10, 10);
+  CGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -38,14 +38,14 @@ void LeadSkeleton::drawRoot () const
   glColor4f (0.0f, 0.4f, 0.0f, 0.8f);
   glPushMatrix ();
   glTranslatef (m_root.x, m_root.y, m_root.z);
-  GraphicsFn::SolidSphere (0.01f, 10, 10);
+  CGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
 void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
-{ 
+{
   m_selfVelocity = 0.0f;
-  
+
   /* Applications des FDF */
   switch(fdf){
   case FDF_LINEAR :
@@ -66,7 +66,7 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
   default:
     cerr << "(EE) FDF type error !!!" << endl;
   }
-  
+
   switch(perturbate){
   case FLICKERING_VERTICAL :
     if (m_perturbateCount >= 2)
@@ -94,24 +94,24 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
   m_solver->addVsrc( m_root, m_lastAppliedForce, m_selfVelocity);
 }
 
-void LeadSkeleton::addParticle(const Point* const pt)
+void LeadSkeleton::addParticle(const CPoint* const pt)
 {
   if(m_headIndex >= NB_PARTICLES_MAX-1){
     puts("(EE) Too many particles in LeadSkeleton::addParticle() !!!");
     return;
   }
   m_headIndex++;
-  
+
   m_queue[m_headIndex] = *pt;
   m_queue[m_headIndex].birth(m_lifeSpan);
 }
 
 FreeLeadSkeleton* LeadSkeleton::split (uint splitHeight)
-{ 
+{
   FreeLeadSkeleton *skel = new FreeLeadSkeleton(this, splitHeight);
-  
+
   m_headIndex = splitHeight;
-  
+
   return( skel );
 }
 
@@ -128,15 +128,15 @@ FreeLeadSkeleton::~FreeLeadSkeleton ()
 {
 }
 
-FreePeriSkeleton* FreeLeadSkeleton::dup(const Point& offset)
+FreePeriSkeleton* FreeLeadSkeleton::dup(const CPoint& offset)
 {
   FreePeriSkeleton *copy = new FreePeriSkeleton(getInternalSize (), m_solver, this);
-  
+
   for (uint i = 0; i < getInternalSize (); i++){
     copy->m_queue[i] = m_queue[i] + offset;
     copy->m_queue[i].m_lifespan += m_queue[i].m_lifespan;
   }
-  
+
   copy->m_headIndex = m_headIndex;
   copy->m_selfVelocity = m_selfVelocity;
   return copy;
@@ -147,6 +147,6 @@ void FreeLeadSkeleton::drawParticle (Particle * const particle) const
   glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  GraphicsFn::SolidSphere (0.01f, 10, 10);
+  CGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }

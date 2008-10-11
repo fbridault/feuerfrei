@@ -494,8 +494,8 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
       /* On module la largeur de la gaussienne */
       //     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
 
-      //     Point position(m[3][0], m[3][1], m[3][2]);
-      //     Vector direction = position;
+      //     CPoint position(m[3][0], m[3][1], m[3][2]);
+      //     CVector direction = position;
       //     dist = direction.length();
 
       /* Définition de la largeur de la gaussienne en fonction de la distance */
@@ -615,7 +615,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 void GLFlameCanvas::drawScene()
 {
-  Point position, scale;
+  CPoint position, scale;
 
   if (m_currentConfig->shadowsEnabled)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

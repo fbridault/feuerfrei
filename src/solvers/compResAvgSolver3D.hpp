@@ -30,10 +30,10 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  CompResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
-		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, 
+  CompResAvgSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+		     float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj,
 		     float epsilon, uint nbTimeSteps);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param nbTimeSteps Nombre de pas de temps de la simulation.
    * @param omegaDiff Paramètre omega pour la diffusion.
@@ -46,7 +46,7 @@ public:
 
 protected:
   virtual void vel_step ();
-  
+
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
 };

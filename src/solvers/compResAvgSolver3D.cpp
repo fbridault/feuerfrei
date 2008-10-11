@@ -1,13 +1,13 @@
 #include "compResAvgSolver3D.hpp"
 
-CompResAvgSolver3D::CompResAvgSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
+CompResAvgSolver3D::CompResAvgSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
 					float timeStep, float buoyancy, float vorticityConfinement,
-					float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps) : 
+					float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps) :
   Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
   LogResAvgSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_file.open ("logs/0.1/residualsAverage.log", ios::out | ios::trunc);
-  
+
   m_omegaDiff = 0.1;
   m_omegaProj = 0.1;
 }
@@ -29,13 +29,13 @@ void CompResAvgSolver3D::vel_step ()
 	m_file.open (file, ios::out | ios::trunc);
 	if (!m_file.is_open ())
 	  cerr << "Can't open file " << file << endl;
-	
+
 	m_nbIter = 0;
 	m_perturbateCount = 0;
       }
     else
       return;
-  
+
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
@@ -62,7 +62,7 @@ void CompResAvgSolver3D::vel_step ()
   if(m_nbIter == m_nbMaxIter){
     for(uint i=0; i <= m_nbSteps; i++){
       m_file << i << " ";
-      
+
       for(uint j=0; j < (NB_PROJ_LOGS+NB_DIFF_LOGS) ; j++)
 	m_file << m_averages[j*(m_nbSteps+1) + i] << " ";
 
@@ -85,7 +85,7 @@ void CompResAvgSolver3D::project (float *const p, float *const div)
 {
   float h_x = 1.0f / m_nbVoxelsX, h_y = 1.0f / m_nbVoxelsY, h_z = 1.0f / m_nbVoxelsZ;
   uint i, j, k;
-  
+
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)
       for (k = 1; k <= m_nbVoxelsZ; k++){
@@ -98,10 +98,10 @@ void CompResAvgSolver3D::project (float *const p, float *const div)
 //   set_bnd (0, div);
   fill_n(p, m_nbVoxels, 0.0f);
 //   set_bnd (0, p);
-  
+
   m_index +=2;
   GCSSOR(p,div,1, 6.0f, m_omegaProj,m_nbSteps);
-  
+
   for (i = 1; i <= m_nbVoxelsX; i++)
     for (j = 1; j <= m_nbVoxelsY; j++)
       for (k = 1; k <= m_nbVoxelsZ; k++){

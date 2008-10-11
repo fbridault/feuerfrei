@@ -12,7 +12,7 @@ extern uint g_objectCount;
 Object::Object(const Scene* const scene)
 {
   assert(scene != NULL);
-  
+
   m_scene = scene;
   m_attributes = 0;
   glGenBuffers(1, &m_bufferID);
@@ -22,7 +22,7 @@ Object::Object(const Scene* const scene)
 Object::~Object ()
 {
   m_vertexArray.clear();
-  
+
   for (list <Mesh* >::iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
@@ -34,9 +34,9 @@ Object::~Object ()
 
 void Object::buildBoundingBox ()
 {
-  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
   /* Création de la bounding box */
-  
+
   for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
        vertexIterator != m_vertexArray.end (); vertexIterator++)
     {
@@ -104,14 +104,14 @@ void Object::buildVBO()
        meshesListIterator++)
     if( (*meshesListIterator)->getAttributes() > m_attributes)
       m_attributes = (*meshesListIterator)->getAttributes();
-  
+
   glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
   glBufferData(GL_ARRAY_BUFFER, m_vertexArray.size()*sizeof(Vertex), &m_vertexArray[0], GL_STATIC_DRAW);
-    
+
   for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
        meshesListIterator != m_meshesList.end ();
        meshesListIterator++)
-    (*meshesListIterator)->buildVBO();	
+    (*meshesListIterator)->buildVBO();
   glBindBuffer(GL_ARRAY_BUFFER, 0 );
 }
 
@@ -119,7 +119,7 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres) const
 {
   /* On initialise le dernier matériau au premier de la liste, le matériau par défaut */
   uint lastMaterialIndex=0;
-  
+
   if(boundingSpheres){
     m_scene->getMaterial(0)->apply();
     for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
@@ -130,13 +130,13 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres) const
     if(drawCode == AMBIENT)
       /* Dessiner avec le matériau par défaut (pour tester les zones d'ombres par exemple) */
       m_scene->getMaterial(0)->apply();
-    
+
     /* Parcours de la liste des meshes */
     for (list <Mesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 	 meshesListIterator != m_meshesList.end ();
 	 meshesListIterator++)
       (*meshesListIterator)->draw(drawCode, tex, lastMaterialIndex);
-    
+
     /* On désactive l'unité de texture le cas échéant */
     if(m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex){
       glDisable(GL_TEXTURE_2D);
@@ -144,7 +144,7 @@ void Object::draw (char drawCode, bool tex, bool boundingSpheres) const
   }
 }
 
-void Object::translate(const Vector& direction)
+void Object::translate(const CVector& direction)
 {
   for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
        vertexIterator != m_vertexArray.end (); vertexIterator++)
@@ -167,7 +167,7 @@ Mesh::Mesh (const Scene* const scene, uint materialIndex, Object* parent)
 {
   assert(scene  != NULL);
   assert(parent != NULL);
-  
+
   m_scene = scene;
   m_attributes = 0;
   m_materialIndex = materialIndex;
@@ -183,9 +183,9 @@ Mesh::~Mesh ()
 }
 
 void Mesh::buildVBO() const
-{  
+{
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexArray.size()*sizeof(GLuint), &m_indexArray[0], GL_STATIC_DRAW); 
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexArray.size()*sizeof(GLuint), &m_indexArray[0], GL_STATIC_DRAW);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
 }
 
@@ -194,10 +194,10 @@ void Mesh::buildBoundingSphere ()
   float dist;
   Vertex v;
   uint n=0;
-  
+
   /* On initialise la table */
   m_parent->initLookupTable();
-  
+
   for (uint i = 0; i < m_indexArray.size(); i++)
     {
       /* Il ne faut prendre un même point qu'une seule fois en compte. */
@@ -205,17 +205,17 @@ void Mesh::buildBoundingSphere ()
 	{
 	  v = m_parent->getVertex(m_indexArray[i]);
 	  m_parent->addRefInLookupTable( m_indexArray[i], i );
-	  m_boundingSphere.centre = (m_boundingSphere.centre*n + Point(v.x, v.y, v.z)) / (float)(n+1);	  
+	  m_boundingSphere.centre = (m_boundingSphere.centre*n + CPoint(v.x, v.y, v.z)) / (float)(n+1);
 	  n++;
 	}
     }
-  
+
   for (vector < GLuint >::iterator indexIterator = m_indexArray.begin ();
        indexIterator != m_indexArray.end ();  indexIterator++)
-    {      
-      Point p;
+    {
+      CPoint p;
       v=m_parent->getVertex(*indexIterator);
-      p=Point(v.x, v.y, v.z);
+      p=CPoint(v.x, v.y, v.z);
       dist=p.squaredDistanceFrom(m_boundingSphere.centre);
       if( dist > m_boundingSphere.radius)
 	m_boundingSphere.radius = dist;
@@ -237,10 +237,10 @@ void Mesh::computeVisibility(const Camera &view)
 }
 
 void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
-{  
+{
   if(!m_visibility)
     return;
-  
+
   if(drawCode == TEXTURED){
     /* Ne dessiner que si il y a une texture */
     if(!m_scene->getMaterial(m_materialIndex)->hasDiffuseTexture())
@@ -251,7 +251,7 @@ void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
       if(m_scene->getMaterial(m_materialIndex)->hasDiffuseTexture())
 	return;
     }
-  
+
   if(drawCode != AMBIENT)
     if( m_materialIndex != lastMaterialIndex){
       if(m_scene->getMaterial(m_materialIndex)->hasDiffuseTexture() && tex){
@@ -270,39 +270,39 @@ void Mesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 	}
       m_scene->getMaterial(m_materialIndex)->apply();
     }
-  
+
   /* Affichage du VBO */
   m_parent->bindVBO();
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
-  
+
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
-  glEnableClientState(GL_VERTEX_ARRAY); 
+  glEnableClientState(GL_VERTEX_ARRAY);
 
   glDrawElements(GL_TRIANGLES, m_indexArray.size(), GL_UNSIGNED_INT, 0);
-  
-  glDisableClientState(GL_VERTEX_ARRAY); 
+
+  glDisableClientState(GL_VERTEX_ARRAY);
   glDisableClientState(GL_NORMAL_ARRAY);
   glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-  
+
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
   glBindBuffer(GL_ARRAY_BUFFER, 0 );
   lastMaterialIndex = m_materialIndex;
 }
 
 const bool Mesh::isTransparent () const
-{ 
+{
   if(m_scene->getMaterial(m_materialIndex)->hasDiffuseTexture())
     if( m_scene->getMaterial(m_materialIndex)->isTransparent())
       return true;
   return false;
 }
 
-void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector < GLuint > &normalsIndexVector, 
-			    const vector < Point >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector)
+void Mesh::setUVsAndNormals(const vector < CVector > &normalsVector, const vector < GLuint > &normalsIndexVector,
+			    const vector < CPoint >  &texCoordsVector, const vector < GLuint > &texCoordsIndexVector)
 {
   Vertex v;
-  Vector normal, texCoord;
+  CVector normal, texCoord;
   uint dup=0,nondup=0;
 
   //   cerr << " Over " << m_indexArray.size() << " vertices, ";
@@ -334,17 +334,17 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 	  /* On affecte les coordonnées de texture et de normale au point courant */
 	  m_parent->setVertex( m_indexArray[i], 0.0f, 0.0f, normal.x, normal.y, normal.z);
 	}
-    else      
+    else
       for (uint i = 0; i < m_indexArray.size(); i++)
 	{
 	  normal = normalsVector[normalsIndexVector[i]];
 	  texCoord = texCoordsVector[texCoordsIndexVector[i]];
-	  
+
 	  if( m_parent->findRefInLookupTable( m_indexArray[i] ) )
 	    /* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
-	    {	
+	    {
 	      v = m_parent->getVertex(m_indexArray[i]);
-	      if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v && 
+	      if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v &&
 		   ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz ){
 		nondup++;
 		/* La normale et les coordonnées de texture du point courant sont identiques à la précédente référence, il n'y a donc rien à faire */
@@ -353,7 +353,7 @@ void Mesh::setUVsAndNormals(const vector < Vector > &normalsVector, const vector
 		m_parent->addVertex( v );
 		/* Le nouveau point est placé en dernier, on récupère son index et on le stocke */
 		m_indexArray[i] = m_parent->getVertexArraySize()-1;
-		dup++;	  
+		dup++;
 	      }
 	    }
 	  else

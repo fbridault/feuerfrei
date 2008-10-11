@@ -19,14 +19,14 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
   char mtlName[255];
   Field3D *field;
   FireSource *fireSource;
-  
+
   m_scale = config.fields[0].scale;
   /* On importe tous les objets contenus dans le fichier OBJ dont le nom commence par LAMP_NAME */
   if(scene->getMTLFileNameFromOBJ(filename, mtlName))
     scene->importMTL(mtlName);
-  
+
   m_hasLuminary = scene->importOBJ(filename, &m_luminary, NULL, LAMP_NAME);
-      
+
   m_position = config.position;
   if(config.fires[0].type != CANDLESSET)
     {
@@ -34,7 +34,7 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
       fireSource = initFire( config.fires[0], filename, field, scene, index, program );
       field->addFireSource( fireSource );
       field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
-      
+
       m_fields.push_back( field );
       fields.push_back( field );
       m_fireSources.push_back( fireSource );
@@ -44,9 +44,9 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
     {
       list<Wick *> objList;
       int i=0;
-      
+
       scene->importOBJ(filename, NULL, &objList, WICK_NAME_PREFIX);
-      
+
       for (list < Wick *>::iterator objListIterator = objList.begin ();
 	   objListIterator != objList.end (); objListIterator++, i++)
 	{
@@ -54,11 +54,11 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
 	  fireSource = new Candle (config.fires[0], field, scene, i, program, .125f, NULL, *objListIterator);
 	  field->addFireSource( fireSource );
 	  field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
-	  
+
 	  fireSource->setInnerForce(config.fires[0].innerForce);
 	  fireSource->setFDF(config.fires[0].fdf);
-	  fireSource->setPerturbateMode(config.fires[0].flickering);	  
-	  
+	  fireSource->setPerturbateMode(config.fires[0].flickering);
+
 	  m_fields.push_back( field );
 	  fields.push_back( field );
 	  m_fireSources.push_back( fireSource );
@@ -85,7 +85,7 @@ Luminary::~Luminary ()
 #define ARGS_SLV ARGS, fieldConfig.vorticityConfinement
 #define ARGS_GC ARGS_SLV, fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon
 
-Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& position)
+Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& position)
 {
   switch(fieldConfig.type){
   case GS_SOLVER :
@@ -114,7 +114,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const Point& posit
 }
 
 
-FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, 
+FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field,
 			       Scene* const scene, uint i, const GLSLProgram* const SVProgram)
 {
   FireSource *fire;
@@ -138,10 +138,10 @@ FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileN
       cerr << "Unknown flame type : " << (int)flameConfig.type << endl;
       ::wxExit();
       return NULL;
-  } 
+  }
   fire->setInnerForce(flameConfig.innerForce);
   fire->setFDF(flameConfig.fdf);
   fire->setPerturbateMode(flameConfig.flickering);
-  
+
   return fire;
 }

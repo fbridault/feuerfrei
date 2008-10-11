@@ -13,7 +13,7 @@ class GLFlameCanvas;
 
 #include "../scene/camera.hpp"
 #include "../scene/scene.hpp"
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
 
 #include "../flames/abstractFires.hpp"
 #include "../flames/glowengine.hpp"
@@ -31,18 +31,18 @@ class PhotometricSolidsRenderer;
 class GLFlameCanvas : public wxGLCanvas
 {
 public:
-  GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,  
+  GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList = 0,
 		long style=0, const wxString& name=_("GLCanvas"), const wxPalette& palette = wxNullPalette);
-  
+
   ~GLFlameCanvas();
-  
+
   void OnIdle(wxIdleEvent& event);
   void OnPaint(wxPaintEvent& event);
   void drawScene(void);
   void drawFlames(void);
   void drawFlamesBoundingBoxes(void);
   void drawFlamesBoundingBoxes(const GLSLProgram& glowProgram, uint index);
-  
+
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
   /** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
@@ -50,7 +50,7 @@ public:
   void OnMouseWheel(wxMouseEvent& event);
   void OnKeyPressed(wxKeyEvent& event);
   void OnSize(wxSizeEvent& event);
-  
+
   /** Initialisations relatives à l'environnement OpenGL */
   void InitGL();
   /** Initialisations des luminaires, qui eux-mêmes créent les champs de vélocité et les flammes. */
@@ -68,17 +68,17 @@ public:
   void DestroyScene(void);
   /** Initialisation globale du contrôle */
   void Init(FlameAppConfig *config);
-  
+
   bool IsRunning(void) { return m_run; };
   /** Lance/arrête l'animation */
-  void setRunningState(bool run) { 
+  void setRunningState(bool run) {
     m_run=run;
 #ifdef MULTITHREADS
     if(!m_run) PauseThreads();
     if(m_run) ResumeThreads();
 #endif
   };
-  
+
   /** Active/Désactive le glow seul */
   void ToggleGlowOnlyDisplay(void) { m_glowOnly=!m_glowOnly; };
   void ToggleGridDisplay(void) { m_displayGrid=!m_displayGrid; };
@@ -94,30 +94,30 @@ public:
       (*firesIterator)->setSmoothShading (state);
   };
   void ToggleSaveImages(void) { m_saveImages = !m_saveImages; };
-  void moveLuminary(int selected, Point& pt){ 
+  void moveLuminary(int selected, CPoint& pt){
     /* On ne peut déplacer que les solveurs locaux */
     m_luminaries[selected]->move(pt);
     for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
 	 firesIterator != m_fires.end (); firesIterator++)
       (*firesIterator)->computeVisibility(*m_camera,true);
   };
-  void addPermanentExternalForcesToField(int selectedField, Point &pt){ 
+  void addPermanentExternalForcesToField(int selectedField, CPoint &pt){
     if(selectedField >= 0) m_fields[selectedField]->addPermanentExternalForces(pt);
     else m_globalField->addPermanentExternalForces(pt);
   };
-  void setFieldBuoyancy(int index, float value){ 
+  void setFieldBuoyancy(int index, float value){
     if(index >= 0) m_fields[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
   void setFlameForces(int index, float value){ m_fires[index]->setInnerForce(value); };
   void setFlameIntensity(int index, float value){ m_fires[index]->setIntensityCoef(value); };
   void setFlameLOD(int index, u_char value){ m_fires[index]->setLOD(value); };
-  
-  void setLuminaryBuoyancy(int index, float value){ 
+
+  void setLuminaryBuoyancy(int index, float value){
     if(index >= 0) m_luminaries[index]->setBuoyancy(value);
     else m_globalField->setBuoyancy(value);
   };
-  void setLuminaryVorticity(int index, float value){ 
+  void setLuminaryVorticity(int index, float value){
     if(index >= 0) m_luminaries[index]->setVorticity(value);
     else m_globalField->setVorticity(value);
   };
@@ -125,12 +125,12 @@ public:
   void setLuminaryLOD(int index, u_char value){ m_luminaries[index]->setLOD(value); };
   void setLuminaryFDF(int index, int value) { m_luminaries[index]->setFDF(value); };
   void setLuminaryPerturbateMode(int index, char value) { m_luminaries[index]->setPerturbateMode(value); };
-  void setLuminaryLeadLifeSpan(int index, uint value) {m_luminaries[index]->setLeadLifeSpan(value); };  
+  void setLuminaryLeadLifeSpan(int index, uint value) {m_luminaries[index]->setLeadLifeSpan(value); };
   void setLuminaryPeriLifeSpan(int index, uint value) { m_luminaries[index]->setPeriLifeSpan(value); };
-  
+
   void setNbDepthPeelingLayers(uint value){ m_depthPeelingEngine->setNbLayers(value); };
   void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
-  
+
   /** Change l'affichage des sphères englobantes. */
   void setBoundingSphereMode(bool mode) { m_scene->setBoundingSphereMode(mode); };
   void setBoundingVolumesDisplay(u_char display) { m_displayFlamesBoundingVolumes = display; };
@@ -154,7 +154,7 @@ private:
 #endif
 //   void cast_shadows_float_multiple();
   void castShadows();
-  
+
   /** Configuration de l'application */
   FlameAppConfig *m_currentConfig;
   /********* Variables relatives au contrôle de l'affichage **************/
@@ -169,16 +169,16 @@ private:
   /********* Variables relatives à la fenêtre d'affichage ****************/
   uint m_width, m_height;
   uint prevNbFields, prevNbFlames;
-  
+
   Camera *m_camera;
   /* Pour le compte des frames */
   uint m_framesCount, m_globalFramesCount;
 
   int m_t;
-  
+
   uint m_nurbsTest;
   GLint m_flamesDisplayList;
-  
+
   /* Tableau de pixels pour la sauvegarde des images */
   u_char *m_pixels;
 
@@ -188,9 +188,9 @@ private:
 
   /********* Variables relatives au glow *********************************/
   GlowEngine *m_glowEngine;
-  
+
   DepthPeelingEngine *m_depthPeelingEngine;
-  
+
   vector <Luminary *> m_luminaries;
 #ifdef MULTITHREADS
   /** Liste de threads. */
@@ -200,7 +200,7 @@ private:
 #endif
   vector <Field3D *> m_fields;
   GlobalField *m_globalField;
-    
+
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_fires;
   Scene *m_scene;
@@ -208,7 +208,7 @@ private:
   GLSLVertexShader *m_SVShader;
   GammaEngine *m_gammaEngine;
   wxStopWatch *m_swatch;
-  
+
   float *m_intensities;
   bool m_visibility;
 

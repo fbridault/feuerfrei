@@ -17,7 +17,7 @@ enum
   };
 
 /** Panneau pour les onglets de la boîte de dialogue des solveurs */
-class SolverPanel: public wxPanel 
+class SolverPanel: public wxPanel
 {
 public:
   SolverPanel(wxWindow* parent, int id, bool localSolver=true, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
@@ -61,11 +61,11 @@ protected:
 };
 
 /** Boîte de dialogue pour les réglages du solveur */
-class SolverDialog: public wxDialog 
+class SolverDialog: public wxDialog
 {
 public:
   SolverDialog(wxWindow* parent, int id, const wxString& title, FluidsAppConfig *config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
-  
+
 private:
   void doLayout();
   void OnClickButtonAdd(wxCommandEvent& event);
@@ -78,7 +78,7 @@ private:
    * @param solverIndex index du solveur à vérifier
    */
   void checkSolverUsage(int solverIndex);
-  
+
   int m_nbPanels;
   SolverPanel *m_solverPanels[NB_MAXSOLVERS];
   wxNotebook *m_solverNotebook;

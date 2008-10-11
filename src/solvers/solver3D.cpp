@@ -1,14 +1,14 @@
 #include "solver3D.hpp"
 #include "SSE4.hpp"
 #include <math.h>
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
 
 Solver3D::Solver3D ()
 {
 }
 
-Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale,
-		    float timeStep, float buoyancy, float vorticityConfinement) : 
+Solver3D::Solver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+		    float timeStep, float buoyancy, float vorticityConfinement) :
   RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
 {
   m_uPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
@@ -21,7 +21,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_roty     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
   m_rotz     = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
   m_rot      = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
-  
+
 //   m_uPrev    = new float[m_nbVoxels];
 //   m_vPrev    = new float[m_nbVoxels];
 //   m_wPrev    = new float[m_nbVoxels];
@@ -32,7 +32,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
 //   m_roty     = new float[m_nbVoxels];
 //   m_rotz     = new float[m_nbVoxels];
 //   m_rot      = new float[m_nbVoxels];
-  
+
   fill_n(m_uPrev, m_nbVoxels, 0.0f);
   fill_n(m_vPrev, m_nbVoxels, 0.0f);
   fill_n(m_wPrev, m_nbVoxels, 0.0f);
@@ -40,11 +40,11 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   fill_n(m_densPrev, m_nbVoxels, 0.0f);
   fill_n(m_densSrc, m_nbVoxels, 0.0f);
   fill_n(m_rot, m_nbVoxels, 0.0f);
-  
+
   m_visc = 0.000022f;
   m_diff = 0.001f;
   m_vorticityConfinement = vorticityConfinement;
-  
+
   m_hx= 0.5f/n_x;
   m_hy= 0.5f/n_y;
   m_hz= 0.5f/n_z;
@@ -52,7 +52,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_invhx= 0.5f*n_x;
   m_invhy= 0.5f*n_y;
   m_invhz= 0.5f*n_z;
-  
+
   // Utilisé pour la densité
   // m_aDiff = m_dt * m_diff * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
   m_aVisc = m_dt * m_visc * m_nbVoxelsX * m_nbVoxelsY * m_nbVoxelsZ;
@@ -61,7 +61,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   m_nx = m_nbVoxelsX+2;
   m_t1 = m_n2 + m_nx + 1;
   m_t2nx = 2*m_nx;
-  
+
   // chercher le premier groupe de 4 contenant le premier voxel
   // de la grille initiale
   // m_t1 = 4*q1 + r1 avec 0 <= r1 < 4
@@ -75,7 +75,7 @@ Solver3D::Solver3D (const Point& position, uint n_x, uint n_y, uint n_z, float d
   //m_dernier = 4*q2 + r2 avec 0 <= r2 < 4
   // m_nbgrps = q2 - q1 + 1 est le nombre cherché
   m_nbgrps= (m_dernier-m_t1)/4+1;
-  
+
 //   m_forceCoef = 10;
 //   m_forceRatio = 1/m_forceCoef;
   m_perturbateCount = 0;
@@ -93,7 +93,7 @@ Solver3D::~Solver3D ()
   _mm_free(m_roty);
   _mm_free(m_rotz);
   _mm_free(m_rot);
-  
+
 //   delete [] m_uPrev;
 //   delete [] m_vPrev;
 //   delete [] m_wPrev;
@@ -150,24 +150,24 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
   dt0_x = m_dt * m_nbVoxelsX;
   dt0_y = m_dt * m_nbVoxelsY;
   dt0_z = m_dt * m_nbVoxelsZ;
-  
+
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
       for (uint i = 1; i <= m_nbVoxelsX; i++){
-	
+
 	x = i - dt0_x * u[m_t];
 	y = j - dt0_y * v[m_t];
 	z = k - dt0_z * w[m_t];
-	  
+
 	if (x < 0.5f) x = 0.5f;
 	if (x > m_nbVoxelsX + 0.5f) x = m_nbVoxelsX + 0.5f;
 	i0 = (uint) x; i1 = i0 + 1;
-	  
+
 	if (y < 0.5f) y = 0.5f;
 	if (y > m_nbVoxelsY + 0.5f) y = m_nbVoxelsY + 0.5f;
 	j0 = (uint) y; j1 = j0 + 1;
-	  
+
 	if (z < 0.5f) z = 0.5f;
 	if (z > m_nbVoxelsZ + 0.5f) z = m_nbVoxelsZ + 0.5f;
 	k0 = (uint) z; k1 = k0 + 1;
@@ -178,21 +178,21 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 	s0 = 1 - s1;
 	t1 = z - k0;
 	t0 = 1 - t1;
-	  
+
 	d[m_t] = r0 * (s0 * (t0 * d0[IX (i0, j0, k0)] + t1 * d0[IX (i0, j0, k1)]) +
 		       s1 * (t0 * d0[IX (i0, j1, k0)] + t1 * d0[IX (i0, j1, k1)])
 		       ) +
 	  r1 * (s0 * (t0 * d0[IX (i1, j0, k0)] + t1 * d0[IX (i1, j0, k1)]) +
 		s1 * (t0 * d0[IX (i1, j1, k0)] + t1 * d0[IX (i1, j1, k1)])
 		);
-	  
+
 	m_t++;
       }//for i
       m_t+=2;
     }//for j
     m_t+=m_t2nx;
   }//for k
-  
+
   //set_bnd (b, d);
 }
 
@@ -204,12 +204,12 @@ void Solver3D::advect (unsigned char b, float *const d, const float *const d0,
 // }
 void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float * const w)
 {
-  uint i,j,k;	
+  uint i,j,k;
   float eps =m_dt*m_forceCoef*m_vorticityConfinement;//epsilon
   float x,y,z;
   float Nx,Ny,Nz;
   float invNormeN;
-  
+
   /** Calcul de m_rot la norme du rotationnel du champ de vélocité (m_u, m_v, m_w)
    */
   m_t = m_t1;
@@ -220,7 +220,7 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 	x = m_rotx[m_t] = (w[m_t+m_nx] - w[m_t-m_nx]) * m_invhy -
 	  (v[m_t+m_n2] - v[m_t-m_n2]) * m_invhz;
 	// m_roty = dm_u/dz - dm_w/dx
-	
+
 	y = m_roty[m_t] = (u[m_t+m_n2] - u[m_t-m_n2]) * m_invhz -
 	  (w[m_t+1] - w[m_t-1]) * m_invhx;
 
@@ -241,18 +241,18 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
    * Le vecteur est multiplié par epsilon*h
    * et est ajouté au champ de vélocité
    */
-	
+
   m_t=m_t1;
   for (k=1; k<=m_nbVoxelsZ; k++) {
     for (j=1; j<=m_nbVoxelsY; j++) {
       for (i=1; i<=m_nbVoxelsX; i++) {
-			
+
 	Nx = (m_rot[m_t+1] - m_rot[m_t-1]) * m_invhx;
 	Ny = (m_rot[m_t+m_nx] - m_rot[m_t-m_nx]) * m_invhy;
 	Nz = (m_rot[m_t+m_n2] - m_rot[m_t-m_n2]) * m_invhz;
-	
+
 	invNormeN = 1.0f/(sqrtf(Nx*Nx+Ny*Ny+Nz*Nz)+0.000001f);
-	  
+
 	Nx *= invNormeN;
 	Ny *= invNormeN;
 	Nz *= invNormeN;
@@ -270,7 +270,7 @@ void Solver3D::addVorticityConfinement( float * const u, float *const  v,  float
 }//AddVorticityConfinement
 
 void Solver3D::vel_step ()
-{  
+{
   add_source (m_u, m_uSrc);
   add_source (m_v, m_vSrc);
   add_source (m_w, m_wSrc);
@@ -292,9 +292,9 @@ void Solver3D::vel_step ()
 }
 
 // Affiche le temps passé dans chacune des étapes
-// 
+//
 // void Solver3D::vel_step ()
-// {  
+// {
 //   unsigned long long int start, t, start2, t3;
 //   start2=rdtsc();
 //   add_source (m_u, m_uSrc);
@@ -325,19 +325,19 @@ void Solver3D::vel_step ()
 // }
 
 void Solver3D::iterate ()
-{ 
+{
   if(!m_run)
     return;
-  
+
   /* Cellule(s) génératrice(s) */
-  
+
   //   for (uint i = 1; i < m_nbVoxelsX + 1; i++)
   //     for (uint k = 1; k < m_nbVoxelsZ + 1; k++)
   //       m_vSrc[IX(i,1,k)] += m_buoyancy/20.0f;
 
   // On normalise !!!
   float invy = 1.0f/(float)m_nbVoxelsY;
-  
+
   m_t=m_t1;
   for (uint k = 1; k <= m_nbVoxelsZ; k++){
     for (uint j = 1; j <= m_nbVoxelsY; j++){
@@ -349,22 +349,22 @@ void Solver3D::iterate ()
     }//for j
     m_t+=m_t2nx;
   }//for k
-  
+
   if(m_permanentExternalForces.x || m_permanentExternalForces.y || m_permanentExternalForces.z)
     addExternalForces(m_permanentExternalForces,false);
-  
+
   if(m_temporaryExternalForces.x || m_temporaryExternalForces.y || m_temporaryExternalForces.z)
     {
       addExternalForces(m_temporaryExternalForces,false);
       m_temporaryExternalForces.resetToNull();
     }
-  
+
   if(m_movingForces.x || m_movingForces.y || m_movingForces.z)
     {
       addExternalForces(m_movingForces,true);
       m_movingForces.resetToNull();
     }
-  
+
 #ifdef RTFLUIDS_BUILD
   addRightForce();
 #endif
@@ -374,16 +374,16 @@ void Solver3D::iterate ()
   m_nbIter++;
   if(m_nbIter == 1000)
     cerr << "Simulation over" << endl;
-  
+
 }
 
-void Solver3D::addExternalForces(const Point& position, bool move)
+void Solver3D::addExternalForces(const CPoint& position, bool move)
 {
   uint i,j;
   uint widthx, widthy, widthz;
   uint ceilx, ceily, ceilz;
-  Point strength;
-  Point force;
+  CPoint strength;
+  CPoint force;
   //  float factor = m_dim.y/(m_nbVoxelsY - 1);
   if(move){
     force = position;
@@ -394,12 +394,12 @@ void Solver3D::addExternalForces(const Point& position, bool move)
     strength = position * .05f * m_forceCoef;
     strength.x = fabs(strength.x);
     strength.y = fabs(strength.y);
-    strength.z = fabs(strength.z);  
+    strength.z = fabs(strength.z);
   }
-  
-  findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
-  findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
-    
+
+  findCPointPosition(m_dim-CPoint(.1f,.1f,.1f),widthx,widthy,widthz);
+  findCPointPosition(CPoint(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
+
   /* Ajouter des forces externes */
   if(force.x)
     if( force.x > 0.0f)
@@ -436,10 +436,10 @@ void Solver3D::addRightForce()
   uint i,j;
   uint widthx, widthy, widthz;
   uint ceilx, ceily, ceilz;
-    
-  findPointPosition(m_dim-Point(.1f,.1f,.1f),widthx,widthy,widthz);
-  findPointPosition(Point(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
-  
+
+  findCPointPosition(m_dim-CPoint(.1f,.1f,.1f),widthx,widthy,widthz);
+  findCPointPosition(CPoint(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
+
   /* Utilisé pour faire des benchs sur le solveur */
   if(m_perturbateCount>90){
     m_perturbateCount = 0;
@@ -462,8 +462,8 @@ void Solver3D::addRightForce()
 }
 #endif
 
-void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
-			       const Point& TRStrength, const Point& BRStrength)
+void Solver3D::addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+			       const CPoint& TRStrength, const CPoint& BRStrength)
 {
   uint i,j;
   float coef=.5f;
@@ -473,17 +473,17 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
       for (j = 1; j <= m_nbVoxelsY; j++)
 	m_uSrc[IX(m_nbVoxelsX, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)*coef;
     break;
-  case RIGHT_FACE : 
+  case RIGHT_FACE :
     for (i = 1; i <= m_nbVoxelsZ; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
 	m_uSrc[IX(1, j, i)] += (BLStrength.x+TLStrength.x+TRStrength.x+BRStrength.x)*coef;
     break;
-  case BACK_FACE : 
+  case BACK_FACE :
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
 	m_wSrc[IX(i, j, 1)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)*coef;
     break;
-  case FRONT_FACE : 
+  case FRONT_FACE :
     for (i = 1; i <= m_nbVoxelsX; i++)
       for (j = 1; j <= m_nbVoxelsY; j++)
 	m_wSrc[IX(i, j, m_nbVoxelsZ)] += (BLStrength.z+TLStrength.z+TRStrength.z+BRStrength.z)*coef;
@@ -491,11 +491,11 @@ void Solver3D::addForcesOnFace(unsigned char face, const Point& BLStrength, cons
   }
 }
 
-float Solver3D::getTrilinearFilteredValue(const Point& pt, uint i, uint j, uint k, float *const v)
+float Solver3D::getTrilinearFilteredValue(const CPoint& pt, uint i, uint j, uint k, float *const v)
 {
   uint xd,yd,zd;
   float i1, i2, j1, j2, w1, w2;
-  
+
   /* Les coordonnées de pt sont dans un cube de côté 1 */
   /* on s'arrange pour les mettrent dans un cube de côté m_nbVoxels{X,Y,Z} */
   /* de sorte à avoir des voxels de largeur 1 nécessaires pour l'interpolation */
@@ -509,7 +509,7 @@ float Solver3D::getTrilinearFilteredValue(const Point& pt, uint i, uint j, uint 
   i2 = v[IX(i,  j+1,k)]*(1-zd) + v[IX(i,  j+1,k+1)]*zd;
   j1 = v[IX(i+1,j,  k)]*(1-zd) + v[IX(i+1,j,  k+1)]*zd;
   j2 = v[IX(i+1,j+1,k)]*(1-zd) + v[IX(i+1,j+1,k+1)]*zd;
-  
+
   /* Interpolation selon y */
   w1 = i1*(1 - yd) + i2*yd;
   w2 = j1*(1 - yd) + j2*yd;
@@ -521,8 +521,8 @@ float Solver3D::getTrilinearFilteredValue(const Point& pt, uint i, uint j, uint 
 void Solver3D::trilinearInterpolation( float *const v, float *const v2, uint nx2, uint ny2, uint nz2 )
 {
   uint I,J,K;
-  Point pt;
-  Point inc;
+  CPoint pt;
+  CPoint inc;
   uint count=0;
   inc.x = m_dim.x/nx2; inc.y = m_dim.y/ny2; inc.z = m_dim.z/nz2;
   pt.z = inc.z/2.0f;
@@ -552,7 +552,7 @@ void Solver3D::trilinearInterpolation( float *const v, float *const v2, uint nx2
 void Solver3D::prolonger(float  *const v2h, float *const vh)
 {
   // on utilise une interpolation bilinéaire
-  // récupérer la taille du solveur 
+  // récupérer la taille du solveur
 
   int nx=getXRes();
   int ny=getYRes();
@@ -580,20 +580,20 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	// i = 2*I + ir
 	//	I=i/2;
 	//  ir=i%2;
-			
-			
+
+
 	// il y a 8 possibilités
 	// i = 2*I ou i = 2*I +1
 	// j = 2*J ou j = 2*J +1
 	// k = 2*K ou k = 2*K +1
-	// Chacune des possibilités est codée en positionnant les 3 bits de 
+	// Chacune des possibilités est codée en positionnant les 3 bits de
 	// poids faible de l'entier code : bit2 = ir, bit1 = jr, bit0 = kr
 	// Le point (i,j,k) de la grille fine est l'un des sommets du "petit"
-	// voxel ayant en commun le point (2I,2J,2K) avec le "gros" voxel 
+	// voxel ayant en commun le point (2I,2J,2K) avec le "gros" voxel
 	// Le point (i,j,k) est soit le milieu d'une arête du "gros" voxel,
-	// soit le centre de l'une de ses faces, soit son centre,  
+	// soit le centre de l'une de ses faces, soit son centre,
 	// soit le point commun des deux voxels
-				 
+
 
 	code=4*ir+2*jr+kr;
 	switch(code){
@@ -619,12 +619,12 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	  break;
 	case 4: // milieu d'une arête
 	  vh[IX(i,j,k)] = 0.5f*
-	    (v2h[IX2h(I,J,K)] + 
+	    (v2h[IX2h(I,J,K)] +
 	     v2h[IX2h(I+1,J,K)]);
 	  break;
 	case 5: // centre d'une face
 	  vh[IX(i,j,k)] = 0.25f*
-	    (v2h[IX2h(I,J,K)]+ 
+	    (v2h[IX2h(I,J,K)]+
 	     v2h[IX2h(I+1,J,K)]+
 	     v2h[IX2h(I+1,J,K+1)]+
 	     v2h[IX2h(I,J,K+1)]);
@@ -638,11 +638,11 @@ void Solver3D::prolonger(float  *const v2h, float *const vh)
 	  break;
 	case 7: // centre du cube
 	  vh[IX(i,j,k)] = 0.125f*
-	    (v2h[IX2h(I,J,K)]+ 
+	    (v2h[IX2h(I,J,K)]+
 	     v2h[IX2h(I+1,J,K)]+
 	     v2h[IX2h(I+1,J,K+1)]+
 	     v2h[IX2h(I,J,K+1)] +
-	     v2h[IX2h(I,J+1,K)]+ 
+	     v2h[IX2h(I,J+1,K)]+
 	     v2h[IX2h(I+1,J+1,K)]+
 	     v2h[IX2h(I+1,J+1,K+1)]+
 	     v2h[IX2h(I,J+1,K+1)]);
@@ -678,7 +678,7 @@ void  Solver3D::restreindre(float *const vh, float *const v2h){
 	// Les points de la grille fine situés dans le plan du point courant
 	// de la grille grossière ont respectivement pour poids 1/8, 1/16, 1/32
 	// en fonction de leur distance à ce point.
-	// Les points de la grille fine situés dans les plans immédiatement 
+	// Les points de la grille fine situés dans les plans immédiatement
 	// parallèles au plan contenant le point courant de la grille grossière
 	// ont respectivement pour poids 1/16, 1/32, 1/64
 	// en fonction de leur distance à ce point.
@@ -693,7 +693,7 @@ void  Solver3D::restreindre(float *const vh, float *const v2h){
 	jjS = jj-1;
 	kkU = kk+1;
 	kkD = kk-1;
-	// multiplication par 4 car le problème n'est pas un problème de Poisson              
+	// multiplication par 4 car le problème n'est pas un problème de Poisson
 	//                                 |
 	//                                 v
 

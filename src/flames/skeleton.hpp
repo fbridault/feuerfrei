@@ -33,24 +33,24 @@ class FreeSkeleton
 public:
   /** Constructeur de squelette libre.
    *
-   * @param size Nombre de particules maximum du squelette.  
-   * @param s Pointeur sur le solveur de fluides.
+   * @param size Nombre de particules maximum du squelette.
+   * @param s CPointeur sur le solveur de fluides.
    */
   FreeSkeleton(uint size, Field3D* const s);
-  
+
   /** Constructeur de squelette libre. Permet de construire un squelette à
    * partir d'un autre, en découpant celui en deux à la hauteur passée en
    * paramètre. Le squelette crée sera constitué de la partie supérieure, donc
    * des particules comprises dans l'intervalle [0;splitHeight].
    *
-   * @param src Pointeur sur le squelette source.
+   * @param src CPointeur sur le squelette source.
    * @param splitHeight Hauteur de la découpe.
    */
   FreeSkeleton(const FreeSkeleton * const src, uint splitHeight);
-  
+
   /** Destructeur */
   virtual ~FreeSkeleton();
-  
+
   /** Donne l'élément en tête de file.
    *
    * @return particule en tête de file
@@ -58,7 +58,7 @@ public:
   Particle *getLastParticle() const{
     return &m_queue[m_headIndex];
   };
-  
+
   /** Donne l'élément à l'indice passé en paramètre.
    *
    * @param i Indice de la particule.
@@ -67,7 +67,7 @@ public:
   Particle *getInternalParticle(uint i) const{
     return &m_queue[i];
   };
-  
+
   /** Donne l'élément à l'indice passé en paramètre.
    *
    * @param i Indice de la particule.
@@ -76,15 +76,15 @@ public:
   virtual Particle *getParticle(uint i) const{
     return &m_queue[i];
   };
-  
+
   /** Donne l'élément situé au milieu.
    *
-   * @return Pointeur sur la particule du milieu.
+   * @return CPointeur sur la particule du milieu.
    */
   Particle *getMiddleParticle() const{
     return &m_queue[m_headIndex/2];
   };
-  
+
   /** Donne la taille du squelette, sans tenir compte éventuellement de
    * l'origine.
    *
@@ -93,7 +93,7 @@ public:
   virtual uint getInternalSize() const{
     return m_headIndex+1;
   };
-  
+
   /** Donne la taille du squelette, sans tenir compte éventuellement de
    * l'origine.
    *
@@ -102,7 +102,7 @@ public:
   virtual uint getSize() const{
     return m_headIndex+1;
   };
-  
+
   /** Donne l'élément en tête de file.
    *
    * @return particule en tête de file
@@ -110,7 +110,7 @@ public:
   float getSelfVelocity() const{
     return m_selfVelocity;
   };
-  
+
   /** Retourne true si le squelette ne contient plus de particules.
    *
    * @return true sur le squelette est mort
@@ -118,15 +118,15 @@ public:
   virtual bool isDead() const{
     return (m_headIndex < 0);
   };
-    
+
   /** Dessine le squelette à l'écran. */
   virtual void draw () const;
-  
+
   /** Déplacement des particules du squelette et suppression des particules
    * mortes. Aucune particule n'est générée dans cette classe.
    */
   virtual void move();
-  
+
   /** Déplace une particule dans le champ de vélocité.
    *
    * @param pos position de la particule
@@ -141,39 +141,39 @@ protected:
    * @param j indice de la seconde particule
    */
   void swap(uint i, uint j);
-    
+
   /** Supprime la particule à une position donnée.
    *
    * @param n indice
    */
   virtual void removeParticle(uint n);
-  
+
   /** Affectation de la position d'une particule dans l'espace.
    *
    * @param i indice de la particule dans la file
    * @param pt nouvelle position de la particule
    */
-  void updateParticle(uint i, const Point* const pt)
+  void updateParticle(uint i, const CPoint* const pt)
   {
     m_queue[i] = *pt;
     m_queue[i].decreaseLife();
   }
-  
+
   /** Dessine les particules du squelettes
    *
    * @param particle Particule à dessiner.
    */
   virtual void drawParticle (Particle * const particle) const;
-  
-  /** Pointeur sur le solveur de fluides. */
+
+  /** CPointeur sur le solveur de fluides. */
   Field3D *m_solver;
 
   /** Indice de la tête de la file. */
   int m_headIndex;
-  
+
   /** File de particules. */
   Particle *m_queue;
-  
+
   /** Velocité propre des particules du squelette, utilisée par les FakeFields. */
   float m_selfVelocity;
 };
@@ -200,78 +200,78 @@ class Skeleton : public FreeSkeleton
 public:
   /** Constructeur de squelette périphérique libre
    *
-   * @param s Pointeur sur le solveur de fluides.
+   * @param s CPointeur sur le solveur de fluides.
    * @param position Position de la flamme dans l'espace.
    * @param rootMoveFactor Amplitude du déplacement autorisé pour l'origine du
    * squelette. Varie en fonction du type de flamme.
    * @param pls Durée de vie initiale d'une particule.
    */
-  Skeleton(Field3D* const s, const Point& position, const Point& rootMoveFactor, uint pls);
+  Skeleton(Field3D* const s, const CPoint& position, const CPoint& rootMoveFactor, uint pls);
   /** Destructeur. */
   virtual ~Skeleton(){};
-  
+
   void draw () const;
-  
+
   /** Déplacement des particules du squelette, génération d'une nouvelle
    * particule et suppression des particules mortes.
    */
   void move();
   virtual bool moveParticle(Particle* const particle);
-  
+
   virtual Particle *getParticle(uint i) const{
     return &m_queue[(m_lod) ? i*2 : i];
   };
-  
+
   virtual uint getSize() const{
     return ( (m_lod) ? (m_headIndex / 2)+1 : m_headIndex+1);
   };
-  
+
   /** Déplacement de l'origine du squelette. */
   void moveRoot ();
-  
+
   /** Retourne un pointeur sur l'origine du squelette.
-   * @return Pointeur sur l'origine du squelette.
+   * @return CPointeur sur l'origine du squelette.
    */
-  Point *getRoot(){
+  CPoint *getRoot(){
     return &m_root;
   };
-  
+
   /* Change la valeur du niveau de détail du squelette
    *
    * @param value valeur parmi {FULL_SKELETON détaillé, HALF_SKELETON grossier
    * (on considère une particule sur 2)}
    */
   void setLOD(u_char value){ m_lod = value; };
-  
+
   /** Affectation de la durée de vie des nouvelles particules du squelette. */
   void setLifeSpan(uint lifeSpan) { m_lifeSpan = lifeSpan; };
-  
+
 protected:
   /** Insère une particule en queue de file.
    *
    * @param pt position de la particule
    */
-  virtual void addParticle(const Point* const pt) = 0;
-  
+  virtual void addParticle(const CPoint* const pt) = 0;
+
   /** Dessine l'origine du squelette. */
   virtual void drawRoot () const;
-  
+
   /** Origine actuelle du squelette. */
-  Point m_root;
-  
+  CPoint m_root;
+
   /** Origine initiale du squelette. */
-  Point m_rootSave;
+  CPoint m_rootSave;
 
   /** Durée de vie des particules du squelette. */
   uint m_lifeSpan;
-  
-private:  
+
+private:
   /** Contient trois facteurs correctifs pour le déplacement de l'origine
    * des squelettes. Selon le type de flamme, il est en effet nécessaire
    * que les origines se déplacent différemment.
    */
-  Point m_rootMoveFactor;
-  
+  CPoint m_rootMoveFactor;
+
   /** Variable correspondant au niveau de détail : FULL_SKELETON détaillé,
    *  HALF_SKELETON grossier (on considère une particule sur 2) */
   u_char m_lod;

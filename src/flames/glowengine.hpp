@@ -3,12 +3,10 @@
 
 class GlowEngine;
 
+#include <engine/renderTarget.hpp>
+
 #include "flames.hpp"
-#include "renderTarget.hpp"
 #include "../shaders/glsl.hpp"
-#include "../scene/camera.hpp"
-#include "../scene/texture.hpp"
-#include "abstractFires.hpp"
 
 #define GLOW_LEVELS 2
 
@@ -89,8 +87,8 @@ private:
   /** Tableau contenant la largeur du filtre */
   GLfloat m_offsets[6][FILTER_SIZE];
 
-  /** RenderTarget */
-  RenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
+  /** CRenderTarget */
+  CRenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
   GLSLProgram m_programX, m_programY, m_blurRendererProgram;
   /** Fragment Shader pour le blur */
   GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y, m_blurRendererShader;

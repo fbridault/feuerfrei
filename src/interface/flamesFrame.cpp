@@ -56,7 +56,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
-  
+
   const wxString m_lightingChoices[] = {
     _("Standard"),
     _("Multi-point"),
@@ -64,46 +64,46 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
     _("Photometric Solid")
   };
   /*********************************** Création des contrôles *************************************************/
-  // Création d'un bouton. Ce bouton est associé à l'identifiant 
+  // Création d'un bouton. Ce bouton est associé à l'identifiant
   // événement ID_Bt_Click, en consultant, la table des événements
-  // on en déduit que c'est la fonction OnClickButton qui sera 
+  // on en déduit que c'est la fonction OnClickButton qui sera
   // appelée lors d'un click sur ce bouton
   m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(320,240), attributelist, wxSUNKEN_BORDER);
   m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
-  
-  m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize, 
+
+  m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize,
 				      4, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
-  
+
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
-  
+
   m_blendedSolidCheckBox = new wxCheckBox(this,IDCHK_BS,_("Show PS"));
   m_shadowsEnabledCheckBox = new wxCheckBox(this,IDCHK_Shadows,_("Shadows"));
   m_glowEnabledCheckBox = new wxCheckBox(this,IDCHK_Glow,_("Glow"));
   m_glow1Slider = new wxSlider(this,IDSL_GLOW1,30,0,100, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_glow2Slider = new wxSlider(this,IDSL_GLOW2,100,0,100, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_depthPeelingEnabledCheckBox = new wxCheckBox(this,IDCHK_DP,_("Depth Peeling"));
-  m_depthPeelingSlider = new wxSlider(this,IDSL_DP,0,0,DEPTH_PEELING_LAYERS_MAX, wxDefaultPosition, 
+  m_depthPeelingSlider = new wxSlider(this,IDSL_DP,0,0,DEPTH_PEELING_LAYERS_MAX, wxDefaultPosition,
 				      wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
-  
+
   m_luminariesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
   m_flamesNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
-  
+
   m_gammaCheckBox =  new wxCheckBox(this,IDCHK_Gamma,_("Enable"));
   m_gammaSlider = new wxSlider(this,IDSL_Gamma,0,40,200, wxDefaultPosition, wxDefaultSize, wxSL_LABELS|wxSL_AUTOTICKS);
-  
+
   SetToolTips();
   DoLayout();
   CreateMenuBar();
-  
+
   m_configFileName = configFileName;
   LoadSettings();
-  
+
   m_currentConfig.gammaCorrection = 1;
   m_gammaSlider->SetValue((int)m_currentConfig.gammaCorrection*100);
-  
+
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
 }
@@ -117,75 +117,75 @@ void FlamesFrame::SetToolTips()
 
 void FlamesFrame::DoLayout()
 {
-  wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;  
+  wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;
   wxBoxSizer *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *multiBottomSizer, *globalTopSizer;
-  
+
   /* Réglages globaux */
   globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
   globalTopSizer->Add(m_buttonRun, 0, 0, 0);
   globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
-  
+
   globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   globalSizer->Add(globalTopSizer, 0, 0, 0);
   globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
-  
+
   /* Réglages du glow et du depth peeling */
   multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
   multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
   multiTopSizer->Add(m_glow1Slider, 1, wxEXPAND, 0);
   multiTopSizer->Add(m_glow2Slider, 1, wxEXPAND, 0);
-  
+
   multiBottomSizer = new wxBoxSizer(wxHORIZONTAL);
   multiBottomSizer->Add(m_depthPeelingEnabledCheckBox, 0, 0, 0);
   multiBottomSizer->Add(m_depthPeelingSlider, 1, wxEXPAND, 0);
-  
+
   multiSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Multi-pass Rendering"));
   multiSizer->Add(multiTopSizer, 0, wxEXPAND, 0);
   multiSizer->Add(multiBottomSizer, 0, wxEXPAND, 0);
-    
+
   /* Réglages de l'éclairage */
   lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
   lightingBottomSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
   lightingBottomSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
-  
+
   lightingSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Lighting"));
   lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
   lightingSizer->Add(lightingBottomSizer, 1, 0, 0);
-  
+
   /* Réglages de la correction Gamma */
   gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
   gammaSizer->Add(m_gammaCheckBox, 0, wxEXPAND, 0);
   gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
-  
+
   bottomSizer = new wxBoxSizer(wxHORIZONTAL);
   bottomSizer->Add(globalSizer, 1, wxEXPAND, 0);
   bottomSizer->Add(multiSizer, 1, wxEXPAND, 0);
   bottomSizer->Add(lightingSizer, 1, wxEXPAND, 0);
   bottomSizer->Add(gammaSizer, 1, wxEXPAND, 0);
-  
+
   luminariesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Luminaries settings"));
   luminariesSizer->Add(m_luminariesNotebook);
-  
+
   solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   solversSizer->Add(m_solversNotebook);
 
   flamesSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Flames settings"));
   flamesSizer->Add(m_flamesNotebook);
-  
+
   /* Placement des sizers principaux */
   rightSizer = new wxBoxSizer(wxVERTICAL);
   rightSizer->Add(luminariesSizer);
   rightSizer->Add(solversSizer);
-  rightSizer->Add(flamesSizer);  
-  
+  rightSizer->Add(flamesSizer);
+
   m_leftSizer = new wxBoxSizer(wxVERTICAL);
   m_leftSizer->Add(m_glBuffer, 1, wxEXPAND, 0);
   m_leftSizer->Add(bottomSizer, 0, 0, 0);
-  
+
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_leftSizer, 1, wxEXPAND, 0);
   m_mainSizer->Add(rightSizer, 0, 0, 0);
-  
+
   SetSizerAndFit(m_mainSizer);
 }
 
@@ -193,7 +193,7 @@ void FlamesFrame::CreateMenuBar()
 {
   /* Création des menus */
   m_menuFile = new wxMenu;
-  
+
   m_menuFile->Append( IDM_LoadParam, _("&Load simulation file...") );
   m_menuFile->Append( IDM_OpenScene, _("&Open scene...") );
   m_menuFile->Append( IDM_SaveSettings, _("&Save settings") );
@@ -201,7 +201,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuFile->Append( IDM_About, _("&About...") );
   m_menuFile->AppendSeparator();
   m_menuFile->Append( IDM_Quit, _("E&xit") );
-  
+
   m_menuDisplayFlames = new wxMenu;
   m_menuDisplayFlames->AppendCheckItem( IDM_Hide, _("&Hide"));
   m_menuDisplayFlames->AppendCheckItem( IDM_FBDS, _("&Bounding Spheres"));
@@ -209,7 +209,7 @@ void FlamesFrame::CreateMenuBar()
   m_menuDisplayFlames->AppendCheckItem( IDM_Wired, _("&Wired"));
   m_menuDisplayFlames->AppendCheckItem( IDM_Shaded, _("&Shaded"));
   m_menuDisplayFlames->Check(IDM_Shaded,true);
-  
+
   m_menuDisplay = new wxMenu;
   m_menuDisplay->AppendCheckItem( IDM_Grid, _("&Grid"));
   m_menuDisplay->AppendCheckItem( IDM_Base, _("&Base"));
@@ -220,17 +220,17 @@ void FlamesFrame::CreateMenuBar()
   m_menuDisplay->AppendCheckItem( IDM_ShadowVolumes, _("&Shadow Volumes"));
   m_menuDisplay->AppendCheckItem( IDM_GlowOnly, _("&Glow only"));
   m_menuDisplay->AppendCheckItem( IDM_BDS, _("&Bounding spheres"));
-  
+
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_Settings, _("&Simulation..."));
   m_menuSettings->Append( IDM_ShadowVolumesSettings, _("S&hadows..."));
   m_menuSettings->Append( IDM_Resolution, _("Screen &resolution..."));
-  
+
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
   m_menuBar->Append( m_menuDisplay, _("&Display") );
   m_menuBar->Append( m_menuSettings, _("&Settings") );
-  
+
   SetMenuBar( m_menuBar );
 }
 
@@ -247,22 +247,22 @@ void FlamesFrame::InitGLBuffer()
   m_glBuffer->setNbDepthPeelingLayers(m_currentConfig.nbDepthPeelingLayers);
   cout << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
   m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
-  
+
   m_mainSizer->Fit(this);
   m_mainSizer->SetSizeHints(this);
-  Layout();  
+  Layout();
 }
 
 void FlamesFrame::InitLuminariesPanels()
 {
   wxString tabName;
   char type=0;
-  
+
   m_luminariesNotebook->DeleteAllPages();
-  
+
   for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
-      m_luminaryPanels[i+type] = new LuminaryMainPanel(m_luminariesNotebook, -1, &m_currentConfig.luminaries[i], 
+      m_luminaryPanels[i+type] = new LuminaryMainPanel(m_luminariesNotebook, -1, &m_currentConfig.luminaries[i],
 						       i, m_glBuffer);
       tabName.Printf(_("Luminary #%d"),i+1);
       m_luminariesNotebook->AddPage(m_luminaryPanels[i+type], tabName);
@@ -273,9 +273,9 @@ void FlamesFrame::InitSolversPanels()
 {
   wxString tabName;
   char type=0;
-  
+
   m_solversNotebook->DeleteAllPages();
-  
+
   if(m_currentConfig.useGlobalField)
     {
       m_solverPanels[0] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.globalField.buoyancy,
@@ -295,13 +295,13 @@ void FlamesFrame::InitSolversPanels()
 void FlamesFrame::InitFlamesPanels()
 {
   wxString tabName;
-  
+
   m_flamesNotebook->DeleteAllPages();
-  
+
   for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
       m_flamePanels[i] = new FlameMainPanel(m_flamesNotebook, -1, &m_currentConfig.luminaries[i].fires[0], i, m_glBuffer);
-      tabName.Printf(_("Flame #%d"),i+1);       
+      tabName.Printf(_("Flame #%d"),i+1);
       m_flamesNotebook->AddPage(m_flamePanels[i], tabName);
     }
 }
@@ -312,7 +312,7 @@ void FlamesFrame::OnClose(wxCloseEvent& event)
   m_glBuffer->DeleteThreads();
 #endif
   m_glBuffer->setRunningState(false);
-  
+
   for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
     {
       delete [] m_currentConfig.luminaries[i].fires;
@@ -320,7 +320,7 @@ void FlamesFrame::OnClose(wxCloseEvent& event)
     }
   delete [] m_currentConfig.luminaries;
   delete m_config;
-  
+
   Destroy();
 }
 
@@ -350,7 +350,7 @@ void FlamesFrame::OnCheckBS(wxCommandEvent& event)
 void FlamesFrame::OnSelectLighting(wxCommandEvent& event)
 {
   m_currentConfig.lightingMode = event.GetSelection();
-  
+
   switch(m_currentConfig.lightingMode)
     {
     case LIGHTING_PHOTOMETRIC :
@@ -392,16 +392,16 @@ void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 }
 
 void FlamesFrame::OnScrollGlow(wxScrollEvent& event)
-{  
+{
   switch (event.GetId())
     {
-    case IDSL_GLOW1 : 
+    case IDSL_GLOW1 :
       m_glBuffer->computeGlowWeights(0,event.GetPosition()/10.0);
       break;
-    case IDSL_GLOW2 : 
+    case IDSL_GLOW2 :
       m_glBuffer->computeGlowWeights(1,event.GetPosition()/10.0);
       break;
-    }    
+    }
 }
 
 void FlamesFrame::OnScrollDP(wxScrollEvent& event)
@@ -418,7 +418,7 @@ void FlamesFrame::OnScrollGamma(wxScrollEvent& event)
 
 void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleSaveImages();  
+  m_glBuffer->ToggleSaveImages();
 }
 
 void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
@@ -426,17 +426,17 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << SCENES_DIRECTORY;
-  
+
   wxFileDialog fileDialog(this, _("Choose a scene file"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     m_glBuffer->setRunningState(false);
     filename = fileDialog.GetPath();
-    
+
     /* Récupération le chemin absolu vers la scène */
     filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
-    
+
     if(!filename.IsEmpty()){
       m_currentConfig.sceneName = filename;
       m_glBuffer->Restart();
@@ -449,11 +449,11 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
-  
+
   wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.ini"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
-    
+
     if(!filename.IsEmpty()){
       m_glBuffer->setRunningState(false);
       Disable();
@@ -463,17 +463,17 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
       filename=filename.Mid(1);
 
       m_configFileName = filename;
-      
+
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
-      
+
       for(int unsigned i=0; i < m_currentConfig.nbLuminaries; i++)
 	{
 	  delete [] m_currentConfig.luminaries[i].fires;
 	  delete [] m_currentConfig.luminaries[i].fields;
 	}
       delete [] m_currentConfig.luminaries;
-      
-      m_flamesNotebook->DeleteAllPages();      
+
+      m_flamesNotebook->DeleteAllPages();
       m_solversNotebook->DeleteAllPages();
 
       LoadSettings();
@@ -493,13 +493,13 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
   double tmp;
-  
+
   m_config->Read(groupName + _("FieldType"), (int *) &solverConfig.type, HYBRID_SOLVER);
-  
+
   solverConfig.resx = m_config->Read(groupName + _("X_res"), 15);
   solverConfig.resy = m_config->Read(groupName + _("Y_res"), 15);
   solverConfig.resz = m_config->Read(groupName + _("Z_res"), 15);
-  
+
   m_config->Read(groupName + _("Dim"),&tmp, 1.0);
   solverConfig.dim = (float)tmp;
   m_config->Read(groupName + _("Scale.x"),&tmp,1.0);
@@ -508,14 +508,14 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
   solverConfig.scale.y = (float)tmp;
   m_config->Read(groupName + _("Scale.z"),&tmp,1.0);
   solverConfig.scale.z = (float)tmp;
-  
+
   m_config->Read(groupName + _("TimeStep"), &tmp, 0.4);
   solverConfig.timeStep = (float)tmp;
   m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
   solverConfig.buoyancy = (float)tmp;
   m_config->Read(groupName + _("Vorticity"), &tmp, 0.02);
   solverConfig.vorticityConfinement = (float)tmp;
-  
+
   m_config->Read(groupName + _("omegaDiff"),&tmp, 1.0);
   solverConfig.omegaDiff = (float)tmp;
   m_config->Read(groupName + _("omegaProj"),&tmp, 1.6);
@@ -528,7 +528,7 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
 void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
 {
   double tmp;
-  
+
   m_config->Read(groupName + _("Type"), (int *) &fireConfig.type, CANDLE);
   if(fireConfig.type != CANDLE){
     m_config->Read(groupName + _("SkeletonsNumber"), (int *) &fireConfig.skeletonsNumber, 5);
@@ -554,9 +554,9 @@ void FlamesFrame::LoadSettings (void)
   double tmp;
   wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
-  
+
   m_config = new wxFileConfig( file );
-  
+
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
@@ -567,7 +567,7 @@ void FlamesFrame::LoadSettings (void)
   m_config->Read(_("/Display/DepthPeeling"), &m_currentConfig.depthPeelingEnabled, false);
   m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
   m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scenes/scene2.obj"));
-  
+
   m_config->Read(_("/Shadows/Fatness.x"), &tmp, -.001);
   m_currentConfig.fatness[0] = (float)tmp;
   m_config->Read(_("/Shadows/Fatness.y"), &tmp, -.001);
@@ -582,59 +582,59 @@ void FlamesFrame::LoadSettings (void)
   m_currentConfig.extrudeDist[2] = (float)tmp;
   m_currentConfig.fatness[3] = 0.0f;
   m_currentConfig.extrudeDist[3] = 0.0f;
-  
+
   m_config->Read(_("/GlobalField/Enabled"), &m_currentConfig.useGlobalField, 0);
   groupName << _("/GlobalField/");
   LoadSolverSettings(groupName,m_currentConfig.globalField);
-  
+
   m_currentConfig.nbLuminaries = m_config->Read(_("/Luminaries/Number"), 1);
   m_currentConfig.luminaries = new LuminaryConfig[m_currentConfig.nbLuminaries];
   m_nbLuminariesMax = m_currentConfig.nbLuminaries;
-  
+
   for(uint i=0; i < m_currentConfig.nbLuminaries; i++)
     {
       groupName.Printf(_("/Luminary%d/"), i);
       m_currentConfig.luminaries[i].fileName = m_config->Read(groupName + _("FileName"), _("scenes/bougie.obj"));
-      
+
       m_config->Read(groupName + _("Pos.x"), &tmp, 0.0);
       m_currentConfig.luminaries[i].position.x = (float)tmp;
       m_config->Read(groupName + _("Pos.y"), &tmp, 0.0);
       m_currentConfig.luminaries[i].position.y = (float)tmp;
       m_config->Read(groupName + _("Pos.z"), &tmp, 0.0);
       m_currentConfig.luminaries[i].position.z = (float)tmp;
-      
+
       m_currentConfig.luminaries[i].nbFields = m_config->Read(_("/Luminary%d/NbFields"), 1);
       m_currentConfig.luminaries[i].fields = new SolverConfig[m_currentConfig.luminaries[i].nbFields];
-      
+
       /** A modifier pour prendre en compte la sauvegarde de plusieurs solveurs et flammes par luminaire */
       groupName.Printf(_("/Luminary%d/Solver0/"), i);
       LoadSolverSettings(groupName, m_currentConfig.luminaries[i].fields[0]);
-      
+
       m_currentConfig.luminaries[i].nbFires = m_config->Read(_("/Luminary%d/NbFires"), 1);
       m_currentConfig.luminaries[i].fires = new FlameConfig[m_currentConfig.luminaries[i].nbFires];
-      
+
       groupName.Printf(_("/Luminary%d/Flame0/"), i);
       LoadFireSettings(groupName, m_currentConfig.luminaries[i].fires[0]);
     }
   InitLuminariesPanels();
   InitSolversPanels();
   InitFlamesPanels();
-  
+
   m_blendedSolidCheckBox->SetValue(!m_currentConfig.BPSEnabled);
   m_lightingRadioBox->SetSelection(m_currentConfig.lightingMode);
   m_glowEnabledCheckBox->SetValue(m_currentConfig.glowEnabled);
   m_shadowsEnabledCheckBox->SetValue(m_currentConfig.shadowsEnabled);
-  
+
   m_depthPeelingEnabledCheckBox->SetValue(m_currentConfig.depthPeelingEnabled);
   m_depthPeelingSlider->SetValue(m_currentConfig.nbDepthPeelingLayers);
-    
+
   if(m_currentConfig.depthPeelingEnabled)
     m_depthPeelingSlider->Enable();
   else
     m_depthPeelingSlider->Disable();
   switch(m_currentConfig.lightingMode)
     {
-    case LIGHTING_STANDARD : 
+    case LIGHTING_STANDARD :
       m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
       m_blendedSolidCheckBox->Disable();
       break;
@@ -643,7 +643,7 @@ void FlamesFrame::LoadSettings (void)
       m_blendedSolidCheckBox->Enable();
       break;
     }
-  
+
   return;
 }
 
@@ -655,24 +655,24 @@ void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverCo
 {
 //   solverConfig.buoyancy = ;
   m_config->Write(groupName + _("FieldType"), (int)solverConfig.type);
-  
+
   m_config->Write(groupName + _("X_res"),(int)solverConfig.resx);
   m_config->Write(groupName + _("Y_res"),(int)solverConfig.resy);
   m_config->Write(groupName + _("Z_res"),(int)solverConfig.resz);
-  
+
   m_config->Write(groupName + _("Dim"),solverConfig.dim);
   m_config->Write(groupName + _("Scale.x"),solverConfig.scale.x);
   m_config->Write(groupName + _("Scale.y"),solverConfig.scale.y);
   m_config->Write(groupName + _("Scale.z"),solverConfig.scale.z);
-  
-  m_config->Write(groupName + _("TimeStep"),solverConfig.timeStep);      
-  m_config->Write(groupName + _("Buoyancy"), solverConfig.buoyancy);   
+
+  m_config->Write(groupName + _("TimeStep"),solverConfig.timeStep);
+  m_config->Write(groupName + _("Buoyancy"), solverConfig.buoyancy);
   m_config->Write(groupName + _("Vorticity"), solverConfig.vorticityConfinement);
-  
+
   m_config->Write(groupName + _("omegaDiff"),solverConfig.omegaDiff);
   m_config->Write(groupName + _("omegaProj"),solverConfig.omegaProj);
   m_config->Write(groupName + _("epsilon"),solverConfig.epsilon);
-  
+
   m_config->Write(groupName + _("nbMaxIter"),(int)solverConfig.nbMaxIter);
 }
 
@@ -692,7 +692,7 @@ void FlamesFrame::SaveFireSettings(wxString& groupName, FlameConfig& fireConfig)
 void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
   wxString groupName;
-  
+
   m_config->Write(_("/Display/Width"), (int)m_currentConfig.width);
   m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
@@ -703,56 +703,56 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/NbDepthPeelingLayers"), (int)m_currentConfig.nbDepthPeelingLayers);
   m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
   m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
-  
+
   m_config->Write(_("/Shadows/Fatness.x"), (GLfloat)m_currentConfig.fatness[0]);
   m_config->Write(_("/Shadows/Fatness.y"), (GLfloat)m_currentConfig.fatness[1]);
   m_config->Write(_("/Shadows/Fatness.z"), (GLfloat)m_currentConfig.fatness[2]);
   m_config->Write(_("/Shadows/ExtrudeDist.x"), (GLfloat)m_currentConfig.extrudeDist[0]);
   m_config->Write(_("/Shadows/ExtrudeDist.y"), (GLfloat)m_currentConfig.extrudeDist[1]);
   m_config->Write(_("/Shadows/ExtrudeDist.z"), (GLfloat)m_currentConfig.extrudeDist[2]);
-  
+
   m_config->Write(_("/Luminaries/Number"), (int)m_currentConfig.nbLuminaries);
 
   groupName << _("/GlobalField/");
   m_config->DeleteGroup(groupName);
-  
+
   m_config->Write(_("/GlobalField/Enabled"), m_currentConfig.useGlobalField);
   if(m_currentConfig.useGlobalField){
     m_solverPanels[0]->getCtrlValues(m_currentConfig.globalField);
     SaveSolverSettings(groupName,m_currentConfig.globalField);
   }
-  
+
   for(uint i=0; i < m_nbLuminariesMax; i++)
     {
       groupName.Printf(_("/Luminary%d"),i);
 
       m_config->DeleteGroup(groupName);
     }
-  
+
   for(uint i=0; i < m_currentConfig.nbLuminaries; i++)
     {
       groupName.Printf(_("/Luminary%d/"),i);
-      
+
       m_config->Write(groupName + _("FileName"),m_currentConfig.luminaries[i].fileName);
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.luminaries[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.luminaries[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.luminaries[i].position.z);
-      
+
       groupName.Printf(_("/Luminary%d/NbFields"),i);
       m_config->Write(groupName, (int)m_currentConfig.luminaries[i].nbFields);
       groupName.Printf(_("/Luminary%d/Solver0/"),i);
       m_solverPanels[i+m_currentConfig.useGlobalField]->getCtrlValues(m_currentConfig.luminaries[i].fields[0]);
       SaveSolverSettings(groupName,m_currentConfig.luminaries[i].fields[0]);
-      
+
       groupName.Printf(_("/Luminary%d/NbFires"),i);
       m_config->Write(groupName, (int)m_currentConfig.luminaries[i].nbFires);
       groupName.Printf(_("/Luminary%d/Flame0/"),i);
       m_flamePanels[i]->getCtrlValues(m_currentConfig.luminaries[i].fires[0]);
-      SaveFireSettings(groupName,m_currentConfig.luminaries[i].fires[0]);  
+      SaveFireSettings(groupName,m_currentConfig.luminaries[i].fires[0]);
     }
-  
+
   wxFileOutputStream file( m_configFileName );
-  
+
   if (m_config->Save(file) )
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
@@ -760,11 +760,11 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 
 void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
-  
+
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
-  
+
   wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxOVERWRITE_PROMPT);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
@@ -772,10 +772,10 @@ void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
     filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
-  
+
     if(!filename.IsEmpty()){
       m_configFileName = filename;
-      
+
       SetTitle(_("Real-time Animation of small Flames - ") + m_configFileName);
       OnSaveSettingsMenu(event);
     }
@@ -834,14 +834,14 @@ void FlamesFrame::OnHideMenu(wxCommandEvent& event)
 }
 
 void FlamesFrame::OnShadowVolumesMenu(wxCommandEvent& event)
-{ 
+{
   m_glBuffer->ToggleShadowVolumesDisplay();
 }
 
 void FlamesFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
 {
   ShadowsDialog shadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
-  shadowsDialog.ShowModal();  
+  shadowsDialog.ShowModal();
 }
 
 void FlamesFrame::OnFBDSMenu(wxCommandEvent& event)
@@ -900,7 +900,7 @@ void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
   wxString choices[] = {_("800x600"),_("960x720"),_("1024x768"),_("1152x864"),_("1280x1024")};
   wxString res;
   res = ::wxGetSingleChoice(_("Choose OpenGL window resolution"), _("Resolution"), 5, choices);
-  
+
   if(!res.IsEmpty())
     {
       long unsigned int w,h;
@@ -909,7 +909,7 @@ void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
       m_currentConfig.width = (uint)w; m_currentConfig.height = (uint)h;
       cout << "Stretch GL buffer size to : " << m_currentConfig.width << "x" << m_currentConfig.height << endl;
       m_leftSizer->SetItemMinSize(m_glBuffer,m_currentConfig.width,m_currentConfig.height);
-      
+
       m_mainSizer->Fit(this);
       m_mainSizer->SetSizeHints(this);
       Layout();
@@ -920,6 +920,6 @@ void FlamesFrame::SetFPS(int fps, int rps, uint width, uint height)
 {
   wxString s;
   s += wxString::Format(_("%d FPS %d RPS | %dx%d"), fps, rps, width, height);
-  
+
   SetStatusText(s);
 }

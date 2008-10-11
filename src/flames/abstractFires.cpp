@@ -120,8 +120,8 @@ FireSource::~FireSource()
 
 void FireSource::build()
 {
-  Point averagePos;
-  Vector averageVec;
+  CPoint averagePos;
+  CVector averageVec;
 
   if(!m_visibility) return;
 
@@ -142,7 +142,7 @@ void FireSource::computeIntensityPositionAndDirection()
 {
   //  float r,y;
 
-  Vector o = getMainDirection();
+  CVector o = getMainDirection();
 
   // l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
@@ -168,7 +168,7 @@ void FireSource::computeIntensityPositionAndDirection()
 
 void FireSource::buildBoundingSphere ()
 {
-  Point p;
+  CPoint p;
   float t;
   p = (m_solver->getScale() * m_solver->getDim());
   t = p.max();
@@ -185,23 +185,23 @@ void FireSource::drawImpostor() const
 {
   if(m_visibility)
     {
-//       Point position(getPosition());
-//       Point scale(m_solver->getScale());
+//       CPoint position(getPosition());
+//       CPoint scale(m_solver->getScale());
 //       glPushMatrix();
 //       glTranslatef (position.x, position.y, position.z);
 //       glScalef (scale.x, scale.y, scale.z);
-//       GraphicsFn::SolidBox(Point(),m_solver->getDim());
+//       CGraphicsFn::SolidBox(CPoint(),m_solver->getDim());
 //       glPopMatrix();
       GLfloat modelview[16];
 
-      Point pos(getPosition());
+      CPoint pos(getPosition());
       float size=m_solver->getScale().x*1.5f, halfSize=m_solver->getScale().x*.5f;
-      Point a,b,c,d,zero;
-      Vector right,up,offset;
+      CPoint a,b,c,d,zero;
+      CVector right,up,offset;
 
       glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
 
-      offset = Vector(modelview[2], modelview[6], modelview[10])*m_solver->getDim().z*m_solver->getScale().z/2.0f;
+      offset = CVector(modelview[2], modelview[6], modelview[10])*m_solver->getDim().z*m_solver->getScale().z/2.0f;
 
       right.x = modelview[0];
       right.y = modelview[4];
@@ -349,8 +349,8 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
   default :
     if(m_visibility)
       {
-	Point pt(getPosition());
-	Point scale(m_solver->getScale());
+	CPoint pt(getPosition());
+	CPoint scale(m_solver->getScale());
 	glPushMatrix();
 	glTranslatef (pt.x, pt.y, pt.z);
 	glScalef (scale.x, scale.y, scale.z);
@@ -370,8 +370,8 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
 
 void DetachableFireSource::build()
 {
-  Point averagePos, tmp;
-  Vector averageVec;
+  CPoint averagePos, tmp;
+  CVector averageVec;
   DetachedFlame* flame;
 
   if(!m_visibility) return;
@@ -400,9 +400,9 @@ void DetachableFireSource::build()
       flamesIterator++;
   }
 
-  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
-  Point pt;
-  Point p;
+  CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  CPoint pt;
+  CPoint p;
   float t,k;
   p = (m_solver->getScale() * m_solver->getDim())/2.0f;
   t = p.max();
@@ -444,13 +444,13 @@ void DetachableFireSource::build()
 //     {
 //       GLfloat modelview[16];
 
-//       Point pos(m_solver->getPosition());
+//       CPoint pos(m_solver->getPosition());
 //       float size=m_solver->getScale().x*1.1;
-//       Point a,b,c,d,zero;
-//       Vector right,up,offset;//(0.0f,0.0f,0.5f);
+//       CPoint a,b,c,d,zero;
+//       CVector right,up,offset;//(0.0f,0.0f,0.5f);
 
 //       glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
-//       offset = Vector(modelview[2], modelview[6], modelview[10])*.5f*size;
+//       offset = CVector(modelview[2], modelview[6], modelview[10])*.5f*size;
 
 //       right.x = modelview[0];
 //       right.y = modelview[4];
@@ -488,7 +488,7 @@ void DetachableFireSource::setSmoothShading (bool state)
 
 void DetachableFireSource::computeIntensityPositionAndDirection()
 {
-  Vector o = getMainDirection();
+  CVector o = getMainDirection();
 
   // l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
   // et de la taille en y de la grille fois un coeff correcteur
@@ -595,9 +595,9 @@ void DetachableFireSource::computeVisibility(const Camera &view, bool forceSpher
 
 void DetachableFireSource::buildBoundingBox ()
 {
-  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
-  Point pt;
-  Point pos(getPosition());
+  CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  CPoint pt;
+  CPoint pos(getPosition());
 
   if( m_detachedFlamesList.size () )
     for (list < DetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();

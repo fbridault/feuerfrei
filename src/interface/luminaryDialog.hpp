@@ -18,7 +18,7 @@ enum
 
 
 /** Panneau pour les onglets de la boîte de dialogue des réglages des flammes */
-class LuminaryPanel: public wxPanel 
+class LuminaryPanel: public wxPanel
 {
 public:
   LuminaryPanel(wxWindow* parent, int id, bool localSolver, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=0);
@@ -26,14 +26,14 @@ public:
   void setCtrlValues(const SolverConfig& solverConfig);
   bool getCtrlValues(LuminaryConfig& luminaryConfig);
   bool getCtrlValues(SolverConfig& solverConfig);
-  
+
 private:
   void setProperties();
   void doLayout();
   void OnClickButtonBrowseWick(wxCommandEvent& event);
   void OnSelectFlameType(wxCommandEvent& event);
   void OnSelectFieldType(wxCommandEvent& event);
-  
+
   protected:
   wxStaticText* m_posLabel;
   DoubleTextCtrl* m_posXTextCtrl;
@@ -45,7 +45,7 @@ private:
   LongTextCtrl* m_skeletonsNumberCtrl;
   wxButton* m_wickBrowseButton;
   wxRadioBox* m_luminaryTypeRadioBox;
-  
+
   wxStaticText* m_dimLabel;
   DoubleTextCtrl* m_dimTextCtrl;
   wxStaticText* m_scaleLabel;
@@ -66,12 +66,12 @@ private:
   wxStaticText* m_epsilonLabel;
   DoubleTextCtrl* m_epsilonTextCtrl;
   bool m_luminary;
-  
+
   DECLARE_EVENT_TABLE()
 };
 
 /** Boîte de dialogue pour les réglages des flammes */
-class LuminaryDialog: public wxDialog 
+class LuminaryDialog: public wxDialog
 {
 public:
   LuminaryDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, const wxPoint& pos=wxDefaultPosition, const wxSize& size=wxDefaultSize, long style=wxDEFAULT_DIALOG_STYLE);
@@ -83,7 +83,7 @@ private:
   void OnOK(wxCommandEvent& event);
   void OnCancel(wxCommandEvent& event);
   void OnCheckActivateGlobalSolver(wxCommandEvent& event);
-  
+
   int m_nbPanels;
   wxCheckBox *m_activateGlobalSolverCheckBox;
   LuminaryPanel* m_luminaryPanels[NB_MAXFLAMMES];

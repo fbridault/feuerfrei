@@ -5,9 +5,8 @@ class GammaEngine;
 
 #include "../shaders/glsl.hpp"
 
-#include "../flames/renderTarget.hpp"
-#include "../scene/texture.hpp"
-#include <GL/glu.h>
+#include <engine/renderTarget.hpp>
+#include <engine/texture.hpp>
 
 /** Classe servant d'interface avec le fragment program de la correction gamma.
  *
@@ -19,7 +18,7 @@ public:
     /** Constructeur par défaut.
    * @param sourceName Nom du fichier source.
    * @param shaderName Nom du programme Cg.
-   * @param context Pointeur vers le contexte Cg (il doit être déjà créé).
+   * @param context CPointeur vers le contexte Cg (il doit être déjà créé).
    * @param recompile Indique s'il faut recompiler le shader à partir du fichier glsl ou si le .o est déjà compilé.
    */
   GammaEngine(uint width, uint height,  bool recompile=true);
@@ -30,7 +29,7 @@ public:
   {
     m_width = width; m_height=height;
     delete m_renderTarget;
-    m_renderTarget = new RenderTarget("color rect rgba depthbuffer nearest",width, height,0);
+    m_renderTarget = new CRenderTarget("color rect rgba depthbuffer nearest",width, height,0);
   }
 
   /** Affecte la correction gamma.
@@ -81,7 +80,7 @@ public:
 private:
   GLSLFragmentShader m_fp;
   GLfloat m_gamma;
-  RenderTarget *m_renderTarget;
+  CRenderTarget *m_renderTarget;
   uint m_width, m_height;
 };
 

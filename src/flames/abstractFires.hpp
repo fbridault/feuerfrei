@@ -10,14 +10,14 @@ class FireSource;
 
 #include "flames.hpp"
 
-#include "../scene/graphicsFn.hpp"
+#include <engine/graphicsFn.hpp>
 
 #include "../solvers/solver3D.hpp"
 #include "../scene/object.hpp"
-#include "../scene/texture.hpp"
 #include "../shaders/glsl.hpp"
 #include "realFlames.hpp"
 #include "ies.hpp"
+#include <engine/texture.hpp>
 
 class RealFlame;
 class Field3D;
@@ -29,7 +29,6 @@ class IES;
 extern uint g_count;
 #endif
 
-#define FILTER_SIZE 7
 
 /**********************************************************************************************************************/
 /************************************** DEFINITION DE LA CLASSE FLAMELIGHT ********************************************/
@@ -56,7 +55,7 @@ public:
   /** Déplace la lumière à la position. Ceci déplace en réalité la lumière OpenGL.
    * @param pos Position de la lumière.
    */
-  virtual void setLightPosition (const Point& pos)
+  virtual void setLightPosition (const CPoint& pos)
   {
     m_lightPosition[0] = pos.x;
     m_lightPosition[1] = pos.y;
@@ -78,7 +77,7 @@ public:
   virtual void switchOffMulti (){};
 
   /** Récupération du tableau des intensités du solide photométrique.
-   * @return Pointeur sur les intensités.
+   * @return CPointeur sur les intensités.
    */
   float *getIntensities(void) const { return m_iesFile->getIntensities(); };
 
@@ -98,7 +97,7 @@ public:
 
   /** Récupération du centre.
    */
-  Point getCenterSP(void) const { return m_centreSP; };
+  CPoint getCenterSP(void) const { return m_centreSP; };
 
   const float getLazimut() const {return m_iesFile->getLazimut();};
 
@@ -130,11 +129,11 @@ public:
 protected:
 
   /** Centre du solide photométrique dans l'espace. */
-  Point m_centreSP;
+  CPoint m_centreSP;
   /** Orientation du solide photométrique, utilisée pour la rotation. */
   float m_orientationSPtheta;
   /** Axe de rotation. */
-  Vector m_axeRotation;
+  CVector m_axeRotation;
   /** Valeur de l'intensité du solide. */
   float m_intensity;
   /** Coefficient pondérateur de l'intensité de la source. */
@@ -150,10 +149,10 @@ protected:
   GLfloat m_glowDivide[2];
 private:
 
-  /** Pointeur sur la scène. */
+  /** CPointeur sur la scène. */
   const Scene *m_scene;
 
-  /** Pointeur sur le program générateur de volumes d'ombres. */
+  /** CPointeur sur le program générateur de volumes d'ombres. */
   const GLSLProgram *m_SVProgram;
 
 
@@ -181,13 +180,13 @@ class FireSource : public FlameLight
 public:
   /** Constructeur d'une source de flammes. La position de la source est donnée dans le repère du solveur.
    * @param flameConfig Configuration de la flamme.
-   * @param s Pointeur sur le solveur de fluides.
+   * @param s CPointeur sur le solveur de fluides.
    * @param nbFlames Nombre de flammes, si = 0 alors le tableau contenant les flammes n'est pas alloué.
    * et ceci doit alors être réalisé par la classe fille.
-   * @param scene Pointeur sur la scène.
+   * @param scene CPointeur sur la scène.
    * @param texname Nom du fichier contenant le luminaire.
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param program Pointeur sur le program chargé de la construction des shadow volumes.
+   * @param program CPointeur sur le program chargé de la construction des shadow volumes.
    */
   FireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
 	      const wxString &texname, uint index, const GLSLProgram* const program);
@@ -257,7 +256,7 @@ public:
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
-  Point getPosition () const
+  CPoint getPosition () const
   {
     return m_solver->getPosition();
   }
@@ -265,7 +264,7 @@ public:
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */
-  Point getWickPosition () const
+  CPoint getWickPosition () const
   {
     return m_position;
   }
@@ -280,8 +279,8 @@ public:
    */
   virtual void drawWick(bool displayBoxes) const
   {
-    Point pt(getPosition());
-    Point scale(m_solver->getScale());
+    CPoint pt(getPosition());
+    CPoint scale(m_solver->getScale());
     glPushMatrix();
     glTranslatef (pt.x, pt.y, pt.z);
     glScalef (scale.x, scale.y, scale.z);
@@ -309,8 +308,8 @@ public:
     default :
       if(m_visibility)
 	{
-	  Point pt(getPosition());
-	  Point scale(m_solver->getScale());
+	  CPoint pt(getPosition());
+	  CPoint scale(m_solver->getScale());
 	  glPushMatrix();
 	  glTranslatef (pt.x, pt.y, pt.z);
 	  glScalef (scale.x, scale.y, scale.z);
@@ -320,7 +319,7 @@ public:
 	  // Trace une sphère indiquant le centre
 // 	  	    glPushMatrix();
 // 	  	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
-// 	  	    GraphicsFn::SolidSphere (.05, 10, 10);
+// 	  	    CGraphicsFn::SolidSphere (.05, 10, 10);
 // 	  	    glPopMatrix();
 	}
       break;
@@ -387,10 +386,10 @@ public:
   }
 
   /** Fonction permettant de récupérer le centre de la flamme dans le repère local. */
-  virtual Point getCenter() const { return m_center; };
+  virtual CPoint getCenter() const { return m_center; };
 
   /** Fonction permettant de récupérer l'orientation principale de la flamme. */
-  virtual Vector getMainDirection() const { return m_direction; };
+  virtual CVector getMainDirection() const { return m_direction; };
 
   /** Fonction recalculant le centre et la direction de la flamme, en vue de
    * l'éclairage. Appelée à chaque pas de simulation. */
@@ -424,11 +423,11 @@ protected:
   /** Tableau contenant les flammes */
   RealFlame **m_flames;
 
-  /** Pointeur sur le solveur de fluides */
+  /** CPointeur sur le solveur de fluides */
   Field3D *m_solver;
 
-  /** Texture utilisée pour les flammes */
-  BitmapTexture m_texture;
+  /** ITexture utilisée pour les flammes */
+  CBitmapTexture m_texture;
 
   /** Sphère englobante utilisée pour vérifier la visibilité de la source. */
   BoundingSphere m_boundingSphere;
@@ -452,16 +451,16 @@ protected:
   int m_fdf;
 
   /** Centre de la flamme, recalculé à chaque itération dans build() */
-  Point m_center;
+  CPoint m_center;
 
   /** Direction principale de la flamme, recalculée à chaque itération dans build() */
-  Vector m_direction;
+  CVector m_direction;
 
   /** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
   int m_fluidsLODSave, m_nurbsLODSave;
 
   /** Position de la flamme dans le monde. */
-  Point m_position;
+  CPoint m_position;
 };
 
 /** La classe Firesource ajoute la notion de flammes détachées.
@@ -473,13 +472,13 @@ class DetachableFireSource : public FireSource
 public:
   /** Constructeur.
    * @param flameConfig Configuration de la flamme.
-   * @param s Pointeur sur le solveur de fluides.
+   * @param s CPointeur sur le solveur de fluides.
    * @param filename Nom du fichier contenant le luminaire.
    * @param nbFlames Nombre de flammes.
-   * @param scene Pointeur sur la scène.
+   * @param scene CPointeur sur la scène.
    * @param texname Nom du fichier image de la texture.
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-   * @param program Pointeur sur le program chargé de la construction des shadow volumes.
+   * @param program CPointeur sur le program chargé de la construction des shadow volumes.
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   DetachableFireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
@@ -550,7 +549,7 @@ public:
 //   virtual void drawImpostor () const;
 
   /** Ajoute une flamme détachée à la source.
-   * @param detachedFlame Pointeur sur la nouvelle flamme détachée à ajouter.
+   * @param detachedFlame CPointeur sur la nouvelle flamme détachée à ajouter.
    */
   virtual void addDetachedFlame(DetachedFlame* detachedFlame)
   {
@@ -558,7 +557,7 @@ public:
   }
 
   /** Supprime une flamme détachée à la source.
-   * @param detachedFlame Pointeur sur la flamme détachée à enlever.
+   * @param detachedFlame CPointeur sur la flamme détachée à enlever.
    */
   virtual void removeDetachedFlame(DetachedFlame* detachedFlame)
   {
@@ -577,7 +576,7 @@ private:
 
   /** Liste des flammes détachées */
   list<DetachedFlame *> m_detachedFlamesList;
-  Point m_BBmin, m_BBmax;
+  CPoint m_BBmin, m_BBmax;
 };
 
 #endif

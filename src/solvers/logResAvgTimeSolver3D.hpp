@@ -31,20 +31,20 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResAvgTimeSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
+  LogResAvgTimeSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
 			 float timeStep, float buoyancy, float vorticityConfinement,
 			 float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps);
   /** Destructeur. */
   virtual ~LogResAvgTimeSolver3D ();
-  
+
 private:
   void vel_step ();
-  
+
   void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
   void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
-  
+
   void computeAverage ( uint iter, float value, float time );
-  
+
   /** Tableau contenant les moyennes des temps. Il est organisé comme ceci :<br>
    *    - de O à m_nbSteps : diffusion en u avec GS
    *    - de m_nbSteps à 2*m_nbSteps : diffusion en v avec GS

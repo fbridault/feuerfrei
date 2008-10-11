@@ -19,10 +19,10 @@ class PixelLightingRenderer
 {
 public:
   /** Constructeur par défaut.
-   * @param s Pointeur vers la scène 3D.
+   * @param s CPointeur vers la scène 3D.
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
-   * @param context Pointeur vers le contexte Cg.
+   * @param context CPointeur vers le contexte Cg.
    * @param  Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
   PixelLightingRenderer(const Scene* const s, const vector <FireSource *> *flames);
@@ -36,9 +36,9 @@ public:
   virtual void draw(bool color);
 
 protected:
-  /** Pointeur vers la scène 3D. */
+  /** CPointeur vers la scène 3D. */
   const Scene* m_scene;
-  /** Pointeur vers les flammes. */
+  /** CPointeur vers les flammes. */
   const vector <FireSource *> *m_flames;
 
   GLSLProgram m_SPProgram;
@@ -66,10 +66,10 @@ class PhotometricSolidsRenderer : public PixelLightingRenderer
 {
 public:
   /** Constructeur par défaut.
-   * @param s Pointeur vers la scène 3D.
+   * @param s CPointeur vers la scène 3D.
    * @param flames Tableau contenant les flammes.
    * @param nbFlames Nombre de flammes dans le tableau.
-   * @param context Pointeur vers le contexte Cg.
+   * @param context CPointeur vers le contexte Cg.
    * @param  Booléne indiquant s'il faut recompiler ou non les shaders Cg.
    */
   PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames);
@@ -87,8 +87,8 @@ public:
   void generateTexture(void);
 
 private:
-  /** Texture 3D contenant les valeurs de luminance de tous les flammes. */
-  Texture3D *m_photometricSolidsTex;
+  /** ITexture 3D contenant les valeurs de luminance de tous les flammes. */
+  CTexture3D *m_photometricSolidsTex;
 
   /** Tableau contenant le fragment program pour SP interpolé sans couleur des objets */
   GLSLFragmentShader m_SPOnlyFragmentShader;

@@ -45,10 +45,10 @@ void GlowEngine::generateTex()
     m_width[i] = m_initialWidth/m_scaleFactor[i];
     m_height[i] = m_initialHeight/m_scaleFactor[i];
 
-    m_firstPassRT[i] = new RenderTarget(m_width[i], m_height[i]);
+    m_firstPassRT[i] = new CRenderTarget(m_width[i], m_height[i]);
     m_firstPassRT[i]->addTarget("color rect rgba depthbuffer linear",0);
 
-    m_secondPassRT[i] = new RenderTarget(m_width[i], m_height[i]);
+    m_secondPassRT[i] = new CRenderTarget(m_width[i], m_height[i]);
     m_secondPassRT[i]->addTarget("color rect rgba depthbuffer linear",0);
   }
 }

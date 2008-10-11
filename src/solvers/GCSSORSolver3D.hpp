@@ -7,7 +7,7 @@ class GCSSORSolver3D;
 
 /** La classe GCSSORSolver propose d'utiliser la méthode du gradient conjugué préconditionné comme
  * méthode de resolution des systèmes linéaires.
- * 
+ *
  * @author	Flavien Bridault et Michel Leblond
  */
 class GCSSORSolver3D : public virtual Solver3D
@@ -25,9 +25,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep, 
+  GCSSORSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
-  
+
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.
    * @param omegaProj Paramètre omega pour la projection.
@@ -36,7 +36,7 @@ public:
   GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon);
   /** Destructeur. */
   virtual ~GCSSORSolver3D ();
-  
+
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
   * et de la projection à l'aide de la méthode du Gradient Conjugué
@@ -49,13 +49,13 @@ protected:
   * @param maxiter Nombre d'itérations maximal à effectuer
   */
   virtual void GCSSOR(float *const x0, const float *const b, float a, float diagonal, float omega, uint maxiter);
-  
-  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);  
+
+  virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
-  
+
   /** Résidu, pour SSOR, direction de descente et ? */
   float *m_r, *m_z, *m_p, *m_q;
-  
+
   /** Paramètre omega pour la diffusion */
   float m_omegaDiff;
   /** Paramètre omega pour la projection */

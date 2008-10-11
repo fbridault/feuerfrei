@@ -17,8 +17,10 @@
 					<Add directory="/usr/include/IL" />
 				</Compiler>
 				<Linker>
+					<Add option="-Wl,-rpath,engine/bin/Debug" />
 					<Add library="IL" />
 					<Add library="ILUT" />
+					<Add directory="engine/bin/Debug" />
 				</Linker>
 			</Target>
 			<Target title="Fire - Release">
@@ -33,6 +35,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-Wl,-rpath,engine/bin/Release" />
 					<Add library="IL" />
 					<Add library="ILUT" />
 				</Linker>
@@ -67,13 +70,22 @@
 			<Add option="`wx-config --cxxflags`" />
 			<Add option="-DGL_GLEXT_PROTOTYPES" />
 			<Add option="-DMULTITHREADS" />
+			<Add directory="/home/flavien/recherche/git/flames/" />
 		</Compiler>
+		<ResourceCompiler>
+			<Add directory="bin/Debug" />
+		</ResourceCompiler>
 		<Linker>
 			<Add option="`wx-config --libs gl std`" />
 			<Add library="GL" />
 			<Add library="GLU" />
+			<Add library="engine" />
 		</Linker>
-		<Unit filename="src/CMakeLists.txt" />
+		<Unit filename="src/CMakeLists.txt">
+			<Option target="Fire - Release" />
+			<Option target="Fluids - Debug" />
+			<Option target="Fluids - Release" />
+		</Unit>
 		<Unit filename="src/common.hpp" />
 		<Unit filename="src/flames.cpp">
 			<Option target="Fire - Debug" />
@@ -183,14 +195,6 @@
 			<Option target="Fire - Debug" />
 			<Option target="Fire - Release" />
 		</Unit>
-		<Unit filename="src/flames/renderTarget.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/flames/renderTarget.hpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
 		<Unit filename="src/flames/skeleton.cpp">
 			<Option target="Fire - Debug" />
 			<Option target="Fire - Release" />
@@ -284,8 +288,6 @@
 			<Option target="Fire - Release" />
 		</Unit>
 		<Unit filename="src/scene/gammaEngine.hpp" />
-		<Unit filename="src/scene/graphicsFn.cpp" />
-		<Unit filename="src/scene/graphicsFn.hpp" />
 		<Unit filename="src/scene/intensity.hpp" />
 		<Unit filename="src/scene/material.cpp">
 			<Option target="Fire - Debug" />
@@ -302,27 +304,35 @@
 			<Option target="Fire - Release" />
 		</Unit>
 		<Unit filename="src/scene/scene.hpp" />
-		<Unit filename="src/scene/source.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
+		<Unit filename="src/shaders/ShadowVolumeExtrusion.cg">
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/scene/source.hpp" />
-		<Unit filename="src/scene/texture.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
+		<Unit filename="src/shaders/gamma.fp">
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/scene/texture.hpp" />
-		<Unit filename="src/shaders/ShadowVolumeExtrusion.cg" />
-		<Unit filename="src/shaders/gamma.fp" />
-		<Unit filename="src/shaders/glowShaderX.fp" />
-		<Unit filename="src/shaders/glowShaderY.fp" />
+		<Unit filename="src/shaders/glowShaderX.fp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/glowShaderY.fp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src/shaders/glsl.cpp" />
 		<Unit filename="src/shaders/glsl.hpp" />
-		<Unit filename="src/shaders/photoSolid.fp" />
-		<Unit filename="src/shaders/photoSolid.vp" />
-		<Unit filename="src/shaders/photoSolidOnly.fp" />
-		<Unit filename="src/shaders/shadowVolume.vp" />
-		<Unit filename="src/shaders/viewportSizedTex.fp" />
+		<Unit filename="src/shaders/photoSolid.fp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/photoSolid.vp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/photoSolidOnly.fp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/shadowVolume.vp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/viewportSizedTex.fp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="src/solvers/CGSSORSolver2D.cpp">
 			<Option target="Fluids - Debug" />
 			<Option target="Fluids - Release" />
@@ -408,7 +418,6 @@
 		</Unit>
 		<Unit filename="src/solvers/solver3D.cpp" />
 		<Unit filename="src/solvers/solver3D.hpp" />
-		<Unit filename="src/vector.hpp" />
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />

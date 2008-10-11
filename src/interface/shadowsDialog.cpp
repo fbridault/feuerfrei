@@ -11,14 +11,14 @@ END_EVENT_TABLE();
 
 /**************************************** ShadowsDialog Class methods **************************************/
 
-ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, 
+ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config,
 			     GLFlameCanvas* const glBuffer, const wxPoint& pos, const wxSize& size, long style):
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
   wxString tmp;
-  
+
   m_currentConfig = config;
-  
+
   m_fatnessLabel = new wxStaticText(this, -1, _("Fatness"));
   m_fatnessXTextCtrl = new DoubleTextCtrl(this, IDT_FATX, -1, 1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
   m_fatnessYTextCtrl = new DoubleTextCtrl(this, IDT_FATY, -1, 1, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
@@ -40,7 +40,7 @@ ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, Fl
   (*m_shadowExtrudeDistZTextCtrl) << m_currentConfig->extrudeDist[2];
 
   m_glBuffer = glBuffer;
-    
+
   doLayout();
 }
 
@@ -49,19 +49,19 @@ void ShadowsDialog::doLayout()
   wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* fatnessSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* shadowExtrudeDistSizer = new wxBoxSizer(wxHORIZONTAL);
-  
+
   fatnessSizer->Add(m_fatnessLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   fatnessSizer->Add(m_fatnessXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   fatnessSizer->Add(m_fatnessYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   fatnessSizer->Add(m_fatnessZTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 10);
   sizer->Add(fatnessSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  
+
   shadowExtrudeDistSizer->Add(m_shadowExtrudeDistLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   shadowExtrudeDistSizer->Add(m_shadowExtrudeDistXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   shadowExtrudeDistSizer->Add(m_shadowExtrudeDistYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   shadowExtrudeDistSizer->Add(m_shadowExtrudeDistZTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   sizer->Add(shadowExtrudeDistSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  
+
   SetAutoLayout(true);
   SetSizer(sizer);
   sizer->Fit(this);
@@ -73,13 +73,13 @@ void ShadowsDialog::OnFatnessEnter(wxCommandEvent& event)
 {
   switch(event.GetId())
     {
-    case IDT_FATX : 
+    case IDT_FATX :
       m_currentConfig->fatness[0]=m_fatnessXTextCtrl->GetSafelyValue();
       break;
-    case IDT_FATY : 
+    case IDT_FATY :
       m_currentConfig->fatness[1]=m_fatnessYTextCtrl->GetSafelyValue();
       break;
-    case IDT_FATZ : 
+    case IDT_FATZ :
       m_currentConfig->fatness[2]=m_fatnessZTextCtrl->GetSafelyValue();
       break;
     }
@@ -89,13 +89,13 @@ void ShadowsDialog::OnShadowsExtrudeDistEnter(wxCommandEvent& event)
 {
   switch(event.GetId())
     {
-    case IDT_SEDX : 
+    case IDT_SEDX :
       m_currentConfig->extrudeDist[0]=m_shadowExtrudeDistXTextCtrl->GetSafelyValue();
       break;
-    case IDT_SEDY : 
+    case IDT_SEDY :
       m_currentConfig->extrudeDist[1]=m_shadowExtrudeDistYTextCtrl->GetSafelyValue();
       break;
-    case IDT_SEDZ : 
+    case IDT_SEDZ :
       m_currentConfig->extrudeDist[2]=m_shadowExtrudeDistZTextCtrl->GetSafelyValue();
       break;
     }

@@ -11,7 +11,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
   wxPanel(parent, id, pos, size, wxTAB_TRAVERSAL)
 {
   wxString itemName;
-  
+
   m_luminary = luminary;
   if(m_luminary){
     /* Field */
@@ -27,7 +27,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
     m_scaleZTextCtrl = new DoubleTextCtrl(this, -1, -10, 10, _("1"));
     m_resYTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
     m_resZTextCtrl = new LongTextCtrl(this, -1, 0, 100, _("15"));
-    
+
     /* Flame */
     m_skeletonsNumberLabel = new wxStaticText(this, -1, _("Skeletons number"));
     m_skeletonsNumberCtrl = new LongTextCtrl(this, -1, 0, 100, _("4"));
@@ -40,7 +40,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
       _("Candles Set"),
       _("Candlestick")
     };
-    m_luminaryTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Flame Type"), wxDefaultPosition, wxDefaultSize, 
+    m_luminaryTypeRadioBox = new wxRadioBox(this, IDRF_Type, _("Flame Type"), wxDefaultPosition, wxDefaultSize,
 					    6, m_luminaryTypeRadioBoxChoices, 0, wxRA_SPECIFY_COLS);
     m_wickLabel = new wxStaticText(this, -1, _("Luminary file"));
     m_wickTextCtrl = new wxTextCtrl(this, -1, _("scenes/bougie.obj"));
@@ -63,7 +63,7 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
     _("LOD field"),
     _("LOD smooth field ")
   };
-  m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Velocity Field Type"), wxDefaultPosition, wxDefaultSize, 
+  m_solverTypeRadioBox = new wxRadioBox(this, IDRS_Type, _("Velocity Field Type"), wxDefaultPosition, wxDefaultSize,
 					9, m_solverTypeRadioBoxChoices, 2, wxRA_SPECIFY_COLS);
 
   m_omegaDiffLabel = new wxStaticText(this, -1, _("Omega in diffusion"));
@@ -72,10 +72,10 @@ LuminaryPanel::LuminaryPanel(wxWindow* parent, int id, bool luminary, const wxPo
   m_omegaProjTextCtrl = new DoubleTextCtrl(this, -1, 0, 2, _("1.6"));
   m_epsilonLabel = new wxStaticText(this, -1, _("Error threshold"));
   m_epsilonTextCtrl = new DoubleTextCtrl(this, -1, 0, 0.1, _("0.00001"));
-  
+
   setProperties();
   doLayout();
-  
+
   m_omegaDiffLabel->Disable();
   m_omegaDiffTextCtrl->Disable();
   m_omegaProjLabel->Disable();
@@ -98,7 +98,7 @@ void LuminaryPanel::setProperties()
     m_scaleZTextCtrl->SetMinSize(wxSize(50, 22));
     m_resYTextCtrl->SetMinSize(wxSize(50, 22));
     m_resZTextCtrl->SetMinSize(wxSize(50, 22));
-  
+
     /* Flame */
     m_wickTextCtrl->SetMinSize(wxSize(120, 22));
     m_luminaryTypeRadioBox->SetSelection(0);
@@ -114,30 +114,30 @@ void LuminaryPanel::setProperties()
 
 void LuminaryPanel::doLayout()
 {
-  wxBoxSizer* m_panelSizer = new wxBoxSizer(wxVERTICAL);  
+  wxBoxSizer* m_panelSizer = new wxBoxSizer(wxVERTICAL);
   wxBoxSizer* m_timeStepSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_resSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_omegaDiffSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_omegaProjSizer = new wxBoxSizer(wxHORIZONTAL);
   wxBoxSizer* m_epsilonSizer = new wxBoxSizer(wxHORIZONTAL);
-  
+
   if(m_luminary){
     wxBoxSizer* m_posSizer = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* m_wickSizer = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* m_skeletonsNumberSizer = new wxBoxSizer(wxHORIZONTAL);
-    
+
     /* Luminaire */
     m_posSizer->Add(m_posLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
     m_posSizer->Add(m_posXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
     m_posSizer->Add(m_posYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
     m_posSizer->Add(m_posZTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 10);
     m_panelSizer->Add(m_posSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-    
+
     m_wickSizer->Add(m_wickLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
     m_wickSizer->Add(m_wickTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
     m_wickSizer->Add(m_wickBrowseButton, 0, wxADJUST_MINSIZE, 0);
     m_panelSizer->Add(m_wickSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-    
+
     /* Flame */
     m_panelSizer->Add(m_luminaryTypeRadioBox, 0, wxADJUST_MINSIZE, 0);
     m_skeletonsNumberSizer->Add(m_skeletonsNumberLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
@@ -154,15 +154,15 @@ void LuminaryPanel::doLayout()
     m_resSizer->Add(m_resZTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   }
   m_panelSizer->Add(m_resSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  
+
   if(m_luminary){
     wxBoxSizer* m_dimSizer = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* m_scaleSizer = new wxBoxSizer(wxHORIZONTAL);
-    
+
     m_dimSizer->Add(m_dimLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
     m_dimSizer->Add(m_dimTextCtrl, 0, wxLEFT|wxADJUST_MINSIZE, 8);
     m_panelSizer->Add(m_dimSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  
+
     m_scaleSizer->Add(m_scaleLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
     m_scaleSizer->Add(m_scaleXTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
     m_scaleSizer->Add(m_scaleYTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
@@ -185,7 +185,7 @@ void LuminaryPanel::doLayout()
   m_epsilonSizer->Add(m_epsilonLabel, 0, wxLEFT|wxTOP|wxADJUST_MINSIZE, 3);
   m_epsilonSizer->Add(m_epsilonTextCtrl, 0, wxLEFT|wxRIGHT|wxADJUST_MINSIZE, 10);
   m_panelSizer->Add(m_epsilonSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 5);
-  
+
   SetAutoLayout(true);
   SetSizer(m_panelSizer);
   m_panelSizer->Fit(this);
@@ -194,9 +194,9 @@ void LuminaryPanel::doLayout()
 
 
 void LuminaryPanel::setCtrlValues(const LuminaryConfig& luminaryConfig)
-{  
+{
   wxString tmp;
-  
+
   /* Field */
   m_posXTextCtrl->Clear();
   m_posYTextCtrl->Clear();
@@ -216,7 +216,7 @@ void LuminaryPanel::setCtrlValues(const LuminaryConfig& luminaryConfig)
   /* Flame */
   m_wickTextCtrl->Clear();
   m_skeletonsNumberCtrl->Clear();
-  
+
   /* Field */
   (*m_posXTextCtrl) << luminaryConfig.position.x;
   (*m_posYTextCtrl) << luminaryConfig.position.y;
@@ -227,7 +227,7 @@ void LuminaryPanel::setCtrlValues(const LuminaryConfig& luminaryConfig)
   (*m_scaleZTextCtrl) << luminaryConfig.fields[0].scale.z;
   (*m_resYTextCtrl) << (int)luminaryConfig.fields[0].resy;
   (*m_resZTextCtrl) << (int)luminaryConfig.fields[0].resz;
-    
+
   (*m_resXTextCtrl) << (int)luminaryConfig.fields[0].resx;
   tmp.Printf(_("%.4lf"), luminaryConfig.fields[0].timeStep);
   (*m_timeStepTextCtrl) << tmp;
@@ -260,22 +260,22 @@ void LuminaryPanel::setCtrlValues(const LuminaryConfig& luminaryConfig)
 
   /* Flame */
   (*m_wickTextCtrl) << luminaryConfig.fileName;
-  
+
   m_luminaryTypeRadioBox->SetSelection(luminaryConfig.fires[0].type);
 
   (*m_skeletonsNumberCtrl) << (int)luminaryConfig.fires[0].skeletonsNumber;
 }
 
 void LuminaryPanel::setCtrlValues(const SolverConfig& solverConfig)
-{  
+{
   wxString tmp;
-  
+
   m_resXTextCtrl->Clear();
   m_timeStepTextCtrl->Clear();
   m_omegaDiffTextCtrl->Clear();
   m_omegaProjTextCtrl->Clear();
   m_epsilonTextCtrl->Clear();
-  
+
   (*m_resXTextCtrl) << (int)solverConfig.resx;
   tmp.Printf(_("%.4lf"), solverConfig.timeStep);
   (*m_timeStepTextCtrl) << tmp;
@@ -337,9 +337,9 @@ bool LuminaryPanel::getCtrlValues(LuminaryConfig& luminaryConfig)
   if(!m_wickTextCtrl->GetValue().IsEmpty())
     luminaryConfig.fileName = m_wickTextCtrl->GetValue();
   luminaryConfig.fires[0].type = m_luminaryTypeRadioBox->GetSelection();
-  
+
   luminaryConfig.fields[0].type = m_solverTypeRadioBox->GetSelection();
-  
+
   return true;
 }
 
@@ -371,7 +371,7 @@ void LuminaryPanel::OnSelectFieldType(wxCommandEvent& event)
       m_omegaProjTextCtrl->Enable();
       m_epsilonLabel->Enable();
       m_epsilonTextCtrl->Enable();
-    } 
+    }
   else
     {
       m_omegaDiffLabel->Disable();
@@ -388,17 +388,17 @@ void LuminaryPanel::OnClickButtonBrowseWick(wxCommandEvent& event)
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << _("/scenes");
-  
+
   wxFileDialog fileDialog(this, _("Choose a OBJ file for the wick"), pwd, _(""), _("*.obj"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
-    
+
     /* On récupère le chemin absolu vers la scène */
     filename.Replace(wxGetCwd(),_(""),false);
     filename=filename.Mid(1);
-    
+
     if(!filename.IsEmpty())
-      m_wickTextCtrl->SetValue(filename);    
+      m_wickTextCtrl->SetValue(filename);
   }
 }
 
@@ -412,7 +412,7 @@ BEGIN_EVENT_TABLE(LuminaryDialog, wxDialog)
 END_EVENT_TABLE();
 
 
-LuminaryDialog::LuminaryDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config, 
+LuminaryDialog::LuminaryDialog(wxWindow* parent, int id, const wxString& title, FlameAppConfig* const config,
 			 const wxPoint& pos, const wxSize& size, long style):
   wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 {
@@ -423,10 +423,10 @@ LuminaryDialog::LuminaryDialog(wxWindow* parent, int id, const wxString& title, 
   /* Solveur global */
   m_activateGlobalSolverCheckBox = new wxCheckBox(this,IDCHK_GS,_("Activate Global Field"));
   m_activateGlobalSolverCheckBox->SetValue(m_currentConfig->useGlobalField);
-  
+
   m_globalSolverPanel = new LuminaryPanel(m_luminaryNotebook, -1, false);
   m_globalSolverPanel->setCtrlValues(m_currentConfig->globalField);
-  
+
   /* Luminaires */
   for(uint i = 0; i < m_currentConfig->nbLuminaries; i++)
     {
@@ -444,12 +444,12 @@ LuminaryDialog::LuminaryDialog(wxWindow* parent, int id, const wxString& title, 
 void LuminaryDialog::doLayout()
 {
   m_sizer = new wxBoxSizer(wxVERTICAL);
-  
+
   m_sizer->Add(m_activateGlobalSolverCheckBox, 0, 0, 0);
   m_luminaryNotebook->AddPage(m_globalSolverPanel, _("Global Solver"));
   if(!m_currentConfig->useGlobalField)
     m_globalSolverPanel->Disable();
-  
+
   for(uint i = 0; i < m_currentConfig->nbLuminaries; i++)
     {
       wxString tabName(_("Luminary #")); tabName << i+1;
@@ -493,24 +493,24 @@ void LuminaryDialog::OnOK(wxCommandEvent& event)
   LuminaryConfig *newConfig;
   SolverConfig newGlobalConfig;
   uint newNb;
-    
+
   newNb = m_nbPanels;
   newConfig = new LuminaryConfig[newNb];
   for(uint i = 0; i < newNb; i++){
     newConfig[i].fields = new SolverConfig[1];
     newConfig[i].fires = new FlameConfig[1];
   }
-  
+
   if(!m_globalSolverPanel->getCtrlValues(newGlobalConfig))
     return;
   else
     {
       m_currentConfig->globalField = newGlobalConfig;
       m_currentConfig->useGlobalField = m_activateGlobalSolverCheckBox->GetValue();
-      m_currentConfig->globalField.buoyancy=0; 
-      m_currentConfig->globalField.vorticityConfinement=.1; 
+      m_currentConfig->globalField.buoyancy=0;
+      m_currentConfig->globalField.vorticityConfinement=.1;
     }
-  
+
   for(uint i = 0; i < newNb; i++)
     {
       if( m_luminaryPanels[i]->getCtrlValues(newConfig[i]) ){

@@ -44,10 +44,10 @@ Scene::Scene (const char* const fileName, vector <Luminary *> *luminaries, vecto
 //       }
 // }
 
-void Scene::computeBoundingBox(Point& max, Point& min)
+void Scene::computeBoundingBox(CPoint& max, CPoint& min)
 {
-  Point ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
-  Point objMax, objMin;
+  CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
+  CPoint objMax, objMin;
 
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();
@@ -147,18 +147,18 @@ Scene::~Scene ()
        objectsArrayIteratorWSV++)
     delete (*objectsArrayIteratorWSV);
   m_objectsArrayWSV.clear ();
-
-  for (vector < Source * >::iterator lightSourcesIterator = m_lightSourcesArray.begin ();
-       lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
-    delete (*lightSourcesIterator);
-  m_lightSourcesArray.clear ();
+//
+//  for (vector < Source * >::iterator lightSourcesIterator = m_lightSourcesArray.begin ();
+//       lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
+//    delete (*lightSourcesIterator);
+//  m_lightSourcesArray.clear ();
 
   for (vector < Material * >::iterator materialArrayIterator = m_materialArray.begin ();
        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
     delete (*materialArrayIterator);
   m_materialArray.clear ();
 
-  for (vector < BitmapTexture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
+  for (vector < CBitmapTexture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
        texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
     delete (*texturesArrayIterator);
   m_texturesArray.clear ();
@@ -210,9 +210,9 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
   Mesh* currentMesh=NULL;
 
   /**<Liste des normales de l'objet */
-  vector < Vector >normalsVector;
+  vector < CVector >normalsVector;
   /**<Liste des coordonnées de textures de l'objet */
-  vector < Point  >texCoordsVector;
+  vector < CPoint  >texCoordsVector;
   /**<Liste des indices des normales des facettes */
   vector < GLuint >normalsIndexVector;
   /**<Liste des indices des coordonnées de textures des facettes */
@@ -342,14 +342,14 @@ bool Scene::importOBJ(const char* fileName, list <Object*>* const objectsList,
 	    case 'n':
 	      objFile >> x >> y >> z;
 	      if(!skip)
-		normalsVector.push_back(Vector(x, y, z));
+		normalsVector.push_back(CVector(x, y, z));
 	      nbNormals++;
 	      break;
 	    case 't':
 	      objFile >> x >> y;
 	      if(!skip)
 		/* On inverse la coordonnée y */
-		texCoordsVector.push_back(Point(x, -y, 0));
+		texCoordsVector.push_back(CPoint(x, -y, 0));
 	      nbTexCoords++;
 	      break;
 	    }
@@ -589,11 +589,11 @@ void Scene::importMTL(const char* fileName)
 	  break;
 	case 'm':		//map_K?
 	  matFile >> buffer >> buffer;
-	  //nouvelle_texture = new Texture (buffer);
+	  //nouvelle_texture = new ITexture (buffer);
 	  strcpy(texturePath, m_currentDir);
 	  strcat(texturePath,buffer);
 	  if( (nouvelle_texture = searchTextureIndexByName(texturePath)) == -1) {
-	    nouvelle_texture = addTexture(new BitmapTexture (string(texturePath)));
+	    nouvelle_texture = addTexture(new CBitmapTexture (string(texturePath)));
 	  }
 	  break;
 	default:
@@ -662,7 +662,7 @@ int Scene::getMaterialIndexByName(const char *name)
 int Scene::searchTextureIndexByName(const char *name)
 {
   int index=0;
-  for (vector<BitmapTexture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
+  for (vector<CBitmapTexture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
        texturesArrayIterator != m_texturesArray.end ();
        texturesArrayIterator++)
     {

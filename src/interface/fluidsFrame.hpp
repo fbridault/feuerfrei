@@ -48,19 +48,19 @@ enum
 class FluidsFrame: public wxFrame
 {
 public:
-  FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini")); 
-  
+  FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini"));
+
   void GetSettingsFromConfigFile (void);
   void InitGLBuffer ();
   void InitSolversPanels();
-  
+
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
   void OnClickButtonRun(wxCommandEvent& event);
   void OnClickButtonRestart(wxCommandEvent& event);
   void OnClickButtonFlickering(wxCommandEvent& event);
   void OnClickButtonSwap(wxCommandEvent& event);
-  
+
   /** Actions des menus */
   void OnLoadParamMenu(wxCommandEvent& event);
   void OnOpenSceneMenu(wxCommandEvent& event);
@@ -79,10 +79,10 @@ public:
   void OnSelectSolver(wxCommandEvent& event);
   void OnSize(wxSizeEvent& event);
   void SetFPS(int fps);
-  
+
 private:
   wxString m_configFileName;
-  /** Pointeur sur le fichier de configuration */
+  /** CPointeur sur le fichier de configuration */
   wxFileConfig *m_config;
   /** Zone d'affichage OpenGL */
   GLFluidsCanvas *m_glBuffer;
@@ -92,22 +92,22 @@ private:
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
   wxMenuBar *m_menuBar;
-  
+
   wxCheckBox *m_saveImagesCheckBox;
-  
-  wxStaticBoxSizer *m_globalSizer,*m_solversSizer;  
+
+  wxStaticBoxSizer *m_globalSizer,*m_solversSizer;
   wxBoxSizer *m_mainSizer, *m_rightSizer, *m_globalTopSizer;
 
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
-  
+
   wxNotebook *m_solversNotebook;
-  
+
   FluidsAppConfig m_currentConfig;
-  
+
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   uint m_nbSolversMax;
-  
+
   DECLARE_EVENT_TABLE()
 };
 

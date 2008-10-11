@@ -27,12 +27,12 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  LODSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 	       float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODSolver3D ();
-  
+
   void iterate ()
-  { 
+  {
     /* Adaptation de la taille de la grille */
     while(m_resCount < 0){
       decrementRes();
@@ -44,29 +44,29 @@ public:
 //       multiplyRes();
       m_resCount--;
     }
-    
+
     Solver3D::iterate();
   }
 
-  virtual void decreaseRes () { m_resCount--; };  
+  virtual void decreaseRes () { m_resCount--; };
   virtual void increaseRes () { m_resCount++; };
-  
+
   virtual uint getNbMaxDiv () { return m_nbMaxDiv; };
-  
+
   /** Fonction de dessin de la grille */
   virtual void displayGrid ();
-  
+
   /** Fonction de dessin du repère de base */
   virtual void displayBase ();
-  
+
 private:
   virtual void recomputeAttributes();
-  
+
   virtual void divideRes ();
   virtual void multiplyRes ();
   virtual void decrementRes ();
   virtual void incrementRes ();
-    
+
   float *m_tmp;
 
   /** Nombre de voxels initiaux en X. */
@@ -83,7 +83,7 @@ private:
   uint m_level;
 };
 
-/** @test La classe LODField3D implémente un champ de vecteur fonctionnant soit comme un solveur de classe HybridSolver 
+/** @test La classe LODField3D implémente un champ de vecteur fonctionnant soit comme un solveur de classe HybridSolver
  * ou un FakeField3D, dans le but de moduler le niveau de détail en fonction de la distance.<br>
  * Conceptuellement parlant, la classe hérite de Field3D, mais possède une relation de composition avec FakeField3D et
  * HybridSolver. Son implémentation des comportements d'un Field3D consiste donc à appeler ceux de l'un ou l'autre de
@@ -104,36 +104,36 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODField3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  LODField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 	      float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODField3D () {};
-  
+
   /********************* Redéfinition des méthodes héritées *********************/
   virtual void iterate ()
   {
     /* Changement de type de champ de vélocité si demandé */
     if(m_currentField != m_fieldToSwitch)
       m_currentField = m_fieldToSwitch;
-    
+
     m_currentField->iterate();
   };
-  
-  virtual Point getUVW (const Point& pos, float selfVelocity) const
+
+  virtual CPoint getUVW (const CPoint& pos, float selfVelocity) const
   {
     return m_currentField->getUVW (pos, selfVelocity);
   };
-  
+
   virtual void moveParticle (Particle& particle, float selfVelocity) const
   {
     m_currentField->moveParticle (particle, selfVelocity);
   };
-  
-  void addUsrc (const Point& pos, float value)
+
+  void addUsrc (const CPoint& pos, float value)
   {
     m_currentField->addUsrc (pos, value);
   };
-  
-  void addVsrc (const Point& pos, float value, float& selfVelocity)
+
+  void addVsrc (const CPoint& pos, float value, float& selfVelocity)
   {
     //if(m_switch)
     m_solver.addVsrc (pos, value, selfVelocity);
@@ -141,7 +141,7 @@ public:
     //}else
     //m_currentField->addVsrc (pos, value, selfVelocity);
   };
-  
+
   void cleanSources ()
   {
     //if(m_switch){
@@ -150,88 +150,88 @@ public:
     //}else
     //m_currentField->cleanSources();
   };
-  
-  void addWsrc (const Point& pos, float value)
+
+  void addWsrc (const CPoint& pos, float value)
   {
     m_currentField->addWsrc (pos, value);
   };
-  
+
   void displayVelocityField (void)
   {
     m_currentField->displayVelocityField ();
   };
-  
+
   void displayGrid (void)
   {
     m_currentField->displayGrid ();
   };
-    
-  Point getPosition (void) const { return m_currentField->getPosition(); };
-  
-  void setPosition (const Point& position) 
-  { 
+
+  CPoint getPosition (void) const { return m_currentField->getPosition(); };
+
+  void setPosition (const CPoint& position)
+  {
     m_fakeField.setPosition(position);
-    m_solver.setPosition(position); 
+    m_solver.setPosition(position);
   }
-  
-  virtual void move(const Point& forces) 
+
+  virtual void move(const CPoint& forces)
   {
     m_fakeField.move(forces);
     m_solver.move(forces);
   }
-  
-  void addTemporaryExternalForces(const Point& forces)
+
+  void addTemporaryExternalForces(const CPoint& forces)
   {
     m_fakeField.addTemporaryExternalForces(forces);
     m_solver.addTemporaryExternalForces(forces);
   }
-    
-  void addPermanentExternalForces(const Point& forces)
+
+  void addPermanentExternalForces(const CPoint& forces)
   {
     m_fakeField.addPermanentExternalForces(forces);
     m_solver.addPermanentExternalForces(forces);
   }
 
-  void addForcesOnFace(unsigned char face, const Point& BLStrength, const Point& TLStrength,
-		       const Point& TRStrength, const Point& BRStrength)
+  void addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+		       const CPoint& TRStrength, const CPoint& BRStrength)
   {
     m_fakeField.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
     m_solver.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
   }
-  
+
   virtual void setBuoyancy(float value)
-  { 
+  {
     m_fakeField.setBuoyancy(value);
     m_solver.setBuoyancy(value);
   }
-  
+
   virtual void setVorticity(float value)
-  { 
+  {
     m_fakeField.setVorticity(value);
     m_solver.setVorticity(value);
   }
-  
+
   virtual void setRunningState(bool state)
-  { 
+  {
     m_fakeField.setRunningState(state);
-    m_solver.setRunningState(state);  
+    m_solver.setRunningState(state);
   }
-  
+
   virtual bool isRealSolver () const { return (m_currentField == &m_solver); };
   virtual void switchToRealSolver () { m_fieldToSwitch = &m_solver; };
   virtual void switchToFakeField () { m_fieldToSwitch = &m_fakeField; };
-    
+
   virtual void decreaseRes () { m_solver.decreaseRes(); };
   virtual void increaseRes () { m_solver.increaseRes(); };
   virtual uint getNbMaxDiv () { return m_solver.getNbMaxDiv(); };
 protected:
   FakeField3D m_fakeField;
   LODSolver3D m_solver;
-  /** Pointeur sur le champ de vecteur utilisé. */
+  /** CPointeur sur le champ de vecteur utilisé. */
   Field3D *m_currentField;
   Field3D *m_fieldToSwitch;
 private:
-  virtual void addExternalForces(const Point& position, bool move) {};
+  virtual void addExternalForces(const CPoint& position, bool move) {};
   virtual void add_source (float *const x, float *const src){};
 };
 
@@ -255,10 +255,10 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODSmoothField (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, float timeStep,
+  LODSmoothField (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
 		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODSmoothField () {};
-  
+
   /********************* Redéfinition des méthodes héritées *********************/
   void iterate ()
   {
@@ -278,15 +278,15 @@ public:
     else
       m_currentField->iterate();
   };
-  
-  Point getUVW (const Point& pos, float selfVelocity) const
+
+  CPoint getUVW (const CPoint& pos, float selfVelocity) const
   {
     if(m_switch)
       return (m_fakeField.getUVW (pos, selfVelocity)*m_fieldWeight + m_solver.getUVW (pos, selfVelocity)*m_solverWeight);
     else
       return m_currentField->getUVW (pos, selfVelocity);
   };
-  
+
   void moveParticle (Particle& pos, float selfVelocity) const
   {
     if(m_switch)
@@ -299,7 +299,7 @@ public:
     else
       m_currentField->moveParticle (pos, selfVelocity);
   };
-  
+
   void switchToRealSolver ()
   {
     cerr << "real" << endl;
@@ -308,10 +308,10 @@ public:
     m_solverWeight = 0.0f;
     m_fieldIncrement = -1.0f/(float)NB_STEPS_TO_SWITCH;
     m_solverIncrement = 1.0f/(float)NB_STEPS_TO_SWITCH;
-    m_fieldToSwitch = &m_solver; 
+    m_fieldToSwitch = &m_solver;
   };
-  
-  void switchToFakeField () 
+
+  void switchToFakeField ()
   {
     cerr << "fake" << endl;
     m_switch = NB_STEPS_TO_SWITCH;
@@ -323,7 +323,7 @@ public:
 //     while(m_solver.getXRes() > RESOLUTION_MIN && m_solver.getYRes() > RESOLUTION_MIN && m_solver.getZRes() > RESOLUTION_MIN )
 //       m_solver.decreaseRes();
   };
-  
+
 private:
   uint m_switch;
   float m_fieldWeight, m_solverWeight;

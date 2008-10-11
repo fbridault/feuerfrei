@@ -32,77 +32,77 @@ FluidsFrame::FluidsFrame(const wxString& title, const wxPoint& pos, const wxSize
 			      WX_GL_STENCIL_SIZE,
 			      1                 ,
 			      0                  };
-  
+
   /*********************************** Création des contrôles *************************************************/
-  // Création d'un bouton. Ce bouton est associé à l'identifiant 
+  // Création d'un bouton. Ce bouton est associé à l'identifiant
   // événement ID_Bt_Click, en consultant, la table des événements
-  // on en déduit que c'est la fonction OnClickButton qui sera 
+  // on en déduit que c'est la fonction OnClickButton qui sera
   // appelée lors d'un click sur ce bouton
   m_glBuffer = new GLFluidsCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(1024,768),attributelist, wxSUNKEN_BORDER );
-    
+
   m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
   m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
-  
+
   m_saveImagesCheckBox =  new wxCheckBox(this,IDCHK_SaveImages,_("Save Images"));
-  
+
   m_solversNotebook = new wxNotebook(this, -1, wxDefaultPosition, wxDefaultSize, 0);
-  
+
   /* Réglages globaux */
   m_globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
   m_globalTopSizer->Add(m_buttonRun, 0, 0, 0);
   m_globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
-  
+
   m_globalSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Global"));
   m_globalSizer->Add(m_globalTopSizer, 0, 0, 0);
   m_globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
-  
+
   m_solversSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Solvers settings"));
   m_solversSizer->Add(m_solversNotebook, 1, wxEXPAND, 0);
-  
+
   /* Placement des sizers principaux */
   m_rightSizer = new wxBoxSizer(wxVERTICAL);
   m_rightSizer->Add(m_globalSizer, 0, wxEXPAND, 0);
   m_rightSizer->Add(m_solversSizer, 0, wxEXPAND, 0);
-  
+
   m_mainSizer = new wxBoxSizer(wxHORIZONTAL);
   m_mainSizer->Add(m_glBuffer, 0, 0, 0);
   m_mainSizer->Add(m_rightSizer, 1, 0, 0);
-  
+
   /* Création des menus */
   m_menuFile = new wxMenu;
-  
+
   m_menuFile->Append( IDM_LoadParam, _("&Load simulation file...") );
   m_menuFile->Append( IDM_SaveSettings, _("&Save settings") );
   m_menuFile->Append( IDM_SaveSettingsAs, _("&Save settings as...") );
   m_menuFile->Append( IDM_About, _("&About...") );
   m_menuFile->AppendSeparator();
   m_menuFile->Append( IDM_Quit, _("E&xit") );
-  
+
   m_menuDisplay = new wxMenu;
   m_menuDisplay->AppendCheckItem( IDM_Grid, _("&Grid"));
   m_menuDisplay->AppendCheckItem( IDM_Base, _("&Base"));
   m_menuDisplay->AppendCheckItem( IDM_Velocity, _("&Velocity"));
   m_menuDisplay->AppendCheckItem( IDM_Density, _("&Density"));
-  
+
   m_menuDisplay->Check(IDM_Base,true);
   m_menuDisplay->Check(IDM_Velocity,true);
   m_menuDisplay->Check(IDM_Density,true);
 
   m_menuSettings = new wxMenu;
   m_menuSettings->Append( IDM_SolversSettings, _("&Solvers..."));
-  
+
   m_menuBar = new wxMenuBar;
   m_menuBar->Append( m_menuFile, _("&File") );
   m_menuBar->Append( m_menuDisplay, _("&Display") );
   m_menuBar->Append( m_menuSettings, _("&Settings") );
-  
+
   SetMenuBar( m_menuBar );
-  
+
   m_configFileName = configFileName;
   GetSettingsFromConfigFile();
-  
+
   SetSizerAndFit(m_mainSizer);
-  
+
   CreateStatusBar();
   SetStatusText( _("FPS will be here...") );
 }
@@ -118,36 +118,36 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
 {
   wxFileInputStream file( m_configFileName );
   //if(!wxFileInputStream::Ok())
-  
+
   m_config = new wxFileConfig( file );
-  
+
   m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
   m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
   m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
-    
+
   m_currentConfig.nbSolvers = m_config->Read(_("/Solvers/Number"), 1);
   m_currentConfig.solvers = new SolverConfig[m_currentConfig.nbSolvers];
   m_nbSolversMax = m_currentConfig.nbSolvers;
-  
+
   wxString groupName,tabName;
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       double tmp;
       groupName.Printf(_("/Solver%d/"),i);
-      
+
       m_config->Read(groupName + _("Type"), (int *) &m_currentConfig.solvers[i].type, 1);
-      
+
       m_config->Read(groupName + _("Pos.x"), &tmp, 0.0);
       m_currentConfig.solvers[i].position.x = (float)tmp;
       m_config->Read(groupName + _("Pos.y"), &tmp, 0.0);
       m_currentConfig.solvers[i].position.y = (float)tmp;
       m_config->Read(groupName + _("Pos.z"), &tmp, 0.0);
       m_currentConfig.solvers[i].position.z = (float)tmp;
-      
+
       m_currentConfig.solvers[i].resx = m_config->Read(groupName + _("X_res"), 15);
       m_currentConfig.solvers[i].resy = m_config->Read(groupName + _("Y_res"), 15);
       m_currentConfig.solvers[i].resz = m_config->Read(groupName + _("Z_res"), 15);
-      
+
       m_config->Read(groupName + _("Dim"),&tmp,1.0);
       m_currentConfig.solvers[i].dim = (float)tmp;
       m_config->Read(groupName + _("Scale.x"),&tmp,1.0);
@@ -156,14 +156,14 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
       m_currentConfig.solvers[i].scale.y = (float)tmp;
       m_config->Read(groupName + _("Scale.z"),&tmp,1.0);
       m_currentConfig.solvers[i].scale.z = (float)tmp;
-            
+
       m_config->Read(groupName + _("TimeStep"),&tmp,0.4);
       m_currentConfig.solvers[i].timeStep = (float)tmp;
       m_config->Read(groupName + _("Buoyancy"), &tmp, 0.02);
       m_currentConfig.solvers[i].buoyancy = (float)tmp;
       m_config->Read(groupName + _("Vorticity"), &tmp, 0.02);
       m_currentConfig.solvers[i].vorticityConfinement = (float)tmp;
-      
+
       m_config->Read(groupName + _("omegaDiff"),&tmp,1.0);
       m_currentConfig.solvers[i].omegaDiff = (float)tmp;
       m_config->Read(groupName + _("omegaProj"),&tmp,1.6);
@@ -171,14 +171,14 @@ void FluidsFrame::GetSettingsFromConfigFile (void)
       m_config->Read(groupName + _("epsilon"),&tmp,0.00001);
       m_currentConfig.solvers[i].epsilon = (float)tmp;
       m_currentConfig.solvers[i].nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
-      
+
       tabName.Printf(_("Solver #%d"),i+1);
-      
-      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.solvers[i].buoyancy, 
+
+      m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.solvers[i].buoyancy,
 					      m_currentConfig.solvers[i].vorticityConfinement, i, m_glBuffer);
       m_solversNotebook->AddPage(m_solverPanels[i], tabName);
     }
-  
+
   return;
 }
 
@@ -194,9 +194,9 @@ void FluidsFrame::InitGLBuffer()
 void FluidsFrame::InitSolversPanels()
 {
   wxString tabName;
-  
+
   m_solversNotebook->DeleteAllPages();
-  
+
   for(int unsigned i=0; i < m_currentConfig.nbSolvers; i++)
     {
       m_solverPanels[i] = new SolverMainPanel(m_solversNotebook, -1, m_currentConfig.solvers[i].buoyancy,
@@ -211,7 +211,7 @@ void FluidsFrame::OnClose(wxCloseEvent& event)
   m_glBuffer->setRunningState(false);
   delete [] m_currentConfig.solvers;
   delete m_config;
-  
+
   Destroy();
 }
 
@@ -235,7 +235,7 @@ void FluidsFrame::OnClickButtonRestart(wxCommandEvent& event)
 
 void FluidsFrame::OnCheckSaveImages(wxCommandEvent& event)
 {
-  m_glBuffer->ToggleSaveImages();  
+  m_glBuffer->ToggleSaveImages();
 }
 
 void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
@@ -243,11 +243,11 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
-  
+
   wxFileDialog fileDialog(this, _("Choose a simulation file"), pwd, _(""), _("*.slv"), wxOPEN|wxFILE_MUST_EXIST);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
-    
+
     if(!filename.IsEmpty()){
       m_glBuffer->setRunningState(false);
       /* Récupération le chemin absolu vers la scène */
@@ -256,12 +256,12 @@ void FluidsFrame::OnLoadParamMenu(wxCommandEvent& event)
       filename=filename.Mid(1);
 
       m_configFileName = filename;
-      
+
       SetTitle(_("Real-time Fluids - ") + m_configFileName);
 
       delete [] m_currentConfig.solvers;
       m_solversNotebook->DeleteAllPages();
-      
+
       GetSettingsFromConfigFile();
       m_glBuffer->Restart();
       m_glBuffer->SetSize(wxSize(m_currentConfig.width,m_currentConfig.height));
@@ -277,49 +277,49 @@ void FluidsFrame::OnSaveSettingsMenu(wxCommandEvent& event)
   m_config->Write(_("/Display/Width"), (int)m_currentConfig.width);
   m_config->Write(_("/Display/Height"), (int)m_currentConfig.height);
   m_config->Write(_("/Display/Clipping"), m_currentConfig.clipping);
-  
+
   m_config->Write(_("/Solvers/Number"), (int)m_currentConfig.nbSolvers);
-  
+
   wxString groupName;
   for(uint i=0; i < m_nbSolversMax; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
       m_config->DeleteGroup(groupName);
     }
- 
+
   for(uint i=0; i < m_currentConfig.nbSolvers; i++)
     {
       groupName.Printf(_("/Solver%d/"),i);
-      
+
       m_solverPanels[i]->getCtrlValues(m_currentConfig.solvers[i]);
       m_config->Write(groupName + _("Type"), (int)m_currentConfig.solvers[i].type);
-      
+
       m_config->Write(groupName + _("Pos.x"),m_currentConfig.solvers[i].position.x);
       m_config->Write(groupName + _("Pos.y"),m_currentConfig.solvers[i].position.y);
       m_config->Write(groupName + _("Pos.z"),m_currentConfig.solvers[i].position.z);
-      
+
       m_config->Write(groupName + _("X_res"),(int)m_currentConfig.solvers[i].resx);
       m_config->Write(groupName + _("Y_res"),(int)m_currentConfig.solvers[i].resy);
       m_config->Write(groupName + _("Z_res"),(int)m_currentConfig.solvers[i].resz);
-      
+
       m_config->Write(groupName + _("Dim"),m_currentConfig.solvers[i].dim);
       m_config->Write(groupName + _("Scale.x"),m_currentConfig.solvers[i].scale.x);
       m_config->Write(groupName + _("Scale.y"),m_currentConfig.solvers[i].scale.y);
       m_config->Write(groupName + _("Scale.z"),m_currentConfig.solvers[i].scale.z);
-      
-      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);      
+
+      m_config->Write(groupName + _("TimeStep"),m_currentConfig.solvers[i].timeStep);
       m_config->Write(groupName + _("Buoyancy"), m_currentConfig.solvers[i].buoyancy);
       m_config->Write(groupName + _("Vorticity"), m_currentConfig.solvers[i].vorticityConfinement);
-      
+
       m_config->Write(groupName + _("omegaDiff"),m_currentConfig.solvers[i].omegaDiff);
       m_config->Write(groupName + _("omegaProj"),m_currentConfig.solvers[i].omegaProj);
       m_config->Write(groupName + _("epsilon"),m_currentConfig.solvers[i].epsilon);
-      
+
       m_config->Write(groupName + _("nbMaxIter"),(int)m_currentConfig.solvers[i].nbMaxIter);
     }
-  
+
   wxFileOutputStream file ( m_configFileName );
-  
+
   if (m_config->Save(file) )
     wxMessageBox(_("Configuration for the current simulation have been saved"),
 		 _("Save settings"), wxOK | wxICON_INFORMATION, this);
@@ -330,7 +330,7 @@ void FluidsFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
   wxString filename;
   wxString pwd=wxGetCwd();
   pwd << PARAMS_DIRECTORY;
-  
+
   wxFileDialog fileDialog(this, _("Enter a simulation file"), pwd, _(""), _("*.ini"), wxSAVE|wxOVERWRITE_PROMPT);
   if(fileDialog.ShowModal() == wxID_OK){
     filename = fileDialog.GetPath();
@@ -338,10 +338,10 @@ void FluidsFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
     filename.Replace(wxGetCwd(),_(""),false);
     /* Suppression du premier slash */
     filename=filename.Mid(1);
-  
+
     if(!filename.IsEmpty()){
       m_configFileName = filename;
-      
+
       SetTitle(_("Real-time Fluids - ") + m_configFileName);
       OnSaveSettingsMenu(event);
     }
@@ -394,6 +394,6 @@ void FluidsFrame::SetFPS(int fps)
 {
   wxString s;
   s += wxString::Format(_("%d FPS"), fps);
-  
+
   SetStatusText(s);
 }

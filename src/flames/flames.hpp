@@ -12,5 +12,6 @@
 #define SHADOW_SAMPLE_PER_LIGHT 3
 
 #define NB_PARTICLES_MAX 10
+#define FILTER_SIZE 7
 
 #endif

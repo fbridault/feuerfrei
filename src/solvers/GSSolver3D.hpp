@@ -7,7 +7,7 @@ class GSSolver3D;
 
 /** La classe GCSSSolver propose d'utiliser la méthode de Gauss-Seidel comme
  * méthode de resolution des systèmes linéaires.
- * 
+ *
  * @author	Flavien Bridault et Michel Leblond
  */
 class GSSolver3D : public virtual Solver3D
@@ -24,11 +24,11 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSSolver3D (const Point& position, uint n_x, uint n_y, uint n_z, float dim, const Point& scale, 
+  GSSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
 	      float timeStep, float buoyancy, float vorticityConfinement);
   /** Desctructeur. */
   virtual ~GSSolver3D ();
-  
+
 protected:
   /** Effectue une résolution des systèmes linéaires de la diffusion
    * et de la projection à l'aide de la méthode itérative de Gauss-Seidel.
@@ -41,10 +41,10 @@ protected:
    * @param nb_steps Nombre d'itérations à effectuer
    */
   virtual void GS_solve(unsigned char b, float *const x, const float *const x0, float a, float div, uint nb_steps);
-  
+
   virtual void diffuse (unsigned char b, float *const x, float *const x0, float a);
   virtual void project (float *const p, float *const div);
-  
+
   float *m_res;
 };
 

@@ -72,8 +72,8 @@ enum
 class FlamesFrame: public wxFrame
 {
 public:
-  FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini")); 
-  
+  FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName=_("param.ini"));
+
   void LoadSettings (void);
   void LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig);
   void SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig);
@@ -85,14 +85,14 @@ public:
   void InitFlamesPanels();
   void DoLayout();
   void CreateMenuBar();
-  
+
   void OnClose(wxCloseEvent& event);
   /** Actions des boutons */
   void OnClickButtonRun(wxCommandEvent& event);
   void OnClickButtonRestart(wxCommandEvent& event);
   void OnClickButtonFlickering(wxCommandEvent& event);
   void OnClickButtonSwap(wxCommandEvent& event);
-  
+
   /** Actions des menus */
   void OnLoadParamMenu(wxCommandEvent& event);
   void OnOpenSceneMenu(wxCommandEvent& event);
@@ -125,7 +125,7 @@ public:
   void OnCheckSaveImages(wxCommandEvent& event);
   void OnCheckGamma(wxCommandEvent& event);
   void OnSelectLighting(wxCommandEvent& event);
-  void OnSelectSolver(wxCommandEvent& event);  
+  void OnSelectSolver(wxCommandEvent& event);
   void OnScrollGlow(wxScrollEvent& event);
   void OnScrollDP(wxScrollEvent& event);
   void OnScrollGamma(wxScrollEvent& event);
@@ -135,7 +135,7 @@ public:
 
 private:
   wxString m_configFileName;
-  /** Pointeur sur le fichier de configuration */
+  /** CPointeur sur le fichier de configuration */
   wxFileConfig *m_config;
   /** Zone d'affichage OpenGL */
   GLFlameCanvas *m_glBuffer;
@@ -145,7 +145,7 @@ private:
   wxMenu *m_menuFile, *m_menuDisplay, *m_menuDisplayFlames, *m_menuSettings;
   /** Barre de menu */
   wxMenuBar *m_menuBar;
-  
+
   wxRadioBox *m_lightingRadioBox;
 
   wxCheckBox *m_blendedSolidCheckBox;
@@ -153,20 +153,20 @@ private:
   wxCheckBox *m_saveImagesCheckBox, *m_depthPeelingEnabledCheckBox, *m_gammaCheckBox;
   wxSlider *m_glow1Slider, *m_glow2Slider, *m_depthPeelingSlider, *m_gammaSlider;
   wxBoxSizer *m_mainSizer, *m_leftSizer;
-  
+
   /** \todo Supprimer la limite codée en dur du nombre max de luminaires,... */
   LuminaryMainPanel* m_luminaryPanels[NB_MAXLUMINARIES];
   SolverMainPanel* m_solverPanels[NB_MAXSOLVERS];
   FlameMainPanel* m_flamePanels[NB_MAXFLAMMES];
-  
+
   wxNotebook *m_luminariesNotebook, *m_solversNotebook, *m_flamesNotebook;
-  
+
   FlameAppConfig m_currentConfig;
-  
+
   /** Nombre maximum de flammes utilisées durant la session, variable utilisée */
   /* Pour savoir combien de groupes /Flame# supprimer dans le fichier de configuration */
   uint m_nbLuminariesMax;
-  
+
   DECLARE_EVENT_TABLE()
 };
 

@@ -91,7 +91,7 @@
 	<File name="src/flames/wick.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="2190" topLine="21" />
 	</File>
-	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="0" tabpos="2">
+	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="1" tabpos="2">
 		<Cursor position="15149" topLine="451" />
 	</File>
 	<File name="src/interface/GLFlameCanvas.hpp" open="1" top="0" tabpos="9">
@@ -153,12 +153,6 @@
 	</File>
 	<File name="src/scene/camera.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="4711" topLine="138" />
-	</File>
-	<File name="src/scene/gammaEngine.cpp" open="0" top="0" tabpos="21">
-		<Cursor position="120" topLine="0" />
-	</File>
-	<File name="src/scene/gammaEngine.hpp" open="1" top="0" tabpos="9">
-		<Cursor position="1678" topLine="41" />
 	</File>
 	<File name="src/scene/intensity.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="0" topLine="108" />

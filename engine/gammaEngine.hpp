@@ -3,9 +3,9 @@
 
 class GammaEngine;
 
-#include <engine/glsl.hpp>
-#include <engine/renderTarget.hpp>
-#include <engine/texture.hpp>
+#include "glsl.hpp"
+#include "renderTarget.hpp"
+#include "texture.hpp"
 
 /** Classe servant d'interface avec le fragment program de la correction gamma.
  *

@@ -2202,15 +2202,15 @@
 	"abstractFires.hpp"
 	"../solvers/field3D.hpp"
 
-1224198204 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
+1224198676 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
 	"../common.hpp"
 	"interface.hpp"
 	<wx/glcanvas.h>
 	<engine/glsl.hpp>
-	"../scene/gammaEngine.hpp"
+	<engine/gammaEngine.hpp>
+	<engine/graphicsFn.hpp>
 	"../scene/camera.hpp"
 	"../scene/scene.hpp"
-	<engine/graphicsFn.hpp>
 	"../flames/abstractFires.hpp"
 	"../flames/glowengine.hpp"
 	"../flames/DPengine.hpp"
@@ -2277,7 +2277,7 @@
 	"periSkeleton.hpp"
 	"../solvers/solver3D.hpp"
 
-1224197015 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
+1224198203 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
 	"luminary.hpp"
 	"../interface/interface.hpp"
 	"../solvers/GSSolver3D.hpp"
@@ -2314,7 +2314,7 @@
 	"fakeField3D.hpp"
 	"GCSSORSolver3D.hpp"
 
-1224196795 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
+1224198203 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
 	"abstractFires.hpp"
 	"cloneFlames.hpp"
 
@@ -2332,7 +2332,7 @@
 	"../solvers/solver3D.hpp"
 	"leadSkeleton.hpp"
 
-1224196795 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
+1224198203 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
 	"realFires.hpp"
 	<engine/graphicsFn.hpp>
 	"../scene/scene.hpp"
@@ -2715,4 +2715,9 @@
 	<GL/gl.h>
 	<iostream>
 	<vector>
+
+1224198624 /home/flavien/recherche/git/flames//engine/gammaEngine.hpp
+	"glsl.hpp"
+	"renderTarget.hpp"
+	"texture.hpp"
 

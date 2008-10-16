@@ -7,13 +7,13 @@ class GLFlameCanvas;
 #include "interface.hpp"
 
 #include <wx/glcanvas.h>
-#include <engine/glsl.hpp>
 
-#include "../scene/gammaEngine.hpp"
+#include <engine/glsl.hpp>
+#include <engine/gammaEngine.hpp>
+#include <engine/graphicsFn.hpp>
 
 #include "../scene/camera.hpp"
 #include "../scene/scene.hpp"
-#include <engine/graphicsFn.hpp>
 
 #include "../flames/abstractFires.hpp"
 #include "../flames/glowengine.hpp"

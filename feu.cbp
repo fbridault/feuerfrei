@@ -283,11 +283,6 @@
 		<Unit filename="src/interface/solverDialog.hpp" />
 		<Unit filename="src/scene/camera.cpp" />
 		<Unit filename="src/scene/camera.hpp" />
-		<Unit filename="src/scene/gammaEngine.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/scene/gammaEngine.hpp" />
 		<Unit filename="src/scene/intensity.hpp" />
 		<Unit filename="src/scene/material.cpp">
 			<Option target="Fire - Debug" />

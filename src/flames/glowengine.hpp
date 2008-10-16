@@ -4,26 +4,26 @@
 class GlowEngine;
 
 #include <engine/renderTarget.hpp>
+#include <engine/glsl.hpp>
 
 #include "flames.hpp"
-#include "../shaders/glsl.hpp"
 
 #define GLOW_LEVELS 2
 
 class GLFlameCanvas;
 
-/** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
- * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
+/** Classe regroupant des mÃ©thodes pour rÃ©aliser un glow. AprÃ¨s l'appel au constructeur,
+ * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se dÃ©compose comme ceci :<br><br>
  * glowEngine.activate();<br>
- * // Réglages de la largeur de la Gaussienne utilisée pour le blur<br>
+ * // RÃ©glages de la largeur de la Gaussienne utilisÃ©e pour le blur<br>
  * m_glowEngine->setGaussSigma(4.5);<br>
- * // Opérations de dessin - 1ère passe<br>
+ * // OpÃ©rations de dessin - 1Ã¨re passe<br>
  * ......................<br>
- * // Réalisation du blur<br>
+ * // RÃ©alisation du blur<br>
  * glowEngine.blur();<br>
  * glowEngine.deactivate();<br>
  *<br>
- * // Opérations de dessin - 2ème passe<br>
+ * // OpÃ©rations de dessin - 2Ã¨me passe<br>
  * ......................<br>
  *<br>
  * // Dessin du blur<br>
@@ -35,26 +35,26 @@ class GLFlameCanvas;
 class GlowEngine
 {
 public:
-  /** Contructeur par défaut.
+  /** Contructeur par dÃ©faut.
    * @param w largeur du viewport
    * @param h hauteur du viewport
-   * @param scaleFactor rapport entre le viewport et la texture utilisée, typiquement > 1
+   * @param scaleFactor rapport entre le viewport et la texture utilisÃ©e, typiquement > 1
    * @param  indique s'il faut compiler ou non les shaders
    * @param cgcontext contexte Cg
    */
   GlowEngine(uint w, uint h, uint scaleFactor[GLOW_LEVELS-1] );
   virtual ~GlowEngine();
 
-  /** Active le rendu du Glow, c'est-à-dire que toutes ce qui sera dessiné après l'appel à cette
-   * fonction sera considérée comme étant une source de glow, donc rendue dans le FBO
+  /** Active le rendu du Glow, c'est-Ã -dire que toutes ce qui sera dessinÃ© aprÃ¨s l'appel Ã  cette
+   * fonction sera considÃ©rÃ©e comme Ã©tant une source de glow, donc rendue dans le FBO
    */
   void activate(){
     /* On dessine dans le FBO #1 */
     m_firstPassRT[0]->bindTarget();
-    /* On prend la résolution la plus grande */
+    /* On prend la rÃ©solution la plus grande */
     glViewport (0, 0, m_width[0], m_height[0]);
   }
-  /** Désactive le glow, les appels suivants dessineront dans le color buffer */
+  /** DÃ©sactive le glow, les appels suivants dessineront dans le color buffer */
   void deactivate()
   {
     m_firstPassRT[0]->bindDefaultTarget();
@@ -63,7 +63,7 @@ public:
 
   /** Effectue le blur en trois passes */
   void blur(GLFlameCanvas* const glBuffer);
-  /** Plaque le blur à l'écran */
+  /** Plaque le blur Ã  l'Ã©cran */
   void drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly=false);
 
   void deleteTex();
@@ -81,7 +81,7 @@ private:
   uint m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
   uint m_initialWidth, m_initialHeight;
 
-  /** Rapport d'échelle entre la taille du viewport et de la texture du blur */
+  /** Rapport d'Ã©chelle entre la taille du viewport et de la texture du blur */
   uint m_scaleFactor[GLOW_LEVELS];
 
   /** Tableau contenant la largeur du filtre */
@@ -89,9 +89,8 @@ private:
 
   /** CRenderTarget */
   CRenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
-  GLSLProgram m_programX, m_programY, m_blurRendererProgram;
-  /** Fragment Shader pour le blur */
-  GLSLFragmentShader m_blurFragmentShader8X, m_blurFragmentShader8Y, m_blurRendererShader;
+  /** Shaders pour le blur */
+  GLSLShader m_oShaderX, m_oShaderY, m_oBlurRendererShader;
 };
 
 #endif

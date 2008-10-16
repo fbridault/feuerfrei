@@ -46,8 +46,7 @@ GLFlameCanvas::~GLFlameCanvas()
   delete [] m_pixels;
   if( m_intensities ) delete [] m_intensities;
   delete m_gammaEngine;
-  delete m_SVShader;
-  delete m_SVProgram;
+  delete m_pSVShader;
 }
 
 void GLFlameCanvas::InitUISettings(void)
@@ -85,11 +84,7 @@ void GLFlameCanvas::InitGL()
 
   glDisable (GL_LIGHTING);
 
-  m_SVShader = new GLSLVertexShader();
-  m_SVProgram = new GLSLProgram();
-  m_SVShader->load ("shadowVolume.vp");
-  m_SVProgram->attachShader(*m_SVShader);
-  m_SVProgram->link();
+  m_pSVShader = new GLSLShader("shadowVolume.vp", "");
 
   m_gammaEngine = new GammaEngine (m_width, m_height);
   setGammaCorrection( m_currentConfig->gammaCorrection );
@@ -100,7 +95,7 @@ void GLFlameCanvas::InitLuminaries(void)
 {
   for(uint i=0; i < m_currentConfig->nbLuminaries; i++)
     m_luminaries.push_back( new Luminary( m_currentConfig->luminaries[i], m_fields, m_fires, m_scene,
-					  m_SVProgram, m_currentConfig->luminaries[i].fileName.fn_str(), i) );
+					  *m_pSVShader, m_currentConfig->luminaries[i].fileName.fn_str(), i) );
 
 //   m_currentConfig->nbFires = m_fires.size(); m_currentConfig->nbFields = m_fields.size();
   prevNbFlames = m_fires.size(); prevNbFields = m_fields.size();
@@ -167,8 +162,11 @@ void GLFlameCanvas::InitScene()
 				    m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff,
 				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
 #endif
-  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires);
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
+  char macro[25];
+  sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
+
+  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires, macro);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires, macro);
 
   m_scene->createVBOs();
 
@@ -310,8 +308,12 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 				    m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff,
 				    m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
 #endif
-  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires);
-  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires);
+
+  char macro[25];
+  sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
+
+  m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires, macro);
+  m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires, macro);
 
 #ifdef MULTITHREADS
   InitThreads();

@@ -1,37 +1,30 @@
 #include "solidePhoto.hpp"
 
-PixelLightingRenderer::PixelLightingRenderer(const Scene* const s, const vector <FireSource *> *flames)
+PixelLightingRenderer::PixelLightingRenderer(	const Scene* const a_pScene,
+																						const vector <FireSource *> *a_pvpFlames,
+																						const string& a_strMacro) :
+	m_oShader("pixelLighting.vp", "pixelLighting.fp", a_strMacro)
 {
-  char macro[25];
-
-  m_scene = s;
-  m_flames = flames;
-
-  sprintf(macro,"#define NBSOURCES %d\n",(int)m_flames->size());
+  m_scene = a_pScene;
+  m_flames = a_pvpFlames;
 
   m_centers = new GLfloat[m_flames->size()*3];
   m_intensities = new GLfloat[m_flames->size()];
   m_lazimuth_lzenith = new GLfloat[m_flames->size()*2];
-
-  m_SPVertexShaderTex.load("pixelLighting.vp");
-  m_SPFragmentShader.load("pixelLighting.fp", true, macro);
-
-  m_SPProgram.attachShader(m_SPVertexShaderTex);
-  m_SPProgram.attachShader(m_SPFragmentShader);
-
-  m_SPProgram.link();
 }
 
-PixelLightingRenderer::PixelLightingRenderer(const Scene* const s, const vector <FireSource *> *flames, bool dummy)
+PixelLightingRenderer::PixelLightingRenderer(	const Scene* const a_pScene,
+																						const vector <FireSource *> *a_pvpFlames,
+																						const string& a_strFragmentProgram,
+																						const string& a_strMacro) :
+	m_oShader("pixelLighting.vp", a_strFragmentProgram, a_strMacro)
 {
-  m_scene = s;
-  m_flames = flames;
+  m_scene = a_pScene;
+  m_flames = a_pvpFlames;
 
   m_centers = new GLfloat[m_flames->size()*3];
   m_intensities = new GLfloat[m_flames->size()];
   m_lazimuth_lzenith = new GLfloat[m_flames->size()*2];
-
-  m_SPVertexShaderTex.load("pixelLighting.vp");
 }
 
 PixelLightingRenderer::~PixelLightingRenderer()
@@ -55,39 +48,27 @@ void PixelLightingRenderer::draw(bool color)
     }
 
   /* Affichage du solide modulé avec la couleur des objets  */
-  m_SPProgram.enable();
-  m_SPProgram.setUniform3fv("centreSP", m_centers, m_flames->size());
-  m_SPProgram.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
-  m_SPProgram.setUniform1i("isTextured",1);
-  m_SPProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
-  m_SPProgram.setUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
+  m_oShader.Enable();
+  m_oShader.SetUniform3fv("centreSP", m_centers, m_flames->size());
+  m_oShader.SetUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
+  m_oShader.SetUniform1i("isTextured",1);
+  m_oShader.SetUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+  m_oShader.SetUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
 
-  m_SPProgram.setUniform1i("textureObjet",0);
+  m_oShader.SetUniform1i("textureObjet",0);
   m_scene->drawSceneTEX();
-  m_SPProgram.setUniform1i("isTextured",0);
-  m_scene->drawSceneWTEX(&m_SPProgram);
-  m_SPProgram.disable();
+  m_oShader.SetUniform1i("isTextured",0);
+  m_scene->drawSceneWTEX(&m_oShader);
+  m_oShader.Disable();
 }
 
 /***************************************************************************************************************/
-PhotometricSolidsRenderer::PhotometricSolidsRenderer(const Scene* const s, const vector <FireSource *> *flames) :
-  PixelLightingRenderer(s, flames, true)
+PhotometricSolidsRenderer::PhotometricSolidsRenderer(	const Scene* const s,
+																												const vector <FireSource *> *flames,
+																												const string& a_strMacro) :
+  PixelLightingRenderer(s, flames, "photoSolid.fp", a_strMacro),
+  m_oSPOnlyShader("pixelLighting.vp", "photoSolidOnly.fp", a_strMacro)
 {
-  char macro[25];
-
-  sprintf(macro,"#define NBSOURCES %d\n",(int)m_flames->size());
-
-  m_SPOnlyFragmentShader.load("photoSolidOnly.fp", true, macro);
-  m_SPFragmentShader.load("photoSolid.fp", true, macro);
-
-  m_SPProgram.attachShader(m_SPVertexShaderTex);
-  m_SPProgram.attachShader(m_SPFragmentShader);
-  m_SPOnlyProgram.attachShader(m_SPVertexShaderTex);
-  m_SPOnlyProgram.attachShader(m_SPOnlyFragmentShader);
-
-  m_SPProgram.link();
-  m_SPOnlyProgram.link();
-
   generateTexture();
 }
 
@@ -203,38 +184,38 @@ void PhotometricSolidsRenderer::draw(bool color)
 
   /* Affichage du solide seul */
   if(!color){
-    m_SPOnlyProgram.enable();
-    m_SPOnlyProgram.setUniform3fv("centreSP", m_centers, m_flames->size());
-    m_SPOnlyProgram.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
-    m_SPOnlyProgram.setUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
-    m_SPOnlyProgram.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
-    m_SPOnlyProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
-    m_SPOnlyProgram.setUniform3f("scale", 1.0f, 1.0f, 1.0f);
+    m_oSPOnlyShader.Enable();
+    m_oSPOnlyShader.SetUniform3fv("centreSP", m_centers, m_flames->size());
+    m_oSPOnlyShader.SetUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
+    m_oSPOnlyShader.SetUniform2fv("angles",m_lazimuth_lzenith, m_flames->size());
+    m_oSPOnlyShader.SetUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
+    m_oSPOnlyShader.SetUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+    m_oSPOnlyShader.SetUniform3f("scale", 1.0f, 1.0f, 1.0f);
 
     glActiveTexture(GL_TEXTURE0);
     m_photometricSolidsTex->bind();
-    m_SPOnlyProgram.setUniform1i("textureSP",0);
+    m_oSPOnlyShader.SetUniform1i("textureSP",0);
     /* Dessin en enlevant toutes les textures si nécessaire */
-    m_scene->drawSceneWT(&m_SPOnlyProgram);
-    m_SPOnlyProgram.disable();
+    m_scene->drawSceneWT(&m_oSPOnlyShader);
+    m_oSPOnlyShader.Disable();
   }else{
     /* Affichage du solide modulé avec la couleur des objets  */
-    m_SPProgram.enable();
-    m_SPProgram.setUniform3fv("centreSP", m_centers, m_flames->size());
-    m_SPProgram.setUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
-    m_SPProgram.setUniform2fv("angles", m_lazimuth_lzenith, m_flames->size());
-    m_SPProgram.setUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
-    m_SPProgram.setUniform1i("isTextured",1);
-    m_SPProgram.setUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
-    m_SPProgram.setUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
+    m_oShader.Enable();
+    m_oShader.SetUniform3fv("centreSP", m_centers, m_flames->size());
+    m_oShader.SetUniform1fv("fluctuationIntensite", m_intensities, m_flames->size());
+    m_oShader.SetUniform2fv("angles", m_lazimuth_lzenith, m_flames->size());
+    m_oShader.SetUniform1f("incr", m_flames->size() > 1 ? 1/(m_flames->size()-1) : 0.0f);
+    m_oShader.SetUniform1i("isTextured",1);
+    m_oShader.SetUniform3f("lumTr", 0.0f, 0.0f, 0.0f);
+    m_oShader.SetUniform4f("scale", 1.0f, 1.0f, 1.0f, 1.0f);
 
     glActiveTexture(GL_TEXTURE1);
     m_photometricSolidsTex->bind();
-    m_SPProgram.setUniform1i("textureSP",1);
-    m_SPProgram.setUniform1i("textureObjet",0);
+    m_oShader.SetUniform1i("textureSP",1);
+    m_oShader.SetUniform1i("textureObjet",0);
     m_scene->drawSceneTEX();
-    m_SPProgram.setUniform1i("isTextured",0);
-    m_scene->drawSceneWTEX(&m_SPProgram);
-    m_SPProgram.disable();
+    m_oShader.SetUniform1i("isTextured",0);
+    m_scene->drawSceneWTEX(&m_oShader);
+    m_oShader.Disable();
   }
 }

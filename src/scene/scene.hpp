@@ -199,7 +199,7 @@ public:
   };
 
   /** Dessin des objets non texturés */
-  void drawSceneWTEX(GLSLProgram *program=NULL) const
+  void drawSceneWTEX(GLSLShader *a_pShader=NULL) const
   {
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
@@ -209,13 +209,13 @@ public:
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end();
 	 objectsArrayIteratorWSV++)
       (*objectsArrayIteratorWSV)->draw(FLAT,false, m_boundingSpheresMode);
-    if(program)
+    if(a_pShader != NULL)
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
 	CPoint pos=(*luminariesIterator)->getPosition();
 	CPoint sc=(*luminariesIterator)->getScale();
-	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
-	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
+	a_pShader->SetUniform3f("lumTr", pos.x,pos.y,pos.z);
+	a_pShader->SetUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
       }
     else
@@ -225,7 +225,7 @@ public:
   };
 
   /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
-  void drawSceneWT(GLSLProgram *program=NULL) const
+  void drawSceneWT(GLSLShader *a_pShader=NULL) const
   {
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();
@@ -235,13 +235,13 @@ public:
 	 objectsArrayIterator != m_objectsArray.end ();
 	 objectsArrayIterator++)
       (*objectsArrayIterator)->draw (AMBIENT,false, m_boundingSpheresMode);
-    if(program)
+    if(a_pShader != NULL)
       for (vector < Luminary* >::const_iterator luminariesIterator = m_luminaries->begin ();
 	   luminariesIterator != m_luminaries->end (); luminariesIterator++){
 	CPoint pos=(*luminariesIterator)->getPosition();
 	CPoint sc=(*luminariesIterator)->getScale();
-	program->setUniform3f("lumTr", pos.x,pos.y,pos.z);
-	program->setUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
+	a_pShader->SetUniform3f("lumTr", pos.x,pos.y,pos.z);
+	a_pShader->SetUniform4f("scale", sc.x,sc.y,sc.z, 1.0f);
 	(*luminariesIterator)->draw();
       }
     else

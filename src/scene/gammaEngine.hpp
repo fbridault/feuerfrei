@@ -3,8 +3,7 @@
 
 class GammaEngine;
 
-#include "../shaders/glsl.hpp"
-
+#include <engine/glsl.hpp>
 #include <engine/renderTarget.hpp>
 #include <engine/texture.hpp>
 
@@ -12,7 +11,7 @@ class GammaEngine;
  *
  * @author	Flavien Bridault
  */
-class GammaEngine : public GLSLProgram
+class GammaEngine
 {
 public:
     /** Constructeur par défaut.
@@ -63,10 +62,10 @@ public:
     glActiveTexture(GL_TEXTURE0_ARB);
     glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
-    enable();
-    setUniform1f("gamma", m_gamma);
+    m_oShader.Enable();
+    m_oShader.SetUniform1f("gamma", m_gamma);
     m_renderTarget->drawTextureOnScreen(m_width,m_height, 0);
-    disable();
+    m_oShader.Disable();
 
     glDisable(GL_TEXTURE_RECTANGLE_ARB);
     glMatrixMode(GL_PROJECTION);
@@ -78,7 +77,7 @@ public:
   };
 
 private:
-  GLSLFragmentShader m_fp;
+  GLSLShader m_oShader;
   GLfloat m_gamma;
   CRenderTarget *m_renderTarget;
   uint m_width, m_height;

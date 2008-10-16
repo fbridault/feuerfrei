@@ -7,8 +7,8 @@ class GLFlameCanvas;
 #include "interface.hpp"
 
 #include <wx/glcanvas.h>
+#include <engine/glsl.hpp>
 
-#include "../shaders/glsl.hpp"
 #include "../scene/gammaEngine.hpp"
 
 #include "../scene/camera.hpp"
@@ -41,7 +41,7 @@ public:
   void drawScene(void);
   void drawFlames(void);
   void drawFlamesBoundingBoxes(void);
-  void drawFlamesBoundingBoxes(const GLSLProgram& glowProgram, uint index);
+  void drawFlamesBoundingBoxes(const GLSLShader& a_rGlowShader, uint a_uiIndex);
 
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
@@ -204,8 +204,7 @@ private:
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_fires;
   Scene *m_scene;
-  GLSLProgram *m_SVProgram;
-  GLSLVertexShader *m_SVShader;
+  GLSLShader *m_pSVShader;
   GammaEngine *m_gammaEngine;
   wxStopWatch *m_swatch;
 
@@ -241,13 +240,13 @@ inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
     (*firesIterator)->drawImpostor ();
 }
 
-inline void GLFlameCanvas::drawFlamesBoundingBoxes(const GLSLProgram& glowProgram, uint index)
+inline void GLFlameCanvas::drawFlamesBoundingBoxes(const GLSLShader& a_rGlowShader, uint a_uiIndex)
 {
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)
     {
-      glowProgram.setUniform1f("divide",(*firesIterator)->getGlowDivide(index));
-      glowProgram.setUniform1fv("weights",(*firesIterator)->getGlowWeights(index),FILTER_SIZE);
+      a_rGlowShader.SetUniform1f("divide",(*firesIterator)->getGlowDivide(a_uiIndex));
+      a_rGlowShader.SetUniform1fv("weights",(*firesIterator)->getGlowWeights(a_uiIndex),FILTER_SIZE);
       (*firesIterator)->drawImpostor ();
     }
 }

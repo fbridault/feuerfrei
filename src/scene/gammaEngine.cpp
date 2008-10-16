@@ -1,10 +1,8 @@
 #include "gammaEngine.hpp"
 
 GammaEngine::GammaEngine(uint width, uint height, bool recompile)
+	: m_oShader("gamma.fp","")
 {
-  m_fp.load ( "gamma.fp", recompile);
-  attachShader(m_fp);
-  link();
   m_gamma = 1;
 
   m_width = width;

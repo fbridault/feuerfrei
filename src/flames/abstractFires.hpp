@@ -11,10 +11,10 @@ class FireSource;
 #include "flames.hpp"
 
 #include <engine/graphicsFn.hpp>
+#include <engine/glsl.hpp>
 
 #include "../solvers/solver3D.hpp"
 #include "../scene/object.hpp"
-#include "../shaders/glsl.hpp"
 #include "realFlames.hpp"
 #include "ies.hpp"
 #include <engine/texture.hpp>
@@ -47,7 +47,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    * @param IESFilename nom du fichier IES à utiliser
    */
-  FlameLight (const Scene* const scene, uint index, const GLSLProgram* const program, const char* const IESFilename);
+  FlameLight (const Scene* const a_scene, uint index, const GLSLShader& a_rSVShader, const char* const IESFilename);
 
   /** Destructeur */
   virtual ~FlameLight();
@@ -153,7 +153,7 @@ private:
   const Scene *m_scene;
 
   /** CPointeur sur le program générateur de volumes d'ombres. */
-  const GLSLProgram *m_SVProgram;
+  const GLSLShader &m_rSVShader;
 
 
   /** Fichier IES utilisé pour le solide photométrique de la source. */
@@ -189,7 +189,7 @@ public:
    * @param program CPointeur sur le program chargé de la construction des shadow volumes.
    */
   FireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
-	      const wxString &texname, uint index, const GLSLProgram* const program);
+						const wxString &texname, uint index, const GLSLShader& a_rShader);
   /** Destructeur */
   virtual ~FireSource ();
 
@@ -482,7 +482,7 @@ public:
    * @param objName Nom du luminaire à charger dans le fichier filename.
    */
   DetachableFireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
-			const wxString &texname, uint index, const GLSLProgram* const program);
+			const wxString &texname, uint index, const GLSLShader& a_rShader);
   virtual ~DetachableFireSource();
 
   virtual void build();

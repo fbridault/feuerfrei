@@ -14,7 +14,7 @@
 #include "../scene/scene.hpp"
 
 Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-		    Scene* const scene, const GLSLProgram * const program, const char *filename, uint index)
+		    Scene* const scene, const GLSLShader& a_rShader, const char *filename, uint index)
 {
   char mtlName[255];
   Field3D *field;
@@ -31,7 +31,7 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
   if(config.fires[0].type != CANDLESSET)
     {
       field = initField( config.fields[0], m_position );
-      fireSource = initFire( config.fires[0], filename, field, scene, index, program );
+      fireSource = initFire( config.fires[0], filename, field, scene, index, a_rShader );
       field->addFireSource( fireSource );
       field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
 
@@ -51,7 +51,7 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
 	   objListIterator != objList.end (); objListIterator++, i++)
 	{
 	  field = initField( config.fields[0], m_position);
-	  fireSource = new Candle (config.fires[0], field, scene, i, program, .125f, NULL, *objListIterator);
+	  fireSource = new Candle (config.fires[0], field, scene, i, a_rShader, .125f, NULL, *objListIterator);
 	  field->addFireSource( fireSource );
 	  field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
 
@@ -115,24 +115,24 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 
 
 FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field,
-			       Scene* const scene, uint i, const GLSLProgram* const SVProgram)
+			       Scene* const scene, uint i, const GLSLShader& a_rShader)
 {
   FireSource *fire;
   switch(flameConfig.type){
     case CANDLE :
-      fire = new Candle (flameConfig, field, scene, i, SVProgram, .125f, fileName);
+      fire = new Candle (flameConfig, field, scene, i, a_rShader, .125f, fileName);
       break;
     case FIRMALAMPE :
-      fire = new Firmalampe(flameConfig, field, scene, i, SVProgram, fileName);
+      fire = new Firmalampe(flameConfig, field, scene, i, a_rShader, fileName);
       break;
     case TORCH :
-      fire = new Torch(flameConfig, field, scene, fileName, i, SVProgram);
+      fire = new Torch(flameConfig, field, scene, fileName, i, a_rShader);
       break;
     case CAMPFIRE :
-      fire = new CampFire(flameConfig, field, scene, fileName, i, SVProgram);
+      fire = new CampFire(flameConfig, field, scene, fileName, i, a_rShader);
       break;
     case CANDLESTICK :
-      fire = new CandleStick (flameConfig, field, scene, "scenes/bougie.obj", i, SVProgram, .125f);
+      fire = new CandleStick (flameConfig, field, scene, "scenes/bougie.obj", i, a_rShader, .125f);
       break;
     default :
       cerr << "Unknown flame type : " << (int)flameConfig.type << endl;

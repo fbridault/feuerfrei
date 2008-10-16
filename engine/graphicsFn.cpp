@@ -26,8 +26,7 @@ void CGraphicsFn::SolidSphere (GLfloat radius, GLint slices, GLint stacks)
 	gluSphere (quadObj, radius, slices, stacks);
 }
 
-void CGraphicsFn::SolidCone (GLfloat base, GLfloat height, GLint slices,
-												GLint stacks)
+void CGraphicsFn::SolidCone (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -38,8 +37,7 @@ void CGraphicsFn::SolidCone (GLfloat base, GLfloat height, GLint slices,
 	gluCylinder (quadObj, base, 0.0, height, slices, stacks);
 }
 
-void CGraphicsFn::SolidCylinder (	GLfloat base, GLfloat height, GLint slices,
-                                                        GLint stacks)
+void CGraphicsFn::SolidCylinder (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);

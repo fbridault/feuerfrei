@@ -46,6 +46,8 @@
 			<Add option="-Wall" />
 		</Compiler>
 		<Unit filename="common.hpp" />
+		<Unit filename="glsl.cpp" />
+		<Unit filename="glsl.hpp" />
 		<Unit filename="graphicsFn.cpp" />
 		<Unit filename="graphicsFn.hpp" />
 		<Unit filename="init.hpp" />

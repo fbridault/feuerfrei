@@ -6,10 +6,9 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(const Scene* const scene, uint index, const GLSLProgram* const program, const char* const IESFilename)
+FlameLight::FlameLight(const Scene* const a_scene, uint index, const GLSLShader& a_rSVShader, const char* const IESFilename) :
+	m_orientationSPtheta(0.0f), m_scene(a_scene), m_rSVShader(a_rSVShader)
 {
-  m_scene = scene;
-
   switch(index){
   case 0 : m_light = GL_LIGHT0; break;
   case 1 : m_light = GL_LIGHT1; break;
@@ -23,8 +22,6 @@ FlameLight::FlameLight(const Scene* const scene, uint index, const GLSLProgram* 
   }
 
   m_lightPosition[3] = 1.0f;
-  m_SVProgram = program;
-  m_orientationSPtheta = 0.0f;
 
   m_iesFile = new IES(IESFilename);
 }
@@ -59,13 +56,13 @@ void FlameLight::switchOn()
 
 void FlameLight::drawShadowVolume (GLfloat fatness[4], GLfloat extrudeDist[4])
 {
-  m_SVProgram->enable();
-  m_SVProgram->setUniform4f("LightPos",m_lightPosition);
-  m_SVProgram->setUniform4f("Fatness",fatness);
-  m_SVProgram->setUniform4f("ShadowExtrudeDist",extrudeDist);
+  m_rSVShader.Enable();
+  m_rSVShader.SetUniform4f("LightPos",m_lightPosition);
+  m_rSVShader.SetUniform4f("Fatness",fatness);
+  m_rSVShader.SetUniform4f("ShadowExtrudeDist",extrudeDist);
 
   m_scene->drawSceneWSV();
-  m_SVProgram->disable();
+  m_rSVShader.Disable();
 }
 
 void FlameLight::computeGlowWeights(uint index, float sigma)
@@ -88,8 +85,8 @@ void FlameLight::computeGlowWeights(uint index, float sigma)
 /**********************************************************************************************************************/
 
 FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
-		       const wxString &texname, uint index, const GLSLProgram* const program) :
-  FlameLight(scene, index, program, flameConfig.IESFileName.ToAscii()),
+		       const wxString &texname, uint index, const GLSLShader& a_rShader) :
+  FlameLight(scene, index, a_rShader, flameConfig.IESFileName.ToAscii()),
   m_texture(string(texname.fn_str()), GL_REPEAT, GL_REPEAT),
   m_position(0.0f,0.0f,0.0f)
 {
@@ -323,8 +320,8 @@ bool FireSource::operator<(const FireSource& other) const{
 
 DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
 					   Scene* const scene,
-					   const wxString &texname, uint index, const GLSLProgram* const program) :
-  FireSource (flameConfig, s, nbFlames, scene, texname, index, program)
+					   const wxString &texname, uint index, const GLSLShader& a_rShader) :
+  FireSource (flameConfig, s, nbFlames, scene, texname, index, a_rShader)
 {
   computeGlowWeights(0,1.8f);
   computeGlowWeights(1,2.2f);

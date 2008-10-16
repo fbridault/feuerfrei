@@ -320,8 +320,6 @@
 		<Unit filename="src/shaders/glowShaderY.fp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/shaders/glsl.cpp" />
-		<Unit filename="src/shaders/glsl.hpp" />
 		<Unit filename="src/shaders/photoSolid.fp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>

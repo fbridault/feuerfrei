@@ -12,7 +12,7 @@
 
 using namespace std;
 
-GLSLShader::GLSLShader(const string& vpname, const string& fpname, const string& macros)
+CShader::CShader(const string& vpname, const string& fpname, const string& macros)
 {
   assert(!vpname.empty());
   assert(!fpname.empty());
@@ -28,7 +28,7 @@ GLSLShader::GLSLShader(const string& vpname, const string& fpname, const string&
   Link();
 };
 
-GLSLShader::GLSLShader(const string& fpname, const string& macros)
+CShader::CShader(const string& fpname, const string& macros)
 {
   assert(!fpname.empty());
 
@@ -42,7 +42,7 @@ GLSLShader::GLSLShader(const string& fpname, const string& macros)
 };
 
 
-void GLSLProgram::load(const string& fileNames, const string& macros ) const
+void IShaderProgram::load(const string& fileNames, const string& macros ) const
 {
   GLint infologLength;
   int compiled;
@@ -95,7 +95,7 @@ void GLSLProgram::load(const string& fileNames, const string& macros ) const
   }
 }
 
-void GLSLProgram::addMacros(const string& macros, string& source) const
+void IShaderProgram::addMacros(const string& macros, string& source) const
 {
   vector<string> vMacros;
 
@@ -108,7 +108,7 @@ void GLSLProgram::addMacros(const string& macros, string& source) const
     source.insert(0,*vMacrosIterator);
 }
 
-void GLSLProgram::getFileContents(const string& fileName, string& source) const
+void IShaderProgram::getFileContents(const string& fileName, string& source) const
 {
   string buffer;
 
@@ -124,7 +124,7 @@ void GLSLProgram::getFileContents(const string& fileName, string& source) const
   input.close();
 }
 
-void GLSLProgram::splitStringInStringsArray(const string& names, vector<string>& splitNames,
+void IShaderProgram::splitStringInStringsArray(const string& names, vector<string>& splitNames,
     const string& prefix, const string& suffix) const
 {
   bool find = true;

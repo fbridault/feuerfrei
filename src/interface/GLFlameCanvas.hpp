@@ -41,7 +41,7 @@ public:
   void drawScene(void);
   void drawFlames(void);
   void drawFlamesBoundingBoxes(void);
-  void drawFlamesBoundingBoxes(const GLSLShader& a_rGlowShader, uint a_uiIndex);
+  void drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex);
 
   /** Défini l'action à effectuer lorsque la souris se déplace */
   void OnMouseMotion(wxMouseEvent& event);
@@ -204,7 +204,7 @@ private:
   /********* Variables relatives à la simulation *************************/
   vector <FireSource *> m_fires;
   Scene *m_scene;
-  GLSLShader *m_pSVShader;
+  CShader *m_pSVShader;
   GammaEngine *m_gammaEngine;
   wxStopWatch *m_swatch;
 
@@ -240,7 +240,7 @@ inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
     (*firesIterator)->drawImpostor ();
 }
 
-inline void GLFlameCanvas::drawFlamesBoundingBoxes(const GLSLShader& a_rGlowShader, uint a_uiIndex)
+inline void GLFlameCanvas::drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex)
 {
   for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
        firesIterator != m_fires.end (); firesIterator++)

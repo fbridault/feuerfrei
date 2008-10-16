@@ -6,7 +6,7 @@
 #include "../solvers/fakeField3D.hpp"
 
 Candle::Candle (const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index,
-		const GLSLShader& a_rShader, float rayon, const char *wickFileName, Wick *wick):
+		const CShader& a_rShader, float rayon, const char *wickFileName, Wick *wick):
  FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, a_rShader)
 {
   if(wickFileName)
@@ -103,7 +103,7 @@ void Candle::switchOnMulti()
 }
 
 Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene, uint index,
-		       const GLSLShader& a_rShader, const char *wickFileName):
+		       const CShader& a_rShader, const char *wickFileName):
   FireSource (flameConfig, s, 1, scene, _("textures/firmalampe.png"), index, a_rShader)
 {
   list<Wick *> objList;
@@ -124,7 +124,7 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene
 }
 
 Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
-	     const GLSLShader& a_rShader):
+	     const CShader& a_rShader):
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"), index, a_rShader)
 {
   list<Wick *> objList;
@@ -152,7 +152,7 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const ch
 }
 
 CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index,
-		   const GLSLShader& a_rShader):
+		   const CShader& a_rShader):
   DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"), index, a_rShader)
 {
   list<Wick *> objList;
@@ -180,7 +180,7 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, co
 }
 
 CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
-			  const GLSLShader& a_rShader, float rayon):
+			  const CShader& a_rShader, float rayon):
   FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, a_rShader)
 {
   list<Wick *> objList;

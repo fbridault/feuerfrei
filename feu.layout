@@ -10,13 +10,13 @@
 	<File name="src/flames/DPengine.cpp" open="0" top="0" tabpos="3">
 		<Cursor position="239" topLine="0" />
 	</File>
-	<File name="src/flames/DPengine.hpp" open="0" top="0" tabpos="10">
+	<File name="src/flames/DPengine.hpp" open="1" top="0" tabpos="10">
 		<Cursor position="2280" topLine="0" />
 	</File>
-	<File name="src/flames/abstractFires.cpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/abstractFires.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="10190" topLine="301" />
 	</File>
-	<File name="src/flames/abstractFires.hpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/abstractFires.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="16739" topLine="462" />
 	</File>
 	<File name="src/flames/abstractFlames.cpp" open="0" top="0" tabpos="13">
@@ -37,7 +37,7 @@
 	<File name="src/flames/glowengine.cpp" open="0" top="0" tabpos="6">
 		<Cursor position="3766" topLine="89" />
 	</File>
-	<File name="src/flames/glowengine.hpp" open="0" top="0" tabpos="5">
+	<File name="src/flames/glowengine.hpp" open="1" top="0" tabpos="5">
 		<Cursor position="2246" topLine="51" />
 	</File>
 	<File name="src/flames/leadSkeleton.cpp" open="0" top="0" tabpos="0">
@@ -46,10 +46,10 @@
 	<File name="src/flames/leadSkeleton.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="3241" topLine="57" />
 	</File>
-	<File name="src/flames/luminary.cpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/luminary.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="1176" topLine="11" />
 	</File>
-	<File name="src/flames/luminary.hpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/luminary.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="1610" topLine="12" />
 	</File>
 	<File name="src/flames/particle.hpp" open="0" top="0" tabpos="0">
@@ -61,10 +61,10 @@
 	<File name="src/flames/periSkeleton.hpp" open="0" top="0" tabpos="3">
 		<Cursor position="3413" topLine="46" />
 	</File>
-	<File name="src/flames/realFires.cpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/realFires.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="4885" topLine="138" />
 	</File>
-	<File name="src/flames/realFires.hpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/realFires.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="5251" topLine="155" />
 	</File>
 	<File name="src/flames/realFlames.cpp" open="0" top="0" tabpos="0">
@@ -157,7 +157,7 @@
 	<File name="src/scene/gammaEngine.cpp" open="0" top="0" tabpos="21">
 		<Cursor position="120" topLine="0" />
 	</File>
-	<File name="src/scene/gammaEngine.hpp" open="0" top="0" tabpos="9">
+	<File name="src/scene/gammaEngine.hpp" open="1" top="0" tabpos="9">
 		<Cursor position="1678" topLine="41" />
 	</File>
 	<File name="src/scene/intensity.hpp" open="0" top="0" tabpos="0">
@@ -178,7 +178,7 @@
 	<File name="src/scene/scene.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="19969" topLine="618" />
 	</File>
-	<File name="src/scene/scene.hpp" open="0" top="0" tabpos="1">
+	<File name="src/scene/scene.hpp" open="1" top="0" tabpos="1">
 		<Cursor position="9583" topLine="219" />
 	</File>
 	<File name="src/shaders/depthPeeling.fp" open="0" top="0" tabpos="0">

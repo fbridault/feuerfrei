@@ -25,13 +25,13 @@ public:
    * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
    */
   Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-	    Scene* const scene, const GLSLShader& a_rShader, const char *filename, uint index);
+	    Scene* const scene, const CShader& a_rShader, const char *filename, uint index);
   /** Destructeur */
   virtual ~Luminary ();
 
   Field3D* initField(const SolverConfig& fieldConfig, const CPoint& position);
   FireSource* initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, Scene* const scene,
-		       uint i, const GLSLShader& a_rShader);
+		       uint i, const CShader& a_rShader);
   /** Retourne la position absolue dans le repère du monde.
    * @return Position absolue dans le repère du monde.
    */

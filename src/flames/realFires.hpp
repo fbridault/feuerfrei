@@ -29,7 +29,7 @@ public:
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   Candle(const FlameConfig& flameConfig, Field3D * s, Scene* const scene, uint index,
-	 const GLSLShader& a_rShader, float rayon, const char *wickFileName, Wick *wick=NULL);
+	 const CShader& a_rShader, float rayon, const char *wickFileName, Wick *wick=NULL);
   /** Destructeur */
   virtual ~Candle(){};
 
@@ -63,7 +63,7 @@ public:
    * @param wickFileName nom du fichier contenant la mèche
    */
   Firmalampe(const FlameConfig& flameConfig, Field3D * s, Scene *scene, uint index,
-	     const GLSLShader& a_rShader, const char *wickFileName);
+	     const CShader& a_rShader, const char *wickFileName);
   /** Destructeur */
   virtual ~Firmalampe(){};
 };
@@ -87,7 +87,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
   Torch(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *torchName, uint index,
-	const GLSLShader& a_rShader);
+	const CShader& a_rShader);
   /** Destructeur */
   virtual ~Torch(){};
 
@@ -117,7 +117,7 @@ public:
    * @param program pointeur sur le program chargé de la construction des shadow volumes.
    */
   CampFire(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *fireName, uint index,
-	   const GLSLShader& a_rShader);
+	   const CShader& a_rShader);
   /** Destructeur */
   virtual ~CampFire(){};
 };
@@ -140,7 +140,7 @@ public:
    * @param rayon Rayon de la flamme.
    */
   CandleStick(const FlameConfig& flameConfig, Field3D * s, Scene *scene, const char *filename, uint index,
-	      const GLSLShader& a_rShader, float rayon);
+	      const CShader& a_rShader, float rayon);
   /** Destructeur */
   virtual ~CandleStick();
 

@@ -76,7 +76,7 @@ private:
 	CRenderTarget *m_renderTarget[2], *m_sceneDepthRenderTarget;
 	GLuint m_curDepthTex;
 
-	GLSLShader m_oDpShader, m_oDpRendererShader;
+	CShader m_oDpShader, m_oDpRendererShader;
 
 	GLuint m_flamesDisplayList;
 };

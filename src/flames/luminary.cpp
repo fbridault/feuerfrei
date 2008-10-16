@@ -14,7 +14,7 @@
 #include "../scene/scene.hpp"
 
 Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-		    Scene* const scene, const GLSLShader& a_rShader, const char *filename, uint index)
+		    Scene* const scene, const CShader& a_rShader, const char *filename, uint index)
 {
   char mtlName[255];
   Field3D *field;
@@ -115,7 +115,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 
 
 FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field,
-			       Scene* const scene, uint i, const GLSLShader& a_rShader)
+			       Scene* const scene, uint i, const CShader& a_rShader)
 {
   FireSource *fire;
   switch(flameConfig.type){

@@ -77,7 +77,7 @@ public:
   };
 
 private:
-  GLSLShader m_oShader;
+  CShader m_oShader;
   GLfloat m_gamma;
   CRenderTarget *m_renderTarget;
   uint m_width, m_height;

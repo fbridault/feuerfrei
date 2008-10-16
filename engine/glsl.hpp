@@ -9,7 +9,7 @@
 #ifndef GLSL_H
 #define GLSL_H
 
-class GLSLShader;
+class CShader;
 
 #ifdef __APPLE__
 #include <openGL/gl.h>
@@ -27,17 +27,16 @@ using namespace std;
  * @author	Flavien Bridault
  *
  */
-class GLSLProgram
+class IShaderProgram
 {
 protected:
 	GLuint m_shader;
 
-public:
 	/** Default Constructor
 	 * @param sourceName Source file name.
 	 */
-	GLSLProgram() {};
-	virtual ~GLSLProgram()
+	IShaderProgram() {};
+	virtual ~IShaderProgram()
 	{
 		glDeleteShader(m_shader);
 	};
@@ -48,62 +47,63 @@ public:
 		return m_shader;
 	};
 
-protected:
+private:
 	void addMacros(const string& macros, string& source) const;
 	void getFileContents(const string& fileName, string& source) const;
-	void splitStringInStringsArray(const string& names, vector<string>& splitNames,
-	                               const string& prefix, const string& suffix) const;
+	void splitStringInStringsArray(const string& names, vector<string>& splitNames,const string& prefix, const string& suffix) const;
+
+	friend class CShader;
 };
 
-class GLSLVertexShader : public GLSLProgram
+class CVertexProgram : public IShaderProgram
 {
 public:
-	GLSLVertexShader()
+	CVertexProgram()
 	{
 		m_shader=glCreateShader(GL_VERTEX_SHADER);
 	};
-	virtual ~GLSLVertexShader() {};
+	virtual ~CVertexProgram() {};
 };
 
-class GLSLFragmentShader : public GLSLProgram
+class CFragmentProgram : public IShaderProgram
 {
 public:
-	GLSLFragmentShader()
+	CFragmentProgram()
 	{
 		m_shader=glCreateShader(GL_FRAGMENT_SHADER);
 	};
-	virtual ~GLSLFragmentShader() {};
+	virtual ~CFragmentProgram() {};
 };
 
 /** Abstraction d'un programme GLSL, contenant un vertex et un fragment shader
  *
  * @author	Flavien Bridault
  */
-class GLSLShader
+class CShader
 {
 private:
 	/** ID du programme */
 	GLuint m_program;
 	/** Vertex program. */
-	GLSLVertexShader m_vertexShader;
+	CVertexProgram m_vertexShader;
 	/** Fragment program. */
-	GLSLFragmentShader m_fragmentShader;
+	CFragmentProgram m_fragmentShader;
 
 public:
 	/** Constructeur par défaut.
 	 * @param vpname Nom du fichier source.
 	 * @param fpname Nom du fichier source.
 	 */
-	GLSLShader(const string& vpname, const string& fpname, const string& macros);
+	CShader(const string& vpname, const string& fpname, const string& macros);
 
 	/** Constructeur ne prenant qu'un seul fragment program. Les fonctions fixes du pipeline
 	 *  sont implicitement utilisées pour les vertex.
 	 *
 	 * @param fpname Nom du fichier source.
 	 */
-	GLSLShader(const string& fpname, const string& macros);
+	CShader(const string& fpname, const string& macros);
 
-	virtual ~GLSLShader()
+	virtual ~CShader()
 	{
 		glDeleteProgram(m_program);
 	};
@@ -137,13 +137,13 @@ public:
 	};
 
 	/** Attachement d'un shader au programme. */
-	virtual void AttachShader(const GLSLProgram& shader) const
+	virtual void AttachShader(const IShaderProgram& shader) const
 	{
 		glAttachShader(m_program,shader.getID());
 	}
 
 	/** Détachement d'un shader au programme. */
-	virtual void DetachShader(const GLSLProgram& shader) const
+	virtual void DetachShader(const IShaderProgram& shader) const
 	{
 		glDetachShader(m_program,shader.getID());
 	}

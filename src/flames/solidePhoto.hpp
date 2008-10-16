@@ -42,7 +42,7 @@ protected:
   const vector <FireSource *> *m_flames;
 
   /** Shader */
-  GLSLShader m_oShader;
+  CShader m_oShader;
 
   /** Tableau contenant les centres de tous les solides. */
   GLfloat *m_centers;
@@ -90,7 +90,7 @@ private:
   uint m_tex2DSize[2];
 
   /** Shader pour SP interpolé sans couleur des objets */
-  GLSLShader m_oSPOnlyShader;
+  CShader m_oSPOnlyShader;
 };
 
 

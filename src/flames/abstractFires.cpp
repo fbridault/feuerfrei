@@ -6,7 +6,7 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(const Scene* const a_scene, uint index, const GLSLShader& a_rSVShader, const char* const IESFilename) :
+FlameLight::FlameLight(const Scene* const a_scene, uint index, const CShader& a_rSVShader, const char* const IESFilename) :
 	m_orientationSPtheta(0.0f), m_scene(a_scene), m_rSVShader(a_rSVShader)
 {
   switch(index){
@@ -85,7 +85,7 @@ void FlameLight::computeGlowWeights(uint index, float sigma)
 /**********************************************************************************************************************/
 
 FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, Scene* const scene,
-		       const wxString &texname, uint index, const GLSLShader& a_rShader) :
+		       const wxString &texname, uint index, const CShader& a_rShader) :
   FlameLight(scene, index, a_rShader, flameConfig.IESFileName.ToAscii()),
   m_texture(string(texname.fn_str()), GL_REPEAT, GL_REPEAT),
   m_position(0.0f,0.0f,0.0f)
@@ -320,7 +320,7 @@ bool FireSource::operator<(const FireSource& other) const{
 
 DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
 					   Scene* const scene,
-					   const wxString &texname, uint index, const GLSLShader& a_rShader) :
+					   const wxString &texname, uint index, const CShader& a_rShader) :
   FireSource (flameConfig, s, nbFlames, scene, texname, index, a_rShader)
 {
   computeGlowWeights(0,1.8f);

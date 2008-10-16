@@ -56,3 +56,15 @@
 1223759828 source:/home/flavien/recherche/git/flames/engine/main.cpp
 	<ilut.h>
 
+1224198230 source:/home/flavien/recherche/git/flames/engine/glsl.cpp
+	"glsl.hpp"
+	<fstream>
+	<iostream>
+	"common.hpp"
+
+1224198315 /home/flavien/recherche/git/flames/engine/glsl.hpp
+	<openGL/gl.h>
+	<GL/gl.h>
+	<iostream>
+	<vector>
+

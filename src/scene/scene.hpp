@@ -199,7 +199,7 @@ public:
   };
 
   /** Dessin des objets non texturés */
-  void drawSceneWTEX(GLSLShader *a_pShader=NULL) const
+  void drawSceneWTEX(CShader *a_pShader=NULL) const
   {
     for (vector<Object*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
 	 objectsArrayIterator != m_objectsArray.end();
@@ -225,7 +225,7 @@ public:
   };
 
   /** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
-  void drawSceneWT(GLSLShader *a_pShader=NULL) const
+  void drawSceneWT(CShader *a_pShader=NULL) const
   {
     for (vector < Object * >::const_iterator objectsArrayIteratorWSV = m_objectsArrayWSV.begin ();
 	 objectsArrayIteratorWSV != m_objectsArrayWSV.end ();

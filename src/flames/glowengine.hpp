@@ -90,7 +90,7 @@ private:
   /** CRenderTarget */
   CRenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
   /** Shaders pour le blur */
-  GLSLShader m_oShaderX, m_oShaderY, m_oBlurRendererShader;
+  CShader m_oShaderX, m_oShaderY, m_oBlurRendererShader;
 };
 
 #endif

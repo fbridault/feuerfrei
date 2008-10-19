@@ -33,7 +33,7 @@ protected:
 	GLuint m_shader;
 
 	/** Default Constructor
-	 * @param sourceName Source file name.
+	 * @param sourceName ILight file name.
 	 */
 	IShaderProgram() {};
 	virtual ~IShaderProgram()

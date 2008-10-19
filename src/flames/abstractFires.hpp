@@ -319,7 +319,7 @@ public:
 	  // Trace une sphère indiquant le centre
 // 	  	    glPushMatrix();
 // 	  	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
-// 	  	    CGraphicsFn::SolidSphere (.05, 10, 10);
+// 	  	    CUGraphicsFn::SolidSphere (.05, 10, 10);
 // 	  	    glPopMatrix();
 	}
       break;

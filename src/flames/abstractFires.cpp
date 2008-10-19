@@ -187,7 +187,7 @@ void FireSource::drawImpostor() const
 //       glPushMatrix();
 //       glTranslatef (position.x, position.y, position.z);
 //       glScalef (scale.x, scale.y, scale.z);
-//       CGraphicsFn::SolidBox(CPoint(),m_solver->getDim());
+//       CUGraphicsFn::SolidBox(CPoint(),m_solver->getDim());
 //       glPopMatrix();
       GLfloat modelview[16];
 

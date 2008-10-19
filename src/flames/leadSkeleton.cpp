@@ -29,7 +29,7 @@ void LeadSkeleton::drawParticle (Particle * const particle) const
   glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  CGraphicsFn::SolidSphere (0.01f, 10, 10);
+  CUGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -38,7 +38,7 @@ void LeadSkeleton::drawRoot () const
   glColor4f (0.0f, 0.4f, 0.0f, 0.8f);
   glPushMatrix ();
   glTranslatef (m_root.x, m_root.y, m_root.z);
-  CGraphicsFn::SolidSphere (0.01f, 10, 10);
+  CUGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -147,6 +147,6 @@ void FreeLeadSkeleton::drawParticle (Particle * const particle) const
   glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  CGraphicsFn::SolidSphere (0.01f, 10, 10);
+  CUGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }

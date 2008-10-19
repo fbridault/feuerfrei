@@ -140,5 +140,5 @@ void Field3D::displayArrow (const CVector& direction)
   //  printf("%f\n",norme_vel);
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
 
-  CGraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
+  CUGraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
 }

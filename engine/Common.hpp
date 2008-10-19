@@ -5,6 +5,9 @@
 #include <GL/glu.h>
 
 #include "assert.h"
+#include <string>
+
+using namespace std;
 
 typedef unsigned int uint;
 
@@ -13,5 +16,8 @@ typedef unsigned int uint;
 
 #define RAD_TO_DEG 180.0/M_PI
 #define DEG_TO_RAD M_PI/180.0
+
+// TEMP
+extern GLfloat g_modelViewMatrix[16];
 
 #endif

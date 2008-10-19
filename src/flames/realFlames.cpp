@@ -346,7 +346,7 @@ bool LineFlame::buildFlat ()
 //     glColor4f (1.0, 1.0, 0.45, 1.0);
 //     glPushMatrix ();
 //     glTranslatef ((*sparksListIterator)->x, (*sparksListIterator)->y, (*sparksListIterator)->z);
-//     CGraphicsFn::SolidSphere (0.01, 4, 4);
+//     CUGraphicsFn::SolidSphere (0.01, 4, 4);
 //     glPopMatrix ();
 //   }
 // }

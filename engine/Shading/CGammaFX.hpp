@@ -1,17 +1,17 @@
 #ifndef GAMMASHADER_H
 #define GAMMASHADER_H
 
-class GammaEngine;
+class CGammaFX;
 
-#include "glsl.hpp"
-#include "renderTarget.hpp"
-#include "texture.hpp"
+#include "../Shading/Glsl.hpp"
+#include "../Shading/CRenderTarget.hpp"
+#include "../Scene/Texture.hpp"
 
 /** Classe servant d'interface avec le fragment program de la correction gamma.
  *
  * @author	Flavien Bridault
  */
-class GammaEngine
+class CGammaFX
 {
 public:
     /** Constructeur par défaut.
@@ -20,9 +20,9 @@ public:
    * @param context CPointeur vers le contexte Cg (il doit être déjà créé).
    * @param recompile Indique s'il faut recompiler le shader à partir du fichier glsl ou si le .o est déjà compilé.
    */
-  GammaEngine(uint width, uint height,  bool recompile=true);
+  CGammaFX(uint width, uint height,  bool recompile=true);
   /** Destructeur. */
-  virtual ~GammaEngine();
+  virtual ~CGammaFX();
 
   void setSize(uint width, uint height)
   {

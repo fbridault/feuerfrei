@@ -92,7 +92,7 @@ void Scene::computeBoundingBox(CPoint& max, CPoint& min)
   max = ptMax; min = ptMin;
 }
 
-void Scene::computeVisibility(const Camera &view)
+void Scene::computeVisibility(const CCamera &view)
 {
   for (vector<Object*>::iterator objectsArrayIterator = m_objectsArray.begin();
        objectsArrayIterator != m_objectsArray.end();

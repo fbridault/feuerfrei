@@ -205,7 +205,7 @@ private:
   vector <FireSource *> m_fires;
   Scene *m_scene;
   CShader *m_pSVShader;
-  GammaEngine *m_gammaEngine;
+  CGammaFX *m_gammaEngine;
   wxStopWatch *m_swatch;
 
   float *m_intensities;

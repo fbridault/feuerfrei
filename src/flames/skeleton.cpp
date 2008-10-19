@@ -132,7 +132,7 @@ void FreeSkeleton::drawParticle (Particle * const particle) const
   glColor4f (1.0f, 1.0f, 0.25f, 0.8f);
   glPushMatrix ();
   glTranslatef (particle->x, particle->y, particle->z);
-  CGraphicsFn::SolidSphere (0.01f, 10, 10);
+  CUGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 
@@ -168,7 +168,7 @@ void Skeleton::drawRoot () const
   glColor4f (1.0f, 0.0f, 0.25f, 0.8f);
   glPushMatrix ();
   glTranslatef (m_root.x, m_root.y, m_root.z);
-  CGraphicsFn::SolidSphere (0.01f, 10, 10);
+  CUGraphicsFn::SolidSphere (0.01f, 10, 10);
   glPopMatrix ();
 }
 

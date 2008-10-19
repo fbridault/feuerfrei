@@ -1,6 +1,7 @@
-#include "graphicsFn.hpp"
+#include "GraphicsFn.hpp"
 
 #include <iostream>
+#include "../Maths/CPoint.hpp"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ static void initQuadObj (void)
 		cerr << ("out of memory.");
 }
 
-void CGraphicsFn::SolidSphere (GLfloat radius, GLint slices, GLint stacks)
+void UGraphicsFn::SolidSphere (GLfloat radius, GLint slices, GLint stacks)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -26,7 +27,7 @@ void CGraphicsFn::SolidSphere (GLfloat radius, GLint slices, GLint stacks)
 	gluSphere (quadObj, radius, slices, stacks);
 }
 
-void CGraphicsFn::SolidCone (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
+void UGraphicsFn::SolidCone (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -37,7 +38,7 @@ void CGraphicsFn::SolidCone (	GLfloat base, GLfloat height, GLint slices, GLint 
 	gluCylinder (quadObj, base, 0.0, height, slices, stacks);
 }
 
-void CGraphicsFn::SolidCylinder (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
+void UGraphicsFn::SolidCylinder (	GLfloat base, GLfloat height, GLint slices, GLint stacks)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -48,7 +49,7 @@ void CGraphicsFn::SolidCylinder (	GLfloat base, GLfloat height, GLint slices, GL
 	gluCylinder (quadObj, base, base, height, slices, stacks);
 }
 
-void CGraphicsFn::SolidDisk (GLfloat rayon, GLint slices, GLint loops)
+void UGraphicsFn::SolidDisk (GLfloat rayon, GLint slices, GLint loops)
 {
 	QUAD_OBJ_INIT ();
 	gluQuadricDrawStyle (quadObj, GLU_FILL);
@@ -59,7 +60,7 @@ void CGraphicsFn::SolidDisk (GLfloat rayon, GLint slices, GLint loops)
 	gluDisk (quadObj, 0, rayon, slices, loops);
 }
 
-void CGraphicsFn::SolidBox (const CPoint& ptMin, const CPoint& ptMax)
+void UGraphicsFn::SolidBox (const CPoint& ptMin, const CPoint& ptMax)
 {
 	glColor4f(1.0,1.0,0.0,0.0);
 	glBegin(GL_QUADS);
@@ -94,3 +95,11 @@ void CGraphicsFn::SolidBox (const CPoint& ptMin, const CPoint& ptMax)
 	glVertex3f(ptMax.x,ptMax.y,ptMin.z);
 	glEnd();
 }
+
+//void UGraphicsFn::renderBitmapString(float x, float y, float height, void *font, const char *string)
+//{
+//  const char *c;
+//  glRasterPos2f(x, height-y);
+//  for (c=string; *c != '\0'; c++)
+//    glutBitmapCharacter(font, *c);
+//}

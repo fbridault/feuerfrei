@@ -31,6 +31,7 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
+					<Add option="-march=athlon-xp" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -45,18 +46,42 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="common.hpp" />
-		<Unit filename="glsl.cpp" />
-		<Unit filename="glsl.hpp" />
-		<Unit filename="graphicsFn.cpp" />
-		<Unit filename="graphicsFn.hpp" />
-		<Unit filename="init.hpp" />
-		<Unit filename="main.cpp" />
-		<Unit filename="pointVector.hpp" />
-		<Unit filename="renderTarget.cpp" />
-		<Unit filename="renderTarget.hpp" />
-		<Unit filename="texture.cpp" />
-		<Unit filename="texture.hpp" />
+		<Unit filename="Common.hpp" />
+		<Unit filename="Init.cpp" />
+		<Unit filename="Init.hpp" />
+		<Unit filename="Maths/CPoint.cpp" />
+		<Unit filename="Maths/CPoint.hpp" />
+		<Unit filename="Maths/CQuaternion.hpp" />
+		<Unit filename="Maths/CVector.hpp" />
+		<Unit filename="Physics/CEnergy.hpp" />
+		<Unit filename="Scene/CBoundingSphere.hpp" />
+		<Unit filename="Scene/CCamera.cpp" />
+		<Unit filename="Scene/CCamera.hpp" />
+		<Unit filename="Scene/CMaterial.cpp" />
+		<Unit filename="Scene/CMaterial.hpp" />
+		<Unit filename="Scene/CMesh.cpp" />
+		<Unit filename="Scene/CMesh.hpp" />
+		<Unit filename="Scene/CObject.cpp" />
+		<Unit filename="Scene/CObject.hpp" />
+		<Unit filename="Scene/CScene.cpp" />
+		<Unit filename="Scene/CScene.hpp" />
+		<Unit filename="Scene/Light.cpp" />
+		<Unit filename="Scene/Light.hpp" />
+		<Unit filename="Scene/Texture.cpp" />
+		<Unit filename="Scene/Texture.hpp" />
+		<Unit filename="Shading/CGammaFX.cpp" />
+		<Unit filename="Shading/CGammaFX.hpp" />
+		<Unit filename="Shading/CRenderTarget.cpp" />
+		<Unit filename="Shading/CRenderTarget.hpp" />
+		<Unit filename="Shading/Glsl.cpp" />
+		<Unit filename="Shading/Glsl.hpp" />
+		<Unit filename="Utility/CObjImporter.cpp" />
+		<Unit filename="Utility/CObjImporter.hpp" />
+		<Unit filename="Utility/CRefTable.hpp" />
+		<Unit filename="Utility/GraphicsFn.cpp" />
+		<Unit filename="Utility/GraphicsFn.hpp" />
+		<Unit filename="Utility/ISingleton.hpp" />
+		<Unit filename="Utility/Numerable.hpp" />
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />

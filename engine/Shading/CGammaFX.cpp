@@ -1,6 +1,6 @@
-#include "gammaEngine.hpp"
+#include "CGammaFX.hpp"
 
-GammaEngine::GammaEngine(uint width, uint height, bool recompile)
+CGammaFX::CGammaFX(uint width, uint height, bool recompile)
 	: m_oShader("gamma.fp","")
 {
   m_gamma = 1;
@@ -11,7 +11,7 @@ GammaEngine::GammaEngine(uint width, uint height, bool recompile)
   m_renderTarget = new CRenderTarget("color rect rgba depthbuffer nearest",width, height,0);
 }
 
-GammaEngine::~GammaEngine()
+CGammaFX::~CGammaFX()
 {
   delete m_renderTarget;
 }

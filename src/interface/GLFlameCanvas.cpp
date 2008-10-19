@@ -86,7 +86,7 @@ void GLFlameCanvas::InitGL()
 
   m_pSVShader = new CShader("shadowVolume.vp", "");
 
-  m_gammaEngine = new GammaEngine (m_width, m_height);
+  m_gammaEngine = new CGammaFX (m_width, m_height);
   setGammaCorrection( m_currentConfig->gammaCorrection );
 
 }

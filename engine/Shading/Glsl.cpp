@@ -1,4 +1,4 @@
-#include "glsl.hpp"
+#include "Glsl.hpp"
 
 #include <fstream>
 
@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "common.hpp"
+#include "../Common.hpp"
 
 
 using namespace std;

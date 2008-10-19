@@ -1,4 +1,4 @@
-#include "texture.hpp"
+#include "Texture.hpp"
 #include "ilut.h"
 #include <iostream>
 

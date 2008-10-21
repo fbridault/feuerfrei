@@ -90,11 +90,13 @@ public:
 	virtual void preRendering(bool shadows) const;
 	virtual void postRendering(bool shadows) const;
 
-	void toggle() {
+	void toggle()
+	{
 		m_enabled = !m_enabled;
 	};
 
-	bool isEnabled() {
+	bool isEnabled()
+	{
 		return m_enabled;
 	};
 
@@ -126,7 +128,7 @@ class COmniLight : public ILight
 {
 public:
 	COmniLight (const CPoint& P, const Energy& I, GLuint depthMapSize, const CShader* genShadowCubeMapShader,
-	           const CRenderTarget *shadowRenderTarget);
+	            const CRenderTarget *shadowRenderTarget);
 	/** Destructeur par d&eacute;faut. */
 	virtual ~COmniLight ();
 
@@ -156,7 +158,7 @@ public:
 	 * @param I intensit&eacute; lumineuse de la source.
 	 */
 	CSpotLight (const CPoint & P, const CVector& direction, const Energy & I, float cutoff,
-	           GLuint depthMapSize, const CRenderTarget *shadowRenderTarget);
+	            GLuint depthMapSize, const CRenderTarget *shadowRenderTarget);
 
 	/**
 	 * Destructeur par d&eacute;faut.

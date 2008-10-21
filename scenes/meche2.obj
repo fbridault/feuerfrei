@@ -1,6 +1,6 @@
 #Produced by Art of Illusion 2.3, Wed Jan 03 18:25:51 CET 2007
 mtllib meche2.mtl
-g Tube_1
+o Tube_1
 usemtl Default_Texture
 v 0.71885 0.00536 0.5
 v 0.68507 -0.00617 0.46421

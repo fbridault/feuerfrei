@@ -1,11 +1,11 @@
 #ifndef BASICFLAMES_H
 #define BASICFLAMES_H
 
-class NurbsFlame;
-class FixedFlame;
-class RealFlame;
+class INurbsFlame;
+class IFixedFlame;
+class IRealFlame;
 
-#include <engine/texture.hpp>
+#include <engine/Scene/Texture.hpp>
 
 #include "periSkeleton.hpp"
 #include "leadSkeleton.hpp"
@@ -30,230 +30,244 @@ extern uint g_count;
 /****************************************** DEFINITION DE LA CLASSE NURBSFLAME ****************************************/
 /**********************************************************************************************************************/
 
-/** La classe NurbsFlame est l'objet de plus bas niveau représentant une flamme. Elle définit les propriétés nécessaires
+/** La classe INurbsFlame est l'objet de plus bas niveau reprÃ©sentant une flamme. Elle dÃ©finit les propriÃ©tÃ©s nÃ©cessaires
  * pour la construction d'une NURBS, ainsi que la localisation de la flamme dans l'espace. En revanche, la notion de
- * squelette n'apparaît absolument pas ici.
+ * squelette n'apparaÃ®t absolument pas ici.
  *
  * @author	Flavien Bridault
  */
-class NurbsFlame
+class INurbsFlame
 {
 public:
-  /** Constructeur de flamme par défaut n'effectuant pas l'allocation des tableaux utilisés pour la génération
-   * des points de contrôle. L'allocation doit donc être effectuée par la classe fille, ce que fait par exemple
-   * la classe FixedFlame.
-   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
-   * @param nbFixedCPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
-   * @param tex CPointeur sur la texture de la flamme.
-   */
-  NurbsFlame(uint nbSkeletons, ushort nbFixedCPoints, const ITexture* const tex);
+	/** Constructeur de flamme par dÃ©faut n'effectuant pas l'allocation des tableaux utilisÃ©s pour la gÃ©nÃ©ration
+	 * des points de contrÃ´le. L'allocation doit donc Ãªtre effectuÃ©e par la classe fille, ce que fait par exemple
+	 * la classe IFixedFlame.
+	 * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage.
+	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
+	 * @param tex CPointeur sur la texture de la flamme.
+	 */
+	INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
 
-  /** Constructeur de flamme.
-   * @param source CPointeur sur la flamme qui a généré la flamme courante.
-   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
-   * @param nbFixedCPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
-   * @param tex CPointeur sur la texture de la flamme.
-   */
-  NurbsFlame(const NurbsFlame* const source, uint nbSkeletons, ushort nbFixedCPoints, const ITexture* const tex);
-  virtual ~NurbsFlame ();
+	/** Constructeur de flamme.
+	 * @param source CPointeur sur la flamme qui a gÃ©nÃ©rÃ© la flamme courante.
+	 * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage.
+	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
+	 * @param tex CPointeur sur la texture de la flamme.
+	 */
+	INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
+	virtual ~INurbsFlame ();
 
-  void initNurbs(GLUnurbsObj** nurbs);
-  /** Fonction appelée par la fonction de dessin OpenGL. Elle commence par déplacer les particules
-   * des squelettes périphériques. Ensuite, elle définit la matrice de points de contrôle de la NURBS,
-   * des vecteurs de noeuds.
-   * @return false si un problème dans la contruction est survenu (pas assez de particules par exemple)
-   */
-  virtual bool build() = 0;
+	void initNurbs(GLUnurbsObj** nurbs);
+	/** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle commence par dÃ©placer les particules
+	 * des squelettes pÃ©riphÃ©riques. Ensuite, elle dÃ©finit la matrice de points de contrÃ´le de la NURBS,
+	 * des vecteurs de noeuds.
+	 * @return false si un problÃ¨me dans la contruction est survenu (pas assez de particules par exemple)
+	 */
+	virtual bool build() = 0;
 
-  virtual void drawLineFlame() const;
+	virtual void drawLineFlame() const;
 
-  /** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-   * build() avec le placage de texture.
-   * @param display Affiche ou non la flamme.
-   * @param displayParticle Affiche ou non les particules.
-   */
-  virtual void drawFlame(bool display, bool displayParticle) const = 0;
+	/** Fonction appelÃ©e par la fonction de dessin OpenGL. Elle dessine la NURBS dÃ©finie par la fonction
+	 * build() avec le placage de texture.
+	 * @param display Affiche ou non la flamme.
+	 * @param displayParticle Affiche ou non les particules.
+	 */
+	virtual void drawFlame(bool display, bool displayParticle) const = 0;
 
-  /** Ajuste la valeur d'échantillonnage de la NURBS.
-   * @param value Valeur de sampling, compris dans un intervalle [1;4].
-   */
-  virtual void setSamplingTolerance(u_char value){
-    switch(value){
-    case 4:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
-      break;
-    case 3:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 3);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 3);
-      break;
-    case 2:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
-      break;
-    case 1:
-      gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
-      gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
-      break;
-    default:
-      cerr << "Bad NURBS step parameter" << endl;
-    }
-  };
+	/** Ajuste la valeur d'Ã©chantillonnage de la NURBS.
+	 * @param value Valeur de sampling, compris dans un intervalle [1;4].
+	 */
+	virtual void setSamplingTolerance(u_char value)
+	{
+		switch (value)
+		{
+			case 4:
+				gluNurbsProperty(m_nurbs, GLU_U_STEP, 4);
+				gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
+				break;
+			case 3:
+				gluNurbsProperty(m_nurbs, GLU_U_STEP, 3);
+				gluNurbsProperty(m_nurbs, GLU_V_STEP, 3);
+				break;
+			case 2:
+				gluNurbsProperty(m_nurbs, GLU_U_STEP, 2);
+				gluNurbsProperty(m_nurbs, GLU_V_STEP, 2);
+				break;
+			case 1:
+				gluNurbsProperty(m_nurbs, GLU_U_STEP, 1);
+				gluNurbsProperty(m_nurbs, GLU_V_STEP, 1);
+				break;
+			default:
+				cerr << "Bad NURBS step parameter" << endl;
+		}
+	};
 
-  /** Active ou désactive l'affichage texturé sur la flamme. */
-  virtual void setSmoothShading (bool state) { m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2; };
+	/** Active ou dÃ©sactive l'affichage texturÃ© sur la flamme. */
+	virtual void setSmoothShading (bool state)
+	{
+		m_shadingType = (state) ? m_shadingType | 1 : m_shadingType & 2;
+	};
 
-  /** Retourne le nombre de squelettes */
-  uint getNbSkeletons() const { return m_nbSkeletons; };
+	/** Retourne le nombre de squelettes */
+	uint getNbSkeletons() const
+	{
+		return m_nbSkeletons;
+	};
 
-  /** Retourne le nombre de points fixes, autrement dit le nombre de racines dans la flamme */
-  unsigned short getNbFixedCPoints() const{ return m_nbFixedCPoints; };
+	/** Retourne le nombre de points fixes, autrement dit le nombre de racines dans la flamme */
+	unsigned short getNbFixedCPoints() const
+	{
+		return m_nbFixedPoints;
+	};
 
-  /** Méthode permettant de cloner la flamme passée en paramètre
-   * @param source Flamme à cloner
-   */
-  void cloneNURBSPropertiesFrom(const NurbsFlame& source)
-  {
-    m_maxParticles = source.m_maxParticles;
+	/** MÃ©thode permettant de cloner la flamme passÃ©e en paramÃ¨tre
+	 * @param source Flamme Ã  cloner
+	 */
+	void cloneNURBSPropertiesFrom(const INurbsFlame& source)
+	{
+		m_maxParticles = source.m_maxParticles;
 
-    copy(source.m_ctrlCPoints, &source.m_ctrlCPoints[(m_maxParticles + m_nbFixedCPoints) * (m_nbSkeletons + m_uorder) * 3], m_ctrlCPoints);
-    m_uknotsCount = source.m_uknotsCount;
-    m_vknotsCount = source.m_vknotsCount;
-    copy(source.m_uknots, &source.m_uknots[m_uknotsCount], m_uknots);
-    copy(source.m_vknots, &source.m_vknots[m_vknotsCount], m_vknots);
-    copy(source.m_texCPoints, &source.m_texCPoints[(m_maxParticles + m_nbFixedCPoints) * (m_nbSkeletons + m_uorder) * 2], m_texCPoints);
-    copy(source.m_texTmp, &source.m_texTmp[m_maxParticles + m_nbFixedCPoints], m_texTmp);
-    m_vsize = source.m_vsize;
-  }
+		copy(source.m_ctrlPoints, &source.m_ctrlPoints[(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 3], m_ctrlPoints);
+		m_uknotsCount = source.m_uknotsCount;
+		m_vknotsCount = source.m_vknotsCount;
+		copy(source.m_uknots, &source.m_uknots[m_uknotsCount], m_uknots);
+		copy(source.m_vknots, &source.m_vknots[m_vknotsCount], m_vknots);
+		copy(source.m_texCPoints, &source.m_texCPoints[(m_maxParticles + m_nbFixedPoints) * (m_nbSkeletons + m_uorder) * 2], m_texCPoints);
+		copy(source.m_texTmp, &source.m_texTmp[m_maxParticles + m_nbFixedPoints], m_texTmp);
+		m_vsize = source.m_vsize;
+	}
 
-  const ITexture *getTexture() const { return m_tex; };
+	const ITexture *getTexture() const
+	{
+		return m_tex;
+	};
 
 protected:
-  /** Affiche la flamme sous forme de NURBS, à partir du tableau de points de contrôles et du tableau
-   * de coordonnées de texture construits au préalable.
-   */
-  void drawNurbs () const;
+	/** Affiche la flamme sous forme de NURBS, Ã  partir du tableau de points de contrÃ´les et du tableau
+	 * de coordonnÃ©es de texture construits au prÃ©alable.
+	 */
+	void drawNurbs () const;
 
-  /** Fonction simplifiant l'affectation d'un point de contrôle. L'algorithme de construction
-   * de la NURBS parcours de façon séquentielle les squelettes, aucun indice dans le tableau
-   * de points de contrôles n'est donc passé. En lieu et place, un pointeur est utilisé et
-   * incrémenté après chaque affectation dans cette fonction. Le même système est employé
-   * pour le tableau des coordonnées (u,v) de texture. La coordonnée u est précalculée dans
-   * texTmp, tandis que la coordonnée v est passée en paramètre.
-   *
-   * @param pt point à affecter dans le tableau
-   * @param v valeur de la coordonnée de texture t
-   */
-  void setCtrlCPoint (const CPoint * const pt, GLfloat u)
-  {
-    *m_ctrlCPoints++ = pt->x;
-    *m_ctrlCPoints++ = pt->y;
-    *m_ctrlCPoints++ = pt->z;
-    *m_texCPoints++ = u;
-    *m_texCPoints++ = *m_texTmp++;
-    m_count++;
-  }
+	/** Fonction simplifiant l'affectation d'un point de contrÃ´le. L'algorithme de construction
+	 * de la NURBS parcours de faÃ§on sÃ©quentielle les squelettes, aucun indice dans le tableau
+	 * de points de contrÃ´les n'est donc passÃ©. En lieu et place, un pointeur est utilisÃ© et
+	 * incrÃ©mentÃ© aprÃ¨s chaque affectation dans cette fonction. Le mÃªme systÃ¨me est employÃ©
+	 * pour le tableau des coordonnÃ©es (u,v) de texture. La coordonnÃ©e u est prÃ©calculÃ©e dans
+	 * texTmp, tandis que la coordonnÃ©e v est passÃ©e en paramÃ¨tre.
+	 *
+	 * @param pt point Ã  affecter dans le tableau
+	 * @param v valeur de la coordonnÃ©e de texture t
+	 */
+	void setCtrlCPoint (const CPoint * const pt, GLfloat u)
+	{
+		*m_ctrlPoints++ = pt->x;
+		*m_ctrlPoints++ = pt->y;
+		*m_ctrlPoints++ = pt->z;
+		*m_texCPoints++ = u;
+		*m_texCPoints++ = *m_texTmp++;
+		m_count++;
+	}
 
-  static void CALLBACK nurbsError(GLenum errorCode)
-  {
-    const GLubyte *estring;
+	static void CALLBACK nurbsError(GLenum errorCode)
+	{
+		const GLubyte *estring;
 
-    estring = gluErrorString(errorCode);
-    cerr << "Nurbs error : " << estring << endl;
-    exit(0);
-  }
+		estring = gluErrorString(errorCode);
+		cerr << "Nurbs error : " << estring << endl;
+		exit(0);
+	}
 
-  static void CALLBACK NurbsBegin(GLenum type, GLvoid *shadingType)
-  {
+	static void CALLBACK NurbsBegin(GLenum type, GLvoid *shadingType)
+	{
 #ifdef COUNT_NURBS_POLYGONS
-    g_count++;
+		g_count++;
 #endif
-    /* Si on est en mode NURBS plate */
-    if( *(u_char *)shadingType & 2)
-      {
-	glDisable(GL_CULL_FACE);
-	if( (*(u_char *)shadingType & 1))
-	  glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	else
-	  glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-      }
-    else
-      if( ! (*(u_char *)shadingType & 1))
-	glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+		/* Si on est en mode NURBS plate */
+		if ( *(u_char *)shadingType & 2)
+		{
+			glDisable(GL_CULL_FACE);
+			if ( (*(u_char *)shadingType & 1))
+				glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+			else
+				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+		}
+		else
+			if ( ! (*(u_char *)shadingType & 1))
+				glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
-    glBegin(type);
-  }
+		glBegin(type);
+	}
 
-  static void CALLBACK NurbsEnd(GLvoid *shadingType)
-  {
-    glEnd();
-    if( *(char *)shadingType & 2)
-      /* Si on est en mode NURBS plate */
-      {
-	glEnable(GL_CULL_FACE);
-	glPolygonMode(GL_FRONT,GL_FILL);
-      }
-    else
-      if( ! (*(char *)shadingType & 1))
-	glPolygonMode(GL_FRONT,GL_FILL);
-  }
+	static void CALLBACK NurbsEnd(GLvoid *shadingType)
+	{
+		glEnd();
+		if ( *(char *)shadingType & 2)
+			/* Si on est en mode NURBS plate */
+		{
+			glEnable(GL_CULL_FACE);
+			glPolygonMode(GL_FRONT,GL_FILL);
+		}
+		else
+			if ( ! (*(char *)shadingType & 1))
+				glPolygonMode(GL_FRONT,GL_FILL);
+	}
 
-  static void CALLBACK NurbsVertex ( GLfloat *vertex )
-  {
-    glVertex3fv(vertex);
-  }
+	static void CALLBACK NurbsVertex ( GLfloat *vertex )
+	{
+		glVertex3fv(vertex);
+	}
 
-  static void CALLBACK NurbsNormal ( GLfloat *normal )
-  {
-    glNormal3fv(normal);
-  }
+	static void CALLBACK NurbsNormal ( GLfloat *normal )
+	{
+		glNormal3fv(normal);
+	}
 
-  static void CALLBACK NurbsTexCoord ( GLfloat *texCoord )
-  {
-    glTexCoord2fv(texCoord);
-  }
+	static void CALLBACK NurbsTexCoord ( GLfloat *texCoord )
+	{
+		glTexCoord2fv(texCoord);
+	}
 
-  /** Ordre de la NURBS en u (égal au degré en u + 1). */
-  u_char m_uorder;
-  /** Ordre de la NURBS en v (égal au degré en v + 1). */
-  u_char m_vorder;
-  /** Nombre de squelettes de la flamme. */
-  uint m_nbSkeletons;
-  /** Matrice de points de contrôle */
-  GLfloat *m_ctrlCPoints;
-  /** Copie du pointeur vers le tableau de points de contrôle */
-  GLfloat  *m_ctrlCPointsSave;
+	/** Ordre de la NURBS en u (Ã©gal au degrÃ© en u + 1). */
+	u_char m_uorder;
+	/** Ordre de la NURBS en v (Ã©gal au degrÃ© en v + 1). */
+	u_char m_vorder;
+	/** Nombre de squelettes de la flamme. */
+	uint m_nbSkeletons;
+	/** Matrice de points de contrÃ´le */
+	GLfloat *m_ctrlPoints;
+	/** Copie du pointeur vers le tableau de points de contrÃ´le */
+	GLfloat  *m_ctrlPointsSave;
 
-  GLfloat *m_texCPoints, *m_texCPointsSave;
-  GLfloat *m_texTmp, *m_texTmpSave;
+	GLfloat *m_texCPoints, *m_texCPointsSave;
+	GLfloat *m_texTmp, *m_texTmpSave;
 
-  /** Vecteur de noeuds en u */
-  GLfloat *m_uknots;
-  /** Vecteur de noeuds en v */
-  GLfloat *m_vknots;
-  /** Tableau temporaire utilisé pour stocker les distances entre chaque point de contrôle d'un
-   * squelette. Alloué une seule fois en début de programme à la taille maximale pour des raisons
-   * évidentes d'optimisation du temps d'exécution.
-   */
-  uint m_uknotsCount, m_vknotsCount;
-  uint m_maxParticles;
-  uint m_count;
-  /** Nombre de points fixes pour chaque direction v, par exemple origine des squelettes, sommet du guide */
-  unsigned short m_nbFixedCPoints;
+	/** Vecteur de noeuds en u */
+	GLfloat *m_uknots;
+	/** Vecteur de noeuds en v */
+	GLfloat *m_vknots;
+	/** Tableau temporaire utilisÃ© pour stocker les distances entre chaque point de contrÃ´le d'un
+	 * squelette. AllouÃ© une seule fois en dÃ©but de programme Ã  la taille maximale pour des raisons
+	 * Ã©videntes d'optimisation du temps d'exÃ©cution.
+	 */
+	uint m_uknotsCount, m_vknotsCount;
+	uint m_maxParticles;
+	uint m_count;
+	/** Nombre de points fixes pour chaque direction v, par exemple origine des squelettes, sommet du guide */
+	unsigned short m_nbFixedPoints;
 
-  /** Nombre de points total dans la direction v de la NURBS, soit m_nbFixedCPoints+m_maxParticles */
-  uint m_vsize;
-  /** Codage du type de shading : 1er bit à 1 si fil de fer; 2e bit à 1 si front and back */
-  u_char m_shadingType;
+	/** Nombre de points total dans la direction v de la NURBS, soit m_nbFixedPoints+m_maxParticles */
+	uint m_vsize;
+	/** Codage du type de shading : 1er bit Ã  1 si fil de fer; 2e bit Ã  1 si front and back */
+	u_char m_shadingType;
 
-  /** ITexture de la flamme */
-  const ITexture *m_tex;
-  /* Incrément en u pour la coordonnée de texture */
-  float m_utexInc;
+	/** ITexture de la flamme */
+	const ITexture *m_tex;
+	/* IncrÃ©ment en u pour la coordonnÃ©e de texture */
+	float m_utexInc;
 
 private:
-  /** Objet OpenGL permettant de définir la NURBS */
-  GLUnurbsObj *m_nurbs;
+	/** Objet OpenGL permettant de dÃ©finir la NURBS */
+	GLUnurbsObj *m_nurbs;
 };
 
 
@@ -261,189 +275,211 @@ private:
 /****************************************** DEFINITION DE LA CLASSE FIXEDFLAME ****************************************/
 /**********************************************************************************************************************/
 
-/** La classe FixedFlame est l'objet de plus bas niveau représentant une flamme dont la base est fixe. Par rapport à la
- * classe de base NurbsFlame, elle rajoute la prise en compte des origines des squelettes, notamment pour l'allocation
- * des tableaux de points de contrôles. Elle défini également quelques méthodes abstraites pour obtenir des informations
- * sur la localisation de la flamme nécessaire pour l'éclairage. Tout ceci n'est en effet
- * pas nécessaire pour la définition d'une flamme détachée.
+/** La classe IFixedFlame est l'objet de plus bas niveau reprÃ©sentant une flamme dont la base est fixe. Par rapport Ã  la
+ * classe de base INurbsFlame, elle rajoute la prise en compte des origines des squelettes, notamment pour l'allocation
+ * des tableaux de points de contrÃ´les. Elle dÃ©fini Ã©galement quelques mÃ©thodes abstraites pour obtenir des informations
+ * sur la localisation de la flamme nÃ©cessaire pour l'Ã©clairage. Tout ceci n'est en effet
+ * pas nÃ©cessaire pour la dÃ©finition d'une flamme dÃ©tachÃ©e.
  *
  * @author	Flavien Bridault
  */
-class FixedFlame : public NurbsFlame
+class IFixedFlame : public INurbsFlame
 {
 public:
-  /** Constructeur de flamme par défaut.
-   * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
-   * @param nbFixedCPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
-   * @param tex CPointeur sur la texture de la flamme.
-   */
-  FixedFlame(uint nbSkeletons, ushort nbFixedCPoints, const ITexture* const tex);
+	/** Constructeur de flamme par dÃ©faut.
+	 * @param nbSkeletons nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage.
+	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
+	 * @param tex CPointeur sur la texture de la flamme.
+	 */
+	IFixedFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
 
-  virtual ~FixedFlame ();
+	virtual ~IFixedFlame ();
 
-  /** Dessine la mèche de la flamme.
-   * @param displayBoxes Affiche ou non le partitionnement de la mèche.
-   */
-  virtual void drawWick(bool displayBoxes) const = 0;
+	/** Dessine la mÃ¨che de la flamme.
+	 * @param displayBoxes Affiche ou non le partitionnement de la mÃ¨che.
+	 */
+	virtual void drawWick(bool displayBoxes) const = 0;
 
-  /** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
-   * pour rester en face de l'observateur.
-   */
-  virtual void drawCPointFlame() const;
+	/** Dessine une flamme ponctuelle. La diffÃ©rence avec drawLineFlame() est que la texture est translatÃ©e
+	 * pour rester en face de l'observateur.
+	 */
+	virtual void drawCPointFlame() const;
 
-  /** Retourne la direction de la base de la flamme vers la derniere particule
-   * pour orienter le solide photométrique.
-   * @return Direction.
-   */
-  virtual CVector getMainDirection() const = 0;
+	/** Retourne la direction de la base de la flamme vers la derniere particule
+	 * pour orienter le solide photomÃ©trique.
+	 * @return Direction.
+	 */
+	virtual CVector getMainDirection() const = 0;
 
-  /** Retourne le centre de la flamme.
-   * @return Centre de la flamme.
-   */
-  virtual CPoint getCenter () const = 0;
+	/** Retourne le centre de la flamme.
+	 * @return Centre de la flamme.
+	 */
+	virtual CPoint getCenter () const = 0;
 
-  /** Renvoie un pointeur vers le sommet de la flamme.
-   * @return CPointeur vers le sommet.
-   */
-  virtual CPoint getTop() const = 0;
+	/** Renvoie un pointeur vers le sommet de la flamme.
+	 * @return CPointeur vers le sommet.
+	 */
+	virtual CPoint getTop() const = 0;
 
-  /** Renvoie un pointeur vers le bas de la flamme.
-   * @return CPointeur vers le bas.
-   */
-  virtual CPoint getBottom() const = 0;
+	/** Renvoie un pointeur vers le bas de la flamme.
+	 * @return CPointeur vers le bas.
+	 */
+	virtual CPoint getBottom() const = 0;
 
 };
 
-class DetachedFlame;
+class CDetachedFlame;
 
 #include <vector>
 /**********************************************************************************************************************/
 /********************************************* DEFINITION DE LA CLASSE REALFLAME **************************************/
 /**********************************************************************************************************************/
 
-/** La classe RealFlame, par rapport à la classe FixedFlame, ajoute la notion de squelettes de flamme ainsi que les
- * interactions avec un solveur de fluides. Elle est qualifiée de "Real" en comparaison avec les CloneFlame.
- * Cette classe reste abstraite et est héritée par les classes LineFlame et CPointFlame.
- * Elle permet de définir une primitive géométrique pour une flamme, mais ne permet pas de construire une flamme
- * en tant que source de lumière d'une scène. C'est la classe FireSource qui permet de définir ceci, en utilisant
- * les classes héritées de RealFlame comme élément de base.<br>
- * Une RealFlame est construite à sa position relative définie dans m_position. Lors du dessin, la translation dans
- * le repère du feu est donc déjà effectuée. C'est la classe FireSource qui s'occupe de placer correctement dans
- * le repère du monde. En revanche, la mèche en définie en (0,0,0) et il faut donc la translater dans le repère du
- * feu à chaque opération de dessin.
+/** La classe IRealFlame, par rapport Ã  la classe IFixedFlame, ajoute la notion de squelettes de flamme ainsi que les
+ * interactions avec un solveur de fluides. Elle est qualifiÃ©e de "Real" en comparaison avec les CloneFlame.
+ * Cette classe reste abstraite et est hÃ©ritÃ©e par les classes CLineFlame et CPointFlame.
+ * Elle permet de dÃ©finir une primitive gÃ©omÃ©trique pour une flamme, mais ne permet pas de construire une flamme
+ * en tant que source de lumiÃ¨re d'une scÃ¨ne. C'est la classe FireSource qui permet de dÃ©finir ceci, en utilisant
+ * les classes hÃ©ritÃ©es de IRealFlame comme Ã©lÃ©ment de base.<br>
+ * Une IRealFlame est construite Ã  sa position relative dÃ©finie dans m_position. Lors du dessin, la translation dans
+ * le repÃ¨re du feu est donc dÃ©jÃ  effectuÃ©e. C'est la classe FireSource qui s'occupe de placer correctement dans
+ * le repÃ¨re du monde. En revanche, la mÃ¨che en dÃ©finie en (0,0,0) et il faut donc la translater dans le repÃ¨re du
+ * feu Ã  chaque opÃ©ration de dessin.
  *
  * @author	Flavien Bridault
  */
-class RealFlame : public FixedFlame
+class IRealFlame : public IFixedFlame
 {
 public:
-  /** Constructeur de flamme.
-   * @param nbSkeletons Nombre de squelettes. Pour le moment nbSkeletons doit être pair en raison de l'affichage.
-   * @param nbFixedCPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
-   * @param tex CPointeur sur la texture de la flamme.
-   * @param s CPointeur vers le solveur.
-   */
-  RealFlame(uint nbSkeletons, ushort nbFixedCPoints, const ITexture* const tex, Field3D* const s);
-  virtual ~RealFlame ();
+	/** Constructeur de flamme.
+	 * @param nbSkeletons Nombre de squelettes. Pour le moment nbSkeletons doit Ãªtre pair en raison de l'affichage.
+	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
+	 * @param tex CPointeur sur la texture de la flamme.
+	 * @param s CPointeur vers le solveur.
+	 */
+	IRealFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex, Field3D* const s);
+	virtual ~IRealFlame ();
 
-  /** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
-   */
-  virtual void addForces (int fdf, float innerForce, char perturbate){
-    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-      (*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
-  }
+	/** Fonction appelÃ©e par le solveur de fluides pour ajouter l'Ã©lÃ©vation thermique de la flamme.
+	 */
+	virtual void addForces (int fdf, float innerForce, char perturbate)
+	{
+		for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+		     skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+			(*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
+	}
 
-  /** Affectation de la durée de vie des squelettes guides.
-   * @param value Durée de vie en itérations.
-   */
-  virtual void setLeadLifeSpan(uint value) {
-    for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	 skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
-      (*skeletonsIterator)->setLifeSpan(value);
-  };
+	/** Affectation de la durÃ©e de vie des squelettes guides.
+	 * @param value DurÃ©e de vie en itÃ©rations.
+	 */
+	virtual void setLeadLifeSpan(uint value)
+	{
+		for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+		     skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+			(*skeletonsIterator)->setLifeSpan(value);
+	};
 
-  /** Affectation de la durée de vie des squelettes périphériques.
-   * @param value Durée de vie en itérations.
-   */
-  virtual void setPeriLifeSpan(uint value) {
-    for (uint i = 0; i < m_nbSkeletons; i++)
-      m_periSkeletons[i]->setLifeSpan(value);
-  };
+	/** Affectation de la durÃ©e de vie des squelettes pÃ©riphÃ©riques.
+	 * @param value DurÃ©e de vie en itÃ©rations.
+	 */
+	virtual void setPeriLifeSpan(uint value)
+	{
+		for (uint i = 0; i < m_nbSkeletons; i++)
+		{
+			assert(m_periSkeletons[i] != NULL);
+			m_periSkeletons[i]->setLifeSpan(value);
+		}
+	};
 
-  virtual void drawWick(bool displayBoxes) const { m_wick->drawWick(displayBoxes); };
+	virtual void drawWick(bool displayBoxes) const
+	{
+		m_wick->drawWick(displayBoxes);
+	};
 
-  /** Affiche les particules de tous les squelettes composants la flamme. */
-  void drawParticles() const
-  {
-    uint i;
-    /* Déplacement et détermination du maximum */
-    if(!m_flat)
-      for (i = 0; i < m_nbSkeletons; i++)
-	m_periSkeletons[i]->draw();
-    for (i = 0; i < m_nbLeadSkeletons; i++)
-      m_leadSkeletons[i]->draw();
-  };
+	/** Affiche les particules de tous les squelettes composants la flamme. */
+	void drawParticles() const
+	{
+		uint i;
+		/* DÃ©placement et dÃ©termination du maximum */
+		if (!m_flat)
+			for (i = 0; i < m_nbSkeletons; i++)
+			{
+				assert(m_periSkeletons[i] != NULL);
+				m_periSkeletons[i]->draw();
+			}
+		for (i = 0; i < m_nbLeadSkeletons; i++)
+		{
+			assert(m_leadSkeletons[i] != NULL);
+			m_leadSkeletons[i]->draw();
+		}
+	};
 
-  /** Place un marqueur pour ordonner un changement de niveau de
-   *  détail dans les squelettes à la prochaine construction.
-   * @param value FULL_SKELETON ou HALF_SKELETON
-   */
-  void setSkeletonsLOD(u_char value) { m_lodSkel = value; m_lodSkelChanged = true; };
+	/** Place un marqueur pour ordonner un changement de niveau de
+	 *  dÃ©tail dans les squelettes Ã  la prochaine construction.
+	 * @param value FULL_SKELETON ou HALF_SKELETON
+	 */
+	void setSkeletonsLOD(u_char value)
+	{
+		m_lodSkel = value;
+		m_lodSkelChanged = true;
+	};
 
-  /** Effectue le changement de niveau de détail dans les squelettes. */
-  virtual void changeSkeletonsLOD()
-  {
-    uint i;
-    for (i = 0; i < m_nbSkeletons; i++)
-      m_periSkeletons[i]->setLOD(m_lodSkel);
-    for (i = 0; i < m_nbLeadSkeletons; i++)
-      m_leadSkeletons[i]->setLOD(m_lodSkel);
-    m_lodSkelChanged = false;
-  };
+	/** Effectue le changement de niveau de dÃ©tail dans les squelettes. */
+	virtual void changeSkeletonsLOD()
+	{
+		uint i;
+		for (i = 0; i < m_nbSkeletons; i++)
+			m_periSkeletons[i]->setLOD(m_lodSkel);
+		for (i = 0; i < m_nbLeadSkeletons; i++)
+			m_leadSkeletons[i]->setLOD(m_lodSkel);
+		m_lodSkelChanged = false;
+	};
 
-  void setFlatFlame(bool value) { m_flat = value; };
+	void setFlatFlame(bool value)
+	{
+		m_flat = value;
+	};
 
-  /** Fonction chargée de remplir les coordonées de texture dans la direction v. Elles sont
-   * en effet dépendantes du nombre de particules dans les squelettes et il est donc nécessaire
-   * de les recalculer à chaque construction de la NURBS.
-   */
-  virtual void computeVTexCoords();
-  virtual bool build();
+	/** Fonction chargÃ©e de remplir les coordonÃ©es de texture dans la direction v. Elles sont
+	 * en effet dÃ©pendantes du nombre de particules dans les squelettes et il est donc nÃ©cessaire
+	 * de les recalculer Ã  chaque construction de la NURBS.
+	 */
+	virtual void computeVTexCoords();
+	virtual bool build();
 
-  virtual CVector getMainDirection() const = 0;
-  virtual CPoint getCenter () const = 0;
+	virtual CVector getMainDirection() const = 0;
+	virtual CPoint getCenter () const = 0;
 
-  virtual CPoint getTop() const = 0;
-  virtual CPoint getBottom() const = 0;
+	virtual CPoint getTop() const = 0;
+	virtual CPoint getBottom() const = 0;
 
-  /** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
-  virtual void breakCheck() = 0;
+	/** Fonction testant si les squelettes doivent se briser. Si c'est le cas, elle effectue la division. */
+	virtual void breakCheck() = 0;
 
 protected:
-  /** Vecteur contenant les squelettes guide. */
-  vector < LeadSkeleton * > m_leadSkeletons;
+	/** Vecteur contenant les squelettes guide. */
+	vector < LeadSkeleton * > m_leadSkeletons;
 
-  /** Nombres de squelettes guides */
-  uint m_nbLeadSkeletons;
-  /** Tableau contenant les pointeurs vers les squelettes périphériques. */
-  PeriSkeleton **m_periSkeletons;
-  /** CPointeur sur le solveur de fluides */
-  Field3D *m_solver;
+	/** Nombres de squelettes guides */
+	uint m_nbLeadSkeletons;
+	/** Tableau contenant les pointeurs vers les squelettes pÃ©riphÃ©riques. */
+	PeriSkeleton **m_periSkeletons;
+	/** CPointeur sur le solveur de fluides */
+	Field3D *m_solver;
 
-  float *m_distances;
-  /** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle
-   * lors de l'ajout de points de contrôle supplémentaires dans la NURBS.  Alloué une seule fois
-   * en début de programme à la taille maximale pour des raisons évidentes d'optimisation du temps
-   * d'exécution.
-   */
-  int *m_maxDistancesIndexes;
+	float *m_distances;
+	/** Tableau temporaire utilisÃ© pour classer les indices des distances entre points de contrÃ´le
+	 * lors de l'ajout de points de contrÃ´le supplÃ©mentaires dans la NURBS.  AllouÃ© une seule fois
+	 * en dÃ©but de programme Ã  la taille maximale pour des raisons Ã©videntes d'optimisation du temps
+	 * d'exÃ©cution.
+	 */
+	int *m_maxDistancesIndexes;
 
-  u_char m_lodSkel, m_flat;
-  /** Indique qu'un changement de niveau de détail sur les squelettes a été demandé. */
-  bool m_lodSkelChanged;
-  /** Mèche de la flamme */
-  Wick *m_wick;
+	u_char m_lodSkel, m_flat;
+	/** Indique qu'un changement de niveau de dÃ©tail sur les squelettes a Ã©tÃ© demandÃ©. */
+	bool m_lodSkelChanged;
+	/** MÃ¨che de la flamme */
+	CWick *m_wick;
 };
 
 #endif

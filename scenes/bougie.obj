@@ -1,6 +1,6 @@
 #Produced by Art of Illusion 2.5.1, Mon Nov 05 18:53:25 CET 2007
 mtllib bougie.mtl
-g Lamp1
+o Lamp1
 usemtl Default_Texture
 v 0.5 -1.03525 0.5
 v 0.65216 -1.03525 0.50002
@@ -166,7 +166,7 @@ f 34//66 30//58 31//60
 f 34//66 31//60 32//62
 f 34//66 32//62 33//64
 f 34//66 33//64 18//34
-g Wick
+o Wick
 usemtl noir
 v 0.52378 -0.02297 0.49449
 v 0.50004 -0.02362 0.4642

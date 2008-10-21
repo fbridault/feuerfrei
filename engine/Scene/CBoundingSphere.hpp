@@ -18,7 +18,8 @@ public:
 	/** Calcule la visibilité de la sphère par rapport au point de vue courant.
 	 * @param view Référence sur la caméra
 	 */
-	bool isVisible(const CCamera &view) const{
+	bool isVisible(const CCamera &view) const
+	{
 		uint i;
 		const float *plan;
 
@@ -30,7 +31,8 @@ public:
 		//     }
 
 		// Sphère dans le frustrum ?
-		for ( i = 0; i < 6; i++ ){
+		for ( i = 0; i < 6; i++ )
+		{
 			plan=view.getFrustum(i);
 			if ( plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3] <= -radius )
 				return false;
@@ -43,13 +45,15 @@ public:
 	 * @param view Référence sur la caméra.
 	 * @return 0 si non visible, distance à la caméra sinon.
 	 */
-	float visibleDistance(const CCamera &view) const{
+	float visibleDistance(const CCamera &view) const
+	{
 		uint i;
 		const float *plan;
 		float d;
 
 		// Sphère dans le frustrum ?
-		for ( i = 0; i < 6; i++ ){
+		for ( i = 0; i < 6; i++ )
+		{
 			plan=view.getFrustum(i);
 			d = plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3];
 			if ( d <= -radius )
@@ -62,7 +66,8 @@ public:
 	 * On projette le centre et un point à la périphérie sur l'écran, puis on calcule
 	 * l'aire du disque obtenu.
 	 */
-	float getPixelCoverage(const CCamera &view) const{
+	float getPixelCoverage(const CCamera &view) const
+	{
 		CPoint centerSC, periSC;
 
 		view.getSphereCoordinates(centre, radius, centerSC, periSC);
@@ -70,7 +75,8 @@ public:
 		return ( M_PI* centerSC.squaredDistanceFrom(periSC));
 	}
 
-	void draw(void) const{
+	void draw(void) const
+	{
 		glEnable(GL_BLEND);
 		glPushMatrix();
 		glTranslatef(centre.x, centre.y, centre.z);

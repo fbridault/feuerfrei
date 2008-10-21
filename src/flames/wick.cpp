@@ -1,263 +1,269 @@
 #include "wick.hpp"
 
-#include <engine/graphicsFn.hpp>
-#include "../scene/scene.hpp"
+#include <engine/Utility/GraphicsFn.hpp>
 
-Wick::Wick (Scene* const scene) : Object(scene)
+
+uint CWick::buildPointFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
 {
+	CPoint bounds[2], barycentre;
+
+	/* Cr√©ation du VBO */
+	buildVBO();
+
+	/* La bounding box est d√©limit√©e par les points ptMax[flameConfig.skeletonsNumber] et ptMin[0] */
+	getBoundingBox (bounds[1], bounds[0]);
+
+	m_boxesDisplayList=glGenLists(1);
+	glNewList (m_boxesDisplayList, GL_COMPILE);
+	glColor3f(0.0f,1.0f,1.0f);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
+	glVertex3f(bounds[0].x,bounds[0].y,bounds[1].z);
+	glVertex3f(bounds[0].x,bounds[1].y,bounds[1].z);
+	glVertex3f(bounds[0].x,bounds[1].y,bounds[0].z);
+	glEnd();
+	glBegin(GL_LINE_LOOP);
+	glVertex3f(bounds[1].x,bounds[0].y,bounds[0].z);
+	glVertex3f(bounds[1].x,bounds[0].y,bounds[1].z);
+	glVertex3f(bounds[1].x,bounds[1].y,bounds[1].z);
+	glVertex3f(bounds[1].x,bounds[1].y,bounds[0].z);
+	glEnd();
+	glBegin(GL_LINES);
+	glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
+	glVertex3f(bounds[1].x,bounds[0].y,bounds[0].z);
+	glVertex3f(bounds[0].x,bounds[1].y,bounds[0].z);
+	glVertex3f(bounds[1].x,bounds[1].y,bounds[0].z);
+	glVertex3f(bounds[0].x,bounds[0].y,bounds[1].z);
+	glVertex3f(bounds[1].x,bounds[0].y,bounds[1].z);
+	glVertex3f(bounds[0].x,bounds[1].y,bounds[1].z);
+	glVertex3f(bounds[1].x,bounds[1].y,bounds[1].z);
+	glEnd();
+	glEndList();
+
+	CPoint rootMoveFactorL(2.0f,.2f,2.0f);
+
+	barycentre.resetToNull ();
+	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	        vertexIterator != m_vertexArray.end (); vertexIterator++)
+	{
+		barycentre.x += (*vertexIterator).x;
+		barycentre.y += (*vertexIterator).y;
+		barycentre.z += (*vertexIterator).z;
+	}
+	barycentre = barycentre / (float)m_vertexArray.size();
+
+	leadSkeletons.push_back (new LeadSkeleton(field, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 1,  .5f, 0.0f, .025f));
+
+	return 0;
 }
 
-uint Wick::buildCPointFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
+uint CWick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
 {
-  CPoint bounds[2], barycentre;
+	/* Cr√©ation du VBO */
+	buildVBO();
 
-  /* CrÈation du VBO */
-  buildVBO();
+	/*****************************************************************************/
+	/* Cr√©ation des points qui vont servir d'origines pour les squelettes guides */
+	/*****************************************************************************/
 
-  /* La bounding box est dÈlimitÈe par les points ptMax[flameConfig.skeletonsNumber] et ptMin[0] */
-  getBoundingBox (bounds[1], bounds[0]);
+	/* R√©cup√©ration de la bounding box */
+	CPoint bounds[flameConfig.skeletonsNumber + 1];
+	getBoundingBox (bounds[flameConfig.skeletonsNumber], bounds[0]);
 
-  m_boxesDisplayList=glGenLists(1);
-  glNewList (m_boxesDisplayList, GL_COMPILE);
-  glColor3f(0.0f,1.0f,1.0f);
-  glBegin(GL_LINE_LOOP);
-  glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
-  glVertex3f(bounds[0].x,bounds[0].y,bounds[1].z);
-  glVertex3f(bounds[0].x,bounds[1].y,bounds[1].z);
-  glVertex3f(bounds[0].x,bounds[1].y,bounds[0].z);
-  glEnd();
-  glBegin(GL_LINE_LOOP);
-  glVertex3f(bounds[1].x,bounds[0].y,bounds[0].z);
-  glVertex3f(bounds[1].x,bounds[0].y,bounds[1].z);
-  glVertex3f(bounds[1].x,bounds[1].y,bounds[1].z);
-  glVertex3f(bounds[1].x,bounds[1].y,bounds[0].z);
-  glEnd();
-  glBegin(GL_LINES);
-  glVertex3f(bounds[0].x,bounds[0].y,bounds[0].z);
-  glVertex3f(bounds[1].x,bounds[0].y,bounds[0].z);
-  glVertex3f(bounds[0].x,bounds[1].y,bounds[0].z);
-  glVertex3f(bounds[1].x,bounds[1].y,bounds[0].z);
-  glVertex3f(bounds[0].x,bounds[0].y,bounds[1].z);
-  glVertex3f(bounds[1].x,bounds[0].y,bounds[1].z);
-  glVertex3f(bounds[0].x,bounds[1].y,bounds[1].z);
-  glVertex3f(bounds[1].x,bounds[1].y,bounds[1].z);
-  glEnd();
-  glEndList();
+	CPoint midDist = (bounds[flameConfig.skeletonsNumber] - bounds[0]) / (flameConfig.skeletonsNumber);
+	CPoint cellSpan = bounds[flameConfig.skeletonsNumber] - bounds[0];
 
-  CPoint rootMoveFactorL(2.0f,.2f,2.0f);
+	/* D√©termination de l'axe de d√©coupe, on prend le plus grand */
+	u_char max; /* 0 -> x, 1 -> y, 2 -> z */
+	if (midDist.x > midDist.y)
+		if (midDist.x > midDist.z)
+			/* D√©coupage en x */
+			max=0;
+		else
+			/* D√©coupage en z */
+			max=2;
+	else
+		if (midDist.y > midDist.z)
+			/* D√©coupage en y */
+			max=1;
+		else
+			/* D√©coupage en z */
+			max=2;
 
-  barycentre.resetToNull ();
-  for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-       vertexIterator != m_vertexArray.end (); vertexIterator++)
-    {
-      barycentre.x += (*vertexIterator).x;
-      barycentre.y += (*vertexIterator).y;
-      barycentre.z += (*vertexIterator).z;
-    }
-  barycentre = barycentre / (float)m_vertexArray.size();
+	/* D√©coupage de la bounding box en flameConfig.skeletonsNumber partitions */
+	CPoint MinBound (FLT_MAX, FLT_MAX, FLT_MAX), MaxBound (-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-  leadSkeletons.push_back (new LeadSkeleton(field, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 1,  .5f, 0.0f, .025f));
+	switch (max)
+	{
+		case 0 :
+			/* D√©coupage en x */
+			for (uint i = 1; i < flameConfig.skeletonsNumber; i++)
+			{
+				bounds[i] = bounds[i-1];
+				bounds[i].x += midDist.x;
+			}
+			cellSpan.x=midDist.x;
 
-  return 0;
+			for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+			        vertexIterator != m_vertexArray.end (); vertexIterator++)
+			{
+				/* Calcul du max */
+				if (vertexIterator->x >= MaxBound.x)
+					MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+				/* Calcul du min */
+				if (vertexIterator->x <= MinBound.x)
+					MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+			}
+			//       cerr << "D√©coupe en x" << endl;
+			break;
+		case 1 :
+			/* D√©coupage en y */
+			for (uint i = 1; i < flameConfig.skeletonsNumber; i++)
+			{
+				bounds[i] = bounds[i-1];
+				bounds[i].y += midDist.y;
+			}
+			cellSpan.y=midDist.y;
+
+			for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+			        vertexIterator != m_vertexArray.end (); vertexIterator++)
+			{
+				/* Calcul du max */
+				if (vertexIterator->y >= MaxBound.y)
+					MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+				/* Calcul du min */
+				if (vertexIterator->y <= MinBound.y)
+					MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+			}
+			//       cerr << "D√©coupe en y" << endl;
+			break;
+		case 2 :
+			/* D√©coupage en z */
+			for (uint i = 1; i < flameConfig.skeletonsNumber; i++)
+			{
+				bounds[i] = bounds[i-1];
+				bounds[i].z += midDist.z;
+			}
+			cellSpan.z=midDist.z;
+
+			for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+			        vertexIterator != m_vertexArray.end (); vertexIterator++)
+			{
+				/* Calcul du max */
+				if (vertexIterator->z >= MaxBound.z)
+					MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+				/* Calcul du min */
+				if (vertexIterator->z <= MinBound.z)
+					MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
+			}
+			//       cerr << "D√©coupe en z" << endl;
+			break;
+	}
+
+	//    cerr << flameConfig.skeletonsNumber << endl;
+	//    for (int i = 0; i <= flameConfig.skeletonsNumber; i++)
+	//      cerr << bounds[i] << endl;
+	//    cerr << "CellSpan " << cellSpan << endl;
+
+	m_boxesDisplayList=glGenLists(1);
+	glNewList (m_boxesDisplayList, GL_COMPILE);
+	for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
+	{
+		glColor3f(0.0f,i*1.0f/(float)flameConfig.skeletonsNumber,1.0f);
+		CPoint bounds2 = bounds[i]+cellSpan;
+		glBegin(GL_LINE_LOOP);
+		glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
+		glVertex3f(bounds[i].x,bounds[i].y,bounds2.z);
+		glVertex3f(bounds[i].x,bounds2.y,bounds2.z);
+		glVertex3f(bounds[i].x,bounds2.y,bounds[i].z);
+		glEnd();
+		glBegin(GL_LINE_LOOP);
+		glVertex3f(bounds2.x,bounds[i].y,bounds[i].z);
+		glVertex3f(bounds2.x,bounds[i].y,bounds2.z);
+		glVertex3f(bounds2.x,bounds2.y,bounds2.z);
+		glVertex3f(bounds2.x,bounds2.y,bounds[i].z);
+		glEnd();
+		glBegin(GL_LINES);
+		glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
+		glVertex3f(bounds2.x,bounds[i].y,bounds[i].z);
+		glVertex3f(bounds[i].x,bounds2.y,bounds[i].z);
+		glVertex3f(bounds2.x,bounds2.y,bounds[i].z);
+		glVertex3f(bounds[i].x,bounds[i].y,bounds2.z);
+		glVertex3f(bounds2.x,bounds[i].y,bounds2.z);
+		glVertex3f(bounds[i].x,bounds2.y,bounds2.z);
+		glVertex3f(bounds2.x,bounds2.y,bounds2.z);
+		glEnd();
+	}
+	glEndList();
+
+	/* Tri des points pour les ranger dans les partitions */
+	/* Il serait possible de faire un tri par dichotomie */
+	/* pour aller un peu plus vite */
+	vector < CPoint * >pointsPartitionsArray[flameConfig.skeletonsNumber];
+
+	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	        vertexIterator != m_vertexArray.end (); vertexIterator++)
+		for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
+		{
+			CPoint bounds2 = bounds[i]+cellSpan;
+			if (vertexIterator->x > bounds[i].x &&
+			        vertexIterator->y > bounds[i].y &&
+			        vertexIterator->z > bounds[i].z &&
+			        vertexIterator->x < bounds2.x &&
+			        vertexIterator->y < bounds2.y &&
+			        vertexIterator->z < bounds2.z)
+				pointsPartitionsArray[i].push_back (new CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z));
+		}
+
+	CPoint rootMoveFactorL(2.0f,.1f,1.0f);
+	float noiseMin=-.1f;
+	float noiseMax=.1f;
+	float noiseInc=.5f;
+	/* Cr√©ation des leadSkeletons */
+	/* On prend simplement le barycentre de chaque partition */
+	leadSkeletons.push_back (new LeadSkeleton(field, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, noiseInc, noiseMin, noiseMax));
+
+	for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
+	{
+		CPoint barycentre;
+
+		/** CWick partition should not be empty */
+		assert (pointsPartitionsArray[i].empty() == false);
+
+		barycentre.resetToNull ();
+		for (vector < CPoint * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
+				pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
+		{
+			barycentre.x += (*pointsIterator)->x;
+			barycentre.y += (*pointsIterator)->y;
+			barycentre.z += (*pointsIterator)->z;
+		}
+		barycentre = barycentre / (float)pointsPartitionsArray[i].size();
+
+		/** Calcul de la valeur d'entr√©e de la fonction de distribution de carburant F(u). */
+		float fu = 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1;
+
+		LeadSkeleton *pLeadSkeleton =
+			new LeadSkeleton(field, barycentre,rootMoveFactorL, flameConfig.leadLifeSpan, fu, noiseInc,noiseMin, noiseMax);
+		leadSkeletons.push_back (pLeadSkeleton);
+	}
+	leadSkeletons.push_back (new LeadSkeleton(field, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, noiseInc, noiseMin, noiseMax));
+
+	/* Suppression des points */
+	for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
+	{
+		for (vector < CPoint * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
+		        pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
+			delete (*pointsIterator);
+		pointsPartitionsArray[i].clear();
+	}
+	//  buildFDF(field);
+	assert(leadSkeletons.size() == flameConfig.skeletonsNumber+2);
+
+	return (max);
 }
 
-uint Wick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
-{
-  CPoint bounds[flameConfig.skeletonsNumber + 1];
-  CPoint MinBound (FLT_MAX, FLT_MAX, FLT_MAX), MaxBound (-FLT_MAX, -FLT_MAX, -FLT_MAX);
-  CPoint midDist, cellSpan;
-  vector < CPoint * >pointsPartitionsArray[flameConfig.skeletonsNumber];
-  u_char max; /* 0 -> x, 1 -> y, 2 -> z */
-
-  /* CrÈation du VBO */
-  buildVBO();
-
-  /*****************************************************************************/
-  /* CrÈation des points qui vont servir d'origines pour les squelettes guides */
-  /*****************************************************************************/
-
-  /* Parcours des points */
-  /* La bounding box est dÈlimitÈe par les points ptMax[flameConfig.skeletonsNumber] et ptMin[0] */
-  getBoundingBox (bounds[flameConfig.skeletonsNumber], bounds[0]);
-
-  /* DÈcoupage de la bounding box en flameConfig.skeletonsNumber partitions */
-  midDist = (bounds[flameConfig.skeletonsNumber] - bounds[0]) / (flameConfig.skeletonsNumber);
-  cellSpan = bounds[flameConfig.skeletonsNumber] - bounds[0];
-
-  if(midDist.x > midDist.y)
-    if(midDist.x > midDist.z)
-      /* DÈcoupage en x */
-      max=0;
-    else
-      /* DÈcoupage en z */
-      max=2;
-  else
-    if(midDist.y > midDist.z)
-      /* DÈcoupage en y */
-      max=1;
-    else
-      /* DÈcoupage en z */
-      max=2;
-
-  switch(max){
-  case 0 :
-    /* DÈcoupage en x */
-    for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
-      bounds[i] = bounds[i-1];
-      bounds[i].x += midDist.x;
-    }
-    cellSpan.x=midDist.x;
-
-    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if (vertexIterator->x >= MaxBound.x)
-	  MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-	/* Calcul du min */
-	if (vertexIterator->x <= MinBound.x)
-	  MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-      }
-    //       cerr << "DÈcoupe en x" << endl;
-    break;
-  case 1 :
-    /* DÈcoupage en y */
-    for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
-      bounds[i] = bounds[i-1];
-      bounds[i].y += midDist.y;
-    }
-    cellSpan.y=midDist.y;
-
-    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if (vertexIterator->y >= MaxBound.y)
-	  MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-	/* Calcul du min */
-	if (vertexIterator->y <= MinBound.y)
-	  MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-      }
-    //       cerr << "DÈcoupe en y" << endl;
-    break;
-  case 2 :
-    /* DÈcoupage en z */
-    for (uint i = 1; i < flameConfig.skeletonsNumber; i++){
-      bounds[i] = bounds[i-1];
-      bounds[i].z += midDist.z;
-    }
-    cellSpan.z=midDist.z;
-
-    for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-	 vertexIterator != m_vertexArray.end (); vertexIterator++)
-      {
-	/* Calcul du max */
-	if (vertexIterator->z >= MaxBound.z)
-	  MaxBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-	/* Calcul du min */
-	if (vertexIterator->z <= MinBound.z)
-	  MinBound = CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z);
-      }
-    //       cerr << "DÈcoupe en z" << endl;
-    break;
-  }
-
-  //    cerr << flameConfig.skeletonsNumber << endl;
-  //    for (int i = 0; i <= flameConfig.skeletonsNumber; i++)
-  //      cerr << bounds[i] << endl;
-  //    cerr << "CellSpan " << cellSpan << endl;
-
-  m_boxesDisplayList=glGenLists(1);
-  glNewList (m_boxesDisplayList, GL_COMPILE);
-  for (uint i = 0; i < flameConfig.skeletonsNumber; i++){
-    glColor3f(0.0f,i*1.0f/(float)flameConfig.skeletonsNumber,1.0f);
-    CPoint bounds2 = bounds[i]+cellSpan;
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
-    glVertex3f(bounds[i].x,bounds[i].y,bounds2.z);
-    glVertex3f(bounds[i].x,bounds2.y,bounds2.z);
-    glVertex3f(bounds[i].x,bounds2.y,bounds[i].z);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex3f(bounds2.x,bounds[i].y,bounds[i].z);
-    glVertex3f(bounds2.x,bounds[i].y,bounds2.z);
-    glVertex3f(bounds2.x,bounds2.y,bounds2.z);
-    glVertex3f(bounds2.x,bounds2.y,bounds[i].z);
-    glEnd();
-    glBegin(GL_LINES);
-    glVertex3f(bounds[i].x,bounds[i].y,bounds[i].z);
-    glVertex3f(bounds2.x,bounds[i].y,bounds[i].z);
-    glVertex3f(bounds[i].x,bounds2.y,bounds[i].z);
-    glVertex3f(bounds2.x,bounds2.y,bounds[i].z);
-    glVertex3f(bounds[i].x,bounds[i].y,bounds2.z);
-    glVertex3f(bounds2.x,bounds[i].y,bounds2.z);
-    glVertex3f(bounds[i].x,bounds2.y,bounds2.z);
-    glVertex3f(bounds2.x,bounds2.y,bounds2.z);
-    glEnd();
-  }
-  glEndList();
-
-  /* Tri des points pour les ranger dans les partitions */
-  /* Il serait possible de faire un tri par dichotomie */
-  /* pour aller un peu plus vite */
-
-  for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-       vertexIterator != m_vertexArray.end (); vertexIterator++)
-    for (uint i = 0; i < flameConfig.skeletonsNumber; i++){
-      CPoint bounds2 = bounds[i]+cellSpan;
-      if (vertexIterator->x > bounds[i].x &&
-	  vertexIterator->y > bounds[i].y &&
-	  vertexIterator->z > bounds[i].z &&
-	  vertexIterator->x < bounds2.x &&
-	  vertexIterator->y < bounds2.y &&
-	  vertexIterator->z < bounds2.z)
-	pointsPartitionsArray[i].push_back (new CPoint(vertexIterator->x, vertexIterator->y, vertexIterator->z));
-    }
-
-  CPoint rootMoveFactorL(2.0f,.1f,1.0f);
-  float noiseMin=-.1f;
-  float noiseMax=.1f;
-  float noiseInc=.5f;
-  /* CrÈation des leadSkeletons */
-  /* On prend simplement le barycentre de chaque partition */
-  leadSkeletons.push_back (new LeadSkeleton(field, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, noiseInc, noiseMin, noiseMax));
-
-  for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
-    {
-      CPoint barycentre;
-
-      if (!pointsPartitionsArray[i].empty ())
- 	{
-	  barycentre.resetToNull ();
-	  for (vector < CPoint * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
-	       pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
-	    {
-	      barycentre.x += (*pointsIterator)->x;
-	      barycentre.y += (*pointsIterator)->y;
-	      barycentre.z += (*pointsIterator)->z;
-	    }
-	  barycentre = barycentre / (float)pointsPartitionsArray[i].size();
-
-	  leadSkeletons.push_back (new LeadSkeleton(field, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1, noiseInc, noiseMin, noiseMax));
- 	}
-      else
-	cerr << "Warning ! Wick partition #" << i << " is empty" << endl;
-    }
-  leadSkeletons.push_back (new LeadSkeleton(field, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, noiseInc, noiseMin, noiseMax));
-
-  /* Suppression des points */
-  for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
-    {
-      for (vector < CPoint * >::iterator pointsIterator = pointsPartitionsArray[i].begin ();
-	   pointsIterator != pointsPartitionsArray[i].end (); pointsIterator++)
-	delete (*pointsIterator);
-      pointsPartitionsArray[i].clear();
-    }
-  //  buildFDF(field);
-  return (max);
-}
-
-// void Wick::buildFDF(Field3D* const field)
+// void CWick::buildFDF(Field3D* const field)
 // {
 //   CPoint h=field->getDim();
 
@@ -284,6 +290,6 @@ uint Wick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& l
 // 	  }
 // }
 
-Wick::~Wick ()
+CWick::~CWick ()
 {
 }

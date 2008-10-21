@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <engine/pointVector.hpp>
+#include <engine/Maths/CVector.hpp>
 
 #include <wx/wxprec.h>
 
@@ -41,41 +41,43 @@ using namespace std;
 #define FDF_RANDOM 4
 
 /** Configuration d'un solveur de fluide */
-class SolverConfig{
+class SolverConfig
+{
 public:
 #ifdef RTFLUIDS_BUILD
-  CPoint position;
+	CPoint position;
 #endif
-  char type;
-  uint resx, resy, resz;
-  /* Dimension réelle du solveur, utilisée lors de la résolution */
-  float dim;
-  /* Facteur d'échelle */
-  CPoint scale;
-  float timeStep;
-  float omegaDiff, omegaProj;
-  float epsilon;
-  uint nbMaxIter;
-  float buoyancy;
-  float vorticityConfinement;
+	char type;
+	uint resx, resy, resz;
+	/* Dimension réelle du solveur, utilisée lors de la résolution */
+	float dim;
+	/* Facteur d'échelle */
+	CPoint scale;
+	float timeStep;
+	float omegaDiff, omegaProj;
+	float epsilon;
+	uint nbMaxIter;
+	float buoyancy;
+	float vorticityConfinement;
 };
 
 #ifdef RTFLAMES_BUILD
 
 /* Propriétés des flammes */
-class FlameConfig{
+class FlameConfig
+{
 public:
-  /** Type de flamme utilisé pour le luminaire. */
-  char type;
-  uint skeletonsNumber;
-  float innerForce;
-  char flickering;
-  int fdf;
-  float lod;
-  /** Durée de vie des squelettes. */
-  uint leadLifeSpan, periLifeSpan;
-  /** Chemin vers le fichier IES utilsé pour le solide photométrique. */
-  wxString IESFileName;
+	/** Type de flamme utilisé pour le luminaire. */
+	char type;
+	uint skeletonsNumber;
+	float innerForce;
+	char flickering;
+	int fdf;
+	float lod;
+	/** Durée de vie des squelettes. */
+	uint leadLifeSpan, periLifeSpan;
+	/** Chemin vers le fichier IES utilsé pour le solide photométrique. */
+	wxString IESFileName;
 };
 
 /** Configuration d'un luminaire. Un luminaire est chargé à partir d'un fichier OBJ et contient
@@ -83,50 +85,53 @@ public:
  * A chaque luminaire est associé un seul type de champ. Si le luminaire entraîne la création de plusieurs
  * champs, ils auront tous les mêmes propriétés. Idem pour les flammes.
  */
-class LuminaryConfig{
+class LuminaryConfig
+{
 public:
-  CPoint position;
-  /** Nom du fichier contenant le luminaire et les mèches. */
-  wxString fileName;
-  uint nbFields;
-  SolverConfig *fields;
-  uint nbFires;
-  FlameConfig *fires;
+	CPoint position;
+	/** Nom du fichier contenant le luminaire et les mèches. */
+	wxString fileName;
+	uint nbFields;
+	SolverConfig *fields;
+	uint nbFires;
+	FlameConfig *fires;
 };
 
-class FlameAppConfig{
+class FlameAppConfig
+{
 public:
-  uint width, height;
-  float clipping;
-  wxString sceneName;
-  /** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */
-  int lightingMode;
-  bool shadowsEnabled;
-  /** Activation du glow */
-  bool glowEnabled;
-  /** Activation du Depth Peeling */
-  bool depthPeelingEnabled;
-  /** Nombre de calques pour le Depth Peeling, compris entre 0 et DEPTH_PEELING_LAYERS_MAX */
-  uint nbDepthPeelingLayers;
-  /** IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
-  int IPSEnabled, BPSEnabled;
-  uint nbLuminaries;
-  LuminaryConfig *luminaries;
-  bool useGlobalField;
-  SolverConfig globalField;
-  GLfloat fatness[4];
-  GLfloat extrudeDist[4];
-  float gammaCorrection;
+	uint width, height;
+	float clipping;
+	wxString sceneName;
+	/** LIGHTING_STANDARD normal, LIGHTING_PHOTOMETRIC pour solides photmétriques */
+	int lightingMode;
+	bool shadowsEnabled;
+	/** Activation du glow */
+	bool glowEnabled;
+	/** Activation du Depth Peeling */
+	bool depthPeelingEnabled;
+	/** Nombre de calques pour le Depth Peeling, compris entre 0 et DEPTH_PEELING_LAYERS_MAX */
+	uint nbDepthPeelingLayers;
+	/** IPSEnabled = 0 ou 1; BPSEnabled = 0 ou 2 */
+	int IPSEnabled, BPSEnabled;
+	uint nbLuminaries;
+	LuminaryConfig *luminaries;
+	bool useGlobalField;
+	SolverConfig globalField;
+	GLfloat fatness[4];
+	GLfloat extrudeDist[4];
+	float gammaCorrection;
 };
 
 #else
 
-class FluidsAppConfig{
+class FluidsAppConfig
+{
 public:
-  uint width, height;
-  float clipping;
-  uint nbSolvers;
-  SolverConfig *solvers;
+	uint width, height;
+	float clipping;
+	uint nbSolvers;
+	SolverConfig *solvers;
 };
 
 #endif
@@ -136,9 +141,9 @@ public:
 /* Pour obtenir le temps en s, il faut diviser par la fréquence du processeur */
 __inline__ unsigned long long int rdtsc()
 {
-  unsigned long long int x;
-  __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-  return x;
+	unsigned long long int x;
+__asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
+	return x;
 }
 
 #endif

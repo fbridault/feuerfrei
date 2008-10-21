@@ -11,15 +11,15 @@ class CloneCPointFlame;
 /****************************************** DEFINITION DE LA CLASSE CLONEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-/** La classe CloneFlame permet de répliquer une flamme de type RealFlame à un endroit quelconque de la scène.
+/** La classe CloneFlame permet de répliquer une flamme de type IRealFlame à un endroit quelconque de la scène.
  * Ce clone n'est en effet pas conçu d'après l'état d'un solveur de fluides, mais uniquement à partir des
- * points de contrôle d'une RealFlame.
+ * points de contrôle d'une IRealFlame.
  * @todo Il faut trouver un moyen simple et convaincant de perturber les points de contrôle pour que le clone
  * ressemble un peu moins à sa source.
  *
  * @author	Flavien Bridault
  */
-class CloneFlame : public FixedFlame
+class CloneFlame : public IFixedFlame
 {
 public:
   /** Constructeur.
@@ -27,7 +27,7 @@ public:
    * @param source CPointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneFlame(const FlameConfig& flameConfig, const RealFlame* const source, const CPoint& offset);
+  CloneFlame(const FlameConfig& flameConfig, const IRealFlame* const source, const CPoint& offset);
   virtual ~CloneFlame();
 
   /** Dessine la mèche de la flamme.
@@ -53,11 +53,11 @@ public:
   CPoint getBottom() const { return m_source->getBottom(); };
 
 protected:
-  const RealFlame *m_source;
+  const IRealFlame *m_source;
   CPoint m_position;
 };
 
-/** La classe CloneLineFlame implémente une flamme clone dont la source est une LineFlame.
+/** La classe CloneLineFlame implémente une flamme clone dont la source est une CLineFlame.
  *
  * @author	Flavien Bridault
  * @see         CloneFlame
@@ -70,7 +70,7 @@ public:
    * @param source CPointeur sur la flamme qui sert de source au clone.
    * @param offset Décalage de la flamme par rapport à la flamme source.
    */
-  CloneLineFlame(const FlameConfig& flameConfig, const LineFlame* const source, const CPoint& offset);
+  CloneLineFlame(const FlameConfig& flameConfig, const CLineFlame* const source, const CPoint& offset);
   virtual ~CloneLineFlame();
 
   virtual void drawFlame(bool display, bool displayParticle) const{

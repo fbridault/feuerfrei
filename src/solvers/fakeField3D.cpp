@@ -1,7 +1,7 @@
 #include "fakeField3D.hpp"
 
 #include <math.h>
-#include <engine/graphicsFn.hpp>
+#include <engine/Utility/GraphicsFn.hpp>
 
 FakeField3D::FakeField3D (const CPoint& position, float dim, const CPoint& scale, float timeStep, float buoyancy) :
   Field3D(position, 1, 1, 1, dim, scale, timeStep, buoyancy)

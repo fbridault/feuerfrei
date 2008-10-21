@@ -1,7 +1,7 @@
 #include "solver3D.hpp"
 #include "SSE4.hpp"
 #include <math.h>
-#include <engine/graphicsFn.hpp>
+#include <engine/Utility/GraphicsFn.hpp>
 
 Solver3D::Solver3D ()
 {

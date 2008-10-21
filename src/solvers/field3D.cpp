@@ -1,8 +1,8 @@
 #include "field3D.hpp"
 
 #include <math.h>
-#include <engine/graphicsFn.hpp>
-#include <engine/common.hpp>
+#include <engine/Utility/GraphicsFn.hpp>
+#include <engine/Common.hpp>
 
 Field3D::Field3D ()
 {
@@ -140,5 +140,5 @@ void Field3D::displayArrow (const CVector& direction)
   //  printf("%f\n",norme_vel);
   glColor4f (norme_vel / VELOCITE_MAX, 0.0, (VELOCITE_MAX - norme_vel) / VELOCITE_MAX, 0.75);
 
-  CUGraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
+  UGraphicsFn::SolidCone (taille/2.0f, taille, 3, 3);
 }

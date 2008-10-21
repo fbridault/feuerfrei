@@ -8,8 +8,8 @@ private:
 	typedef t_object CType;
 
 public:
-	CNumerable();
-	~CNumerable();
+	CNumerable() {};
+	~CNumerable() {};
 
 	CNumerable<t_object>& operator=(CNumerable<t_object> const& a_rSource)
 	{

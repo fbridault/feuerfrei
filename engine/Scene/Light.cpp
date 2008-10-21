@@ -10,7 +10,7 @@
 
 
 ILight* LightFactory::getInstance(const char *type, GLuint depthMapSize, const CShader* genShadowCubeMapShader,
-                                   const CRenderTarget *shadowRenderTarget)
+                                  const CRenderTarget *shadowRenderTarget)
 {
 	CPoint p, i;
 	CVector d;
@@ -131,7 +131,7 @@ void ILight::postRendering(bool shadows) const
 /******************************************* OMNILIGHT *********************************************/
 /***************************************************************************************************/
 COmniLight::COmniLight(const CPoint &P, const Energy &I, GLuint depthMapSize,
-                     const CShader* genShadowCubeMapShader, const CRenderTarget* shadowRenderTarget) :
+                       const CShader* genShadowCubeMapShader, const CRenderTarget* shadowRenderTarget) :
 		ILight(P,I,depthMapSize,shadowRenderTarget)
 {
 	assert(genShadowCubeMapShader != NULL);
@@ -291,7 +291,7 @@ CVector COmniLight::generateRandomRay() const
 /******************************************* SPOTLIGHT *********************************************/
 /***************************************************************************************************/
 CSpotLight::CSpotLight (const CPoint & P, const CVector& direction, const Energy & I, float angle,
-                      GLuint depthMapSize, const CRenderTarget* shadowRenderTarget) :
+                        GLuint depthMapSize, const CRenderTarget* shadowRenderTarget) :
 		ILight(P,I,depthMapSize,shadowRenderTarget)
 {
 	GLuint slices=10;

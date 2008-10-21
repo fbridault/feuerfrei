@@ -43,42 +43,49 @@ public:
 
 	/** Lecture d'un indice dans le maillage.
 	 * @return Indice. */
-	uint getIndex(uint i) const{
+	uint getIndex(uint i) const
+	{
 		assert( i < m_indexArray.size()) ;
 		return m_indexArray[i];
 	}
 
 	/** Affectation d'un indice dans le maillage.
 	 * @return Indice. */
-	void setIndex(uint i, GLuint value){
+	void setIndex(uint i, GLuint value)
+	{
 		assert( i < m_indexArray.size()) ;
 		m_indexArray[i] = value;
 	}
 
 	/** Lecture du nombre de polygones contenus dans le maillage.
 	 * @return Nombre de polygones. */
-	uint getIndexesCount () const {
+	uint getIndexesCount () const
+	{
 		return (m_indexArray.size());
 	};
 
 	/** Lecture du nombre de polygones contenus dans le maillage.
 	 * @return Nombre de polygones. */
-	uint getPolygonsCount () const {
+	uint getPolygonsCount () const
+	{
 		return (m_indexArray.size() / 3);
 	};
 
 	/** Lecture de l'index du matériau utilisé par le maillage.
 	 * @return Index du matériau dans la liste de matériau contenu dans la scène. */
-	uint getMaterialIndex () const {
+	uint getMaterialIndex () const
+	{
 		return (m_uiMaterial);
 	};
 
 	/** Met à jour les attributs de l'objet. */
-	void setAttributes (uint attr) {
+	void setAttributes (uint attr)
+	{
 		m_attributes = attr;
 	};
 	/** Récupérer les attributs de l'objet. */
-	uint getAttributes () const {
+	uint getAttributes () const
+	{
 		return m_attributes;
 	};
 
@@ -103,7 +110,8 @@ public:
 	/** Ajout d'un index de point dans le tableau d'indices.
 	 * @param i indice à ajouter.
 	 */
-	void addIndex( GLuint i ) {
+	void addIndex( GLuint i )
+	{
 		m_indexArray.push_back(i);
 	};
 
@@ -123,7 +131,8 @@ public:
 		m_boundingSphere.centre += dir;
 	};
 
-	CPoint getPosition () const {
+	CPoint getPosition () const
+	{
 		return m_boundingSphere.centre;
 	};
 

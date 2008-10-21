@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <math.h>
-#include <engine/graphicsFn.hpp>
+#include <engine/Utility/GraphicsFn.hpp>
 
 #include "../solvers/solver3D.hpp"
 #include "leadSkeleton.hpp"

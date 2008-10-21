@@ -1,9 +1,9 @@
 #ifndef REALFLAMES_HPP
 #define REALFLAMES_HPP
 
-class LineFlame;
+class CLineFlame;
 class CPointFlame;
-class DetachedFlame;
+class CDetachedFlame;
 class DetachableFireSource;
 
 #include "abstractFlames.hpp"
@@ -14,14 +14,14 @@ class DetachableFireSource;
 /**************************************** DEFINITION DE LA CLASSE LINEFLAME **************************************/
 /**********************************************************************************************************************/
 
-/** La classe LineFlame implémente une flamme qui provient d'une mèche "linéaire".<br>
- * L'objet Wick appartient à la classe LineFlame, il est donc précisé dans le constructeur
- * de Wick que l'objet doit être importé dans la scène dans l'état "detached", de sorte que
+/** La classe CLineFlame implémente une flamme qui provient d'une mèche "linéaire".<br>
+ * L'objet CWick appartient à la classe CLineFlame, il est donc précisé dans le constructeur
+ * de CWick que l'objet doit être importé dans la scène dans l'état "detached", de sorte que
  * le constructeur de la scène ne cherche pas à le référencer ni à le détruire.
  *
  * @author	Flavien Bridault
  */
-class LineFlame : public RealFlame
+class CLineFlame : public IRealFlame
 {
 public:
   /** Constructeur.
@@ -33,9 +33,9 @@ public:
    * @param detachedFlamesWidth Largeur des flammes détachées.
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  LineFlame (const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
-	     Wick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
-  virtual ~LineFlame();
+  CLineFlame (const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
+	     CWick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
+  virtual ~CLineFlame();
 
   virtual void drawFlame(bool display, bool displayParticle) const{
     if(displayParticle) drawParticles();
@@ -57,13 +57,13 @@ public:
   {
     if(m_flat)
       {
-	m_nbFixedCPoints = 1;
+	m_nbFixedPoints = 1;
 	m_shadingType = m_shadingType | 2;
 	return buildFlat();
       }
     else
       {
-	m_nbFixedCPoints = 3;
+	m_nbFixedPoints = 3;
 	m_shadingType = m_shadingType & 1;
 	return buildNormal();
       }
@@ -75,7 +75,7 @@ public:
   CPoint getBottom() const { return m_bottom; };
 
   virtual void setSamplingTolerance(u_char value){
-    NurbsFlame::setSamplingTolerance(value);
+    INurbsFlame::setSamplingTolerance(value);
     m_samplingMethod = value;
   };
 
@@ -89,7 +89,7 @@ public:
 private:
   virtual bool buildNormal()
   {
-    if(RealFlame::build()){
+    if(IRealFlame::build()){
       computeCenterAndExtremities();
       return true;
     }
@@ -147,7 +147,7 @@ private:
  *
  * @author	Flavien Bridault
  */
-class CPointFlame : public RealFlame
+class CPointFlame : public IRealFlame
 {
 public:
   /** Constructeur.
@@ -158,7 +158,7 @@ public:
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
   CPointFlame ( const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
-	       float rayon, Wick *wick);
+	       float rayon, CWick *wick);
 
   /** Destructeur*/
   virtual ~CPointFlame();
@@ -199,12 +199,12 @@ public:
 /********************************************* DEFINITION DE LA CLASSE DETACHEDFLAME **********************************/
 /**********************************************************************************************************************/
 
-/** La classe DetachedFlame défini une flamme détachée, autrement dit une flamme éphémère qui n'est pas attachée à un
- * quelconque support. Pour l'instant seule une classe héritée de RealFlame peut produire une flamme détachée.
+/** La classe CDetachedFlame défini une flamme détachée, autrement dit une flamme éphémère qui n'est pas attachée à un
+ * quelconque support. Pour l'instant seule une classe héritée de IRealFlame peut produire une flamme détachée.
  *
  * @author	Flavien Bridault
  */
-class DetachedFlame : public NurbsFlame
+class CDetachedFlame : public INurbsFlame
 {
 public:
   /** Constructeur de flamme détachée. Il est appelée lors de la division d'une flamme dans la méthode breackCheck().
@@ -215,12 +215,12 @@ public:
    * @param periSkeletons Tableaux contenant les squelettes périphériques.
    * @param tex CPointeur vers la texture à utiliser.
    */
-  DetachedFlame(const RealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons,
+  CDetachedFlame(const IRealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons,
 		uint nbSkeletons, FreePeriSkeleton **periSkeletons, const ITexture* const tex,
 		bool smoothShading, u_char samplingMethod);
 
   /** Destructeur*/
-  virtual ~DetachedFlame ();
+  virtual ~CDetachedFlame ();
 
   virtual bool build();
   void computeVTexCoords();

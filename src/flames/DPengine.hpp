@@ -6,8 +6,8 @@ class DepthPeelingEngine;
 class CRenderTarget;
 
 #include "flames.hpp"
-#include "../scene/scene.hpp"
-#include "../scene/camera.hpp"
+#include <engine/Scene/CScene.hpp>
+#include <engine/Scene/CCamera.hpp>
 
 
 /** Classe regroupant des méthodes implémentant le Depth Peeling.
@@ -36,7 +36,7 @@ public:
 	 * @param boundingVolume Le cas échéant, volume englobant à afficher à la place des flammes.
 	 * (le paramètre displayFlames doit tout de même être à <i>true</i> pour les visualiser)
 	 */
-	void makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene);
+	void makePeels(GLFlameCanvas* const glBuffer, const CScene* const scene);
 	void render(GLFlameCanvas* const glBuffer);
 	void renderFS();
 

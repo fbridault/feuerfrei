@@ -27,14 +27,16 @@ public:
 	/** Donne l'identifiant de la texture à utiliser avec glBindTexture().
 	 * @return Identifiant de la texture.
 	 */
-	const GLuint getTexture() const {
+	const GLuint getTexture() const
+	{
 		return m_texName;
 	};
 
 	/** Donne le type de la texture.
 	 * @return Type de la texture.
 	 */
-	const GLuint getTextureType() const {
+	const GLuint getTextureType() const
+	{
 		return m_type;
 	};
 
@@ -106,11 +108,13 @@ public:
 
 	virtual ~CBitmapTexture();
 
-	const bool hasAlpha() const {
+	const bool hasAlpha() const
+	{
 		return m_hasAlpha;
 	};
 
-	const string& getName() const {
+	const string& getName() const
+	{
 		return m_filename;
 	};
 

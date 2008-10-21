@@ -18,9 +18,9 @@ extern uint g_objectCount;
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 CObject::CObject(CScene* const scene) : CSceneItem(CPoint(0,0,0))
 {
-	assert ( scene != NULL);
+	assert (scene != NULL);
 
-	m_scene      = scene;
+	m_scene = scene;
 	m_attributes = 0;
 
 	glGenBuffers(1, &m_bufferID);
@@ -168,13 +168,16 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 	/* On initialise le dernier matériau au premier de la liste, le matériau par défaut */
 	uint lastMaterialIndex=0;
 
-	if (boundingSpheres){
+	if (boundingSpheres)
+	{
 		m_scene->getMaterial(0)->apply();
 		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 		     meshesListIterator != m_meshesList.end ();
 		     meshesListIterator++)
 			(*meshesListIterator)->drawBoundingSphere();
-	}else{
+	}
+	else
+	{
 		if (drawCode == AMBIENT)
 			/* Dessiner avec le matériau par défaut (pour tester les zones d'ombres par exemple) */
 			m_scene->getMaterial(0)->apply();
@@ -190,7 +193,8 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 
 		if (drawCode != AMBIENT)
 			/* On désactive l'unité de texture le cas échéant */
-			if (m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex){
+			if (m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+			{
 				glDisable(GL_TEXTURE_2D);
 			}
 	}

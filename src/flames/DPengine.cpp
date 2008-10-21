@@ -1,6 +1,6 @@
 #include "DPengine.hpp"
 #include "../interface/GLFlameCanvas.hpp"
-#include <engine/renderTarget.hpp>
+#include <engine/Shading/CRenderTarget.hpp>
 
 DepthPeelingEngine::DepthPeelingEngine(uint width, uint height, uint nbLayers) :
 	m_oDpShader("depthPeeling.fp", ""), m_oDpRendererShader("viewportSizedTex.fp", "")
@@ -48,7 +48,7 @@ void DepthPeelingEngine::generateTex()
 	m_alwaysTrueDepthTex = new CDepthTexture(GL_TEXTURE_RECTANGLE_ARB, m_width,m_height, GL_NEAREST, GLenum(GL_ALWAYS));
 }
 
-void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const Scene* const scene)
+void DepthPeelingEngine::makePeels(GLFlameCanvas* const glBuffer, const CScene* const scene)
 {
 	uint l;
 

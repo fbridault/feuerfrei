@@ -12,7 +12,7 @@
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 CMesh::CMesh (CScene* const a_pScene, uint a_uiMaterial, CObject* a_pParent) :
-	m_pScene(a_pScene), m_pParent(a_pParent), m_uiMaterial(a_uiMaterial), m_attributes(0), m_visibility(true)
+		m_pScene(a_pScene), m_pParent(a_pParent), m_uiMaterial(a_uiMaterial), m_attributes(0), m_visibility(true)
 {
 	glGenBuffers(1, &m_bufferID);
 }
@@ -98,29 +98,37 @@ void CMesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 	if (!m_visibility)
 		return;
 
-	if (drawCode == TEXTURED){
+	if (drawCode == TEXTURED)
+	{
 		/* Ne dessiner que si il y a une texture */
 		if (!m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture())
 			return;
-	}else
-		if (drawCode == FLAT){
+	}
+	else
+		if (drawCode == FLAT)
+		{
 			/* Ne dessiner que si il n'y a pas de texture */
 			if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture())
 				return;
 		}
 
 	if (drawCode != AMBIENT)
-		if ( m_uiMaterial != lastMaterialIndex){
-			if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture() && tex){
+		if ( m_uiMaterial != lastMaterialIndex)
+		{
+			if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture() && tex)
+			{
 				/* Inutile de réactiver l'unité de texture si le matériau précédent en avait une */
-				if (!m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture()){
+				if (!m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture())
+				{
 					glActiveTexture(GL_TEXTURE0+OBJECT_TEX_UNIT);
 					glEnable(GL_TEXTURE_2D);
 					glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				}
 				m_pScene->getMaterial(m_uiMaterial)->getDiffuseTexture()->bind();
-			}else
-				if (m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex){
+			}
+			else
+				if (m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+				{
 					/* Pas de texture pour le matériau courant, on désactive l'unité de texture car le matériau précédent en avait une */
 					glDisable(GL_TEXTURE_2D);
 				}

@@ -75,13 +75,13 @@
 		<Unit filename="Shading/CRenderTarget.hpp" />
 		<Unit filename="Shading/Glsl.cpp" />
 		<Unit filename="Shading/Glsl.hpp" />
-		<Unit filename="Utility/CObjImporter.cpp" />
-		<Unit filename="Utility/CObjImporter.hpp" />
 		<Unit filename="Utility/CRefTable.hpp" />
 		<Unit filename="Utility/GraphicsFn.cpp" />
 		<Unit filename="Utility/GraphicsFn.hpp" />
 		<Unit filename="Utility/ISingleton.hpp" />
 		<Unit filename="Utility/Numerable.hpp" />
+		<Unit filename="Utility/UObjImporter.cpp" />
+		<Unit filename="Utility/UObjImporter.hpp" />
 		<Extensions>
 			<AutoVersioning>
 				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />

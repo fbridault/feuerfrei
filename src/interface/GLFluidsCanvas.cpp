@@ -168,7 +168,7 @@ void GLFluidsCanvas::Init (FluidsAppConfig *config)
   SetCurrent();
   InitGL();
 
-  m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
+  m_camera = new CCamera (m_width, m_height, m_currentConfig->clipping);
   InitSolvers();
 
   m_swatch = new wxStopWatch();
@@ -188,7 +188,7 @@ void GLFluidsCanvas::Restart (void)
 
   m_width = m_currentConfig->width; m_height = m_currentConfig->height;
   glViewport (0, 0, m_width, m_height);
-  m_camera = new Camera (m_width, m_height, m_currentConfig->clipping);
+  m_camera = new CCamera (m_width, m_height, m_currentConfig->clipping);
 
   InitUISettings();
   InitSolvers();

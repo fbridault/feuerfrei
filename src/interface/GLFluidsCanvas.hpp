@@ -8,8 +8,8 @@ class GLFluidsCanvas;
 
 #include <wx/glcanvas.h>
 
-#include "../scene/camera.hpp"
-#include "../scene/graphicsFn.hpp"
+#include <engine/Scene/CCamera.hpp>
+#include <engine/Utility/GraphicsFn.hpp>
 
 #include "../solvers/field.hpp"
 
@@ -77,7 +77,7 @@ private:
   uint m_width, m_height;
   uint prevNbSolvers;
 
-  Camera *m_camera;
+  CCamera *m_camera;
   /* Pour le compte des frames */
   wxStopWatch *m_swatch;
   uint m_framesCount, m_globalFramesCount;

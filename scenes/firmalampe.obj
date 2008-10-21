@@ -1,6 +1,6 @@
-#Produced by Art of Illusion 2.4, Wed Jun 06 21:56:59 GMT 2007
+#Produced by Art of Illusion 2.4, Wed Jun 06 21:56:59 oMT 2007
 mtllib firmalampe.mtl
-g Lamp
+o Lamp
 usemtl LampMat
 v -0.45924 0.03378 0.53676
 v -0.46467 0.06724 0.53676
@@ -2595,7 +2595,7 @@ f 655//655 627//627 626//626
 f 635//635 642//642 636//636
 f 634//634 642//642 635//635
 f 648//648 642//642 641//641
-g Wick
+o Wick
 usemtl MecheMat
 v 0.67811 0.01237 0.49449
 v 0.65337 0.00381 0.4642

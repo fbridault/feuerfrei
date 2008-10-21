@@ -5,6 +5,7 @@
 #include "../Common.hpp"
 
 uint g_objectCount;
+GLfloat g_modelViewMatrix[16];
 
 CCamera::CCamera () :
 		m_position(0.0f,0.0f,-1.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)

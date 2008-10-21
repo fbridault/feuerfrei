@@ -1,7 +1,7 @@
 #include "interface/flamesFrame.hpp"
 
 #include <wx/tooltip.h>
-#include <engine/init.hpp>
+#include <engine/Init.hpp>
 
 /** \mainpage Index page
  *
@@ -111,9 +111,9 @@ bool FlamesApp::OnInit()
 
 	/* Teste s'il est nécessaire de recompiler les shaders */
 	FlamesFrame *frame = new FlamesFrame( 	_("Real-time Animation of small Flames - ")+configFileName,
-																						wxDefaultPosition,
-																						wxDefaultSize,
-																						configFileName );
+	                                       wxDefaultPosition,
+	                                       wxDefaultSize,
+	                                       configFileName );
 
 	wxToolTip::Enable(true);
 

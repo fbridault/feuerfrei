@@ -47,10 +47,12 @@ public:
 		m_position.z += z;
 	}
 
-	void select() {
+	void select()
+	{
 		m_selected = true;
 	};
-	void deselect() {
+	void deselect()
+	{
 		m_selected = false;
 	};
 
@@ -80,7 +82,7 @@ public:
 	/** Destructeur par défaut. */
 	virtual ~CObject ();
 
-	void addCMesh(CMesh* const mesh)
+	void addMesh(CMesh* const mesh)
 	{
 		m_meshesList.push_back(mesh);
 	}
@@ -88,18 +90,21 @@ public:
 	/** Lecture du nombre de meshes contenus dans l'objet.
 	 * @return Nombre de points.
 	 */
-	uint getNbCMeshes () const {
+	uint getNbCMeshes () const
+	{
 		return m_meshesList.size();
 	};
 
 	/** Lecture du nombre de points contenus dans l'objet.
 	 * @return Nombre de points.
 	 */
-	uint getVertexArraySize () const {
+	uint getVertexArraySize () const
+	{
 		return m_vertexArray.size();
 	};
 
-	Vertex getVertex (GLuint i) const {
+	Vertex getVertex (GLuint i) const
+	{
 		return m_vertexArray[i];
 	};
 
@@ -111,9 +116,16 @@ public:
 	 * @param max Retourne le coin supérieur de l'englobant.
 	 * @param min Retourne le coin inférieur de l'englobant.
 	 */
-	void getBoundingBox (CPoint& max, CPoint& min) const {
+	void getBoundingBox (CPoint& max, CPoint& min) const
+	{
 		max=m_max;
 		min=m_min;
+	};
+
+	/** Retourne la position de l'objet, calculé en prenant le centre de la boîte englobante. */
+	CPoint getCenter () const
+	{
+		return (m_max+m_min)/2.0f;
 	};
 
 	/** Redimensionne l'objet, utilisé lors de la normalisation de la scène.
@@ -151,7 +163,8 @@ public:
 	uint getPolygonsCount () const;
 
 	/** Ajout d'un point dans le tableau de points.*/
-	void addVertex( const Vertex& v ) {
+	void addVertex( const Vertex& v )
+	{
 		m_vertexArray.push_back(v);
 	};
 

@@ -1,6 +1,6 @@
 #Produced by Art of Illusion 2.3, Wed Jan 03 18:15:00 CET 2007
 mtllib meche1.mtl
-g Tube_1
+o Tube_1
 usemtl Untitled_1
 v 0.70076 0.00478 0.5
 v 0.65096 -0.01186 0.46969

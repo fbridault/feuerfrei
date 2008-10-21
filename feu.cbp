@@ -281,24 +281,6 @@
 			<Option target="Fluids - Release" />
 		</Unit>
 		<Unit filename="src/interface/solverDialog.hpp" />
-		<Unit filename="src/scene/camera.cpp" />
-		<Unit filename="src/scene/camera.hpp" />
-		<Unit filename="src/scene/intensity.hpp" />
-		<Unit filename="src/scene/material.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/scene/material.hpp" />
-		<Unit filename="src/scene/object.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/scene/object.hpp" />
-		<Unit filename="src/scene/scene.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/scene/scene.hpp" />
 		<Unit filename="src/shaders/ShadowVolumeExtrusion.cg">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
@@ -318,14 +300,23 @@
 		<Unit filename="src/shaders/photoSolid.fp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="src/shaders/photoSolid.vp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="src/shaders/photoSolidOnly.fp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="src/shaders/pixelLighting.fp">
+			<Option target="Fire - Debug" />
+			<Option target="Fire - Release" />
+		</Unit>
+		<Unit filename="src/shaders/pixelLighting.vp">
+			<Option target="Fire - Debug" />
+			<Option target="Fire - Release" />
+		</Unit>
 		<Unit filename="src/shaders/shadowVolume.vp">
 			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="src/shaders/viewportSizedScaledTex.fp">
+			<Option target="Fire - Debug" />
+			<Option target="Fire - Release" />
 		</Unit>
 		<Unit filename="src/shaders/viewportSizedTex.fp">
 			<Option target="&lt;{~None~}&gt;" />

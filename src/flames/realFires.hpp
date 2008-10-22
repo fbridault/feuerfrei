@@ -22,23 +22,16 @@ public:
 	 * @param flameConfig Configuration de la flamme.
 	 * @param s CPointeur sur le solveur de fluides.
 	 * @param scene CPointeur sur la scène.
-	 * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 * @param rayon Rayon de la flamme.
 	 * @param wickFileName nom du fichier contenant la mèche. Si NULL, alors wick doit être fourni.
 	 * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
 	 */
-	Candle(const FlameConfig& flameConfig, Field3D * s, CScene* const scene, uint index,
-	       const CShader& a_rShader, float rayon, const char *wickFileName, CWick *wick=NULL);
+	Candle(	const FlameConfig& flameConfig, Field3D * s, CScene* const scene, float rayon,
+					const char *wickFileName, CWick *wick=NULL);
 	/** Destructeur */
 	virtual ~Candle(){};
 
 	void setLightPosition (const CPoint& pos);
-
-	/** Active la source de lumière. */
-	void switchOnMulti ();
-	/** Eteint la source */
-	void switchOffMulti ();
 
 private:
 	/** Position de la lumière ponctuelle OpenGL dans l'espace. */
@@ -58,12 +51,9 @@ public:
 	 * @param flameConfig Configuration de la flamme.
 	 * @param s CPointeur sur le solveur de fluides.
 	 * @param scene CPointeur sur la scène.
-	 * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 * @param wickFileName nom du fichier contenant la mèche
 	 */
-	Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scene, uint index,
-	           const CShader& a_rShader, const char *wickFileName);
+	Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *wickFileName);
 	/** Destructeur */
 	virtual ~Firmalampe(){};
 };
@@ -83,11 +73,8 @@ public:
 	 * @param s CPointeur sur le solveur de fluides.
 	 * @param scene CPointeur sur la scène.
 	 * @param torchName nom du fichier contenant le luminaire.
-	 * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 */
-	Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *torchName, uint index,
-	      const CShader& a_rShader);
+	Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *torchName);
 	/** Destructeur */
 	virtual ~Torch(){};
 
@@ -113,11 +100,8 @@ public:
 	 * @param s CPointeur sur le solveur de fluides.
 	 * @param scene CPointeur sur la scène.
 	 * @param fireName nom du fichier contenant le luminaire.
-	 * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 */
-	CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *fireName, uint index,
-	         const CShader& a_rShader);
+	CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *fireName);
 	/** Destructeur */
 	virtual ~CampFire(){};
 };
@@ -135,12 +119,9 @@ public:
 	 * @param s CPointeur sur le solveur de fluides.
 	 * @param scene CPointeur sur la scène.
 	 * @param filename Nom du fichier contenant le luminaire.
-	 * @param index indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 * @param rayon Rayon de la flamme.
 	 */
-	CandleStick(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *filename, uint index,
-	            const CShader& a_rShader, float rayon);
+	CandleStick(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *filename, float rayon);
 	/** Destructeur */
 	virtual ~CandleStick();
 

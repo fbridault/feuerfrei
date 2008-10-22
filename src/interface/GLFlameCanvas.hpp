@@ -282,7 +282,6 @@ private:
 	/********* Variables relatives à la simulation *************************/
 	vector <FireSource *> m_fires;
 	CScene *m_scene;
-	CShader *m_pSVShader;
 	CGammaFX *m_gammaEngine;
 	wxStopWatch *m_swatch;
 

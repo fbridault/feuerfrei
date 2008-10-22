@@ -45,13 +45,9 @@ public:
 	 * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
 	 * loadCObject() qui permet d'ajouter des objets individuels.
 	 */
-	void postInit();
+	void postInit(bool a_bNormalize);
 
-	/** Crée les display lists - A n'appeler qu'une fois que tous les objets
-	 * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
-	 * loadCObject() qui permet d'ajouter des objets individuels.
-	 */
-	void createDisplayLists(void);
+	void computeBoundingBox(bool a_bNormalize);
 
 	void sortTransparentObjects();
 
@@ -281,8 +277,6 @@ public:
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
 		glBindBuffer(GL_ARRAY_BUFFER, 0 );
 	};
-
-	void computeBoundingBox();
 
 	void getBoundingBox(CPoint& a_rMin, CPoint& a_rMax)
 	{

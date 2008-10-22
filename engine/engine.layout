@@ -10,16 +10,16 @@
 	<File name="Maths/CPoint.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="8531" topLine="283" />
 	</File>
-	<File name="Maths/CVector.hpp" open="1" top="0" tabpos="8">
+	<File name="Maths/CVector.hpp" open="0" top="0" tabpos="6">
 		<Cursor position="719" topLine="27" />
 	</File>
 	<File name="Scene/CBoundingSphere.hpp" open="0" top="0" tabpos="12">
 		<Cursor position="1763" topLine="23" />
 	</File>
-	<File name="Scene/CCamera.cpp" open="1" top="0" tabpos="6">
+	<File name="Scene/CCamera.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="502" topLine="0" />
 	</File>
-	<File name="Scene/CCamera.hpp" open="1" top="0" tabpos="5">
+	<File name="Scene/CCamera.hpp" open="0" top="0" tabpos="3">
 		<Cursor position="1620" topLine="43" />
 	</File>
 	<File name="Scene/CMaterial.cpp" open="0" top="0" tabpos="6">
@@ -28,23 +28,23 @@
 	<File name="Scene/CMaterial.hpp" open="0" top="0" tabpos="7">
 		<Cursor position="79" topLine="0" />
 	</File>
-	<File name="Scene/CMesh.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="3132" topLine="39" />
+	<File name="Scene/CMesh.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="3132" topLine="29" />
 	</File>
-	<File name="Scene/CMesh.hpp" open="1" top="0" tabpos="9">
+	<File name="Scene/CMesh.hpp" open="0" top="0" tabpos="7">
 		<Cursor position="202" topLine="0" />
 	</File>
-	<File name="Scene/CObject.cpp" open="1" top="0" tabpos="12">
-		<Cursor position="2622" topLine="33" />
+	<File name="Scene/CObject.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="2622" topLine="26" />
 	</File>
-	<File name="Scene/CObject.hpp" open="1" top="0" tabpos="11">
-		<Cursor position="2271" topLine="105" />
+	<File name="Scene/CObject.hpp" open="1" top="0" tabpos="9">
+		<Cursor position="2271" topLine="62" />
 	</File>
-	<File name="Scene/CScene.cpp" open="1" top="0" tabpos="4">
+	<File name="Scene/CScene.cpp" open="1" top="1" tabpos="2">
 		<Cursor position="345" topLine="0" />
 	</File>
-	<File name="Scene/CScene.hpp" open="1" top="0" tabpos="3">
-		<Cursor position="2225" topLine="43" />
+	<File name="Scene/CScene.hpp" open="1" top="0" tabpos="1">
+		<Cursor position="2225" topLine="33" />
 	</File>
 	<File name="Scene/Light.cpp" open="0" top="0" tabpos="14">
 		<Cursor position="5981" topLine="172" />
@@ -88,13 +88,7 @@
 	<File name="Utility/ISingleton.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="990" topLine="0" />
 	</File>
-	<File name="Utility/Numerable.hpp" open="1" top="0" tabpos="7">
+	<File name="Utility/Numerable.hpp" open="0" top="0" tabpos="5">
 		<Cursor position="185" topLine="0" />
-	</File>
-	<File name="Utility/UObjImporter.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="28" topLine="15" />
-	</File>
-	<File name="Utility/UObjImporter.hpp" open="1" top="1" tabpos="2">
-		<Cursor position="12192" topLine="361" />
 	</File>
 </CodeBlocks_layout_file>

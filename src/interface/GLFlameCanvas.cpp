@@ -46,7 +46,6 @@ GLFlameCanvas::~GLFlameCanvas()
 	delete [] m_pixels;
 	if ( m_intensities ) delete [] m_intensities;
 	delete m_gammaEngine;
-	delete m_pSVShader;
 }
 
 void GLFlameCanvas::InitUISettings(void)
@@ -93,8 +92,8 @@ void GLFlameCanvas::InitGL()
 void GLFlameCanvas::InitLuminaries(void)
 {
 	for (uint i=0; i < m_currentConfig->nbLuminaries; i++)
-		m_luminaries.push_back( new Luminary( m_currentConfig->luminaries[i], m_fields, m_fires, m_scene,
-		                                      *m_pSVShader, m_currentConfig->luminaries[i].fileName.fn_str(), i) );
+		m_luminaries.push_back( new Luminary(	m_currentConfig->luminaries[i], m_fields, m_fires, m_scene,
+																						m_currentConfig->luminaries[i].fileName.fn_str()) );
 
 //   m_currentConfig->nbFires = m_fires.size(); m_currentConfig->nbFields = m_fields.size();
 	prevNbFlames = m_fires.size();
@@ -171,7 +170,7 @@ void GLFlameCanvas::InitScene()
 	m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires, macro);
 	m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires, macro);
 
-	m_scene->postInit();
+	m_scene->postInit(false);
 
 	m_camera = CCamera::getInstance();
 	m_camera->init (m_width, m_height, m_currentConfig->clipping, m_scene);
@@ -689,33 +688,8 @@ void GLFlameCanvas::drawScene()
 		case LIGHTING_PHOTOMETRIC:
 			m_photoSolid->draw(m_currentConfig->BPSEnabled);
 			break;
-		case LIGHTING_MULTI:
-			glEnable (GL_LIGHTING);
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
-			{
-				(*firesIterator)->computeIntensityPositionAndDirection();
-				(*firesIterator)->switchOnMulti ();
-			}
-			m_scene->drawScene();
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
-				(*firesIterator)->switchOffMulti ();
-			glDisable (GL_LIGHTING);
-			break;
 		default:
-			glEnable (GL_LIGHTING);
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
-			{
-				(*firesIterator)->computeIntensityPositionAndDirection();
-				(*firesIterator)->switchOn ();
-			}
-			m_scene->drawScene();
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
-				(*firesIterator)->switchOff ();
-			glDisable (GL_LIGHTING);
+			assert(false);
 			break;
 	}
 

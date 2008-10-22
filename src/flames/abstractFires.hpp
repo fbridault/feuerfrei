@@ -43,11 +43,10 @@ class FlameLight
 public:
 	/** Constructeur de source lumineuse de type flamme.
 	 * @param scene pointeur sur la scène.
-	 * @param index Indice de la lumière pour OpenGL. Compris entre [0;7].
 	 * @param program pointeur sur le program chargé de la construction des shadow volumes.
 	 * @param IESFilename nom du fichier IES à utiliser
 	 */
-	FlameLight (const CScene* const a_scene, uint index, const CShader& a_rSVShader, const char* const IESFilename);
+	FlameLight (const CScene* const a_scene, const char* const IESFilename);
 
 	/** Destructeur */
 	virtual ~FlameLight();
@@ -62,16 +61,6 @@ public:
 		m_lightPosition[2] = pos.z;
 		m_centreSP = pos;
 	}
-
-	/** Active la source de lumière. */
-	void switchOn ();
-	/** Eteint la source */
-	void switchOff ();
-
-	/** Active la source de lumière. */
-	virtual void switchOnMulti (){};
-	/** Eteint la source */
-	virtual void switchOffMulti (){};
 
 	/** Récupération du tableau des intensités du solide photométrique.
 	 * @return CPointeur sur les intensités.
@@ -178,8 +167,6 @@ protected:
 	float m_intensity;
 	/** Coefficient pondérateur de l'intensité de la source. */
 	float m_intensityCoef;
-	/** Indice de la lumière pour OpenGL. */
-	short m_light;
 	/** Position de la lumière ponctuelle OpenGL dans l'espace. */
 	GLfloat m_lightPosition[4];
 
@@ -191,10 +178,6 @@ private:
 
 	/** CPointeur sur la scène. */
 	const CScene *m_scene;
-
-	/** CPointeur sur le program générateur de volumes d'ombres. */
-	const CShader &m_rSVShader;
-
 
 	/** Fichier IES utilisé pour le solide photométrique de la source. */
 	IES *m_iesFile;
@@ -225,11 +208,9 @@ public:
 	 * et ceci doit alors être réalisé par la classe fille.
 	 * @param scene CPointeur sur la scène.
 	 * @param texname Nom du fichier contenant le luminaire.
-	 * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program CPointeur sur le program chargé de la construction des shadow volumes.
 	 */
-	FireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, CScene* const scene,
-	            const wxString &texname, uint index, const CShader& a_rShader);
+	FireSource (	const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, CScene* const scene,
+							const wxString &texname);
 	/** Destructeur */
 	virtual ~FireSource ();
 
@@ -552,12 +533,9 @@ public:
 	 * @param nbFlames Nombre de flammes.
 	 * @param scene CPointeur sur la scène.
 	 * @param texname Nom du fichier image de la texture.
-	 * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
-	 * @param program CPointeur sur le program chargé de la construction des shadow volumes.
-	 * @param objName Nom du luminaire à charger dans le fichier filename.
 	 */
 	DetachableFireSource (const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, CScene* const scene,
-	                      const wxString &texname, uint index, const CShader& a_rShader);
+												const wxString &texname);
 	virtual ~DetachableFireSource();
 
 	virtual void build();

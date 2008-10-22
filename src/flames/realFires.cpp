@@ -8,9 +8,9 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-Candle::Candle (const FlameConfig& flameConfig, Field3D * s, CScene* const scene, uint index,
-                const CShader& a_rShader, float rayon, const char *wickFileName, CWick *wick):
-		FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, a_rShader)
+Candle::Candle (const FlameConfig& flameConfig, Field3D * s, CScene* const scene, float rayon,
+								const char *wickFileName, CWick *wick):
+		FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"))
 {
 	if (wickFileName)
 	{
@@ -55,108 +55,8 @@ void Candle::setLightPosition (const CPoint& pos)
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-void Candle::switchOffMulti()
-{
-	int n,light=0;
-
-	for ( n = 0 ; n < 8 ; n++)
-	{
-		switch (n)
-		{
-			case 0 :
-				light = GL_LIGHT0;
-				break;
-			case 1 :
-				light = GL_LIGHT1;
-				break;
-			case 2 :
-				light = GL_LIGHT2;
-				break;
-			case 3 :
-				light = GL_LIGHT3;
-				break;
-			case 4 :
-				light = GL_LIGHT4;
-				break;
-			case 5 :
-				light = GL_LIGHT5;
-				break;
-			case 6 :
-				light = GL_LIGHT6;
-				break;
-			case 7 :
-				light = GL_LIGHT7;
-				break;
-		}
-		glDisable(light);
-	}
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void Candle::switchOnMulti()
-{
-	uint n,light=0;
-	double coef;
-
-	for ( n = 0 ; n < m_nbLights ; n++)
-	{
-		switch (n)
-		{
-			case 0 :
-				light = GL_LIGHT0;
-				break;
-			case 1 :
-				light = GL_LIGHT1;
-				break;
-			case 2 :
-				light = GL_LIGHT2;
-				break;
-			case 3 :
-				light = GL_LIGHT3;
-				break;
-			case 4 :
-				light = GL_LIGHT4;
-				break;
-			case 5 :
-				light = GL_LIGHT5;
-				break;
-			case 6 :
-				light = GL_LIGHT6;
-				break;
-			case 7 :
-				light = GL_LIGHT7;
-				break;
-		}
-		//    coef = 2/(double)(n+1);
-		coef = (-(n - m_nbLights/2)*(n - m_nbLights/2)+16)/40.0;
-		//x    cout << coef << " ";
-		GLfloat val_diffuse[]={1.0f*coef,0.5f*coef,0.0f,1.0f};
-		//GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
-		GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
-		GLfloat val_specular[]={.1f,.1f,.1f,1.0f};
-
-		m_lightPositions[n][0] = m_lightPositions[n][0] * m_solver->getScale().x + getPosition().x;
-		m_lightPositions[n][1] = m_lightPositions[n][1] * m_solver->getScale().y + getPosition().y;
-		m_lightPositions[n][2] = m_lightPositions[n][2] * m_solver->getScale().z + getPosition().z;
-
-		glLightfv(light,GL_POSITION,m_lightPositions[n]);
-		glLightfv(light,GL_DIFFUSE,val_diffuse);
-		glLightfv(light,GL_SPECULAR,val_specular);
-		glLightfv(light,GL_AMBIENT,val_null);
-		glLightf(light,GL_QUADRATIC_ATTENUATION,0.05f);
-		glEnable(light);
-	}
-	//cout << endl;
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scene, uint index,
-                       const CShader& a_rShader, const char *wickFileName):
-		FireSource (flameConfig, s, 1, scene, _("textures/firmalampe.png"), index, a_rShader)
+Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *wickFileName):
+		FireSource (flameConfig, s, 1, scene, _("textures/firmalampe.png"))
 {
 	vector<CWick *> objList;
 
@@ -175,9 +75,8 @@ Firmalampe::Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scen
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-Torch::Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *torchName, uint index,
-             const CShader& a_rShader):
-		DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"), index, a_rShader)
+Torch::Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *torchName) :
+		DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch6.png"))
 {
 	vector<CWick *> objList;
 
@@ -208,9 +107,8 @@ Torch::Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const c
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *fireName, uint index,
-                   const CShader& a_rShader):
-		DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"), index, a_rShader)
+CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *fireName):
+		DetachableFireSource (flameConfig, s, 0, scene, _("textures/torch4.png"))
 {
 	vector<CWick *> objList;
 
@@ -240,9 +138,8 @@ CampFire::CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, c
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *filename, uint index,
-                          const CShader& a_rShader, float rayon):
-		FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"), index, a_rShader)
+CandleStick::CandleStick (const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *filename, float rayon):
+		FireSource (flameConfig, s, 1, scene, _("textures/bougie2.png"))
 {
 	vector<CWick *> objList;
 

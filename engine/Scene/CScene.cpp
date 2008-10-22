@@ -8,50 +8,72 @@
 
 uint CScene::glNameCounter = 0;
 
-void CScene::init (const string& fileName)
+void CScene::init (const string& a_strFileName)
 {
 	m_boundingSpheresMode = false;
 	m_selectedItem        = NULL;
 
 	addMaterial(new CMaterial(this));
 
-	cout << "Chargement de la scène " << fileName << endl;
-	UObjImporter::import(this,fileName,m_objectsArray);
-	computeBoundingBox();
+	cout << "Chargement de la scène " << a_strFileName << endl;
+	UObjImporter::import(this, a_strFileName, m_objectsArray);
 }
 
 
 CScene::~CScene ()
 {
 	for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
-	     objectsArrayIterator != m_objectsArray.end (); objectsArrayIterator++)
+	        objectsArrayIterator != m_objectsArray.end (); objectsArrayIterator++)
 		delete (*objectsArrayIterator);
 	m_objectsArray.clear ();
 
 	for (vector < ILight * >::iterator lightSourcesIterator = m_lightSourcesArray.begin ();
-	     lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
+	        lightSourcesIterator != m_lightSourcesArray.end (); lightSourcesIterator++)
 		delete (*lightSourcesIterator);
 	m_lightSourcesArray.clear ();
 
 	for (vector < CMaterial * >::iterator materialArrayIterator = m_materialArray.begin ();
-	     materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
+	        materialArrayIterator != m_materialArray.end (); materialArrayIterator++)
 		delete (*materialArrayIterator);
 	m_materialArray.clear ();
 
 	for (vector < CBitmapTexture * >::iterator texturesArrayIterator = m_texturesArray.begin ();
-	     texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
+	        texturesArrayIterator != m_texturesArray.end (); texturesArrayIterator++)
 		delete (*texturesArrayIterator);
 	m_texturesArray.clear ();
 }
 
 
-void CScene::computeBoundingBox()
+void CScene::postInit(bool a_bNormalize)
+{
+	cout << "Building VBOs..." << endl;
+	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
+	        objectsArrayIterator != m_objectsArray.end();
+	        objectsArrayIterator++)
+	{
+		(*objectsArrayIterator)->buildVBO();
+		(*objectsArrayIterator)->buildBoundingSpheres();
+	}
+
+	computeBoundingBox(a_bNormalize);
+
+	cout << "Terminé" << endl;
+	cout << "*******************************************" << endl;
+	cout << "Statistiques sur la scène :" << endl;
+	cout << getCObjectsCount() << " objets" << endl;
+	cout << getPolygonsCount() << " polygones" << endl;
+	cout << getVertexCount() << " vertex" << endl;
+	cout << "*******************************************" << endl;
+}
+
+
+void CScene::computeBoundingBox(bool a_bNormalize)
 {
 	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
 	CPoint objMax, objMin;
 
 	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
-	     objectsArrayIterator != m_objectsArray.end(); objectsArrayIterator++)
+	        objectsArrayIterator != m_objectsArray.end(); objectsArrayIterator++)
 	{
 		(*objectsArrayIterator)->buildBoundingBox();
 		(*objectsArrayIterator)->getBoundingBox(objMax, objMin);
@@ -71,51 +93,31 @@ void CScene::computeBoundingBox()
 			ptMin.z = objMin.z;
 	}
 
-	/** Normalisation */
-	CPoint offset = CPoint(0,0,0) - ((ptMax + ptMin)/2.0f);
-	float invNormMax = 1.0f/((ptMax - ptMin).max());
-
-	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
-	     objectsArrayIterator != m_objectsArray.end();
-	     objectsArrayIterator++)
+	if (a_bNormalize)
 	{
-		(*objectsArrayIterator)->scale(invNormMax,offset);
-	}
+		/** Normalisation */
+		CPoint offset = CPoint(0,0,0) - ((ptMax + ptMin)/2.0f);
+		float invNormMax = 1.0f/((ptMax - ptMin).max());
 
-	m_max = (ptMax+offset) * invNormMax;
-	m_min = (ptMin+offset) * invNormMax;
+		for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
+		        objectsArrayIterator != m_objectsArray.end();
+		        objectsArrayIterator++)
+		{
+			(*objectsArrayIterator)->scale(invNormMax,offset);
+		}
+
+		m_max = (ptMax+offset) * invNormMax;
+		m_min = (ptMin+offset) * invNormMax;
+	}
 }
 
 
 void CScene::computeVisibility(const CCamera &view)
 {
 	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
-	     objectsArrayIterator != m_objectsArray.end();
-	     objectsArrayIterator++)
+	        objectsArrayIterator != m_objectsArray.end();
+	        objectsArrayIterator++)
 		(*objectsArrayIterator)->computeVisibility(view);
-}
-
-
-void CScene::postInit()
-{
-	cout << "Building VBOs..." << endl;
-	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
-	     objectsArrayIterator != m_objectsArray.end();
-	     objectsArrayIterator++)
-	{
-		(*objectsArrayIterator)->buildVBO();
-		(*objectsArrayIterator)->buildBoundingSpheres();
-	}
-
-	computeBoundingBox();
-
-	cout << "Terminé" << endl;
-	cout << "*******************************************" << endl;
-	cout << "Statistiques sur la scène :" << endl;
-	cout << getCObjectsCount() << " objets" << endl;
-	cout << getPolygonsCount() << " polygones" << endl;
-	cout << getVertexCount() << " vertex" << endl;
-	cout << "*******************************************" << endl;
 }
 
 
@@ -124,8 +126,8 @@ uint CScene::getPolygonsCount()
 	int nb=0;
 
 	for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
-	     objectsArrayIterator != m_objectsArray.end ();
-	     objectsArrayIterator++)
+	        objectsArrayIterator != m_objectsArray.end ();
+	        objectsArrayIterator++)
 		nb += (*objectsArrayIterator)->getPolygonsCount();
 
 	return nb;
@@ -137,8 +139,8 @@ uint CScene::getVertexCount()
 	int nb=0;
 
 	for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
-	     objectsArrayIterator != m_objectsArray.end ();
-	     objectsArrayIterator++)
+	        objectsArrayIterator != m_objectsArray.end ();
+	        objectsArrayIterator++)
 		nb += (*objectsArrayIterator)->getVertexArraySize();
 
 	return nb;
@@ -149,8 +151,8 @@ int CScene::getMaterialIndexByName(const string& name)
 {
 	int index=0;
 	for (vector<CMaterial*>::iterator materialArrayIterator = m_materialArray.begin ();
-	     materialArrayIterator != m_materialArray.end ();
-	     materialArrayIterator++)
+	        materialArrayIterator != m_materialArray.end ();
+	        materialArrayIterator++)
 	{
 		if ( !(*materialArrayIterator)->getName().compare (name) )
 		{
@@ -168,8 +170,8 @@ int CScene::searchTextureIndexByName(const string& name)
 {
 	int index=0;
 	for (vector<CBitmapTexture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
-	     texturesArrayIterator != m_texturesArray.end ();
-	     texturesArrayIterator++)
+	        texturesArrayIterator != m_texturesArray.end ();
+	        texturesArrayIterator++)
 	{
 		if ( !(*texturesArrayIterator)->getName().compare (name) )
 		{

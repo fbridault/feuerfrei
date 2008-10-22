@@ -60,8 +60,6 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 
 	const wxString m_lightingChoices[] =
 	{
-		_("Standard"),
-		_("Multi-point"),
 		_("Pixel-lighting"),
 		_("Photometric Solid")
 	};
@@ -74,7 +72,7 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 	m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
 
 	m_lightingRadioBox = new wxRadioBox(this, IDRB_Lighting, _("Type"), wxDefaultPosition, wxDefaultSize,
-	                                    4, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
+	                                    2, m_lightingChoices, 2, wxRA_SPECIFY_COLS);
 
 	m_buttonRun = new wxButton(this,IDB_Run,_("Pause"));
 	m_buttonRestart = new wxButton(this,IDB_Restart,_("Restart"));
@@ -572,7 +570,7 @@ void FlamesFrame::LoadSettings (void)
 	m_currentConfig.width = m_config->Read(_("/Display/Width"), 1024);
 	m_currentConfig.height = m_config->Read(_("/Display/Height"), 768);
 	m_currentConfig.clipping = m_config->Read(_("/Display/Clipping"), 100);
-	m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_STANDARD);
+	m_config->Read(_("/Display/LightingMode"), &m_currentConfig.lightingMode, LIGHTING_PIXEL);
 	m_config->Read(_("/Display/BPSEnabled"), &m_currentConfig.BPSEnabled, 0);
 	m_config->Read(_("/Display/Shadows"), &m_currentConfig.shadowsEnabled, false);
 	m_config->Read(_("/Display/Glow"), &m_currentConfig.glowEnabled, false);
@@ -646,10 +644,7 @@ void FlamesFrame::LoadSettings (void)
 		m_depthPeelingSlider->Disable();
 	switch (m_currentConfig.lightingMode)
 	{
-		case LIGHTING_STANDARD :
-			m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
-			m_blendedSolidCheckBox->Disable();
-			break;
+		case LIGHTING_PIXEL :
 		case LIGHTING_PHOTOMETRIC :
 			m_menuDisplayFlames->Enable(IDM_ShadowVolumes,false);
 			m_blendedSolidCheckBox->Enable();

@@ -20,18 +20,16 @@ public:
 	 * @param fields Vecteur contenant les solveurs de la scène.
 	 * @param fireSources Vecteur contenant les feux de la scène.
 	 * @param scene CPointeur sur la scène.
-	 * @param program CPointeur sur le program chargé de la construction des shadow volumes.
 	 * @param filename Nom du fichier contenant le luminaire.
-	 * @param index Indice de la flamme dans la scène (pour attribution d'une lumière OpenGL).
 	 */
 	Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-	          CScene* const scene, const CShader& a_rShader, const char *filename, uint index);
+						CScene* const scene, const char *filename);
 	/** Destructeur */
 	virtual ~Luminary ();
 
 	Field3D* initField(const SolverConfig& fieldConfig, const CPoint& position);
-	FireSource* initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, CScene* const scene,
-	                     uint i, const CShader& a_rShader);
+	FireSource* initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, CScene* const scene);
+
 	/** Retourne la position absolue dans le repère du monde.
 	 * @return Position absolue dans le repère du monde.
 	 */

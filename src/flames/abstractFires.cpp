@@ -6,71 +6,15 @@
 /************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
 /**********************************************************************************************************************/
 
-FlameLight::FlameLight(const CScene* const a_scene, uint index, const CShader& a_rSVShader, const char* const IESFilename) :
-		m_orientationSPtheta(0.0f), m_scene(a_scene), m_rSVShader(a_rSVShader)
+FlameLight::FlameLight(const CScene* const a_scene, const char* const IESFilename) :
+	m_orientationSPtheta(0.0f), m_scene(a_scene)
 {
-	switch (index)
-	{
-		case 0 :
-			m_light = GL_LIGHT0;
-			break;
-		case 1 :
-			m_light = GL_LIGHT1;
-			break;
-		case 2 :
-			m_light = GL_LIGHT2;
-			break;
-		case 3 :
-			m_light = GL_LIGHT3;
-			break;
-		case 4 :
-			m_light = GL_LIGHT4;
-			break;
-		case 5 :
-			m_light = GL_LIGHT5;
-			break;
-		case 6 :
-			m_light = GL_LIGHT6;
-			break;
-		case 7 :
-			m_light = GL_LIGHT7;
-			break;
-		default :
-			m_light = GL_LIGHT0;
-			break;
-	}
-
-	m_lightPosition[3] = 1.0f;
-
 	m_iesFile = new IES(IESFilename);
 }
 
 FlameLight::~FlameLight()
 {
 	delete m_iesFile;
-}
-
-void FlameLight::switchOff()
-{
-	glDisable(m_light);
-}
-
-void FlameLight::switchOn()
-{
-	float coef = 3.0f*m_intensity;
-//   GLfloat val_diffuse[]={1,1,1,1.0};
-	GLfloat val_diffuse[]={1.0f*coef,0.5f*coef,0.0f,1.0f};
-	//GLfloat val_ambiant[]={0.05*coef,0.05*coef,0.05*coef,1.0};
-	GLfloat val_null[]={0.0f,0.0f,0.0f,1.0f};
-	GLfloat val_specular[]={.5f*coef,.5f*coef,.5f*coef,1.0f};
-
-	/* Définition de l'intensité lumineuse de chaque flamme en fonction de la hauteur de celle-ci */
-	glLightfv(m_light,GL_POSITION,m_lightPosition);
-	glLightfv(m_light,GL_DIFFUSE,val_diffuse);
-	glLightfv(m_light,GL_SPECULAR,val_specular);
-	glLightfv(m_light,GL_AMBIENT,val_null);
-	glLightf(m_light,GL_QUADRATIC_ATTENUATION,0.05f);
-	glEnable(m_light);
 }
 
 void FlameLight::computeGlowWeights(uint index, float sigma)
@@ -93,9 +37,9 @@ void FlameLight::computeGlowWeights(uint index, float sigma)
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames, CScene* const scene,
-                       const wxString &texname, uint index, const CShader& a_rShader) :
-		FlameLight(scene, index, a_rShader, flameConfig.IESFileName.ToAscii()),
+FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
+											CScene* const scene, const wxString &texname) :
+		FlameLight(scene, flameConfig.IESFileName.ToAscii()),
 		m_texture(string(texname.fn_str()), GL_REPEAT, GL_REPEAT),
 		m_position(0.0f,0.0f,0.0f)
 {
@@ -256,7 +200,9 @@ void FireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 	{
 		if (!vis_save)
 		{
-			cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			// TODO : Could a counter to re-enable index notification
+			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			cout << "solver launched" << endl;
 			m_solver->setRunningState(true);
 		}
 
@@ -324,7 +270,9 @@ void FireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 	else
 		if (vis_save)
 		{
-			cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
+			// TODO : Could a counter to re-enable index notification
+			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			cout << "solver stopped" << endl;
 			m_solver->setRunningState(false);
 		}
 }
@@ -339,9 +287,8 @@ bool FireSource::operator<(const FireSource& other) const
 /**********************************************************************************************************************/
 
 DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
-    CScene* const scene,
-    const wxString &texname, uint index, const CShader& a_rShader) :
-		FireSource (flameConfig, s, nbFlames, scene, texname, index, a_rShader)
+        CScene* const scene, const wxString &texname) :
+		FireSource (flameConfig, s, nbFlames, scene, texname)
 {
 	computeGlowWeights(0,1.8f);
 	computeGlowWeights(1,2.2f);
@@ -350,7 +297,7 @@ DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field
 DetachableFireSource::~DetachableFireSource()
 {
 	for (list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
-	     flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 		delete (*flamesIterator);
 	m_detachedFlamesList.clear ();
 }
@@ -379,7 +326,7 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
 				for (uint i = 0; i < m_nbFlames; i++)
 					m_flames[i]->drawFlame(display, displayParticle);
 				for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-				     flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+				        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 					(*flamesIterator)->drawFlame(display, displayParticle);
 				glPopMatrix();
 			}
@@ -508,7 +455,7 @@ void DetachableFireSource::setSmoothShading (bool state)
 {
 	FireSource::setSmoothShading(state);
 	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	     flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 		(*flamesIterator)->setSmoothShading(state);
 }
 
@@ -542,7 +489,9 @@ void DetachableFireSource::computeVisibility(const CCamera &view, bool forceSphe
 	{
 		if (!vis_save)
 		{
-			cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			// TODO : Could a counter to re-enable index notification
+			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			cerr << "solver launched" << endl;
 			m_solver->setRunningState(true);
 		}
 
@@ -626,7 +575,9 @@ void DetachableFireSource::computeVisibility(const CCamera &view, bool forceSphe
 	else
 		if (vis_save)
 		{
-			cerr << "solver " << m_light - GL_LIGHT0 << " stopped" << endl;
+			// TODO : Could a counter to re-enable index notification
+			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
+			cerr << "solver stopped" << endl;
 			m_solver->setRunningState(false);
 		}
 }
@@ -639,7 +590,7 @@ void DetachableFireSource::buildBoundingBox ()
 
 	if ( m_detachedFlamesList.size () )
 		for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-		     flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+		        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 		{
 			pt = (*flamesIterator)->getTop();
 			if (pt.x > ptMax.x)

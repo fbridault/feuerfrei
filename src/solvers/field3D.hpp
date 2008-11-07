@@ -120,7 +120,7 @@ public:
   /** Retourne le facteur d'échelle.
    * @return Echelle.
    */
-  CPoint getScale () const { return m_scale; };
+  CPoint const& getScale () const { return m_scale; };
 
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () {};

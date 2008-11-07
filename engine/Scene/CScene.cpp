@@ -199,6 +199,6 @@ void CScene::moveSelectedItem(float x, float y, float z, float oldX, float oldY)
 	if ( gluUnProject( oldX, oldY, z, modelMatrix, projMatrix, viewport, &v2[0], &v2[1], &v2[2]) == GL_FALSE )
 		cerr << "gluUnProject failed" << endl;
 
-	m_selectedItem->move(v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]);
+	m_selectedItem->Move(v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]);
 }
 

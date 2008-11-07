@@ -129,7 +129,7 @@ public:
 	void moveLuminary(int selected, CPoint& pt)
 	{
 		/* On ne peut déplacer que les solveurs locaux */
-		m_luminaries[selected]->move(pt);
+		m_luminaries[selected]->Move(pt);
 		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
 			(*firesIterator)->computeVisibility(*m_camera,true);

@@ -38,7 +38,7 @@ public:
  * @since	1.0
  * @see Material, CEnergy
  */
-class ILight : public CSceneItem
+class ILight : public ISceneItem
 {
 protected:
 	/**
@@ -63,7 +63,7 @@ public:
 	};
 
 	virtual void draw() const;
-	virtual void drawForSelection() const;
+	virtual void DrawForSelection() const;
 
 	/**
 	 * Lecture de l'intensit&eacute; lumineuse de la source.
@@ -85,8 +85,6 @@ public:
 		*projection = m_lightProjectionMatrix;
 		*modelView = m_lightModelViewMatrix;
 	}
-
-	void move (float x, float y, float z);
 
 	/** Rendu à partir du point de vue de la source. */
 	virtual void castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix) = 0;

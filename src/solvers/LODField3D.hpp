@@ -166,7 +166,7 @@ public:
     m_currentField->displayGrid ();
   };
 
-  CPoint getPosition (void) const { return m_currentField->getPosition(); };
+  CPoint const& getPosition (void) const { return m_currentField->getPosition(); };
 
   void setPosition (const CPoint& position)
   {

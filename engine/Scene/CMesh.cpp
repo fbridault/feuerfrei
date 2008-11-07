@@ -210,9 +210,9 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) cons
 	P3.y=V3.y;
 	P3.z=V3.z;
 	/** Prise en compte de la translation */
-	P1 += m_rParent.getPosition();
-	P2 += m_rParent.getPosition();
-	P3 += m_rParent.getPosition();
+	P1 += m_rParent.GetPosition();
+	P2 += m_rParent.GetPosition();
+	P3 += m_rParent.GetPosition();
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -235,9 +235,9 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVec
 	P3.y=V3.y;
 	P3.z=V3.z;
 	/** Prise en compte de la translation */
-	P1 += m_rParent.getPosition();
-	P2 += m_rParent.getPosition();
-	P3 += m_rParent.getPosition();
+	P1 += m_rParent.GetPosition();
+	P2 += m_rParent.GetPosition();
+	P3 += m_rParent.GetPosition();
 
 	normal = CVector(P2-P1)^CVector(P3-P1);
 	normal.normalize();

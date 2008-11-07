@@ -66,7 +66,7 @@ public:
   /** Retourne la position du solveur dans le repère du monde
    * @return Position dans l'espace.
    */
-  virtual CPoint getPosition () const { return (m_position); };
+  virtual CPoint const& getPosition () const { return (m_position); };
 
   /** Affecte la position du solveur dans le repère du monde
    * @return Position dans l'espace.

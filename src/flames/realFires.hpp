@@ -90,17 +90,18 @@ public:
 		m_nbFlames = objList.size();
 		m_flames = new IRealFlame* [m_nbFlames];
 
+		CPoint rPosition = GrabPosition();
 		/* Calcul de la position et recentrage des mèches */
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();
 		        objListIterator != objList.end (); objListIterator++)
 		{
 			(*objListIterator)->buildBoundingBox();
-			m_position += (*objListIterator)->getCenter();
+			rPosition += (*objListIterator)->getCenter();
 		}
-		m_position = CPoint(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+		rPosition = CPoint(0.5f,0.0f,0.5f) - rPosition/m_nbFlames;
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();
 		        objListIterator != objList.end (); objListIterator++)
-			(*objListIterator)->translate(m_position);
+			(*objListIterator)->translate(rPosition);
 
 		int i=0;
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();

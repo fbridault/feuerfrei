@@ -268,7 +268,7 @@ public:
 		for (vector < CObject * >::const_iterator objectsArrayIterator = m_objectsArray.begin ();
 		     objectsArrayIterator != m_objectsArray.end ();
 		     objectsArrayIterator++)
-			(*objectsArrayIterator)->drawForSelection ();
+			(*objectsArrayIterator)->DrawForSelection ();
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
@@ -291,12 +291,12 @@ public:
 			m_selectedItem = m_objectsArray[selectedItem];
 		else
 			m_selectedItem = m_lightSourcesArray[selectedItem-m_objectsArray.size()];
-		m_selectedItem->select();
+		m_selectedItem->Select();
 	}
 
 	void deselectItem()
 	{
-		m_selectedItem->deselect();
+		m_selectedItem->Deselect();
 		m_selectedItem = NULL;
 	}
 
@@ -323,7 +323,7 @@ private:
 
 	float m_initialNbPhotons;
 
-	CSceneItem *m_selectedItem;
+	ISceneItem *m_selectedItem;
 
 public:
 	/** Compteur permettant d'affecter un nom unique */

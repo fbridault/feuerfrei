@@ -41,36 +41,6 @@ public:
 											const CShader& a_rShadowMapShader,
 											const CRenderTarget& a_rShadowRenderTarget);
 
-	/** Retourne la position absolue dans le repère du monde.
-	 * @return Position absolue dans le repère du monde.
-	 */
-	virtual CPoint getPosition () const
-	{
-		return m_position;
-	};
-	virtual CPoint getScale () const
-	{
-		return m_scale;
-	};
-
-	/** Dessine le luminaire de la flamme. Les luminaires sont définis en (0,0,0), une translation
-	 * est donc effectuée pour tenir compte du placement du feu dans le monde.
-	 */
-	void draw() const
-	{
-		if (m_hasLuminary)
-		{
-			CPoint position(getPosition());
-			glPushMatrix();
-			glTranslatef (position.x, position.y, position.z);
-			glScalef (m_scale.x, m_scale.y, m_scale.z);
-			for (vector < CObject* >::const_iterator luminaryIterator = m_luminary.begin ();
-			     luminaryIterator  != m_luminary.end (); luminaryIterator++)
-				(*luminaryIterator)->draw();
-			glPopMatrix();
-		}
-	}
-
 	/** Ajuste le niveau de détail de la NURBS.
 	 * @param value valeur comprise entre 1 et LOD_VALUES.
 	 */
@@ -148,17 +118,21 @@ public:
 	/** Déplace le luminaire.
 	 * @param forces Déplacement en (x,y,z).
 	 */
-	virtual void move(const CPoint& position)
+	virtual void Move(const CPoint& a_rPosition)
 	{
-		CPoint diff = position - m_position;
+		CPoint diff = a_rPosition - m_position;
 		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
-		     fieldIterator != m_fields.end (); fieldIterator++)
+			fieldIterator != m_fields.end (); fieldIterator++)
 			(*fieldIterator)->move(diff);
 
 		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->move(diff.x, diff.y, diff.z);
-		m_position = position;
+			fireIterator != m_fireSources.end (); fireIterator++)
+				(*fireIterator)->Move(diff.x, diff.y, diff.z);
+
+		for (vector < CObject* >::const_iterator luminaryIterator = m_luminary.begin ();
+			luminaryIterator  != m_luminary.end (); luminaryIterator++)
+			(*luminaryIterator)->SetPosition(a_rPosition);
+		m_position = a_rPosition;
 	}
 
 protected:
@@ -173,7 +147,7 @@ protected:
 	bool m_hasLuminary;
 
 	/** Position du luminaire. */
-	CPoint m_position, m_scale;
+	CPoint m_position;
 };
 
 

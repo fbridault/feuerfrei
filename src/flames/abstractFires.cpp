@@ -93,7 +93,7 @@ void IFireSource::computeIntensityPositionAndDirection()
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef;
+	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef*2.f;
 
 	//  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);

@@ -8,6 +8,15 @@
 
 extern uint g_objectCount;
 
+/**************************************************************************************************/
+/**														 DEFINITION DE L'INTERFACE ISCENEITEM												*/
+/**************************************************************************************************/
+
+ISceneItem::ISceneItem(CPoint const& a_rPosition) :
+	m_oPosition(a_rPosition), m_oScale(1.f,1.f,1.f), m_bSelected(false)
+{
+	m_uiGlName = CScene::glNameCounter++;
+}
 
 /**************************************************************************************************/
 /**														 DEFINITION DE LA CLASSE OBJECT 											 	    			*/
@@ -17,13 +26,11 @@ extern uint g_objectCount;
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 CObject::CObject(CScene& a_rScene) :
-	CSceneItem(CPoint(0,0,0)),
+	ISceneItem(CPoint(0,0,0)),
 	m_rScene(a_rScene),
 	m_attributes(0)
 {
 	glGenBuffers(1, &m_bufferID);
-
-	m_glName = CScene::glNameCounter++;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -180,8 +187,11 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 			/* Dessiner avec le matériau par défaut (pour tester les zones d'ombres par exemple) */
 			m_rScene.getMaterial(0)->apply();
 
+		CPoint const& rPosition = GetPosition();
+		CPoint const& rScale = GetScale();
 		glPushMatrix();
-		glTranslatef(m_position.x, m_position.y, m_position.z);
+		glTranslatef(rPosition.x,rPosition.y, rPosition.z);
+		glScalef(rScale.x, rScale.y, rScale.z);
 		/* Parcours de la liste des meshes */
 		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 		     meshesListIterator != m_meshesList.end ();
@@ -201,13 +211,16 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::drawForSelection () const
+void CObject::DrawForSelection () const
 {
 	m_rScene.getMaterial(0)->apply();
 
+	CPoint const& rPosition = GetPosition();
+	CPoint const& rScale = GetScale();
 	glPushMatrix();
-	glTranslatef(m_position.x, m_position.y, m_position.z);
-	glPushName(m_glName);
+	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
+	glScalef(rScale.x, rScale.y, rScale.z);
+	glPushName(GetItemName());
 	/* Parcours de la liste des meshes */
 	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 	     meshesListIterator != m_meshesList.end ();

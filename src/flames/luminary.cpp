@@ -27,8 +27,8 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 	string mtlName;
 	Field3D *pField;
 	IFireSource *pFireSource;
+	CPoint& rScale = a_rConfig.fields[0].scale;
 
-	m_scale = a_rConfig.fields[0].scale;
 	/* On importe tous les objets contenus dans le fichier OBJ dont le nom commence par LAMP_NAME */
 	if (UObjImporter::getMTLFileNameFromOBJ(string(a_szFilename), mtlName))
 		UObjImporter::importMTL(a_rScene, mtlName);
@@ -40,14 +40,6 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 	{
 		pField = initField( a_rConfig.fields[0], m_position );
 		pFireSource = initFire(a_rConfig.fires[0], a_szFilename, pField, a_rScene, a_rShadowMapShader, a_rShadowRenderTarget);
-		pField->addFireSource( pFireSource );
-		pField->setPosition( m_position - pFireSource->getWickPosition()*m_scale );
-
-		m_fields.push_back( pField );
-		a_vpFields.push_back( pField );
-		m_fireSources.push_back( pFireSource );
-		a_vpFireSources.push_back( pFireSource );
-		a_rScene.addSource( pFireSource );
 	}
 	else
 	{
@@ -62,36 +54,37 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 			pField = initField( a_rConfig.fields[0], m_position);
 			pFireSource = new Candle (	a_rConfig.fires[0], pField, a_rScene, .125f, NULL,
 																	a_rShadowMapShader, a_rShadowRenderTarget, *objListIterator);
-			pField->addFireSource( pFireSource );
-			pField->setPosition( m_position - pFireSource->getWickPosition()*m_scale );
 
 			pFireSource->setInnerForce(a_rConfig.fires[0].innerForce);
 			pFireSource->setFDF(a_rConfig.fires[0].fdf);
 			pFireSource->setPerturbateMode(a_rConfig.fires[0].flickering);
-
-			m_fields.push_back( pField );
-			a_vpFields.push_back( pField );
-			m_fireSources.push_back( pFireSource );
-			a_vpFireSources.push_back( pFireSource );
-			a_rScene.addSource( pFireSource );
 		}
 	}
+
+	pField->addFireSource( pFireSource );
+	pField->setPosition( m_position - pFireSource->GetPosition() * rScale );
+
+	/* Add field and fire in vectors */
+	m_fields.push_back( pField );
+	a_vpFields.push_back( pField );
+	m_fireSources.push_back( pFireSource );
+	a_vpFireSources.push_back( pFireSource );
+	a_rScene.addSource( pFireSource );
+
 	if (m_hasLuminary)
 		for (vector < CObject* >::iterator luminaryIterator = m_luminary.begin ();
 		     luminaryIterator  != m_luminary.end (); luminaryIterator++)
 		{
 			(*luminaryIterator)->buildVBO();
 			a_rScene.addObject(*luminaryIterator);
+			(*luminaryIterator)->SetPosition(m_position);
+			(*luminaryIterator)->SetScale(rScale);
 		}
 }
 
 Luminary::~Luminary ()
 {
 	/* On efface pas le luminaire, il appartient à la scène */
-//	for (vector < CObject* >::iterator luminaryIterator = m_luminary.begin ();
-//	     luminaryIterator  != m_luminary.end (); luminaryIterator++)
-//		delete (*luminaryIterator);
-//	m_luminary.clear();
 }
 
 #define ARGS position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\

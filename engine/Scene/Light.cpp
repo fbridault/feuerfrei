@@ -42,25 +42,26 @@ ILight* LightFactory::getInstance(	const char *type,
 
 
 ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
-	CSceneItem(P),
+	ISceneItem(P),
 	m_shadowRenderTarget(shadowRenderTarget)
 {
 	m_lightEnergy = I;
-	m_glName = CScene::glNameCounter++;
 	m_depthMapW = m_depthMapH = depthMapSize;
 	m_lightProjectionMatrix = new GLfloat[16];
 	m_lightModelViewMatrix = new GLfloat[16];
 
 	m_enabled = true;
-	m_selected = false;
 };
 
 
 void ILight::draw() const
 {
+	CPoint const& rPosition = GetPosition();
+	CPoint const& rScale = GetScale();
 	glPushMatrix();
-	glTranslatef(m_position.x, m_position.y, m_position.z);
-	if (m_selected)
+	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
+	glScalef(rScale.x, rScale.y, rScale.z);
+	if (IsSelected())
 		glColor3f(0.95,0.0,.2);
 	else
 		glColor3f(0.95,1.0,.2);
@@ -69,20 +70,17 @@ void ILight::draw() const
 }
 
 
-void ILight::drawForSelection() const
+void ILight::DrawForSelection() const
 {
+	CPoint const& rPosition = GetPosition();
+	CPoint const& rScale = GetScale();
 	glPushMatrix();
-	glTranslatef(m_position.x, m_position.y, m_position.z);
-	glPushName(m_glName);
+	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
+	glScalef(rScale.x, rScale.y, rScale.z);
+	glPushName(GetItemName());
 	UGraphicsFn::SolidSphere(0.003, 10, 10);
 	glPopName();
 	glPopMatrix();
-}
-
-
-void ILight::move (float x, float y, float z)
-{
-	CSceneItem::move(x,y,z);
 }
 
 
@@ -91,7 +89,7 @@ void ILight::preRendering(bool shadows) const
 	m_shadowRenderTarget.bindTexture();
 	assert(m_shader != NULL);
 
-	CPoint position = m_position * g_modelViewMatrix;
+	CPoint position = GetPosition() * g_modelViewMatrix;
 
 	m_shader->Enable();
 	m_shader->SetUniform3f("u_lightCentre", position.x,position.y,position.z);
@@ -175,36 +173,37 @@ void COmniLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 	m_shadowRenderTarget.bindTarget();
 	m_shadowRenderTarget.bindChannel(0);
 
+	CPoint const& rPosition = GetPosition();
 	m_genShadowCubeMapShader.Enable();
-	m_genShadowCubeMapShader.SetUniform3f("u_lightCentre", m_position.x,m_position.y,m_position.z);
+	m_genShadowCubeMapShader.SetUniform3f("u_lightCentre", rPosition.x,rPosition.y,rPosition.z);
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector( 1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0)); // Il faut "inverser" les textures en y à cause du repère
+	camera.setFromViewPoint(rPosition,CVector( 1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0)); // Il faut "inverser" les textures en y à cause du repère
 	scene.drawSceneWT();
 
 	m_shadowRenderTarget.bindChannel(1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector(-1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0));
+	camera.setFromViewPoint(rPosition,CVector(-1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0));
 	scene.drawSceneWT();
 
 	m_shadowRenderTarget.bindChannel(2);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector( 0.0, 1.0, 0.0), CVector( 0.0, 0.0, 1.0));
+	camera.setFromViewPoint(rPosition,CVector( 0.0, 1.0, 0.0), CVector( 0.0, 0.0, 1.0));
 	scene.drawSceneWT();
 
 	m_shadowRenderTarget.bindChannel(3);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector( 0.0,-1.0, 0.0), CVector( 0.0, 0.0, -1.0));
+	camera.setFromViewPoint(rPosition,CVector( 0.0,-1.0, 0.0), CVector( 0.0, 0.0, -1.0));
 	scene.drawSceneWT();
 
 	m_shadowRenderTarget.bindChannel(4);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector( 0.0, 0.0, 1.0), CVector( 0.0, -1.0, 0.0));
+	camera.setFromViewPoint(rPosition,CVector( 0.0, 0.0, 1.0), CVector( 0.0, -1.0, 0.0));
 	scene.drawSceneWT();
 
 	m_shadowRenderTarget.bindChannel(5);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-	camera.setFromViewPoint(m_position,CVector( 0.0, 0.0,-1.0), CVector( 0.0, -1.0, 0.0));
+	camera.setFromViewPoint(rPosition,CVector( 0.0, 0.0,-1.0), CVector( 0.0, -1.0, 0.0));
 	scene.drawSceneWT();
 
 	m_genShadowCubeMapShader.Disable();
@@ -234,10 +233,12 @@ void COmniLight::preRendering(bool shadows) const
 	GLfloat filter[6][3] = { {offset, 0.0, 0.0}, {-offset, 0.0, 0.0}, {0.0, offset, 0.0}, {0.0, -offset, 0.0},
 		{0.0, 0.0, offset}, {0.0, 0.0, -offset}
 	};
+	CPoint const& rPosition = GetPosition();
+
 	ILight::preRendering(shadows);
 	m_shader->SetUniform1f( "u_mapSize",1.0/(float)m_depthMapW);
 	m_shader->SetUniform3fv("u_vFilter", &filter[0][0], 6);
-	m_shader->SetUniform3f( "u_worldLightCentre", m_position.x,m_position.y,m_position.z);
+	m_shader->SetUniform3f( "u_worldLightCentre", rPosition.x,rPosition.y,rPosition.z);
 }
 
 
@@ -245,7 +246,8 @@ void COmniLight::renderLightVolume(const CCamera& camera) const
 {
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
 	bool in=false;
-	CVector vecToLight = camera.getPosition() - m_position;
+	CPoint const& rPosition = GetPosition();
+	CVector vecToLight = camera.getPosition() - rPosition;
 	if ( vecToLight.norm() < m_radius )
 	{
 		glCullFace(GL_FRONT);
@@ -253,7 +255,7 @@ void COmniLight::renderLightVolume(const CCamera& camera) const
 	}
 
 	glPushMatrix();
-	glTranslatef(m_position.x, m_position.y, m_position.z);
+	glTranslatef(rPosition.x, rPosition.y, rPosition.z);
 	glCallList(m_volumeDL);
 	glPopMatrix();
 
@@ -330,6 +332,7 @@ void CSpotLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 void CSpotLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix)
 {
 	CVector up(0,0,1);
+	CPoint const& rPosition = GetPosition();
 
 	// Check if dir and up vectors are colinear for glutLookAt openGL call
 	// We compute the trapezoid area = norm of the cross product */
@@ -343,7 +346,7 @@ void CSpotLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 	gluPerspective (90.0f, m_depthMapW/(float)(m_depthMapH), 0.01f, 2.0f);
 
 	glMatrixMode(GL_MODELVIEW);
-	camera.setFromViewPoint(m_position,m_direction,up);
+	camera.setFromViewPoint(rPosition,m_direction,up);
 
 	glGetFloatv (GL_PROJECTION_MATRIX, m_lightProjectionMatrix); // On récupère la matrice de projection à partir de la source
 	glGetFloatv (GL_MODELVIEW_MATRIX, m_lightModelViewMatrix);   // On récupère la matrice de transformation à partir de la source
@@ -397,9 +400,10 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	float angle = acos(dir * m_direction);  // m_direction est déjà normalisé
 	bool in=false;
 	CVector axeRot = dir ^ m_direction;
+	CPoint const& rPosition = GetPosition();
 
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
-	CVector vecToLight = camera.getPosition() - m_position;
+	CVector vecToLight = camera.getPosition() - rPosition;
 	vecToLight.normalize();
 
 	if ( (vecToLight * m_direction) > m_cutoff)
@@ -409,7 +413,7 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	}
 
 	glPushMatrix();
-	glTranslatef(m_position.x, m_position.y, m_position.z);
+	glTranslatef(rPosition.x, rPosition.y, rPosition.z);
 	glRotatef( angle * RAD_TO_DEG, axeRot.x, axeRot.y, axeRot.z);
 	glTranslatef(0.0, 0.0, -m_height);
 	glCallList(m_volumeDL);

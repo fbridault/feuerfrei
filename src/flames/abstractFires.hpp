@@ -203,17 +203,9 @@ public:
 	/** Retourne la position absolue dans le repère du monde.
 	 * @return Position absolue dans le repère du monde.
 	 */
-	CPoint getPosition () const
+	CPoint const& getPosition () const
 	{
 		return m_solver->getPosition();
-	}
-
-	/** Retourne la position absolue dans le repère du monde.
-	 * @return Position absolue dans le repère du monde.
-	 */
-	CPoint getWickPosition () const
-	{
-		return m_position;
 	}
 
 	/** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également
@@ -226,11 +218,11 @@ public:
 	 */
 	virtual void drawWick(bool displayBoxes) const
 	{
-		CPoint pt(getPosition());
-		CPoint scale(m_solver->getScale());
+		CPoint const& rPt = getPosition();
+		CPoint const& rScale = m_solver->getScale();
 		glPushMatrix();
-		glTranslatef (pt.x, pt.y, pt.z);
-		glScalef (scale.x, scale.y, scale.z);
+		glTranslatef (rPt.x,rPt.y, rPt.z);
+		glScalef (rScale.x, rScale.y, rScale.z);
 		for (uint i = 0; i < m_nbFlames; i++)
 			m_flames[i]->drawWick(displayBoxes);
 		glPopMatrix();
@@ -260,11 +252,11 @@ public:
 			default :
 				if (m_visibility)
 				{
-					CPoint pt(getPosition());
-					CPoint scale(m_solver->getScale());
+					CPoint const& rPt = getPosition();
+					CPoint const& rScale = m_solver->getScale();
 					glPushMatrix();
-					glTranslatef (pt.x, pt.y, pt.z);
-					glScalef (scale.x, scale.y, scale.z);
+					glTranslatef (rPt.x,rPt.y, rPt.z);
+					glScalef (rScale.x, rScale.y, rScale.z);
 					for (uint i = 0; i < m_nbFlames; i++)
 						m_flames[i]->drawFlame(display, displayParticle);
 					glPopMatrix();

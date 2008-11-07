@@ -33,8 +33,10 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 		CWick* pWick = *objList.begin();
 		/* Calcul de la position et recentrage de la mèche */
 		pWick->buildBoundingBox();
-		m_position = CPoint(0.5f,0.0f,0.5f) - pWick->getCenter();
-		pWick->translate(m_position);
+
+		CPoint rPosition = GrabPosition();
+		rPosition = CPoint(0.5f,0.0f,0.5f) - pWick->getCenter();
+		pWick->translate(rPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_pField, a_fRayon, pWick);
 	}
 	else
@@ -43,8 +45,10 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 
 		/* Calcul de la position et recentrage de la mèche */
 		a_pWick->buildBoundingBox();
-		m_position = CPoint(0.5f,0.0f,0.5f) - a_pWick->getCenter();
-		a_pWick->translate(m_position);
+
+		CPoint rPosition = GrabPosition();
+		rPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->getCenter();
+		a_pWick->translate(rPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_pField, a_fRayon, a_pWick);
 	}
 }
@@ -73,10 +77,11 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 
 	assert(objList.size() > 0);
 
+	CPoint rPosition = GrabPosition();
 	/* Calcul de la position et recentrage de la mèche */
 	(*objList.begin())->buildBoundingBox();
-	m_position = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getCenter();
-	(*objList.begin())->translate(m_position);
+	rPosition = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getCenter();
+	(*objList.begin())->translate(rPosition);
 
 	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_pField, (*objList.begin()), 0.03f, 0.01f);
 }

@@ -17,55 +17,90 @@ class CMesh;
 #include <list>
 #include <vector>
 
-
-class CSceneItem
+/** Class representing a single element of a scene. It abstracts simple transforms and selection
+ *   process.
+ */
+class ISceneItem
 {
 protected:
-	CSceneItem(CPoint const& position) : m_position(position), m_selected(false) {};
+	ISceneItem(CPoint const& a_rPosition);
 
 public:
-	virtual ~CSceneItem() {};
+	virtual ~ISceneItem() {};
 
-	virtual void drawForSelection() const = 0;
+	/** Child class must implement this method to draw the object at selection time */
+	virtual void DrawForSelection() const = 0;
 
-	CPoint const& getPosition () const
+	/** Get item position */
+	CPoint const& GetPosition () const
 	{
-		return m_position;
+		return m_oPosition;
 	}
 
+	/** Get item position */
+	CPoint& GrabPosition ()
+	{
+		return m_oPosition;
+	}
+
+	/** Get item position */
 	void GetPosition (float &x, float &y, float &z) const
 	{
-		x = m_position.x;
-		y = m_position.y;
-		z = m_position.z;
+		x = m_oPosition.x;
+		y = m_oPosition.y;
+		z = m_oPosition.z;
 	}
-
-	virtual void move (float x, float y, float z)
-	{
-		m_position.x += x;
-		m_position.y += y;
-		m_position.z += z;
-	}
-
+	/** Set item position */
 	void SetPosition (CPoint const& a_rPosition)
 	{
-		m_position = a_rPosition;
+		m_oPosition = a_rPosition;
 	}
 
-	void select()
+	/** Move item at given position */
+	virtual void Move (float x, float y, float z)
 	{
-		m_selected = true;
-	};
-	void deselect()
-	{
-		m_selected = false;
-	};
+		m_oPosition.x += x;
+		m_oPosition.y += y;
+		m_oPosition.z += z;
+	}
 
-protected:
-	CPoint m_position;
-	bool m_selected;
+	/** Get item scale factor */
+	CPoint const& GetScale () const
+	{
+		return m_oScale;
+	}
+	/** Set item scale factor */
+	void SetScale (CPoint const& a_rScale)
+	{
+		m_oScale = a_rScale;
+	}
+
+	/** Select/Unselect */
+	void Select()
+	{
+		m_bSelected = true;
+	}
+	void Deselect()
+	{
+		m_bSelected = false;
+	}
+	bool IsSelected() const
+	{
+		return m_bSelected;
+	}
+
+	/** Retrieve OpenGL item name for selection */
+	GLuint GetItemName() const
+	{
+		return m_uiGlName;
+	}
+
+private:
+	CPoint m_oPosition;
+	CPoint m_oScale;
+	bool m_bSelected;
 	/** Identifiant OpenGL pour la sélection */
-	GLuint m_glName;
+	GLuint m_uiGlName;
 };
 
 /**********************************************************************************************************************/
@@ -75,7 +110,7 @@ protected:
 /** Classe représentant un groupe d'objets. Elle stocke les points, les normales et les coordonnées de ces points.
  * Ceci permet d'éviter des changements trop fréquents de VBO.
  */
-class CObject : public CSceneItem
+class CObject : public ISceneItem
 {
 public:
 	/**
@@ -160,7 +195,7 @@ public:
 	 */
 	void draw(char drawCode=ALL, bool tex=true, bool boundingSpheres=false) const;
 
-	void drawForSelection () const;
+	void DrawForSelection () const;
 
 	/** Lecture du nombre de polygones contenus dans l'objet.
 	 * @return Nombre de polygones.
@@ -204,7 +239,7 @@ public:
 	{
 		float area=0.0f;
 		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-		     meshesListIterator != m_meshesList.end ();  meshesListIterator++)
+		        meshesListIterator != m_meshesList.end ();  meshesListIterator++)
 			area += (*meshesListIterator)->getArea();
 		return area;
 	};

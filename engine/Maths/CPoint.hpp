@@ -66,7 +66,7 @@ public:
 		x=P.x;
 		y=P.y;
 		z=P.z;
-		return *this;
+		return rThis;
 	};
 	/**
 	 * Op&eacute;rateur d'&eacute;galit&eacute;. Une marge correspondant &egrave; plus ou moins <CODE>epsilon</CODE> est tol&eacute;r&eacute;e
@@ -256,7 +256,7 @@ public:
 		return(z);
 	}
 
-	virtual void randomize( float min, float max )
+	void randomize( float min, float max )
 	{
 		float range = max - min;
 		x = (rand()/(float)RAND_MAX) * range + min;

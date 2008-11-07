@@ -19,6 +19,7 @@ class CShader;
 
 #include <iostream>
 #include <vector>
+#include "../Common.hpp"
 
 using namespace std;
 
@@ -107,6 +108,8 @@ public:
 	{
 		glDeleteProgram(m_program);
 	};
+
+	static void SetShadersDirectory(CharCPtrC a_szDirectory);
 
 	virtual void Link() const
 	{

@@ -1,6 +1,6 @@
 #include "abstractFlames.hpp"
 
-#include <wx/intl.h>
+#include <engine/Scene/Texture.hpp>
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE NURBSFLAME ****************************************/
@@ -10,10 +10,10 @@
 uint g_count=0;
 #endif
 
-INurbsFlame::INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex)
+INurbsFlame::INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
+	m_rTexture(a_rTexture)
 {
 	assert(nbSkeletons > 0);
-	assert(tex != NULL);
 
 	m_nbSkeletons = nbSkeletons;
 	m_nbFixedPoints = nbFixedPoints;
@@ -42,15 +42,13 @@ INurbsFlame::INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture*
 	gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
 
 	m_shadingType=1;
-
-	m_tex = tex;
 }
 
-INurbsFlame::INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex)
+INurbsFlame::INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
+	m_rTexture(a_rTexture)
 {
 	assert(source != NULL);
 	assert(nbSkeletons > 0);
-	assert(tex != NULL);
 
 	m_nbSkeletons = nbSkeletons;
 	m_nbFixedPoints = nbFixedPoints;
@@ -79,8 +77,6 @@ INurbsFlame::INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, usho
 	gluNurbsProperty(m_nurbs, GLU_V_STEP, 4);
 
 	m_shadingType=1;
-
-	m_tex = tex;
 }
 
 INurbsFlame::~INurbsFlame()
@@ -142,7 +138,7 @@ void INurbsFlame::drawLineFlame () const
 		glActiveTextureARB(GL_TEXTURE0_ARB);
 		glEnable (GL_TEXTURE_2D);
 		glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		m_tex->bind();
+		m_rTexture.bind();
 
 		drawNurbs ();
 
@@ -154,8 +150,8 @@ void INurbsFlame::drawLineFlame () const
 /************************************** IMPLEMENTATION DE LA CLASSE FIXEDFLAME ****************************************/
 /**********************************************************************************************************************/
 
-IFixedFlame::IFixedFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex) :
-		INurbsFlame(nbSkeletons, nbFixedPoints, tex)
+IFixedFlame::IFixedFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
+		INurbsFlame(nbSkeletons, nbFixedPoints, a_rTexture)
 {
 }
 
@@ -219,7 +215,7 @@ void IFixedFlame::drawCPointFlame () const
 		/* Affichage de la flamme */
 
 		glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		m_tex->bind();
+		m_rTexture.bind();
 
 		glMatrixMode (GL_TEXTURE);
 		glPushMatrix ();
@@ -241,8 +237,8 @@ void IFixedFlame::drawCPointFlame () const
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-IRealFlame::IRealFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex, Field3D* const s) :
-		IFixedFlame (nbSkeletons, nbFixedPoints, tex)
+IRealFlame::IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture, Field3D* const s) :
+		IFixedFlame (nbSkeletons, nbFixedPoints, a_rTexture)
 {
 	assert(s != NULL);
 

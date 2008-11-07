@@ -16,56 +16,64 @@
 #include "realFires.hpp"
 #include "wick.hpp"
 
-Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-                    CScene* const scene, const char *filename)
+Luminary::Luminary (const LuminaryConfig& a_rConfig,
+										vector <Field3D *> &a_vpFields,
+										vector <IFireSource *> &a_vpFireSources,
+										CScene& a_rScene,
+										CharCPtrC a_szFilename,
+										const CShader& a_rShadowMapShader,
+										const CRenderTarget& a_rShadowRenderTarget)
 {
 	string mtlName;
-	Field3D *field;
-	FireSource *fireSource;
+	Field3D *pField;
+	IFireSource *pFireSource;
 
-	m_scale = config.fields[0].scale;
+	m_scale = a_rConfig.fields[0].scale;
 	/* On importe tous les objets contenus dans le fichier OBJ dont le nom commence par LAMP_NAME */
-	if (UObjImporter::getMTLFileNameFromOBJ(string(filename), mtlName))
-		UObjImporter::importMTL(scene, mtlName);
+	if (UObjImporter::getMTLFileNameFromOBJ(string(a_szFilename), mtlName))
+		UObjImporter::importMTL(a_rScene, mtlName);
 
-	m_hasLuminary = UObjImporter::import(scene, string(filename), m_luminary, LAMP_NAME);
+	m_hasLuminary = UObjImporter::import(a_rScene, string(a_szFilename), m_luminary, LAMP_NAME);
 
-	m_position = config.position;
-	if (config.fires[0].type != CANDLESSET)
+	m_position = a_rConfig.position;
+	if (a_rConfig.fires[0].type != CANDLESSET)
 	{
-		field = initField( config.fields[0], m_position );
-		fireSource = initFire(config.fires[0], filename, field, scene);
-		field->addFireSource( fireSource );
-		field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
+		pField = initField( a_rConfig.fields[0], m_position );
+		pFireSource = initFire(a_rConfig.fires[0], a_szFilename, pField, a_rScene, a_rShadowMapShader, a_rShadowRenderTarget);
+		pField->addFireSource( pFireSource );
+		pField->setPosition( m_position - pFireSource->getWickPosition()*m_scale );
 
-		m_fields.push_back( field );
-		fields.push_back( field );
-		m_fireSources.push_back( fireSource );
-		fireSources.push_back( fireSource );
+		m_fields.push_back( pField );
+		a_vpFields.push_back( pField );
+		m_fireSources.push_back( pFireSource );
+		a_vpFireSources.push_back( pFireSource );
+		a_rScene.addSource( pFireSource );
 	}
 	else
 	{
 		vector<CWick *> objList;
 		int i=0;
 
-		UObjImporter::import(scene, string(filename), objList, WICK_NAME_PREFIX);
+		UObjImporter::import(a_rScene, string(a_szFilename), objList, WICK_NAME_PREFIX);
 
 		for (vector < CWick *>::iterator objListIterator = objList.begin ();
 		     objListIterator != objList.end (); objListIterator++, i++)
 		{
-			field = initField( config.fields[0], m_position);
-			fireSource = new Candle (config.fires[0], field, scene, .125f, NULL, *objListIterator);
-			field->addFireSource( fireSource );
-			field->setPosition( m_position-fireSource->getWickPosition()*m_scale );
+			pField = initField( a_rConfig.fields[0], m_position);
+			pFireSource = new Candle (	a_rConfig.fires[0], pField, a_rScene, .125f, NULL,
+																	a_rShadowMapShader, a_rShadowRenderTarget, *objListIterator);
+			pField->addFireSource( pFireSource );
+			pField->setPosition( m_position - pFireSource->getWickPosition()*m_scale );
 
-			fireSource->setInnerForce(config.fires[0].innerForce);
-			fireSource->setFDF(config.fires[0].fdf);
-			fireSource->setPerturbateMode(config.fires[0].flickering);
+			pFireSource->setInnerForce(a_rConfig.fires[0].innerForce);
+			pFireSource->setFDF(a_rConfig.fires[0].fdf);
+			pFireSource->setPerturbateMode(a_rConfig.fires[0].flickering);
 
-			m_fields.push_back( field );
-			fields.push_back( field );
-			m_fireSources.push_back( fireSource );
-			fireSources.push_back( fireSource );
+			m_fields.push_back( pField );
+			a_vpFields.push_back( pField );
+			m_fireSources.push_back( pFireSource );
+			a_vpFireSources.push_back( pFireSource );
+			a_rScene.addSource( pFireSource );
 		}
 	}
 	if (m_hasLuminary)
@@ -73,7 +81,7 @@ Luminary::Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, ve
 		     luminaryIterator  != m_luminary.end (); luminaryIterator++)
 		{
 			(*luminaryIterator)->buildVBO();
-			scene->addObject(*luminaryIterator);
+			a_rScene.addObject(*luminaryIterator);
 		}
 }
 
@@ -121,34 +129,41 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 }
 
 
-FireSource* Luminary::initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, CScene* const scene)
+IFireSource* Luminary::initFire(	const FlameConfig& a_rFlameConfig,
+															CharCPtrC a_szFilename,
+															Field3D* a_pField,
+															CScene& a_rScene,
+															const CShader& a_rShadowMapShader,
+															const CRenderTarget& a_rShadowRenderTarget)
 {
-	FireSource *fire;
-	switch (flameConfig.type)
+	IFireSource *fire;
+	switch (a_rFlameConfig.type)
 	{
 		case CANDLE :
-			fire = new Candle (flameConfig, field, scene, .125f, fileName);
+			fire = new Candle (a_rFlameConfig,a_pField, a_rScene, .125f, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case FIRMALAMPE :
-			fire = new Firmalampe(flameConfig, field, scene, fileName);
+			fire = new Firmalampe(a_rFlameConfig, a_pField, a_rScene, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case TORCH :
-			fire = new Torch(flameConfig, field, scene, fileName);
+			fire = new CTorch(a_rFlameConfig, a_pField, a_rScene, a_szFilename, ("textures/torch6.png"),
+												a_rShadowMapShader, a_rShadowRenderTarget, 0.03f, 0.04f);
 			break;
 		case CAMPFIRE :
-			fire = new CampFire(flameConfig, field, scene, fileName);
+			fire = new CCampFire(a_rFlameConfig, a_pField, a_rScene, a_szFilename, ("textures/torch4.png"),
+														a_rShadowMapShader, a_rShadowRenderTarget, 0.05f, 0.02f);
 			break;
 		case CANDLESTICK :
-			fire = new CandleStick (flameConfig, field, scene, "scenes/bougie.obj", .125f);
+			fire = new CandleStick (a_rFlameConfig, a_pField, a_rScene, "scenes/bougie.obj", .125f, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		default :
-			cerr << "Unknown flame type : " << (int)flameConfig.type << endl;
+			cerr << "Unknown flame type : " << (int)a_rFlameConfig.type << endl;
 			::wxExit();
 			return NULL;
 	}
-	fire->setInnerForce(flameConfig.innerForce);
-	fire->setFDF(flameConfig.fdf);
-	fire->setPerturbateMode(flameConfig.flickering);
+	fire->setInnerForce(a_rFlameConfig.innerForce);
+	fire->setFDF(a_rFlameConfig.fdf);
+	fire->setPerturbateMode(a_rFlameConfig.flickering);
 
 	return fire;
 }

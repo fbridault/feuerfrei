@@ -11,6 +11,7 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option parameters="params/candle.ini" />
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-DRTFLAMES_BUILD" />
@@ -200,14 +201,6 @@
 			<Option target="Fire - Release" />
 		</Unit>
 		<Unit filename="src/flames/skeleton.hpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/flames/solidePhoto.cpp">
-			<Option target="Fire - Debug" />
-			<Option target="Fire - Release" />
-		</Unit>
-		<Unit filename="src/flames/solidePhoto.hpp">
 			<Option target="Fire - Debug" />
 			<Option target="Fire - Release" />
 		</Unit>

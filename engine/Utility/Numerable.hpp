@@ -2,22 +2,22 @@
 #define NUMERABLE_H
 
 template <typename t_object>
-class CNumerable : public t_object
+class CTNumerable : public t_object
 {
 private:
 	typedef t_object CType;
 
 public:
-	CNumerable() {};
-	~CNumerable() {};
+	CTNumerable() {};
+	~CTNumerable() {};
 
-	CNumerable<t_object>& operator=(CNumerable<t_object> const& a_rSource)
+	CTNumerable<t_object>& operator=(CTNumerable<t_object> const& a_rSource)
 	{
 		eVal = a_rSource.eVal;
 		return *this;
 	}
 
-	CNumerable<t_object>& operator=(uint a_uiSource)
+	CTNumerable<t_object>& operator=(uint a_uiSource)
 	{
 		assert(a_uiSource <	CType::_NbValues);
 		eVal = a_uiSource;
@@ -35,7 +35,7 @@ private:
 };
 
 #define DeclareNumerable(x_Enum, x_Class)\
-	typedef CNumerable<struct  x_Enum> x_Class;
+	typedef CTNumerable<struct  x_Enum> x_Class;
 
 
 #endif // NUMERABLE_H

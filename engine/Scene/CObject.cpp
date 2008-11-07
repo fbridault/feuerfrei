@@ -16,13 +16,11 @@ extern uint g_objectCount;
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-CObject::CObject(CScene* const scene) : CSceneItem(CPoint(0,0,0))
+CObject::CObject(CScene& a_rScene) :
+	CSceneItem(CPoint(0,0,0)),
+	m_rScene(a_rScene),
+	m_attributes(0)
 {
-	assert (scene != NULL);
-
-	m_scene = scene;
-	m_attributes = 0;
-
 	glGenBuffers(1, &m_bufferID);
 
 	m_glName = CScene::glNameCounter++;
@@ -107,7 +105,7 @@ void CObject::buildBoundingSpheres ()
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CObject::drawBoundingSpheres ()
 {
-	m_scene->getMaterial(0)->apply();
+	m_rScene.getMaterial(0)->apply();
 	for (vector <CMesh* >::iterator meshesListIterator = m_meshesList.begin ();
 	     meshesListIterator != m_meshesList.end ();
 	     meshesListIterator++)
@@ -170,7 +168,7 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 
 	if (boundingSpheres)
 	{
-		m_scene->getMaterial(0)->apply();
+		m_rScene.getMaterial(0)->apply();
 		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 		     meshesListIterator != m_meshesList.end ();
 		     meshesListIterator++)
@@ -180,7 +178,7 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 	{
 		if (drawCode == AMBIENT)
 			/* Dessiner avec le matériau par défaut (pour tester les zones d'ombres par exemple) */
-			m_scene->getMaterial(0)->apply();
+			m_rScene.getMaterial(0)->apply();
 
 		glPushMatrix();
 		glTranslatef(m_position.x, m_position.y, m_position.z);
@@ -193,7 +191,7 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 
 		if (drawCode != AMBIENT)
 			/* On désactive l'unité de texture le cas échéant */
-			if (m_scene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+			if (m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
 			{
 				glDisable(GL_TEXTURE_2D);
 			}
@@ -205,7 +203,7 @@ void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CObject::drawForSelection () const
 {
-	m_scene->getMaterial(0)->apply();
+	m_rScene.getMaterial(0)->apply();
 
 	glPushMatrix();
 	glTranslatef(m_position.x, m_position.y, m_position.z);

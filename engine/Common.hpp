@@ -5,6 +5,7 @@
 #include <GL/glu.h>
 
 #include "assert.h"
+#include "stdlib.h"
 #include <string>
 
 using namespace std;
@@ -19,5 +20,12 @@ typedef unsigned int uint;
 
 // TEMP
 extern GLfloat g_modelViewMatrix[16];
+
+#define rThis *this
+
+typedef char * CharPtr;
+typedef char const * CharCPtr;
+typedef char * const CharPtrC;
+typedef char const * const CharCPtrC;
 
 #endif

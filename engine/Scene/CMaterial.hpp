@@ -16,7 +16,7 @@ class CScene;
  * mani&egrave;re dont il réfléchit la lumière.
  *
  * @author	Flavien Bridault
- * @see Energy
+ * @see CEnergy
  */
 class CMaterial
 {
@@ -24,7 +24,7 @@ public:
 	/**
 	 * Constructeur par défaut. Crée un matériau blanc ambiant.
 	 */
-	CMaterial(const CScene* const scene );
+	CMaterial(CScene const& a_rScene);
 	/**
 	 * Constructeur.
 	 * @param name Nom donné au matériau.
@@ -34,7 +34,7 @@ public:
 	 * @param specularExponent Indice de tache spéculaire.
 	 * @param tex Pointeur optionel sur la texture.
 	 */
-	CMaterial(const CScene* const scene, const string& name, float* const ambientCoefficients, float* const diffuseCoefficients, float* const specularCoefficients, float specularExponent=0.0, int tex=-1);
+	CMaterial(CScene const& a_rScene, const string& name, float* const ambientCoefficients, float* const diffuseCoefficients, float* const specularCoefficients, float specularExponent=0.0, int tex=-1);
 	/** Destructeur par défaut. */
 	~CMaterial(){};
 
@@ -47,25 +47,25 @@ public:
 	};
 
 	/* Lecture de la composante spéculaire.
-	 * @return Une variable de type Energy.
+	 * @return Une variable de type CEnergy.
 	 */
-	const Energy& getSpecularCoefficients() const
+	const CEnergy& getSpecularCoefficients() const
 	{
 		return (m_Ks);
 	};
 
 	/** Lecture de la composante diffuse.
-	 * @return Une variable de type Energy.
+	 * @return Une variable de type CEnergy.
 	 */
-	const Energy& getDiffuseCoefficients() const
+	const CEnergy& getDiffuseCoefficients() const
 	{
 		return (m_Kd);
 	};
 
 	/** Lecture de la composante ambiante.
-	 * @return Une variable de type Energy.
+	 * @return Une variable de type CEnergy.
 	 */
-	const Energy& getAmbientCoefficients() const
+	const CEnergy& getAmbientCoefficients() const
 	{
 		return (m_Ka);
 	};
@@ -93,13 +93,13 @@ public:
 	 */
 	const ITexture* getDiffuseTexture() const
 	{
-		return m_scene->getTexture(m_diffuseTexture);
+		return m_rScene.getTexture(m_diffuseTexture);
 	};
 
 	/** Lecture de la composante diffuse.
-	 * @return Une variable de type Energy.
+	 * @return Une variable de type CEnergy.
 	 */
-	const Energy& getDiffuseReflectivity() const
+	const CEnergy& getDiffuseReflectivity() const
 	{
 		if (m_diffuseTexture > -1)
 			return m_KDiffuseTexture;
@@ -113,14 +113,14 @@ public:
 	const bool isTransparent() const;
 
 private:
+	CScene const& m_rScene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
 	string m_name;               /** Nom du matériau. */
-	Energy m_Kd;                 /** Composante de réflexion diffuse. */
-	Energy m_Ks;                 /** Composante de réflexion spéculaire. */
+	CEnergy m_Kd;                 /** Composante de réflexion diffuse. */
+	CEnergy m_Ks;                 /** Composante de réflexion spéculaire. */
 	float m_Kss;                 /** Indice de tache spéculaire. */
-	Energy m_Ka;                 /** Composante de réflexion ambiante. */
-	Energy m_KDiffuseTexture;    /** Composante moyenne de réflexion diffuse de la texture. */
+	CEnergy m_Ka;                 /** Composante de réflexion ambiante. */
+	CEnergy m_KDiffuseTexture;    /** Composante moyenne de réflexion diffuse de la texture. */
 
-	const CScene *m_scene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
 	int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
 };
 

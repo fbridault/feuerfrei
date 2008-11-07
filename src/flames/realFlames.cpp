@@ -8,9 +8,9 @@
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-CLineFlame::CLineFlame (const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
-                        CWick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire ) :
-		IRealFlame ((flameConfig.skeletonsNumber+2)*2, 3, tex, s)
+CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s,
+                        CWick *wickObject, float width, float detachedFlamesWidth, IDetachableFireSource *parentFire ) :
+		IRealFlame ((flameConfig.skeletonsNumber+2)*2, 3, a_rTex, s)
 {
 	CPoint pt;
 	uint i,j;
@@ -120,7 +120,9 @@ void CLineFlame::breakCheck()
 			splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getInternalSize()-1));
 			periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
 
-			m_parentFire->addDetachedFlame(new CDetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_tex, m_shadingType, m_samplingMethod));
+			CDetachedFlame *pDetachedFlame =
+				new CDetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_rTexture, m_shadingType, m_samplingMethod);
+			m_parentFire->addDetachedFlame(pDetachedFlame);
 		}
 	}
 }
@@ -369,8 +371,8 @@ bool CLineFlame::buildFlat ()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-CPointFlame::CPointFlame (const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s, float rayon, CWick *wick):
-		IRealFlame ( flameConfig.skeletonsNumber, 3, tex, s)
+CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s, float rayon, CWick *wick):
+		IRealFlame ( flameConfig.skeletonsNumber, 3, a_rTex, s)
 {
 	uint i;
 	float angle;
@@ -402,31 +404,15 @@ CPointFlame::~CPointFlame ()
 	delete m_wick;
 }
 
-void CPointFlame::getLightPositions (GLfloat lightPositions[8][4], uint& nbLights)
-{
-	Particle *tmp;
-
-	nbLights=0;
-	for (uint i = 0; i < m_leadSkeletons[0]->getSize () - 1; i++)
-	{
-		tmp = m_leadSkeletons[0]->getParticle (i);
-
-		nbLights++;
-		lightPositions[i][0] = tmp->x;
-		lightPositions[i][1] = tmp->y;
-		lightPositions[i][2] = tmp->z;
-		lightPositions[i][3] = 1.0;
-	}
-}
 
 /**********************************************************************************************************************/
 /*************************************** IMPLEMENTATION DE LA CLASSE DETACHEDFLAME ************************************/
 /**********************************************************************************************************************/
 
 CDetachedFlame::CDetachedFlame(const IRealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons,
-                               uint nbSkeletons, FreePeriSkeleton **periSkeletons, const ITexture* const tex, bool shadingType,
+                               uint nbSkeletons, FreePeriSkeleton **periSkeletons, ITexture const& a_rTex, bool shadingType,
                                u_char samplingMethod) :
-		INurbsFlame (source, nbSkeletons, 2, tex)
+		INurbsFlame (source, nbSkeletons, 2, a_rTex)
 {
 	m_distances = new float[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
 	m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];

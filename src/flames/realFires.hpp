@@ -1,127 +1,171 @@
 #if !defined(FIRESOURCES_H)
 #define FIRESOURCES_H
 
-class Candle;
-class Firmalampe;
+#include <engine/Utility/UObjImporter.hpp>
 
 #include "abstractFires.hpp"
 #include "cloneFlames.hpp"
 
 class CPointFlame;
 class CLineFlame;
-class FireSource;
+class IFireSource;
 
-/** La classe Candle permet la définition d'une bougie.
+/** La classe Candle permet la dÃ©finition d'une bougie.
  *
  * @author	Flavien Bridault
  */
-class Candle : public FireSource
+class Candle : public IFireSource
 {
 public:
 	/** Constructeur d'une bougie.
 	 * @param flameConfig Configuration de la flamme.
 	 * @param s CPointeur sur le solveur de fluides.
-	 * @param scene CPointeur sur la scène.
+	 * @param scene CPointeur sur la scÃ¨ne.
 	 * @param rayon Rayon de la flamme.
-	 * @param wickFileName nom du fichier contenant la mèche. Si NULL, alors wick doit être fourni.
-	 * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
+	 * @param wickFileName nom du fichier contenant la mÃ¨che. Si NULL, alors wick doit Ãªtre fourni.
+	 * @param wick Optionnel, objet reprÃ©sentant la mÃ¨che. Si NULL, un cylindre simple est utilisÃ©.
 	 */
-	Candle(	const FlameConfig& flameConfig, Field3D * s, CScene* const scene, float rayon,
-					const char *wickFileName, CWick *wick=NULL);
+	Candle(	const FlameConfig& a_rFlameConfig,
+					Field3D * a_pField,
+					CScene& a_rScene,
+					float a_fRayon,
+					CharCPtrC a_szWickFileName,
+					const CShader& a_rGenShadowCubeMapShader,
+					const CRenderTarget& a_rShadowRenderTarget,
+					CWick *a_pWick=NULL);
 	/** Destructeur */
 	virtual ~Candle(){};
-
-	void setLightPosition (const CPoint& pos);
-
-private:
-	/** Position de la lumière ponctuelle OpenGL dans l'espace. */
-	GLfloat m_lightPositions[8][4];
-	uint m_nbLights;
 };
 
 
-/** La classe Firmalampe permet la définition d'une firmalampe.
+/** La classe Firmalampe permet la dÃ©finition d'une firmalampe.
  *
  * @author	Flavien Bridault
  */
-class Firmalampe : public FireSource
+class Firmalampe : public IFireSource
 {
 public:
 	/** Constructeur d'une torche.
 	 * @param flameConfig Configuration de la flamme.
 	 * @param s CPointeur sur le solveur de fluides.
-	 * @param scene CPointeur sur la scène.
-	 * @param wickFileName nom du fichier contenant la mèche
+	 * @param scene CPointeur sur la scÃ¨ne.
+	 * @param wickFileName nom du fichier contenant la mÃ¨che
 	 */
-	Firmalampe(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *wickFileName);
+	Firmalampe(const FlameConfig& a_rFlameConfig,
+							Field3D * a_pField,
+							CScene& a_rScene,
+							CharCPtrC a_szWickFileName,
+							const CShader& a_rGenShadowCubeMapShader,
+							const CRenderTarget& a_rShadowRenderTarget);
 	/** Destructeur */
 	virtual ~Firmalampe(){};
 };
 
-/** La classe Torche permet la définition d'une flamme de type torche.
- * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
- * en CWick*. Celle-ci ne sont pas affichées à l'écran. Les objets composant le luminaire
+template <bool t_bDrawWick>
+class CTFire : public IDetachableFireSource
+{
+public:
+	/** Constructeur d'une torche.
+	 * @param flameConfig Configuration de la flamme.
+	 * @param s CPointeur sur le solveur de fluides.
+	 * @param scene CPointeur sur la scÃ¨ne.
+	 * @param torchName nom du fichier contenant le luminaire.
+	 */
+	CTFire(	const FlameConfig& a_rFlameConfig,
+					Field3D * a_pField,
+					CScene& a_rScene,
+					CharCPtrC a_szTorchName,
+					CharCPtrC a_rTextureName,
+					const CShader& a_rGenShadowCubeMapShader,
+					const CRenderTarget& a_rShadowRenderTarget,
+					float a_fWidth,
+					float a_fDetachedWidth) :
+			IDetachableFireSource (a_rFlameConfig, a_pField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+	{
+		vector<CWick *> objList;
+
+		bool bStatus = UObjImporter::import(a_rScene, a_szTorchName, objList, WICK_NAME_PREFIX);
+		assert(bStatus == true);
+
+		m_nbFlames = objList.size();
+		m_flames = new IRealFlame* [m_nbFlames];
+
+		/* Calcul de la position et recentrage des mÃ¨ches */
+		for (vector <CWick *>::iterator objListIterator = objList.begin ();
+		        objListIterator != objList.end (); objListIterator++)
+		{
+			(*objListIterator)->buildBoundingBox();
+			m_position += (*objListIterator)->getCenter();
+		}
+		m_position = CPoint(0.5f,0.0f,0.5f)-m_position/m_nbFlames;
+		for (vector <CWick *>::iterator objListIterator = objList.begin ();
+		        objListIterator != objList.end (); objListIterator++)
+			(*objListIterator)->translate(m_position);
+
+		int i=0;
+		for (vector <CWick *>::iterator objListIterator = objList.begin ();
+		        objListIterator != objList.end (); objListIterator++, i++)
+			m_flames[i] = new CLineFlame( a_rFlameConfig, m_oTexture, a_pField, (*objListIterator), a_fWidth, a_fDetachedWidth, this);
+	}
+
+	/** Destructeur */
+	virtual ~CTFire(){};
+
+	/** Dessine la mÃ¨che de la flamme. Les mÃ¨ches des IRealFlame sont dÃ©finies en (0,0,0), une translation
+	 * est donc effectuÃ©e pour tenir compte du placement du feu dans le monde.
+	 */
+	virtual void drawWick(bool displayBoxes) const
+	{
+		if (t_bDrawWick)
+		{
+			IDetachableFireSource::drawWick(displayBoxes);
+		}
+	}
+};
+
+
+/** La classe Torche permet la dÃ©finition d'une flamme de type torche.
+ * Le fichier OBJ reprÃ©sentant le luminaire contient des mÃ¨ches qui doivent avoir un nom
+ * en CWick*. Celle-ci ne sont pas affichÃ©es Ã  l'Ã©cran. Les objets composant le luminaire
  * doivent s'appeler Torch.*
  *
  * @author	Flavien Bridault
  */
-class Torch : public DetachableFireSource
-{
-public:
-	/** Constructeur d'une torche.
-	 * @param flameConfig Configuration de la flamme.
-	 * @param s CPointeur sur le solveur de fluides.
-	 * @param scene CPointeur sur la scène.
-	 * @param torchName nom du fichier contenant le luminaire.
-	 */
-	Torch(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *torchName);
-	/** Destructeur */
-	virtual ~Torch(){};
+typedef CTFire<true> CTorch;
 
-	/** Dessine la mèche de la flamme. Les mèches des IRealFlame sont définies en (0,0,0), une translation
-	 * est donc effectuée pour tenir compte du placement du feu dans le monde.
-	 */
-	virtual void drawWick(bool displayBoxes) const {};
-
-};
-
-/** La classe CampFire permet la définition d'un feu de camp.
- * Le fichier OBJ représentant le luminaire contient des mèches qui doivent avoir un nom
- * en CWick*. A la différence de la classe Torch, les mèches sont affichées. En revanche,
+/** La classe CampFire permet la dÃ©finition d'un feu de camp.
+ * Le fichier OBJ reprÃ©sentant le luminaire contient des mÃ¨ches qui doivent avoir un nom
+ * en CWick*. A la diffÃ©rence de la classe Torch, les mÃ¨ches sont affichÃ©es. En revanche,
  * il n'existe pas de luminaire.
  *
  * @author	Flavien Bridault
  */
-class CampFire : public DetachableFireSource
-{
-public:
-	/** Constructeur d'une torche.
-	 * @param flameConfig Configuration de la flamme.
-	 * @param s CPointeur sur le solveur de fluides.
-	 * @param scene CPointeur sur la scène.
-	 * @param fireName nom du fichier contenant le luminaire.
-	 */
-	CampFire(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *fireName);
-	/** Destructeur */
-	virtual ~CampFire(){};
-};
+typedef CTFire<false> CCampFire;
 
-/** La classe CandleStick permet la définition d'un chandelier. Elle est composée de flammes
+
+/** La classe CandleStick permet la dÃ©finition d'un chandelier. Elle est composÃ©e de flammes
  * clones.
  *
  * @author	Flavien Bridault
  */
-class CandleStick : public FireSource
+class CandleStick : public IFireSource
 {
 public:
 	/** Constructeur d'un chandelier.
 	 * @param flameConfig Configuration de la flamme.
 	 * @param s CPointeur sur le solveur de fluides.
-	 * @param scene CPointeur sur la scène.
+	 * @param scene CPointeur sur la scÃ¨ne.
 	 * @param filename Nom du fichier contenant le luminaire.
 	 * @param rayon Rayon de la flamme.
 	 */
-	CandleStick(const FlameConfig& flameConfig, Field3D * s, CScene *scene, const char *filename, float rayon);
+	CandleStick(const FlameConfig& a_rFlameConfig,
+							Field3D * a_rField,
+							CScene& a_rScene,
+							CharCPtrC a_szFilename,
+							float a_fRayon,
+							const CShader& a_rGenShadowCubeMapShader,
+							const CRenderTarget& a_rShadowRenderTarget);
+
 	/** Destructeur */
 	virtual ~CandleStick();
 
@@ -170,7 +214,7 @@ public:
 
 	virtual void toggleSmoothShading (bool state);
 //   virtual void setSamplingTolerance(u_char value){
-//     FireSource::setSamplingTolerance(value);
+//     IFireSource::setSamplingTolerance(value);
 //     for (uint i = 0; i < m_nbCloneFlames; i++)
 //       m_cloneFlames[i]->setSamplingTolerance(value);
 //   };

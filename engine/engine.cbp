@@ -53,6 +53,8 @@
 		<Unit filename="Maths/CPoint.hpp" />
 		<Unit filename="Maths/CQuaternion.hpp" />
 		<Unit filename="Maths/CVector.hpp" />
+		<Unit filename="Maths/UMatrixFn.cpp" />
+		<Unit filename="Maths/UMatrixFn.hpp" />
 		<Unit filename="Physics/CEnergy.hpp" />
 		<Unit filename="Scene/CBoundingSphere.hpp" />
 		<Unit filename="Scene/CCamera.cpp" />
@@ -73,8 +75,18 @@
 		<Unit filename="Shading/CGammaFX.hpp" />
 		<Unit filename="Shading/CRenderTarget.cpp" />
 		<Unit filename="Shading/CRenderTarget.hpp" />
+		<Unit filename="Shading/CRenderer.cpp" />
+		<Unit filename="Shading/CRenderer.hpp" />
 		<Unit filename="Shading/Glsl.cpp" />
 		<Unit filename="Shading/Glsl.hpp" />
+		<Unit filename="Shading/IRenderer.cpp" />
+		<Unit filename="Shading/IRenderer.hpp" />
+		<Unit filename="Shading/Shaders/deferredShadingFP.glsl" />
+		<Unit filename="Shading/Shaders/deferredShadingVP.glsl" />
+		<Unit filename="Shading/Shaders/lightingFP.glsl" />
+		<Unit filename="Shading/Shaders/lightingVP.glsl" />
+		<Unit filename="Shading/Shaders/shadowMapFP.glsl" />
+		<Unit filename="Shading/Shaders/shadowMapVP.glsl" />
 		<Unit filename="Utility/CRefTable.hpp" />
 		<Unit filename="Utility/GraphicsFn.cpp" />
 		<Unit filename="Utility/GraphicsFn.hpp" />

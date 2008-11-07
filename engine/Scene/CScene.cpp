@@ -13,10 +13,10 @@ void CScene::init (const string& a_strFileName)
 	m_boundingSpheresMode = false;
 	m_selectedItem        = NULL;
 
-	addMaterial(new CMaterial(this));
+	addMaterial(new CMaterial(rThis));
 
 	cout << "Chargement de la scène " << a_strFileName << endl;
-	UObjImporter::import(this, a_strFileName, m_objectsArray);
+	UObjImporter::import(rThis, a_strFileName, m_objectsArray);
 }
 
 
@@ -166,14 +166,14 @@ int CScene::getMaterialIndexByName(const string& name)
 }
 
 
-int CScene::searchTextureIndexByName(const string& name)
+int CScene::searchTextureIndexByName(CharCPtrC name)
 {
 	int index=0;
 	for (vector<CBitmapTexture*>::iterator texturesArrayIterator = m_texturesArray.begin ();
 	        texturesArrayIterator != m_texturesArray.end ();
 	        texturesArrayIterator++)
 	{
-		if ( !(*texturesArrayIterator)->getName().compare (name) )
+		if ( !strcmp((*texturesArrayIterator)->getName(), name) )
 		{
 			return index;
 		}
@@ -201,6 +201,4 @@ void CScene::moveSelectedItem(float x, float y, float z, float oldX, float oldY)
 
 	m_selectedItem->move(v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2]);
 }
-
-
 

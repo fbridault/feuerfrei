@@ -8,13 +8,13 @@
  *  pour avoir que ISingleton seulement ait accès aux constructeurs et destructeurs.
  */
 template <typename T>
-class ISingleton
+class ITSingleton
 {
 protected:
   /** Constructeur */
-  ISingleton () { }
+  ITSingleton () { }
   /** Destructeur */
-  ~ISingleton () { std::cout << "Destroying singleton" << std::endl; }
+  ~ITSingleton () { std::cout << "Destroying singleton" << std::endl; }
 
 public:
   // Interface publique
@@ -47,6 +47,6 @@ private:
 };
 
 template <typename T>
-T *ISingleton<T>::m_singleton = NULL;
+T *ITSingleton<T>::m_singleton = NULL;
 
 #endif

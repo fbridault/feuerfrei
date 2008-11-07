@@ -1,7 +1,7 @@
 #ifndef ENERGY_H
 #define ENERGY_H
 
-class Energy;
+class CEnergy;
 
 #include <stdlib.h>
 
@@ -20,7 +20,7 @@ class Energy;
  * @version	%I%, %G%
  * @since	1.0
  */
-class Energy
+class CEnergy
 {
 private:
   float color[COMPOSANTES];
@@ -35,14 +35,14 @@ public:
    * Constructeur par défaut. Crée une intensité
    * lumineuse nulle.
    */
-  Energy (){
+  CEnergy (){
     for (int i=0;i<COMPOSANTES; i++)
       color[i]=0.0;
   }
   /**
    * Constructeur par recopie.
    */
-  Energy (const Energy& I){
+  CEnergy (const CEnergy& I){
     for (int i=0; i<COMPOSANTES; i++)
       color[i]=I.color[i];
   }
@@ -51,7 +51,7 @@ public:
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
    * éléments de type <CODE>float</CODE>
    */
-  Energy (float r, float g, float b){
+  CEnergy (float r, float g, float b){
     color[RED] = r;
     color[GREEN] = g;
     color[BLUE] = b;
@@ -62,14 +62,14 @@ public:
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
    * éléments de type <CODE>float</CODE>
    */
-  Energy (float c[COMPOSANTES]){
+  CEnergy (float c[COMPOSANTES]){
     for (int i=0; i<COMPOSANTES; i++)
       color[i]=c[i];
   }
   /**
    * Destructeur par défaut.
    */
-  ~Energy(){
+  ~CEnergy(){
 
   };
 
@@ -80,13 +80,13 @@ public:
    * Seules les intensités supérieures à 0
    * sont prises en compte.
    */
-  Energy operator+(const Energy& I) const
+  CEnergy operator+(const CEnergy& I) const
   {
     float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]= color[i] + I.color[i];
-    Energy Energy(result);
-    return Energy;
+    CEnergy CEnergy(result);
+    return CEnergy;
   }
   /**
    * Opérateur de quotient par un scalaire. Chacune des composantes
@@ -94,13 +94,13 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Energy operator/(const float& K) const
+  CEnergy operator/(const float& K) const
   {
     float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=color[i]/K;
-    Energy Energy(result);
-    return Energy;
+    CEnergy CEnergy(result);
+    return CEnergy;
   }
   /**
    * Opérateur de produit par un scalaire. Chacune des composantes
@@ -108,13 +108,13 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Energy operator*(const float& K) const
+  CEnergy operator*(const float& K) const
   {
     float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=color[i]*K;
-    Energy Energy(result);
-    return Energy;
+    CEnergy CEnergy(result);
+    return CEnergy;
   }
 
   /**
@@ -124,13 +124,13 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Energy operator*(const Energy& I) const
+  CEnergy operator*(const CEnergy& I) const
   {
     float result[COMPOSANTES];
     for (int i=0;i<COMPOSANTES;i++)
       result[i]=color[i]*I.color[i];
-    Energy Energy(result);
-    return Energy;
+    CEnergy CEnergy(result);
+    return CEnergy;
   }
 
   float& operator[](int i)
@@ -146,7 +146,7 @@ public:
   /**
    * Opérateur d'égalité.
    */
-  bool operator==(const Energy& I) const
+  bool operator==(const CEnergy& I) const
   {
     for (int i=0;i<COMPOSANTES;i++)
       if (color[i]!=I.color[i])
@@ -161,13 +161,13 @@ public:
    * par affectation.
    * Seules les intensités supérieures à 0 sont prises en compte.
    */
-  Energy& operator+=(const Energy& I){
+  CEnergy& operator+=(const CEnergy& I){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]= color[i] + I.color[i];
     return *this;
   }
 
-  Energy& operator-=(const Energy& I){
+  CEnergy& operator-=(const CEnergy& I){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]= color[i] - I.color[i];
     return *this;
@@ -179,7 +179,7 @@ public:
    * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
-  Energy& operator/=(const float& K){
+  CEnergy& operator/=(const float& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=color[i]/K;
     return *this;
@@ -191,7 +191,7 @@ public:
    * Seules les intensités supérieures à 0 sont prises en
    * compte.
    */
-  Energy& operator*=(const float& K){
+  CEnergy& operator*=(const float& K){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=color[i]*K;
     return *this;
@@ -204,7 +204,7 @@ public:
    * Seules les intensités supérieures à 0 sont prises
    * en compte.
    */
-  Energy& operator*=(const Energy& I){
+  CEnergy& operator*=(const CEnergy& I){
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=color[i]*I.color[i];
     return *this;
@@ -213,7 +213,7 @@ public:
   /**
    * Opérateur d'allocation.
    */
-  Energy& operator=(const Energy& I) {
+  CEnergy& operator=(const CEnergy& I) {
     for (int i=0;i<COMPOSANTES;i++)
       color[i]=I.color[i];
     return *this;
@@ -258,6 +258,6 @@ public:
         return(color[GREEN]);
     return(color[BLUE]);
   }
-};//class Energy
+};//class CEnergy
 
 #endif

@@ -4,8 +4,8 @@
 class CLineFlame;
 class CPointFlame;
 class CDetachedFlame;
-class DetachableFireSource;
-
+class IDetachableFireSource;
+class CBitmapTexture;
 #include "abstractFlames.hpp"
 
 #include <list>
@@ -33,8 +33,8 @@ public:
    * @param detachedFlamesWidth Largeur des flammes détachées.
    * @param wickName Chaîne de caractère contenant le nom de la mèche dans le fichier OBJ.
    */
-  CLineFlame (const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
-	     CWick *wickObject, float width, float detachedFlamesWidth, DetachableFireSource *parentFire=NULL);
+  CLineFlame (	const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s,
+							CWick *wickObject, float width, float detachedFlamesWidth, IDetachableFireSource *parentFire=NULL);
   virtual ~CLineFlame();
 
   virtual void drawFlame(bool display, bool displayParticle) const{
@@ -125,7 +125,7 @@ private:
   list<Particle *> m_sparksList;
 
   /** CPointeur sur le feu auquel appartient la flamme */
-  DetachableFireSource *m_parentFire;
+  IDetachableFireSource *m_parentFire;
 
   /** Largeur des flammes détachées */
   float m_detachedFlamesWidth;
@@ -157,7 +157,7 @@ public:
    * @param rayon Valeur du rayon du cercle formé par les racines des squelettes.
    * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
    */
-  CPointFlame ( const FlameConfig& flameConfig, const ITexture* const tex, Field3D* const s,
+  CPointFlame ( const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s,
 	       float rayon, CWick *wick);
 
   /** Destructeur*/
@@ -191,7 +191,6 @@ public:
     for (uint i = 0; i < m_nbSkeletons; i++)
       m_periSkeletons[i]->addForces ();
   }
-  void getLightPositions (GLfloat lightPositions[8][4], uint& nbLights);
 };
 
 
@@ -216,7 +215,7 @@ public:
    * @param tex CPointeur vers la texture à utiliser.
    */
   CDetachedFlame(const IRealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons,
-		uint nbSkeletons, FreePeriSkeleton **periSkeletons, const ITexture* const tex,
+		uint nbSkeletons, FreePeriSkeleton **periSkeletons, ITexture const& a_rTex,
 		bool smoothShading, u_char samplingMethod);
 
   /** Destructeur*/

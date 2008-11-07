@@ -24,8 +24,8 @@ private:
 	LightFactory();
 	~LightFactory();
 public:
-	static ILight* getInstance(const char *type, GLuint depthMapSize, const CShader* genShadowCubeMapShader,
-	                           const CRenderTarget *shadowRenderTarget);
+	static ILight* getInstance(const char *type, GLuint depthMapSize, const CShader& genShadowCubeMapShader,
+	                           const CRenderTarget& shadowRenderTarget);
 };
 
 /**
@@ -36,7 +36,7 @@ public:
  * @author	Christophe Cassagnab&egrave;re modifi&eacute; par Flavien Bridault
  * @version	%I%, %G%
  * @since	1.0
- * @see Material, Energy
+ * @see Material, CEnergy
  */
 class ILight : public CSceneItem
 {
@@ -46,7 +46,7 @@ protected:
 	 * @param P position de la source.
 	 * @param I intensit&eacute; lumineuse de la source.
 	 */
-	ILight (const CPoint & P, const Energy & I, GLuint depthMapSize, const CRenderTarget *shadowRenderTarget);
+	ILight (const CPoint & P, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget);
 
 public:
 	virtual void chooseForwardShader( const CShader* spotShader, const CShader* omniShader) = 0;
@@ -68,9 +68,16 @@ public:
 	/**
 	 * Lecture de l'intensit&eacute; lumineuse de la source.
 	 */
-	const Energy& getEnergy () const
+	const CEnergy& getEnergy () const
 	{
 		return m_lightEnergy;
+	};
+	/**
+	 * Lecture de l'intensit&eacute; lumineuse de la source.
+	 */
+	void setEnergy (const CEnergy& a_rEnergy)
+	{
+		m_lightEnergy = a_rEnergy;
 	};
 
 	void getMatrices(GLfloat** projection, GLfloat** modelView)
@@ -79,13 +86,12 @@ public:
 		*modelView = m_lightModelViewMatrix;
 	}
 
-	virtual void updateModelViewPosition(GLfloat m[16]);
 	void move (float x, float y, float z);
 
 	/** Rendu à partir du point de vue de la source. */
 	virtual void castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix) = 0;
 
-	virtual void renderLightVolume(const CCamera* const camera) const = 0;
+	virtual void renderLightVolume(const CCamera& camera) const = 0;
 
 	virtual void preRendering(bool shadows) const;
 	virtual void postRendering(bool shadows) const;
@@ -111,15 +117,14 @@ public:
 	virtual CVector generateRandomRay() const = 0;
 
 protected:
-	Energy m_lightEnergy;
+	CEnergy m_lightEnergy;
 
-	CPoint m_modelViewPosition;
 	bool m_enabled;
 	GLfloat *m_lightProjectionMatrix, *m_lightModelViewMatrix;
 	GLuint m_depthMapW, m_depthMapH;
 
 	const CShader* m_shader, *m_forwardShader, *m_deferredShader;
-	const CRenderTarget *m_shadowRenderTarget;
+	const CRenderTarget &m_shadowRenderTarget;
 	GLuint m_volumeDL;
 	GLUquadricObj *m_quadObj;
 };
@@ -127,8 +132,8 @@ protected:
 class COmniLight : public ILight
 {
 public:
-	COmniLight (const CPoint& P, const Energy& I, GLuint depthMapSize, const CShader* genShadowCubeMapShader,
-	            const CRenderTarget *shadowRenderTarget);
+	COmniLight (const CPoint& P, const CEnergy& I, GLuint depthMapSize, const CShader& genShadowCubeMapShader,
+							const CRenderTarget& shadowRenderTarget);
 	/** Destructeur par d&eacute;faut. */
 	virtual ~COmniLight ();
 
@@ -138,14 +143,14 @@ public:
 	/** Rendu à partir du point de vue de la source. */
 	void castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix);
 
-	void renderLightVolume(const CCamera* const camera) const;
+	void renderLightVolume(const CCamera& camera) const;
 
 	void preRendering(bool shadows) const;
 
 	CVector generateRandomRay() const;
 
 private:
-	const CShader *m_genShadowCubeMapShader;
+	const CShader& m_genShadowCubeMapShader;
 	float m_radius;
 };
 
@@ -157,8 +162,8 @@ public:
 	 * @param P position de la source.
 	 * @param I intensit&eacute; lumineuse de la source.
 	 */
-	CSpotLight (const CPoint & P, const CVector& direction, const Energy & I, float cutoff,
-	            GLuint depthMapSize, const CRenderTarget *shadowRenderTarget);
+	CSpotLight (const CPoint & P, const CVector& direction, const CEnergy & I, float cutoff,
+							GLuint depthMapSize, const CRenderTarget& shadowRenderTarget);
 
 	/**
 	 * Destructeur par d&eacute;faut.
@@ -170,24 +175,22 @@ public:
 	void chooseForwardShader( const CShader* spotShader, const CShader* omniShader);
 	void chooseDeferredShader(const CShader* spotShader, const CShader* omniShader);
 
-	void updateModelViewPosition(GLfloat m[16]);
-
 	const CPoint& getDirection () const
 	{
 		return m_direction;
 	};
 
 	/** Rendu à partir du point de vue de la source. */
-	void castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix);
+	void castShadows(CCamera& camera, const CScene& scene, GLfloat *invModelViewMatrix);
 
-	void renderLightVolume(const CCamera* const camera) const;
+	void renderLightVolume(const CCamera& camera) const;
 
 	void preRendering(bool shadows) const;
 
 	CVector generateRandomRay() const;
 
 private:
-	CVector m_direction, m_modelViewDirection;
+	CVector m_direction;
 	CVector m_iAxis,m_jAxis;
 	float m_cutoff, m_angle;
 	float m_height, m_base;

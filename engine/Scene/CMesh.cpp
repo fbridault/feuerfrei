@@ -11,8 +11,8 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-CMesh::CMesh (CScene* const a_pScene, uint a_uiMaterial, CObject* a_pParent) :
-		m_pScene(a_pScene), m_pParent(a_pParent), m_uiMaterial(a_uiMaterial), m_attributes(0), m_visibility(true)
+CMesh::CMesh (CScene& a_rScene, uint a_uiMaterial, CObject& a_rParent) :
+		m_rScene(a_rScene), m_rParent(a_rParent), m_uiMaterial(a_uiMaterial), m_attributes(0), m_visibility(true)
 {
 	glGenBuffers(1, &m_bufferID);
 }
@@ -51,7 +51,7 @@ void CMesh::buildBoundingSphere (CRefTable& refTable)
 		/* Il ne faut prendre un même point qu'une seule fois en compte. */
 		if ( !refTable.findRef( m_indexArray[i] ) )
 		{
-			v = m_pParent->getVertex(m_indexArray[i]);
+			v = m_rParent.getVertex(m_indexArray[i]);
 			refTable.addRef( m_indexArray[i] );
 			m_boundingSphere.centre = (m_boundingSphere.centre*n + CPoint(v.x, v.y, v.z)) / (float)(n+1);
 			n++;
@@ -62,7 +62,7 @@ void CMesh::buildBoundingSphere (CRefTable& refTable)
 	     indexIterator != m_indexArray.end ();  indexIterator++)
 	{
 		CPoint p;
-		v=m_pParent->getVertex(*indexIterator);
+		v=m_rParent.getVertex(*indexIterator);
 		p=CPoint(v.x, v.y, v.z);
 		dist=p.squaredDistanceFrom(m_boundingSphere.centre);
 		if ( dist > m_boundingSphere.radius)
@@ -101,41 +101,41 @@ void CMesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 	if (drawCode == TEXTURED)
 	{
 		/* Ne dessiner que si il y a une texture */
-		if (!m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture())
+		if (!m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
 			return;
 	}
 	else
 		if (drawCode == FLAT)
 		{
 			/* Ne dessiner que si il n'y a pas de texture */
-			if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture())
+			if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
 				return;
 		}
 
 	if (drawCode != AMBIENT)
 		if ( m_uiMaterial != lastMaterialIndex)
 		{
-			if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture() && tex)
+			if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture() && tex)
 			{
 				/* Inutile de réactiver l'unité de texture si le matériau précédent en avait une */
-				if (!m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture())
+				if (!m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture())
 				{
 					glActiveTexture(GL_TEXTURE0+OBJECT_TEX_UNIT);
 					glEnable(GL_TEXTURE_2D);
 					glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				}
-				m_pScene->getMaterial(m_uiMaterial)->getDiffuseTexture()->bind();
+				m_rScene.getMaterial(m_uiMaterial)->getDiffuseTexture()->bind();
 			}
 			else
-				if (m_pScene->getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+				if (m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
 				{
 					/* Pas de texture pour le matériau courant, on désactive l'unité de texture car le matériau précédent en avait une */
 					glDisable(GL_TEXTURE_2D);
 				}
-			m_pScene->getMaterial(m_uiMaterial)->apply();
+			m_rScene.getMaterial(m_uiMaterial)->apply();
 		}
 
-	m_pParent->bindVBO();
+	m_rParent.bindVBO();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
 
 	glDrawElements(GL_TRIANGLES, m_indexArray.size(), GL_UNSIGNED_INT, 0);
@@ -152,7 +152,7 @@ void CMesh::drawForSelection () const
 	if (!m_visibility)
 		return;
 
-	m_pParent->bindVBO();
+	m_rParent.bindVBO();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
 
 	glDrawElements(GL_TRIANGLES, m_indexArray.size(), GL_UNSIGNED_INT, 0);
@@ -164,8 +164,8 @@ void CMesh::drawForSelection () const
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 const bool CMesh::isTransparent () const
 {
-	if (m_pScene->getMaterial(m_uiMaterial)->hasDiffuseTexture())
-		if ( m_pScene->getMaterial(m_uiMaterial)->isTransparent())
+	if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
+		if ( m_rScene.getMaterial(m_uiMaterial)->isTransparent())
 			return true;
 	return false;
 }
@@ -179,9 +179,9 @@ float CMesh::getArea() const
 
 	for (uint i = 0; i < m_indexArray.size(); i+=3)
 	{
-		Vertex V1 = m_pParent->getVertex(m_indexArray[i]);
-		Vertex V2 = m_pParent->getVertex(m_indexArray[i+1]);
-		Vertex V3 = m_pParent->getVertex(m_indexArray[i+2]);
+		Vertex V1 = m_rParent.getVertex(m_indexArray[i]);
+		Vertex V2 = m_rParent.getVertex(m_indexArray[i+1]);
+		Vertex V3 = m_rParent.getVertex(m_indexArray[i+2]);
 		CPoint P1(V1.x,V1.y,V1.z);
 		CPoint P2(V2.x,V2.y,V2.z);
 		CPoint P3(V3.x,V3.y,V3.z);
@@ -196,9 +196,9 @@ float CMesh::getArea() const
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const
 {
-	Vertex V1 = m_pParent->getVertex(m_indexArray[iTriangle*3]);
-	Vertex V2 = m_pParent->getVertex(m_indexArray[iTriangle*3+1]);
-	Vertex V3 = m_pParent->getVertex(m_indexArray[iTriangle*3+2]);
+	Vertex V1 = m_rParent.getVertex(m_indexArray[iTriangle*3]);
+	Vertex V2 = m_rParent.getVertex(m_indexArray[iTriangle*3+1]);
+	Vertex V3 = m_rParent.getVertex(m_indexArray[iTriangle*3+2]);
 
 	P1.x=V1.x;
 	P1.y=V1.y;
@@ -210,9 +210,9 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) cons
 	P3.y=V3.y;
 	P3.z=V3.z;
 	/** Prise en compte de la translation */
-	P1 += m_pParent->getPosition();
-	P2 += m_pParent->getPosition();
-	P3 += m_pParent->getPosition();
+	P1 += m_rParent.getPosition();
+	P2 += m_rParent.getPosition();
+	P3 += m_rParent.getPosition();
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -220,9 +220,9 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) cons
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVector& normal) const
 {
-	Vertex V1 = m_pParent->getVertex(m_indexArray[iTriangle*3]);
-	Vertex V2 = m_pParent->getVertex(m_indexArray[iTriangle*3+1]);
-	Vertex V3 = m_pParent->getVertex(m_indexArray[iTriangle*3+2]);
+	Vertex V1 = m_rParent.getVertex(m_indexArray[iTriangle*3]);
+	Vertex V2 = m_rParent.getVertex(m_indexArray[iTriangle*3+1]);
+	Vertex V3 = m_rParent.getVertex(m_indexArray[iTriangle*3+2]);
 	CVector N(V1.nx,V1.ny,V1.nz);
 
 	P1.x=V1.x;
@@ -235,9 +235,9 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVec
 	P3.y=V3.y;
 	P3.z=V3.z;
 	/** Prise en compte de la translation */
-	P1 += m_pParent->getPosition();
-	P2 += m_pParent->getPosition();
-	P3 += m_pParent->getPosition();
+	P1 += m_rParent.getPosition();
+	P2 += m_rParent.getPosition();
+	P3 += m_rParent.getPosition();
 
 	normal = CVector(P2-P1)^CVector(P3-P1);
 	normal.normalize();

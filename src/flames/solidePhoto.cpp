@@ -3,7 +3,7 @@
 #include "abstractFires.hpp"
 
 PixelLightingRenderer::PixelLightingRenderer(	const CScene* const a_pScene,
-    const vector <FireSource *> *a_pvpFlames,
+    const vector <IFireSource *> *a_pvpFlames,
     const string& a_strMacro) :
 		m_oShader("pixelLighting.vp", "pixelLighting.fp", a_strMacro)
 {
@@ -16,7 +16,7 @@ PixelLightingRenderer::PixelLightingRenderer(	const CScene* const a_pScene,
 }
 
 PixelLightingRenderer::PixelLightingRenderer(	const CScene* const a_pScene,
-    const vector <FireSource *> *a_pvpFlames,
+    const vector <IFireSource *> *a_pvpFlames,
     const string& a_strFragmentProgram,
     const string& a_strMacro) :
 		m_oShader("pixelLighting.vp", a_strFragmentProgram, a_strMacro)
@@ -40,7 +40,7 @@ void PixelLightingRenderer::draw(bool color)
 {
 	uint k=0;
 	/* Récupération des propriétés des flammes */
-	for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	for (vector < IFireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	     flamesIterator != m_flames->end (); flamesIterator++, k++)
 	{
 		(*flamesIterator)->computeIntensityPositionAndDirection();
@@ -66,7 +66,7 @@ void PixelLightingRenderer::draw(bool color)
 
 /***************************************************************************************************************/
 PhotometricSolidsRenderer::PhotometricSolidsRenderer(	const CScene* const s,
-    const vector <FireSource *> *flames,
+    const vector <IFireSource *> *flames,
     const string& a_strMacro) :
 		PixelLightingRenderer(s, flames, "photoSolid.fp", a_strMacro),
 		m_oSPOnlyShader("pixelLighting.vp", "photoSolidOnly.fp", a_strMacro)
@@ -87,7 +87,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 
 	m_tex2DSize[0] = m_tex2DSize[1] = 0;
 	/* Calcul de la taille maximale */
-	for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	for (vector < IFireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	     flamesIterator != m_flames->end (); flamesIterator++)
 	{
 		if ((*flamesIterator)->getIESAzimuthSize() > m_tex2DSize[0])
@@ -124,7 +124,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 	tex3DValues = new GLfloat[m_tex2DSize[0]*m_tex2DSize[1]*m_flames->size()];
 	ptrTex = tex3DValues;
 
-	for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	for (vector < IFireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	     flamesIterator != m_flames->end (); flamesIterator++)
 	{
 		GLfloat *values = (*flamesIterator)->getIntensities();
@@ -162,7 +162,7 @@ void PhotometricSolidsRenderer::generateTexture(void)
 	m_photometricSolidsTex = new CTexture3D((GLsizei)m_tex2DSize[0], (GLsizei)m_tex2DSize[1], (GLsizei)m_flames->size(), tex3DValues);
 
 	uint k=0;
-	for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	for (vector < IFireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	     flamesIterator != m_flames->end (); flamesIterator++, k++)
 	{
 		/* On prend l'inverse pour éviter une division dans le shader et on divise par la taille */
@@ -183,7 +183,7 @@ void PhotometricSolidsRenderer::draw(bool color)
 {
 	uint k=0;
 	/* Récupération des propriétés des flammes */
-	for (vector < FireSource* >::const_iterator flamesIterator = m_flames->begin ();
+	for (vector < IFireSource* >::const_iterator flamesIterator = m_flames->begin ();
 	     flamesIterator != m_flames->end (); flamesIterator++, k++)
 	{
 		(*flamesIterator)->computeIntensityPositionAndDirection();

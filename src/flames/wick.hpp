@@ -35,7 +35,7 @@ public:
 	/** Constructeur de mèche.
 	 * @param scene CPointeur sur la scène.
 	 */
-	CWick(CScene* const a_pScene) : CObject(a_pScene) {};
+	CWick(CScene& a_rScene) : CObject(a_rScene) {};
 
 	virtual ~CWick();
 
@@ -44,14 +44,14 @@ public:
 	 * @param position Position de la mèche dans l'espace.
 	 * @param leadSkeletons Vecteur des squelettes guides.
 	 */
-	uint buildPointFDF(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
+	uint buildPointFDF(FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
 
 	/* Construction de la mèche
 	 * @param scene CPointeur sur la scène.
 	 * @param position Position de la mèche dans l'espace.
 	 * @param leadSkeletons Vecteur des squelettes guides.
 	 */
-	uint buildFDF(const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
+	uint buildFDF(FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
 
 //   void buildFDF(Field3D* const m_field);
 	/** Affiche la mèche

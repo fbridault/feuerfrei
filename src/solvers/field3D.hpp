@@ -14,7 +14,7 @@ enum{
 };
 
 #ifdef RTFLAMES_BUILD
-class FireSource;
+class IFireSource;
 #endif
 
 class Field;
@@ -153,8 +153,8 @@ public:
 
 #ifdef RTFLAMES_BUILD
   /** Ajout d'une source de feu */
-  void addFireSource(FireSource* fireSource) { m_fireSources.push_back(fireSource); };
-  list <FireSource *> *getFireSourcesList() { return &m_fireSources; };
+  void addFireSource(IFireSource* fireSource) { m_fireSources.push_back(fireSource); };
+  list <IFireSource *> *getFireSourcesList() { return &m_fireSources; };
 #endif
 
 protected:
@@ -186,7 +186,7 @@ protected:
    * Ceci est utilisé uniquement pour garder une trace des associations champs/feux,
    * utilisée pour les threads.
    */
-  list <FireSource *> m_fireSources;
+  list <IFireSource *> m_fireSources;
 #endif
 };
 

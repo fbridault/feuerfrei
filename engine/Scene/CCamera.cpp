@@ -20,7 +20,7 @@ CCamera::CCamera () :
 	m_ouverture = 60.0f;
 }
 
-void CCamera::init (int width, int height, float clipping, CScene* const scene )
+void CCamera::init (int width, int height, float clipping, CScene* const scene)
 {
 	m_scene = scene;
 
@@ -113,6 +113,7 @@ void CCamera::OnMouseMotion (int x, int y)
 		if (m_buttonPressed == NMouseButton::eButtonRight)
 		{
 			computeView(x,y);
+			glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 		}
 		else
 			if (m_buttonPressed == NMouseButton::eButtonMiddle)
@@ -123,6 +124,7 @@ void CCamera::OnMouseMotion (int x, int y)
 		m_beginMouseX = x;
 		m_beginMouseY = y;
 		setView();
+		glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 	}
 }
 

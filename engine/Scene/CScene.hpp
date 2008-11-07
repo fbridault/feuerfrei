@@ -24,9 +24,9 @@ class CMaterial;
  *
  * @author	Flavien Bridault
  */
-class CScene : public ISingleton<CScene>
+class CScene : public ITSingleton<CScene>
 {
-	friend class ISingleton<CScene>;
+	friend class ITSingleton<CScene>;
 private:
 	/**
 	 * Constructeur par défaut.
@@ -168,7 +168,7 @@ public:
 	 * @param name Nom du fichier de la texture.
 	 * @return Index de la texture, -1 si elle n'existe pas
 	 */
-	int searchTextureIndexByName(const string& name);
+	int searchTextureIndexByName(CharCPtrC name);
 
 	/** Change l'affichage des sphères englobantes. */
 	void setBoundingSphereMode(bool mode)

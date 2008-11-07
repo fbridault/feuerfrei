@@ -12,6 +12,7 @@ class CRefTable;
 #include "../Scene/CScene.hpp"
 #include "../Scene/CMaterial.hpp"
 #include "../Utility/CRefTable.hpp"
+#include "string.h"
 
 #include <string>
 #include <vector>
@@ -41,7 +42,7 @@ public:
 	 */
 
 	template<class t_Object>
-	static bool import(CScene* const scene, const string& sceneName, vector <t_Object*> &objectsList, const char* prefix=NULL)
+	static bool import(CScene& a_rScene, const string& sceneName, vector <t_Object*> &objectsList, const char* prefix=NULL)
 	{
 		bool skip = false;
 		bool objectsAttributesSet=false;
@@ -126,7 +127,7 @@ public:
 						if (!buffer.compare(0,prefixlen,prefix))
 						{
 							/* Objet trouvé ! */
-							currentObject = new t_Object(scene);
+							currentObject = new t_Object(a_rScene);
 							objectsList.push_back(currentObject);
 							objectCreated = true;
 							firstMesh = true;
@@ -138,7 +139,7 @@ public:
 					else
 					{
 						/* Sinon on prend tous les objets dans le fichier. */
-						currentObject = new t_Object(scene);
+						currentObject = new t_Object(a_rScene);
 						objectsList.push_back(currentObject);
 						objectCreated = true;
 						firstMesh = true;
@@ -173,7 +174,7 @@ public:
 					if (!objectCreated)
 					{
 						/* On prend tous les objets dans le fichier. */
-						currentObject = new t_Object(scene);
+						currentObject = new t_Object(a_rScene);
 						objectsList.push_back(currentObject);
 						objectCreated = true;
 						firstMesh = true;
@@ -196,8 +197,9 @@ public:
 					objFile >> buffer >> buffer;
 					if (!skip)
 					{
-						matIndex = scene->getMaterialIndexByName(buffer);
-						currentMesh = new CMesh(scene, matIndex, currentObject);
+						matIndex = a_rScene.getMaterialIndexByName(buffer);
+						assert(currentObject != NULL);
+						currentMesh = new CMesh(a_rScene, matIndex, *currentObject);
 						currentObject->addMesh(currentMesh);
 						meshCreated = true;
 						objectsAttributesSet = false;
@@ -208,7 +210,7 @@ public:
 					objFile >> buffer >> buffer;
 					/* La définition des matériaux est évitée si l'on importe qu'un seul objet. */
 					if (!lookForSpecificObjects)
-						importMTL (scene, buffer);
+						importMTL (a_rScene, buffer);
 					break;
 				case 'v':
 					objFile.get(lettre);
@@ -249,8 +251,9 @@ public:
 					/** Pour prendre en compte les fichiers véreux ou usemtl n'est pas écrit */
 					if (!meshCreated && !skip)
 					{
-						matIndex = scene->getMaterialIndexByName("default");
-						currentMesh = new CMesh(scene, matIndex, currentObject);
+						matIndex = a_rScene.getMaterialIndexByName("default");
+						assert(currentObject != NULL);
+						currentMesh = new CMesh(a_rScene, matIndex, *currentObject);
 						currentObject->addMesh(currentMesh);
 						meshCreated = true;
 						objectsAttributesSet = false;
@@ -405,7 +408,7 @@ public:
 	 *
 	 * @param fileName nom du fichier OBJ &agrave; importer.
 	 */
-	static void importMTL(CScene* const scene, const string& fileName);
+	static void importMTL(CScene& a_rScene, const string& fileName);
 
 private:
 

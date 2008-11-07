@@ -21,19 +21,19 @@ class CMesh;
 class CSceneItem
 {
 protected:
-	CSceneItem(const CPoint& position) : m_position(position), m_selected(false) {};
+	CSceneItem(CPoint const& position) : m_position(position), m_selected(false) {};
 
 public:
 	virtual ~CSceneItem() {};
 
 	virtual void drawForSelection() const = 0;
 
-	const CPoint& getPosition () const
+	CPoint const& getPosition () const
 	{
 		return m_position;
 	}
 
-	void getPosition (float &x, float &y, float &z) const
+	void GetPosition (float &x, float &y, float &z) const
 	{
 		x = m_position.x;
 		y = m_position.y;
@@ -45,6 +45,11 @@ public:
 		m_position.x += x;
 		m_position.y += y;
 		m_position.z += z;
+	}
+
+	void SetPosition (CPoint const& a_rPosition)
+	{
+		m_position = a_rPosition;
 	}
 
 	void select()
@@ -77,7 +82,7 @@ public:
 	 * Constructeur par d&eacute;faut.
 	 * @param scene Pointeur vers la scene.
 	 */
-	CObject(CScene* const scene);
+	CObject(CScene& a_rScene);
 
 	/** Destructeur par défaut. */
 	virtual ~CObject ();
@@ -243,7 +248,7 @@ private:
 	bool m_previousCMeshWasTextured;
 
 	/** Pointeur vers la scène. */
-	CScene *m_scene;
+	CScene& m_rScene;
 
 	/* Identifiant du Vertex Buffer CObject. */
 	GLuint m_bufferID;

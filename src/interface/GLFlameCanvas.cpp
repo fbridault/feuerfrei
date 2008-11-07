@@ -3,7 +3,7 @@
 #include "flamesFrame.hpp"
 #include <iostream>
 
-#include "../flames/solidePhoto.hpp"
+#include <engine/Shading/CRenderer.hpp>
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
 	EVT_SIZE(GLFlameCanvas::OnSize)
@@ -84,6 +84,7 @@ void GLFlameCanvas::InitGL()
 
 	glDisable (GL_LIGHTING);
 
+	CShader::SetShadersDirectory("src/shaders/");
 	m_gammaEngine = new CGammaFX (m_width, m_height);
 	setGammaCorrection( m_currentConfig->gammaCorrection );
 
@@ -91,9 +92,24 @@ void GLFlameCanvas::InitGL()
 
 void GLFlameCanvas::InitLuminaries(void)
 {
+	assert(m_scene != NULL);
+
+	CShader::SetShadersDirectory("engine/Shading/Shaders/");
+	m_shadowMapRenderTarget = new CRenderTarget("depth shadow 2D linear", 512, 512, SHADOW_MAP_TEX_UNIT);
+	m_genShadowCubeMapShader = new CShader ("shadowMapVP.glsl", "shadowMapFP.glsl", "SHADOW_MAP_CUBE");
+
+	assert(m_genShadowCubeMapShader != NULL);
+	assert(m_shadowMapRenderTarget != NULL);
+
 	for (uint i=0; i < m_currentConfig->nbLuminaries; i++)
-		m_luminaries.push_back( new Luminary(	m_currentConfig->luminaries[i], m_fields, m_fires, m_scene,
-																						m_currentConfig->luminaries[i].fileName.fn_str()) );
+		m_luminaries.push_back( 	new Luminary(	m_currentConfig->luminaries[i],
+		                                       m_fields,
+		                                       m_fires,
+		                                       *m_scene,
+		                                       m_currentConfig->luminaries[i].fileName.fn_str(),
+		                                       *m_genShadowCubeMapShader,
+		                                       *m_shadowMapRenderTarget)
+		                      );
 
 //   m_currentConfig->nbFires = m_fires.size(); m_currentConfig->nbFields = m_fields.size();
 	prevNbFlames = m_fires.size();
@@ -108,7 +124,7 @@ void GLFlameCanvas::InitThreads()
 {
 	/* Création d'un thread par champ de vélocité. */
 	for (vector <Field3D *>::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 		m_threads.push_back(new FieldFiresThread(*fieldsIterator, m_scheduler));
 
 	if (m_currentConfig->useGlobalField)
@@ -128,7 +144,7 @@ void GLFlameCanvas::InitThreads()
 	}
 
 	for (list <FieldThread *>::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 		/* Création proprement dite du thread, il ne reste plus qu'à le lancer avec Run() */
 		if ( (*threadsIterator)->Create() != wxTHREAD_NO_ERROR )
 		{
@@ -139,7 +155,7 @@ void GLFlameCanvas::InitThreads()
 	m_scheduler->Run();
 	/* Lancement des threads */
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 		(*threadsIterator)->Run();
 }
 #endif
@@ -167,14 +183,14 @@ void GLFlameCanvas::InitScene()
 	char macro[25];
 	sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
 
-	m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires, macro);
-	m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires, macro);
+	m_pForwardRenderer = new CForwardRenderer(*m_scene);
 
 	m_scene->postInit(false);
 
 	m_camera = CCamera::getInstance();
 	m_camera->init (m_width, m_height, m_currentConfig->clipping, m_scene);
 
+	CShader::SetShadersDirectory("src/shaders/");
 	m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
 	m_depthPeelingEngine = new DepthPeelingEngine(m_width, m_height, DEPTH_PEELING_LAYERS_MAX);
 
@@ -204,7 +220,7 @@ void GLFlameCanvas::PauseThreads()
 {
 	m_scheduler->Pause();
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 	{
 		(*threadsIterator)->Pause();
 	}
@@ -214,7 +230,7 @@ void GLFlameCanvas::ResumeThreads()
 {
 	m_scheduler->Resume();
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 	{
 		(*threadsIterator)->Resume();
 	}
@@ -229,7 +245,7 @@ void GLFlameCanvas::DeleteThreads()
 	m_scheduler->Stop();
 
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 		(*threadsIterator)->Stop();
 
 	m_scheduler->forceEnd();
@@ -237,13 +253,13 @@ void GLFlameCanvas::DeleteThreads()
 	m_scheduler->Wait();
 
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 		(*threadsIterator)->Wait();
 
 	delete m_scheduler;
 	/* Tous les threads sont terminés, on peut tout supprimer sans risque */
 	for (list < FieldThread* >::iterator threadsIterator = m_threads.begin ();
-	     threadsIterator != m_threads.end (); threadsIterator++)
+	        threadsIterator != m_threads.end (); threadsIterator++)
 		delete (*threadsIterator);
 	m_threads.clear();
 }
@@ -282,19 +298,19 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	DeleteThreads();
 #endif
 
-	delete m_photoSolid;
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
+	delete m_pForwardRenderer;
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+	        firesIterator != m_fires.end (); firesIterator++)
 		delete (*firesIterator);
 	m_fires.clear();
 
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 		delete (*fieldsIterator);
 	m_fields.clear();
 
 	for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
-	     luminariesIterator != m_luminaries.end (); luminariesIterator++)
+	        luminariesIterator != m_luminaries.end (); luminariesIterator++)
 		delete (*luminariesIterator);
 	m_luminaries.clear();
 
@@ -319,8 +335,7 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	char macro[25];
 	sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
 
-	m_pixelLighting = new PixelLightingRenderer(m_scene, &m_fires, macro);
-	m_photoSolid = new PhotometricSolidsRenderer(m_scene, &m_fires, macro);
+	m_pForwardRenderer = new CForwardRenderer(*m_scene);
 
 #ifdef MULTITHREADS
 	InitThreads();
@@ -334,9 +349,10 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 
 void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
 {
-	m_fires[flameIndex]->useNewIESFile(IESFileName.ToAscii());
-	m_photoSolid->deleteTexture();
-	m_photoSolid->generateTexture();
+	assert(false);
+//	m_fires[flameIndex]->useNewIESFile(IESFileName.ToAscii());
+//	m_photoSolid->deleteTexture();
+//	m_photoSolid->generateTexture();
 }
 
 void GLFlameCanvas::DestroyScene(void)
@@ -345,12 +361,9 @@ void GLFlameCanvas::DestroyScene(void)
 	delete m_glowEngine;
 	m_camera->destroy();
 	m_scene->destroy();
-	delete m_photoSolid;
-	delete m_pixelLighting;
+	delete m_pForwardRenderer;
 
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
-		delete (*firesIterator);
+	// Fire sources are deleted by the scene
 	m_fires.clear();
 
 	if (m_globalField)
@@ -359,12 +372,12 @@ void GLFlameCanvas::DestroyScene(void)
 		m_globalField = NULL;
 	}
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 		delete (*fieldsIterator);
 	m_fields.clear();
 
 	for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
-	     luminariesIterator != m_luminaries.end (); luminariesIterator++)
+	        luminariesIterator != m_luminaries.end (); luminariesIterator++)
 		delete (*luminariesIterator);
 	m_luminaries.clear();
 }
@@ -372,20 +385,20 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
 #ifndef MULTITHREADS
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+	        firesIterator != m_fires.end (); firesIterator++)
 		(*firesIterator)->addForces ();
 
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 		(*fieldsIterator)->iterate ();
 
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+	        firesIterator != m_fires.end (); firesIterator++)
 		(*firesIterator)->build();
 
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 		(*fieldsIterator)->cleanSources ();
 #endif
 	/* Force à redessiner */
@@ -396,7 +409,6 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 
 void GLFlameCanvas::OnMouseMotion(wxMouseEvent& event)
 {
-
 	m_camera->OnMouseMotion(event.GetX(), event.GetY());
 }
 
@@ -405,13 +417,19 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 	NMouseButton nButton;
 	NMouseButtonState nButtonState;
 
-	switch(event.GetButton())
+	switch (event.GetButton())
 	{
-		case wxMOUSE_BTN_LEFT : nButton = NMouseButton::eButtonLeft; break;
-		case wxMOUSE_BTN_MIDDLE : nButton = NMouseButton::eButtonMiddle; break;
-		case wxMOUSE_BTN_RIGHT : nButton = NMouseButton::eButtonRight; break;
+		case wxMOUSE_BTN_LEFT :
+			nButton = NMouseButton::eButtonLeft;
+			break;
+		case wxMOUSE_BTN_MIDDLE :
+			nButton = NMouseButton::eButtonMiddle;
+			break;
+		case wxMOUSE_BTN_RIGHT :
+			nButton = NMouseButton::eButtonRight;
+			break;
 	}
-	if(event.ButtonDown())
+	if (event.ButtonDown())
 	{
 		nButtonState = NMouseButtonState::eButtonDown;
 	}
@@ -457,12 +475,12 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 			break;
 		case 'l':
 			for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-			     fieldsIterator != m_fields.end (); fieldsIterator++)
+			        fieldsIterator != m_fields.end (); fieldsIterator++)
 				(*fieldsIterator)->decreaseRes ();
 			break;
 		case 'L':
 			for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-			     fieldsIterator != m_fields.end (); fieldsIterator++)
+			        fieldsIterator != m_fields.end (); fieldsIterator++)
 				(*fieldsIterator)->increaseRes ();
 			break;
 		case WXK_SPACE :
@@ -474,25 +492,25 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 			/* ceci évidemment à des fins de tests et comparaisons */
 #ifdef MULTITHREADS
 			for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
-			     threadIterator != m_threads.end (); threadIterator++)
+			        threadIterator != m_threads.end (); threadIterator++)
 				(*threadIterator)->Lock();
 #endif
 			/* On remet à la résolution max */
 			for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-			     fieldsIterator != m_fields.end (); fieldsIterator++)
+			        fieldsIterator != m_fields.end (); fieldsIterator++)
 			{
 				(*fieldsIterator)->switchToRealSolver();
 				for (uint i=0; i < (*fieldsIterator)->getNbMaxDiv(); i++)
 					(*fieldsIterator)->increaseRes ();
 			}
 
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
+			for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+			        firesIterator != m_fires.end (); firesIterator++)
 				(*firesIterator)->setLOD(1);
 
 #ifdef MULTITHREADS
 			for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
-			     threadIterator != m_threads.end (); threadIterator++)
+			        threadIterator != m_threads.end (); threadIterator++)
 				(*threadIterator)->Unlock();
 #endif
 			break;
@@ -514,12 +532,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 	if (m_run)
 	{
-		/********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
 		m_visibility = false;
 		if (m_displayFlame)
 		{
-			for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-			     firesIterator != m_fires.end (); firesIterator++)
+			for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+			        firesIterator != m_fires.end (); firesIterator++)
 				if ((*firesIterator)->isVisible())
 				{
 					m_visibility = true;
@@ -528,29 +545,12 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 		}
 	}
 
-
 	if (!m_nurbsTest)
 		if (m_visibility || m_displayParticles)
 		{
 			if (m_currentConfig->glowEnabled )
 			{
-				//    GLfloat m[4][4];
-				//    float dist, sigma;
-
-				/* Adaptation du flou en fonction de la distance */
-				/* On module la largeur de la gaussienne */
-				//     glGetDoublev (GL_MODELVIEW_MATRIX, &m[0][0]);
-
-				//     CPoint position(m[3][0], m[3][1], m[3][2]);
-				//     CVector direction = position;
-				//     dist = direction.length();
-
-				/* Définition de la largeur de la gaussienne en fonction de la distance */
-				/* A définir de manière plus précise par la suite */
-				//     sigma = dist > 0.1 ? -log(4*dist)+6 : 6.0;
-				//sigma = dist > 0.1 ? -log(dist)+6 : 6.0;
-				//     sigma = 2;
-
+				/********** RENDU DES FLAMMES AVEC LE GLOW  *******************************/
 				if (m_currentConfig->depthPeelingEnabled)
 				{
 					/* On décortique dans les calques */
@@ -569,11 +569,11 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 					/* Dessin de la scène dans le depth buffer sans les textures pour avoir les occlusions sur les flammes */
 					glClear(GL_DEPTH_BUFFER_BIT);
-					glDrawBuffer(GL_NONE);
-					glReadBuffer(GL_NONE);
+//					glDrawBuffer(GL_NONE);
+//					glReadBuffer(GL_NONE);
 					m_scene->drawSceneWT ();
-					glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-					glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+//					glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+//					glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
 					glClear(GL_COLOR_BUFFER_BIT);
 					glEnable(GL_BLEND);
@@ -594,6 +594,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 		m_gammaEngine->enableGamma();
 
 	drawScene();
+
 	/********************* DESSINS DES FLAMMES SANS GLOW **********************************/
 	if ((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
 	{
@@ -669,29 +670,67 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 void GLFlameCanvas::drawScene()
 {
 	CPoint position, scale;
+	bool additiveBlending = false; /** Active le blending qu'à partir de la seconde passe de dessin */
 
-	if (m_currentConfig->shadowsEnabled)
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	else
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	/******************* AFFICHAGE DE LA SCENE *******************************/
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
-		(*firesIterator)->drawWick (m_displayWickBoxes);
 
-	/**** Affichage de la scène ****/
-	switch (m_currentConfig->lightingMode)
+	glEnable(GL_POLYGON_OFFSET_FILL);
+	glPolygonOffset (2, 2);
+
+	//memcpy(m_modelViewMatrix,g_modelViewMatrix,16*sizeof(float));
+	//Maths::InvertMatrix(m_modelViewMatrix);
+
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+	        firesIterator != m_fires.end (); firesIterator++)
 	{
-		case LIGHTING_PIXEL :
-			m_pixelLighting->draw(m_currentConfig->BPSEnabled);
-			break;
-		case LIGHTING_PHOTOMETRIC:
-			m_photoSolid->draw(m_currentConfig->BPSEnabled);
-			break;
-		default:
-			assert(false);
-			break;
+		IFireSource* pFireSource = *firesIterator;
+
+		pFireSource->drawWick (m_displayWickBoxes);
+
+		if ( !pFireSource->isEnabled() ) continue;
+
+		//if (m_displayShadows)
+		/** Construction de la shadowMap */
+		//m_scene->getSource(i)->castShadows(*m_camera, *m_scene, &m_modelViewMatrix[0][0]);
+
+		/** Activation du blending additif à partir de la seconde passe */
+		if (additiveBlending)
+		{
+			glEnable (GL_BLEND);
+			glBlendFunc(GL_ONE,GL_ONE);
+			glDepthMask(GL_FALSE);
+			glDepthFunc(GL_LEQUAL);
+		}
+
+		m_pForwardRenderer->drawDirect(*pFireSource);
+
+		if (additiveBlending)
+		{
+			glDisable (GL_BLEND);
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
+		}
+		else
+			additiveBlending = true;
 	}
+	glDisable(GL_POLYGON_OFFSET_FILL);
+
+
+	/** Passe ambiante, les couleurs des matériaux ne sont récupérées qu'à ce stade */
+	/** Multiplication de la couleur ambiante : par une constante pour atténuer + par la couleur source */
+	glEnable (GL_BLEND);
+	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_ZERO,GL_SRC_COLOR);
+
+	m_pForwardRenderer-> drawBrdf();
+
+	glDisable (GL_BLEND);
+	glDepthMask(GL_TRUE);
+	glDepthFunc(GL_ALWAYS);
+
+
 
 	/************ Affichage des outils d'aide à la visu (grille, etc...) *********/
 	glEnable (GL_BLEND);
@@ -711,7 +750,7 @@ void GLFlameCanvas::drawScene()
 		glPopMatrix ();
 	}
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	     fieldsIterator != m_fields.end (); fieldsIterator++)
+	        fieldsIterator != m_fields.end (); fieldsIterator++)
 	{
 		position = (*fieldsIterator)->getPosition ();
 		scale =  (*fieldsIterator)->getScale ();

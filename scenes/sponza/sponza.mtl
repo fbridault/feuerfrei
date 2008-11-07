@@ -1,154 +1,220 @@
-# 
-# Wavefront material file
-# Converted by the DEEP Exploration  3.5.7.1088
-# Right Hemisphere, LTD
-# http://www.righthemisphere.com/
-# 
-
-newmtl sp_00_pod
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+# Blender3D MTL File: <memory>
+# Material Count: 20
+newmtl sp_01_stub_baza_
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.501961 0.501961 0.501961
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd KAMEN.jpg
-map_bump KAMEN.jpg
-bump KAMEN.jpg
 
-newmtl sp_00_stup_kapitel
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd sp_00_stup_kapitel.jpg
-map_bump sp_00_stup_kapitel.jpg
-bump sp_00_stup_kapitel.jpg
 
-newmtl sp_vijenac_ploha
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_00_zid_KAMEN.JPG_KAMEN.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.401569 0.366431 0.358902
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd sp_luk.jpg
-map_bump sp_luk.jpg
-bump sp_luk.jpg
+map_Kd KAMEN.JPG
 
-newmtl sp_02_prozor
-Ka 0 0 0
-Kd 0.627451 0.627451 0.627451
-Ks 0 0 0
-illum 2
-Ns 8
 
-newmtl sp_00_luk_mali
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_01_stub_kut_01_STU_01_STUB.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.471843 0.454274 0.429177
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd sp_luk.jpg
-map_bump sp_luk.jpg
-bump sp_luk.jpg
+map_Kd 01_STUB.JPG
 
-newmtl sp_01_stup_baza
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd SP_01_STUP_baza.jpg
-map_bump SP_01_STUP_baza.jpg
-bump SP_01_STUP_baza.jpg
 
-newmtl sp_01_stup
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_00_vrata_kock_vrat_vrata_ko.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.501961 0.501961 0.501961
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd sp_01_stup.jpg
+map_Kd vrata_ko.JPG
 
-newmtl sp_01_stup_kapitel
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd SP_01_STUP_kapitel.jpg
 
-newmtl sp_00_stup
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_01_stup_x01_st.JPG_x01_st.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.529569 0.512000 0.491922
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd SP_01_STUB.jpg
-map_bump SP_01_STUB.jpg
-bump SP_01_STUB.jpg
+map_Kd x01_st.JPG
 
-newmtl sp_01_stub_kapitel
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd SP_01_STUB_kapitel.jpg
 
-newmtl sp_01_stub_baza
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_zid_vani_KAMEN.JPG_KAMEN.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.401569 0.366431 0.358902
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd SP_01_STUP_baza.jpg
-map_bump SP_01_STUP_baza.jpg
-bump SP_01_STUP_baza.jpg
+map_Kd KAMEN.JPG
 
-newmtl sp_00_prozor
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd prozor1.jpg
-map_bump prozor1.jpg
-bump prozor1.jpg
 
-newmtl sp_00_vrata_krug
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_00_prozor_prozor1._prozor1.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd vrata_krug.jpg
-map_bump vrata_krug.jpg
-bump vrata_krug.jpg
+map_Kd prozor1.JPG
 
-newmtl sp_00_vrata_kocka
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
-illum 2
-Ns 8
-map_Kd vrata_kocka.jpg
-map_bump vrata_kocka.jpg
-bump vrata_kocka.jpg
 
-newmtl sp_02_reljef
-Ka 0 0 0
-Kd 0.784314 0.784314 0.784314
-Ks 0 0 0
+newmtl sp_01_stub_01_STUB.JP_01_STUB.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.471843 0.454274 0.429177
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
-map_Kd reljef.jpg
-map_bump reljef.jpg
-bump reljef.jpg
+map_Kd 01_STUB.JPG
+
+
+newmtl sp_vijenac_00_skap.JP_00_skap.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.456784 0.451765 0.421647
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 00_skap.JPG
+
 
 newmtl sp_00_svod
-Ka 0 0 0
-Kd 0.89803 0.756855 0.521563
-Ks 0 0 0
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.602353 0.554666 0.471843
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
 illum 2
-Ns 8
+
+
+newmtl sp_01_stub_baza_01_S__01_S_ba.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.501961 0.479373
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_S_ba.JPG
+
+
+newmtl sp_01_stup_baza_01_S__01_S_ba.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.512000 0.501961 0.479373
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_S_ba.JPG
+
+
+newmtl sp_01_luk_a_sp_luk.JP_sp_luk.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.476862 0.454274 0.431686
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd sp_luk.JPG
+
+
+newmtl sp_svod_kapitel_00_sk_00_skap.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.456784 0.451765 0.421647
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 00_skap.JPG
+
+
+newmtl sp_00_luk_mal1_01_St__01_St_kp.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.476862 0.454274 0.431686
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_St_kp.JPG
+
+
+newmtl sp_00_luk_mali_sp_luk_sp_luk.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.476862 0.454274 0.431686
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd sp_luk.JPG
+
+
+newmtl sp_00_pod_KAMEN.JPG_KAMEN.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.401569 0.366431 0.358902
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd KAMEN.JPG
+
+
+newmtl sp_02_reljef_reljef.J_reljef.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.338823 0.318745 0.313726
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd reljef.JPG
+
+
+newmtl sp_00_stup_01_STUB.JP_01_STUB.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.471843 0.454274 0.429177
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd 01_STUB.JPG
+
+
+newmtl sp_00_vrata_krug_vrat_vrata_kr.JPG
+Ns 92.156863
+Ka 0.000000 0.000000 0.000000
+Kd 0.501961 0.501961 0.501961
+Ks 0.250000 0.250000 0.250000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd vrata_kr.JPG
+
+

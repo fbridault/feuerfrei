@@ -4,8 +4,8 @@
 class INurbsFlame;
 class IFixedFlame;
 class IRealFlame;
+class ITexture;
 
-#include <engine/Scene/Texture.hpp>
 
 #include "periSkeleton.hpp"
 #include "leadSkeleton.hpp"
@@ -46,7 +46,7 @@ public:
 	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
 	 * @param tex CPointeur sur la texture de la flamme.
 	 */
-	INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
+	INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture);
 
 	/** Constructeur de flamme.
 	 * @param source CPointeur sur la flamme qui a généré la flamme courante.
@@ -54,7 +54,7 @@ public:
 	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
 	 * @param tex CPointeur sur la texture de la flamme.
 	 */
-	INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
+	INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture);
 	virtual ~INurbsFlame ();
 
 	void initNurbs(GLUnurbsObj** nurbs);
@@ -137,9 +137,9 @@ public:
 		m_vsize = source.m_vsize;
 	}
 
-	const ITexture *getTexture() const
+	ITexture const& getTexture() const
 	{
-		return m_tex;
+		return m_rTexture;
 	};
 
 protected:
@@ -261,7 +261,7 @@ protected:
 	u_char m_shadingType;
 
 	/** ITexture de la flamme */
-	const ITexture *m_tex;
+	ITexture const& m_rTexture;
 	/* Incrément en u pour la coordonnée de texture */
 	float m_utexInc;
 
@@ -291,7 +291,7 @@ public:
 	 * @param nbFixedPoints Nombre de points fixes, autrement dit les racines des squelettes de la flamme.
 	 * @param tex CPointeur sur la texture de la flamme.
 	 */
-	IFixedFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex);
+	IFixedFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture);
 
 	virtual ~IFixedFlame ();
 
@@ -339,10 +339,10 @@ class CDetachedFlame;
  * interactions avec un solveur de fluides. Elle est qualifiée de "Real" en comparaison avec les CloneFlame.
  * Cette classe reste abstraite et est héritée par les classes CLineFlame et CPointFlame.
  * Elle permet de définir une primitive géométrique pour une flamme, mais ne permet pas de construire une flamme
- * en tant que source de lumière d'une scène. C'est la classe FireSource qui permet de définir ceci, en utilisant
+ * en tant que source de lumière d'une scène. C'est la classe IFireSource qui permet de définir ceci, en utilisant
  * les classes héritées de IRealFlame comme élément de base.<br>
  * Une IRealFlame est construite à sa position relative définie dans m_position. Lors du dessin, la translation dans
- * le repère du feu est donc déjà effectuée. C'est la classe FireSource qui s'occupe de placer correctement dans
+ * le repère du feu est donc déjà effectuée. C'est la classe IFireSource qui s'occupe de placer correctement dans
  * le repère du monde. En revanche, la mèche en définie en (0,0,0) et il faut donc la translater dans le repère du
  * feu à chaque opération de dessin.
  *
@@ -357,7 +357,7 @@ public:
 	 * @param tex CPointeur sur la texture de la flamme.
 	 * @param s CPointeur vers le solveur.
 	 */
-	IRealFlame(uint nbSkeletons, ushort nbFixedPoints, const ITexture* const tex, Field3D* const s);
+	IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture, Field3D* const s);
 	virtual ~IRealFlame ();
 
 	/** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.

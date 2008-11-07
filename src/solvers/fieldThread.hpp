@@ -18,7 +18,7 @@ using namespace std;
 #include "../flames/abstractFires.hpp"
 
 class FieldFiresThread;
-class FireSource;
+class IFireSource;
 
 class FieldThreadsScheduler : public wxThread
 {
@@ -116,7 +116,7 @@ public:
   virtual ExitCode Entry();
   Field3D *getSolver() const { return m_field; };
   void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes){
-    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
 	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
       (*flamesIterator)->drawFlame (displayFlame, displayParticles, displayFlamesBoundingVolumes);
   }

@@ -15,7 +15,7 @@
 	"interface.hpp"
 	"mainPanels.hpp"
 
-1205803499 /usr/include/wx-2.6/wx/glcanvas.h
+1223906546 /usr/include/wx-2.6/wx/glcanvas.h
 	"wx/defs.h"
 	"wx/msw/glcanvas.h"
 	"wx/x11/glcanvas.h"
@@ -26,7 +26,7 @@
 	"wx/os2/glcanvas.h"
 	"wx/app.h"
 
-1205803498 /usr/include/wx-2.6/wx/defs.h
+1223906545 /usr/include/wx-2.6/wx/defs.h
 	"wx/platform.h"
 	"wx/features.h"
 	"wx/version.h"
@@ -36,7 +36,7 @@
 	<sys/types.h>
 	<unistd.h>
 
-1205803498 /usr/include/wx-2.6/wx/platform.h
+1223906545 /usr/include/wx-2.6/wx/platform.h
 	<stddef.h>
 	<unistd.h>
 	"wx/mac/carbon/config_xcode.h"
@@ -47,28 +47,28 @@
 	"wx/msw/gccpriv.h"
 	<AvailabilityMacros.h>
 
-1205803498 /usr/lib/wx/include/gtk2-unicode-release-2.6/wx/setup.h
+1223906545 /usr/lib/wx/include/gtk2-unicode-release-2.6/wx/setup.h
 	"wx/chkconf.h"
 
-1205803498 /usr/include/wx-2.6/wx/chkconf.h
+1223906545 /usr/include/wx-2.6/wx/chkconf.h
 	"wx/palmos/chkconf.h"
 	"wx/msw/wince/chkconf.h"
 	"wx/msw/chkconf.h"
 	"wx/mac/chkconf.h"
 	"wx/motif/chkconf.h"
 
-1205803498 /usr/include/wx-2.6/wx/features.h
+1223906545 /usr/include/wx-2.6/wx/features.h
 
-1205803498 /usr/include/wx-2.6/wx/version.h
+1223906545 /usr/include/wx-2.6/wx/version.h
 
-1205803498 /usr/include/wx-2.6/wx/dlimpexp.h
+1223906545 /usr/include/wx-2.6/wx/dlimpexp.h
 
-1205803498 /usr/include/wx-2.6/wx/debug.h
+1223906545 /usr/include/wx-2.6/wx/debug.h
 	<assert.h>
 	<limits.h>
 	"wx/wxchar.h"
 
-1205803498 /usr/include/wx-2.6/wx/wxchar.h
+1223906545 /usr/include/wx-2.6/wx/wxchar.h
 	"wx/platform.h"
 	"wx/dlimpexp.h"
 	<stdarg.h>
@@ -96,19 +96,19 @@
 	<time.h>
 	<string.h>
 
-1205803499 /usr/include/wx-2.6/wx/gtk/glcanvas.h
+1223906547 /usr/include/wx-2.6/wx/gtk/glcanvas.h
 	"wx/scrolwin.h"
 	"wx/app.h"
 	<GL/gl.h>
 	<GL/glx.h>
 	<GL/glu.h>
 
-1205803498 /usr/include/wx-2.6/wx/scrolwin.h
+1223906546 /usr/include/wx-2.6/wx/scrolwin.h
 	"wx/window.h"
 	"wx/gtk/scrolwin.h"
 	"wx/generic/scrolwin.h"
 
-1205803498 /usr/include/wx-2.6/wx/window.h
+1223906546 /usr/include/wx-2.6/wx/window.h
 	"wx/event.h"
 	"wx/list.h"
 	"wx/cursor.h"
@@ -131,7 +131,7 @@
 	"wx/os2/window.h"
 	"wx/univ/window.h"
 
-1205803498 /usr/include/wx-2.6/wx/event.h
+1223906545 /usr/include/wx-2.6/wx/event.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/clntdata.h"
@@ -140,19 +140,19 @@
 	"wx/thread.h"
 	"wx/dynarray.h"
 
-1205803498 /usr/include/wx-2.6/wx/object.h
+1223906545 /usr/include/wx-2.6/wx/object.h
 	"wx/defs.h"
 	"wx/memory.h"
 	"wx/xti.h"
 	"wx/msw/msvcrt.h"
 
-1205803498 /usr/include/wx-2.6/wx/memory.h
+1223906545 /usr/include/wx-2.6/wx/memory.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/msgout.h"
 	<stddef.h>
 
-1205803498 /usr/include/wx-2.6/wx/string.h
+1223906545 /usr/include/wx-2.6/wx/string.h
 	"wx/defs.h"
 	<ctype.h>
 	<stdio.h>
@@ -175,11 +175,11 @@
 	"wx/arrstr.h"
 	"wx/iosfwrap.h"
 
-1205803498 /usr/include/wx-2.6/wx/buffer.h
+1223906545 /usr/include/wx-2.6/wx/buffer.h
 	"wx/wxchar.h"
 	<stdlib.h>
 
-1205803498 /usr/include/wx-2.6/wx/strconv.h
+1223906545 /usr/include/wx-2.6/wx/strconv.h
 	"wx/defs.h"
 	"wx/wxchar.h"
 	"wx/buffer.h"
@@ -187,35 +187,35 @@
 	<stdlib.h>
 	"wx/fontenc.h"
 
-1205803498 /usr/include/wx-2.6/wx/fontenc.h
+1223906545 /usr/include/wx-2.6/wx/fontenc.h
 
-1205803498 /usr/include/wx-2.6/wx/beforestd.h
+1223906545 /usr/include/wx-2.6/wx/beforestd.h
 
-1205803498 /usr/include/wx-2.6/wx/afterstd.h
+1223906545 /usr/include/wx-2.6/wx/afterstd.h
 	"wx/msw/winundef.h"
 
-1205803498 /usr/include/wx-2.6/wx/arrstr.h
+1223906545 /usr/include/wx-2.6/wx/arrstr.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/dynarray.h"
 
-1205803498 /usr/include/wx-2.6/wx/dynarray.h
+1223906545 /usr/include/wx-2.6/wx/dynarray.h
 	"wx/defs.h"
 	"wx/beforestd.h"
 	<vector>
 	<algorithm>
 	"wx/afterstd.h"
 
-1205803498 /usr/include/wx-2.6/wx/iosfwrap.h
+1223906545 /usr/include/wx-2.6/wx/iosfwrap.h
 	<iostream.h>
 	<iosfwd>
 	"wx/msw/winundef.h"
 
-1205803498 /usr/include/wx-2.6/wx/msgout.h
+1223906545 /usr/include/wx-2.6/wx/msgout.h
 	"wx/defs.h"
 	"wx/wxchar.h"
 
-1205803498 /usr/include/wx-2.6/wx/xti.h
+1223906545 /usr/include/wx-2.6/wx/xti.h
 	"wx/defs.h"
 	"wx/memory.h"
 	"wx/flags.h"
@@ -227,13 +227,13 @@
 	<typeinfo>
 	<wx/dynarray.h>
 
-1205803498 /usr/include/wx-2.6/wx/hashmap.h
+1223906545 /usr/include/wx-2.6/wx/hashmap.h
 	"wx/string.h"
 	<ext/hash_map>
 	<hash_map>
 	<stddef.h>
 
-1205803498 /usr/include/wx-2.6/wx/log.h
+1223906545 /usr/include/wx-2.6/wx/log.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/arrstr.h"
@@ -243,30 +243,30 @@
 	"wx/generic/logg.h"
 	"wx/cocoa/log.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/logg.h
+1223906546 /usr/include/wx-2.6/wx/generic/logg.h
 
-1205803498 /usr/include/wx-2.6/wx/intl.h
+1223906545 /usr/include/wx-2.6/wx/intl.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/fontenc.h"
 
-1205803498 /usr/include/wx-2.6/wx/clntdata.h
+1223906545 /usr/include/wx-2.6/wx/clntdata.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/hashmap.h"
 	"wx/vector.h"
 
-1205803498 /usr/include/wx-2.6/wx/vector.h
+1223906545 /usr/include/wx-2.6/wx/vector.h
 	"wx/defs.h"
 
-1205803498 /usr/include/wx-2.6/wx/gdicmn.h
+1223906546 /usr/include/wx-2.6/wx/gdicmn.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/string.h"
 	"wx/fontenc.h"
 	"wx/hashmap.h"
 
-1205803498 /usr/include/wx-2.6/wx/list.h
+1223906545 /usr/include/wx-2.6/wx/list.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -276,7 +276,7 @@
 	<list>
 	"wx/afterstd.h"
 
-1205803498 /usr/include/wx-2.6/wx/cursor.h
+1223906546 /usr/include/wx-2.6/wx/cursor.h
 	"wx/defs.h"
 	"wx/palmos/cursor.h"
 	"wx/msw/cursor.h"
@@ -289,13 +289,13 @@
 	"wx/os2/cursor.h"
 	"wx/utils.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/cursor.h
+1223906546 /usr/include/wx-2.6/wx/gtk/cursor.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdicmn.h"
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/image.h
+1223906546 /usr/include/wx-2.6/wx/image.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -312,14 +312,14 @@
 	"wx/imagxpm.h"
 	"wx/imagiff.h"
 
-1205803498 /usr/include/wx-2.6/wx/stream.h
+1223906545 /usr/include/wx-2.6/wx/stream.h
 	"wx/defs.h"
 	<stdio.h>
 	"wx/object.h"
 	"wx/string.h"
 	"wx/filefn.h"
 
-1205803498 /usr/include/wx-2.6/wx/filefn.h
+1223906545 /usr/include/wx-2.6/wx/filefn.h
 	"wx/list.h"
 	"wx/arrstr.h"
 	"wx/msw/wince/time.h"
@@ -356,37 +356,37 @@
 	<sys/types.h>
 	"wx/msw/private.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagbmp.h
+1223906546 /usr/include/wx-2.6/wx/imagbmp.h
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagpng.h
+1223906546 /usr/include/wx-2.6/wx/imagpng.h
 	"wx/defs.h"
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imaggif.h
+1223906546 /usr/include/wx-2.6/wx/imaggif.h
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagpcx.h
+1223906546 /usr/include/wx-2.6/wx/imagpcx.h
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagjpeg.h
+1223906546 /usr/include/wx-2.6/wx/imagjpeg.h
 	"wx/defs.h"
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagtiff.h
+1223906546 /usr/include/wx-2.6/wx/imagtiff.h
 	"wx/defs.h"
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagpnm.h
+1223906546 /usr/include/wx-2.6/wx/imagpnm.h
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagxpm.h
+1223906546 /usr/include/wx-2.6/wx/imagxpm.h
 	"wx/image.h"
 
-1205803499 /usr/include/wx-2.6/wx/imagiff.h
+1223906546 /usr/include/wx-2.6/wx/imagiff.h
 	"wx/image.h"
 
-1205803498 /usr/include/wx-2.6/wx/utils.h
+1223906545 /usr/include/wx-2.6/wx/utils.h
 	"wx/object.h"
 	"wx/list.h"
 	"wx/filefn.h"
@@ -395,16 +395,16 @@
 	<unistd.h>
 	<stdio.h>
 
-1205803498 /usr/include/wx-2.6/wx/longlong.h
+1223906545 /usr/include/wx-2.6/wx/longlong.h
 	"wx/defs.h"
 	"wx/string.h"
 	<limits.h>
 	"wx/iosfwrap.h"
 
-1205803498 /usr/include/wx-2.6/wx/thread.h
+1223906545 /usr/include/wx-2.6/wx/thread.h
 	"wx/defs.h"
 
-1205803499 /usr/include/wx-2.6/wx/font.h
+1223906546 /usr/include/wx-2.6/wx/font.h
 	"wx/defs.h"
 	"wx/fontenc.h"
 	"wx/gdiobj.h"
@@ -418,7 +418,7 @@
 	"wx/cocoa/font.h"
 	"wx/os2/font.h"
 
-1205803499 /usr/include/wx-2.6/wx/gdiobj.h
+1223906546 /usr/include/wx-2.6/wx/gdiobj.h
 	"wx/palmos/gdiobj.h"
 	"wx/msw/gdiobj.h"
 	"wx/motif/gdiobj.h"
@@ -429,19 +429,19 @@
 	"wx/cocoa/gdiobj.h"
 	"wx/os2/gdiobj.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/gdiobj.h
+1223906546 /usr/include/wx-2.6/wx/gtk/gdiobj.h
 	"wx/object.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/font.h
+1223906546 /usr/include/wx-2.6/wx/gtk/font.h
 	"wx/hash.h"
 
-1205803498 /usr/include/wx-2.6/wx/hash.h
+1223906545 /usr/include/wx-2.6/wx/hash.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/dynarray.h"
 
-1205803499 /usr/include/wx-2.6/wx/colour.h
+1223906546 /usr/include/wx-2.6/wx/colour.h
 	"wx/palmos/colour.h"
 	"wx/msw/colour.h"
 	"wx/motif/colour.h"
@@ -452,14 +452,14 @@
 	"wx/cocoa/colour.h"
 	"wx/os2/colour.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/colour.h
+1223906546 /usr/include/wx-2.6/wx/gtk/colour.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/palette.h"
 
-1205803498 /usr/include/wx-2.6/wx/palette.h
+1223906546 /usr/include/wx-2.6/wx/palette.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -472,13 +472,13 @@
 	"wx/mac/palette.h"
 	"wx/os2/palette.h"
 
-1205803499 /usr/include/wx-2.6/wx/generic/paletteg.h
+1223906546 /usr/include/wx-2.6/wx/generic/paletteg.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1205803499 /usr/include/wx-2.6/wx/region.h
+1223906546 /usr/include/wx-2.6/wx/region.h
 	"wx/colour.h"
 	"wx/palmos/region.h"
 	"wx/msw/region.h"
@@ -489,16 +489,16 @@
 	"wx/cocoa/region.h"
 	"wx/os2/region.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/region.h
+1223906546 /usr/include/wx-2.6/wx/gtk/region.h
 	"wx/list.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1205803498 /usr/include/wx-2.6/wx/validate.h
+1223906546 /usr/include/wx-2.6/wx/validate.h
 	"wx/defs.h"
 	"wx/event.h"
 
-1205803498 /usr/include/wx-2.6/wx/accel.h
+1223906546 /usr/include/wx-2.6/wx/accel.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/generic/accel.h"
@@ -509,12 +509,12 @@
 	"wx/generic/accel.h"
 	"wx/os2/accel.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/accel.h
+1223906546 /usr/include/wx-2.6/wx/generic/accel.h
 
-1205803499 /usr/include/wx-2.6/wx/gtk/accel.h
+1223906546 /usr/include/wx-2.6/wx/gtk/accel.h
 	"wx/generic/accel.h"
 
-1205803498 /usr/include/wx-2.6/wx/access.h
+1223906546 /usr/include/wx-2.6/wx/access.h
 	"wx/variant.h"
 	"wx/msw/ole/access.h"
 	"wx/generic/access.h"
@@ -524,7 +524,7 @@
 	"wx/generic/access.h"
 	"wx/generic/access.h"
 
-1205803498 /usr/include/wx-2.6/wx/variant.h
+1223906545 /usr/include/wx-2.6/wx/variant.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -534,7 +534,7 @@
 	"wx/db.h"
 	"wx/iosfwrap.h"
 
-1205803498 /usr/include/wx-2.6/wx/datetime.h
+1223906545 /usr/include/wx-2.6/wx/datetime.h
 	"wx/defs.h"
 	<time.h>
 	"wx/msw/wince/time.h"
@@ -542,7 +542,7 @@
 	"wx/longlong.h"
 	"wx/dynarray.h"
 
-1205803498 /usr/include/wx-2.6/wx/db.h
+1223906546 /usr/include/wx-2.6/wx/db.h
 	"wx/defs.h"
 	"wx/string.h"
 	<afxwin.h>
@@ -559,31 +559,31 @@
 	<sqlext.h>
 	"wx/object.h"
 
-1205803498 /usr/include/wx-2.6/wx/isql.h
+1223906545 /usr/include/wx-2.6/wx/isql.h
 
-1205803498 /usr/include/wx-2.6/wx/isqlext.h
+1223906545 /usr/include/wx-2.6/wx/isqlext.h
 	"wx/isql.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/window.h
+1223906546 /usr/include/wx-2.6/wx/gtk/window.h
 
-1205803499 /usr/include/wx-2.6/wx/gtk/scrolwin.h
+1223906546 /usr/include/wx-2.6/wx/gtk/scrolwin.h
 	"wx/window.h"
 	"wx/panel.h"
 
-1205803498 /usr/include/wx-2.6/wx/panel.h
+1223906546 /usr/include/wx-2.6/wx/panel.h
 	"wx/generic/panelg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/panelg.h
+1223906546 /usr/include/wx-2.6/wx/generic/panelg.h
 	"wx/window.h"
 	"wx/containr.h"
 
-1205803498 /usr/include/wx-2.6/wx/containr.h
+1223906545 /usr/include/wx-2.6/wx/containr.h
 
-1205803498 /usr/include/wx-2.6/wx/generic/scrolwin.h
+1223906546 /usr/include/wx-2.6/wx/generic/scrolwin.h
 	"wx/window.h"
 	"wx/panel.h"
 
-1205803498 /usr/include/wx-2.6/wx/app.h
+1223906545 /usr/include/wx-2.6/wx/app.h
 	"wx/event.h"
 	"wx/window.h"
 	"wx/vidmode.h"
@@ -600,20 +600,20 @@
 	"wx/os2/app.h"
 	"wx/univ/theme.h"
 
-1205803499 /usr/include/wx-2.6/wx/vidmode.h
+1223906546 /usr/include/wx-2.6/wx/vidmode.h
 
-1205803498 /usr/include/wx-2.6/wx/build.h
+1223906545 /usr/include/wx-2.6/wx/build.h
 	"wx/version.h"
 
-1205803498 /usr/include/wx-2.6/wx/init.h
+1223906545 /usr/include/wx-2.6/wx/init.h
 	"wx/wxchar.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/app.h
+1223906546 /usr/include/wx-2.6/wx/gtk/app.h
 	"wx/frame.h"
 	"wx/icon.h"
 	"wx/strconv.h"
 
-1205803498 /usr/include/wx-2.6/wx/frame.h
+1223906546 /usr/include/wx-2.6/wx/frame.h
 	"wx/toplevel.h"
 	"wx/univ/frame.h"
 	"wx/palmos/frame.h"
@@ -624,7 +624,7 @@
 	"wx/cocoa/frame.h"
 	"wx/os2/frame.h"
 
-1205803499 /usr/include/wx-2.6/wx/toplevel.h
+1223906546 /usr/include/wx-2.6/wx/toplevel.h
 	"wx/window.h"
 	"wx/iconbndl.h"
 	"wx/palmos/toplevel.h"
@@ -638,15 +638,15 @@
 	"wx/motif/toplevel.h"
 	"wx/univ/toplevel.h"
 
-1205803499 /usr/include/wx-2.6/wx/iconbndl.h
+1223906546 /usr/include/wx-2.6/wx/iconbndl.h
 	"wx/dynarray.h"
 	"wx/gdicmn.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/toplevel.h
+1223906546 /usr/include/wx-2.6/wx/gtk/toplevel.h
 
-1205803499 /usr/include/wx-2.6/wx/gtk/frame.h
+1223906546 /usr/include/wx-2.6/wx/gtk/frame.h
 
-1205803498 /usr/include/wx-2.6/wx/icon.h
+1223906546 /usr/include/wx-2.6/wx/icon.h
 	"wx/iconloc.h"
 	"wx/palmos/icon.h"
 	"wx/msw/icon.h"
@@ -658,15 +658,15 @@
 	"wx/cocoa/icon.h"
 	"wx/os2/icon.h"
 
-1205803498 /usr/include/wx-2.6/wx/iconloc.h
+1223906545 /usr/include/wx-2.6/wx/iconloc.h
 	"wx/string.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/icon.h
+1223906546 /usr/include/wx-2.6/wx/gtk/icon.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/bitmap.h"
 
-1205803498 /usr/include/wx-2.6/wx/bitmap.h
+1223906546 /usr/include/wx-2.6/wx/bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -682,42 +682,42 @@
 	"wx/cocoa/bitmap.h"
 	"wx/os2/bitmap.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/bitmap.h
+1223906546 /usr/include/wx-2.6/wx/gtk/bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/palette.h"
 	"wx/gdiobj.h"
 
-1205803498 /usr/include/wx-2.6/wx/fileconf.h
+1223906545 /usr/include/wx-2.6/wx/fileconf.h
 	"wx/defs.h"
 	"wx/textfile.h"
 	"wx/string.h"
 	"wx/confbase.h"
 
-1205803498 /usr/include/wx-2.6/wx/textfile.h
+1223906545 /usr/include/wx-2.6/wx/textfile.h
 	"wx/defs.h"
 	"wx/textbuf.h"
 	"wx/file.h"
 
-1205803498 /usr/include/wx-2.6/wx/textbuf.h
+1223906545 /usr/include/wx-2.6/wx/textbuf.h
 	"wx/defs.h"
 	"wx/arrstr.h"
 	"wx/string.h"
 	"wx/dynarray.h"
 
-1205803498 /usr/include/wx-2.6/wx/file.h
+1223906545 /usr/include/wx-2.6/wx/file.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/filefn.h"
 	"wx/strconv.h"
 
-1205803498 /usr/include/wx-2.6/wx/confbase.h
+1223906545 /usr/include/wx-2.6/wx/confbase.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/string.h"
 
-1205803498 /usr/include/wx-2.6/wx/wfstream.h
+1223906545 /usr/include/wx-2.6/wx/wfstream.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -725,13 +725,13 @@
 	"wx/file.h"
 	"wx/ffile.h"
 
-1205803498 /usr/include/wx-2.6/wx/ffile.h
+1223906545 /usr/include/wx-2.6/wx/ffile.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/filefn.h"
 	<stdio.h>
 
-1205803499 /usr/include/wx-2.6/wx/notebook.h
+1223906546 /usr/include/wx-2.6/wx/notebook.h
 	"wx/defs.h"
 	"wx/bookctrl.h"
 	"wx/univ/notebook.h"
@@ -742,14 +742,14 @@
 	"wx/cocoa/notebook.h"
 	"wx/os2/notebook.h"
 
-1205803498 /usr/include/wx-2.6/wx/bookctrl.h
+1223906546 /usr/include/wx-2.6/wx/bookctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/dynarray.h"
 	"wx/notebook.h"
 	"wx/choicebk.h"
 
-1205803498 /usr/include/wx-2.6/wx/control.h
+1223906546 /usr/include/wx-2.6/wx/control.h
 	"wx/defs.h"
 	"wx/window.h"
 	"wx/univ/control.h"
@@ -761,21 +761,21 @@
 	"wx/cocoa/control.h"
 	"wx/os2/control.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/control.h
+1223906546 /usr/include/wx-2.6/wx/gtk/control.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/window.h"
 
-1205803498 /usr/include/wx-2.6/wx/choicebk.h
+1223906546 /usr/include/wx-2.6/wx/choicebk.h
 	"wx/defs.h"
 	"wx/bookctrl.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/notebook.h
+1223906546 /usr/include/wx-2.6/wx/generic/notebook.h
 	"wx/event.h"
 	"wx/control.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/notebook.h
+1223906546 /usr/include/wx-2.6/wx/gtk/notebook.h
 	"wx/list.h"
 
 1223672243 /home/flavien/dev/feu/src/interface/interface.hpp
@@ -796,14 +796,14 @@
 	<math.h>
 	<iostream>
 
-1205803498 /usr/include/wx-2.6/wx/wxprec.h
+1223906545 /usr/include/wx-2.6/wx/wxprec.h
 	"wx/defs.h"
 	"wx/wxchar.h"
 	"wx/msw/wrapwin.h"
 	<PalmOS.h>
 	"wx/wx.h"
 
-1205803498 /usr/include/wx-2.6/wx/wx.h
+1223906545 /usr/include/wx-2.6/wx/wx.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/dynarray.h"
@@ -868,7 +868,7 @@
 	"wx/validate.h"
 	"wx/valtext.h"
 
-1205803498 /usr/include/wx-2.6/wx/dc.h
+1223906546 /usr/include/wx-2.6/wx/dc.h
 	"wx/object.h"
 	"wx/cursor.h"
 	"wx/font.h"
@@ -890,7 +890,7 @@
 	"wx/cocoa/dc.h"
 	"wx/os2/dc.h"
 
-1205803498 /usr/include/wx-2.6/wx/brush.h
+1223906546 /usr/include/wx-2.6/wx/brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -903,14 +903,14 @@
 	"wx/cocoa/brush.h"
 	"wx/os2/brush.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/brush.h
+1223906546 /usr/include/wx-2.6/wx/gtk/brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1205803498 /usr/include/wx-2.6/wx/pen.h
+1223906546 /usr/include/wx-2.6/wx/pen.h
 	"wx/palmos/pen.h"
 	"wx/msw/pen.h"
 	"wx/x11/pen.h"
@@ -920,21 +920,21 @@
 	"wx/cocoa/pen.h"
 	"wx/os2/pen.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/pen.h
+1223906546 /usr/include/wx-2.6/wx/gtk/pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1205803498 /usr/include/wx-2.6/wx/math.h
+1223906545 /usr/include/wx-2.6/wx/math.h
 	"wx/defs.h"
 	<math.h>
 	<float.h>
 
-1205803499 /usr/include/wx-2.6/wx/gtk/dc.h
+1223906546 /usr/include/wx-2.6/wx/gtk/dc.h
 
-1205803498 /usr/include/wx-2.6/wx/dcclient.h
+1223906546 /usr/include/wx-2.6/wx/dcclient.h
 	"wx/palmos/dcclient.h"
 	"wx/msw/dcclient.h"
 	"wx/motif/dcclient.h"
@@ -945,11 +945,11 @@
 	"wx/cocoa/dcclient.h"
 	"wx/os2/dcclient.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/dcclient.h
+1223906546 /usr/include/wx-2.6/wx/gtk/dcclient.h
 	"wx/dc.h"
 	"wx/window.h"
 
-1205803498 /usr/include/wx-2.6/wx/dcmemory.h
+1223906546 /usr/include/wx-2.6/wx/dcmemory.h
 	"wx/palmos/dcmemory.h"
 	"wx/msw/dcmemory.h"
 	"wx/motif/dcmemory.h"
@@ -960,17 +960,17 @@
 	"wx/cocoa/dcmemory.h"
 	"wx/os2/dcmemory.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/dcmemory.h
+1223906546 /usr/include/wx-2.6/wx/gtk/dcmemory.h
 	"wx/defs.h"
 	"wx/dcclient.h"
 
-1205803498 /usr/include/wx-2.6/wx/dcprint.h
+1223906546 /usr/include/wx-2.6/wx/dcprint.h
 	"wx/palmos/dcprint.h"
 	"wx/msw/dcprint.h"
 	"wx/os2/dcprint.h"
 	"wx/mac/dcprint.h"
 
-1205803498 /usr/include/wx-2.6/wx/dcscreen.h
+1223906546 /usr/include/wx-2.6/wx/dcscreen.h
 	"wx/palmos/dcscreen.h"
 	"wx/msw/dcscreen.h"
 	"wx/motif/dcscreen.h"
@@ -981,10 +981,10 @@
 	"wx/cocoa/dcscreen.h"
 	"wx/os2/dcscreen.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/dcscreen.h
+1223906546 /usr/include/wx-2.6/wx/gtk/dcscreen.h
 	"wx/dcclient.h"
 
-1205803498 /usr/include/wx-2.6/wx/button.h
+1223906546 /usr/include/wx-2.6/wx/button.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/button.h"
@@ -996,13 +996,13 @@
 	"wx/os2/button.h"
 	"wx/palmos/button.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/button.h
+1223906546 /usr/include/wx-2.6/wx/gtk/button.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/control.h"
 
-1205803498 /usr/include/wx-2.6/wx/menu.h
+1223906546 /usr/include/wx-2.6/wx/menu.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/window.h"
@@ -1016,7 +1016,7 @@
 	"wx/cocoa/menu.h"
 	"wx/os2/menu.h"
 
-1205803499 /usr/include/wx-2.6/wx/menuitem.h
+1223906546 /usr/include/wx-2.6/wx/menuitem.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/univ/menuitem.h"
@@ -1028,12 +1028,12 @@
 	"wx/cocoa/menuitem.h"
 	"wx/os2/menuitem.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/menuitem.h
+1223906546 /usr/include/wx-2.6/wx/gtk/menuitem.h
 	"wx/bitmap.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/menu.h
+1223906546 /usr/include/wx-2.6/wx/gtk/menu.h
 
-1205803498 /usr/include/wx-2.6/wx/dialog.h
+1223906546 /usr/include/wx-2.6/wx/dialog.h
 	"wx/defs.h"
 	"wx/containr.h"
 	"wx/toplevel.h"
@@ -1046,10 +1046,10 @@
 	"wx/cocoa/dialog.h"
 	"wx/os2/dialog.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/dialog.h
+1223906546 /usr/include/wx-2.6/wx/gtk/dialog.h
 	"wx/defs.h"
 
-1205803498 /usr/include/wx-2.6/wx/timer.h
+1223906545 /usr/include/wx-2.6/wx/timer.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/longlong.h"
@@ -1063,19 +1063,19 @@
 	"wx/mac/timer.h"
 	"wx/os2/timer.h"
 
-1205803498 /usr/include/wx-2.6/wx/stopwatch.h
+1223906545 /usr/include/wx-2.6/wx/stopwatch.h
 	"wx/defs.h"
 	"wx/longlong.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/timer.h
+1223906546 /usr/include/wx-2.6/wx/gtk/timer.h
 
-1205803498 /usr/include/wx-2.6/wx/generic/timer.h
+1223906546 /usr/include/wx-2.6/wx/generic/timer.h
 
-1205803498 /usr/include/wx-2.6/wx/settings.h
+1223906546 /usr/include/wx-2.6/wx/settings.h
 	"wx/colour.h"
 	"wx/font.h"
 
-1205803498 /usr/include/wx-2.6/wx/msgdlg.h
+1223906546 /usr/include/wx-2.6/wx/msgdlg.h
 	"wx/defs.h"
 	"wx/generic/msgdlgg.h"
 	"wx/generic/msgdlgg.h"
@@ -1088,15 +1088,15 @@
 	"wx/generic/msgdlgg.h"
 	"wx/os2/msgdlg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/msgdlgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/msgdlgg.h
 	"wx/setup.h"
 	"wx/dialog.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/msgdlg.h
+1223906546 /usr/include/wx-2.6/wx/gtk/msgdlg.h
 	"wx/setup.h"
 	"wx/dialog.h"
 
-1205803498 /usr/include/wx-2.6/wx/cmndata.h
+1223906546 /usr/include/wx-2.6/wx/cmndata.h
 	"wx/window.h"
 	"wx/font.h"
 	"wx/encinfo.h"
@@ -1104,14 +1104,14 @@
 	"wx/gdicmn.h"
 	"wx/stream.h"
 
-1205803498 /usr/include/wx-2.6/wx/encinfo.h
+1223906546 /usr/include/wx-2.6/wx/encinfo.h
 	"wx/string.h"
 
-1205803498 /usr/include/wx-2.6/wx/ctrlsub.h
+1223906546 /usr/include/wx-2.6/wx/ctrlsub.h
 	"wx/defs.h"
 	"wx/control.h"
 
-1205803498 /usr/include/wx-2.6/wx/bmpbuttn.h
+1223906546 /usr/include/wx-2.6/wx/bmpbuttn.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 	"wx/button.h"
@@ -1123,9 +1123,9 @@
 	"wx/cocoa/bmpbuttn.h"
 	"wx/os2/bmpbuttn.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/bmpbuttn.h
+1223906546 /usr/include/wx-2.6/wx/gtk/bmpbuttn.h
 
-1205803498 /usr/include/wx-2.6/wx/checkbox.h
+1223906546 /usr/include/wx-2.6/wx/checkbox.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/checkbox.h"
@@ -1137,9 +1137,9 @@
 	"wx/os2/checkbox.h"
 	"wx/palmos/checkbox.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/checkbox.h
+1223906546 /usr/include/wx-2.6/wx/gtk/checkbox.h
 
-1205803498 /usr/include/wx-2.6/wx/checklst.h
+1223906546 /usr/include/wx-2.6/wx/checklst.h
 	"wx/listbox.h"
 	"wx/univ/checklst.h"
 	"wx/msw/wince/checklst.h"
@@ -1150,7 +1150,7 @@
 	"wx/cocoa/checklst.h"
 	"wx/os2/checklst.h"
 
-1205803498 /usr/include/wx-2.6/wx/listbox.h
+1223906546 /usr/include/wx-2.6/wx/listbox.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/univ/listbox.h"
@@ -1161,12 +1161,12 @@
 	"wx/os2/listbox.h"
 	"wx/cocoa/listbox.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/listbox.h
+1223906546 /usr/include/wx-2.6/wx/gtk/listbox.h
 	"wx/list.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/checklst.h
+1223906546 /usr/include/wx-2.6/wx/gtk/checklst.h
 
-1205803498 /usr/include/wx-2.6/wx/choice.h
+1223906546 /usr/include/wx-2.6/wx/choice.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/univ/choice.h"
@@ -1178,9 +1178,9 @@
 	"wx/cocoa/choice.h"
 	"wx/os2/choice.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/choice.h
+1223906546 /usr/include/wx-2.6/wx/gtk/choice.h
 
-1205803498 /usr/include/wx-2.6/wx/scrolbar.h
+1223906546 /usr/include/wx-2.6/wx/scrolbar.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/scrolbar.h"
@@ -1191,10 +1191,10 @@
 	"wx/cocoa/scrolbar.h"
 	"wx/os2/scrolbar.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/scrolbar.h
+1223906546 /usr/include/wx-2.6/wx/gtk/scrolbar.h
 	"wx/defs.h"
 
-1205803498 /usr/include/wx-2.6/wx/stattext.h
+1223906546 /usr/include/wx-2.6/wx/stattext.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/stattext.h"
@@ -1206,13 +1206,13 @@
 	"wx/os2/stattext.h"
 	"wx/palmos/stattext.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/stattext.h
+1223906546 /usr/include/wx-2.6/wx/gtk/stattext.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/control.h"
 
-1205803498 /usr/include/wx-2.6/wx/statbmp.h
+1223906546 /usr/include/wx-2.6/wx/statbmp.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/bitmap.h"
@@ -1224,10 +1224,10 @@
 	"wx/cocoa/statbmp.h"
 	"wx/os2/statbmp.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/statbmp.h
+1223906546 /usr/include/wx-2.6/wx/gtk/statbmp.h
 	"wx/icon.h"
 
-1205803498 /usr/include/wx-2.6/wx/statbox.h
+1223906546 /usr/include/wx-2.6/wx/statbox.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/statbox.h"
@@ -1238,9 +1238,9 @@
 	"wx/cocoa/statbox.h"
 	"wx/os2/statbox.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/statbox.h
+1223906546 /usr/include/wx-2.6/wx/gtk/statbox.h
 
-1205803498 /usr/include/wx-2.6/wx/radiobox.h
+1223906546 /usr/include/wx-2.6/wx/radiobox.h
 	"wx/ctrlsub.h"
 	"wx/univ/radiobox.h"
 	"wx/msw/radiobox.h"
@@ -1251,10 +1251,10 @@
 	"wx/os2/radiobox.h"
 	"wx/palmos/radiobox.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/radiobox.h
+1223906546 /usr/include/wx-2.6/wx/gtk/radiobox.h
 	"wx/bitmap.h"
 
-1205803498 /usr/include/wx-2.6/wx/radiobut.h
+1223906546 /usr/include/wx-2.6/wx/radiobut.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/radiobut.h"
@@ -1266,9 +1266,9 @@
 	"wx/os2/radiobut.h"
 	"wx/palmos/radiobut.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/radiobut.h
+1223906546 /usr/include/wx-2.6/wx/gtk/radiobut.h
 
-1205803498 /usr/include/wx-2.6/wx/textctrl.h
+1223906546 /usr/include/wx-2.6/wx/textctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/dynarray.h"
@@ -1284,14 +1284,14 @@
 	"wx/cocoa/textctrl.h"
 	"wx/os2/textctrl.h"
 
-1205803498 /usr/include/wx-2.6/wx/ioswrap.h
+1223906545 /usr/include/wx-2.6/wx/ioswrap.h
 	<iostream.h>
 	<iostream>
 	"wx/msw/winundef.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/textctrl.h
+1223906546 /usr/include/wx-2.6/wx/gtk/textctrl.h
 
-1205803498 /usr/include/wx-2.6/wx/slider.h
+1223906546 /usr/include/wx-2.6/wx/slider.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/slider.h"
@@ -1303,9 +1303,9 @@
 	"wx/os2/slider.h"
 	"wx/palmos/slider.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/slider.h
+1223906546 /usr/include/wx-2.6/wx/gtk/slider.h
 
-1205803498 /usr/include/wx-2.6/wx/gauge.h
+1223906546 /usr/include/wx-2.6/wx/gauge.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/gauge.h"
@@ -1316,13 +1316,13 @@
 	"wx/cocoa/gauge.h"
 	"wx/os2/gauge.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/gauge.h
+1223906546 /usr/include/wx-2.6/wx/gtk/gauge.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/control.h"
 
-1205803498 /usr/include/wx-2.6/wx/dirdlg.h
+1223906546 /usr/include/wx-2.6/wx/dirdlg.h
 	"wx/dialog.h"
 	"wx/generic/dirdlgg.h"
 	"wx/generic/dirdlgg.h"
@@ -1330,10 +1330,10 @@
 	"wx/mac/dirdlg.h"
 	"wx/generic/dirdlgg.h"
 
-1205803499 /usr/include/wx-2.6/wx/generic/dirdlgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/dirdlgg.h
 	"wx/dialog.h"
 
-1205803498 /usr/include/wx-2.6/wx/toolbar.h
+1223906546 /usr/include/wx-2.6/wx/toolbar.h
 	"wx/defs.h"
 	"wx/tbarbase.h"
 	"wx/univ/toolbar.h"
@@ -1347,15 +1347,15 @@
 	"wx/cocoa/toolbar.h"
 	"wx/os2/toolbar.h"
 
-1205803499 /usr/include/wx-2.6/wx/tbarbase.h
+1223906546 /usr/include/wx-2.6/wx/tbarbase.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 	"wx/list.h"
 	"wx/control.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/tbargtk.h
+1223906546 /usr/include/wx-2.6/wx/gtk/tbargtk.h
 
-1205803498 /usr/include/wx-2.6/wx/combobox.h
+1223906546 /usr/include/wx-2.6/wx/combobox.h
 	"wx/defs.h"
 	"wx/textctrl.h"
 	"wx/ctrlsub.h"
@@ -1367,14 +1367,14 @@
 	"wx/cocoa/combobox.h"
 	"wx/os2/combobox.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/combobox.h
+1223906546 /usr/include/wx-2.6/wx/gtk/combobox.h
 	"wx/defs.h"
 	"wx/object.h"
 
-1205803498 /usr/include/wx-2.6/wx/layout.h
+1223906546 /usr/include/wx-2.6/wx/layout.h
 	"wx/object.h"
 
-1205803498 /usr/include/wx-2.6/wx/sizer.h
+1223906546 /usr/include/wx-2.6/wx/sizer.h
 	"wx/defs.h"
 	"wx/button.h"
 	"wx/window.h"
@@ -1382,7 +1382,7 @@
 	"wx/dialog.h"
 	"wx/bookctrl.h"
 
-1205803498 /usr/include/wx-2.6/wx/mdi.h
+1223906546 /usr/include/wx-2.6/wx/mdi.h
 	"wx/defs.h"
 	"wx/generic/mdig.h"
 	"wx/msw/mdi.h"
@@ -1392,7 +1392,7 @@
 	"wx/cocoa/mdi.h"
 	"wx/generic/mdig.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/mdi.h
+1223906546 /usr/include/wx-2.6/wx/gtk/mdi.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
@@ -1401,7 +1401,7 @@
 	"wx/frame.h"
 	"wx/toolbar.h"
 
-1205803498 /usr/include/wx-2.6/wx/statusbr.h
+1223906546 /usr/include/wx-2.6/wx/statusbr.h
 	"wx/window.h"
 	"wx/list.h"
 	"wx/dynarray.h"
@@ -1412,41 +1412,41 @@
 	"wx/mac/statusbr.h"
 	"wx/generic/statusbr.h"
 
-1205803499 /usr/include/wx-2.6/wx/generic/statusbr.h
+1223906546 /usr/include/wx-2.6/wx/generic/statusbr.h
 	"wx/pen.h"
 	"wx/font.h"
 	"wx/statusbr.h"
 	"wx/arrstr.h"
 
-1205803498 /usr/include/wx-2.6/wx/choicdlg.h
+1223906546 /usr/include/wx-2.6/wx/choicdlg.h
 	"wx/generic/choicdgg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/choicdgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/choicdgg.h
 	"wx/dynarray.h"
 	"wx/dialog.h"
 
-1205803498 /usr/include/wx-2.6/wx/textdlg.h
+1223906546 /usr/include/wx-2.6/wx/textdlg.h
 	"wx/generic/textdlgg.h"
 	"wx/numdlg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/textdlgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/textdlgg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/valtext.h"
 
-1205803498 /usr/include/wx-2.6/wx/valtext.h
+1223906546 /usr/include/wx-2.6/wx/valtext.h
 	"wx/defs.h"
 	"wx/textctrl.h"
 	"wx/validate.h"
 
-1205803498 /usr/include/wx-2.6/wx/numdlg.h
+1223906546 /usr/include/wx-2.6/wx/numdlg.h
 	"wx/generic/numdlgg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/numdlgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/numdlgg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1205803498 /usr/include/wx-2.6/wx/filedlg.h
+1223906546 /usr/include/wx-2.6/wx/filedlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/arrstr.h"
@@ -1460,24 +1460,24 @@
 	"wx/cocoa/filedlg.h"
 	"wx/os2/filedlg.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/filedlgg.h
+1223906546 /usr/include/wx-2.6/wx/generic/filedlgg.h
 	"wx/listctrl.h"
 	"wx/datetime.h"
 
-1205803499 /usr/include/wx-2.6/wx/listctrl.h
+1223906546 /usr/include/wx-2.6/wx/listctrl.h
 	"wx/defs.h"
 	"wx/listbase.h"
 	"wx/msw/listctrl.h"
 	"wx/generic/listctrl.h"
 
-1205803499 /usr/include/wx-2.6/wx/listbase.h
+1223906546 /usr/include/wx-2.6/wx/listbase.h
 	"wx/defs.h"
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/gdicmn.h"
 	"wx/event.h"
 
-1205803499 /usr/include/wx-2.6/wx/generic/listctrl.h
+1223906546 /usr/include/wx-2.6/wx/generic/listctrl.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/imaglist.h"
@@ -1489,20 +1489,20 @@
 	"wx/settings.h"
 	"wx/listbase.h"
 
-1205803499 /usr/include/wx-2.6/wx/imaglist.h
+1223906546 /usr/include/wx-2.6/wx/imaglist.h
 	"wx/msw/imaglist.h"
 	"wx/mac/imaglist.h"
 	"wx/generic/imaglist.h"
 
-1205803498 /usr/include/wx-2.6/wx/generic/imaglist.h
+1223906546 /usr/include/wx-2.6/wx/generic/imaglist.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/icon.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/filedlg.h
+1223906546 /usr/include/wx-2.6/wx/gtk/filedlg.h
 	"wx/generic/filedlgg.h"
 
-1205803499 /usr/include/wx-2.6/wx/spinctrl.h
+1223906546 /usr/include/wx-2.6/wx/spinctrl.h
 	"wx/defs.h"
 	"wx/spinbutt.h"
 	"wx/generic/spinctlg.h"
@@ -1513,7 +1513,7 @@
 	"wx/mac/spinctrl.h"
 	"wx/generic/spinctlg.h"
 
-1205803499 /usr/include/wx-2.6/wx/spinbutt.h
+1223906546 /usr/include/wx-2.6/wx/spinbutt.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/event.h"
@@ -1525,16 +1525,16 @@
 	"wx/cocoa/spinbutt.h"
 	"wx/os2/spinbutt.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/spinbutt.h
+1223906546 /usr/include/wx-2.6/wx/gtk/spinbutt.h
 
-1205803498 /usr/include/wx-2.6/wx/generic/spinctlg.h
+1223906546 /usr/include/wx-2.6/wx/generic/spinctlg.h
 	"wx/textctrl.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/spinctrl.h
+1223906546 /usr/include/wx-2.6/wx/gtk/spinctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 
-1205803499 /usr/include/wx-2.6/wx/tooltip.h
+1223906546 /usr/include/wx-2.6/wx/tooltip.h
 	"wx/defs.h"
 	"wx/msw/tooltip.h"
 	"wx/gtk/tooltip.h"
@@ -1542,7 +1542,7 @@
 	"wx/cocoa/tooltip.h"
 	"wx/os2/tooltip.h"
 
-1205803499 /usr/include/wx-2.6/wx/gtk/tooltip.h
+1223906546 /usr/include/wx-2.6/wx/gtk/tooltip.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/object.h"
@@ -1879,7 +1879,7 @@
 	"GLFlameCanvas.hpp"
 	"GLFluidsCanvas.hpp"
 
-1205803498 /usr/include/wx-2.6/wx/gbsizer.h
+1223906546 /usr/include/wx-2.6/wx/gbsizer.h
 	"wx/sizer.h"
 
 1188595533 /home/flavien/dev/feu/src/interface/GLFluidsCanvas.hpp
@@ -2122,12 +2122,13 @@
 	<GL/glu.h>
 	"../vector.hpp"
 
-1224711061 /home/flavien/recherche/git/flames/src/flames/abstractFires.hpp
+1226079403 /home/flavien/recherche/git/flames/src/flames/abstractFires.hpp
 	"flames.hpp"
 	<engine/Utility/GraphicsFn.hpp>
 	<engine/Shading/Glsl.hpp>
 	<engine/Scene/Texture.hpp>
 	<engine/Scene/CObject.hpp>
+	<engine/Scene/Light.hpp>
 	"../solvers/solver3D.hpp"
 	"realFlames.hpp"
 	"ies.hpp"
@@ -2140,7 +2141,7 @@
 1223747376 /home/flavien/recherche/git/flames/src/solvers/realField3D.hpp
 	"field3D.hpp"
 
-1223748575 /home/flavien/recherche/git/flames/src/solvers/field3D.hpp
+1224866176 /home/flavien/recherche/git/flames/src/solvers/field3D.hpp
 	"field.hpp"
 	"../flames/particle.hpp"
 	<list>
@@ -2164,12 +2165,11 @@
 	<iostream>
 	<string.h>
 
-1224626857 /home/flavien/recherche/git/flames/src/flames/realFlames.hpp
+1225924037 /home/flavien/recherche/git/flames/src/flames/realFlames.hpp
 	"abstractFlames.hpp"
 	<list>
 
-1224626857 /home/flavien/recherche/git/flames/src/flames/abstractFlames.hpp
-	<engine/Scene/Texture.hpp>
+1225666397 /home/flavien/recherche/git/flames/src/flames/abstractFlames.hpp
 	"periSkeleton.hpp"
 	"leadSkeleton.hpp"
 	"../solvers/solver3D.hpp"
@@ -2191,18 +2191,18 @@
 1223738129 /home/flavien/recherche/git/flames/src/flames/noise.hpp
 	<sys/types.h>
 
-1224626857 /home/flavien/recherche/git/flames/src/flames/wick.hpp
+1225839645 /home/flavien/recherche/git/flames/src/flames/wick.hpp
 	<engine/Scene/CObject.hpp>
 	"leadSkeleton.hpp"
 
 1223738129 /home/flavien/recherche/git/flames/src/flames/ies.hpp
 	"flames.hpp"
 
-1224711521 /home/flavien/recherche/git/flames/src/flames/luminary.hpp
+1226015821 /home/flavien/recherche/git/flames/src/flames/luminary.hpp
 	"abstractFires.hpp"
 	"../solvers/field3D.hpp"
 
-1224711403 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
+1226011440 /home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp
 	"../common.hpp"
 	"interface.hpp"
 	<wx/glcanvas.h>
@@ -2234,26 +2234,27 @@
 	<vector>
 	<list>
 
-1224626857 /home/flavien/recherche/git/flames/src/flames/solidePhoto.hpp
+1224866176 /home/flavien/recherche/git/flames/src/flames/solidePhoto.hpp
 	<engine/Scene/CScene.hpp>
 	<engine/Shading/Glsl.hpp>
 	"flames.hpp"
 	"ies.hpp"
 
-1223747371 /home/flavien/recherche/git/flames/src/solvers/fieldThread.hpp
+1224866177 /home/flavien/recherche/git/flames/src/solvers/fieldThread.hpp
 	"wx/wx.h"
 	<wx/thread.h>
 	<list>
 	"globalField.hpp"
 	"../flames/abstractFires.hpp"
 
-1224711146 source:/home/flavien/recherche/git/flames/src/flames/abstractFires.cpp
+1225923704 source:/home/flavien/recherche/git/flames/src/flames/abstractFires.cpp
 	"abstractFires.hpp"
 	<engine/Scene/CScene.hpp>
+	<engine/Physics/CEnergy.hpp>
 
-1224626857 source:/home/flavien/recherche/git/flames/src/flames/abstractFlames.cpp
+1225666397 source:/home/flavien/recherche/git/flames/src/flames/abstractFlames.cpp
 	"abstractFlames.hpp"
-	<wx/intl.h>
+	<engine/Scene/Texture.hpp>
 
 1224626857 source:/home/flavien/recherche/git/flames/src/flames/cloneFlames.cpp
 	"cloneFlames.hpp"
@@ -2278,7 +2279,7 @@
 	"periSkeleton.hpp"
 	"../solvers/solver3D.hpp"
 
-1224711350 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
+1226013619 source:/home/flavien/recherche/git/flames/src/flames/luminary.cpp
 	"luminary.hpp"
 	<engine/Scene/CScene.hpp>
 	<engine/Utility/UObjImporter.hpp>
@@ -2317,7 +2318,8 @@
 	"fakeField3D.hpp"
 	"GCSSORSolver3D.hpp"
 
-1224711267 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
+1225922787 /home/flavien/recherche/git/flames/src/flames/realFires.hpp
+	<engine/Utility/UObjImporter.hpp>
 	"abstractFires.hpp"
 	"cloneFlames.hpp"
 
@@ -2335,13 +2337,12 @@
 	"../solvers/solver3D.hpp"
 	"leadSkeleton.hpp"
 
-1224711403 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
+1225923861 source:/home/flavien/recherche/git/flames/src/flames/realFires.cpp
 	"realFires.hpp"
 	<engine/Utility/GraphicsFn.hpp>
-	<engine/Utility/UObjImporter.hpp>
 	"../solvers/fakeField3D.hpp"
 
-1224626857 source:/home/flavien/recherche/git/flames/src/flames/realFlames.cpp
+1225924175 source:/home/flavien/recherche/git/flames/src/flames/realFlames.cpp
 	"realFlames.hpp"
 	<engine/Utility/GraphicsFn.hpp>
 	"abstractFires.hpp"
@@ -2357,15 +2358,15 @@
 	"solidePhoto.hpp"
 	"abstractFires.hpp"
 
-1224626857 source:/home/flavien/recherche/git/flames/src/flames/wick.cpp
+1225839635 source:/home/flavien/recherche/git/flames/src/flames/wick.cpp
 	"wick.hpp"
 	<engine/Utility/GraphicsFn.hpp>
 
-1224711533 source:/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.cpp
+1226077845 source:/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.cpp
 	"GLFlameCanvas.hpp"
 	"flamesFrame.hpp"
 	<iostream>
-	"../flames/solidePhoto.hpp"
+	<engine/Shading/CRenderer.hpp>
 
 1224711645 source:/home/flavien/recherche/git/flames/src/interface/flamesFrame.cpp
 	"flamesFrame.hpp"
@@ -2482,7 +2483,7 @@
 	"GCSSORSolver3D.hpp"
 	<fstream>
 
-1224626857 source:/home/flavien/recherche/git/flames/src/solvers/fakeField3D.cpp
+1226011726 source:/home/flavien/recherche/git/flames/src/solvers/fakeField3D.cpp
 	"fakeField3D.hpp"
 	<math.h>
 	<engine/Utility/GraphicsFn.hpp>
@@ -2496,7 +2497,7 @@
 	<engine/Utility/GraphicsFn.hpp>
 	<engine/Common.hpp>
 
-1223742537 source:/home/flavien/recherche/git/flames/src/solvers/fieldThread.cpp
+1224866177 source:/home/flavien/recherche/git/flames/src/solvers/fieldThread.cpp
 	"fieldThread.hpp"
 	"solver3D.hpp"
 	"../flames/abstractFires.hpp"
@@ -2728,15 +2729,17 @@
 	<GL/gl.h>
 	<GL/glu.h>
 
-1224429711 /home/flavien/recherche/git/flames//engine/Shading/Glsl.hpp
+1226012648 /home/flavien/recherche/git/flames//engine/Shading/Glsl.hpp
 	<openGL/gl.h>
 	<GL/gl.h>
 	<iostream>
 	<vector>
+	"../Common.hpp"
 
-1224626857 /home/flavien/recherche/git/flames//engine/Scene/Texture.hpp
+1225841009 /home/flavien/recherche/git/flames//engine/Scene/Texture.hpp
 	<GL/gl.h>
 	<string>
+	"../Common.hpp"
 
 1224626857 /home/flavien/recherche/git/flames//engine/Shading/CGammaFX.hpp
 	"../Shading/Glsl.hpp"
@@ -2749,23 +2752,24 @@
 	<string>
 	<vector>
 
-1224376811 /home/flavien/recherche/git/flames//engine/Common.hpp
+1225840917 /home/flavien/recherche/git/flames//engine/Common.hpp
 	<GL/gl.h>
 	<GL/glu.h>
 	"assert.h"
+	"stdlib.h"
 	<string>
 
 1224320334 /home/flavien/recherche/git/flames//engine/Maths/CVector.hpp
 	"CPoint.hpp"
 
-1224320192 /home/flavien/recherche/git/flames//engine/Maths/CPoint.hpp
+1225665215 /home/flavien/recherche/git/flames//engine/Maths/CPoint.hpp
 	<math.h>
 	<iostream>
 	"../Common.hpp"
 
 1223759696 /home/flavien/recherche/git/flames//engine/Init.hpp
 
-1224710171 /home/flavien/recherche/git/flames//engine/Scene/CScene.hpp
+1225841187 /home/flavien/recherche/git/flames//engine/Scene/CScene.hpp
 	"CObject.hpp"
 	"Light.hpp"
 	"CCamera.hpp"
@@ -2774,13 +2778,13 @@
 	<list>
 	"../Utility/ISingleton.hpp"
 
-1224626857 /home/flavien/recherche/git/flames//engine/Scene/CObject.hpp
+1225839148 /home/flavien/recherche/git/flames//engine/Scene/CObject.hpp
 	"../Common.hpp"
 	"CMesh.hpp"
 	<list>
 	<vector>
 
-1224626857 /home/flavien/recherche/git/flames//engine/Scene/CMesh.hpp
+1225839038 /home/flavien/recherche/git/flames//engine/Scene/CMesh.hpp
 	"../Common.hpp"
 	"../Maths/CVector.hpp"
 	"CBoundingSphere.hpp"
@@ -2790,7 +2794,7 @@
 	"CCamera.hpp"
 	"../Utility/GraphicsFn.hpp"
 
-1224429738 /home/flavien/recherche/git/flames//engine/Scene/CCamera.hpp
+1226077875 /home/flavien/recherche/git/flames//engine/Scene/CCamera.hpp
 	<math.h>
 	"../Common.hpp"
 	"../Maths/CQuaternion.hpp"
@@ -2800,12 +2804,12 @@
 
 1224276619 /home/flavien/recherche/git/flames//engine/Maths/CQuaternion.hpp
 
-1224321103 /home/flavien/recherche/git/flames//engine/Utility/ISingleton.hpp
+1224865994 /home/flavien/recherche/git/flames//engine/Utility/ISingleton.hpp
 	<iostream>
 
-1224626857 /home/flavien/recherche/git/flames//engine/Utility/Numerable.hpp
+1224712516 /home/flavien/recherche/git/flames//engine/Utility/Numerable.hpp
 
-1224626857 /home/flavien/recherche/git/flames//engine/Scene/Light.hpp
+1226079347 /home/flavien/recherche/git/flames//engine/Scene/Light.hpp
 	"../Maths/CVector.hpp"
 	"../Physics/CEnergy.hpp"
 	"CObject.hpp"
@@ -2813,25 +2817,32 @@
 	<vector>
 	<string>
 
-1224276520 /home/flavien/recherche/git/flames//engine/Physics/CEnergy.hpp
+1225665428 /home/flavien/recherche/git/flames//engine/Physics/CEnergy.hpp
 	<stdlib.h>
 
-1224626857 /home/flavien/recherche/git/flames//engine/Utility/UObjImporter.hpp
+1225839239 /home/flavien/recherche/git/flames//engine/Utility/UObjImporter.hpp
 	"../Common.hpp"
 	"../Scene/CScene.hpp"
 	"../Scene/CMaterial.hpp"
 	"../Utility/CRefTable.hpp"
+	"string.h"
 	<string>
 	<vector>
 	<list>
 	<fstream>
 	<sstream>
 
-1224626857 /home/flavien/recherche/git/flames//engine/Scene/CMaterial.hpp
+1225839505 /home/flavien/recherche/git/flames//engine/Scene/CMaterial.hpp
 	"../Physics/CEnergy.hpp"
 	"Texture.hpp"
 	"CScene.hpp"
 
 1224626857 /home/flavien/recherche/git/flames//engine/Utility/CRefTable.hpp
 	<list>
+
+1225664374 /home/flavien/recherche/git/flames//engine/Shading/CRenderer.hpp
+	"IRenderer.hpp"
+	"../Common.hpp"
+
+1226079115 /home/flavien/recherche/git/flames//engine/Shading/IRenderer.hpp
 

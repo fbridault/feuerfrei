@@ -110,7 +110,7 @@ void *FieldFiresThread::Entry()
     AskExecAuthorization();
 
     /* Ajouter les forces externes des FDFs */
-    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
 	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
       (*flamesIterator)->addForces ();
 
@@ -118,7 +118,7 @@ void *FieldFiresThread::Entry()
 
     /* Il faut protéger l'accès aux flammes lors de la construction */
     Lock();
-    for (list < FireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
+    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
 	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
       (*flamesIterator)->build();
     Unlock();

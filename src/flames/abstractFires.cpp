@@ -1,51 +1,33 @@
 #include "abstractFires.hpp"
 
 #include <engine/Scene/CScene.hpp>
+#include <engine/Physics/CEnergy.hpp>
 
-/**********************************************************************************************************************/
-/************************************** IMPLEMENTATION DE LA CLASSE FLAMELIGHT ****************************************/
-/**********************************************************************************************************************/
-
-FlameLight::FlameLight(const CScene* const a_scene, const char* const IESFilename) :
-	m_orientationSPtheta(0.0f), m_scene(a_scene)
-{
-	m_iesFile = new IES(IESFilename);
-}
-
-FlameLight::~FlameLight()
-{
-	delete m_iesFile;
-}
-
-void FlameLight::computeGlowWeights(uint index, float sigma)
-{
-	int offset;
-	m_glowDivide[index] = 0.0f;
-
-	offset = FILTER_SIZE/2;
-	for (int x=-offset ; x<=offset ; x++)
-	{
-		m_glowWeights[index][x+offset] = expf(-(x*x)/(sigma*sigma));
-		m_glowDivide[index] += m_glowWeights[index][x+offset];
-		//    cerr << x << " " << x+offset << " " << m_glowWeights[index][x+offset] << endl;
-	}
-	//     cerr << m_divide[index] << endl;
-	m_glowDivide[index] = 1/m_glowDivide[index];
-}
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
-											CScene* const scene, const wxString &texname) :
-		FlameLight(scene, flameConfig.IESFileName.ToAscii()),
-		m_texture(string(texname.fn_str()), GL_REPEAT, GL_REPEAT),
-		m_position(0.0f,0.0f,0.0f)
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
+												Field3D* const a_rField,
+												uint a_uiNbFlames,
+												CharCPtrC a_szTexname,
+												const CShader& a_rGenShadowCubeMapShader,
+												const CRenderTarget& a_rShadowRenderTarget) :
+		CFlameLight(CPoint(0.0f,0.0f,0.0f),
+								CEnergy(1.0,1.0,1.0),
+								512,
+								a_rGenShadowCubeMapShader,
+								a_rShadowRenderTarget,
+								string(a_rFlameConfig.IESFileName.fn_str())),
+		m_oTexture(a_szTexname, GL_REPEAT, GL_REPEAT)
 {
-	m_solver = s;
+	m_solver = a_rField;
 
-	m_nbFlames=nbFlames;
+	m_nbFlames=a_uiNbFlames;
 	/* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
 	if (m_nbFlames) m_flames = new IRealFlame* [m_nbFlames];
 
@@ -61,7 +43,10 @@ FireSource::FireSource(const FlameConfig& flameConfig, Field3D* const s, uint nb
 	computeGlowWeights(1,10.0f);
 }
 
-FireSource::~FireSource()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+IFireSource::~IFireSource()
 {
 	assert(m_flames != NULL);
 	for (uint i = 0; i < m_nbFlames; i++)
@@ -72,7 +57,10 @@ FireSource::~FireSource()
 	delete[]m_flames;
 }
 
-void FireSource::build()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::build()
 {
 	CPoint averagePos;
 	CVector averageVec;
@@ -88,26 +76,31 @@ void FireSource::build()
 	averagePos *= m_solver->getScale();
 	m_center = averagePos/m_nbFlames;
 	averagePos = m_center + getPosition();
-	setLightPosition(averagePos);
+	SetPosition(averagePos);
 
 	m_direction = averageVec/m_nbFlames;
 }
 
-void FireSource::computeIntensityPositionAndDirection()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::computeIntensityPositionAndDirection()
 {
 	//  float r,y;
 
 	CVector o = getMainDirection();
+	float fIntensity;
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	m_intensity=o.norm()*(m_solver->getScale().y)*m_intensityCoef;
+	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef;
 
 	//  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
-	m_intensity = sqrt(m_intensity);
+	fIntensity = sqrt(fIntensity);
 
+	SetIntensity(fIntensity);
 	// l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
 	// de o projeté perpendiculairement dans ce plan
 //   m_axeRotation.set(-o.z,0.0,o.x);
@@ -121,7 +114,10 @@ void FireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
-void FireSource::buildBoundingSphere ()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::buildBoundingSphere ()
 {
 	CPoint p;
 	float t;
@@ -136,7 +132,10 @@ void FireSource::buildBoundingSphere ()
 	//  m_boundingSphere.centre = getCenterSP();
 }
 
-void FireSource::drawImpostor() const
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::drawImpostor() const
 {
 	if (m_visibility)
 	{
@@ -184,7 +183,10 @@ void FireSource::drawImpostor() const
 	}
 }
 
-void FireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 {
 	bool vis_save=m_visibility;
 	int fluidsLOD, nurbsLOD;
@@ -277,24 +279,58 @@ void FireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 		}
 }
 
-bool FireSource::operator<(const FireSource& other) const
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IFireSource::computeGlowWeights(uint index, float sigma)
+{
+	int offset;
+	m_glowDivide[index] = 0.0f;
+
+	offset = FILTER_SIZE/2;
+	for (int x=-offset ; x<=offset ; x++)
+	{
+		m_glowWeights[index][x+offset] = expf(-(x*x)/(sigma*sigma));
+		m_glowDivide[index] += m_glowWeights[index][x+offset];
+		//    cerr << x << " " << x+offset << " " << m_glowWeights[index][x+offset] << endl;
+	}
+	//     cerr << m_divide[index] << endl;
+	m_glowDivide[index] = 1/m_glowDivide[index];
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+bool IFireSource::operator<(const IFireSource& other) const
 {
 	return (m_dist < other.m_dist);
 }
+
+
 
 /**********************************************************************************************************************/
 /******************************** IMPLEMENTATION DE LA CLASSE DETACHABLEFIRESOURCE ************************************/
 /**********************************************************************************************************************/
 
-DetachableFireSource::DetachableFireSource(const FlameConfig& flameConfig, Field3D* const s, uint nbFlames,
-        CScene* const scene, const wxString &texname) :
-		FireSource (flameConfig, s, nbFlames, scene, texname)
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+IDetachableFireSource::IDetachableFireSource(const FlameConfig& a_rFlameConfig,
+																						Field3D* const a_pField,
+																						uint a_uiNbFlames,
+																						CharCPtrC a_szTexname,
+																						const CShader& a_rGenShadowCubeMapShader,
+																						const CRenderTarget& a_rShadowRenderTarget) :
+		IFireSource (a_rFlameConfig, a_pField, a_uiNbFlames, a_szTexname, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 {
 	computeGlowWeights(0,1.8f);
 	computeGlowWeights(1,2.2f);
 }
 
-DetachableFireSource::~DetachableFireSource()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+IDetachableFireSource::~IDetachableFireSource()
 {
 	for (list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
 	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
@@ -302,7 +338,10 @@ DetachableFireSource::~DetachableFireSource()
 	m_detachedFlamesList.clear ();
 }
 
-void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
 {
 #ifdef COUNT_NURBS_POLYGONS
 	g_count=0;
@@ -337,7 +376,10 @@ void DetachableFireSource::drawFlame(bool display, bool displayParticle, u_char 
 #endif
 }
 
-void DetachableFireSource::build()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::build()
 {
 	CPoint averagePos, tmp;
 	CVector averageVec;
@@ -355,7 +397,7 @@ void DetachableFireSource::build()
 	averagePos *= m_solver->getScale();
 	m_center = averagePos/m_nbFlames;
 	averagePos = m_center + getPosition();
-	setLightPosition(averagePos);
+	SetPosition(averagePos);
 
 	m_direction = averageVec/m_nbFlames;
 
@@ -411,7 +453,7 @@ void DetachableFireSource::build()
 	buildBoundingBox ();
 }
 
-// void DetachableFireSource::drawImpostor() const
+// void IDetachableFireSource::drawImpostor() const
 // {
 //   if(m_visibility)
 //     {
@@ -451,28 +493,39 @@ void DetachableFireSource::build()
 //     }
 // }
 
-void DetachableFireSource::setSmoothShading (bool state)
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::setSmoothShading (bool state)
 {
-	FireSource::setSmoothShading(state);
+	IFireSource::setSmoothShading(state);
 	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
 	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 		(*flamesIterator)->setSmoothShading(state);
 }
 
-void DetachableFireSource::computeIntensityPositionAndDirection()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::computeIntensityPositionAndDirection()
 {
 	CVector o = getMainDirection();
+	float fIntensity;
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	m_intensity=o.norm()*(m_solver->getScale().y)*m_intensityCoef;
+	fIntensity=o.norm()*(m_solver->getScale().y)*m_intensityCoef;
 
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
-	m_intensity = sqrt(m_intensity)*2.0f;
+	fIntensity = sqrt(fIntensity)*2.0f;
 
+	SetIntensity(fIntensity);
 }
 
-void DetachableFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 {
 	bool vis_save=m_visibility;
 	int nurbsLOD, fluidsLOD;
@@ -582,7 +635,10 @@ void DetachableFireSource::computeVisibility(const CCamera &view, bool forceSphe
 		}
 }
 
-void DetachableFireSource::buildBoundingBox ()
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::buildBoundingBox ()
 {
 	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
 	CPoint pt;

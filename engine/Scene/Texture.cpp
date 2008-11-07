@@ -23,33 +23,33 @@ ITexture::~ITexture()
 /******************************* Class CBitmapTexture ******************************/
 /************************************************************************************/
 
-CBitmapTexture::CBitmapTexture(const string& filename) :
+CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename) :
 		ITexture(GL_TEXTURE_2D)
 {
-	load(filename);
-	cout << "Loading scene texture : " << filename << "......" << endl;
+	load(a_szFilename);
+	cout << "Loading scene texture : " << a_szFilename << "......" << endl;
 }
 
-CBitmapTexture::CBitmapTexture(const string& filename, GLenum type) :
+CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLenum type) :
 		ITexture(type)
 {
 	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
 	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
 
-	cout << "Loading scene texture : " << filename << "......" << endl;
-	load(filename);
+	cout << "Loading scene texture : " << a_szFilename << "......" << endl;
+	load(a_szFilename);
 	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
-CBitmapTexture::CBitmapTexture(const string& filename, GLint wrap_s, GLint wrap_t) :
+CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t) :
 		ITexture(GL_TEXTURE_2D)
 {
 	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,wrap_s);
 	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,wrap_t);
 
-	cout << "Loading texture : " << filename << "......" << endl;
-	load(filename);
+	cout << "Loading texture : " << a_szFilename << "......" << endl;
+	load(a_szFilename);
 	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
@@ -60,7 +60,7 @@ CBitmapTexture::~CBitmapTexture()
 
 #define isPowerOfTwo(x) ( ((x&(x-1)) == 0) && (x!=0) )
 
-void CBitmapTexture::load(const string& filename)
+void CBitmapTexture::load(CharCPtrC a_szFilename)
 {
 	uint w,h;
 
@@ -69,18 +69,18 @@ void CBitmapTexture::load(const string& filename)
 	ilGenImages(1, &ImgId); // Generate an image name to use.
 	ilBindImage(ImgId); // Bind this image name
 
-	if ( !ilLoadImage((char *)filename.c_str()) )
-		cerr << "Error loading texture " << filename << endl;
+	if ( !ilLoadImage((char *)a_szFilename) )
+		cerr << "Error loading texture " << a_szFilename << endl;
 
 	w=ilGetInteger(IL_IMAGE_WIDTH);
 	h=ilGetInteger(IL_IMAGE_HEIGHT);
 
 	if (m_type == GL_TEXTURE_2D && (!isPowerOfTwo(w) || !isPowerOfTwo(h)))
-		cerr << "(WW) Bitmap texture " << filename << " size is not a power of 2" << endl;
+		cerr << "(WW) Bitmap texture " << a_szFilename << " size is not a power of 2" << endl;
 
 	m_texName = ilutGLBindMipmaps();
 
-	m_filename = filename;
+	m_szFilename = a_szFilename;
 	m_hasAlpha = false;
 
 	ilDeleteImages(1, &ImgId);

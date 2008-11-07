@@ -22,13 +22,24 @@ public:
 	 * @param scene CPointeur sur la scène.
 	 * @param filename Nom du fichier contenant le luminaire.
 	 */
-	Luminary (const LuminaryConfig& config, vector <Field3D *> &fields, vector <FireSource *> &fireSources,
-						CScene* const scene, const char *filename);
+	Luminary (const LuminaryConfig& a_rConfig,
+						vector <Field3D *> &a_vpFields,
+						vector <IFireSource *> &a_vpFireSources,
+						CScene& a_rScene,
+						CharCPtrC a_szFilename,
+						const CShader& a_rGenShadowCubeMapShader,
+						const CRenderTarget& a_rShadowRenderTarget);
+
 	/** Destructeur */
 	virtual ~Luminary ();
 
 	Field3D* initField(const SolverConfig& fieldConfig, const CPoint& position);
-	FireSource* initFire(const FlameConfig& flameConfig, const char *fileName, Field3D* field, CScene* const scene);
+	IFireSource* initFire(	const FlameConfig& a_rFlameConfig,
+											CharCPtrC a_szFilename,
+											Field3D* a_pField,
+											CScene& a_rScene,
+											const CShader& a_rShadowMapShader,
+											const CRenderTarget& a_rShadowRenderTarget);
 
 	/** Retourne la position absolue dans le repère du monde.
 	 * @return Position absolue dans le repère du monde.
@@ -65,7 +76,7 @@ public:
 	 */
 	virtual void setLOD(u_char value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setLOD(value);
 	};
@@ -75,7 +86,7 @@ public:
 	 */
 	virtual void setInnerForce(float value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setInnerForce(value);
 	};
@@ -85,7 +96,7 @@ public:
 	 */
 	virtual void setFDF(int value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setFDF(value);
 	};
@@ -95,7 +106,7 @@ public:
 	 */
 	virtual void setPerturbateMode(char value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setPerturbateMode(value);
 	};
@@ -105,7 +116,7 @@ public:
 	 */
 	virtual void setLeadLifeSpan(uint value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setLeadLifeSpan(value);
 	};
@@ -115,7 +126,7 @@ public:
 	 */
 	virtual void setPeriLifeSpan(uint value)
 	{
-		for (list < FireSource* >::iterator fireIterator = m_fireSources.begin ();
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 		     fireIterator != m_fireSources.end (); fireIterator++)
 			(*fireIterator)->setPeriLifeSpan(value);
 	};
@@ -143,6 +154,10 @@ public:
 		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
 		     fieldIterator != m_fields.end (); fieldIterator++)
 			(*fieldIterator)->move(diff);
+
+		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
+		     fireIterator != m_fireSources.end (); fireIterator++)
+			(*fireIterator)->move(diff.x, diff.y, diff.z);
 		m_position = position;
 	}
 
@@ -150,7 +165,7 @@ protected:
 	/** Luminaire */
 	vector <CObject *> m_luminary;
 	/** Luminaire */
-	list <FireSource *> m_fireSources;
+	list <IFireSource *> m_fireSources;
 	/** Luminaire */
 	list <Field3D *> m_fields;
 

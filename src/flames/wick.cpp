@@ -3,7 +3,7 @@
 #include <engine/Utility/GraphicsFn.hpp>
 
 
-uint CWick::buildPointFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
+uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
 {
 	CPoint bounds[2], barycentre;
 
@@ -57,7 +57,7 @@ uint CWick::buildPointFDF (const FlameConfig& flameConfig, vector< LeadSkeleton 
 	return 0;
 }
 
-uint CWick::buildFDF (const FlameConfig& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
+uint CWick::buildFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
 {
 	/* Création du VBO */
 	buildVBO();

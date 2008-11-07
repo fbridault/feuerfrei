@@ -36,7 +36,7 @@ public:
 	 * Constructeur par d&eacute;faut.
 	 * @param scene Pointeur vers la scene.
 	 */
-	CMesh (CScene* const scene, uint materialIndex, CObject *a_pParent);
+	CMesh (CScene& a_rScene, uint a_uiMaterial, CObject& a_rParent);
 
 	/** Destructeur par défaut. */
 	virtual ~CMesh ();
@@ -147,11 +147,11 @@ private:
 	/**<Liste des indices des points des facettes */
 	vector <GLuint> m_indexArray;
 
-	/** Pointeur vers la scène. */
-	CScene *m_pScene;
+	/** Référence vers la scène. */
+	CScene& m_rScene;
 
-	/** Pointeur vers l'objet parent */
-	CObject *m_pParent;
+	/** Référence vers l'objet parent */
+	CObject& m_rParent;
 
 	/** Pointeur vers le matériau utilisé. */
 	uint m_uiMaterial;

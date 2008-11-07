@@ -26,7 +26,7 @@ class GLFlameCanvas;
 #include "../solvers/fieldThread.hpp"
 #endif
 
-class PhotometricSolidsRenderer;
+class CForwardRenderer;
 
 class GLFlameCanvas : public wxGLCanvas
 {
@@ -43,37 +43,37 @@ public:
 	void drawFlamesBoundingBoxes(void);
 	void drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex);
 
-	/** Défini l'action à effectuer lorsque la souris se déplace */
+	/** DÃ©fini l'action Ã  effectuer lorsque la souris se dÃ©place */
 	void OnMouseMotion(wxMouseEvent& event);
-	/** Défini l'action à effectuer lorsqu'un bouton de la souris est enfoncé */
+	/** DÃ©fini l'action Ã  effectuer lorsqu'un bouton de la souris est enfoncÃ© */
 	void OnMouseClick(wxMouseEvent& event);
 	void OnMouseWheel(wxMouseEvent& event);
 	void OnKeyPressed(wxKeyEvent& event);
 	void OnSize(wxSizeEvent& event);
 
-	/** Initialisations relatives à l'environnement OpenGL */
+	/** Initialisations relatives Ã  l'environnement OpenGL */
 	void InitGL();
-	/** Initialisations des luminaires, qui eux-mêmes créent les champs de vélocité et les flammes. */
+	/** Initialisations des luminaires, qui eux-mÃªmes crÃ©ent les champs de vÃ©locitÃ© et les flammes. */
 	void InitLuminaries(void);
-	/** Initialisations relatives à la scène */
+	/** Initialisations relatives Ã  la scÃ¨ne */
 	void InitScene();
 #ifdef MULTITHREADS
 	/** Initialisations relatives aux solveurs */
 	void InitThreads(void);
 #endif
-	/** Initialisations relatives aux paramètres de visualisation */
+	/** Initialisations relatives aux paramÃ¨tres de visualisation */
 	void InitUISettings(void);
 	void Restart (void);
 	void ReloadFieldsAndFires (void);
 	void DestroyScene(void);
-	/** Initialisation globale du contrôle */
+	/** Initialisation globale du contrÃ´le */
 	void Init(FlameAppConfig *config);
 
 	bool IsRunning(void)
 	{
 		return m_run;
 	};
-	/** Lance/arrête l'animation */
+	/** Lance/arrÃªte l'animation */
 	void setRunningState(bool run)
 	{
 		m_run=run;
@@ -83,7 +83,7 @@ public:
 #endif
 	};
 
-	/** Active/Désactive le glow seul */
+	/** Active/DÃ©sactive le glow seul */
 	void ToggleGlowOnlyDisplay(void)
 	{
 		m_glowOnly=!m_glowOnly;
@@ -118,7 +118,7 @@ public:
 	};
 	void setSmoothShading(bool state)
 	{
-		for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
 			(*firesIterator)->setSmoothShading (state);
 	};
@@ -128,9 +128,9 @@ public:
 	};
 	void moveLuminary(int selected, CPoint& pt)
 	{
-		/* On ne peut déplacer que les solveurs locaux */
+		/* On ne peut dÃ©placer que les solveurs locaux */
 		m_luminaries[selected]->move(pt);
-		for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
 			(*firesIterator)->computeVisibility(*m_camera,true);
 	};
@@ -150,7 +150,7 @@ public:
 	};
 	void setFlameIntensity(int index, float value)
 	{
-		m_fires[index]->setIntensityCoef(value);
+		m_fires[index]->SetIntensity(value);
 	};
 	void setFlameLOD(int index, u_char value)
 	{
@@ -198,7 +198,7 @@ public:
 	};
 	void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
 
-	/** Change l'affichage des sphères englobantes. */
+	/** Change l'affichage des sphÃ¨res englobantes. */
 	void setBoundingSphereMode(bool mode)
 	{
 		m_scene->setBoundingSphereMode(mode);
@@ -217,7 +217,7 @@ public:
 	};
 	void computeGlowWeights(uint index, float sigma)
 	{
-		for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
 			(*firesIterator)->computeGlowWeights(index, sigma);
 	}
@@ -235,16 +235,16 @@ private:
 
 	/** Configuration de l'application */
 	FlameAppConfig *m_currentConfig;
-	/********* Variables relatives au contrôle de l'affichage **************/
+	/********* Variables relatives au contrÃ´le de l'affichage **************/
 	/* true si la simulation est en cours, 0 sinon */
 	bool m_run, m_saveImages;
 	bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
 	bool m_drawShadowVolumes, m_glowOnly, m_gammaCorrection, m_fullscreen;
 	u_char m_displayFlamesBoundingVolumes;
-	/** true si l'application est correctement initialisée, false sinon */
+	/** true si l'application est correctement initialisÃ©e, false sinon */
 	bool m_init;
 
-	/********* Variables relatives à la fenêtre d'affichage ****************/
+	/********* Variables relatives Ã  la fenÃªtre d'affichage ****************/
 	uint m_width, m_height;
 	uint prevNbFields, prevNbFlames;
 
@@ -260,9 +260,13 @@ private:
 	/* Tableau de pixels pour la sauvegarde des images */
 	u_char *m_pixels;
 
-	/********* Variables relatives aux solides photométriques **************/
-	PhotometricSolidsRenderer *m_photoSolid;
-	PixelLightingRenderer *m_pixelLighting;
+	/********* Variables relatives aux Renderers **************/
+	CForwardRenderer *m_pForwardRenderer;
+
+
+	/********* Variables relatives aux shadow maps **************/
+	CShader *m_genShadowCubeMapShader;
+	CRenderTarget *m_shadowMapRenderTarget;
 
 	/********* Variables relatives au glow *********************************/
 	GlowEngine *m_glowEngine;
@@ -279,8 +283,8 @@ private:
 	vector <Field3D *> m_fields;
 	GlobalField *m_globalField;
 
-	/********* Variables relatives à la simulation *************************/
-	vector <FireSource *> m_fires;
+	/********* Variables relatives Ã  la simulation *************************/
+	vector <IFireSource *> m_fires;
 	CScene *m_scene;
 	CGammaFX *m_gammaEngine;
 	wxStopWatch *m_swatch;
@@ -304,7 +308,7 @@ inline void GLFlameCanvas::drawFlames(void)
 		(*threadIterator)->Unlock();
 	}
 #else
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 	     firesIterator != m_fires.end (); firesIterator++)
 		(*firesIterator)->drawFlame(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
 #endif
@@ -312,14 +316,14 @@ inline void GLFlameCanvas::drawFlames(void)
 
 inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
 {
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 	     firesIterator != m_fires.end (); firesIterator++)
 		(*firesIterator)->drawImpostor ();
 }
 
 inline void GLFlameCanvas::drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex)
 {
-	for (vector < FireSource* >::iterator firesIterator = m_fires.begin ();
+	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 	     firesIterator != m_fires.end (); firesIterator++)
 	{
 		a_rGlowShader.SetUniform1f("divide",(*firesIterator)->getGlowDivide(a_uiIndex));

@@ -51,9 +51,9 @@ DeclareNumerable(_NMouseButton, NMouseButton);
  *
  * @author	Flavien Bridault
  */
-class CCamera : public ISingleton<CCamera>
+class CCamera : public ITSingleton<CCamera>
 {
-	friend class ISingleton<CCamera>;
+	friend class ITSingleton<CCamera>;
 
 private:
 	/** Constructeur du camera.
@@ -144,6 +144,7 @@ public:
 		CVector axis = m_view ^ m_up;
 		m_position = m_position + (axis * value);
 		setView();
+		glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 	};
 	/** Déplacement de la caméra vers l'avant ou vers l'arrière
 	 * On effectue ensuite une translation suivant le vecteur de vue
@@ -153,6 +154,7 @@ public:
 	{
 		m_position = m_position + (m_view * value);
 		setView();
+		glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 	};
 	/** Déplacement de la caméra vers l'avant ou vers l'arrière
 	 * On effectue ensuite une translation suivant le vecteur de vue
@@ -162,6 +164,7 @@ public:
 	{
 		m_position = m_position + (m_up * value);
 		setView();
+		glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 	};
 
 	void setOrthographicProjection()

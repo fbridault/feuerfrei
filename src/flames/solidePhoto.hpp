@@ -9,7 +9,7 @@ class PhotometricSolidsRenderer;
 #include "flames.hpp"
 #include "ies.hpp"
 
-class FireSource;
+class IFireSource;
 
 /** Abstraction d'un solide photométrique.<br>
  * Cette classe permet de charger des fichiers IES et de les utiliser ensuite pour éclairer
@@ -27,8 +27,8 @@ public:
 	 * @param context CPointeur vers le contexte Cg.
 	 * @param  Booléne indiquant s'il faut recompiler ou non les shaders Cg.
 	 */
-	PixelLightingRenderer(const CScene* const a_pScene, const vector <FireSource *> *a_pvpFlames, const string& a_strMacro);
-	PixelLightingRenderer(const CScene* const a_pScene, const vector <FireSource *> *a_pvpFlames, const string& a_strFragmentProgram, const string& a_strMacro);
+	PixelLightingRenderer(const CScene* const a_pScene, const vector <IFireSource *> *a_pvpFlames, const string& a_strMacro);
+	PixelLightingRenderer(const CScene* const a_pScene, const vector <IFireSource *> *a_pvpFlames, const string& a_strFragmentProgram, const string& a_strMacro);
 	/** Destructeur. */
 	virtual ~PixelLightingRenderer();
 
@@ -41,7 +41,7 @@ protected:
 	/** CPointeur vers la scène 3D. */
 	const CScene* m_scene;
 	/** CPointeur vers les flammes. */
-	const vector <FireSource *> *m_flames;
+	const vector <IFireSource *> *m_flames;
 
 	/** Shader */
 	CShader m_oShader;
@@ -70,7 +70,7 @@ public:
 	 * @param context CPointeur vers le contexte Cg.
 	 * @param  Booléne indiquant s'il faut recompiler ou non les shaders Cg.
 	 */
-	PhotometricSolidsRenderer(const CScene* const s, const vector <FireSource *> *flames, const string& a_strMacro);
+	PhotometricSolidsRenderer(const CScene* const s, const vector <IFireSource *> *flames, const string& a_strMacro);
 	/** Destructeur. */
 	virtual ~PhotometricSolidsRenderer();
 

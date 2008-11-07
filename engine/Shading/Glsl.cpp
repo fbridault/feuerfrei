@@ -3,7 +3,6 @@
 #include <fstream>
 
 #define SEPARATOR ","
-#define SHADERS_DIRECTORY "src/shaders/"
 
 #include <iostream>
 
@@ -11,6 +10,8 @@
 
 
 using namespace std;
+
+static CharCPtr s_szDirectory = NULL;
 
 CShader::CShader(const string& vpname, const string& fpname, const string& macros)
 {
@@ -41,6 +42,10 @@ CShader::CShader(const string& fpname, const string& macros)
   Link();
 };
 
+void CShader::SetShadersDirectory(CharCPtrC a_szDirectory)
+{
+	s_szDirectory = a_szDirectory;
+}
 
 void IShaderProgram::load(const string& fileNames, const string& macros ) const
 {
@@ -49,10 +54,11 @@ void IShaderProgram::load(const string& fileNames, const string& macros ) const
   vector<string> vFileNames;
 
   assert(!fileNames.empty());
+  assert(s_szDirectory != NULL);
 
   /** On splitte d'abord les noms de fichiers en un tableau de chaînes */
   /** En ajoutant le nom du répertoire à chaque fichier */
-  splitStringInStringsArray(fileNames,vFileNames,SHADERS_DIRECTORY,"");
+  splitStringInStringsArray(fileNames,vFileNames,s_szDirectory,"");
 
   cout << "Shader(s) ";
   for (vector<string>::const_iterator fileNamesIterator = vFileNames.begin ();
@@ -152,3 +158,4 @@ void IShaderProgram::splitStringInStringsArray(const string& names, vector<strin
     splitNames.push_back(str2);
   }
 }
+

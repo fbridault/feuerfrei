@@ -3,6 +3,7 @@
 
 #include <GL/gl.h>
 #include <string>
+#include "../Common.hpp"
 
 using namespace std;
 
@@ -91,20 +92,20 @@ public:
 	/** Construit une texture RGB de type 2D à partir d'un fichier image.
 	 * @param filename Nom du fichier image à charger.
 	 */
-	CBitmapTexture(const string& filename);
+	CBitmapTexture(CharCPtrC a_szFilename);
 
 	/** Construit une texture RGB à partir d'un fichier image.
 	 * @param filename Nom du fichier image à charger.
 	 * @param type Type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
 	 */
-	CBitmapTexture(const string& filename, GLenum type);
+	CBitmapTexture(CharCPtrC a_szFilename, GLenum type);
 
 	/** Construit une texture RGBA de type 2D à partir d'un fichier image.
 	 * @param filename Nom du fichier image à charger.
 	 * @param wrap_s Paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}.
 	 * @param wrap_t Paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}.
 	 */
-	CBitmapTexture(const string& filename, GLint wrap_s, GLint wrap_t);
+	CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t);
 
 	virtual ~CBitmapTexture();
 
@@ -113,16 +114,16 @@ public:
 		return m_hasAlpha;
 	};
 
-	const string& getName() const
+	CharCPtrC getName() const
 	{
-		return m_filename;
+		return m_szFilename;
 	};
 
 private:
-	void load(const string& filename);
+	void load(CharCPtrC a_szFilename);
 
 private:
-	string m_filename;
+	CharCPtr m_szFilename;
 	bool m_hasAlpha;
 };
 

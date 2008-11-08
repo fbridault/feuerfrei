@@ -16,22 +16,22 @@
 	<File name="src/flames/DPengine.hpp" open="0" top="0" tabpos="13">
 		<Cursor position="412" topLine="0" />
 	</File>
-	<File name="src/flames/abstractFires.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1525" topLine="0" />
+	<File name="src/flames/abstractFires.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="22288" topLine="626" />
 	</File>
 	<File name="src/flames/abstractFires.hpp" open="1" top="0" tabpos="1">
 		<Cursor position="11981" topLine="376" />
 	</File>
-	<File name="src/flames/abstractFlames.cpp" open="0" top="0" tabpos="16">
+	<File name="src/flames/abstractFlames.cpp" open="1" top="0" tabpos="16">
 		<Cursor position="7927" topLine="219" />
 	</File>
-	<File name="src/flames/abstractFlames.hpp" open="0" top="0" tabpos="18">
+	<File name="src/flames/abstractFlames.hpp" open="1" top="0" tabpos="18">
 		<Cursor position="13518" topLine="231" />
 	</File>
 	<File name="src/flames/cloneFlames.cpp" open="0" top="0" tabpos="7">
 		<Cursor position="1275" topLine="0" />
 	</File>
-	<File name="src/flames/cloneFlames.hpp" open="0" top="0" tabpos="9">
+	<File name="src/flames/cloneFlames.hpp" open="1" top="0" tabpos="9">
 		<Cursor position="2761" topLine="27" />
 	</File>
 	<File name="src/flames/flames.hpp" open="0" top="0" tabpos="1">
@@ -46,10 +46,10 @@
 	<File name="src/flames/ies.hpp" open="0" top="0" tabpos="8">
 		<Cursor position="291" topLine="0" />
 	</File>
-	<File name="src/flames/leadSkeleton.cpp" open="0" top="0" tabpos="1">
+	<File name="src/flames/leadSkeleton.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="748" topLine="0" />
 	</File>
-	<File name="src/flames/leadSkeleton.hpp" open="0" top="0" tabpos="11">
+	<File name="src/flames/leadSkeleton.hpp" open="1" top="0" tabpos="11">
 		<Cursor position="2118" topLine="44" />
 	</File>
 	<File name="src/flames/luminary.cpp" open="1" top="0" tabpos="2">
@@ -58,43 +58,43 @@
 	<File name="src/flames/luminary.hpp" open="1" top="0" tabpos="18">
 		<Cursor position="5071" topLine="69" />
 	</File>
-	<File name="src/flames/particle.hpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/particle.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="1890" topLine="22" />
 	</File>
-	<File name="src/flames/periSkeleton.cpp" open="0" top="0" tabpos="0">
+	<File name="src/flames/periSkeleton.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="93" topLine="0" />
 	</File>
-	<File name="src/flames/periSkeleton.hpp" open="0" top="0" tabpos="3">
+	<File name="src/flames/periSkeleton.hpp" open="1" top="0" tabpos="3">
 		<Cursor position="3413" topLine="46" />
 	</File>
-	<File name="src/flames/realFires.cpp" open="0" top="0" tabpos="3">
+	<File name="src/flames/realFires.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="3395" topLine="61" />
 	</File>
 	<File name="src/flames/realFires.hpp" open="1" top="0" tabpos="1">
-		<Cursor position="3401" topLine="24" />
+		<Cursor position="3401" topLine="6" />
 	</File>
-	<File name="src/flames/realFlames.cpp" open="0" top="0" tabpos="5">
+	<File name="src/flames/realFlames.cpp" open="1" top="1" tabpos="5">
 		<Cursor position="12930" topLine="362" />
 	</File>
-	<File name="src/flames/realFlames.hpp" open="0" top="0" tabpos="6">
+	<File name="src/flames/realFlames.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="1584" topLine="99" />
 	</File>
-	<File name="src/flames/skeleton.cpp" open="0" top="0" tabpos="9">
+	<File name="src/flames/skeleton.cpp" open="1" top="0" tabpos="9">
 		<Cursor position="583" topLine="21" />
 	</File>
-	<File name="src/flames/skeleton.hpp" open="0" top="0" tabpos="8">
+	<File name="src/flames/skeleton.hpp" open="1" top="0" tabpos="8">
 		<Cursor position="7193" topLine="226" />
 	</File>
-	<File name="src/flames/wick.cpp" open="0" top="0" tabpos="3">
+	<File name="src/flames/wick.cpp" open="1" top="0" tabpos="3">
 		<Cursor position="3210" topLine="39" />
 	</File>
-	<File name="src/flames/wick.hpp" open="0" top="0" tabpos="2">
+	<File name="src/flames/wick.hpp" open="1" top="0" tabpos="2">
 		<Cursor position="882" topLine="0" />
 	</File>
-	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="0" tabpos="13">
+	<File name="src/interface/GLFlameCanvas.cpp" open="0" top="0" tabpos="13">
 		<Cursor position="21355" topLine="722" />
 	</File>
-	<File name="src/interface/GLFlameCanvas.hpp" open="1" top="0" tabpos="17">
+	<File name="src/interface/GLFlameCanvas.hpp" open="0" top="0" tabpos="17">
 		<Cursor position="3438" topLine="113" />
 	</File>
 	<File name="src/interface/GLFluidsCanvas.cpp" open="0" top="0" tabpos="6">
@@ -220,14 +220,14 @@
 	<File name="src/solvers/fakeField3D.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="993" topLine="24" />
 	</File>
-	<File name="src/solvers/fakeField3D.hpp" open="0" top="0" tabpos="0">
+	<File name="src/solvers/fakeField3D.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="3657" topLine="47" />
 	</File>
 	<File name="src/solvers/field.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="68" topLine="0" />
 	</File>
-	<File name="src/solvers/field.hpp" open="1" top="0" tabpos="20">
-		<Cursor position="2181" topLine="67" />
+	<File name="src/solvers/field.hpp" open="0" top="0" tabpos="20">
+		<Cursor position="2181" topLine="0" />
 	</File>
 	<File name="src/solvers/field3D.cpp" open="0" top="0" tabpos="11">
 		<Cursor position="3882" topLine="99" />
@@ -244,7 +244,7 @@
 	<File name="src/solvers/globalField.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="874" topLine="3" />
 	</File>
-	<File name="src/solvers/globalField.hpp" open="1" top="0" tabpos="0">
+	<File name="src/solvers/globalField.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1183" topLine="0" />
 	</File>
 	<File name="src/solvers/logResAvgSolver3D.cpp" open="0" top="0" tabpos="0">
@@ -269,7 +269,7 @@
 		<Cursor position="4601" topLine="117" />
 	</File>
 	<File name="src/solvers/realField3D.hpp" open="0" top="0" tabpos="0">
-		<Cursor position="3196" topLine="53" />
+		<Cursor position="2333" topLine="7" />
 	</File>
 	<File name="src/solvers/solver2D.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="8415" topLine="285" />
@@ -277,7 +277,7 @@
 	<File name="src/solvers/solver2D.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="5353" topLine="116" />
 	</File>
-	<File name="src/solvers/solver3D.cpp" open="0" top="0" tabpos="0">
+	<File name="src/solvers/solver3D.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="11260" topLine="380" />
 	</File>
 	<File name="src/solvers/solver3D.hpp" open="0" top="0" tabpos="0">

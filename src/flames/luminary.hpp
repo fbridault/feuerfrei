@@ -36,7 +36,7 @@ public:
 	Field3D* initField(const SolverConfig& fieldConfig, const CPoint& position);
 	IFireSource* initFire(	const FlameConfig& a_rFlameConfig,
 											CharCPtrC a_szFilename,
-											Field3D* a_pField,
+											Field3D& a_rField,
 											CScene& a_rScene,
 											const CShader& a_rShadowMapShader,
 											const CRenderTarget& a_rShadowRenderTarget);

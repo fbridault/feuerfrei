@@ -131,7 +131,7 @@ public:
 	 * @param texname Nom du fichier contenant le luminaire.
 	 */
 	IFireSource(	const FlameConfig& a_rFlameConfig,
-							Field3D* const a_rField,
+							Field3D& a_rField,
 							uint a_uiNbFlames,
 							CharCPtrC a_szTexname,
 							const CShader& a_rGenShadowCubeMapShader,
@@ -205,7 +205,7 @@ public:
 	 */
 	CPoint const& getPosition () const
 	{
-		return m_solver->getPosition();
+		return m_rField.getPosition();
 	}
 
 	/** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également
@@ -219,7 +219,7 @@ public:
 	virtual void drawWick(bool displayBoxes) const
 	{
 		CPoint const& rPt = getPosition();
-		CPoint const& rScale = m_solver->getScale();
+		CPoint const& rScale = m_rField.getScale();
 		glPushMatrix();
 		glTranslatef (rPt.x,rPt.y, rPt.z);
 		glScalef (rScale.x, rScale.y, rScale.z);
@@ -253,7 +253,7 @@ public:
 				if (m_visibility)
 				{
 					CPoint const& rPt = getPosition();
-					CPoint const& rScale = m_solver->getScale();
+					CPoint const& rScale = m_rField.getScale();
 					glPushMatrix();
 					glTranslatef (rPt.x,rPt.y, rPt.z);
 					glScalef (rScale.x, rScale.y, rScale.z);
@@ -411,7 +411,7 @@ protected:
 	IRealFlame **m_flames;
 
 	/** Pointeur sur le solveur de fluides */
-	Field3D *m_solver;
+	Field3D& m_rField;
 
 	/** ITexture utilisée pour les flammes */
 	CBitmapTexture m_oTexture;
@@ -470,7 +470,7 @@ public:
 	 * @param texname Nom du fichier image de la texture.
 	 */
 	IDetachableFireSource (const FlameConfig& a_rFlameConfig,
-												Field3D* const a_pField,
+												Field3D& a_rField,
 												uint a_uiNbFlames,
 												CharCPtrC a_szTexname,
 												const CShader& a_rGenShadowCubeMapShader,

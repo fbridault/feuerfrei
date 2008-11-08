@@ -11,7 +11,7 @@ uint g_count=0;
 #endif
 
 INurbsFlame::INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
-	m_rTexture(a_rTexture)
+		m_rTexture(a_rTexture)
 {
 	assert(nbSkeletons > 0);
 
@@ -45,7 +45,7 @@ INurbsFlame::INurbsFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const&
 }
 
 INurbsFlame::INurbsFlame(const INurbsFlame* const source, uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
-	m_rTexture(a_rTexture)
+		m_rTexture(a_rTexture)
 {
 	assert(source != NULL);
 	assert(nbSkeletons > 0);
@@ -237,19 +237,16 @@ void IFixedFlame::drawCPointFlame () const
 /*************************************** IMPLEMENTATION DE LA CLASSE REALFLAME ****************************************/
 /**********************************************************************************************************************/
 
-IRealFlame::IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture, Field3D* const s) :
+IRealFlame::IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture) :
 		IFixedFlame (nbSkeletons, nbFixedPoints, a_rTexture)
 {
-	assert(s != NULL);
-
 	m_distances = new float[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
 	m_maxDistancesIndexes = new int[NB_PARTICLES_MAX - 1 + m_nbFixedPoints];
 
-	m_periSkeletons = new PeriSkeleton* [m_nbSkeletons];
+	m_periSkeletons = new CPeriSkeleton* [m_nbSkeletons];
 	for (uint i = 0; i < m_nbSkeletons; i++)
 		m_periSkeletons[i]=NULL;
 
-	m_solver = s;
 	m_lodSkelChanged = false;
 	m_lodSkel = FULL_SKELETON;
 	m_flat = false;
@@ -269,7 +266,7 @@ void IRealFlame::computeVTexCoords()
 	}
 }
 
-bool IRealFlame::build ()
+bool IRealFlame::build()
 {
 	uint i, j, l;
 	float utex;
@@ -286,7 +283,7 @@ bool IRealFlame::build ()
 	{
 		assert(m_leadSkeletons[i] != NULL);
 
-		m_leadSkeletons[i]->move ();
+		m_leadSkeletons[i]->move();
 	}
 
 	/* Déplacement des squelettes périphériques et détermination du maximum de particules par squelette */
@@ -294,9 +291,9 @@ bool IRealFlame::build ()
 	{
 		assert(m_periSkeletons[i] != NULL);
 
-		m_periSkeletons[i]->move ();
+		m_periSkeletons[i]->move();
 		if (m_periSkeletons[i]->getSize () > m_maxParticles)
-			m_maxParticles = m_periSkeletons[i]->getSize ();
+			m_maxParticles = m_periSkeletons[i]->getSize();
 	}
 
 	m_vsize = m_maxParticles + m_nbFixedPoints;
@@ -314,22 +311,22 @@ bool IRealFlame::build ()
 		if (m_periSkeletons[i]->getSize () < m_maxParticles)
 		{
 			// Nombre de points de contrôle supplémentaires
-			uint nb_pts_supp = m_maxParticles - m_periSkeletons[i]->getSize ();
+			uint nb_pts_supp = m_maxParticles - m_periSkeletons[i]->getSize();
 			CPoint pt;
 			/* On calcule les distances entre les particules successives */
 			/* On prend également en compte l'origine du squelette ET les extrémités du guide */
 			/* On laisse les distances au carré pour des raisons évidentes de coût de calcul */
 			m_distances[0] =
-			  m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (*m_periSkeletons[i]->getParticle (0));
+			    m_periSkeletons[i]->getLeadSkeleton().getParticle(0).squaredDistanceFrom (m_periSkeletons[i]->getParticle(0));
 
 			for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
 				m_distances[j + 1] =
-				  m_periSkeletons[i]->getParticle (j)->squaredDistanceFrom(*m_periSkeletons[i]->getParticle (j + 1));
+				    m_periSkeletons[i]->getParticle(j).squaredDistanceFrom(m_periSkeletons[i]->getParticle(j + 1));
 
-			m_distances[m_periSkeletons[i]->getSize ()] =
-			  m_periSkeletons[i]->getLastParticle ()->squaredDistanceFrom (*m_periSkeletons[i]->getRoot ());
-			m_distances[m_periSkeletons[i]->getSize () + 1] =
-			  m_periSkeletons[i]->getRoot()->squaredDistanceFrom(*m_periSkeletons[i]->getLeadSkeleton ()->getRoot ());
+			m_distances[m_periSkeletons[i]->getSize()] =
+			    m_periSkeletons[i]->getLastParticle ().squaredDistanceFrom (m_periSkeletons[i]->getRoot());
+			m_distances[m_periSkeletons[i]->getSize() + 1] =
+			    m_periSkeletons[i]->getRoot().squaredDistanceFrom(m_periSkeletons[i]->getLeadSkeleton().getRoot ());
 
 			/* On cherche les indices des distances max */
 			/* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
@@ -353,49 +350,50 @@ bool IRealFlame::build ()
 			}
 			/* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == 0)
 				{
-					pt = CPoint::pointBetween(m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), m_periSkeletons[i]->getParticle (0));
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween(	m_periSkeletons[i]->getLeadSkeleton ().getParticle(0),
+					                           m_periSkeletons[i]->getParticle(0));
+					setCtrlCPoint (pt, utex);
 				}
 
-			for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
+			for (j = 0; j < m_periSkeletons[i]->getSize() - 1; j++)
 			{
-				setCtrlCPoint (m_periSkeletons[i]->getParticle (j), utex);
+				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
 				/* On regarde s'il ne faut pas ajouter un point */
 				for (l = 0; l < nb_pts_supp; l++)
 				{
 					if (m_maxDistancesIndexes[l] == (int)j + 1)
 					{
 						/* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
-						pt = CPoint::pointBetween(m_periSkeletons[i]->getParticle (j), m_periSkeletons[i]->getParticle (j + 1));
-						setCtrlCPoint (&pt, utex);
+						pt = CPoint::pointBetween(m_periSkeletons[i]->getParticle(j), m_periSkeletons[i]->getParticle(j + 1));
+						setCtrlCPoint (pt, utex);
 					}
 				}
 			}
 
-			setCtrlCPoint (m_periSkeletons[i]->getLastParticle (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLastParticle(), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
-				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize ())
+				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize())
 				{
-					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot (), m_periSkeletons[i]-> getLastParticle ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot(), m_periSkeletons[i]-> getLastParticle());
+					setCtrlCPoint (pt, utex);
 				}
 
-			setCtrlCPoint (m_periSkeletons[i]->getRoot (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getRoot(), utex);
 
 			bool prec = false;
 
 			for (l = 0; l < nb_pts_supp; l++)
-				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize () + 1)
+				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize() + 1)
 				{
-					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot (),
-					                          m_periSkeletons[i]->getLeadSkeleton()->getRoot ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot(),
+					                          m_periSkeletons[i]->getLeadSkeleton().getRoot());
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
 
@@ -405,25 +403,25 @@ bool IRealFlame::build ()
 				{
 					if (!prec)
 					{
-						pt = *m_periSkeletons[i]-> getRoot ();
+						pt = m_periSkeletons[i]-> getRoot();
 					}
-					pt = CPoint::pointBetween (&pt, m_periSkeletons[i]->getLeadSkeleton()->getRoot ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween (pt, m_periSkeletons[i]->getLeadSkeleton().getRoot());
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot (), utex);
 		}
 		else
 		{
 			/* Cas sans problème */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
-			for (j = 0; j < m_periSkeletons[i]->getSize (); j++)
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
+			for (j = 0; j < m_periSkeletons[i]->getSize(); j++)
 			{
 				setCtrlCPoint (m_periSkeletons[i]->getParticle (j), utex);
 			}
-			setCtrlCPoint (m_periSkeletons[i]->getRoot (), utex);
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getRoot (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getRoot(), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot(), utex);
 		}
 		m_texTmp = m_texTmpSave;
 		utex += m_utexInc;
@@ -490,8 +488,8 @@ IRealFlame::~IRealFlame()
 	}
 	delete[]m_periSkeletons;
 
-	for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
-	     skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
+	for (vector < CLeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+	        skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
 		delete (*skeletonsIterator);
 	m_leadSkeletons.clear ();
 

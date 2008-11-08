@@ -11,40 +11,37 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREESKELETON **************************************/
 /**********************************************************************************************************************/
-FreeSkeleton::FreeSkeleton(uint size, Field3D* const s)
+IFreeSkeleton::IFreeSkeleton(uint a_uiSize, Field3D& a_rField) :
+	m_rField(a_rField)
 {
-	assert (s != NULL);
-	m_solver = s;
-	m_queue = new Particle[size];
+	m_queue = new CParticle[a_uiSize];
 	m_headIndex = -1;
 }
 
-FreeSkeleton::FreeSkeleton(const FreeSkeleton* const src, uint splitHeight)
+IFreeSkeleton::IFreeSkeleton(IFreeSkeleton const& a_rSrc, uint a_uiSplitHeight) :
+	m_rField(a_rSrc.m_rField)
 {
 	uint i;
-
-	assert (src != NULL);
-
-	m_solver = src->m_solver;
-	m_queue = new Particle[splitHeight+1];
+;
+	m_queue = new CParticle[a_uiSplitHeight+1];
 
 	/* Recopie des particules en fonction de la hauteur de coupe */
-	for ( i=0; i <= splitHeight; i++)
+	for ( i=0; i <= a_uiSplitHeight; i++)
 	{
-		m_queue[i] = src->m_queue[i];
-		/* Extension de la durÈe de vie !! */
+		m_queue[i] = a_rSrc.m_queue[i];
+		/* Extension de la dur√©e de vie !! */
 		m_queue[i].m_lifespan +=LIFE_EXTEND;
 	}
-	m_headIndex = splitHeight;
-	m_selfVelocity = src->m_selfVelocity;
+	m_headIndex = a_uiSplitHeight;
+	m_selfVelocity = a_rSrc.m_selfVelocity;
 }
 
-FreeSkeleton::~FreeSkeleton()
+IFreeSkeleton::~IFreeSkeleton()
 {
 	delete [] m_queue;
 }
 
-void FreeSkeleton::removeParticle(uint n)
+void IFreeSkeleton::removeParticle(uint n)
 {
 	int i;
 
@@ -55,24 +52,23 @@ void FreeSkeleton::removeParticle(uint n)
 	assert(m_headIndex>=0);
 }
 
-void FreeSkeleton::swap(uint i, uint j)
+void IFreeSkeleton::swap(uint i, uint j)
 {
-	Particle tmp(m_queue[i]);
+	CParticle tmp(m_queue[i]);
 
 	m_queue[i] = m_queue[j];
 	m_queue[j] = tmp;
 }
 
-void FreeSkeleton::move ()
+void IFreeSkeleton::move ()
 {
-	Particle *tmp;
 	uint i;
 
-	/* DÈplacement des particules */
+	/* D√©placement des particules */
 	/* Boucle de parcours : du haut vers le bas */
 	for (i = 0; i < getInternalSize (); i++)
 	{
-		tmp = getInternalParticle (i);
+		CParticle& tmp = grabParticle (i);
 
 		if (moveParticle (tmp))
 			updateParticle (i, tmp);
@@ -85,40 +81,38 @@ void FreeSkeleton::move ()
 	}
 }
 
-bool FreeSkeleton::moveParticle (Particle * const particle)
+bool IFreeSkeleton::moveParticle (CParticle& a_rParticle)
 {
-	Particle copy(*particle), copy2;
+	CParticle copy(a_rParticle), copy2;
 
-	assert (particle != NULL);
-
-	if (particle->isDead ())
+	if (a_rParticle.isDead ())
 		return false;
 
-	/* Si la particule sort de la grille, elle prend la vÈlocitÈ du bord */
-	if ( particle->x >= m_solver->getDimX() )
-		particle->x = m_solver->getDimX() - EPSILON;
-	if ( particle->y >= m_solver->getDimY() )
-		particle->y = m_solver->getDimY() - EPSILON;
-	if ( particle->z >= m_solver->getDimZ() )
-		particle->z = m_solver->getDimZ() - EPSILON;
-	if ( particle->x < 0.0f )
-		particle->x = EPSILON;
-	if ( particle->z < 0.0f )
-		particle->z = EPSILON;
+	/* Si la particule sort de la grille, elle prend la v√©locit√© du bord */
+	if ( a_rParticle.x >= m_rField.getDimX() )
+		a_rParticle.x = m_rField.getDimX() - EPSILON;
+	if ( a_rParticle.y >= m_rField.getDimY() )
+		a_rParticle.y = m_rField.getDimY() - EPSILON;
+	if ( a_rParticle.z >= m_rField.getDimZ() )
+		a_rParticle.z = m_rField.getDimZ() - EPSILON;
+	if ( a_rParticle.x < 0.0f )
+		a_rParticle.x = EPSILON;
+	if ( a_rParticle.z < 0.0f )
+		a_rParticle.z = EPSILON;
 	/* Cas particulier en y, on supprime la particule si elle passe SOUS la grille
-	 * (Èvite les problËmes de "stagnation" de la flamme) */
-	if ( particle->y < 0.0f )
+	 * (√©vite les probl√®mes de "stagnation" de la flamme) */
+	if ( a_rParticle.y < 0.0f )
 		return false;
 
-	copy2 = *particle;
-	/* Calculer la nouvelle position ( IntÈgration d'Euler, on prend juste la dÈrivÈe premiËre ) */
-	m_solver->moveParticle(*particle, m_selfVelocity);
+	copy2 = a_rParticle;
+	/* Calculer la nouvelle position ( Int√©gration d'Euler, on prend juste la d√©riv√©e premi√®re ) */
+	m_rField.moveParticle(a_rParticle, m_selfVelocity);
 
-	*particle = *particle - copy2 + copy;
+	a_rParticle = a_rParticle - copy2 + copy;
 	return true;
 }
 
-void FreeSkeleton::draw () const
+void IFreeSkeleton::draw () const
 {
 	for (uint i = 0; i < getSize (); i++)
 		drawParticle( getParticle (i) ) ;
@@ -128,11 +122,11 @@ void FreeSkeleton::draw () const
 	glEnd();
 }
 
-void FreeSkeleton::drawParticle (Particle * const particle) const
+void IFreeSkeleton::drawParticle (CParticle const& a_rParticle) const
 {
 	glColor4f (1.0f, 1.0f, 0.25f, 0.8f);
 	glPushMatrix ();
-	glTranslatef (particle->x, particle->y, particle->z);
+	glTranslatef (a_rParticle.x, a_rParticle.y, a_rParticle.z);
 	UGraphicsFn::SolidSphere (0.01f, 10, 10);
 	glPopMatrix ();
 }
@@ -142,8 +136,8 @@ void FreeSkeleton::drawParticle (Particle * const particle) const
 /************************************** IMPLEMENTATION DE LA CLASSE SKELETON ******************************************/
 /**********************************************************************************************************************/
 
-Skeleton::Skeleton(Field3D* const s, const CPoint& position, const CPoint& rootMoveFactor, uint pls) :
-		FreeSkeleton(NB_PARTICLES_MAX, s),
+ISkeleton::ISkeleton(Field3D& a_rField, const CPoint& position, const CPoint& rootMoveFactor, uint pls) :
+		IFreeSkeleton(NB_PARTICLES_MAX, a_rField),
 		m_rootMoveFactor(rootMoveFactor)
 {
 	m_root = m_rootSave = position;
@@ -152,7 +146,7 @@ Skeleton::Skeleton(Field3D* const s, const CPoint& position, const CPoint& rootM
 	m_lifeSpan = pls;
 }
 
-void Skeleton::draw () const
+void ISkeleton::draw () const
 {
 	drawRoot();
 	for (uint i = 0; i < getSize (); i++)
@@ -164,7 +158,7 @@ void Skeleton::draw () const
 	glEnd();
 }
 
-void Skeleton::drawRoot () const
+void ISkeleton::drawRoot () const
 {
 	glColor4f (1.0f, 0.0f, 0.25f, 0.8f);
 	glPushMatrix ();
@@ -173,18 +167,18 @@ void Skeleton::drawRoot () const
 	glPopMatrix ();
 }
 
-void Skeleton::moveRoot ()
+void ISkeleton::moveRoot ()
 {
-	/* Calculer la nouvelle position ( IntÈgration d'Euler, on prend juste la dÈrivÈe premiËre ) */
-	m_root = m_rootSave + m_rootMoveFactor * m_solver->getUVW (m_rootSave, m_selfVelocity);
+	/* Calculer la nouvelle position ( Int√©gration d'Euler, on prend juste la d√©riv√©e premi√®re ) */
+	m_root = m_rootSave + m_rootMoveFactor * m_rField.getUVW (m_rootSave, m_selfVelocity);
 
 	/* Si l'origine sort de la grille, on la replace */
-	if ( m_root.x >= m_solver->getDimX() )
-		m_root.x = m_solver->getDimX() - EPSILON;
-	if ( m_root.y >= m_solver->getDimY() )
-		m_root.y = m_solver->getDimY() - EPSILON;
-	if ( m_root.z >= m_solver->getDimZ() )
-		m_root.z = m_solver->getDimZ() - EPSILON;
+	if ( m_root.x >= m_rField.getDimX() )
+		m_root.x = m_rField.getDimX() - EPSILON;
+	if ( m_root.y >= m_rField.getDimY() )
+		m_root.y = m_rField.getDimY() - EPSILON;
+	if ( m_root.z >= m_rField.getDimZ() )
+		m_root.z = m_rField.getDimZ() - EPSILON;
 	if ( m_root.x < 0.0f )
 		m_root.x = EPSILON;
 	if ( m_root.y < 0.0f )
@@ -193,29 +187,27 @@ void Skeleton::moveRoot ()
 		m_root.z = EPSILON;
 }
 
-void Skeleton::move ()
+void ISkeleton::move ()
 {
 	moveRoot ();
 
 	if (getInternalSize () < NB_PARTICLES_MAX - 1)
-		addParticle (&m_root);
+		addParticle(m_root);
 
-	FreeSkeleton::move ();
+	IFreeSkeleton::move ();
 }
 
-bool Skeleton::moveParticle (Particle * const particle)
+bool ISkeleton::moveParticle (CParticle& a_rParticle)
 {
-	assert (particle != NULL);
-
-	if (particle->isDead ())
+	if (a_rParticle.isDead ())
 		return false;
 
-	m_solver->moveParticle(*particle, m_selfVelocity);
+	m_rField.moveParticle(a_rParticle, m_selfVelocity);
 
-	/* Si la particule sort de la grille, elle est ÈliminÈe */
-	if (   particle->x < 0.0f || particle->x > m_solver->getDimX()
-	       || particle->y < 0.0f || particle->y > m_solver->getDimY()
-	       || particle->z < 0.0f || particle->z > m_solver->getDimZ() )
+	/* Si la particule sort de la grille, elle est √©limin√©e */
+	if (  	   a_rParticle.x < 0.0f || a_rParticle.x > m_rField.getDimX()
+			|| a_rParticle.y < 0.0f || a_rParticle.y > m_rField.getDimY()
+			|| a_rParticle.z < 0.0f || a_rParticle.z > m_rField.getDimZ() )
 		return false;
 
 	return true;

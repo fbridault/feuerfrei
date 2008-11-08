@@ -46,7 +46,7 @@ public:
     return CPoint(m_u[n], m_v[n], m_w[n]);
   };
 
-  void moveParticle (Particle& particle, float selfVelocity) const
+  void moveParticle (CParticle& particle, float selfVelocity) const
   {
     uint i,j,k,n;
 

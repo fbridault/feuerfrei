@@ -11,83 +11,84 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE PERISKELETON **************************************/
 /**********************************************************************************************************************/
-PeriSkeleton::PeriSkeleton (Field3D * const s, const CPoint& position, const CPoint& rootMoveFactor,
-			    LeadSkeleton *leadSkeleton, uint pls) :
-  Skeleton (s, position, rootMoveFactor, pls)
+CPeriSkeleton::CPeriSkeleton (	Field3D& a_rField, const CPoint& a_rPosition, const CPoint& a_rRootMoveFactor,
+															CLeadSkeleton& a_rLeadSkeleton, uint a_uiPls) :
+		ISkeleton (a_rField, a_rPosition, a_rRootMoveFactor, a_uiPls),
+		m_rLead(a_rLeadSkeleton)
 {
-  this->m_lead = leadSkeleton;
-  addParticle(&m_root);
+	addParticle(m_root);
 }
 
-PeriSkeleton::~PeriSkeleton ()
+CPeriSkeleton::~CPeriSkeleton ()
 {
 }
 
-FreePeriSkeleton* PeriSkeleton::split (uint splitHeight, FreeLeadSkeleton *leadSkeleton)
+CFreePeriSkeleton* CPeriSkeleton::split (uint a_uiSplitHeight, CFreeLeadSkeleton& a_rLeadSkeleton)
 {
-  FreePeriSkeleton *skel = new FreePeriSkeleton(this, leadSkeleton, splitHeight);
+	CFreePeriSkeleton *skel = new CFreePeriSkeleton(rThis, a_rLeadSkeleton, a_uiSplitHeight);
 
-  m_headIndex = splitHeight;
+	m_headIndex = a_uiSplitHeight;
 
-  return( skel );
+	assert(skel != NULL);
+	return( skel );
 }
 
-void PeriSkeleton::addForces ()
+void CPeriSkeleton::addForces ()
 {
-  float dummy;
+	float dummy;
 
-  /* Applique une force à la base des squelettes (pour les bougies). Ceci n'a
-   * aucun effet pour les FakeFields, qui comptent eux sur la selfVelocity du
-   * squelette relatif pour transmettre cette force (voir moveParticle() plus
-   * bas). */
-  m_solver->addVsrc( m_root, m_lead->getLastAppliedForce(), dummy); }
-
-void PeriSkeleton::addParticle(const CPoint* const pt)
-{
-  if(m_headIndex >= NB_PARTICLES_MAX-1){
-    puts("(EE) Too many particles in PeriSkeleton::addParticle() !!!");
-    return;
-  }
-  m_headIndex++;
-
-  m_queue[m_headIndex] = *pt;
-  m_queue[m_headIndex].birth(m_lifeSpan);
+	/* Applique une force à la base des squelettes (pour les bougies). Ceci n'a
+	 * aucun effet pour les FakeFields, qui comptent eux sur la selfVelocity du
+	 * squelette relatif pour transmettre cette force (voir moveParticle() plus
+	 * bas). */
+	m_rField.addVsrc( m_root, m_rLead.getLastAppliedForce(), dummy);
 }
 
-bool PeriSkeleton::moveParticle (Particle * const particle)
+void CPeriSkeleton::addParticle(CPoint const& a_rParticle)
 {
-  if (particle->isDead ())
-    return false;
+	if (m_headIndex >= NB_PARTICLES_MAX-1)
+	{
+		puts("(EE) Too many particles in CPeriSkeleton::addParticle() !!!");
+		return;
+	}
+	m_headIndex++;
 
-  /* Déplacement de la particule. Dans le cas présent, on utilise la
-   * selfVelocity du squelette relatif pour ajouter une force propre au
-   * squelette dans le cas des FakeFields. */
-  m_solver->moveParticle(*particle, m_lead->getSelfVelocity());
+	m_queue[m_headIndex] = a_rParticle;
+	m_queue[m_headIndex].birth(m_lifeSpan);
+}
 
-  /* Si la particule sort de la grille, elle est éliminée */
-  if (   particle->x < 0.0f || particle->x > m_solver->getDimX()
-      || particle->y < 0.0f || particle->y > m_solver->getDimY()
-      || particle->z < 0.0f || particle->z > m_solver->getDimZ())
-    return false;
+bool CPeriSkeleton::moveParticle (CParticle& a_rParticle)
+{
+	if (a_rParticle.isDead ())
+		return false;
 
-  return true;
+	/* Déplacement de la particule. Dans le cas présent, on utilise la
+	 * selfVelocity du squelette relatif pour ajouter une force propre au
+	 * squelette dans le cas des FakeFields. */
+	m_rField.moveParticle(a_rParticle, m_rLead.getSelfVelocity());
+
+	/* Si la particule sort de la grille, elle est éliminée */
+	if (   	a_rParticle.x < 0.0f || a_rParticle.x > m_rField.getDimX()
+	        || a_rParticle.y < 0.0f || a_rParticle.y > m_rField.getDimY()
+	        || a_rParticle.z < 0.0f || a_rParticle.z > m_rField.getDimZ())
+		return false;
+
+	return true;
 }
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREEPERISKELETON **********************************/
 /**********************************************************************************************************************/
-FreePeriSkeleton::FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkeleton* const leadSkeleton, uint splitHeight) :
-  FreeSkeleton(src, splitHeight)
-{
-  m_lead = leadSkeleton;
-}
+CFreePeriSkeleton::CFreePeriSkeleton(IFreeSkeleton const& a_rSrc, CFreeLeadSkeleton& a_rLeadSkeleton, uint a_uiSplitHeight) :
+		IFreeSkeleton(a_rSrc, a_uiSplitHeight),
+		m_rLead(a_rLeadSkeleton)
+{}
 
-FreePeriSkeleton::FreePeriSkeleton(uint size, Field3D* const s, FreeLeadSkeleton* const leadSkeleton) :
-  FreeSkeleton(size, s)
-{
-  m_lead = leadSkeleton;
-}
+CFreePeriSkeleton::CFreePeriSkeleton(uint a_uiSize, Field3D& a_rField, CFreeLeadSkeleton& a_rLeadSkeleton) :
+		IFreeSkeleton(a_uiSize, a_rField),
+		m_rLead(a_rLeadSkeleton)
+{}
 
-FreePeriSkeleton::~FreePeriSkeleton ()
+CFreePeriSkeleton::~CFreePeriSkeleton ()
 {
 }

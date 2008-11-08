@@ -45,7 +45,7 @@ public:
   };
 
   virtual CVector getMainDirection() const { return(m_source->getMainDirection()); };
-  virtual CPoint getCenter() const { return (m_source->getCenter()); };
+  virtual CPoint const& getCenter() const { return (m_source->getCenter()); };
 
   virtual bool build();
 

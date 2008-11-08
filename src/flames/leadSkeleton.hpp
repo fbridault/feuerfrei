@@ -1,22 +1,22 @@
 #if !defined(LEADSKELETON_H)
 #define LEADSKELETON_H
 
-class LeadSkeleton;
-class FreeLeadSkeleton;
-class FreePeriSkeleton;
+class CLeadSkeleton;
+class CFreeLeadSkeleton;
+class CFreePeriSkeleton;
 
 #include "skeleton.hpp"
 
 #include "noise.hpp"
 
-class Skeleton;
+class ISkeleton;
 
-/** Classe représentant les squelettes centraux, voir la classe Skeleton pour plus de
+/** Classe représentant les squelettes centraux, voir la classe ISkeleton pour plus de
  * détails.
  *
  * @author	Flavien Bridault
  */
-class LeadSkeleton : public Skeleton
+class CLeadSkeleton : public ISkeleton
 {
 public:
   /** Constructeur de squelette central.
@@ -26,18 +26,18 @@ public:
    * squelette. Varie en fonction du type de flamme.  @param pls Durée de vie
    * initiale d'une particule.
    */
-  LeadSkeleton(Field3D* const s, const CPoint& position, const CPoint& rootMoveFactor, uint pls, float u,
-	       float noiseIncrement, float noiseMin, float noiseMax);
+  CLeadSkeleton(	Field3D& a_rField, const CPoint& position, const CPoint& rootMoveFactor, uint a_uiPls, float u,
+								float noiseIncrement, float noiseMin, float noiseMax);
 
   /** Destructeur. */
-  virtual ~LeadSkeleton();
+  virtual ~CLeadSkeleton();
 
   /** Méthode de séparation d'un squelette.
    * @param splitHeight hauteur de la découpe.
    */
-  FreeLeadSkeleton* split (uint splitHeight);
+  CFreeLeadSkeleton* split (uint a_uiSplitHeight);
 
-  void addParticle(const CPoint* const pt);
+  void addParticle(CPoint const& a_rParticle);
 
   virtual void drawRoot () const;
 
@@ -61,7 +61,7 @@ public:
   float getLastAppliedForce () const { return m_lastAppliedForce; };
 
 private:
-  void drawParticle (Particle * const particle) const;
+  void drawParticle (CParticle const& a_rParticle) const;
 
   /** Valeur d'entrée de la fonction de distribution de carburant F(u). */
   float m_u;
@@ -69,7 +69,7 @@ private:
   /** Dernière force appliquée par le squelette central dans la grille. On est
    * obligé de stocker cette valeur à cause de l'application de forces propres
    * aux squelettes périphériques avec les RealFields dans le cas des bougies
-   * (voir PeriSkeleton::addForces() )
+   * (voir CPeriSkeleton::addForces() )
    */
   float m_lastAppliedForce;
 
@@ -84,7 +84,7 @@ private:
  *
  * @author	Flavien Bridault
  */
-class FreeLeadSkeleton : public FreeSkeleton
+class CFreeLeadSkeleton : public IFreeSkeleton
 {
 public:
   /** Constructeur de squelette périphérique
@@ -93,22 +93,22 @@ public:
    * @param splitHeight hauteur de découpe
    *
    */
-  FreeLeadSkeleton(const LeadSkeleton* const src, uint splitHeight);
-  virtual ~FreeLeadSkeleton();
+  CFreeLeadSkeleton(IFreeSkeleton const& a_rSrc, uint a_uiSplitHeight);
+  virtual ~CFreeLeadSkeleton();
 
   /** Duplique un squelette.
    *
    * @param offset Valeur du décalage dans l'espace du squelette par rapport au
    * squelette courant.
    */
-  virtual FreePeriSkeleton* dup(const CPoint& offset);
+  virtual CFreePeriSkeleton* dup(const CPoint& offset);
 
 private:
   /** Dessine une particule d'un squelette central.
    *
    * @param particle Particule à dessiner.
    */
-  void drawParticle (Particle * const particle) const;
+  void drawParticle (CParticle const& a_rParticle) const;
 };
 
 #endif

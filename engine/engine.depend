@@ -105,7 +105,7 @@
 	"CPoint.hpp"
 	"CVector.hpp"
 
-1225665215 /home/flavien/recherche/git/flames/engine/Maths/CPoint.hpp
+1226139523 /home/flavien/recherche/git/flames/engine/Maths/CPoint.hpp
 	<math.h>
 	<iostream>
 	"../Common.hpp"
@@ -157,7 +157,7 @@
 	"CCamera.hpp"
 	"../Utility/GraphicsFn.hpp"
 
-1226104321 /home/flavien/recherche/git/flames/engine/Scene/CCamera.hpp
+1226135381 /home/flavien/recherche/git/flames/engine/Scene/CCamera.hpp
 	<math.h>
 	"../Common.hpp"
 	"../Maths/CQuaternion.hpp"
@@ -234,7 +234,7 @@
 1225839488 source:/home/flavien/recherche/git/flames/engine/Scene/CMaterial.cpp
 	"CMaterial.hpp"
 
-1226081983 source:/home/flavien/recherche/git/flames/engine/Scene/Light.cpp
+1226104321 source:/home/flavien/recherche/git/flames/engine/Scene/Light.cpp
 	"Light.hpp"
 	<string.h>
 	"../Utility/GraphicsFn.hpp"

@@ -10,30 +10,30 @@
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE LEADSKELETON **************************************/
 /**********************************************************************************************************************/
-LeadSkeleton::LeadSkeleton (Field3D * const s, const CPoint& position, const CPoint& rootMoveFactor,
-                            uint pls, float u, float noiseIncrement, float noiseMin, float noiseMax) :
-		Skeleton (s, position, rootMoveFactor,pls),
+CLeadSkeleton::CLeadSkeleton (Field3D& a_rField, const CPoint& position, const CPoint& rootMoveFactor,
+														uint a_uiPls, float u, float noiseIncrement, float noiseMin, float noiseMax) :
+		ISkeleton (a_rField, position, rootMoveFactor,a_uiPls),
 		m_noiseGenerator(noiseIncrement, noiseMin, noiseMax)
 {
 	m_u = u;
 	m_perturbateCount=0;
-	addParticle(&m_root);
+	addParticle(m_root);
 }
 
-LeadSkeleton::~LeadSkeleton ()
+CLeadSkeleton::~CLeadSkeleton ()
 {
 }
 
-void LeadSkeleton::drawParticle (Particle * const particle) const
+void CLeadSkeleton::drawParticle (CParticle const& a_rParticle) const
 {
 	glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
 	glPushMatrix ();
-	glTranslatef (particle->x, particle->y, particle->z);
+	glTranslatef (a_rParticle.x, a_rParticle.y, a_rParticle.z);
 	UGraphicsFn::SolidSphere (0.01f, 10, 10);
 	glPopMatrix ();
 }
 
-void LeadSkeleton::drawRoot () const
+void CLeadSkeleton::drawRoot () const
 {
 	glColor4f (0.0f, 0.4f, 0.0f, 0.8f);
 	glPushMatrix ();
@@ -42,7 +42,7 @@ void LeadSkeleton::drawRoot () const
 	glPopMatrix ();
 }
 
-void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
+void CLeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 {
 	m_selfVelocity = 0.0f;
 
@@ -93,27 +93,27 @@ void LeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 		default:
 			cerr << "(EE) Flickering type error !!!" << endl;
 	}
-	m_solver->addVsrc( m_root, m_lastAppliedForce, m_selfVelocity);
+	m_rField.addVsrc( m_root, m_lastAppliedForce, m_selfVelocity);
 }
 
-void LeadSkeleton::addParticle(const CPoint* const pt)
+void CLeadSkeleton::addParticle(CPoint const& a_rParticle)
 {
 	if (m_headIndex >= NB_PARTICLES_MAX-1)
 	{
-		puts("(EE) Too many particles in LeadSkeleton::addParticle() !!!");
+		puts("(EE) Too many particles in CLeadSkeleton::addParticle() !!!");
 		return;
 	}
 	m_headIndex++;
 
-	m_queue[m_headIndex] = *pt;
+	m_queue[m_headIndex] = a_rParticle;
 	m_queue[m_headIndex].birth(m_lifeSpan);
 }
 
-FreeLeadSkeleton* LeadSkeleton::split (uint splitHeight)
+CFreeLeadSkeleton* CLeadSkeleton::split (uint a_uiSplitHeight)
 {
-	FreeLeadSkeleton *skel = new FreeLeadSkeleton(this, splitHeight);
+	CFreeLeadSkeleton *skel = new CFreeLeadSkeleton(rThis, a_uiSplitHeight);
 
-	m_headIndex = splitHeight;
+	m_headIndex = a_uiSplitHeight;
 
 	return( skel );
 }
@@ -122,18 +122,18 @@ FreeLeadSkeleton* LeadSkeleton::split (uint splitHeight)
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FREELEADSKELETON **********************************/
 /**********************************************************************************************************************/
-FreeLeadSkeleton::FreeLeadSkeleton(const LeadSkeleton* const src, uint splitHeight) :
-		FreeSkeleton(src, splitHeight)
+CFreeLeadSkeleton::CFreeLeadSkeleton(IFreeSkeleton const& a_rSrc, uint a_uiSplitHeight) :
+		IFreeSkeleton(a_rSrc, a_uiSplitHeight)
 {
 }
 
-FreeLeadSkeleton::~FreeLeadSkeleton ()
+CFreeLeadSkeleton::~CFreeLeadSkeleton ()
 {
 }
 
-FreePeriSkeleton* FreeLeadSkeleton::dup(const CPoint& offset)
+CFreePeriSkeleton* CFreeLeadSkeleton::dup(const CPoint& offset)
 {
-	FreePeriSkeleton *copy = new FreePeriSkeleton(getInternalSize (), m_solver, this);
+	CFreePeriSkeleton *copy = new CFreePeriSkeleton(getInternalSize (), m_rField, rThis);
 
 	for (uint i = 0; i < getInternalSize (); i++)
 	{
@@ -146,11 +146,11 @@ FreePeriSkeleton* FreeLeadSkeleton::dup(const CPoint& offset)
 	return copy;
 }
 
-void FreeLeadSkeleton::drawParticle (Particle * const particle) const
+void CFreeLeadSkeleton::drawParticle (CParticle const& a_rParticle) const
 {
 	glColor4f (0.1f, 1.0f, 0.1f, 0.8f);
 	glPushMatrix ();
-	glTranslatef (particle->x, particle->y, particle->z);
+	glTranslatef (a_rParticle.x, a_rParticle.y, a_rParticle.z);
 	UGraphicsFn::SolidSphere (0.01f, 10, 10);
 	glPopMatrix ();
 }

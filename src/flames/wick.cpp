@@ -3,7 +3,7 @@
 #include <engine/Utility/GraphicsFn.hpp>
 
 
-uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
+uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton * >& leadSkeletons, Field3D& a_rField )
 {
 	CPoint bounds[2], barycentre;
 
@@ -52,12 +52,12 @@ uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< LeadSkeleton 
 	}
 	barycentre = barycentre / (float)m_vertexArray.size();
 
-	leadSkeletons.push_back (new LeadSkeleton(field, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 1,  .5f, 0.0f, .025f));
+	leadSkeletons.push_back (new CLeadSkeleton(a_rField, barycentre, rootMoveFactorL, flameConfig.leadLifeSpan, 1,  .5f, 0.0f, .025f));
 
 	return 0;
 }
 
-uint CWick::buildFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field )
+uint CWick::buildFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton * >& leadSkeletons, Field3D& a_rField )
 {
 	/* Création du VBO */
 	buildVBO();
@@ -221,7 +221,7 @@ uint CWick::buildFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& 
 	float noiseInc=.5f;
 	/* Création des leadSkeletons */
 	/* On prend simplement le barycentre de chaque partition */
-	leadSkeletons.push_back (new LeadSkeleton(field, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, noiseInc, noiseMin, noiseMax));
+	leadSkeletons.push_back (new CLeadSkeleton(a_rField, MinBound, rootMoveFactorL, flameConfig.leadLifeSpan, -1, noiseInc, noiseMin, noiseMax));
 
 	for (uint i = 0; i < flameConfig.skeletonsNumber; i++)
 	{
@@ -243,11 +243,11 @@ uint CWick::buildFDF (FlameConfig const& flameConfig, vector< LeadSkeleton * >& 
 		/** Calcul de la valeur d'entrée de la fonction de distribution de carburant F(u). */
 		float fu = 2*(i+1)/(float)(flameConfig.skeletonsNumber+1)-1;
 
-		LeadSkeleton *pLeadSkeleton =
-			new LeadSkeleton(field, barycentre,rootMoveFactorL, flameConfig.leadLifeSpan, fu, noiseInc,noiseMin, noiseMax);
+		CLeadSkeleton *pLeadSkeleton =
+			new CLeadSkeleton(a_rField, barycentre,rootMoveFactorL, flameConfig.leadLifeSpan, fu, noiseInc,noiseMin, noiseMax);
 		leadSkeletons.push_back (pLeadSkeleton);
 	}
-	leadSkeletons.push_back (new LeadSkeleton(field, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, noiseInc, noiseMin, noiseMax));
+	leadSkeletons.push_back (new CLeadSkeleton(a_rField, MaxBound, rootMoveFactorL, flameConfig.leadLifeSpan, 1, noiseInc, noiseMin, noiseMax));
 
 	/* Suppression des points */
 	for (uint i = 0; i < flameConfig.skeletonsNumber; i++)

@@ -18,8 +18,8 @@ class ITexture;
 #define CALLBACK
 #endif
 
-class PeriSkeleton;
-class LeadSkeleton;
+class CPeriSkeleton;
+class CLeadSkeleton;
 class Field3D;
 
 #ifdef COUNT_NURBS_POLYGONS
@@ -158,11 +158,11 @@ protected:
 	 * @param pt point à affecter dans le tableau
 	 * @param v valeur de la coordonnée de texture t
 	 */
-	void setCtrlCPoint (const CPoint * const pt, GLfloat u)
+	void setCtrlCPoint (CPoint const& a_rPoint, GLfloat u)
 	{
-		*m_ctrlPoints++ = pt->x;
-		*m_ctrlPoints++ = pt->y;
-		*m_ctrlPoints++ = pt->z;
+		*m_ctrlPoints++ =a_rPoint.x;
+		*m_ctrlPoints++ = a_rPoint.y;
+		*m_ctrlPoints++ = a_rPoint.z;
 		*m_texCPoints++ = u;
 		*m_texCPoints++ = *m_texTmp++;
 		m_count++;
@@ -314,7 +314,7 @@ public:
 	/** Retourne le centre de la flamme.
 	 * @return Centre de la flamme.
 	 */
-	virtual CPoint getCenter () const = 0;
+	virtual CPoint const& getCenter () const = 0;
 
 	/** Renvoie un pointeur vers le sommet de la flamme.
 	 * @return CPointeur vers le sommet.
@@ -357,14 +357,14 @@ public:
 	 * @param tex CPointeur sur la texture de la flamme.
 	 * @param s CPointeur vers le solveur.
 	 */
-	IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture, Field3D* const s);
+	IRealFlame(uint nbSkeletons, ushort nbFixedPoints, ITexture const& a_rTexture);
 	virtual ~IRealFlame ();
 
 	/** Fonction appelée par le solveur de fluides pour ajouter l'élévation thermique de la flamme.
 	 */
 	virtual void addForces (int fdf, float innerForce, char perturbate)
 	{
-		for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+		for (vector < CLeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 		     skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
 			(*skeletonsIterator)->addForces (fdf, innerForce, perturbate);
 	}
@@ -374,7 +374,7 @@ public:
 	 */
 	virtual void setLeadLifeSpan(uint value)
 	{
-		for (vector < LeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
+		for (vector < CLeadSkeleton * >::iterator skeletonsIterator = m_leadSkeletons.begin ();
 		     skeletonsIterator != m_leadSkeletons.end (); skeletonsIterator++)
 			(*skeletonsIterator)->setLifeSpan(value);
 	};
@@ -448,7 +448,7 @@ public:
 	virtual bool build();
 
 	virtual CVector getMainDirection() const = 0;
-	virtual CPoint getCenter () const = 0;
+	virtual CPoint const& getCenter () const = 0;
 
 	virtual CPoint getTop() const = 0;
 	virtual CPoint getBottom() const = 0;
@@ -458,14 +458,12 @@ public:
 
 protected:
 	/** Vecteur contenant les squelettes guide. */
-	vector < LeadSkeleton * > m_leadSkeletons;
+	vector < CLeadSkeleton * > m_leadSkeletons;
 
 	/** Nombres de squelettes guides */
 	uint m_nbLeadSkeletons;
 	/** Tableau contenant les pointeurs vers les squelettes périphériques. */
-	PeriSkeleton **m_periSkeletons;
-	/** CPointeur sur le solveur de fluides */
-	Field3D *m_solver;
+	CPeriSkeleton **m_periSkeletons;
 
 	float *m_distances;
 	/** Tableau temporaire utilisé pour classer les indices des distances entre points de contrôle

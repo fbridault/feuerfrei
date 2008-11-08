@@ -231,9 +231,9 @@ public:
 		        + (z - pt.z) * (z - pt.z) ) ;
 	}
 
-	static CPoint pointBetween( const CPoint* const pt1, const CPoint* const pt2 )
+	static CPoint pointBetween(CPoint const& a_rPoint1, CPoint const& a_rPoint2 )
 	{
-		return CPoint( (pt2->x + pt1->x)/2.0, (pt2->y + pt1->y)/2.0, (pt2->z + pt1->z)/2.0);
+		return CPoint( (a_rPoint2.x + a_rPoint1.x)/2.0, (a_rPoint2.y +a_rPoint1.y)/2.0, (a_rPoint2.z + a_rPoint1.z)/2.0);
 	}
 
 	void resetToNull()

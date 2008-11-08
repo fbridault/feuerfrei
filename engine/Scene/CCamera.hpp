@@ -23,7 +23,6 @@ struct _NMouseButtonState
 		_NbValues
 	};
 };
-
 DeclareNumerable(_NMouseButtonState, NMouseButtonState);
 
 struct _NMouseButton
@@ -38,7 +37,6 @@ struct _NMouseButton
 		_NbValues
 	};
 };
-
 DeclareNumerable(_NMouseButton, NMouseButton);
 
 /** Classe définissant une caméra subjective à la première personne, qui permet donc

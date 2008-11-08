@@ -7,7 +7,7 @@
  *
  * @author	Flavien Bridault
  */
-class Particle : public CPoint
+class CParticle : public CPoint
 {
 public:
   /** Durée de vie de la particule. */
@@ -17,13 +17,13 @@ public:
   /**
    * Constructeur par d&eacute;faut. Ce constructeur donne à la particule des coordonn&eacute;es nulles par d&eacute;faut.
    */
-  Particle():CPoint(){m_lifespan=0; xprev=yprev=zprev=0.0;};
+  CParticle():CPoint(){m_lifespan=0; xprev=yprev=zprev=0.0;};
 
   /** Ce constructeur prend un point de l'espace comme base.
    * @param P point dans l'espace
    * @param lifespan durée de vie initiale
    */
-  Particle(const CPoint& P, uint lifespan):CPoint(P)
+  CParticle(const CPoint& P, uint lifespan):CPoint(P)
   {
     xprev=yprev=zprev=0.0;
     m_lifespan=lifespan;
@@ -32,7 +32,7 @@ public:
   /** Constructeur par recopie
    * @param P particule source
    */
-  Particle(const Particle& P):CPoint(P)
+  CParticle(const CParticle& P):CPoint(P)
   {
     m_lifespan=P.m_lifespan;
     xprev = P.xprev;
@@ -56,7 +56,7 @@ public:
   /** Surchage de l'opérateur =
    * @param P particule source
    */
-  virtual Particle& operator= (const Particle& P){
+  virtual CParticle& operator= (const CParticle& P){
     x=P.x; y=P.y; z=P.z;
     xprev = P.xprev; yprev = P.yprev; zprev = P.zprev;
     m_lifespan=P.m_lifespan;
@@ -66,7 +66,7 @@ public:
   /** Surchage de l'opérateur =
    * @param P point dans l'espace
    */
-  virtual Particle& operator= (const CPoint& P){
+  virtual CParticle& operator= (const CPoint& P){
     x=P.x; y=P.y; z=P.z;
     xprev = 0.0; yprev = 0.0; zprev = 0.0;
     return *this;

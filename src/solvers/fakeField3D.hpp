@@ -43,7 +43,7 @@ public:
     return value;
   };
 
-  void moveParticle (Particle& particle, float selfVelocity) const
+  void moveParticle (CParticle& particle, float selfVelocity) const
   {
     /** Sauvegarde de la position à t-1 */
     particle.xprev = particle.x; particle.yprev = particle.y; particle.zprev = particle.z;

@@ -12,7 +12,7 @@
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
-												Field3D* const a_rField,
+												Field3D& a_rField,
 												uint a_uiNbFlames,
 												CharCPtrC a_szTexname,
 												const CShader& a_rGenShadowCubeMapShader,
@@ -23,10 +23,9 @@ IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
 								a_rGenShadowCubeMapShader,
 								a_rShadowRenderTarget,
 								string(a_rFlameConfig.IESFileName.fn_str())),
+		m_rField(a_rField),
 		m_oTexture(a_szTexname, GL_REPEAT, GL_REPEAT)
 {
-	m_solver = a_rField;
-
 	m_nbFlames=a_uiNbFlames;
 	/* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
 	if (m_nbFlames) m_flames = new IRealFlame* [m_nbFlames];
@@ -73,7 +72,7 @@ void IFireSource::build()
 		averagePos += m_flames[i]->getCenter ();
 		averageVec += m_flames[i]->getMainDirection ();
 	}
-	averagePos *= m_solver->getScale();
+	averagePos *= m_rField.getScale();
 	m_center = averagePos/m_nbFlames;
 	averagePos = m_center + getPosition();
 	SetPosition(averagePos);
@@ -93,7 +92,7 @@ void IFireSource::computeIntensityPositionAndDirection()
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef;
+	fIntensity = o.norm()*(m_rField.getScale().y)*m_intensityCoef;
 
 	//  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -121,14 +120,14 @@ void IFireSource::buildBoundingSphere ()
 {
 	CPoint p;
 	float t;
-	p = (m_solver->getScale() * m_solver->getDim());
+	p = (m_rField.getScale() * m_rField.getDim());
 	t = p.max();
 
 	m_boundingSphere.radius = sqrtf(3.0f)/2.0f*t;
 	/* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
 	m_boundingSphere.centre = getPosition() + p/2.0f;
-	//  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_solver->getScale())).length()+.1;
+	//  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_rField.getScale())).length()+.1;
 	//  m_boundingSphere.centre = getCenterSP();
 }
 
@@ -140,22 +139,22 @@ void IFireSource::drawImpostor() const
 	if (m_visibility)
 	{
 //       CPoint position(getPosition());
-//       CPoint scale(m_solver->getScale());
+//       CPoint scale(m_rField.getScale());
 //       glPushMatrix();
 //       glTranslatef (position.x, position.y, position.z);
 //       glScalef (scale.x, scale.y, scale.z);
-//       CUGraphicsFn::SolidBox(CPoint(),m_solver->getDim());
+//       CUGraphicsFn::SolidBox(CPoint(),m_rField.getDim());
 //       glPopMatrix();
 		GLfloat modelview[16];
 
 		CPoint const& rPos = getPosition();
-		float size=m_solver->getScale().x*1.5f, halfSize=m_solver->getScale().x*.5f;
+		float size=m_rField.getScale().x*1.5f, halfSize=m_rField.getScale().x*.5f;
 		CPoint a,b,c,d,zero;
 		CVector right,up,offset;
 
 		glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
 
-		offset = CVector(modelview[2], modelview[6], modelview[10])*m_solver->getDim().z*m_solver->getScale().z/2.0f;
+		offset = CVector(modelview[2], modelview[6], modelview[10])*m_rField.getDim().z*m_rField.getScale().z/2.0f;
 
 		right.x = modelview[0];
 		right.y = modelview[4];
@@ -205,7 +204,7 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 			// TODO : Could a counter to re-enable index notification
 			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
 			cout << "solver launched" << endl;
-			m_solver->setRunningState(true);
+			m_rField.setRunningState(true);
 		}
 
 		coverage = m_boundingSphere.getPixelCoverage(view);
@@ -241,7 +240,7 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 				/* On passe en FakeField */
 				if ( fluidsLOD == 5 )
 				{
-					m_solver->switchToFakeField();
+					m_rField.switchToFakeField();
 				}
 				m_fluidsLODSave-=1;
 			}
@@ -255,7 +254,7 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 					/* On repasse en solveur */
 					if ( fluidsLOD == 6 )
 					{
-						m_solver->switchToRealSolver();
+						m_rField.switchToRealSolver();
 					}
 					m_fluidsLODSave+=1;
 				}
@@ -275,7 +274,7 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 			// TODO : Could a counter to re-enable index notification
 			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
 			cout << "solver stopped" << endl;
-			m_solver->setRunningState(false);
+			m_rField.setRunningState(false);
 		}
 }
 
@@ -316,12 +315,12 @@ bool IFireSource::operator<(const IFireSource& other) const
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 IDetachableFireSource::IDetachableFireSource(const FlameConfig& a_rFlameConfig,
-																						Field3D* const a_pField,
+																						Field3D& a_rField,
 																						uint a_uiNbFlames,
 																						CharCPtrC a_szTexname,
 																						const CShader& a_rGenShadowCubeMapShader,
 																						const CRenderTarget& a_rShadowRenderTarget) :
-		IFireSource (a_rFlameConfig, a_pField, a_uiNbFlames, a_szTexname, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+		IFireSource (a_rFlameConfig, a_rField, a_uiNbFlames, a_szTexname, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 {
 	computeGlowWeights(0,1.8f);
 	computeGlowWeights(1,2.2f);
@@ -358,7 +357,7 @@ void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char
 			if (m_visibility)
 			{
 				CPoint const& rPos = getPosition();
-				CPoint const& rScale = m_solver->getScale();
+				CPoint const& rScale = m_rField.getScale();
 				glPushMatrix();
 				glTranslatef (rPos.x, rPos.y, rPos.z);
 				glScalef (rScale.x, rScale.y, rScale.z);
@@ -394,7 +393,7 @@ void IDetachableFireSource::build()
 		averagePos += m_flames[i]->getCenter ();
 		averageVec += m_flames[i]->getMainDirection ();
 	}
-	averagePos *= m_solver->getScale();
+	averagePos *= m_rField.getScale();
 	m_center = averagePos/m_nbFlames;
 	averagePos = m_center + getPosition();
 	SetPosition(averagePos);
@@ -419,7 +418,7 @@ void IDetachableFireSource::build()
 	CPoint pt;
 	CPoint p;
 	float t,k;
-	p = (m_solver->getScale() * m_solver->getDim())/2.0f;
+	p = (m_rField.getScale() * m_rField.getDim())/2.0f;
 	t = p.max();
 	k = t*t;
 
@@ -441,10 +440,10 @@ void IDetachableFireSource::build()
 // 	ptMin.y = pt.y;
 //       if(pt.z < ptMin.z)
 // 	ptMin.z = pt.z;
-//       ptMin *= m_solver->getScale();
-//       ptMax *= m_solver->getScale();
+//       ptMin *= m_rField.getScale();
+//       ptMax *= m_rField.getScale();
 //       m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
-//       m_boundingSphere.centre = m_solver->getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
+//       m_boundingSphere.centre = m_rField.getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
 //     }else{
 	m_boundingSphere.radius = sqrt(k+k);
 	m_boundingSphere.centre = getPosition() + p;
@@ -459,8 +458,8 @@ void IDetachableFireSource::build()
 //     {
 //       GLfloat modelview[16];
 
-//       CPoint pos(m_solver->getPosition());
-//       float size=m_solver->getScale().x*1.1;
+//       CPoint pos(m_rField.getPosition());
+//       float size=m_rField.getScale().x*1.1;
 //       CPoint a,b,c,d,zero;
 //       CVector right,up,offset;//(0.0f,0.0f,0.5f);
 
@@ -514,7 +513,7 @@ void IDetachableFireSource::computeIntensityPositionAndDirection()
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity=o.norm()*(m_solver->getScale().y)*m_intensityCoef;
+	fIntensity=o.norm()*(m_rField.getScale().y)*m_intensityCoef;
 
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
 	fIntensity = sqrt(fIntensity)*2.0f;
@@ -545,7 +544,7 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 			// TODO : Could a counter to re-enable index notification
 			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
 			cerr << "solver launched" << endl;
-			m_solver->setRunningState(true);
+			m_rField.setRunningState(true);
 		}
 
 		coverage = m_boundingSphere.getPixelCoverage(view);
@@ -586,10 +585,10 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 						m_flickSave = getPerturbateMode();
 						setPerturbateMode(FLICKERING_NOISE);
 					}
-					m_solver->switchToFakeField();
+					m_rField.switchToFakeField();
 				}
 				else
-					m_solver->decreaseRes();
+					m_rField.decreaseRes();
 				diff--;
 				m_fluidsLODSave-=2;
 			}
@@ -609,10 +608,10 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 							setPerturbateMode(m_flickSave);
 							m_flickSave = -1;
 						}
-						m_solver->switchToRealSolver();
+						m_rField.switchToRealSolver();
 					}
 					else
-						m_solver->increaseRes();
+						m_rField.increaseRes();
 					diff--;
 					m_fluidsLODSave+=2;
 				}
@@ -631,7 +630,7 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 			// TODO : Could a counter to re-enable index notification
 			//cerr << "solver " << m_light - GL_LIGHT0 << " launched" << endl;
 			cerr << "solver stopped" << endl;
-			m_solver->setRunningState(false);
+			m_rField.setRunningState(false);
 		}
 }
 
@@ -662,7 +661,7 @@ void IDetachableFireSource::buildBoundingBox ()
 			if (pt.z < ptMin.z)
 				ptMin.z = pt.z;
 		}
-	pt = m_solver->getDim();
+	pt = m_rField.getDim();
 	if (pt.x > ptMax.x)
 		ptMax.x = pt.x;
 	if (pt.y > ptMax.y)
@@ -676,6 +675,6 @@ void IDetachableFireSource::buildBoundingBox ()
 	if (0.0f < ptMin.z)
 		ptMin.z = 0.0f;
 
-	m_BBmin = ptMin * m_solver->getScale();
-	m_BBmax = ptMax * m_solver->getScale();
+	m_BBmin = ptMin * m_rField.getScale();
+	m_BBmax = ptMax * m_rField.getScale();
 }

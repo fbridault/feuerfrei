@@ -44,14 +44,14 @@ public:
 	 * @param position Position de la mèche dans l'espace.
 	 * @param leadSkeletons Vecteur des squelettes guides.
 	 */
-	uint buildPointFDF(FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
+	uint buildPointFDF(FlameConfig const& flameConfig, vector< CLeadSkeleton * >& leadSkeletons, Field3D& field);
 
 	/* Construction de la mèche
 	 * @param scene CPointeur sur la scène.
 	 * @param position Position de la mèche dans l'espace.
 	 * @param leadSkeletons Vecteur des squelettes guides.
 	 */
-	uint buildFDF(FlameConfig const& flameConfig, vector< LeadSkeleton * >& leadSkeletons, Field3D* const field);
+	uint buildFDF(FlameConfig const& flameConfig, vector< CLeadSkeleton * >& leadSkeletons, Field3D& field);
 
 //   void buildFDF(Field3D* const m_field);
 	/** Affiche la mèche

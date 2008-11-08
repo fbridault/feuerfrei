@@ -8,7 +8,7 @@
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 Candle::Candle (	const FlameConfig& a_rFlameConfig,
-								Field3D * a_pField,
+								Field3D& a_rField,
 								CScene& a_rScene,
 								float a_fRayon,
 								CharCPtrC a_szWickFileName,
@@ -16,7 +16,7 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 								const CRenderTarget& a_rShadowRenderTarget,
 								CWick *a_pWick):
 		IFireSource (a_rFlameConfig,
-								a_pField,
+								a_rField,
 								1,
 								("textures/bougie2.png"),
 								a_rGenShadowCubeMapShader,
@@ -37,7 +37,7 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 		CPoint rPosition = GrabPosition();
 		rPosition = CPoint(0.5f,0.0f,0.5f) - pWick->getCenter();
 		pWick->translate(rPosition);
-		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_pField, a_fRayon, pWick);
+		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, pWick);
 	}
 	else
 	{
@@ -49,7 +49,7 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 		CPoint rPosition = GrabPosition();
 		rPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->getCenter();
 		a_pWick->translate(rPosition);
-		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_pField, a_fRayon, a_pWick);
+		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, a_pWick);
 	}
 }
 
@@ -58,13 +58,13 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
-													Field3D * a_pField,
+													Field3D& a_rField,
 													CScene& a_rScene,
 													CharCPtrC a_szWickFileName,
 													const CShader& a_rGenShadowCubeMapShader,
 													const CRenderTarget& a_rShadowRenderTarget) :
 		IFireSource (a_rFlameConfig,
-								a_pField,
+								a_rField,
 								1,
 								("textures/firmalampe.png"),
 								a_rGenShadowCubeMapShader,
@@ -83,14 +83,14 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 	rPosition = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getCenter();
 	(*objList.begin())->translate(rPosition);
 
-	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_pField, (*objList.begin()), 0.03f, 0.01f);
+	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (*objList.begin()), 0.03f, 0.01f);
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 CandleStick::CandleStick (	const FlameConfig& a_rFlameConfig,
-													Field3D * a_rField,
+													Field3D& a_rField,
 													CScene& a_rScene,
 													CharCPtrC a_szFilename,
 													float a_fRayon,

@@ -1,22 +1,22 @@
 #if !defined(PERISKELETON_H)
 #define PERISKELETON_H
 
-class PeriSkeleton;
-class LeadSkeleton;
-class FreePeriSkeleton;
-class FreeLeadSkeleton;
+class CPeriSkeleton;
+class CLeadSkeleton;
+class CFreePeriSkeleton;
+class CFreeLeadSkeleton;
 
 #include "skeleton.hpp"
 
-class Skeleton;
+class ISkeleton;
 
-/** Classe représentant les squelettes périphériques, voir la classe Skeleton pour plus de
+/** Classe représentant les squelettes périphériques, voir la classe ISkeleton pour plus de
  * détails. Un squelette périphérique se réfère à un squelette guide relatif pour la
  * construction des surfaces NURBS.
  *
  * @author	Flavien Bridault
  */
-class PeriSkeleton : public Skeleton
+class CPeriSkeleton : public ISkeleton
 {
 public:
   /** Constructeur de squelette périphérique.
@@ -28,23 +28,23 @@ public:
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    * @param pls Durée de vie initiale d'une particule.
    */
-  PeriSkeleton(Field3D* const s, const CPoint& position, const CPoint& rootMoveFactor,
-	       LeadSkeleton *leadSkeleton, uint pls);
+  CPeriSkeleton(	Field3D& a_rField, const CPoint& a_rPosition, const CPoint& a_rRootMoveFactor,
+							CLeadSkeleton& a_rLeadSkeleton, uint a_uiPls);
   /** Destructeur. */
-  virtual ~PeriSkeleton();
+  virtual ~CPeriSkeleton();
 
   /** Méthode de séparation d'un squelette.
    * @param splitHeight hauteur de la découpe.
    * @param leadSkeleton squelette guide relatif.
    */
-  FreePeriSkeleton* split (uint splitHeight, FreeLeadSkeleton* leadSkeleton);
+  CFreePeriSkeleton* split (uint a_uiSplitHeight, CFreeLeadSkeleton& a_rLeadSkeleton);
 
-  void addParticle(const CPoint* const pt);
+  void addParticle(CPoint const& a_rParticle);
 
-  virtual bool moveParticle(Particle* const particle);
+  virtual bool moveParticle(CParticle& a_rParticle);
 
   /** Retourne un pointeur sur le squelette guide relatif. */
-  LeadSkeleton* getLeadSkeleton() const {return m_lead;};
+  CLeadSkeleton& getLeadSkeleton() const {return m_rLead;};
 
   /** Méthode d'ajout de forces en utilisant celle du squelette relatif. Ceci
    * est utilisé uniquement dans le cas des bougies.
@@ -55,14 +55,14 @@ private:
   /** CPointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
-  LeadSkeleton *m_lead;
+  CLeadSkeleton& m_rLead;
 };
 
 /** Classe représentant les squelettes périphériques libres.
  *
  * @author	Flavien Bridault
  */
-class FreePeriSkeleton : public FreeSkeleton
+class CFreePeriSkeleton : public IFreeSkeleton
 {
 public:
   /** Constructeur de squelette périphérique libre. Permet de construire un squelette à partir
@@ -74,26 +74,26 @@ public:
    * @param leadSkeleton CPointeur sur le squelette guide relatif.
    * @param splitHeight Hauteur de découpe.
    */
-  FreePeriSkeleton(const PeriSkeleton* const src, FreeLeadSkeleton* const leadSkeleton, uint splitHeight);
+  CFreePeriSkeleton(IFreeSkeleton const& a_rSrc, CFreeLeadSkeleton& a_rLeadSkeleton, uint a_uiSplitHeight);
 
   /** Constructeur de squelette périphérique libre.
    * @param size Nombre de particules maximum du squelette.
    * @param s CPointeur sur le solveur de fluides.
    * @param leadSkeleton CPointeur sur le squelette guide relatif.
    */
-  FreePeriSkeleton(uint size, Field3D* const s, FreeLeadSkeleton* const leadSkeleton);
+  CFreePeriSkeleton(uint a_uiSize, Field3D& a_rField, CFreeLeadSkeleton& a_rLeadSkeleton);
   /** Destructeur */
-  virtual ~FreePeriSkeleton();
+  virtual ~CFreePeriSkeleton();
 
   /** Retourne un pointeur sur le squelette guide relatif */
-  FreeLeadSkeleton* getLeadSkeleton() const {return m_lead;};
+  CFreeLeadSkeleton& getLeadSkeleton() const {return m_rLead;};
 
-  friend class FreeLeadSkeleton;
+  friend class CFreeLeadSkeleton;
 private:
   /** CPointeur sur le squelette guide associé (généralement le plus proche,
    * dans le cas de la bougie simple, le problème est simple puisqu'il n'y en a qu'un seul)
    */
-  FreeLeadSkeleton *m_lead;
+  CFreeLeadSkeleton& m_rLead;
 };
 
 #endif

@@ -63,7 +63,7 @@ public:
    * @param particle Particule à déplacer.
    * @param selfVelocity Vélocité propre de la particule, utilisée seulement pour les FakeFields.
    */
-  virtual void moveParticle (Particle& particle, float selfVelocity) const = 0;
+  virtual void moveParticle (CParticle& particle, float selfVelocity) const = 0;
 
   /** Ajout d'une force externe pour la composante U.
    * @param pos Position relative de la particule dans le solveur

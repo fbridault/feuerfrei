@@ -123,7 +123,7 @@ public:
     return m_currentField->getUVW (pos, selfVelocity);
   };
 
-  virtual void moveParticle (Particle& particle, float selfVelocity) const
+  virtual void moveParticle (CParticle& particle, float selfVelocity) const
   {
     m_currentField->moveParticle (particle, selfVelocity);
   };
@@ -287,11 +287,11 @@ public:
       return m_currentField->getUVW (pos, selfVelocity);
   };
 
-  void moveParticle (Particle& pos, float selfVelocity) const
+  void moveParticle (CParticle& pos, float selfVelocity) const
   {
     if(m_switch)
       {
-	Particle p(pos);
+	CParticle p(pos);
 	m_fakeField.moveParticle (p, selfVelocity);
 	m_solver.moveParticle (pos, selfVelocity);
 	pos = p*m_fieldWeight + pos*m_solverWeight;

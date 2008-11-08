@@ -39,7 +39,8 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 	if (a_rConfig.fires[0].type != CANDLESSET)
 	{
 		pField = initField( a_rConfig.fields[0], m_position );
-		pFireSource = initFire(a_rConfig.fires[0], a_szFilename, pField, a_rScene, a_rShadowMapShader, a_rShadowRenderTarget);
+		assert(pField != NULL);
+		pFireSource = initFire(a_rConfig.fires[0], a_szFilename, *pField, a_rScene, a_rShadowMapShader, a_rShadowRenderTarget);
 	}
 	else
 	{
@@ -52,7 +53,8 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 		     objListIterator != objList.end (); objListIterator++, i++)
 		{
 			pField = initField( a_rConfig.fields[0], m_position);
-			pFireSource = new Candle (	a_rConfig.fires[0], pField, a_rScene, .125f, NULL,
+			assert(pField != NULL);
+			pFireSource = new Candle (	a_rConfig.fires[0], *pField, a_rScene, .125f, NULL,
 																	a_rShadowMapShader, a_rShadowRenderTarget, *objListIterator);
 
 			pFireSource->setInnerForce(a_rConfig.fires[0].innerForce);
@@ -123,7 +125,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 
 IFireSource* Luminary::initFire(	const FlameConfig& a_rFlameConfig,
 															CharCPtrC a_szFilename,
-															Field3D* a_pField,
+															Field3D& a_rField,
 															CScene& a_rScene,
 															const CShader& a_rShadowMapShader,
 															const CRenderTarget& a_rShadowRenderTarget)
@@ -132,21 +134,21 @@ IFireSource* Luminary::initFire(	const FlameConfig& a_rFlameConfig,
 	switch (a_rFlameConfig.type)
 	{
 		case CANDLE :
-			fire = new Candle (a_rFlameConfig,a_pField, a_rScene, .125f, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new Candle (a_rFlameConfig,a_rField, a_rScene, .125f, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case FIRMALAMPE :
-			fire = new Firmalampe(a_rFlameConfig, a_pField, a_rScene, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new Firmalampe(a_rFlameConfig, a_rField, a_rScene, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case TORCH :
-			fire = new CTorch(a_rFlameConfig, a_pField, a_rScene, a_szFilename, ("textures/torch6.png"),
+			fire = new CTorch(a_rFlameConfig, a_rField, a_rScene, a_szFilename, ("textures/torch6.png"),
 												a_rShadowMapShader, a_rShadowRenderTarget, 0.03f, 0.04f);
 			break;
 		case CAMPFIRE :
-			fire = new CCampFire(a_rFlameConfig, a_pField, a_rScene, a_szFilename, ("textures/torch4.png"),
+			fire = new CCampFire(a_rFlameConfig, a_rField, a_rScene, a_szFilename, ("textures/torch4.png"),
 														a_rShadowMapShader, a_rShadowRenderTarget, 0.05f, 0.02f);
 			break;
 		case CANDLESTICK :
-			fire = new CandleStick (a_rFlameConfig, a_pField, a_rScene, "scenes/bougie.obj", .125f, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new CandleStick (a_rFlameConfig, a_rField, a_rScene, "scenes/bougie.obj", .125f, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		default :
 			cerr << "Unknown flame type : " << (int)a_rFlameConfig.type << endl;

@@ -8,9 +8,9 @@
 /*************************************** IMPLEMENTATION DE LA CLASSE LINEFLAME ****************************************/
 /**********************************************************************************************************************/
 
-CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s,
-                        CWick *wickObject, float width, float detachedFlamesWidth, IDetachableFireSource *parentFire ) :
-		IRealFlame ((flameConfig.skeletonsNumber+2)*2, 3, a_rTex, s)
+CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D& a_rField,
+												CWick *wickObject, float width, float detachedFlamesWidth, IDetachableFireSource *parentFire ) :
+		IRealFlame ((flameConfig.skeletonsNumber+2)*2, 3, a_rTex)
 {
 	CPoint pt;
 	uint i,j;
@@ -19,7 +19,7 @@ CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, 
 	CPoint rootMoveFactorP(.5f,.1f,.5f);
 
 	m_wick = wickObject;
-	sliceDirection = m_wick->buildFDF(flameConfig, m_leadSkeletons, s);
+	sliceDirection = m_wick->buildFDF(flameConfig, m_leadSkeletons, a_rField);
 	assert(m_nbSkeletons == m_leadSkeletons.size()*2);
 
 	m_nbLeadSkeletons = m_leadSkeletons.size();
@@ -31,7 +31,9 @@ CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, 
 	/* Génération d'un côté des squelettes périphériques */
 	for (i = 0; i < m_nbLeadSkeletons; i++)
 	{
-		pt = *m_leadSkeletons[i]->getRoot();
+		assert(m_leadSkeletons[i] != NULL);
+
+		pt = m_leadSkeletons[i]->getRoot();
 		switch (sliceDirection)
 		{
 			case 0 :
@@ -41,13 +43,14 @@ CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, 
 			case 2 :
 				pt.x += (width / 2.0f);
 		}
-		m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[i], flameConfig.periLifeSpan);
+		m_periSkeletons[i] = new CPeriSkeleton (a_rField, pt, rootMoveFactorP, *m_leadSkeletons[i], flameConfig.periLifeSpan);
 	}
 
 	/* Génération de l'autre côté des squelettes périphériques */
 	for ( j = m_nbLeadSkeletons, i = m_nbLeadSkeletons; j > 0; j--, i++)
 	{
-		pt = *m_leadSkeletons[j-1]->getRoot();
+		assert(m_leadSkeletons[j-1] != NULL);
+		pt = m_leadSkeletons[j-1]->getRoot();
 		switch (sliceDirection)
 		{
 			case 0 :
@@ -57,7 +60,7 @@ CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, 
 			case 2 :
 				pt.x -= (width / 2.0f);
 		}
-		m_periSkeletons[i] = new PeriSkeleton (m_solver, pt, rootMoveFactorP, m_leadSkeletons[j-1], flameConfig.periLifeSpan);
+		m_periSkeletons[i] = new CPeriSkeleton (a_rField, pt, rootMoveFactorP, *m_leadSkeletons[j-1], flameConfig.periLifeSpan);
 	}
 
 	m_parentFire = parentFire;
@@ -77,48 +80,52 @@ CLineFlame::~CLineFlame ()
 
 void CLineFlame::breakCheck()
 {
-	float split,proba;
-	uint threshold=3;
-	float detachThreshold=.9f;
+	float fSplit,fProba;
+	uint const uiThreshold=3;
+	float const fDetachThreshold=.9f;
 	/* Indice de la particule à laquelle un squelette est découpé */
-	uint splitHeight;
-	uint i;
-	FreeLeadSkeleton **leadSkeletonsArray;
-	FreePeriSkeleton **periSkeletonsArray;
+	uint uiSplitHeight;
+	CFreeLeadSkeleton **leadSkeletonsArray;
+	CFreePeriSkeleton **periSkeletonsArray;
 
-	for ( i = 0; i < m_nbLeadSkeletons; i++)
+	for ( uint i = 0; i < m_nbLeadSkeletons; i++)
 	{
-		if (m_leadSkeletons[i]->getInternalSize() < threshold)
+		if (m_leadSkeletons[i]->getInternalSize() < uiThreshold)
 			return;
 
-		proba = (rand()/((float)RAND_MAX));
+		fProba = (rand()/((float)RAND_MAX));
 
 		/* Tirage aléatoire entre 0 et 1 */
-		if ( proba > detachThreshold)
+		if ( fProba > fDetachThreshold)
 		{
 			CPoint offset;
 
 			/* Tirage entre 0.5 et 1 pour la hauteur du squelette */
-			split = (rand()/(2.0f*(float)RAND_MAX))+.5f;
+			fSplit = (rand()/(2.0f*(float)RAND_MAX))+.5f;
 
-			leadSkeletonsArray = new FreeLeadSkeleton* [1];
+			leadSkeletonsArray = new CFreeLeadSkeleton* [1];
 
-			splitHeight = (uint)(split * (m_leadSkeletons[i]->getInternalSize()-1) );
-			leadSkeletonsArray[0] = m_leadSkeletons[i]->split(splitHeight);
+			/* Create first lead skeleton */
+			uiSplitHeight = (uint)(fSplit * (m_leadSkeletons[i]->getInternalSize()-1) );
+			leadSkeletonsArray[0] = m_leadSkeletons[i]->split(uiSplitHeight);
 
-			periSkeletonsArray = new FreePeriSkeleton* [4];
+			assert( leadSkeletonsArray[0] != NULL);
+			CFreeLeadSkeleton& rLeadSkeleton = *leadSkeletonsArray[0];
 
-			offset.x=-m_detachedFlamesWidth * split;
+			/* Create then peri skeleton */
+			periSkeletonsArray = new CFreePeriSkeleton* [4];
+
+			offset.x=-m_detachedFlamesWidth * fSplit;
 			periSkeletonsArray[0] = leadSkeletonsArray[0]->dup(offset);
 
-			splitHeight = (uint)(split * (m_periSkeletons[i+1]->getInternalSize()-1));
-			periSkeletonsArray[1] = m_periSkeletons[i+1]->split(splitHeight, leadSkeletonsArray[0]);
+			uiSplitHeight = (uint)(fSplit * (m_periSkeletons[i+1]->getInternalSize()-1));
+			periSkeletonsArray[1] = m_periSkeletons[i+1]->split(uiSplitHeight, rLeadSkeleton);
 
-			offset.x=m_detachedFlamesWidth * split;
+			offset.x=m_detachedFlamesWidth * fSplit;
 			periSkeletonsArray[2] = leadSkeletonsArray[0]->dup(offset);
 
-			splitHeight = (uint)(split * (m_periSkeletons[m_nbSkeletons-i-1]->getInternalSize()-1));
-			periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(splitHeight, leadSkeletonsArray[0]);
+			uiSplitHeight = (uint)(fSplit * (m_periSkeletons[m_nbSkeletons-i-1]->getInternalSize()-1));
+			periSkeletonsArray[3] = m_periSkeletons[m_nbSkeletons-i-1]->split(uiSplitHeight, rLeadSkeleton);
 
 			CDetachedFlame *pDetachedFlame =
 				new CDetachedFlame(this, 1, leadSkeletonsArray, 4, periSkeletonsArray, m_rTexture, m_shadingType, m_samplingMethod);
@@ -200,10 +207,10 @@ bool CLineFlame::buildFlat ()
 			/* On laisse les distances au carré pour des raisons évidentes de coût de calcul */
 			for (j = 0; j < m_leadSkeletons[i]->getSize () - 1; j++)
 				m_distances[j] =
-				  m_leadSkeletons[i]->getParticle (j)->squaredDistanceFrom(*m_leadSkeletons[i]->getParticle (j + 1));
+				  m_leadSkeletons[i]->getParticle (j).squaredDistanceFrom(m_leadSkeletons[i]->getParticle (j + 1));
 
 			m_distances[m_leadSkeletons[i]->getSize () - 1] =
-			  m_leadSkeletons[i]->getLastParticle ()->squaredDistanceFrom (*m_leadSkeletons[i]->getRoot ());
+			  m_leadSkeletons[i]->getLastParticle ().squaredDistanceFrom (m_leadSkeletons[i]->getRoot ());
 
 			/* On cherche les indices des distances max */
 			/* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
@@ -238,7 +245,7 @@ bool CLineFlame::buildFlat ()
 					{
 						/* On peut référencer j+1 puisque m_maxDistancesIndexes[l] != j si j == m_leadSkeletons[i]->getSize()-1 */
 						pt = CPoint::pointBetween(m_leadSkeletons[i]->getParticle (j), m_leadSkeletons[i]->getParticle (j + 1));
-						setCtrlCPoint (&pt, utex);
+						setCtrlCPoint (pt, utex);
 					}
 				}
 			}
@@ -249,7 +256,7 @@ bool CLineFlame::buildFlat ()
 				if (m_maxDistancesIndexes[l] == (int)m_leadSkeletons[i]->getSize ()-1)
 				{
 					pt = CPoint::pointBetween(m_leadSkeletons[i]->getRoot (), m_leadSkeletons[i]-> getLastParticle ());
-					setCtrlCPoint (&pt, utex);
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
 
@@ -259,10 +266,10 @@ bool CLineFlame::buildFlat ()
 				{
 					if (!prec)
 					{
-						pt = *m_leadSkeletons[i]-> getRoot ();
+						pt = m_leadSkeletons[i]-> getRoot ();
 					}
-					pt = CPoint::pointBetween (&pt, m_leadSkeletons[i]->getLastParticle ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween (pt, m_leadSkeletons[i]->getLastParticle ());
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
 			setCtrlCPoint (m_leadSkeletons[i]->getRoot (), utex);
@@ -327,15 +334,15 @@ bool CLineFlame::buildFlat ()
 //     float r = (rand()/((float)RAND_MAX));
 //     pos = (m_wick.getLeadCPoint(m_wick.getLeadCPointsArraySize()-1)->m_pt);
 //     pos = pos * r + m_wick.getLeadCPoint(0)->m_pt ;
-//     Particle *spark = new Particle(pos, life);
+//     CParticle *spark = new CParticle(pos, life);
 //     m_sparksList.push_back(spark);
 //   }
 
 //   /* Déplacement et affichage des particules */
-//   for (list < Particle *>::iterator sparksListIterator = m_sparksList.begin ();
+//   for (list < CParticle *>::iterator sparksListIterator = m_sparksList.begin ();
 //        sparksListIterator != m_sparksList.end ();
 //        sparksListIterator++){
-//     Particle *par = *sparksListIterator;
+//     CParticle *par = *sparksListIterator;
 //     m_solver->findCPointPosition(*par, i, j, k);
 
 //     (*sparksListIterator)->decreaseLife();
@@ -371,8 +378,8 @@ bool CLineFlame::buildFlat ()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D* const s, float rayon, CWick *wick):
-		IRealFlame ( flameConfig.skeletonsNumber, 3, a_rTex, s)
+CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D& a_rField, float rayon, CWick *wick):
+		IRealFlame ( flameConfig.skeletonsNumber, 3, a_rTex)
 {
 	uint i;
 	float angle;
@@ -383,16 +390,19 @@ CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex
 	m_nbLeadSkeletons = 1;
 
 	m_wick = wick;
-	m_wick->buildPointFDF(flameConfig, m_leadSkeletons, s);
+	m_wick->buildPointFDF(flameConfig, m_leadSkeletons, a_rField);
 
 	/* On créé les squelettes en cercle */
 	angle = 0.0f;
 
-	CPoint pt = *m_leadSkeletons[0]->getRoot();
+	assert(m_leadSkeletons[0] != NULL);
+	CPoint const& pt = m_leadSkeletons[0]->getRoot();
+
 	for (i = 0; i < m_nbSkeletons; i++)
 	{
 		CPoint oRoot(cos (angle) * rayon + pt.x, pt.y, sin (angle) * rayon + pt.z);
-		m_periSkeletons[i] = new PeriSkeleton(m_solver, oRoot,	CPoint(1.0f,.75f,1.0f), m_leadSkeletons[0], flameConfig.periLifeSpan);
+		m_periSkeletons[i] =
+			new CPeriSkeleton(a_rField, oRoot,	CPoint(1.0f,.75f,1.0f), *m_leadSkeletons[0], flameConfig.periLifeSpan);
 		angle += 2.0f * PI / m_nbSkeletons;
 	}
 
@@ -409,8 +419,8 @@ CPointFlame::~CPointFlame ()
 /*************************************** IMPLEMENTATION DE LA CLASSE DETACHEDFLAME ************************************/
 /**********************************************************************************************************************/
 
-CDetachedFlame::CDetachedFlame(const IRealFlame* const source, uint nbLeadSkeletons, FreeLeadSkeleton **leadSkeletons,
-                               uint nbSkeletons, FreePeriSkeleton **periSkeletons, ITexture const& a_rTex, bool shadingType,
+CDetachedFlame::CDetachedFlame(const IRealFlame* const source, uint nbLeadSkeletons, CFreeLeadSkeleton **leadSkeletons,
+                               uint nbSkeletons, CFreePeriSkeleton **periSkeletons, ITexture const& a_rTex, bool shadingType,
                                u_char samplingMethod) :
 		INurbsFlame (source, nbSkeletons, 2, a_rTex)
 {
@@ -497,30 +507,30 @@ bool CDetachedFlame::build()
 		assert(m_periSkeletons[i] != NULL);
 		/* Problème pour la direction des v, le nombre de particules par squelettes n'est pas garanti */
 		/* La solution retenue va ajouter des points de contrôles là où les points de contrôles sont le plus éloignés */
-		if (m_periSkeletons[i]->getSize () < m_maxParticles)
+		if (m_periSkeletons[i]->getSize() < m_maxParticles)
 		{
 			// Nombre de points de contrôle supplémentaires
-			uint nb_pts_supp = m_maxParticles - m_periSkeletons[i]->getSize ();
+			uint nb_pts_supp = m_maxParticles - m_periSkeletons[i]->getSize();
 			CPoint pt;
 			/* On calcule les distances entre les particules successives */
 			/* On prend également en compte l'origine du squelette ET les extrémités du guide */
 			/* On laisse les distances au carré pour des raisons évidentes de coût de calcul */
 			m_distances[0] =
-			  m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0)->squaredDistanceFrom (*m_periSkeletons[i]->getParticle (0));
+			  m_periSkeletons[i]->getLeadSkeleton().getParticle(0).squaredDistanceFrom (m_periSkeletons[i]->getParticle(0));
 
 			for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
 				m_distances[j + 1] =
-				  m_periSkeletons[i]->getParticle (j)->squaredDistanceFrom(*m_periSkeletons[i]->getParticle (j + 1));
+				  m_periSkeletons[i]->getParticle(j).squaredDistanceFrom(m_periSkeletons[i]->getParticle (j + 1));
 
 			m_distances[m_periSkeletons[i]->getSize ()] =
-			  m_periSkeletons[i]->getLastParticle ()->squaredDistanceFrom (*m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle ());
+			  m_periSkeletons[i]->getLastParticle().squaredDistanceFrom (m_periSkeletons[i]->getLeadSkeleton().getLastParticle ());
 
 			/* On cherche les indices des distances max */
 			/* On n'effectue pas un tri complet car on a seulement besoin de connaître les premiers */
 			for (l = 0; l < nb_pts_supp; l++)
 			{
 				dist_max = -FLT_MAX;
-				for (j = 0; j < m_periSkeletons[i]->getSize () - 1 + m_nbFixedPoints; j++)
+				for (j = 0; j < m_periSkeletons[i]->getSize() - 1 + m_nbFixedPoints; j++)
 				{
 					if (m_distances[j] > dist_max)
 					{
@@ -537,13 +547,14 @@ bool CDetachedFlame::build()
 			}
 			/* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == 0)
 				{
-					pt = CPoint::pointBetween(m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), m_periSkeletons[i]->getParticle (0));
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween(	m_periSkeletons[i]->getLeadSkeleton().getParticle(0),
+												m_periSkeletons[i]->getParticle(0));
+					setCtrlCPoint (pt, utex);
 				}
 
 			for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
@@ -554,23 +565,24 @@ bool CDetachedFlame::build()
 					if (m_maxDistancesIndexes[l] == (int)j + 1)
 					{
 						/* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
-						pt = CPoint::pointBetween(m_periSkeletons[i]->getParticle (j), m_periSkeletons[i]->getParticle (j + 1));
-						setCtrlCPoint (&pt, utex);
+						pt = CPoint::pointBetween(	m_periSkeletons[i]->getParticle(j),
+													m_periSkeletons[i]->getParticle(j + 1));
+						setCtrlCPoint (pt, utex);
 					}
 				}
-				setCtrlCPoint (m_periSkeletons[i]->getParticle (j), utex);
+				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
 			}
 
 			bool prec = false;
 
-			setCtrlCPoint (m_periSkeletons[i]->getLastParticle (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLastParticle(), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
-				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize ())
+				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize())
 				{
-					pt = CPoint::pointBetween(m_periSkeletons[i]->getLastParticle (),
-					                          m_periSkeletons[i]->getLeadSkeleton()->getLastParticle ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween(m_periSkeletons[i]->getLastParticle(),
+					                          m_periSkeletons[i]->getLeadSkeleton().getLastParticle());
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
 
@@ -580,24 +592,24 @@ bool CDetachedFlame::build()
 				{
 					if (!prec)
 					{
-						pt = *m_periSkeletons[i]->getLastParticle ();
+						pt = m_periSkeletons[i]->getLastParticle();
 					}
-					pt = CPoint::pointBetween (&pt, m_periSkeletons[i]->getLeadSkeleton()->getLastParticle ());
-					setCtrlCPoint (&pt, utex);
+					pt = CPoint::pointBetween (pt, m_periSkeletons[i]->getLeadSkeleton().getLastParticle());
+					setCtrlCPoint (pt, utex);
 					prec = true;
 				}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
 		}
 		else
 		{
 			/* Cas sans problème */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getParticle (0), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 			for (j = 0; j < m_periSkeletons[i]->getSize (); j++)
 			{
-				setCtrlCPoint (m_periSkeletons[i]->getParticle (j), utex);
+				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
 			}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ()->getLastParticle (), utex);
+			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
 		}
 		m_texTmp = m_texTmpSave;
 		utex += m_utexInc;
@@ -640,8 +652,8 @@ bool CDetachedFlame::build()
 //   uint threshold=4;
 //   uint splitHeight;
 //   uint i,j;
-//   FreeLeadSkeleton **leadSkeletonsArray;
-//   FreePeriSkeleton **periSkeletonsArray;
+//   CFreeLeadSkeleton **leadSkeletonsArray;
+//   CFreePeriSkeleton **periSkeletonsArray;
 
 //   for ( i = 0; i < m_nbLeadSkeletons; i++)
 //     /* La division ne peut avoir lieu qu'au dessus du seuil */
@@ -650,14 +662,14 @@ bool CDetachedFlame::build()
 
 //   split = (rand()/((float)RAND_MAX));
 //   if( split > proba){
-//     leadSkeletonsArray = new FreeLeadSkeleton* [m_nbLeadSkeletons];
+//     leadSkeletonsArray = new CFreeLeadSkeleton* [m_nbLeadSkeletons];
 //     for ( i = 0; i < m_nbLeadSkeletons; i++){
 //       /* Roulette russe : tirage aléatoire entre 0 et 1 */
 //       splitHeight = (uint)(split * m_leadSkeletons[i]->getSize()) - 1;
 //       leadSkeletonsArray[i] = m_leadSkeletons[i]->split(splitHeight);
 //     }
 
-//     periSkeletonsArray = new FreePeriSkeleton* [m_nbSkeletons];
+//     periSkeletonsArray = new CFreePeriSkeleton* [m_nbSkeletons];
 
 //     splitHeight = (uint)(split * m_periSkeletons[0]->getSize()) - 1;
 //     periSkeletonsArray[0] = m_periSkeletons[0]->split(splitHeight, leadSkeletonsArray[0]);

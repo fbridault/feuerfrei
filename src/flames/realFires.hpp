@@ -26,7 +26,7 @@ public:
 	 * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
 	 */
 	Candle(	const FlameConfig& a_rFlameConfig,
-					Field3D * a_pField,
+					Field3D& a_rField,
 					CScene& a_rScene,
 					float a_fRayon,
 					CharCPtrC a_szWickFileName,
@@ -52,7 +52,7 @@ public:
 	 * @param wickFileName nom du fichier contenant la mèche
 	 */
 	Firmalampe(const FlameConfig& a_rFlameConfig,
-							Field3D * a_pField,
+							Field3D& a_rField,
 							CScene& a_rScene,
 							CharCPtrC a_szWickFileName,
 							const CShader& a_rGenShadowCubeMapShader,
@@ -72,7 +72,7 @@ public:
 	 * @param torchName nom du fichier contenant le luminaire.
 	 */
 	CTFire(	const FlameConfig& a_rFlameConfig,
-					Field3D * a_pField,
+					Field3D& a_rField,
 					CScene& a_rScene,
 					CharCPtrC a_szTorchName,
 					CharCPtrC a_rTextureName,
@@ -80,7 +80,7 @@ public:
 					const CRenderTarget& a_rShadowRenderTarget,
 					float a_fWidth,
 					float a_fDetachedWidth) :
-			IDetachableFireSource (a_rFlameConfig, a_pField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+			IDetachableFireSource (a_rFlameConfig, a_rField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 	{
 		vector<CWick *> objList;
 
@@ -106,7 +106,7 @@ public:
 		int i=0;
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();
 		        objListIterator != objList.end (); objListIterator++, i++)
-			m_flames[i] = new CLineFlame( a_rFlameConfig, m_oTexture, a_pField, (*objListIterator), a_fWidth, a_fDetachedWidth, this);
+			m_flames[i] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (*objListIterator), a_fWidth, a_fDetachedWidth, this);
 	}
 
 	/** Destructeur */
@@ -160,7 +160,7 @@ public:
 	 * @param rayon Rayon de la flamme.
 	 */
 	CandleStick(const FlameConfig& a_rFlameConfig,
-							Field3D * a_rField,
+							Field3D& a_rField,
 							CScene& a_rScene,
 							CharCPtrC a_szFilename,
 							float a_fRayon,
@@ -175,7 +175,7 @@ public:
 	virtual void drawWick(bool displayBoxes) const
 	{
 		CPoint const& rPos = getPosition();
-		CPoint const& rScale = m_solver->getScale();
+		CPoint const& rScale = m_rField.getScale();
 		glPushMatrix();
 		glTranslatef (rPos.x,rPos.y,rPos.z);
 		glScalef (rScale.x, rScale.y, rScale.z);
@@ -200,7 +200,7 @@ public:
 				if (m_visibility)
 				{
 					CPoint const& rPos = getPosition();
-					CPoint const& rScale = m_solver->getScale();
+					CPoint const& rScale = m_rField.getScale();
 					glPushMatrix();
 					glTranslatef (rPos.x,rPos.y,rPos.z);
 					glScalef (rScale.x, rScale.y, rScale.z);

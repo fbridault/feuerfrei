@@ -6,8 +6,6 @@
 
 #include <values.h>
 
-extern uint g_objectCount;
-
 /**************************************************************************************************/
 /**														 DEFINITION DE L'INTERFACE ISCENEITEM												*/
 /**************************************************************************************************/
@@ -250,22 +248,5 @@ void CObject::DrawForSelection () const
 		(*meshesListIterator)->drawForSelection();
 	glPopName();
 	glPopMatrix();
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::translate(const CVector& direction)
-{
-	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-	     vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-		vertexIterator->x += direction.x;
-		vertexIterator->y += direction.y;
-		vertexIterator->z += direction.z;
-	}
-	/* On déplace aussi la boîte englobante */
-	m_max += direction;
-	m_min += direction;
 }
 

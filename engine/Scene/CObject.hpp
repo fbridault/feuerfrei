@@ -51,17 +51,15 @@ public:
 		z = m_oPosition.z;
 	}
 	/** Set item position */
-	void SetPosition (CPoint const& a_rPosition)
+	virtual void SetPosition (CPoint const& a_rPosition)
 	{
 		m_oPosition = a_rPosition;
 	}
 
 	/** Move item at given position */
-	virtual void Move (float x, float y, float z)
+	virtual void Move (CVector const& a_rDir)
 	{
-		m_oPosition.x += x;
-		m_oPosition.y += y;
-		m_oPosition.z += z;
+		m_oPosition += a_rDir;
 	}
 
 	/** Get item scale factor */
@@ -156,10 +154,10 @@ public:
 	 * @param max Retourne le coin supérieur de l'englobant.
 	 * @param min Retourne le coin inférieur de l'englobant.
 	 */
-	void getBoundingBox (CPoint& max, CPoint& min) const
+	void getBoundingBox (CPoint& a_rMax, CPoint& a_rMin) const
 	{
-		max=m_max;
-		min=m_min;
+		a_rMax = m_max;
+		a_rMin = m_min;
 	};
 
 	/** Retourne la position de l'objet, calculé en prenant le centre de la boîte englobante. */
@@ -235,11 +233,6 @@ public:
 	/** Dessin des sphères englobantes. */
 	void drawBoundingSpheres ();
 
-	/** Translation en "dur" de l'objet. Toutes les coordonnées de ses points sont modifiées.
-	 * @param direction Vecteur de translation.
-	 */
-	void translate(const CVector& direction);
-
 	float getArea() const
 	{
 		float area=0.0f;
@@ -269,6 +262,29 @@ public:
 		assert( iCMesh < m_meshesList.size() );
 		return m_meshesList[iCMesh]->getMaterialIndex();
 	};
+
+	/** Set item position */
+	virtual void SetPosition (CPoint const& a_rPosition)
+	{
+		// Compute move vector for meshes
+		CVector rDir = a_rPosition - GetPosition();
+
+		ISceneItem::SetPosition(a_rPosition);
+
+		// Apply relative move to meshes
+		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
+			meshesListIterator != m_meshesList.end ();  meshesListIterator++)
+			(*meshesListIterator)->Move(rDir);
+	}
+
+	/** Move item at given position */
+	virtual void Move(CVector const& a_rDir)
+	{
+		ISceneItem::Move(a_rDir);
+		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
+			meshesListIterator != m_meshesList.end ();  meshesListIterator++)
+			(*meshesListIterator)->Move(a_rDir);
+	}
 
 protected:
 	/**<Liste des points de l'objet */

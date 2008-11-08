@@ -126,15 +126,16 @@ public:
 	/** Dessin des sphères englobantes. */
 	void drawBoundingSphere ();
 
-	void moveBoundingSpheres(const CVector& dir)
+	void Move(const CVector& dir)
 	{
-		m_boundingSphere.centre += dir;
-	};
+		CPoint& rCenter = m_boundingSphere.GrabCentre();
+		rCenter += dir;
+	}
 
-	CPoint getPosition () const
+	CPoint const& GetPosition() const
 	{
-		return m_boundingSphere.centre;
-	};
+		return m_boundingSphere.GetCentre();
+	}
 
 	float getArea() const;
 

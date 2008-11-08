@@ -120,14 +120,14 @@ public:
 	 */
 	virtual void Move(const CPoint& a_rPosition)
 	{
-		CPoint diff = a_rPosition - m_position;
+		CVector diff = a_rPosition - m_position;
 		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
 			fieldIterator != m_fields.end (); fieldIterator++)
 			(*fieldIterator)->move(diff);
 
 		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
 			fireIterator != m_fireSources.end (); fireIterator++)
-				(*fireIterator)->Move(diff.x, diff.y, diff.z);
+			(*fireIterator)->Move(diff);
 
 		for (vector < CObject* >::const_iterator luminaryIterator = m_luminary.begin ();
 			luminaryIterator  != m_luminary.end (); luminaryIterator++)

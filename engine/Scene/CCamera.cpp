@@ -265,7 +265,7 @@ void CCamera::computeFrustrum()
 	m_frustum[5][3] /= t;
 
 	/* Compute objects visibility */
-//    g_objectCount=0;
+    g_objectCount=0;
 	m_pScene->computeVisibility(*this);
 //    cerr << g_objectCount << " objects drawn" << endl;
 }

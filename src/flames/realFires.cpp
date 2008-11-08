@@ -7,20 +7,20 @@
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-Candle::Candle (	const FlameConfig& a_rFlameConfig,
-								Field3D& a_rField,
-								CScene& a_rScene,
-								float a_fRayon,
-								CharCPtrC a_szWickFileName,
-								const CShader& a_rGenShadowCubeMapShader,
-								const CRenderTarget& a_rShadowRenderTarget,
-								CWick *a_pWick):
-		IFireSource (a_rFlameConfig,
-								a_rField,
-								1,
-								("textures/bougie2.png"),
-								a_rGenShadowCubeMapShader,
-								a_rShadowRenderTarget)
+Candle::Candle (const FlameConfig& a_rFlameConfig,
+				Field3D& a_rField,
+				CScene& a_rScene,
+				float a_fRayon,
+				CharCPtrC a_szWickFileName,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget,
+				CWick *a_pWick):
+	IFireSource (	a_rFlameConfig,
+					a_rField,
+					1,
+					("textures/bougie2.png"),
+					a_rGenShadowCubeMapShader,
+					a_rShadowRenderTarget)
 {
 	if (a_szWickFileName != NULL)
 	{
@@ -34,9 +34,9 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 		/* Calcul de la position et recentrage de la mèche */
 		pWick->buildBoundingBox();
 
-		CPoint rPosition = GrabPosition();
+		CPoint& rPosition = GrabPosition();
 		rPosition = CPoint(0.5f,0.0f,0.5f) - pWick->getCenter();
-		pWick->translate(rPosition);
+		pWick->HardTranslate(rPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, pWick);
 	}
 	else
@@ -46,9 +46,9 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 		/* Calcul de la position et recentrage de la mèche */
 		a_pWick->buildBoundingBox();
 
-		CPoint rPosition = GrabPosition();
+		CPoint& rPosition = GrabPosition();
 		rPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->getCenter();
-		a_pWick->translate(rPosition);
+		a_pWick->HardTranslate(rPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, a_pWick);
 	}
 }
@@ -58,17 +58,17 @@ Candle::Candle (	const FlameConfig& a_rFlameConfig,
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
-													Field3D& a_rField,
-													CScene& a_rScene,
-													CharCPtrC a_szWickFileName,
-													const CShader& a_rGenShadowCubeMapShader,
-													const CRenderTarget& a_rShadowRenderTarget) :
-		IFireSource (a_rFlameConfig,
-								a_rField,
-								1,
-								("textures/firmalampe.png"),
-								a_rGenShadowCubeMapShader,
-								a_rShadowRenderTarget)
+						Field3D& a_rField,
+						CScene& a_rScene,
+						CharCPtrC a_szWickFileName,
+						const CShader& a_rGenShadowCubeMapShader,
+						const CRenderTarget& a_rShadowRenderTarget) :
+	IFireSource (	a_rFlameConfig,
+					a_rField,
+					1,
+					("textures/firmalampe.png"),
+					a_rGenShadowCubeMapShader,
+					a_rShadowRenderTarget)
 {
 	vector<CWick *> objList;
 
@@ -77,11 +77,11 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 
 	assert(objList.size() > 0);
 
-	CPoint rPosition = GrabPosition();
+	CPoint& rPosition = GrabPosition();
 	/* Calcul de la position et recentrage de la mèche */
 	(*objList.begin())->buildBoundingBox();
 	rPosition = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getCenter();
-	(*objList.begin())->translate(rPosition);
+	(*objList.begin())->HardTranslate(rPosition);
 
 	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (*objList.begin()), 0.03f, 0.01f);
 }

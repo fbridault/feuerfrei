@@ -39,6 +39,7 @@
 					<Add option="-Wl,-rpath,engine/bin/Release" />
 					<Add library="IL" />
 					<Add library="ILUT" />
+					<Add directory="engine/bin/Release" />
 				</Linker>
 			</Target>
 			<Target title="Fluids - Debug">

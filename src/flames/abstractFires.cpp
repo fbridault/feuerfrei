@@ -123,10 +123,10 @@ void IFireSource::buildBoundingSphere ()
 	p = (m_rField.getScale() * m_rField.getDim());
 	t = p.max();
 
-	m_boundingSphere.radius = sqrtf(3.0f)/2.0f*t;
+	m_boundingSphere.SetRadius(sqrtf(3.0f)/2.0f*t);
 	/* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
-	m_boundingSphere.centre = getPosition() + p/2.0f;
+	m_boundingSphere.SetCentre(getPosition() + p/2.0f);
 	//  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_rField.getScale())).length()+.1;
 	//  m_boundingSphere.centre = getCenterSP();
 }
@@ -445,8 +445,8 @@ void IDetachableFireSource::build()
 //       m_boundingSphere.radius = (sqrt(k+k) + ptMax.distance(ptMin));
 //       m_boundingSphere.centre = m_rField.getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
 //     }else{
-	m_boundingSphere.radius = sqrt(k+k);
-	m_boundingSphere.centre = getPosition() + p;
+	m_boundingSphere.SetRadius(sqrt(k+k));
+	m_boundingSphere.SetCentre(getPosition() + p);
 //   }
 	/* Calcul de la bounding box pour affichage */
 	buildBoundingBox ();

@@ -15,8 +15,6 @@
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-g" />
-					<Add option="-DGL_GLEXT_PROTOTYPES" />
-					<Add directory="/usr/include/IL" />
 				</Compiler>
 				<ExtraCommands>
 					<Add after="cp bin/Debug/libengine.so ../bin/Debug/" />
@@ -45,6 +43,8 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DGL_GLEXT_PROTOTYPES" />
+			<Add directory="/usr/include/IL" />
 		</Compiler>
 		<Unit filename="Common.hpp" />
 		<Unit filename="Init.cpp" />

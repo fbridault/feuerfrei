@@ -101,7 +101,7 @@ public:
 		rPosition = CPoint(0.5f,0.0f,0.5f) - rPosition/m_nbFlames;
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();
 		        objListIterator != objList.end (); objListIterator++)
-			(*objListIterator)->translate(rPosition);
+			(*objListIterator)->HardTranslate(rPosition);
 
 		int i=0;
 		for (vector <CWick *>::iterator objListIterator = objList.begin ();

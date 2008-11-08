@@ -8,12 +8,9 @@
 class CBoundingSphere
 {
 public:
-	CBoundingSphere() : radius(0.0f) {};
-	/** Centre de la sphère englobante. */
-	CPoint centre;
-
-	/** Rayon de la sphère englobante. */
-	float radius;
+	CBoundingSphere() :
+		m_fRadius(0.0f)
+	{};
 
 	/** Calcule la visibilité de la sphère par rapport au point de vue courant.
 	 * @param view Référence sur la caméra
@@ -34,7 +31,7 @@ public:
 		for ( i = 0; i < 6; i++ )
 		{
 			plan=view.getFrustum(i);
-			if ( plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3] <= -radius )
+			if ( plan[0] * m_oCentre.x + plan[1] * m_oCentre.y + plan[2] * m_oCentre.z + plan[3] <= -m_fRadius )
 				return false;
 		}
 		return true;
@@ -55,11 +52,11 @@ public:
 		for ( i = 0; i < 6; i++ )
 		{
 			plan=view.getFrustum(i);
-			d = plan[0] * centre.x + plan[1] * centre.y + plan[2] * centre.z + plan[3];
-			if ( d <= -radius )
+			d = plan[0] * m_oCentre.x + plan[1] * m_oCentre.y + plan[2] * m_oCentre.z + plan[3];
+			if ( d <= -m_fRadius )
 				return 0.0f;
 		}
-		return d + radius;
+		return d + m_fRadius;
 	}
 
 	/** Calcule la couverture en pixel de la sphère.
@@ -70,7 +67,7 @@ public:
 	{
 		CPoint centerSC, periSC;
 
-		view.getSphereCoordinates(centre, radius, centerSC, periSC);
+		view.getSphereCoordinates(m_oCentre, m_fRadius, centerSC, periSC);
 		/* PI.R² */
 		return ( M_PI* centerSC.squaredDistanceFrom(periSC));
 	}
@@ -79,12 +76,44 @@ public:
 	{
 		glEnable(GL_BLEND);
 		glPushMatrix();
-		glTranslatef(centre.x, centre.y, centre.z);
+		glTranslatef(m_oCentre.x, m_oCentre.y, m_oCentre.z);
 		glColor4f(1.0f,0.0f,0.0f,0.3f);
-		UGraphicsFn::SolidSphere(radius, 30, 30);
+		UGraphicsFn::SolidSphere(m_fRadius, 30, 30);
 		glPopMatrix();
 		glDisable(GL_BLEND);
 	}
+
+	CPoint const& GetCentre() const
+	{
+		return m_oCentre;
+	}
+	CPoint& GrabCentre()
+	{
+		return m_oCentre;
+	}
+	void SetCentre(CPoint const& a_rCentre)
+	{
+		m_oCentre = a_rCentre;
+	}
+	float GetRadius() const
+	{
+		return m_fRadius;
+	}
+	float& GrabRadius()
+	{
+		return m_fRadius;
+	}
+	void SetRadius(float a_fRadius)
+	{
+		m_fRadius = a_fRadius;
+	}
+
+private:
+	/** Centre de la sphère englobante. */
+	CPoint m_oCentre;
+
+	/** Rayon de la sphère englobante. */
+	float m_fRadius;
 };
 
 #endif // CBOUNDINGSPHERE_H

@@ -174,11 +174,11 @@ public:
 
 	virtual void drawWick(bool displayBoxes) const
 	{
-		CPoint pt(getPosition());
-		CPoint scale(m_solver->getScale());
+		CPoint const& rPos = getPosition();
+		CPoint const& rScale = m_solver->getScale();
 		glPushMatrix();
-		glTranslatef (pt.x, pt.y, pt.z);
-		glScalef (scale.x, scale.y, scale.z);
+		glTranslatef (rPos.x,rPos.y,rPos.z);
+		glScalef (rScale.x, rScale.y, rScale.z);
 		for (uint i = 0; i < m_nbFlames; i++)
 			m_flames[i]->drawWick(displayBoxes);
 		for (uint i = 0; i < m_nbCloneFlames; i++)
@@ -199,11 +199,11 @@ public:
 			default :
 				if (m_visibility)
 				{
-					CPoint pt(m_solver->getPosition());
-					CPoint scale(m_solver->getScale());
+					CPoint const& rPos = getPosition();
+					CPoint const& rScale = m_solver->getScale();
 					glPushMatrix();
-					glTranslatef (pt.x, pt.y, pt.z);
-					glScalef (scale.x, scale.y, scale.z);
+					glTranslatef (rPos.x,rPos.y,rPos.z);
+					glScalef (rScale.x, rScale.y, rScale.z);
 					for (uint i = 0; i < m_nbFlames; i++)
 						m_flames[i]->drawFlame(display, displayParticle);
 					for (uint i = 0; i < m_nbCloneFlames; i++)

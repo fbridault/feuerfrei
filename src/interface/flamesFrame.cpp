@@ -578,20 +578,24 @@ void FlamesFrame::LoadSettings (void)
 	m_config->Read(_("/Display/NbDepthPeelingLayers"), (int *) &m_currentConfig.nbDepthPeelingLayers, 4);
 	m_currentConfig.sceneName = m_config->Read(_("/Scene/FileName"), _("scenes/scene2.obj"));
 
-	m_config->Read(_("/Shadows/Fatness.x"), &tmp, -.001);
-	m_currentConfig.fatness[0] = (float)tmp;
-	m_config->Read(_("/Shadows/Fatness.y"), &tmp, -.001);
-	m_currentConfig.fatness[1] = (float)tmp;
-	m_config->Read(_("/Shadows/Fatness.z"), &tmp, -.001);
-	m_currentConfig.fatness[2] = (float)tmp;
-	m_config->Read(_("/Shadows/ExtrudeDist.x"), &tmp, 5);
-	m_currentConfig.extrudeDist[0] = (float)tmp;
-	m_config->Read(_("/Shadows/ExtrudeDist.y"), &tmp, 5);
-	m_currentConfig.extrudeDist[1] = (float)tmp;
-	m_config->Read(_("/Shadows/ExtrudeDist.z"), &tmp, 5);
-	m_currentConfig.extrudeDist[2] = (float)tmp;
-	m_currentConfig.fatness[3] = 0.0f;
-	m_currentConfig.extrudeDist[3] = 0.0f;
+	m_config->Read(_("/Camera/Position.x"), &tmp, 0.);
+	m_currentConfig.camera.position.x = (float)tmp;
+	m_config->Read(_("/Camera/Position.y"), &tmp, 0.);
+	m_currentConfig.camera.position.y = (float)tmp;
+	m_config->Read(_("/Camera/Position.z"), &tmp, 1.);
+	m_currentConfig.camera.position.z = (float)tmp;
+	m_config->Read(_("/Camera/Up.x"), &tmp, 0.);
+	m_currentConfig.camera.up.x = (float)tmp;
+	m_config->Read(_("/Camera/Up.y"), &tmp, 1.);
+	m_currentConfig.camera.up.y = (float)tmp;
+	m_config->Read(_("/Camera/Up.z"), &tmp, 0.);
+	m_currentConfig.camera.up.z = (float)tmp;
+	m_config->Read(_("/Camera/View.x"), &tmp, 0.);
+	m_currentConfig.camera.view.x = (float)tmp;
+	m_config->Read(_("/Camera/View.y"), &tmp, 0.);
+	m_currentConfig.camera.view.y = (float)tmp;
+	m_config->Read(_("/Camera/View.z"), &tmp, -1.);
+	m_currentConfig.camera.view.z = (float)tmp;
 
 	m_config->Read(_("/GlobalField/Enabled"), &m_currentConfig.useGlobalField, 0);
 	groupName << _("/GlobalField/");
@@ -711,12 +715,18 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 	m_config->Write(_("/Display/Glow"), m_currentConfig.glowEnabled);
 	m_config->Write(_("/Scene/FileName"), m_currentConfig.sceneName);
 
-	m_config->Write(_("/Shadows/Fatness.x"), (GLfloat)m_currentConfig.fatness[0]);
-	m_config->Write(_("/Shadows/Fatness.y"), (GLfloat)m_currentConfig.fatness[1]);
-	m_config->Write(_("/Shadows/Fatness.z"), (GLfloat)m_currentConfig.fatness[2]);
-	m_config->Write(_("/Shadows/ExtrudeDist.x"), (GLfloat)m_currentConfig.extrudeDist[0]);
-	m_config->Write(_("/Shadows/ExtrudeDist.y"), (GLfloat)m_currentConfig.extrudeDist[1]);
-	m_config->Write(_("/Shadows/ExtrudeDist.z"), (GLfloat)m_currentConfig.extrudeDist[2]);
+	CPoint rPosition;
+	CVector rUp, rView;
+	m_glBuffer->getCameraPositionAndDirection(rPosition, rUp, rView);
+	m_config->Write(_("/Camera/Position.x"), rPosition.x);
+	m_config->Write(_("/Camera/Position.y"), rPosition.y);
+	m_config->Write(_("/Camera/Position.z"), rPosition.z);
+	m_config->Write(_("/Camera/Up.x"), rUp.x);
+	m_config->Write(_("/Camera/Up.y"), rUp.y);
+	m_config->Write(_("/Camera/Up.z"), rUp.z);
+	m_config->Write(_("/Camera/View.x"), rView.x);
+	m_config->Write(_("/Camera/View.y"), rView.y);
+	m_config->Write(_("/Camera/View.z"), rView.z);
 
 	m_config->Write(_("/Luminaries/Number"), (int)m_currentConfig.nbLuminaries);
 

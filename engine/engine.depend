@@ -157,7 +157,7 @@
 	"CCamera.hpp"
 	"../Utility/GraphicsFn.hpp"
 
-1226077875 /home/flavien/recherche/git/flames/engine/Scene/CCamera.hpp
+1226104321 /home/flavien/recherche/git/flames/engine/Scene/CCamera.hpp
 	<math.h>
 	"../Common.hpp"
 	"../Maths/CQuaternion.hpp"
@@ -173,7 +173,7 @@
 1224626857 /home/flavien/recherche/git/flames/engine/Utility/CRefTable.hpp
 	<list>
 
-1226089662 /home/flavien/recherche/git/flames/engine/Scene/CObject.hpp
+1226100744 /home/flavien/recherche/git/flames/engine/Scene/CObject.hpp
 	"../Common.hpp"
 	"CMesh.hpp"
 	<list>
@@ -204,14 +204,14 @@
 	"Texture.hpp"
 	"CScene.hpp"
 
-1226083298 source:/home/flavien/recherche/git/flames/engine/Scene/CObject.cpp
+1226101473 source:/home/flavien/recherche/git/flames/engine/Scene/CObject.cpp
 	"CObject.hpp"
 	"CScene.hpp"
 	"CMaterial.hpp"
 	"../Utility/CRefTable.hpp"
 	<values.h>
 
-1226081095 source:/home/flavien/recherche/git/flames/engine/Scene/CScene.cpp
+1226101448 source:/home/flavien/recherche/git/flames/engine/Scene/CScene.cpp
 	"CScene.hpp"
 	<values.h>
 	"CMaterial.hpp"
@@ -223,7 +223,7 @@
 	<vector>
 	<list>
 
-1226078004 source:/home/flavien/recherche/git/flames/engine/Scene/CCamera.cpp
+1226104131 source:/home/flavien/recherche/git/flames/engine/Scene/CCamera.cpp
 	"CCamera.hpp"
 	"CScene.hpp"
 	"../Utility/GraphicsFn.hpp"

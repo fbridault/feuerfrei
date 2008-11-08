@@ -46,6 +46,8 @@ CScene::~CScene ()
 
 void CScene::postInit(bool a_bNormalize)
 {
+	computeBoundingBox(a_bNormalize);
+
 	cout << "Building VBOs..." << endl;
 	for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
 	        objectsArrayIterator != m_objectsArray.end();
@@ -54,8 +56,6 @@ void CScene::postInit(bool a_bNormalize)
 		(*objectsArrayIterator)->buildVBO();
 		(*objectsArrayIterator)->buildBoundingSpheres();
 	}
-
-	computeBoundingBox(a_bNormalize);
 
 	cout << "Terminé" << endl;
 	cout << "*******************************************" << endl;
@@ -95,19 +95,29 @@ void CScene::computeBoundingBox(bool a_bNormalize)
 
 	if (a_bNormalize)
 	{
-		/** Normalisation */
+		// Center scene on 0,0,0
 		CPoint offset = CPoint(0,0,0) - ((ptMax + ptMin)/2.0f);
+		for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
+			objectsArrayIterator != m_objectsArray.end();
+			objectsArrayIterator++)
+		{
+			(*objectsArrayIterator)->HardTranslate(offset);
+		}
+		m_max = ptMax + offset;
+		m_min = ptMin + offset;
+
+		// Normalize scene
 		float invNormMax = 1.0f/((ptMax - ptMin).max());
 
 		for (vector<CObject*>::iterator objectsArrayIterator = m_objectsArray.begin();
 		        objectsArrayIterator != m_objectsArray.end();
 		        objectsArrayIterator++)
 		{
-			(*objectsArrayIterator)->scale(invNormMax,offset);
+			(*objectsArrayIterator)->HardScale(invNormMax);
 		}
 
-		m_max = (ptMax+offset) * invNormMax;
-		m_min = (ptMin+offset) * invNormMax;
+		m_max = ptMax * invNormMax;
+		m_min = ptMin * invNormMax;
 	}
 }
 
@@ -185,7 +195,7 @@ int CScene::searchTextureIndexByName(CharCPtrC name)
 
 void CScene::moveSelectedItem(float x, float y, float z, float oldX, float oldY)
 {
-	/** Déplacement d'une source si il y a eu sélection */
+	// Déplacement d'une source si il y a eu sélection
 	GLdouble projMatrix[16], modelMatrix[16];
 	GLint viewport[4];
 	GLdouble v1[3], v2[3];

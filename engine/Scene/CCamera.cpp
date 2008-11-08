@@ -8,7 +8,7 @@ uint g_objectCount;
 GLfloat g_modelViewMatrix[16];
 
 CCamera::CCamera () :
-		m_position(0.0f,0.0f,-1.0f), m_up(0.0f,1.0f,0.0f), m_view(0.0f,0.0f,-1.0f)
+	m_pScene(NULL)
 {
 	m_buttonPressed = NMouseButton::eButtonNone;
 	m_move = false;
@@ -20,9 +20,19 @@ CCamera::CCamera () :
 	m_ouverture = 60.0f;
 }
 
-void CCamera::init (int width, int height, float clipping, CScene* const scene)
+void CCamera::init (	CPoint const& a_rPosition,
+										CVector const& a_rUp,
+										CVector const& a_rView,
+										int width,
+										int height,
+										float clipping,
+										CScene& a_rScene)
 {
-	m_scene = scene;
+	m_pScene = &a_rScene;
+
+	m_position = a_rPosition;
+	m_up = a_rUp;
+	m_view = a_rView;
 
 	m_clipping_value = clipping;
 
@@ -256,7 +266,7 @@ void CCamera::computeFrustrum()
 
 	/* Compute objects visibility */
 //    g_objectCount=0;
-	m_scene->computeVisibility(*this);
+	m_pScene->computeVisibility(*this);
 //    cerr << g_objectCount << " objects drawn" << endl;
 }
 

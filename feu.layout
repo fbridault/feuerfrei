@@ -4,7 +4,7 @@
 	<File name="src/CMakeLists.txt" open="0" top="0" tabpos="0">
 		<Cursor position="1700" topLine="31" />
 	</File>
-	<File name="src/common.hpp" open="0" top="0" tabpos="8">
+	<File name="src/common.hpp" open="1" top="0" tabpos="8">
 		<Cursor position="2767" topLine="79" />
 	</File>
 	<File name="src/flames.cpp" open="0" top="0" tabpos="2">
@@ -17,7 +17,7 @@
 		<Cursor position="412" topLine="0" />
 	</File>
 	<File name="src/flames/abstractFires.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="1261" topLine="0" />
+		<Cursor position="1525" topLine="0" />
 	</File>
 	<File name="src/flames/abstractFires.hpp" open="1" top="0" tabpos="1">
 		<Cursor position="11981" topLine="376" />
@@ -103,7 +103,7 @@
 	<File name="src/interface/GLFluidsCanvas.hpp" open="0" top="0" tabpos="7">
 		<Cursor position="176" topLine="0" />
 	</File>
-	<File name="src/interface/flamesFrame.cpp" open="0" top="0" tabpos="12">
+	<File name="src/interface/flamesFrame.cpp" open="1" top="0" tabpos="12">
 		<Cursor position="24038" topLine="389" />
 	</File>
 	<File name="src/interface/flamesFrame.hpp" open="0" top="0" tabpos="4">
@@ -137,7 +137,7 @@
 		<Cursor position="2258" topLine="12" />
 	</File>
 	<File name="src/interface/shadowsDialog.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="745" topLine="0" />
+		<Cursor position="3819" topLine="46" />
 	</File>
 	<File name="src/interface/shadowsDialog.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="478" topLine="0" />
@@ -155,10 +155,13 @@
 		<Cursor position="679" topLine="0" />
 	</File>
 	<File name="src/shaders/photoSolid.fp" open="0" top="0" tabpos="4">
-		<Cursor position="296" topLine="0" />
+		<Cursor position="296" topLine="29" />
 	</File>
 	<File name="src/shaders/photoSolidOnly.fp" open="0" top="0" tabpos="0">
 		<Cursor position="394" topLine="0" />
+	</File>
+	<File name="src/shaders/pixelLighting.fp" open="0" top="0" tabpos="0">
+		<Cursor position="0" topLine="22" />
 	</File>
 	<File name="src/solvers/CGSSORSolver2D.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="75" topLine="0" />
@@ -199,7 +202,7 @@
 	<File name="src/solvers/LODField3D.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="8560" topLine="224" />
 	</File>
-	<File name="src/solvers/LODField3D.hpp" open="0" top="0" tabpos="0">
+	<File name="src/solvers/LODField3D.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="5345" topLine="146" />
 	</File>
 	<File name="src/solvers/benchsolver3D.cpp" open="0" top="0" tabpos="0">
@@ -238,10 +241,10 @@
 	<File name="src/solvers/fieldThread.hpp" open="0" top="0" tabpos="4">
 		<Cursor position="3558" topLine="71" />
 	</File>
-	<File name="src/solvers/globalField.cpp" open="0" top="0" tabpos="0">
+	<File name="src/solvers/globalField.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="874" topLine="3" />
 	</File>
-	<File name="src/solvers/globalField.hpp" open="0" top="0" tabpos="0">
+	<File name="src/solvers/globalField.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="1183" topLine="0" />
 	</File>
 	<File name="src/solvers/logResAvgSolver3D.cpp" open="0" top="0" tabpos="0">
@@ -275,7 +278,7 @@
 		<Cursor position="5353" topLine="116" />
 	</File>
 	<File name="src/solvers/solver3D.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="11296" topLine="381" />
+		<Cursor position="11260" topLine="380" />
 	</File>
 	<File name="src/solvers/solver3D.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="2355" topLine="26" />

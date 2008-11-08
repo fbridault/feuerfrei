@@ -40,6 +40,14 @@ using namespace std;
 #define FDF_GAUSS 3
 #define FDF_RANDOM 4
 
+class CameraConfig
+{
+public:
+	CPoint position;
+	CPoint up;
+	CPoint view;
+};
+
 /** Configuration d'un solveur de fluide */
 class SolverConfig
 {
@@ -118,9 +126,8 @@ public:
 	LuminaryConfig *luminaries;
 	bool useGlobalField;
 	SolverConfig globalField;
-	GLfloat fatness[4];
-	GLfloat extrudeDist[4];
 	float gammaCorrection;
+	CameraConfig camera;
 };
 
 #else

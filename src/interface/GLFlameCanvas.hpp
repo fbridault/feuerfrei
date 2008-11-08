@@ -132,7 +132,7 @@ public:
 		m_luminaries[selected]->Move(pt);
 		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
-			(*firesIterator)->computeVisibility(*m_camera,true);
+			(*firesIterator)->computeVisibility(*m_pCamera,true);
 	};
 	void addPermanentExternalForcesToField(int selectedField, CPoint &pt)
 	{
@@ -222,6 +222,14 @@ public:
 			(*firesIterator)->computeGlowWeights(index, sigma);
 	}
 
+	void getCameraPositionAndDirection(CPoint& a_rPos, CVector& a_rUp, CVector& a_rView) const
+	{
+		assert(m_pCamera != NULL);
+		a_rPos = m_pCamera->getPosition();
+		a_rUp = m_pCamera->getUpVector();
+		a_rView = m_pCamera->getViewVector();
+	}
+
 #ifdef MULTITHREADS
 	void DeleteThreads();
 #endif
@@ -248,7 +256,7 @@ private:
 	uint m_width, m_height;
 	uint prevNbFields, prevNbFlames;
 
-	CCamera *m_camera;
+	CCamera *m_pCamera;
 	/* Pour le compte des frames */
 	uint m_framesCount, m_globalFramesCount;
 

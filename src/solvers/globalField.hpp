@@ -114,7 +114,7 @@ public:
 	/** Retourne la position du solveur dans le repère du monde
 	 * @return Position dans l'espace.
 	 */
-	CPoint getPosition (void)
+	CPoint const& getPosition (void)
 	{
 		return m_field->getPosition();
 	};

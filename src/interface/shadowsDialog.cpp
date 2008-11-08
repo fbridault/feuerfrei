@@ -28,17 +28,6 @@ ShadowsDialog::ShadowsDialog(wxWindow* parent, int id, const wxString& title, Fl
   m_shadowExtrudeDistYTextCtrl = new DoubleTextCtrl(this, IDT_SEDY, 0, 100, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
   m_shadowExtrudeDistZTextCtrl = new DoubleTextCtrl(this, IDT_SEDZ, 0, 100, _(""), wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
 
-  tmp.Printf(_("%.5f"), m_currentConfig->fatness[0]);
-  (*m_fatnessXTextCtrl) << tmp;
-  tmp.Printf(_("%.5f"), m_currentConfig->fatness[1]);
-  (*m_fatnessYTextCtrl) << tmp;
-  tmp.Printf(_("%.5f"),  m_currentConfig->fatness[2]);
-  (*m_fatnessZTextCtrl) << tmp;
-
-  (*m_shadowExtrudeDistXTextCtrl) << m_currentConfig->extrudeDist[0];
-  (*m_shadowExtrudeDistYTextCtrl) << m_currentConfig->extrudeDist[1];
-  (*m_shadowExtrudeDistZTextCtrl) << m_currentConfig->extrudeDist[2];
-
   m_glBuffer = glBuffer;
 
   doLayout();
@@ -74,13 +63,13 @@ void ShadowsDialog::OnFatnessEnter(wxCommandEvent& event)
   switch(event.GetId())
     {
     case IDT_FATX :
-      m_currentConfig->fatness[0]=m_fatnessXTextCtrl->GetSafelyValue();
+//      m_currentConfig->fatness[0]=m_fatnessXTextCtrl->GetSafelyValue();
       break;
     case IDT_FATY :
-      m_currentConfig->fatness[1]=m_fatnessYTextCtrl->GetSafelyValue();
+ //     m_currentConfig->fatness[1]=m_fatnessYTextCtrl->GetSafelyValue();
       break;
     case IDT_FATZ :
-      m_currentConfig->fatness[2]=m_fatnessZTextCtrl->GetSafelyValue();
+ //     m_currentConfig->fatness[2]=m_fatnessZTextCtrl->GetSafelyValue();
       break;
     }
 }
@@ -90,13 +79,13 @@ void ShadowsDialog::OnShadowsExtrudeDistEnter(wxCommandEvent& event)
   switch(event.GetId())
     {
     case IDT_SEDX :
-      m_currentConfig->extrudeDist[0]=m_shadowExtrudeDistXTextCtrl->GetSafelyValue();
+ //     m_currentConfig->extrudeDist[0]=m_shadowExtrudeDistXTextCtrl->GetSafelyValue();
       break;
     case IDT_SEDY :
-      m_currentConfig->extrudeDist[1]=m_shadowExtrudeDistYTextCtrl->GetSafelyValue();
+ //     m_currentConfig->extrudeDist[1]=m_shadowExtrudeDistYTextCtrl->GetSafelyValue();
       break;
     case IDT_SEDZ :
-      m_currentConfig->extrudeDist[2]=m_shadowExtrudeDistZTextCtrl->GetSafelyValue();
+ //     m_currentConfig->extrudeDist[2]=m_shadowExtrudeDistZTextCtrl->GetSafelyValue();
       break;
     }
 }

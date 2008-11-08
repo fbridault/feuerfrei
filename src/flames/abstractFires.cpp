@@ -31,7 +31,7 @@ IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
 	/* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
 	if (m_nbFlames) m_flames = new IRealFlame* [m_nbFlames];
 
-	m_intensityCoef = 0.3f;
+	m_intensityCoef = 20.f;
 	m_visibility = true;
 	m_dist=0;
 	buildBoundingSphere();
@@ -93,7 +93,7 @@ void IFireSource::computeIntensityPositionAndDirection()
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef*2.f;
+	fIntensity = o.norm()*(m_solver->getScale().y)*m_intensityCoef;
 
 	//  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -148,7 +148,7 @@ void IFireSource::drawImpostor() const
 //       glPopMatrix();
 		GLfloat modelview[16];
 
-		CPoint pos(getPosition());
+		CPoint const& rPos = getPosition();
 		float size=m_solver->getScale().x*1.5f, halfSize=m_solver->getScale().x*.5f;
 		CPoint a,b,c,d,zero;
 		CVector right,up,offset;
@@ -165,10 +165,10 @@ void IFireSource::drawImpostor() const
 		up.y = modelview[5];
 		up.z = modelview[9];
 
-		a = pos - right * (size * 0.5f);
-		b = pos + right * size * 0.5f;
-		c = pos + right * size * 0.5f + up * size;
-		d = pos - right * size * 0.5f + up * size;
+		a = rPos - right * (size * 0.5f);
+		b = rPos + right * size * 0.5f;
+		c = rPos + right * size * 0.5f + up * size;
+		d = rPos - right * size * 0.5f + up * size;
 
 		glPushMatrix();
 		glColor3f(1.0f,1.0f,1.0f);
@@ -357,11 +357,11 @@ void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char
 		default :
 			if (m_visibility)
 			{
-				CPoint pt(getPosition());
-				CPoint scale(m_solver->getScale());
+				CPoint const& rPos = getPosition();
+				CPoint const& rScale = m_solver->getScale();
 				glPushMatrix();
-				glTranslatef (pt.x, pt.y, pt.z);
-				glScalef (scale.x, scale.y, scale.z);
+				glTranslatef (rPos.x, rPos.y, rPos.z);
+				glScalef (rScale.x, rScale.y, rScale.z);
 				for (uint i = 0; i < m_nbFlames; i++)
 					m_flames[i]->drawFlame(display, displayParticle);
 				for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
@@ -642,7 +642,6 @@ void IDetachableFireSource::buildBoundingBox ()
 {
 	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
 	CPoint pt;
-	CPoint pos(getPosition());
 
 	if ( m_detachedFlamesList.size () )
 		for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();

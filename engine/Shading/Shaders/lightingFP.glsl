@@ -32,7 +32,7 @@ vec4 omniLighting(in vec3 vecToLight, in vec3 worldVecToLight, in vec3 normal, i
 
   if (cosSN > 0)
   {
-    attenuation = clamp(1.0/(r*r),0.0,1.0);
+    attenuation = clamp(1.0/(r),0.0,1.0);
     color = vec4(intensity.xyz * cosSN * attenuation,1.0);
 
     if (u_shadowsEnabled)

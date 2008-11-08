@@ -187,8 +187,11 @@ void GLFlameCanvas::InitScene()
 
 	m_scene->postInit(false);
 
-	m_camera = CCamera::getInstance();
-	m_camera->init (m_width, m_height, m_currentConfig->clipping, m_scene);
+	m_pCamera = CCamera::getInstance();
+	m_pCamera->init (m_currentConfig->camera.position,
+										m_currentConfig->camera.up,
+										m_currentConfig->camera.view,
+										m_width, m_height, m_currentConfig->clipping, *m_scene);
 
 	CShader::SetShadersDirectory("src/shaders/");
 	m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
@@ -359,7 +362,7 @@ void GLFlameCanvas::DestroyScene(void)
 {
 	delete m_depthPeelingEngine;
 	delete m_glowEngine;
-	m_camera->destroy();
+	m_pCamera->destroy();
 	m_scene->destroy();
 	delete m_pForwardRenderer;
 
@@ -409,7 +412,7 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 
 void GLFlameCanvas::OnMouseMotion(wxMouseEvent& event)
 {
-	m_camera->OnMouseMotion(event.GetX(), event.GetY());
+	m_pCamera->OnMouseMotion(event.GetX(), event.GetY());
 }
 
 void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
@@ -437,12 +440,12 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 	{
 		nButtonState = NMouseButtonState::eButtonUp;
 	}
-	m_camera->OnMouseClick(nButton, nButtonState, event.GetX(), event.GetY());
+	m_pCamera->OnMouseClick(nButton, nButtonState, event.GetX(), event.GetY());
 }
 
 void GLFlameCanvas::OnMouseWheel(wxMouseEvent& event)
 {
-	m_camera->moveOnFrontOrBehind(-event.GetWheelRotation()/1000.0f);
+	m_pCamera->moveOnFrontOrBehind(-event.GetWheelRotation()/1000.0f);
 }
 
 void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
@@ -451,22 +454,22 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 	switch (event.GetKeyCode())
 	{
 		case WXK_LEFT:
-			m_camera->moveOnSides(step);
+			m_pCamera->moveOnSides(step);
 			break;
 		case WXK_RIGHT:
-			m_camera->moveOnSides(-step);
+			m_pCamera->moveOnSides(-step);
 			break;
 		case WXK_UP:
-			m_camera->moveOnFrontOrBehind(-step);
+			m_pCamera->moveOnFrontOrBehind(-step);
 			break;
 		case WXK_DOWN:
-			m_camera->moveOnFrontOrBehind(step);
+			m_pCamera->moveOnFrontOrBehind(step);
 			break;
 		case WXK_HOME:
-			m_camera->moveUpOrDown(-step);
+			m_pCamera->moveUpOrDown(-step);
 			break;
 		case WXK_END:
-			m_camera->moveUpOrDown(step);
+			m_pCamera->moveUpOrDown(step);
 			break;
 		case 'f':
 		case 'F':
@@ -669,7 +672,6 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 void GLFlameCanvas::drawScene()
 {
-	CPoint position, scale;
 	bool additiveBlending = false; /** Active le blending qu'à partir de la seconde passe de dessin */
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -692,7 +694,7 @@ void GLFlameCanvas::drawScene()
 
 		//if (m_displayShadows)
 		/** Construction de la shadowMap */
-		//m_scene->getSource(i)->castShadows(*m_camera, *m_scene, &m_modelViewMatrix[0][0]);
+		//m_scene->getSource(i)->castShadows(*m_pCamera, *m_scene, &m_modelViewMatrix[0][0]);
 
 		/** Activation du blending additif à partir de la seconde passe */
 		if (additiveBlending)
@@ -738,9 +740,10 @@ void GLFlameCanvas::drawScene()
 
 	if (m_currentConfig->useGlobalField)
 	{
-		position = m_globalField->getPosition ();
+		CPoint const& rPosition = m_globalField->getPosition ();
+
 		glPushMatrix ();
-		glTranslatef (position.x, position.y, position.z);
+		glTranslatef (rPosition.x, rPosition.y, rPosition.z);
 		if (m_displayBase)
 			m_globalField->displayBase();
 		if (m_displayGrid)
@@ -752,12 +755,12 @@ void GLFlameCanvas::drawScene()
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	        fieldsIterator != m_fields.end (); fieldsIterator++)
 	{
-		position = (*fieldsIterator)->getPosition ();
-		scale =  (*fieldsIterator)->getScale ();
+		CPoint const& rPosition =  (*fieldsIterator)->getPosition ();
+		CPoint const& rScale = (*fieldsIterator)->getScale ();
 
 		glPushMatrix ();
-		glTranslatef (position.x, position.y, position.z);
-		glScalef (scale.x, scale.y, scale.z);
+		glTranslatef (rPosition.x, rPosition.y, rPosition.z);
+		glScalef (rScale.x, rScale.y, rScale.z);
 		if (m_displayBase)
 			(*fieldsIterator)->displayBase();
 		if (m_displayGrid)

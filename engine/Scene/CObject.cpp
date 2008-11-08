@@ -27,6 +27,7 @@ ISceneItem::ISceneItem(CPoint const& a_rPosition) :
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 CObject::CObject(CScene& a_rScene) :
 	ISceneItem(CPoint(0,0,0)),
+	m_bBuilt(false),
 	m_rScene(a_rScene),
 	m_attributes(0)
 {
@@ -81,17 +82,33 @@ void CObject::buildBoundingBox ()
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::scale (float scaleFactor, const CPoint& offset)
+void CObject::HardScale (float scaleFactor)
 {
 	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
 	     vertexIterator != m_vertexArray.end (); vertexIterator++)
 	{
-		vertexIterator->x = (vertexIterator->x + offset.x) * scaleFactor;
-		vertexIterator->y = (vertexIterator->y + offset.y) * scaleFactor;
-		vertexIterator->z = (vertexIterator->z + offset.z) * scaleFactor;
+		vertexIterator->x = vertexIterator->x * scaleFactor;
+		vertexIterator->y = vertexIterator->y * scaleFactor;
+		vertexIterator->z = vertexIterator->z * scaleFactor;
 	}
-	m_max = (m_max + offset) * scaleFactor;
-	m_min = (m_min + offset) * scaleFactor;
+	m_max = m_max * scaleFactor;
+	m_min = m_min * scaleFactor;
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------------------------------------
+void CObject::HardTranslate (const CPoint& offset)
+{
+	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
+	     vertexIterator != m_vertexArray.end (); vertexIterator++)
+	{
+		vertexIterator->x = vertexIterator->x + offset.x;
+		vertexIterator->y = vertexIterator->y + offset.y;
+		vertexIterator->z = vertexIterator->z + offset.z;
+	}
+	m_max = m_max + offset;
+	m_min = m_min + offset;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,6 +165,8 @@ uint CObject::getPolygonsCount () const
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CObject::buildVBO()
 {
+	assert(m_bBuilt == false);
+
 	/* Détermination du type de données décrites à partir des maillages */
 	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 	     meshesListIterator != m_meshesList.end ();
@@ -163,6 +182,7 @@ void CObject::buildVBO()
 	     meshesListIterator++)
 		(*meshesListIterator)->buildVBO();
 	glBindBuffer(GL_ARRAY_BUFFER, 0 );
+	m_bBuilt = true;
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------
@@ -170,6 +190,8 @@ void CObject::buildVBO()
 //---------------------------------------------------------------------------------------------------------------------------------------------------
 void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
 {
+	assert(m_bBuilt == true);
+
 	/* On initialise le dernier matériau au premier de la liste, le matériau par défaut */
 	uint lastMaterialIndex=0;
 

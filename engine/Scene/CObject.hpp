@@ -171,7 +171,12 @@ public:
 	/** Redimensionne l'objet, utilisé lors de la normalisation de la scène.
 	 * @param scaleFactor Facteur d'échelle.
 	 */
-	void scale (float scaleFactor, const CPoint& offset);
+	void HardScale (float scaleFactor);
+
+	/** Translate l'objet, utilisé lors de la normalisation de la scène.
+	 * @param offset Déplacement.
+	 */
+	void HardTranslate (const CPoint& offset);
 
 	void bindVBO() const
 	{
@@ -281,6 +286,8 @@ private:
 	 * désactivations des unités de texture.
 	 */
 	bool m_previousCMeshWasTextured;
+
+	bool m_bBuilt;
 
 	/** Pointeur vers la scène. */
 	CScene& m_rScene;

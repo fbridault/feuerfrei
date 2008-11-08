@@ -25,10 +25,10 @@
 	<File name="Scene/CBoundingSphere.hpp" open="0" top="0" tabpos="12">
 		<Cursor position="1763" topLine="23" />
 	</File>
-	<File name="Scene/CCamera.cpp" open="0" top="0" tabpos="11">
+	<File name="Scene/CCamera.cpp" open="1" top="0" tabpos="11">
 		<Cursor position="2350" topLine="93" />
 	</File>
-	<File name="Scene/CCamera.hpp" open="0" top="0" tabpos="3">
+	<File name="Scene/CCamera.hpp" open="1" top="1" tabpos="3">
 		<Cursor position="4842" topLine="106" />
 	</File>
 	<File name="Scene/CMaterial.cpp" open="0" top="0" tabpos="5">
@@ -46,8 +46,8 @@
 	<File name="Scene/CObject.cpp" open="1" top="0" tabpos="1">
 		<Cursor position="2622" topLine="26" />
 	</File>
-	<File name="Scene/CObject.hpp" open="1" top="1" tabpos="3">
-		<Cursor position="816" topLine="28" />
+	<File name="Scene/CObject.hpp" open="1" top="0" tabpos="3">
+		<Cursor position="379" topLine="1" />
 	</File>
 	<File name="Scene/CScene.cpp" open="1" top="0" tabpos="2">
 		<Cursor position="842" topLine="16" />
@@ -85,23 +85,23 @@
 	<File name="Shading/CRenderer.hpp" open="0" top="0" tabpos="4">
 		<Cursor position="740" topLine="0" />
 	</File>
-	<File name="Shading/Glsl.cpp" open="1" top="0" tabpos="5">
+	<File name="Shading/Glsl.cpp" open="0" top="0" tabpos="5">
 		<Cursor position="999" topLine="12" />
 	</File>
 	<File name="Shading/Glsl.hpp" open="0" top="0" tabpos="8">
 		<Cursor position="241" topLine="0" />
 	</File>
-	<File name="Shading/IRenderer.cpp" open="1" top="0" tabpos="0">
-		<Cursor position="202" topLine="0" />
+	<File name="Shading/IRenderer.cpp" open="0" top="0" tabpos="0">
+		<Cursor position="344" topLine="0" />
 	</File>
 	<File name="Shading/IRenderer.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="166" topLine="0" />
 	</File>
 	<File name="Shading/Shaders/lightingFP.glsl" open="1" top="0" tabpos="10">
-		<Cursor position="1989" topLine="18" />
+		<Cursor position="1966" topLine="21" />
 	</File>
 	<File name="Shading/Shaders/lightingVP.glsl" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+		<Cursor position="279" topLine="0" />
 	</File>
 	<File name="Utility/CRefTable.hpp" open="0" top="0" tabpos="15">
 		<Cursor position="54" topLine="0" />
@@ -112,7 +112,7 @@
 	<File name="Utility/GraphicsFn.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="729" topLine="0" />
 	</File>
-	<File name="Utility/ISingleton.hpp" open="0" top="0" tabpos="0">
+	<File name="Utility/ISingleton.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="545" topLine="0" />
 	</File>
 	<File name="Utility/Numerable.hpp" open="0" top="0" tabpos="5">

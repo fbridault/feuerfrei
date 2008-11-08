@@ -400,8 +400,7 @@ void Solver3D::addExternalForces(const CPoint& position, bool move)
   findCPointPosition(m_dim-CPoint(.1f,.1f,.1f),widthx,widthy,widthz);
   findCPointPosition(CPoint(0.0f,0.0f,0.0f),ceilx,ceily,ceilz);
 
-  /* Ajouter des forces externes */
-  if(force.x)
+  /* Ajouter des forces externes */  if(force.x)
     if( force.x > 0.0f)
       for (i = ceilz; i <= widthz; i++)
 	for (j = ceily; j <= widthy; j++)

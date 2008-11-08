@@ -75,7 +75,6 @@ Luminary::Luminary (const LuminaryConfig& a_rConfig,
 		for (vector < CObject* >::iterator luminaryIterator = m_luminary.begin ();
 		     luminaryIterator  != m_luminary.end (); luminaryIterator++)
 		{
-			(*luminaryIterator)->buildVBO();
 			a_rScene.addObject(*luminaryIterator);
 			(*luminaryIterator)->SetPosition(m_position);
 			(*luminaryIterator)->SetScale(rScale);

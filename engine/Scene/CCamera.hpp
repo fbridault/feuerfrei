@@ -66,7 +66,9 @@ private:
 	virtual ~CCamera() {};
 
 public:
-	void init(int w, int h, float clipping_value, CScene* const scene);
+	void init(	CPoint const& a_rPosition, CVector const& a_rUp, CVector const& a_rView,
+						int w, int h, float clipping_value, CScene& a_rScene);
+
 	// void addCenterX(float value){ centerx+=value; eyex+=value;
 //       recalculer_matrice_initiale (); };
 //   void addCenterZ(float value){ centerz+=value; eyez+=value;
@@ -198,11 +200,19 @@ public:
 	{
 		return m_viewPort[3];
 	};
-	CPoint getPosition() const
-	{
-		return CPoint(0,0,0)-m_position;
-	};
 
+	CPoint const& getPosition() const
+	{
+		return m_position;
+	};
+	CVector const& getUpVector() const
+	{
+		return m_up;
+	};
+	CVector const& getViewVector() const
+	{
+		return m_view;
+	};
 	void setSize(int width, int height);
 
 //  void displayStringOnScreen(const string &time, uint x ,uint y);
@@ -246,7 +256,7 @@ private:
 	double m_projMatrix[16];
 	/** Matrice de transformation */
 	double m_modlMatrix[16];
-	CScene *m_scene;
+	CScene* m_pScene;
 };
 
 #endif

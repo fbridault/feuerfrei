@@ -247,7 +247,7 @@ void COmniLight::renderLightVolume(const CCamera& camera) const
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
 	bool in=false;
 	CPoint const& rPosition = GetPosition();
-	CVector vecToLight = camera.getPosition() - rPosition;
+	CVector vecToLight = CPoint(0,0,0)-camera.getPosition() - rPosition;
 	if ( vecToLight.norm() < m_radius )
 	{
 		glCullFace(GL_FRONT);
@@ -403,7 +403,7 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	CPoint const& rPosition = GetPosition();
 
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
-	CVector vecToLight = camera.getPosition() - rPosition;
+	CVector vecToLight = CPoint(0,0,0)-camera.getPosition() - rPosition;
 	vecToLight.normalize();
 
 	if ( (vecToLight * m_direction) > m_cutoff)

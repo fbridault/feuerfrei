@@ -25,8 +25,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  GCSSORSolver3D_SSE (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
-		      float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
+  GCSSORSolver3D_SSE (	CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
+						float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
 
   /** Constructeur nécessaire pour l'héritage multiple.
    * @param omegaDiff Paramètre omega pour la diffusion.

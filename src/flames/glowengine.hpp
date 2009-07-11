@@ -1,8 +1,6 @@
 #if !defined(GLOWENGINE_H)
 #define GLOWENGINE_H
 
-class GlowEngine;
-
 #include <engine/Shading/CRenderTarget.hpp>
 #include <engine/Shading/Glsl.hpp>
 
@@ -10,7 +8,7 @@ class GlowEngine;
 
 #define GLOW_LEVELS 2
 
-class GLFlameCanvas;
+class CRenderList;
 
 /** Classe regroupant des méthodes pour réaliser un glow. Après l'appel au constructeur,
  * qui va instancier deux FBOs, la fonction de dessin pour obtenir un blur se décompose comme ceci :<br><br>
@@ -51,49 +49,87 @@ public:
 	void activate()
 	{
 		/* On dessine dans le FBO #1 */
-		m_firstPassRT[0]->bindTarget();
+		m_apFirstPassRT[0]->BindTarget();
 		/* On prend la résolution la plus grande */
-		glViewport (0, 0, m_width[0], m_height[0]);
+		glViewport (0, 0, m_auiWidth[0], m_auiHeight[0]);
 	}
 	/** Désactive le glow, les appels suivants dessineront dans le color buffer */
 	void deactivate()
 	{
-		m_firstPassRT[0]->bindDefaultTarget();
-		glViewport (0, 0, m_initialWidth, m_initialHeight);
+		CRenderTarget::BindDefaultTarget();
+		glViewport (0, 0, m_uiInitialWidth, m_uiInitialHeight);
 	};
 
 	/** Effectue le blur en trois passes */
-	void blur(GLFlameCanvas* const glBuffer);
+	void Blur(CRenderList const& a_rRenderList);
+
 	/** Plaque le blur à l'écran */
-	void drawBlur(GLFlameCanvas* const glBuffer, bool glowOnly=false);
+	void DrawBlur(CRenderList const& a_rRenderList, bool glowOnly=false);
 
 	void deleteTex();
 	void generateTex();
 
 	void setSize(uint width, uint height)
 	{
-		m_initialWidth = width;
-		m_initialHeight = height;
+		m_uiInitialWidth = width;
+		m_uiInitialHeight = height;
 		deleteTex();
 		generateTex();
 	}
 
 private:
 	/** Dimensions de la texture */
-	uint m_width[GLOW_LEVELS], m_height[GLOW_LEVELS];
-	uint m_initialWidth, m_initialHeight;
+	uint m_auiWidth[GLOW_LEVELS], m_auiHeight[GLOW_LEVELS];
+	uint m_uiInitialWidth, m_uiInitialHeight;
 
 	/** Rapport d'échelle entre la taille du viewport et de la texture du blur */
-	uint m_scaleFactor[GLOW_LEVELS];
+	uint m_auiScaleFactor[GLOW_LEVELS];
 
 	/** Tableau contenant la largeur du filtre */
-	GLfloat m_offsets[6][FILTER_SIZE];
+	GLfloat m_afOffsets[6][FILTER_SIZE];
 
 	/** CRenderTarget */
-	CRenderTarget *m_firstPassRT[GLOW_LEVELS], *m_secondPassRT[GLOW_LEVELS];
+	CRenderTarget *m_apFirstPassRT[GLOW_LEVELS], *m_apSecondPassRT[GLOW_LEVELS];
 	/** Shaders pour le blur */
 	CShader m_oShaderX, m_oShaderY, m_oBlurRendererShader;
 };
 
+/*********************************************************************************************************************/
+/**		ClassCGlowState	          			  	 																 */
+/*********************************************************************************************************************/
+class CGlowState : public ITSingleton<CGlowState>
+{
+	friend class ITSingleton<CGlowState>;
+	friend class GlowEngine;
+
+private:
+	/**
+	 * Constructeur par défaut.
+	 */
+	CGlowState() :
+		m_bGlowEnabled(false),
+		m_uiGlowPass(0)
+	{}
+
+public:
+
+	uint GetPassNumber() const { return m_uiGlowPass; }
+	bool IsEnabled() const { return m_bGlowEnabled; }
+
+private:
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Private methods - only CGlowEngine is allowed to use them
+//---------------------------------------------------------------------------------------------------------------------
+
+	void Enable() { m_bGlowEnabled = true; }
+	void Disable() { m_bGlowEnabled = false; }
+	void SetPassNumber(uint a_uiGlowPass) { m_uiGlowPass = a_uiGlowPass; }
+
+	/** Glow actif ou non */
+	bool m_bGlowEnabled;
+
+	uint m_uiGlowPass;
+};
 #endif
 

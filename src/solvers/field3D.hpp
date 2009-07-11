@@ -44,7 +44,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Field3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep, float buoyancy);
+  Field3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~Field3D ();
 
@@ -117,11 +117,6 @@ public:
    */
   uint getZRes() const { return m_nbVoxelsZ; };
 
-  /** Retourne le facteur d'échelle.
-   * @return Echelle.
-   */
-  CPoint const& getScale () const { return m_scale; };
-
   /** Divise la résolution de la grille par 2 */
   virtual void divideRes () {};
 
@@ -154,7 +149,7 @@ public:
 #ifdef RTFLAMES_BUILD
   /** Ajout d'une source de feu */
   void addFireSource(IFireSource* fireSource) { m_fireSources.push_back(fireSource); };
-  list <IFireSource *> *getFireSourcesList() { return &m_fireSources; };
+  list <IFireSource *> &getFireSourcesList() { return m_fireSources; };
 #endif
 
 protected:
@@ -176,8 +171,6 @@ protected:
 
   /** Dimensions du solveur */
   CPoint m_dim;
-  /** Facteur d'échelle du solveur */
-  CPoint m_scale;
 
   float m_nbVoxelsXDivDimX,  m_nbVoxelsYDivDimY,  m_nbVoxelsZDivDimZ;
   uint m_nbMaxDiv;

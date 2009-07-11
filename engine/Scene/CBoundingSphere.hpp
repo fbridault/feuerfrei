@@ -30,7 +30,7 @@ public:
 		// Sphère dans le frustrum ?
 		for ( i = 0; i < 6; i++ )
 		{
-			plan=view.getFrustum(i);
+			plan=view.GetFrustum(i);
 			if ( plan[0] * m_oCentre.x + plan[1] * m_oCentre.y + plan[2] * m_oCentre.z + plan[3] <= -m_fRadius )
 				return false;
 		}
@@ -51,7 +51,7 @@ public:
 		// Sphère dans le frustrum ?
 		for ( i = 0; i < 6; i++ )
 		{
-			plan=view.getFrustum(i);
+			plan=view.GetFrustum(i);
 			d = plan[0] * m_oCentre.x + plan[1] * m_oCentre.y + plan[2] * m_oCentre.z + plan[3];
 			if ( d <= -m_fRadius )
 				return 0.0f;
@@ -63,11 +63,11 @@ public:
 	 * On projette le centre et un point à la périphérie sur l'écran, puis on calcule
 	 * l'aire du disque obtenu.
 	 */
-	float getPixelCoverage(const CCamera &view) const
+	float GetPixelCoverage(const CCamera &view) const
 	{
 		CPoint centerSC, periSC;
 
-		view.getSphereCoordinates(m_oCentre, m_fRadius, centerSC, periSC);
+		view.GetSphereCoordinates(m_oCentre, m_fRadius, centerSC, periSC);
 		/* PI.R² */
 		return ( M_PI* centerSC.squaredDistanceFrom(periSC));
 	}

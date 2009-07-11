@@ -2,29 +2,30 @@
 
 #include <engine/Scene/CScene.hpp>
 #include <engine/Physics/CEnergy.hpp>
+#include "glowengine.hpp"
 
 
 /**********************************************************************************************************************/
 /************************************** IMPLEMENTATION DE LA CLASSE FIRESOURCE ****************************************/
 /**********************************************************************************************************************/
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
-												Field3D& a_rField,
-												uint a_uiNbFlames,
-												CharCPtrC a_szTexname,
-												const CShader& a_rGenShadowCubeMapShader,
-												const CRenderTarget& a_rShadowRenderTarget) :
-		CFlameLight(CPoint(0.0f,0.0f,0.0f),
-								CEnergy(1.0,1.0,1.0),
-								512,
-								a_rGenShadowCubeMapShader,
-								a_rShadowRenderTarget,
-								string(a_rFlameConfig.IESFileName.fn_str())),
-		m_rField(a_rField),
-		m_oTexture(a_szTexname, GL_REPEAT, GL_REPEAT)
+							Field3D& a_rField,
+							uint a_uiNbFlames,
+							CharCPtrC a_szTexname,
+							const CShader& a_rGenShadowCubeMapShader,
+							const CRenderTarget& a_rShadowRenderTarget) :
+	CFlameLight(CPoint(0.0f,0.0f,0.0f),
+				CEnergy(1.0,1.0,1.0),
+				512,
+				a_rGenShadowCubeMapShader,
+				a_rShadowRenderTarget,
+				string(a_rFlameConfig.IESFileName.fn_str())),
+	m_rField(a_rField),
+	m_oTexture(a_szTexname, GL_REPEAT, GL_REPEAT)
 {
 	m_nbFlames=a_uiNbFlames;
 	/* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
@@ -42,9 +43,9 @@ IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
 	computeGlowWeights(1,10.0f);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 IFireSource::~IFireSource()
 {
 	assert(m_flames != NULL);
@@ -56,9 +57,61 @@ IFireSource::~IFireSource()
 	delete[]m_flames;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+void IFireSource::Render() const
+{
+#ifdef COUNT_NURBS_POLYGONS
+	g_count=0;
+#endif
+	// Get current flame rendering style
+	CRenderFlameState const& rRenderState = CRenderFlameState::GetInstance();
+	NDisplayBoundingVolume const& nBoundingVolume = rRenderState.GetDisplayBoundingVolume();
+
+	CGlowState& rGlowState = CGlowState::GetInstance();
+	if(rGlowState.IsEnabled() == true)
+	{
+		CShaderState& rShaderState = CShaderState::GetInstance();
+		uint const uiIndex = rGlowState.GetPassNumber();
+
+		GLfloat const fDivide = getGlowDivide(uiIndex);
+		GLfloat const* pfWeights = getGlowWeights(uiIndex);
+		rShaderState.SetUniform1f("divide", fDivide);
+		rShaderState.SetUniform1fv("weights", pfWeights, FILTER_SIZE);
+	}
+
+	switch (nBoundingVolume)
+	{
+		case NDisplayBoundingVolume::eSphere :
+			drawBoundingSphere();
+			break;
+		case NDisplayBoundingVolume::eImpostor :
+			drawImpostor();
+			break;
+		case NDisplayBoundingVolume::eNone :
+			if (m_visibility)
+			{
+				bool const bDisplay = rRenderState.GetDisplay();
+				bool const bDisplayParticle = rRenderState.GetDisplayParticle();
+				ForEachUInt (i, m_nbFlames)
+				{
+					m_flames[i]->drawFlame(bDisplay, bDisplayParticle);
+				}
+			}
+			break;
+		default :
+			assert(false);
+			break;
+	}
+#ifdef COUNT_NURBS_POLYGONS
+	cerr << g_count << endl;
+#endif
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void IFireSource::build()
 {
 	CPoint averagePos;
@@ -72,27 +125,32 @@ void IFireSource::build()
 		averagePos += m_flames[i]->getCenter ();
 		averageVec += m_flames[i]->getMainDirection ();
 	}
-	averagePos *= m_rField.getScale();
-	m_center = averagePos/m_nbFlames;
-	averagePos = m_center + getPosition();
-	SetPosition(averagePos);
 
-	m_direction = averageVec/m_nbFlames;
+	CTransform const& rFieldTransform = m_rField.GetTransform();
+
+	averagePos *= rFieldTransform.GetScale();
+	m_oCenter = averagePos/m_nbFlames;
+	averagePos = m_oCenter + rFieldTransform.GetLocalPosition();
+
+	CTransform& rLightTransform = GrabTransform();
+	rLightTransform.SetPosition(averagePos);
+
+	m_oDirection = averageVec/m_nbFlames;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IFireSource::computeIntensityPositionAndDirection()
 {
 	//  float r,y;
-
 	CVector o = getMainDirection();
-	float fIntensity;
+	CTransform const& rTransform = m_rField.GetTransform();
+	CPoint const& rScale = rTransform.GetScale();
 
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity = o.norm()*(m_rField.getScale().y)*m_intensityCoef;
+	float fIntensity = o.norm()*(rScale.y)*m_intensityCoef;
 
 	//  m_intensity = log(m_intensity)/6.0+1;
 //   m_intensity = sin(m_intensity * PI/2.0);
@@ -113,27 +171,30 @@ void IFireSource::computeIntensityPositionAndDirection()
 //     m_orientationSPtheta=acos(y / r)*180.0/M_PI;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IFireSource::buildBoundingSphere ()
 {
 	CPoint p;
 	float t;
-	p = (m_rField.getScale() * m_rField.getDim());
+	CTransform const& rTransform = m_rField.GetTransform();
+	CPoint const& rScale = rTransform.GetScale();
+
+	p = (rScale * m_rField.getDim());
 	t = p.max();
 
 	m_boundingSphere.SetRadius(sqrtf(3.0f)/2.0f*t);
 	/* Augmentation de 10% du rayon pour prévenir l'apparition des flammes */
 //   m_boundingSphere.radius *= 1.1;
-	m_boundingSphere.SetCentre(getPosition() + p/2.0f);
+	m_boundingSphere.SetCentre(getFieldPosition() + p/2.0f);
 	//  m_boundingSphere.radius = ((getMainDirection()-getCenter()).scaleBy(m_rField.getScale())).length()+.1;
 	//  m_boundingSphere.centre = getCenterSP();
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IFireSource::drawImpostor() const
 {
 	if (m_visibility)
@@ -147,14 +208,16 @@ void IFireSource::drawImpostor() const
 //       glPopMatrix();
 		GLfloat modelview[16];
 
-		CPoint const& rPos = getPosition();
-		float size=m_rField.getScale().x*1.5f, halfSize=m_rField.getScale().x*.5f;
+		CTransform const& rTransform = m_rField.GetTransform();
+		CPoint const& rPos = rTransform.GetLocalPosition();
+		CPoint const& rScale = rTransform.GetScale();
+		float size=rScale.x*1.5f, halfSize=rScale.x*.5f;
 		CPoint a,b,c,d,zero;
 		CVector right,up,offset;
 
 		glGetFloatv (GL_MODELVIEW_MATRIX, modelview);
 
-		offset = CVector(modelview[2], modelview[6], modelview[10])*m_rField.getDim().z*m_rField.getScale().z/2.0f;
+		offset = CVector(modelview[2], modelview[6], modelview[10])*m_rField.getDim().z*rScale.z/2.0f;
 
 		right.x = modelview[0];
 		right.y = modelview[4];
@@ -182,18 +245,17 @@ void IFireSource::drawImpostor() const
 	}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
+//---------------------------------------------------------------------------------------------------------------------
+void IFireSource::ComputeVisibility(const CCamera &view)
 {
 	bool vis_save=m_visibility;
 	int fluidsLOD, nurbsLOD;
 	float glow1LOD, glow2LOD;
 	float coverage;
 
-	if (forceSpheresBuild)
-		buildBoundingSphere();
+	buildBoundingSphere();
 
 	m_dist=m_boundingSphere.visibleDistance(view);
 	m_visibility = (m_dist);
@@ -207,12 +269,12 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 			m_rField.setRunningState(true);
 		}
 
-		coverage = m_boundingSphere.getPixelCoverage(view);
+		coverage = m_boundingSphere.GetPixelCoverage(view);
 
 		/* Fonction obtenue par régression linéaire avec les données
 		 * y = [.60 .25 .05 .025 .015 .01 .001] et x = [15 13 11 9 7 5 3]
 		 */
-		fluidsLOD = (int)nearbyint(2.0870203*log(coverage*2399.4418));
+		fluidsLOD = (int)nearbyint(2.0870203f*log(coverage*2399.4418f));
 
 		if (coverage > .75f) nurbsLOD = 5;
 		else if (coverage > .2f) nurbsLOD = 4;
@@ -221,8 +283,8 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 		else if (coverage > .0015f) nurbsLOD = 1;
 		else nurbsLOD = 0;
 
-		glow1LOD = 0.3134922*log(coverage*11115.586);
-		glow2LOD = 1.5543804*log(coverage*840.01981);
+		glow1LOD = 0.3134922f*log(coverage*11115.586f);
+		glow2LOD = 1.5543804f*log(coverage*840.01981f);
 
 		/* Fonction obtenue par régression linéaire avec les données
 		 */
@@ -278,9 +340,9 @@ void IFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
 		}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IFireSource::computeGlowWeights(uint index, float sigma)
 {
 	int offset;
@@ -294,26 +356,83 @@ void IFireSource::computeGlowWeights(uint index, float sigma)
 		//    cerr << x << " " << x+offset << " " << m_glowWeights[index][x+offset] << endl;
 	}
 	//     cerr << m_divide[index] << endl;
-	m_glowDivide[index] = 1/m_glowDivide[index];
+	m_glowDivide[index] = 1.f/m_glowDivide[index];
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+
 bool IFireSource::operator<(const IFireSource& other) const
 {
 	return (m_dist < other.m_dist);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void IFireSource::setLOD(u_char value)
+{
+	switch (value)
+	{
+		case 5:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(4);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			break;
+		case 4:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(3);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			break;
+		case 3:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(2);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			break;
+		case 2:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(2);
+				m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			break;
+		case 1:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(1);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(true);
+			}
+			break;
+		case 0:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(1);
+				m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+				m_flames[i]->setFlatFlame(true);
+			}
+			break;
+		default:
+			cerr << "Bad NURBS LOD parameter" << endl;
+	}
+}
 
 
 /**********************************************************************************************************************/
 /******************************** IMPLEMENTATION DE LA CLASSE DETACHABLEFIRESOURCE ************************************/
 /**********************************************************************************************************************/
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 IDetachableFireSource::IDetachableFireSource(const FlameConfig& a_rFlameConfig,
 																						Field3D& a_rField,
 																						uint a_uiNbFlames,
@@ -326,9 +445,9 @@ IDetachableFireSource::IDetachableFireSource(const FlameConfig& a_rFlameConfig,
 	computeGlowWeights(1,2.2f);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 IDetachableFireSource::~IDetachableFireSource()
 {
 	for (list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
@@ -337,9 +456,9 @@ IDetachableFireSource::~IDetachableFireSource()
 	m_detachedFlamesList.clear ();
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
 {
 #ifdef COUNT_NURBS_POLYGONS
@@ -356,17 +475,16 @@ void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char
 		default :
 			if (m_visibility)
 			{
-				CPoint const& rPos = getPosition();
-				CPoint const& rScale = m_rField.getScale();
-				glPushMatrix();
-				glTranslatef (rPos.x, rPos.y, rPos.z);
-				glScalef (rScale.x, rScale.y, rScale.z);
+				CTransform const& rTransform = m_rField.GetTransform();
+				rTransform.Push();
+
 				for (uint i = 0; i < m_nbFlames; i++)
 					m_flames[i]->drawFlame(display, displayParticle);
 				for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
 				        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
 					(*flamesIterator)->drawFlame(display, displayParticle);
-				glPopMatrix();
+
+				rTransform.Pop();
 			}
 			break;
 	}
@@ -375,9 +493,9 @@ void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char
 #endif
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IDetachableFireSource::build()
 {
 	CPoint averagePos, tmp;
@@ -393,12 +511,15 @@ void IDetachableFireSource::build()
 		averagePos += m_flames[i]->getCenter ();
 		averageVec += m_flames[i]->getMainDirection ();
 	}
-	averagePos *= m_rField.getScale();
-	m_center = averagePos/m_nbFlames;
-	averagePos = m_center + getPosition();
-	SetPosition(averagePos);
+	CTransform const& rFieldTransform = m_rField.GetTransform();
+	averagePos *= rFieldTransform.GetScale();
+	m_oCenter = averagePos/m_nbFlames;
+	averagePos = m_oCenter + rFieldTransform.GetLocalPosition();
 
-	m_direction = averageVec/m_nbFlames;
+	CTransform &rTransform = GrabTransform();
+	rTransform.SetPosition(averagePos);
+
+	m_oDirection = averageVec/m_nbFlames;
 
 	/* Destruction des flammes détachées en fin de vie */
 	list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
@@ -418,7 +539,7 @@ void IDetachableFireSource::build()
 	CPoint pt;
 	CPoint p;
 	float t,k;
-	p = (m_rField.getScale() * m_rField.getDim())/2.0f;
+	p = (rFieldTransform.GetScale() * m_rField.getDim())/2.0f;
 	t = p.max();
 	k = t*t;
 
@@ -446,7 +567,7 @@ void IDetachableFireSource::build()
 //       m_boundingSphere.centre = m_rField.getPosition() + (p + (ptMax + ptMin)/2.0f)/2.0f;
 //     }else{
 	m_boundingSphere.SetRadius(sqrt(k+k));
-	m_boundingSphere.SetCentre(getPosition() + p);
+	m_boundingSphere.SetCentre(rFieldTransform.GetLocalPosition() + p);
 //   }
 	/* Calcul de la bounding box pour affichage */
 	buildBoundingBox ();
@@ -492,9 +613,9 @@ void IDetachableFireSource::build()
 //     }
 // }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IDetachableFireSource::setSmoothShading (bool state)
 {
 	IFireSource::setSmoothShading(state);
@@ -503,17 +624,19 @@ void IDetachableFireSource::setSmoothShading (bool state)
 		(*flamesIterator)->setSmoothShading(state);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IDetachableFireSource::computeIntensityPositionAndDirection()
 {
 	CVector o = getMainDirection();
 	float fIntensity;
 
+	CTransform const& rFieldTransform = m_rField.GetTransform();
+
 	// l'intensité est calculée à partir du rapport de la longueur de la flamme (o)
 	// et de la taille en y de la grille fois un coeff correcteur
-	fIntensity=o.norm()*(m_rField.getScale().y)*m_intensityCoef;
+	fIntensity=o.norm()*(rFieldTransform.GetScale().y)*m_intensityCoef;
 
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
 	fIntensity = sqrt(fIntensity)*2.0f;
@@ -521,18 +644,17 @@ void IDetachableFireSource::computeIntensityPositionAndDirection()
 	SetIntensity(fIntensity);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSpheresBuild)
+//---------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::ComputeVisibility(const CCamera &view)
 {
 	bool vis_save=m_visibility;
 	int nurbsLOD, fluidsLOD;
 	float glow1LOD, glow2LOD;
 	float coverage;
 
-	if (forceSpheresBuild)
-		buildBoundingSphere();
+	buildBoundingSphere();
 
 	m_dist=m_boundingSphere.visibleDistance(view);
 	m_visibility = (m_dist);
@@ -547,7 +669,7 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 			m_rField.setRunningState(true);
 		}
 
-		coverage = m_boundingSphere.getPixelCoverage(view);
+		coverage = m_boundingSphere.GetPixelCoverage(view);
 
 		/* Fonction obtenue par régression linéaire avec les données
 		 * y = [.60 .25 .05 .025 .015 .01 .001] et x = [15 13 11 9 7 5 3]
@@ -634,9 +756,9 @@ void IDetachableFireSource::computeVisibility(const CCamera &view, bool forceSph
 		}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void IDetachableFireSource::buildBoundingBox ()
 {
 	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -675,6 +797,69 @@ void IDetachableFireSource::buildBoundingBox ()
 	if (0.0f < ptMin.z)
 		ptMin.z = 0.0f;
 
-	m_BBmin = ptMin * m_rField.getScale();
-	m_BBmax = ptMax * m_rField.getScale();
+	CTransform const& rFieldTransform = m_rField.GetTransform();
+	m_BBmin = ptMin * rFieldTransform.GetScale();
+	m_BBmax = ptMax * rFieldTransform.GetScale();
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void IDetachableFireSource::setLOD(u_char value)
+{
+	u_char tolerance=4;
+	switch (value)
+	{
+		case 5:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(4);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+				tolerance = 4;
+			}
+			break;
+		case 4:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(3);
+				m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+				tolerance = 3;
+			}
+			break;
+		case 3:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(2);
+				m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			tolerance = 2;
+			break;
+		case 2:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(1);
+				m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+				m_flames[i]->setFlatFlame(false);
+			}
+			tolerance = 1;
+			break;
+		case 1:
+		case 0:
+			for (uint i = 0; i < m_nbFlames; i++)
+			{
+				m_flames[i]->setSamplingTolerance(1);
+				m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
+				m_flames[i]->setFlatFlame(true);
+			}
+			tolerance = 1;
+			break;
+		default:
+			cerr << "Bad NURBS LOD parameter" << endl;
+	}
+	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
+			flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+		(*flamesIterator)->setSamplingTolerance(tolerance);
 }

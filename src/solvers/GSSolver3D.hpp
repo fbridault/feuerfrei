@@ -24,8 +24,8 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  GSSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
-	      float timeStep, float buoyancy, float vorticityConfinement);
+  GSSolver3D (	CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
+				float timeStep, float buoyancy, float vorticityConfinement);
   /** Desctructeur. */
   virtual ~GSSolver3D ();
 

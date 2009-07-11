@@ -9,7 +9,7 @@ class GlobalField;
 
 class FieldThread;
 class Field3D;
-class CScene;
+class CSpatialGraph;
 
 /** La classe GlobalField est un champ de vecteur qui englobe toute la scène. Il sert de conteneur pour tous
  * les solveurs et c'est lui qui transmet les forces globales aux solveurs locaux.
@@ -31,26 +31,26 @@ public:
 	 * @param epsilon Tolérance d'erreur pour GCSSOR.
 	 */
 #ifdef MULTITHREADS
-	GlobalField(const list <FieldThread *> &threads, CScene* const scene, char type, uint n,
+	GlobalField(list <FieldThread *> const& threads, CSpatialGraph& a_rGraph, char type, uint n,
 #else
-	GlobalField(const vector <Field3D *> &fields, CScene* const scene, char type, uint n,
+	GlobalField(vector <Field3D *> const& fields, CSpatialGraph& a_rGraph, char type, uint n,
 #endif
 	            float timeStep, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
 	/** Destructeur. */
 	virtual ~GlobalField ()
 	{
-		delete m_field;
+		delete m_pField;
 	};
 
 	/** Lance une itération du solveur. */
 	void iterate (void)
 	{
-		m_field->iterate();
+		m_pField->iterate();
 		shareForces();
 	};
 	void cleanSources (void)
 	{
-		m_field->cleanSources();
+		m_pField->cleanSources();
 	};
 
 	/** Ajoute de façon ponctuelle des forces externes sur une des faces du champ. Il faut également considérer
@@ -66,7 +66,7 @@ public:
 	 */
 	virtual void addPermanentExternalForces(CPoint& forces)
 	{
-		m_field->addPermanentExternalForces(forces);
+		m_pField->addPermanentExternalForces(forces);
 	}
 
 	/** Ajoute de façon temporaire (une itération) des forces externes sur une des faces du solveur. Cette méthode
@@ -75,7 +75,7 @@ public:
 	 */
 	virtual void addTemporaryExternalForces(CPoint& forces)
 	{
-		m_field->addTemporaryExternalForces(forces);
+		m_pField->addTemporaryExternalForces(forces);
 	}
 
 	/** Modifie la force de flottabilité dans le solveur
@@ -83,46 +83,47 @@ public:
 	 */
 	virtual void setBuoyancy(float value)
 	{
-		m_field->setBuoyancy(value);
+		m_pField->setBuoyancy(value);
 	};
 	/** Modifie la force de flottabilité dans le solveur
 	 * @param value Nouvelle valeur.
 	 */
 	virtual void setVorticity(float value)
 	{
-		m_field->setVorticity(value);
+		m_pField->setVorticity(value);
 	};
 
 	/** Fonction de dessin du champ de vélocité */
 	void displayVelocityField (void)
 	{
-		m_field->displayVelocityField();
+		m_pField->displayVelocityField();
 	};
 
 	/** Fonction de dessin de la grille */
 	void displayGrid (void)
 	{
-		m_field->displayGrid();
+		m_pField->displayGrid();
 	};
 
 	/** Fonction de dessin du repère de base */
 	void displayBase (void)
 	{
-		m_field->displayBase();
+		m_pField->displayBase();
 	};
 
 	/** Retourne la position du solveur dans le repère du monde
 	 * @return Position dans l'espace.
 	 */
-	CPoint const& getPosition (void)
+	CPoint getPosition (void)
 	{
-		return m_field->getPosition();
+		CTransform const& rTransform = m_pField->GetTransform();
+		return rTransform.GetWorldPosition();
 	};
 
 protected:
 	/** CPointeur sur les solveurs contenus */
 	vector <Field3D*> m_localFields;
-	Field3D *m_field;
+	Field3D *m_pField;
 };
 
 #endif

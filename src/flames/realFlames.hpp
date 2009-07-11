@@ -179,7 +179,7 @@ public:
 	virtual void drawFlame(bool display, bool displayParticle) const
 	{
 		if (displayParticle) drawParticles();
-		if (display) drawCPointFlame();
+		if (display) drawPointFlame();
 	};
 
 	virtual CVector getMainDirection() const

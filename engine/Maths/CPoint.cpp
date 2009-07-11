@@ -2,7 +2,7 @@
 
 #include "CVector.hpp"
 
-float CPoint::getTriangleArea(const CPoint &P1,const CPoint &P2,const CPoint &P3)
+float CPoint::GetTriangleArea(const CPoint &P1,const CPoint &P2,const CPoint &P3)
 {
   CPoint Ph=P1;
   CVector V1, V2, VF;

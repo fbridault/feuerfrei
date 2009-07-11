@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="Common.hpp" open="0" top="0" tabpos="10">
-		<Cursor position="386" topLine="0" />
+	<File name="Common.hpp" open="0" top="0" tabpos="8">
+		<Cursor position="168" topLine="0" />
+	</File>
+	<File name="Init.cpp" open="1" top="1" tabpos="11">
+		<Cursor position="190" topLine="0" />
+	</File>
+	<File name="Init.hpp" open="0" top="0" tabpos="1">
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="Maths/CPoint.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="214" topLine="0" />
+		<Cursor position="64" topLine="0" />
 	</File>
-	<File name="Maths/CPoint.hpp" open="0" top="0" tabpos="5">
-		<Cursor position="6470" topLine="212" />
+	<File name="Maths/CPoint.hpp" open="0" top="0" tabpos="15">
+		<Cursor position="7124" topLine="227" />
 	</File>
 	<File name="Maths/CVector.hpp" open="0" top="0" tabpos="6">
-		<Cursor position="719" topLine="27" />
+		<Cursor position="5921" topLine="145" />
 	</File>
 	<File name="Maths/UMatrixFn.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="627" topLine="0" />
@@ -20,91 +26,106 @@
 		<Cursor position="55" topLine="0" />
 	</File>
 	<File name="Physics/CEnergy.hpp" open="0" top="0" tabpos="4">
-		<Cursor position="6738" topLine="213" />
+		<Cursor position="5779" topLine="213" />
 	</File>
-	<File name="Scene/CBoundingSphere.hpp" open="1" top="0" tabpos="30">
-		<Cursor position="0" topLine="0" />
+	<File name="Scene/CBoundingSphere.hpp" open="0" top="0" tabpos="5">
+		<Cursor position="1753" topLine="24" />
 	</File>
-	<File name="Scene/CCamera.cpp" open="1" top="0" tabpos="5">
-		<Cursor position="2350" topLine="73" />
+	<File name="Scene/CCamera.cpp" open="0" top="0" tabpos="20">
+		<Cursor position="10547" topLine="279" />
 	</File>
-	<File name="Scene/CCamera.hpp" open="0" top="0" tabpos="6">
-		<Cursor position="380" topLine="0" />
+	<File name="Scene/CCamera.hpp" open="0" top="0" tabpos="11">
+		<Cursor position="5235" topLine="183" />
+	</File>
+	<File name="Scene/CDrawState.hpp" open="0" top="0" tabpos="6">
+		<Cursor position="3097" topLine="103" />
 	</File>
 	<File name="Scene/CMaterial.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="784" topLine="0" />
+		<Cursor position="969" topLine="0" />
 	</File>
-	<File name="Scene/CMaterial.hpp" open="0" top="0" tabpos="6">
-		<Cursor position="3216" topLine="73" />
+	<File name="Scene/CMaterial.hpp" open="1" top="0" tabpos="6">
+		<Cursor position="2593" topLine="56" />
 	</File>
-	<File name="Scene/CMesh.cpp" open="1" top="1" tabpos="22">
-		<Cursor position="5716" topLine="98" />
+	<File name="Scene/CMesh.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="5535" topLine="108" />
 	</File>
-	<File name="Scene/CMesh.hpp" open="1" top="0" tabpos="28">
-		<Cursor position="3724" topLine="90" />
+	<File name="Scene/CMesh.hpp" open="0" top="0" tabpos="12">
+		<Cursor position="2328" topLine="92" />
 	</File>
 	<File name="Scene/CObject.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="9021" topLine="169" />
+		<Cursor position="6978" topLine="164" />
 	</File>
-	<File name="Scene/CObject.hpp" open="1" top="0" tabpos="3">
-		<Cursor position="4821" topLine="155" />
+	<File name="Scene/CObject.hpp" open="0" top="0" tabpos="3">
+		<Cursor position="4856" topLine="272" />
 	</File>
-	<File name="Scene/CScene.cpp" open="1" top="0" tabpos="27">
-		<Cursor position="3678" topLine="79" />
+	<File name="Scene/CScene.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="2482" topLine="40" />
 	</File>
-	<File name="Scene/CScene.hpp" open="0" top="0" tabpos="23">
-		<Cursor position="3941" topLine="105" />
+	<File name="Scene/CScene.hpp" open="0" top="0" tabpos="5">
+		<Cursor position="4551" topLine="146" />
 	</File>
-	<File name="Scene/Light.cpp" open="0" top="0" tabpos="2">
-		<Cursor position="12438" topLine="370" />
+	<File name="Scene/CSpatialGraph.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="1314" topLine="7" />
+	</File>
+	<File name="Scene/CSpatialGraph.hpp" open="1" top="0" tabpos="9">
+		<Cursor position="559" topLine="0" />
+	</File>
+	<File name="Scene/CTransform.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="3130" topLine="38" />
+	</File>
+	<File name="Scene/CTransform.hpp" open="1" top="0" tabpos="7">
+		<Cursor position="1533" topLine="53" />
+	</File>
+	<File name="Scene/Light.cpp" open="1" top="0" tabpos="7">
+		<Cursor position="854" topLine="21" />
 	</File>
 	<File name="Scene/Light.hpp" open="0" top="0" tabpos="4">
-		<Cursor position="2862" topLine="75" />
+		<Cursor position="3154" topLine="167" />
 	</File>
-	<File name="Scene/Texture.cpp" open="0" top="0" tabpos="8">
-		<Cursor position="11" topLine="18" />
+	<File name="Scene/Texture.cpp" open="1" top="0" tabpos="10">
+		<Cursor position="39" topLine="0" />
 	</File>
-	<File name="Scene/Texture.hpp" open="0" top="0" tabpos="7">
-		<Cursor position="697" topLine="0" />
+	<File name="Scene/Texture.hpp" open="1" top="0" tabpos="6">
+		<Cursor position="6601" topLine="157" />
 	</File>
 	<File name="Shading/CGammaFX.cpp" open="0" top="0" tabpos="6">
-		<Cursor position="85" topLine="0" />
+		<Cursor position="311" topLine="0" />
 	</File>
 	<File name="Shading/CGammaFX.hpp" open="0" top="0" tabpos="8">
-		<Cursor position="146" topLine="0" />
+		<Cursor position="1985" topLine="39" />
 	</File>
 	<File name="Shading/CRenderTarget.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="12" topLine="0" />
+		<Cursor position="531" topLine="0" />
 	</File>
 	<File name="Shading/CRenderTarget.hpp" open="0" top="0" tabpos="7">
-		<Cursor position="2472" topLine="15" />
+		<Cursor position="1153" topLine="23" />
 	</File>
-	<File name="Shading/CRenderer.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="3272" topLine="80" />
+	<File name="Shading/CRenderer.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="1353" topLine="24" />
 	</File>
-	<File name="Shading/CRenderer.hpp" open="0" top="0" tabpos="4">
-		<Cursor position="740" topLine="0" />
+	<File name="Shading/CRenderer.hpp" open="0" top="0" tabpos="7">
+		<Cursor position="1837" topLine="12" />
 	</File>
 	<File name="Shading/Glsl.cpp" open="0" top="0" tabpos="5">
-		<Cursor position="999" topLine="12" />
+		<Cursor position="4567" topLine="123" />
 	</File>
 	<File name="Shading/Glsl.hpp" open="0" top="0" tabpos="8">
-		<Cursor position="241" topLine="0" />
+		<Cursor position="3034" topLine="105" />
 	</File>
 	<File name="Shading/IRenderer.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="344" topLine="0" />
+		<Cursor position="179" topLine="0" />
 	</File>
-	<File name="Shading/IRenderer.hpp" open="1" top="0" tabpos="0">
-		<Cursor position="166" topLine="0" />
+	<File name="Shading/IRenderer.hpp" open="0" top="0" tabpos="1">
+		<Cursor position="104" topLine="0" />
 	</File>
 	<File name="Shading/Shaders/lightingFP.glsl" open="0" top="0" tabpos="10">
 		<Cursor position="1966" topLine="21" />
 	</File>
-	<File name="Shading/Shaders/lightingVP.glsl" open="1" top="0" tabpos="0">
+	<File name="Shading/Shaders/lightingVP.glsl" open="0" top="0" tabpos="2">
 		<Cursor position="279" topLine="0" />
 	</File>
 	<File name="Utility/CRefTable.hpp" open="0" top="0" tabpos="15">
-		<Cursor position="54" topLine="0" />
+		<Cursor position="804" topLine="0" />
 	</File>
 	<File name="Utility/GraphicsFn.cpp" open="0" top="0" tabpos="0">
 		<Cursor position="2647" topLine="60" />
@@ -112,16 +133,22 @@
 	<File name="Utility/GraphicsFn.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="729" topLine="0" />
 	</File>
-	<File name="Utility/ISingleton.hpp" open="1" top="0" tabpos="0">
-		<Cursor position="545" topLine="0" />
+	<File name="Utility/ISingleton.hpp" open="0" top="0" tabpos="9">
+		<Cursor position="634" topLine="12" />
 	</File>
-	<File name="Utility/Numerable.hpp" open="0" top="0" tabpos="5">
-		<Cursor position="185" topLine="0" />
-	</File>
-	<File name="Utility/UObjImporter.cpp" open="0" top="0" tabpos="1">
+	<File name="Utility/Macros.hpp" open="0" top="0" tabpos="3">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="Utility/UObjImporter.hpp" open="0" top="0" tabpos="0">
-		<Cursor position="405" topLine="3" />
+	<File name="Utility/Numerable.hpp" open="0" top="0" tabpos="11">
+		<Cursor position="992" topLine="3" />
+	</File>
+	<File name="Utility/SmartPtr.hpp" open="1" top="0" tabpos="1">
+		<Cursor position="122" topLine="0" />
+	</File>
+	<File name="Utility/UObjImporter.cpp" open="0" top="0" tabpos="21">
+		<Cursor position="7343" topLine="242" />
+	</File>
+	<File name="Utility/UObjImporter.hpp" open="1" top="0" tabpos="4">
+		<Cursor position="9251" topLine="297" />
 	</File>
 </CodeBlocks_layout_file>

@@ -7,10 +7,10 @@
 #endif
 
 /* Le constructeur de GSsolver n'a pas de paramètre, il n'est donc pas appelé explicitement */
-LogResAvgTimeSolver3D::LogResAvgTimeSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
-					      float timeStep, float buoyancy, float vorticityConfinement,
-					      float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps) :
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
+LogResAvgTimeSolver3D::LogResAvgTimeSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
+											  float timeStep, float buoyancy, float vorticityConfinement,
+											  float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps) :
+  Solver3D (a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement),
   LogResAvgSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_times = new float[m_nbAverages];

@@ -10,6 +10,7 @@ class GLFlameCanvas;
 
 #include <engine/Scene/CScene.hpp>
 #include <engine/Scene/CCamera.hpp>
+#include <engine/Scene/CRenderList.hpp>
 #include <engine/Shading/Glsl.hpp>
 #include <engine/Shading/CGammaFX.hpp>
 #include <engine/Utility/GraphicsFn.hpp>
@@ -20,10 +21,9 @@ class GLFlameCanvas;
 #include "../flames/luminary.hpp"
 
 #include "../solvers/globalField.hpp"
-#include "../flames/solidePhoto.hpp"
 
 #ifdef MULTITHREADS
-#include "../solvers/fieldThread.hpp"
+#	include "../solvers/fieldThread.hpp"
 #endif
 
 class CForwardRenderer;
@@ -40,8 +40,6 @@ public:
 	void OnPaint(wxPaintEvent& event);
 	void drawScene(void);
 	void drawFlames(void);
-	void drawFlamesBoundingBoxes(void);
-	void drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex);
 
 	/** Défini l'action à effectuer lorsque la souris se déplace */
 	void OnMouseMotion(wxMouseEvent& event);
@@ -63,8 +61,8 @@ public:
 #endif
 	/** Initialisations relatives aux paramètres de visualisation */
 	void InitUISettings(void);
-	void Restart (void);
-	void ReloadFieldsAndFires (void);
+	void Restart(void);
+	void ReloadFieldsAndFires(void);
 	void DestroyScene(void);
 	/** Initialisation globale du contrôle */
 	void Init(FlameAppConfig *config);
@@ -87,52 +85,60 @@ public:
 	void ToggleGlowOnlyDisplay(void)
 	{
 		m_glowOnly=!m_glowOnly;
-	};
+	}
 	void ToggleGridDisplay(void)
 	{
 		m_displayGrid=!m_displayGrid;
-	};
+	}
 	void ToggleBaseDisplay(void)
 	{
 		m_displayBase=!m_displayBase;
-	};
+	}
 	void ToggleVelocityDisplay(void)
 	{
 		m_displayVelocity=!m_displayVelocity;
-	};
-	void ToggleParticlesDisplay(void)
-	{
-		m_displayParticles=!m_displayParticles;
-	};
+	}
 	void ToggleWickBoxesDisplay(void)
 	{
 		m_displayWickBoxes=!m_displayWickBoxes;
-	};
+	}
 	void ToggleFlamesDisplay(void)
 	{
-		m_displayFlame=!m_displayFlame;
-	};
+		CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
+
+		bool bDisplay = rRenderState.GetDisplay();
+		rRenderState.SetDisplay(!bDisplay);
+	}
+	void ToggleParticlesDisplay(void)
+	{
+		CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
+
+		bool bDisplay = rRenderState.GetDisplayParticle();
+		rRenderState.SetDisplayParticle(!bDisplay);
+	}
 	void ToggleShadowVolumesDisplay(void)
 	{
 		m_drawShadowVolumes=!m_drawShadowVolumes;
-	};
+	}
+	// TODO Replace this by a state
 	void setSmoothShading(bool state)
 	{
 		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 		     firesIterator != m_fires.end (); firesIterator++)
 			(*firesIterator)->setSmoothShading (state);
-	};
+	}
 	void ToggleSaveImages(void)
 	{
 		m_saveImages = !m_saveImages;
-	};
+	}
 	void moveLuminary(int selected, CPoint& pt)
 	{
+		assert (m_pCamera != NULL);
 		/* On ne peut déplacer que les solveurs locaux */
 		m_luminaries[selected]->Move(pt);
-		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-		     firesIterator != m_fires.end (); firesIterator++)
-			(*firesIterator)->computeVisibility(*m_pCamera,true);
+
+		CVisibilityState &rVisibilityState = CVisibilityState::GetInstance();
+		rVisibilityState.TriggerUpdateVisibility();
 	};
 	void addPermanentExternalForcesToField(int selectedField, CPoint &pt)
 	{
@@ -198,23 +204,31 @@ public:
 	};
 	void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
 
-	/** Change l'affichage des sphères englobantes. */
+	//-----------------------------------------------------------------------------------------------------------------
+	//
+	//-----------------------------------------------------------------------------------------------------------------
 	void setBoundingSphereMode(bool mode)
 	{
-		m_scene->setBoundingSphereMode(mode);
-	};
-	void setBoundingVolumesDisplay(u_char display)
+		CDrawState &rDrawState = CDrawState::GetInstance();
+		rDrawState.SetDrawType(NDrawType::eObject);
+	}
+	void setBoundingVolumesDisplay(NDisplayBoundingVolume const& a_nBoundingVolume)
 	{
-		m_displayFlamesBoundingVolumes = display;
-	};
+		CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
+		rRenderState.SetDisplayBoundingVolume(a_nBoundingVolume);
+	}
+
+	//-----------------------------------------------------------------------------------------------------------------
+	//
+	//-----------------------------------------------------------------------------------------------------------------
 	void setGammaCorrection(float gamma)
 	{
 		m_gammaEngine->SetGamma(gamma);
-	};
+	}
 	void setGammaCorrectionState(bool state)
 	{
 		m_gammaCorrection=state;
-	};
+	}
 	void computeGlowWeights(uint index, float sigma)
 	{
 		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
@@ -222,12 +236,15 @@ public:
 			(*firesIterator)->computeGlowWeights(index, sigma);
 	}
 
+	//-----------------------------------------------------------------------------------------------------------------
+	//
+	//-----------------------------------------------------------------------------------------------------------------
 	void getCameraPositionAndDirection(CPoint& a_rPos, CVector& a_rUp, CVector& a_rView) const
 	{
-		assert(m_pCamera != NULL);
-		a_rPos = m_pCamera->getPosition();
-		a_rUp = m_pCamera->getUpVector();
-		a_rView = m_pCamera->getViewVector();
+		assert (m_pCamera != NULL);
+		a_rPos = m_pCamera->GetPosition();
+		a_rUp = m_pCamera->GetUpVector();
+		a_rView = m_pCamera->GetViewVector();
 	}
 
 #ifdef MULTITHREADS
@@ -246,7 +263,7 @@ private:
 	/********* Variables relatives au contrôle de l'affichage **************/
 	/* true si la simulation est en cours, 0 sinon */
 	bool m_run, m_saveImages;
-	bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayFlame, m_displayParticles, m_displayWickBoxes;
+	bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayWickBoxes;
 	bool m_drawShadowVolumes, m_glowOnly, m_gammaCorrection, m_fullscreen;
 	u_char m_displayFlamesBoundingVolumes;
 	/** true si l'application est correctement initialisée, false sinon */
@@ -256,7 +273,7 @@ private:
 	uint m_width, m_height;
 	uint prevNbFields, prevNbFlames;
 
-	CCamera *m_pCamera;
+	CCamera* m_pCamera;
 	/* Pour le compte des frames */
 	uint m_framesCount, m_globalFramesCount;
 
@@ -271,7 +288,6 @@ private:
 	/********* Variables relatives aux Renderers **************/
 	CForwardRenderer *m_pForwardRenderer;
 
-
 	/********* Variables relatives aux shadow maps **************/
 	CShader *m_genShadowCubeMapShader;
 	CRenderTarget *m_shadowMapRenderTarget;
@@ -281,7 +297,7 @@ private:
 
 	DepthPeelingEngine *m_depthPeelingEngine;
 
-	vector <Luminary *> m_luminaries;
+	vector <CLuminary *> m_luminaries;
 #ifdef MULTITHREADS
 	/** Liste de threads. */
 	list <FieldThread *> m_threads;
@@ -292,8 +308,14 @@ private:
 	GlobalField *m_globalField;
 
 	/********* Variables relatives à la simulation *************************/
+	// TODO: Remove only access by luminaries
+
 	vector <IFireSource *> m_fires;
-	CScene *m_scene;
+	CScene *m_pScene;
+	CSpatialGraph m_oSceneGraph;
+	CRenderList m_oSceneRenderList, m_oFlamesRenderList;
+
+
 	CGammaFX *m_gammaEngine;
 	wxStopWatch *m_swatch;
 
@@ -308,6 +330,8 @@ inline void GLFlameCanvas::drawFlames(void)
 {
 	/* Dessin de la flamme */
 #ifdef MULTITHREADS
+	assert(false);
+// TODO - Référencer les transforms ?
 	for (list < FieldThread* >::iterator threadIterator = m_threads.begin ();
 	     threadIterator != m_threads.end (); threadIterator++)
 	{
@@ -316,28 +340,8 @@ inline void GLFlameCanvas::drawFlames(void)
 		(*threadIterator)->Unlock();
 	}
 #else
-	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
-		(*firesIterator)->drawFlame(m_displayFlame, m_displayParticles, m_displayFlamesBoundingVolumes);
+	m_oFlamesRenderList.Render();
 #endif
-}
-
-inline void GLFlameCanvas::drawFlamesBoundingBoxes(void)
-{
-	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
-		(*firesIterator)->drawImpostor ();
-}
-
-inline void GLFlameCanvas::drawFlamesBoundingBoxes(const CShader& a_rGlowShader, uint a_uiIndex)
-{
-	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-	     firesIterator != m_fires.end (); firesIterator++)
-	{
-		a_rGlowShader.SetUniform1f("divide",(*firesIterator)->getGlowDivide(a_uiIndex));
-		a_rGlowShader.SetUniform1fv("weights",(*firesIterator)->getGlowWeights(a_uiIndex),FILTER_SIZE);
-		(*firesIterator)->drawImpostor ();
-	}
 }
 
 #endif

@@ -1,11 +1,3 @@
-/*
- *  glsl.h
- *
- * Created by Flavien Bridault
- *
- *
- */
-
 #ifndef GLSL_H
 #define GLSL_H
 
@@ -20,6 +12,7 @@ class CShader;
 #include <iostream>
 #include <vector>
 #include "../Common.hpp"
+#include "../Utility/ISingleton.hpp"
 
 using namespace std;
 
@@ -43,14 +36,14 @@ protected:
 	};
 
 	void load(const string& fileNames, const string& macros ) const;
-	GLuint getID() const
+	GLuint GetID() const
 	{
 		return m_shader;
 	};
 
 private:
-	void addMacros(const string& macros, string& source) const;
-	void getFileContents(const string& fileName, string& source) const;
+	void AddMacros(const string& macros, string& source) const;
+	void GetFileContents(const string& fileName, string& source) const;
 	void splitStringInStringsArray(const string& names, vector<string>& splitNames,const string& prefix, const string& suffix) const;
 
 	friend class CShader;
@@ -84,7 +77,7 @@ class CShader
 {
 private:
 	/** ID du programme */
-	GLuint m_program;
+	GLuint m_uiProgram;
 	/** Vertex program. */
 	CVertexProgram m_vertexShader;
 	/** Fragment program. */
@@ -103,102 +96,135 @@ public:
 	 * @param fpname Nom du fichier source.
 	 */
 	CShader(const string& fpname, const string& macros);
-
-	virtual ~CShader()
+	~CShader()
 	{
-		glDeleteProgram(m_program);
-	};
+		glDeleteProgram(m_uiProgram);
+	}
 
+	// TODO: Bouger dans le state
 	static void SetShadersDirectory(CharCPtrC a_szDirectory);
 
-	virtual void Link() const
+	void Link() const
 	{
 		GLint infologLength;
-		glLinkProgram(m_program);
+		glLinkProgram(m_uiProgram);
 
-		glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &infologLength);
+		glGetProgramiv(m_uiProgram, GL_INFO_LOG_LENGTH, &infologLength);
 		if (infologLength > 0)
 		{
 			char *infoLog = new char[infologLength];
 			int charsWritten  = 0;
-			glGetProgramInfoLog(m_program, infologLength, &charsWritten, infoLog);
+			glGetProgramInfoLog(m_uiProgram, infologLength, &charsWritten, infoLog);
 			//cerr << infoLog << endl;
 			delete [] infoLog;
 		}
 	}
 
-	/** Activation du programme. */
-	virtual void Enable() const
-	{
-		glUseProgram(m_program);
-	}
-
-	/** Désactivation du programme. */
-	virtual void Disable() const
-	{
-		glUseProgram(0);
-	};
-
 	/** Attachement d'un shader au programme. */
-	virtual void AttachShader(const IShaderProgram& shader) const
+	void AttachShader(const IShaderProgram& shader) const
 	{
-		glAttachShader(m_program,shader.getID());
+		glAttachShader(m_uiProgram,shader.GetID());
 	}
 
 	/** Détachement d'un shader au programme. */
-	virtual void DetachShader(const IShaderProgram& shader) const
+	void DetachShader(const IShaderProgram& shader) const
 	{
-		glDetachShader(m_program,shader.getID());
+		glDetachShader(m_uiProgram,shader.GetID());
+	}
+
+	GLuint GetProgramId() const { return m_uiProgram; }
+};
+
+/** Simple singleton allowing to get the current shader and set uniforms. */
+class CShaderState : public ITSingleton<CShaderState>
+{
+	friend class ITSingleton<CShaderState>;
+	friend class CShader;
+
+public:
+
+	CShader const& GetShader() const { assert(m_pCurrentShader != NULL); return *m_pCurrentShader; }
+
+	void Enable(CShader const& a_rShader)
+	{
+		m_pCurrentShader = &a_rShader;
+		GLuint uiProgram = a_rShader.GetProgramId();
+		glUseProgram(uiProgram);
+	}
+	void Disable()
+	{
+		m_pCurrentShader = NULL;
+		glUseProgram(0);
 	}
 
 	void SetUniform1f(const char* const var, GLfloat value) const
 	{
-		glUniform1f(glGetUniformLocation(m_program,var), value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform1f(glGetUniformLocation(uiProgram,var), value);
 	}
 
 	void SetUniform2f(const char* const var, GLfloat val1,  GLfloat val2 ) const
 	{
-		glUniform2f(glGetUniformLocation(m_program,var), val1, val2 );
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform2f(glGetUniformLocation(uiProgram,var), val1, val2 );
 	}
 
 	void SetUniform3f(const char* const var, GLfloat val1,  GLfloat val2,  GLfloat val3 ) const
 	{
-		glUniform3f(glGetUniformLocation(m_program,var), val1, val2, val3 );
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform3f(glGetUniformLocation(uiProgram,var), val1, val2, val3 );
 	}
 
 	void SetUniform4f(const char* const var, GLfloat val1,  GLfloat val2,  GLfloat val3, GLfloat val4 ) const
 	{
-		glUniform4f(glGetUniformLocation(m_program,var), val1, val2, val3, val4 );
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform4f(glGetUniformLocation(uiProgram,var), val1, val2, val3, val4 );
 	}
 
 	void SetUniform4f(const char* const var, GLfloat value[4]) const
 	{
-		glUniform4f(glGetUniformLocation(m_program,var), value[0], value[1], value[2], value[3]);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform4f(glGetUniformLocation(uiProgram,var), value[0], value[1], value[2], value[3]);
 	}
 
 	void SetUniform1i(const char* const var, GLint value) const
 	{
-		glUniform1i(glGetUniformLocation(m_program,var), value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform1i(glGetUniformLocation(uiProgram,var), value);
 	}
 
 	void SetUniform1fv(const char* const var, const GLfloat* const value, GLsizei count) const
 	{
-		glUniform1fv(glGetUniformLocation(m_program,var), count, value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform1fv(glGetUniformLocation(uiProgram,var), count, value);
 	}
 
 	void SetUniform2fv(const char* const var, const GLfloat* const value, GLsizei count) const
 	{
-		glUniform2fv(glGetUniformLocation(m_program,var), count, value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform2fv(glGetUniformLocation(uiProgram,var), count, value);
 	}
 
 	void SetUniform3fv(const char* const var, const GLfloat* const value, GLsizei count) const
 	{
-		glUniform3fv(glGetUniformLocation(m_program,var), count, value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniform3fv(glGetUniformLocation(uiProgram,var), count, value);
 	}
 
 	void SetUniformMatrix4fv(const char* const var, const GLfloat* const value) const
 	{
-		glUniformMatrix4fv(glGetUniformLocation(m_program,var), 1, GL_FALSE, value);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		glUniformMatrix4fv(glGetUniformLocation(uiProgram,var), 1, GL_FALSE, value);
 	}
 
 	void SetUniform1f(GLint var, GLfloat value) const
@@ -218,9 +244,16 @@ public:
 
 	GLint GetParameter(const char* const var) const
 	{
-		return glGetUniformLocation(m_program,var);
+		CShader const& rShader = GetShader();
+		GLuint uiProgram = rShader.GetProgramId();
+		return glGetUniformLocation(uiProgram,var);
 	};
 
+//---------------------------------------------------------------------------------------------------------------------
+//  Attributes
+//---------------------------------------------------------------------------------------------------------------------
+
+	CShader const* m_pCurrentShader;
 };
 
 #endif

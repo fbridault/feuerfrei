@@ -20,13 +20,13 @@ CCamera::CCamera () :
 	m_ouverture = 60.0f;
 }
 
-void CCamera::init (	CPoint const& a_rPosition,
-										CVector const& a_rUp,
-										CVector const& a_rView,
-										int width,
-										int height,
-										float clipping,
-										CScene& a_rScene)
+void CCamera::init (CPoint const& a_rPosition,
+					CVector const& a_rUp,
+					CVector const& a_rView,
+					int width,
+					int height,
+					float clipping,
+					CScene& a_rScene)
 {
 	m_pScene = &a_rScene;
 
@@ -266,7 +266,9 @@ void CCamera::computeFrustrum()
 
 	/* Compute objects visibility */
     g_objectCount=0;
-	m_pScene->computeVisibility(*this);
+
+    CVisibilityState &rVisibilityState = CVisibilityState::GetInstance();
+	rVisibilityState.TriggerUpdateVisibility();
 //    cerr << g_objectCount << " objects drawn" << endl;
 }
 
@@ -294,7 +296,7 @@ void CCamera::setSize(int width, int height)
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void CCamera::getScreenCoordinates(const CPoint& objPos, CPoint& screenPos) const
+void CCamera::GetScreenCoordinates(const CPoint& objPos, CPoint& screenPos) const
 {
 	double pos[3];
 
@@ -306,7 +308,7 @@ void CCamera::getScreenCoordinates(const CPoint& objPos, CPoint& screenPos) cons
 	//  screenPos.z = (float)pos[2];
 }
 
-void CCamera::getSphereCoordinates(const CPoint& objPos, float radius, CPoint& centerScreenPos, CPoint& periScreenPos ) const
+void CCamera::GetSphereCoordinates(const CPoint& objPos, float radius, CPoint& centerScreenPos, CPoint& periScreenPos ) const
 {
 	CPoint up, tmp;
 
@@ -318,7 +320,7 @@ void CCamera::getSphereCoordinates(const CPoint& objPos, float radius, CPoint& c
 	up.y = m_modlMatrix[5];
 	up.z = m_modlMatrix[9];
 
-	getScreenCoordinates(objPos, centerScreenPos);
+	GetScreenCoordinates(objPos, centerScreenPos);
 	tmp = objPos+(up*radius);
-	getScreenCoordinates(tmp, periScreenPos);
+	GetScreenCoordinates(tmp, periScreenPos);
 }

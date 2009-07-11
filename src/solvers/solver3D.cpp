@@ -7,9 +7,9 @@ Solver3D::Solver3D ()
 {
 }
 
-Solver3D::Solver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+Solver3D::Solver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
                     float timeStep, float buoyancy, float vorticityConfinement) :
-		RealField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
+		RealField3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
 	m_uPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
 	m_vPrev    = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
@@ -404,7 +404,7 @@ void Solver3D::addExternalForces(const CPoint& position, bool move)
 	{
 		force = position;
 		strength.x = strength.y = strength.z = .1f * m_forceCoef;
-		setPosition(m_position + position);
+		m_rTransform.Move(position);
 	}
 	else
 	{

@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include <engine/Shading/CRenderer.hpp>
+#include <engine/Utility/UObjImporter.hpp>
 
 BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
 	EVT_SIZE(GLFlameCanvas::OnSize)
@@ -19,8 +20,10 @@ BEGIN_EVENT_TABLE(GLFlameCanvas, wxGLCanvas)
 END_EVENT_TABLE();
 
 GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int* attribList,
-                             long style, const wxString& name, const wxPalette& palette)
-		: wxGLCanvas(parent, id, pos, size, style, name, attribList, palette)
+                             long style, const wxString& name, const wxPalette& palette) :
+	wxGLCanvas(parent, id, pos, size, style, name, attribList, palette),
+	m_oSceneRenderList(NRenderType::eNormal),
+	m_oFlamesRenderList(NRenderType::eFx)
 {
 	m_init = false;
 	m_run = false;
@@ -37,6 +40,9 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	m_nurbsTest = 0;
 
 	srand(clock());
+
+	// TODO : To be moved soon in engine !!!
+	CGlowState::Create();
 }
 
 GLFlameCanvas::~GLFlameCanvas()
@@ -54,8 +60,7 @@ void GLFlameCanvas::InitUISettings(void)
 	m_run = true;
 	m_saveImages = false;
 	m_glowOnly = false;
-	m_displayBase = m_displayVelocity = m_displayParticles = m_displayGrid = m_displayWickBoxes = m_fullscreen = false;
-	m_displayFlame = true;
+ 	m_displayBase = m_displayVelocity = m_displayGrid = m_displayWickBoxes = m_fullscreen = false;
 	m_drawShadowVolumes = false;
 	m_gammaCorrection = false;
 	m_displayFlamesBoundingVolumes = 0;
@@ -90,9 +95,12 @@ void GLFlameCanvas::InitGL()
 
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::InitLuminaries(void)
 {
-	assert(m_scene != NULL);
+	assert(m_pScene != NULL);
 
 	CShader::SetShadersDirectory("engine/Shading/Shaders/");
 	m_shadowMapRenderTarget = new CRenderTarget("depth shadow 2D linear", 512, 512, SHADOW_MAP_TEX_UNIT);
@@ -102,16 +110,15 @@ void GLFlameCanvas::InitLuminaries(void)
 	assert(m_shadowMapRenderTarget != NULL);
 
 	for (uint i=0; i < m_currentConfig->nbLuminaries; i++)
-		m_luminaries.push_back( 	new Luminary(	m_currentConfig->luminaries[i],
-		                                       m_fields,
-		                                       m_fires,
-		                                       *m_scene,
-		                                       m_currentConfig->luminaries[i].fileName.fn_str(),
-		                                       *m_genShadowCubeMapShader,
-		                                       *m_shadowMapRenderTarget)
-		                      );
+		m_luminaries.push_back( new CLuminary(	m_currentConfig->luminaries[i],
+												m_fields,
+												m_fires,
+												m_oSceneGraph,
+												*m_pScene,
+												m_currentConfig->luminaries[i].fileName.fn_str(),
+												*m_genShadowCubeMapShader,
+												*m_shadowMapRenderTarget));
 
-//   m_currentConfig->nbFires = m_fires.size(); m_currentConfig->nbFields = m_fields.size();
 	prevNbFlames = m_fires.size();
 	prevNbFields = m_fields.size();
 
@@ -119,6 +126,9 @@ void GLFlameCanvas::InitLuminaries(void)
 	m_intensities = new float[m_fires.size()];
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 #ifdef MULTITHREADS
 void GLFlameCanvas::InitThreads()
 {
@@ -129,7 +139,7 @@ void GLFlameCanvas::InitThreads()
 
 	if (m_currentConfig->useGlobalField)
 	{
-		m_globalField = new GlobalField(m_threads, m_scene, m_currentConfig->globalField.type,
+		m_globalField = new GlobalField(m_threads, m_oSceneGraph, m_currentConfig->globalField.type,
 		                                m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
 		                                m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff,
 		                                m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
@@ -160,13 +170,20 @@ void GLFlameCanvas::InitThreads()
 }
 #endif
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::InitScene()
 {
 	uint glowScales[2] = { 1, 4 };
 
-	m_scene = CScene::getInstance();
+	CScene::Create();
+	m_pScene = &CScene::GetInstance();
 
-	m_scene->init(string(m_currentConfig->sceneName.fn_str())); //, &m_luminaries, &m_fires);
+	string fileName(m_currentConfig->sceneName.fn_str());
+
+	cout << "Chargement de la scène " << fileName << endl;
+	UObjImporter::import<CObject>(*m_pScene, fileName, &m_oSceneGraph);
 
 	InitLuminaries();
 
@@ -175,7 +192,7 @@ void GLFlameCanvas::InitScene()
 	m_scheduler = new FieldThreadsScheduler();
 #else
 	if (m_currentConfig->useGlobalField)
-		m_globalField = new GlobalField(m_fields, m_scene, m_currentConfig->globalField.type,
+		m_globalField = new GlobalField(m_fields, m_oSceneGraph, m_currentConfig->globalField.type,
 		                                m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
 		                                m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff,
 		                                m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
@@ -183,15 +200,16 @@ void GLFlameCanvas::InitScene()
 	char macro[25];
 	sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
 
-	m_pForwardRenderer = new CForwardRenderer(*m_scene);
+	m_pForwardRenderer = new CForwardRenderer(*m_pScene);
 
-	m_scene->postInit(false);
+	m_pScene->postInit(false);
 
-	m_pCamera = CCamera::getInstance();
-	m_pCamera->init (m_currentConfig->camera.position,
-										m_currentConfig->camera.up,
-										m_currentConfig->camera.view,
-										m_width, m_height, m_currentConfig->clipping, *m_scene);
+	CCamera::Create();
+	m_pCamera = &CCamera::GetInstance();
+	m_pCamera->init (	m_currentConfig->camera.position,
+						m_currentConfig->camera.up,
+						m_currentConfig->camera.view,
+						m_width, m_height, m_currentConfig->clipping, *m_pScene);
 
 	CShader::SetShadersDirectory("src/shaders/");
 	m_glowEngine  = new GlowEngine (m_width, m_height, glowScales);
@@ -203,9 +221,14 @@ void GLFlameCanvas::InitScene()
 	m_swatch = new wxStopWatch();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::Init (FlameAppConfig *config)
 {
 	m_currentConfig = config;
+
+	CRenderFlameState::Create();
 
 	InitUISettings();
 	SetCurrent();
@@ -218,6 +241,9 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
 	cout << "Initialization over" << endl;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 #ifdef MULTITHREADS
 void GLFlameCanvas::PauseThreads()
 {
@@ -229,6 +255,9 @@ void GLFlameCanvas::PauseThreads()
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::ResumeThreads()
 {
 	m_scheduler->Resume();
@@ -239,6 +268,9 @@ void GLFlameCanvas::ResumeThreads()
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::DeleteThreads()
 {
 	m_init = false;
@@ -268,6 +300,9 @@ void GLFlameCanvas::DeleteThreads()
 }
 #endif
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::Restart (void)
 {
 	m_run = false;
@@ -294,6 +329,9 @@ void GLFlameCanvas::Restart (void)
 	Enable();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::ReloadFieldsAndFires (void)
 {
 	Disable();
@@ -312,7 +350,7 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 		delete (*fieldsIterator);
 	m_fields.clear();
 
-	for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
+	for (vector < CLuminary* >::iterator luminariesIterator = m_luminaries.begin ();
 	        luminariesIterator != m_luminaries.end (); luminariesIterator++)
 		delete (*luminariesIterator);
 	m_luminaries.clear();
@@ -329,7 +367,7 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	m_scheduler = new FieldThreadsScheduler();
 #else
 	if (m_currentConfig->useGlobalField)
-		m_globalField = new GlobalField(m_fields, m_scene, m_currentConfig->globalField.type,
+		m_globalField = new GlobalField(m_fields, m_oSceneGraph, m_currentConfig->globalField.type,
 		                                m_currentConfig->globalField.resx, m_currentConfig->globalField.timeStep,
 		                                m_currentConfig->globalField.vorticityConfinement, m_currentConfig->globalField.omegaDiff,
 		                                m_currentConfig->globalField.omegaProj, m_currentConfig->globalField.epsilon);
@@ -338,7 +376,7 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	char macro[25];
 	sprintf(macro,"NBSOURCES %d\n",(int)m_fires.size());
 
-	m_pForwardRenderer = new CForwardRenderer(*m_scene);
+	m_pForwardRenderer = new CForwardRenderer(*m_pScene);
 
 #ifdef MULTITHREADS
 	InitThreads();
@@ -350,6 +388,9 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	Enable();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName)
 {
 	assert(false);
@@ -358,12 +399,15 @@ void GLFlameCanvas::RegeneratePhotometricSolids(uint flameIndex, wxString IESFil
 //	m_photoSolid->generateTexture();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::DestroyScene(void)
 {
 	delete m_depthPeelingEngine;
 	delete m_glowEngine;
-	m_pCamera->destroy();
-	m_scene->destroy();
+	m_pCamera->Destroy();
+	m_pScene->Destroy();
 	delete m_pForwardRenderer;
 
 	// Fire sources are deleted by the scene
@@ -379,12 +423,18 @@ void GLFlameCanvas::DestroyScene(void)
 		delete (*fieldsIterator);
 	m_fields.clear();
 
-	for (vector < Luminary* >::iterator luminariesIterator = m_luminaries.begin ();
+	for (vector < CLuminary* >::iterator luminariesIterator = m_luminaries.begin ();
 	        luminariesIterator != m_luminaries.end (); luminariesIterator++)
 		delete (*luminariesIterator);
 	m_luminaries.clear();
+
+	// Clear the graphs
+	m_oSceneGraph.Clear();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
 #ifndef MULTITHREADS
@@ -410,6 +460,9 @@ void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 	//event.RequestMore();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::OnMouseMotion(wxMouseEvent& event)
 {
 	m_pCamera->OnMouseMotion(event.GetX(), event.GetY());
@@ -533,10 +586,23 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 	SetCurrent();
 
+	if(m_oSceneGraph.IsUpdateVisibilityNeeded())
+	{
+		m_oSceneGraph.ComputeVisibility();
+		// Accumulate graph nodes first (performs update only if needed)
+		m_oFlamesRenderList.Accumulate(m_oSceneGraph);
+		m_oSceneRenderList.Accumulate(m_oSceneGraph);
+	}
+
 	if (m_run)
 	{
 		m_visibility = false;
-		if (m_displayFlame)
+
+		// Get display flame state
+		CRenderFlameState const &rRenderState = CRenderFlameState::GetInstance();
+		bool const bDisplayFlame = rRenderState.GetDisplay();
+
+		if (bDisplayFlame)
 		{
 			for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
 			        firesIterator != m_fires.end (); firesIterator++)
@@ -548,8 +614,12 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 		}
 	}
 
+	// Get display particles state
+	CRenderFlameState const &rRenderState = CRenderFlameState::GetInstance();
+	bool const bDisplayParticles = rRenderState.GetDisplayParticle();
+
 	if (!m_nurbsTest)
-		if (m_visibility || m_displayParticles)
+		if (m_visibility || bDisplayParticles)
 		{
 			if (m_currentConfig->glowEnabled )
 			{
@@ -557,14 +627,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 				if (m_currentConfig->depthPeelingEnabled)
 				{
 					/* On décortique dans les calques */
-					m_depthPeelingEngine->makePeels(this, m_scene);
+					m_depthPeelingEngine->makePeels(m_oFlamesRenderList);
 
 					m_glowEngine->activate();
 
 					glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 					/* On affiche la superposition des calques que l'on vient de décortiquer */
-					m_depthPeelingEngine->render(this);
+					m_depthPeelingEngine->render(m_oFlamesRenderList);
 				}
 				else
 				{
@@ -574,7 +644,10 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 					glClear(GL_DEPTH_BUFFER_BIT);
 //					glDrawBuffer(GL_NONE);
 //					glReadBuffer(GL_NONE);
-					m_scene->drawSceneWT ();
+					CDrawState &rDrawState = CDrawState::GetInstance();
+					rDrawState.SetShadingFilter(NShadingFilter::eAll);
+					rDrawState.SetShadingType(NShadingType::eAmbient);
+					m_oSceneRenderList.Render();
 //					glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
 //					glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
@@ -584,14 +657,17 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 					drawFlames();
 					glDisable(GL_BLEND);
 				}
-				m_glowEngine->blur(this);
+				CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
+				rRenderState.SetDisplayBoundingVolume(NDisplayBoundingVolume::eImpostor);
+				m_glowEngine->Blur(m_oFlamesRenderList);
+				rRenderState.SetDisplayBoundingVolume(NDisplayBoundingVolume::eNone);
 
 				m_glowEngine->deactivate();
 			}
 			else
 				if (m_currentConfig->depthPeelingEnabled)
 					/* On effectue l'épluchage avant d'activer le gamma car tous les deux utilisent un FBO */
-					m_depthPeelingEngine->makePeels(this, m_scene);
+					m_depthPeelingEngine->makePeels(m_oFlamesRenderList);
 		}
 	if (m_gammaCorrection)
 		m_gammaEngine->enableGamma();
@@ -599,10 +675,10 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	drawScene();
 
 	/********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-	if ((m_visibility || m_displayParticles) && !m_currentConfig->glowEnabled )
+	if ((m_visibility || bDisplayParticles) && !m_currentConfig->glowEnabled )
 	{
 		if (m_currentConfig->depthPeelingEnabled)
-			m_depthPeelingEngine->render(this);
+			m_depthPeelingEngine->render(m_oFlamesRenderList);
 		else
 			if (!m_nurbsTest)
 				drawFlames();
@@ -619,8 +695,13 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 					glCallList(m_flamesDisplayList);
 	}
 
-	if ((m_visibility || m_displayParticles) && m_currentConfig->glowEnabled )
-		m_glowEngine->drawBlur(this,m_glowOnly);
+	if ((m_visibility || bDisplayParticles) && m_currentConfig->glowEnabled )
+	{
+		CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
+		rRenderState.SetDisplayBoundingVolume(NDisplayBoundingVolume::eImpostor);
+		m_glowEngine->DrawBlur(m_oFlamesRenderList,m_glowOnly);
+		rRenderState.SetDisplayBoundingVolume(NDisplayBoundingVolume::eNone);
+	}
 	if (m_gammaCorrection)
 		m_gammaEngine->disableGamma();
 
@@ -688,13 +769,11 @@ void GLFlameCanvas::drawScene()
 	{
 		IFireSource* pFireSource = *firesIterator;
 
-		pFireSource->drawWick (m_displayWickBoxes);
-
 		if ( !pFireSource->isEnabled() ) continue;
 
 		//if (m_displayShadows)
 		/** Construction de la shadowMap */
-		//m_scene->getSource(i)->castShadows(*m_pCamera, *m_scene, &m_modelViewMatrix[0][0]);
+		//m_pScene->getSource(i)->castShadows(*m_pCamera, *m_pScene, &m_modelViewMatrix[0][0]);
 
 		/** Activation du blending additif à partir de la seconde passe */
 		if (additiveBlending)
@@ -705,7 +784,7 @@ void GLFlameCanvas::drawScene()
 			glDepthFunc(GL_LEQUAL);
 		}
 
-		m_pForwardRenderer->drawDirect(*pFireSource);
+		m_pForwardRenderer->drawDirect(*pFireSource, m_oSceneRenderList);
 
 		if (additiveBlending)
 		{
@@ -718,7 +797,6 @@ void GLFlameCanvas::drawScene()
 	}
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-
 	/** Passe ambiante, les couleurs des matériaux ne sont récupérées qu'à ce stade */
 	/** Multiplication de la couleur ambiante : par une constante pour atténuer + par la couleur source */
 	glEnable (GL_BLEND);
@@ -726,13 +804,11 @@ void GLFlameCanvas::drawScene()
 	glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_ZERO,GL_SRC_COLOR);
 
-	m_pForwardRenderer-> drawBrdf();
+	m_pForwardRenderer->drawBrdf(m_oSceneRenderList);
 
 	glDisable (GL_BLEND);
 	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_ALWAYS);
-
-
 
 	/************ Affichage des outils d'aide à la visu (grille, etc...) *********/
 	glEnable (GL_BLEND);
@@ -755,8 +831,9 @@ void GLFlameCanvas::drawScene()
 	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
 	        fieldsIterator != m_fields.end (); fieldsIterator++)
 	{
-		CPoint const& rPosition =  (*fieldsIterator)->getPosition ();
-		CPoint const& rScale = (*fieldsIterator)->getScale ();
+		CTransform const& rTransform = (*fieldsIterator)->GetTransform();
+		CPoint const& rPosition =  rTransform.GetLocalPosition ();
+		CPoint const& rScale = rTransform.GetScale ();
 
 		glPushMatrix ();
 		glTranslatef (rPosition.x, rPosition.y, rPosition.z);
@@ -770,6 +847,8 @@ void GLFlameCanvas::drawScene()
 		glPopMatrix ();
 	}
 	glDisable (GL_BLEND);
+
+	glDepthFunc(GL_LESS);
 }
 
 void GLFlameCanvas::OnSize(wxSizeEvent& event)

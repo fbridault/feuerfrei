@@ -5,9 +5,9 @@
 
 string UObjImporter::m_currentDir;
 
-void UObjImporter::getObjectAttributesSet(const string& str, uint& normals, uint& texCoords)
+void UObjImporter::GetObjectAttributesSet(const string& str, uint& normals, uint& texCoords)
 {
-	uint i=0,j=0;
+	StrSize i=0,j=0;
 
 	/** On regarde le nombre de slashs pour déterminer les attributs */
 	while ( (i=str.find("//",i+2)) != string::npos ) j++;
@@ -40,13 +40,13 @@ void UObjImporter::getObjectAttributesSet(const string& str, uint& normals, uint
 }
 
 
-bool UObjImporter::getMTLFileNameFromOBJ(const string& sceneName, string& mtlName)
+bool UObjImporter::GetMTLFileNameFromOBJ(const string& sceneName, string& mtlName)
 {
 	char lettre;
 	string buffer;
 	string fileName=sceneName;
 
-	getSceneAbsolutePath(fileName);
+	GetSceneAbsolutePath(fileName);
 	ifstream objFile(fileName.c_str(), ios::in);
 	if (!objFile.is_open ())
 	{
@@ -202,9 +202,9 @@ void UObjImporter::importMTL(CScene& a_rScene, const string& fileName)
 }
 
 
-void UObjImporter::getSceneAbsolutePath(string& fileName)
+void UObjImporter::GetSceneAbsolutePath(string& fileName)
 {
-	uint i = fileName.find_last_of('/');
+	StrSize i = fileName.find_last_of('/');
 
 	if ( i != string::npos )
 		m_currentDir = fileName.substr(0,i+1);
@@ -222,21 +222,21 @@ uint UObjImporter::setUVsAndNormals(CMesh& mesh, CObject& parentObject, CRefTabl
 	uint dup=0,nondup=0;
 	bool adup;
 
-//  cerr << " Over " << mesh.getIndexesCount() << " vertices, ";
-	if (!mesh.getAttributes())
-		for (uint i = 0; i < mesh.getIndexesCount(); i++)
-			parentObject.setVertex( mesh.getIndex(i), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+//  cerr << " Over " << mesh.GetIndexesCount() << " vertices, ";
+	if (!mesh.GetAttributes())
+		for (uint i = 0; i < mesh.GetIndexesCount(); i++)
+			parentObject.SetVertexNormalAndTexcoord( mesh.GetIndex(i), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	else
-		for (uint i = 0; i < mesh.getIndexesCount(); i++)
+		for (uint i = 0; i < mesh.GetIndexesCount(); i++)
 		{
 			normal = normalsVector[normalsIndexVector[i]];
-			if (mesh.getAttributes() == 3)
+			if (mesh.GetAttributes() == 3)
 				texCoord = texCoordsVector[texCoordsIndexVector[i]];
 
-			if ( refTable.findRef( mesh.getIndex(i) ) )
+			if ( refTable.findRef( mesh.GetIndex(i) ) )
 			{
 				/* Le point courant a déjà été référencé auparavant dans le tableau d'indices */
-				v = parentObject.getVertex(mesh.getIndex(i));
+				v = parentObject.GetVertex(mesh.GetIndex(i));
 				if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v &&
 				     ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz )
 				{
@@ -248,13 +248,13 @@ uint UObjImporter::setUVsAndNormals(CMesh& mesh, CObject& parentObject, CRefTabl
 				{
 					adup=true;
 					/* On regarde si le point a été dupliqué auparavant */
-					if ( refTable.hasDupRefs( mesh.getIndex(i) ) )
+					if ( refTable.hasDupRefs( mesh.GetIndex(i) ) )
 					{
-						list<int> refList = refTable.getDupRefs( mesh.getIndex(i) );
+						list<int> refList = refTable.GetDupRefs( mesh.GetIndex(i) );
 
 						for (list<int>::iterator it = refList.begin(); it!=refList.end(); it++)
 						{
-							v = parentObject.getVertex( *it );
+							v = parentObject.GetVertex( *it );
 							if ( ((float)texCoord.x) == v.u && ((float)texCoord.y) == v.v &&
 							     ((float)normal.x) == v.nx && ((float)normal.y) == v.ny && ((float)normal.z) == v.nz )
 							{
@@ -272,11 +272,11 @@ uint UObjImporter::setUVsAndNormals(CMesh& mesh, CObject& parentObject, CRefTabl
 						parentObject.addVertex( v );
 						//cerr << v.x << " " << v.y << " " << v.z << " " << v.nx << " " << v.ny << " " << v.nz << endl;
 						/* On mémorise la duplication du vertex */
-						refTable.addDupRef( mesh.getIndex(i), parentObject.getVertexArraySize()-1 );
+						refTable.addDupRef( mesh.GetIndex(i), parentObject.GetVertexArraySize()-1 );
 						/* Le nouveau point est placé en dernier, on récupère son index et on le stocke */
-						mesh.setIndex(i,parentObject.getVertexArraySize()-1);
+						mesh.setIndex(i,parentObject.GetVertexArraySize()-1);
 						/* On affecte les coordonnées de texture et de normale au point courant */
-						parentObject.setVertex( mesh.getIndex(i), texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
+						parentObject.SetVertexNormalAndTexcoord( mesh.GetIndex(i), texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
 						dup++;
 					}
 				}
@@ -284,8 +284,8 @@ uint UObjImporter::setUVsAndNormals(CMesh& mesh, CObject& parentObject, CRefTabl
 			else
 			{
 				/* On affecte les coordonnées de texture et de normale au point courant */
-				parentObject.setVertex( mesh.getIndex(i), texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
-				refTable.addRef( mesh.getIndex(i));
+				parentObject.SetVertexNormalAndTexcoord( mesh.GetIndex(i), texCoord.x, texCoord.y, normal.x, normal.y, normal.z);
+				refTable.addRef( mesh.GetIndex(i));
 			}
 		}
 	return dup;

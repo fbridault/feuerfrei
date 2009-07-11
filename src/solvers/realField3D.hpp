@@ -29,7 +29,7 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  RealField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep, float buoyancy);
+  RealField3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep, float buoyancy);
   /** Destructeur */
   virtual ~RealField3D ();
 

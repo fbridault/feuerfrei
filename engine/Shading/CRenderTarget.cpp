@@ -52,7 +52,7 @@ void CRenderTarget::addTarget(const string& format, uint texUnit, int attachment
 			type = GL_TEXTURE_2D;
 		else
 			if (format.find("cube") == string::npos)
-				cerr << "(EE) Render target type error" << endl;
+				cerr << "(EE) Render tarGet type error" << endl;
 
 	if (format.find("nearest") != string::npos)
 		filter = GL_NEAREST;
@@ -77,21 +77,21 @@ void CRenderTarget::addTarget(const string& format, uint texUnit, int attachment
 		{
 			ITexture *tex=new CRenderTexture(type,filter,m_uiWidth,m_uiHeight, 0);
 			m_vRenderTextures.push_back(tex);
-			glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->getTexture(), 0 );
+			glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->GetTexture(), 0 );
 		}
 		else
 			if (format.find("rgba") != string::npos)
 			{
 				ITexture *tex=new CRenderTexture(type,filter,m_uiWidth,m_uiHeight, 1);
 				m_vRenderTextures.push_back(tex);
-				glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->getTexture(), 0 );
+				glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->GetTexture(), 0 );
 			}
 			else
 				if (format.find("rgb10a2") != string::npos)
 				{
 					ITexture *tex=new CRenderTexture(type,filter,m_uiWidth,m_uiHeight, 2);
 					m_vRenderTextures.push_back(tex);
-					glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->getTexture(), 0 );
+					glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+attachment, type, tex->GetTexture(), 0 );
 				}else
 					if (format.find("cube") != string::npos)
 					{
@@ -99,10 +99,10 @@ void CRenderTarget::addTarget(const string& format, uint texUnit, int attachment
 						m_vRenderTextures.push_back(tex);
 						for (uint j=0; j < 6; j++)
 							glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT+j,
-							                           CCubeTexture::s_cubeMapTarget[j], tex->getTexture(), 0 );
+							                           CCubeTexture::s_cubeMapTarget[j], tex->GetTexture(), 0 );
 					}
 					else
-						cerr << "(EE) Render target format error" << endl;
+						cerr << "(EE) Render tarGet format error" << endl;
 
 		/** Activation du rendu dans tous les attachements
 		 *  Pour l'instant on le fait à chaque nouvelle cible pour éviter un appel supplémentaire
@@ -161,7 +161,7 @@ void CRenderTarget::addTarget(const string& format, uint texUnit, int attachment
 
 			m_vRenderTextures.push_back(tex);
 
-			glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, type, tex->getTexture(), 0 );
+			glFramebufferTexture2DEXT( GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, type, tex->GetTexture(), 0 );
 
 			/** Si le nombre de texture est égal à 1 alors on suppose qu'on a qu'une depth texture */
 			if (m_vRenderTextures.size() == 1)
@@ -171,10 +171,10 @@ void CRenderTarget::addTarget(const string& format, uint texUnit, int attachment
 			}
 
 		}else
-			cerr << "(EE) Render target format error : should be at least a depth or color texture." << endl;
+			cerr << "(EE) Render tarGet format error : should be at least a depth or color texture." << endl;
 
 	assert( CheckStatus() );
-	bindDefaultTarget();
+	BindDefaultTarget();
 }
 
 
@@ -188,7 +188,7 @@ void CRenderTarget::addDepthRenderBuffer(void)
 	glRenderbufferStorageEXT(     GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24,    m_uiWidth, m_uiHeight );
 	glFramebufferRenderbufferEXT( GL_FRAMEBUFFER_EXT,  GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, m_uiDepthRenderBuffer );
 
-	bindDefaultTarget();
+	BindDefaultTarget();
 }
 
 

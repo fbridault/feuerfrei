@@ -74,8 +74,6 @@ CLineFlame::CLineFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, 
 
 CLineFlame::~CLineFlame ()
 {
-	assert(m_wick != NULL);
-	delete m_wick;
 }
 
 void CLineFlame::breakCheck()
@@ -411,7 +409,6 @@ CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex
 
 CPointFlame::~CPointFlame ()
 {
-	delete m_wick;
 }
 
 

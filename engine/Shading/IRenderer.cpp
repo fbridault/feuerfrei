@@ -6,7 +6,7 @@
 // -------------------------------------------------------
 // Default Constructor
 //
-IRenderer::IRenderer(CScene& a_rScene) : m_rScene(a_rScene)
+IRenderer::IRenderer()
 {
   m_bShadows=false;
 }
@@ -17,7 +17,7 @@ IRenderer::IRenderer(CScene& a_rScene) : m_rScene(a_rScene)
 //
 IRenderer::~IRenderer()
 {
-  delete m_brdfShader;
-  delete m_directSpotShader;
-  delete m_directOmniShader;
+  delete m_pBrdfShader;
+  delete m_pDirectSpotShader;
+  delete m_pDirectOmniShader;
 }

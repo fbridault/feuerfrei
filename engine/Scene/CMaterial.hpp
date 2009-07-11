@@ -41,7 +41,7 @@ public:
 	/** Retourne le nom du matériau.
 	 * @return Nom du matériau.
 	 */
-	const string& getName() const
+	const string& GetName() const
 	{
 		return m_name;
 	};
@@ -49,7 +49,7 @@ public:
 	/* Lecture de la composante spéculaire.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& getSpecularCoefficients() const
+	const CEnergy& GetSpecularCoefficients() const
 	{
 		return (m_Ks);
 	};
@@ -57,7 +57,7 @@ public:
 	/** Lecture de la composante diffuse.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& getDiffuseCoefficients() const
+	const CEnergy& GetDiffuseCoefficients() const
 	{
 		return (m_Kd);
 	};
@@ -65,7 +65,7 @@ public:
 	/** Lecture de la composante ambiante.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& getAmbientCoefficients() const
+	const CEnergy& GetAmbientCoefficients() const
 	{
 		return (m_Ka);
 	};
@@ -73,11 +73,11 @@ public:
 	/** Applique le matériau avec glMaterial(). */
 	void apply () const
 	{
-//    glMaterialfv (GL_FRONT, GL_DIFFUSE, m_Kd.getColors());
-//    glMaterialfv (GL_FRONT, GL_AMBIENT, m_Ka.getColors());
-//    glMaterialfv (GL_FRONT, GL_SPECULAR, m_Ks.getColors());
+//    glMaterialfv (GL_FRONT, GL_DIFFUSE, m_Kd.GetColors());
+//    glMaterialfv (GL_FRONT, GL_AMBIENT, m_Ka.GetColors());
+//    glMaterialfv (GL_FRONT, GL_SPECULAR, m_Ks.GetColors());
 //    glMaterialfv (GL_FRONT, GL_SHININESS, &m_Kss);
-		glColor4fv(m_Kd.getColors());
+		glColor4fv(m_Kd.GetColors());
 	}
 
 	/** Indique si le matériau possède une texture.
@@ -91,15 +91,15 @@ public:
 	/** Retourne un pointeur sur la texture du matériau.
 	 * @return Pointeur sur la texture
 	 */
-	const ITexture* getDiffuseTexture() const
+	const ITexture& GetDiffuseTexture() const
 	{
-		return m_rScene.getTexture(m_diffuseTexture);
+		return m_rScene.GetTexture(m_diffuseTexture);
 	};
 
 	/** Lecture de la composante diffuse.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& getDiffuseReflectivity() const
+	const CEnergy& GetDiffuseReflectivity() const
 	{
 		if (m_diffuseTexture > -1)
 			return m_KDiffuseTexture;

@@ -188,7 +188,7 @@ public:
 		return( vres.norm() == 0);
 	}
 
-	CVector getMinCoord() const
+	CVector GetMinCoord() const
 	{
 		float xp=fabs(x);
 		float yp=fabs(y);

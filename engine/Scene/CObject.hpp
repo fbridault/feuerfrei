@@ -1,77 +1,46 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+class CTransform;
 class CObject;
 class CMesh;
 
 #include "../Common.hpp"
 #include "CMesh.hpp"
 
-#define ALL      0
-#define TEXTURED 1
-#define FLAT     2
-#define AMBIENT  3
-
 #define BUFFER_OFFSET(i) ((char*)NULL + (i))
 
 #include <list>
 #include <vector>
 
-/** Class representing a single element of a scene. It abstracts simple transforms and selection
- *   process.
+
+//*********************************************************************************************************************
+// TEMP: Introduce flags to combine possibilities
+//*********************************************************************************************************************
+struct _NRenderType
+{
+	enum EValue
+	{
+		eNormal,
+		eTransparent,
+		eFx,
+
+		_NbValues
+	};
+};
+DeclareNumerable(_NRenderType, NRenderType);
+
+/** Class representing a single element of a scene. It abstracts simple selection process.
  */
 class ISceneItem
 {
 protected:
-	ISceneItem(CPoint const& a_rPosition);
+
+	ISceneItem(NRenderType const& a_nRenderType);
 
 public:
-	virtual ~ISceneItem() {};
 
-	/** Child class must implement this method to draw the object at selection time */
-	virtual void DrawForSelection() const = 0;
-
-	/** Get item position */
-	CPoint const& GetPosition () const
-	{
-		return m_oPosition;
-	}
-
-	/** Get item position */
-	CPoint& GrabPosition ()
-	{
-		return m_oPosition;
-	}
-
-	/** Get item position */
-	void GetPosition (float &x, float &y, float &z) const
-	{
-		x = m_oPosition.x;
-		y = m_oPosition.y;
-		z = m_oPosition.z;
-	}
-	/** Set item position */
-	virtual void SetPosition (CPoint const& a_rPosition)
-	{
-		m_oPosition = a_rPosition;
-	}
-
-	/** Move item at given position */
-	virtual void Move (CVector const& a_rDir)
-	{
-		m_oPosition += a_rDir;
-	}
-
-	/** Get item scale factor */
-	CPoint const& GetScale () const
-	{
-		return m_oScale;
-	}
-	/** Set item scale factor */
-	void SetScale (CPoint const& a_rScale)
-	{
-		m_oScale = a_rScale;
-	}
+	~ISceneItem(){};
 
 	/** Select/Unselect */
 	void Select()
@@ -86,20 +55,55 @@ public:
 	{
 		return m_bSelected;
 	}
+	bool IsVisible() const
+	{
+		return m_bVisible;
+	}
 
 	/** Retrieve OpenGL item name for selection */
 	GLuint GetItemName() const
 	{
 		return m_uiGlName;
 	}
+	NRenderType const& GetType() const
+	{
+		return m_nRenderType;
+	}
+//---------------------------------------------------------------------------------------------------------------------
+//  Virtuals
+//---------------------------------------------------------------------------------------------------------------------
+
+// TODO Nécessaire ??
+	/** Donne l'englobant de l'objet.
+	 * @param max Retourne le coin supérieur de l'englobant.
+	 * @param min Retourne le coin inférieur de l'englobant.
+	 */
+	virtual void GetBoundingBox(CPoint& a_rMax, CPoint& a_rMin) const = 0;
+
+	virtual void Render() const = 0;
+
+	virtual void Move(CVector const& a_rDir) = 0;
+
+	/** Calcule la visibilité de l'objet
+	 * @param view Référence sur la caméra
+	 */
+	virtual void ComputeVisibility(const CCamera &a_rView) = 0;
+
+protected:
+	void SetVisibility(bool a_bVisible) { m_bVisible = a_bVisible; }
 
 private:
-	CPoint m_oPosition;
-	CPoint m_oScale;
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Attributes
+//---------------------------------------------------------------------------------------------------------------------
+
 	bool m_bSelected;
-	/** Identifiant OpenGL pour la sélection */
+	bool m_bVisible;
 	GLuint m_uiGlName;
+	NRenderType m_nRenderType;
 };
+
 
 /**********************************************************************************************************************/
 /********************************************* DECLARATION DE LA CLASSE OBJECT ****************************************/
@@ -117,102 +121,134 @@ public:
 	 */
 	CObject(CScene& a_rScene);
 
+	/**
+	 * Constructeur par d&eacute;faut.
+	 * @param scene Pointeur vers la scene.
+	 */
+	CObject(CScene& a_rScene, CTransform& rTransform);
+
 	/** Destructeur par défaut. */
 	virtual ~CObject ();
 
-	void addMesh(CMesh* const mesh)
-	{
-		m_meshesList.push_back(mesh);
-	}
-
-	/** Lecture du nombre de meshes contenus dans l'objet.
-	 * @return Nombre de points.
-	 */
-	uint getNbCMeshes () const
-	{
-		return m_meshesList.size();
-	};
-
-	/** Lecture du nombre de points contenus dans l'objet.
-	 * @return Nombre de points.
-	 */
-	uint getVertexArraySize () const
-	{
-		return m_vertexArray.size();
-	};
-
-	Vertex getVertex (GLuint i) const
-	{
-		return m_vertexArray[i];
-	};
-
-	/** Construit l'englobant de l'objet.
-	 */
-	void buildBoundingBox ();
+//---------------------------------------------------------------------------------------------------------------------
+//  Inherited methods
+//---------------------------------------------------------------------------------------------------------------------
 
 	/** Donne l'englobant de l'objet.
 	 * @param max Retourne le coin supérieur de l'englobant.
 	 * @param min Retourne le coin inférieur de l'englobant.
 	 */
-	void getBoundingBox (CPoint& a_rMax, CPoint& a_rMin) const
+	virtual void GetBoundingBox(CPoint& a_rMax, CPoint& a_rMin) const
 	{
-		a_rMax = m_max;
-		a_rMin = m_min;
-	};
+		a_rMax = m_oBBMax;
+		a_rMin = m_oBBMin;
+	}
 
-	/** Retourne la position de l'objet, calculé en prenant le centre de la boîte englobante. */
-	CPoint getCenter () const
+	/** Move item at given position */
+	virtual void Move(CVector const& a_rDir)
 	{
-		return (m_max+m_min)/2.0f;
-	};
+		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
+			meshesListIterator != m_meshesList.end ();  meshesListIterator++)
+			(*meshesListIterator)->Move(a_rDir);
+	}
+
+	/** Fonction de dessin du groupe d'objets.	 */
+	virtual void Render() const;
+
+	/** Calcule la visibilité de l'objet
+	 * @param view Référence sur la caméra
+	 */
+	virtual void ComputeVisibility(const CCamera &a_rView);
 
 	/** Redimensionne l'objet, utilisé lors de la normalisation de la scène.
 	 * @param scaleFactor Facteur d'échelle.
 	 */
-	void HardScale (float scaleFactor);
+	virtual void HardScale(float a_fScaleFactor);
 
 	/** Translate l'objet, utilisé lors de la normalisation de la scène.
 	 * @param offset Déplacement.
 	 */
-	void HardTranslate (const CPoint& offset);
+	virtual void HardTranslate(const CPoint& offset);
 
+//---------------------------------------------------------------------------------------------------------------------
+//  Specific methods
+//---------------------------------------------------------------------------------------------------------------------
+
+	void AddMesh(CMesh* const a_pMesh)
+	{
+		m_meshesList.push_back(a_pMesh);
+	}
+
+	/** Lecture du nombre de meshes contenus dans l'objet.
+	 * @return Nombre de points.
+	 */
+	uint GetNbMeshes() const
+	{
+		return m_meshesList.size();
+	}
+
+	Vertex GetVertex(GLuint a_uiIndex) const
+	{
+		return m_vertexArray[a_uiIndex];
+	}
+
+	/** Lecture du nombre de points contenus dans l'objet.
+	 * @return Nombre de points.
+	 */
+	uint GetVertexArraySize() const
+	{
+		return m_vertexArray.size();
+	}
+
+	/** Lecture du nombre de polygones contenus dans l'objet.
+	 * @return Nombre de polygones.
+	 */
+	uint GetPolygonsCount() const;
+
+	/** Retourne la position de l'objet, calculé en prenant le centre de la boîte englobante. */
+	CPoint GetCenter() const
+	{
+		return (m_oBBMax+m_oBBMin)/2.0f;
+	}
+
+	/** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
+	void BuildBoundingSpheres();
+
+	/** Construction du Vertex Buffer CObject de l'objet, ici le tableau de points, normales et coordonnées de texture. */
+	void BuildVBO();
+
+	/** Bind du VBO */
 	void bindVBO() const
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
 		glTexCoordPointer(2, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(0));
 		glNormalPointer(GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(2*sizeof(float)));
 		glVertexPointer(3, GL_FLOAT, sizeof(Vertex), BUFFER_OFFSET(5*sizeof(float)));
-	};
-
-	/** Construction du Vertex Buffer CObject de l'objet, ici le tableau de points, normales et coordonnées de texture. */
-	void buildVBO();
-
-	/** Fonction de dessin du groupe d'objets.
-	 * @param drawCode
-	 * si TEXTURED, alors l'objet n'est dessiné que s'il possède une texture
-	 * si FLAT alors l'objet n'est dessiné que s'il ne possède pas une texture
-	 * si ALL alors l'objet est dessiné inconditionnellement
-	 * si AMBIENT alors l'objet est dessiné avec un matériau blanc en composante ambiante (pour les ombres)
-	 * @param tex false si l'objet texturé doit être affiché sans sa texture
-	 * @param boundingSpheres true si l'objet doit afficher les sphères englobantes
-	 */
-	void draw(char drawCode=ALL, bool tex=true, bool boundingSpheres=false) const;
-
-	void DrawForSelection () const;
-
-	/** Lecture du nombre de polygones contenus dans l'objet.
-	 * @return Nombre de polygones.
-	 */
-	uint getPolygonsCount () const;
+	}
 
 	/** Ajout d'un point dans le tableau de points.*/
-	void addVertex( const Vertex& v )
+	void addVertex( const Vertex& a_rVertex )
 	{
-		m_vertexArray.push_back(v);
-	};
+		m_vertexArray.push_back(a_rVertex);
+
+		// Adjust bounding box
+		if ( a_rVertex.x > m_oBBMax.x)
+			m_oBBMax.x = a_rVertex.x;
+		if ( a_rVertex.y > m_oBBMax.y)
+			m_oBBMax.y = a_rVertex.y;
+		if ( a_rVertex.z > m_oBBMax.z)
+			m_oBBMax.z = a_rVertex.z;
+
+		if ( a_rVertex.x < m_oBBMin.x)
+			m_oBBMin.x = a_rVertex.x;
+		if ( a_rVertex.y < m_oBBMin.y)
+			m_oBBMin.y = a_rVertex.y;
+		if ( a_rVertex.z < m_oBBMin.z)
+			m_oBBMin.z = a_rVertex.z;
+	}
 
 	/** Affectation des coordonnées de texture et de la normale d'un point donné.*/
-	void setVertex( uint i, float u, float v, float nx, float ny, float nz )
+	void SetVertexNormalAndTexcoord( uint i, float u, float v, float nx, float ny, float nz )
 	{
 		assert ( i < m_vertexArray.size() );
 		m_vertexArray[i].u  =  u;
@@ -220,71 +256,57 @@ public:
 		m_vertexArray[i].nx = nx;
 		m_vertexArray[i].ny = ny;
 		m_vertexArray[i].nz = nz;
-	};
-
-	/** Calcule la visibilité de l'objet
-	 * @param view Référence sur la caméra
-	 */
-	void computeVisibility(const CCamera &view);
-
-	/** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
-	void buildBoundingSpheres ();
+	}
 
 	/** Dessin des sphères englobantes. */
-	void drawBoundingSpheres ();
+	void drawBoundingSpheres();
 
-	float getArea() const
+	/** Return total area of the object */
+	float GetArea() const
 	{
 		float area=0.0f;
 		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
 		        meshesListIterator != m_meshesList.end ();  meshesListIterator++)
-			area += (*meshesListIterator)->getArea();
+			area += (*meshesListIterator)->GetArea();
 		return area;
-	};
-
-	void getTriangle(uint iCMesh, uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const
-	{
-		assert( iCMesh < m_meshesList.size() );
-		m_meshesList[iCMesh]->getTriangle(iTriangle,P1,P2,P3);
 	}
 
-	uint getNbTrianglesMeshes(uint iCMesh) const
+	/** Return a given triangle index in the mesh */
+	void GetTriangle(uint a_uiMesh, uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const
 	{
-		assert( iCMesh < m_meshesList.size() );
-		return m_meshesList[iCMesh]->getPolygonsCount();
-	};
+		assert( a_uiMesh < m_meshesList.size() );
+		m_meshesList[a_uiMesh]->GetTriangle(iTriangle,P1,P2,P3);
+	}
+
+	/** Return triangle meshes count */
+	uint GetNumTrianglesMeshes(uint a_uiMesh) const
+	{
+		assert( a_uiMesh < m_meshesList.size() );
+		return m_meshesList[a_uiMesh]->GetPolygonsCount();
+	}
 
 	/** Lecture de l'index du matériau utilisé par un maillage de l'objet.
 	 *  @return Index du matériau dans la liste de matériau contenu dans la scène.
 	 */
-	uint getMaterialIndex (uint iCMesh) const
+	uint GetMaterialIndex(uint a_uiMesh) const
 	{
-		assert( iCMesh < m_meshesList.size() );
-		return m_meshesList[iCMesh]->getMaterialIndex();
-	};
-
-	/** Set item position */
-	virtual void SetPosition (CPoint const& a_rPosition)
-	{
-		// Compute move vector for meshes
-		CVector rDir = a_rPosition - GetPosition();
-
-		ISceneItem::SetPosition(a_rPosition);
-
-		// Apply relative move to meshes
-		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-			meshesListIterator != m_meshesList.end ();  meshesListIterator++)
-			(*meshesListIterator)->Move(rDir);
+		assert( a_uiMesh < m_meshesList.size() );
+		return m_meshesList[a_uiMesh]->GetMaterialIndex();
 	}
 
-	/** Move item at given position */
-	virtual void Move(CVector const& a_rDir)
+// CLEANUP
+	CTransform const& GetTransform() const
 	{
-		ISceneItem::Move(a_rDir);
-		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-			meshesListIterator != m_meshesList.end ();  meshesListIterator++)
-			(*meshesListIterator)->Move(a_rDir);
+		return m_rTransform;
 	}
+	CTransform& GrabTransform()
+	{
+		return m_rTransform;
+	}
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Attributes
+//---------------------------------------------------------------------------------------------------------------------
 
 protected:
 	/**<Liste des points de l'objet */
@@ -292,23 +314,19 @@ protected:
 
 private:
 	/** Liste des objets */
-	vector < CMesh* > m_meshesList;
-
-	/** Indice du matériau utilisé par le point précédent. Ceci permet de savoir lors de la phase de dessin
-	 * si le point courant utilise un autre matériau qui nécessite un appel à glMaterial().
-	 */
-	int m_lastMaterialIndex;
-	/** Permet de vérifier si le mesh précédent était texturé, permet de limiter les activations et
-	 * désactivations des unités de texture.
-	 */
-	bool m_previousCMeshWasTextured;
+	typedef vector < CMesh* > CMeshesVector;
+	CMeshesVector m_meshesList;
 
 	bool m_bBuilt;
 
-	/** Pointeur vers la scène. */
+	/** Référence vers la scène. */
 	CScene& m_rScene;
 
-	/* Identifiant du Vertex Buffer CObject. */
+// CLEANUP
+	/** Référence vers le noeud de transformation */
+	CTransform& m_rTransform;
+
+	/** Identifiant du Vertex Buffer CObject. */
 	GLuint m_bufferID;
 
 	/** Type d'attributs présents dans le maillage soit :<li>
@@ -319,7 +337,8 @@ private:
 	 * </li> */
 	uint m_attributes;
 
-	CPoint m_min, m_max;
+	CPoint m_oBBMin, m_oBBMax;
 };
+
 
 #endif

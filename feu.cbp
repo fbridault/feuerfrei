@@ -15,6 +15,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-DRTFLAMES_BUILD" />
+					<Add option="-DDEBUG" />
 					<Add directory="/usr/include/IL" />
 				</Compiler>
 				<Linker>
@@ -30,6 +31,8 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-march=nocona" />
+					<Add option="-fexpensive-optimizations" />
 					<Add option="-O2" />
 					<Add option="-DRTFLAMES_BUILD" />
 					<Add directory="/usr/include/IL" />
@@ -50,6 +53,7 @@
 				<Compiler>
 					<Add option="-g" />
 					<Add option="-DRTFLUIDS_BUILD" />
+					<Add option="-DDEBUG" />
 				</Compiler>
 			</Target>
 			<Target title="Fluids - Release">
@@ -58,6 +62,8 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-march=nocona" />
+					<Add option="-fexpensive-optimizations" />
 					<Add option="-O2" />
 					<Add option="-DRTFLUIDS_BUILD" />
 				</Compiler>
@@ -67,11 +73,10 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-march=athlon-xp" />
+			<Add option="-march=nocona" />
 			<Add option="-Wall" />
 			<Add option="`wx-config --cxxflags`" />
 			<Add option="-DGL_GLEXT_PROTOTYPES" />
-			<Add option="-DMULTITHREADS" />
 			<Add directory="/home/flavien/recherche/git/flames/" />
 		</Compiler>
 		<ResourceCompiler>

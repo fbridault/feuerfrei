@@ -1,10 +1,14 @@
 #include "Texture.hpp"
-#include "ilut.h"
+#include <ilut.h>
 #include <iostream>
 
 using namespace std;
 
 /** Constructeur protégé pour les sous-classes */
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 ITexture::ITexture(GLenum type)
 {
 	m_type = type;
@@ -14,6 +18,9 @@ ITexture::ITexture(GLenum type)
 	/** Les paramètres des textures sont ensuite déterminées dans le constructeur de la sous-classe */
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 ITexture::~ITexture()
 {
 	glDeleteTextures(1, &m_texName);
@@ -23,6 +30,9 @@ ITexture::~ITexture()
 /******************************* Class CBitmapTexture ******************************/
 /************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename) :
 		ITexture(GL_TEXTURE_2D)
 {
@@ -30,6 +40,9 @@ CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename) :
 	cout << "Loading scene texture : " << a_szFilename << "......" << endl;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLenum type) :
 		ITexture(type)
 {
@@ -42,6 +55,9 @@ CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLenum type) :
 	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t) :
 		ITexture(GL_TEXTURE_2D)
 {
@@ -54,12 +70,18 @@ CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_
 	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CBitmapTexture::~CBitmapTexture()
 {
 }
 
 #define isPowerOfTwo(x) ( ((x&(x-1)) == 0) && (x!=0) )
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CBitmapTexture::load(CharCPtrC a_szFilename)
 {
 	uint w,h;
@@ -90,6 +112,9 @@ void CBitmapTexture::load(CharCPtrC a_szFilename)
 /******************************* Class CRenderTexture ********************************/
 /************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint height, char format) :
 		ITexture(type)
 {
@@ -112,6 +137,9 @@ CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint heig
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint height) :
 		ITexture(type)
 {
@@ -127,6 +155,9 @@ CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint heig
 /******************************** Class CDepthTexture ********************************/
 /************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter, bool depthComparison) :
 		ITexture( type)
 {
@@ -142,7 +173,9 @@ CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter
 	glTexImage2D( m_type, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter, GLenum func) :
 		ITexture( type)
 {
@@ -170,6 +203,10 @@ const GLenum CCubeTexture::s_cubeMapTarget[6] =
 	GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 	GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 };
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CCubeTexture::CCubeTexture(uint width, uint height) :
 		ITexture(GL_TEXTURE_CUBE_MAP)
 {
@@ -186,6 +223,9 @@ CCubeTexture::CCubeTexture(uint width, uint height) :
 		glTexImage2D( s_cubeMapTarget[i], 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CCubeTexture::CCubeTexture(const string filenames[6]) :
 	ITexture(GL_TEXTURE_CUBE_MAP)
 {
@@ -219,6 +259,9 @@ CCubeTexture::CCubeTexture(const string filenames[6]) :
 /********************************* Class CTexture3D ********************************/
 /************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CTexture3D::CTexture3D(GLsizei x, GLsizei y, GLsizei z, const GLfloat* const texels) :
 		ITexture(GL_TEXTURE_3D)
 {

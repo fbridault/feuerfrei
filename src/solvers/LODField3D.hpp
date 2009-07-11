@@ -27,7 +27,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+  LODSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
 	       float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODSolver3D ();
 
@@ -104,7 +104,7 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+  LODField3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
 	      float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODField3D () {};
 
@@ -166,18 +166,10 @@ public:
     m_currentField->displayGrid ();
   };
 
-  CPoint const& getPosition (void) const { return m_currentField->getPosition(); };
-
-  void setPosition (const CPoint& position)
-  {
-    m_fakeField.setPosition(position);
-    m_solver.setPosition(position);
-  }
-
   virtual void move(const CPoint& forces)
   {
-    m_fakeField.move(forces);
-    m_solver.move(forces);
+  	// Fake field and solver transforms are the same
+  	m_fakeField.move(forces);
   }
 
   void addTemporaryExternalForces(const CPoint& forces)
@@ -192,8 +184,8 @@ public:
     m_solver.addPermanentExternalForces(forces);
   }
 
-  void addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
-		       const CPoint& TRStrength, const CPoint& BRStrength)
+  void addForcesOnFace(	unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+						const CPoint& TRStrength, const CPoint& BRStrength)
   {
     m_fakeField.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
     m_solver.addForcesOnFace(face, BLStrength, TLStrength, TRStrength, BRStrength);
@@ -255,8 +247,8 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LODSmoothField (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
-		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
+  LODSmoothField (	CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
+					float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon);
   virtual ~LODSmoothField () {};
 
   /********************* Redéfinition des méthodes héritées *********************/

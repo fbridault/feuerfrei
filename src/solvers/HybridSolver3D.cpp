@@ -6,10 +6,10 @@
 #endif
 
 /* Le constructeur de GSSolver3D n'a pas de paramètre, il n'est donc pas appelé explicitement */
-HybridSolver3D::HybridSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+HybridSolver3D::HybridSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
 				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
 				float omegaProj, float epsilon) :
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
+  Solver3D (a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement),
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
 }

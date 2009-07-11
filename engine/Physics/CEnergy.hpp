@@ -12,9 +12,9 @@ class CEnergy;
 #define ALPHA                   3
 
 /**
- * Classe pour la représentation d'une intensité lumineuse.
- * Une intensité est définie par un ensemble de valeurs
- * d'intensités pour certaines longueurs d'ondes particulières.
+ * Classe pour la reprÃ©sentation d'une intensitÃ© lumineuse.
+ * Une intensitÃ© est dÃ©finie par un ensemble de valeurs
+ * d'intensitÃ©s pour certaines longueurs d'ondes particuliÃ¨res.
  *
  * @author	Flavien Bridault
  * @version	%I%, %G%
@@ -24,15 +24,15 @@ class CEnergy
 {
 private:
   float color[COMPOSANTES];
-  /**< Tableaux d'intensité. Chaque longueur d'onde
-   * a une intensité lumineuse propre de type réelle.
-   * Une intensité lumineuse est la combinaison de ces
-   * longueur d'ondes. Le système se base pour l'instant
+  /**< Tableaux d'intensitÃ©. Chaque longueur d'onde
+   * a une intensitÃ© lumineuse propre de type rÃ©elle.
+   * Une intensitÃ© lumineuse est la combinaison de ces
+   * longueur d'ondes. Le systÃ¨me se base pour l'instant
    * sur le code RVB.*/
 
 public:
   /**
-   * Constructeur par défaut. Crée une intensité
+   * Constructeur par dÃ©faut. CrÃ©e une intensitÃ©
    * lumineuse nulle.
    */
   CEnergy (){
@@ -47,9 +47,9 @@ public:
       color[i]=I.color[i];
   }
   /**
-   * Constructeur paramétrique.
+   * Constructeur paramÃ©trique.
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
-   * éléments de type <CODE>float</CODE>
+   * Ã©lÃ©ments de type <CODE>float</CODE>
    */
   CEnergy (float r, float g, float b){
     color[RED] = r;
@@ -58,26 +58,26 @@ public:
     color[ALPHA] = 1.0;
   }
   /**
-   * Constructeur paramétrique.
+   * Constructeur paramÃ©trique.
    * @param c pointeur vers un tableau de <CODE>COMPOSANTES</CODE>
-   * éléments de type <CODE>float</CODE>
+   * Ã©lÃ©ments de type <CODE>float</CODE>
    */
   CEnergy (float c[COMPOSANTES]){
     for (int i=0; i<COMPOSANTES; i++)
       color[i]=c[i];
   }
   /**
-   * Destructeur par défaut.
+   * Destructeur par dÃ©faut.
    */
   ~CEnergy(){
 
   };
 
   /**
-   * Opérateur d'addition d'intensité lumineuses.
-   * Chacunes des composantes de chaque intensité sont
-   * additionnées une à une.
-   * Seules les intensités supérieures à 0
+   * OpÃ©rateur d'addition d'intensitÃ© lumineuses.
+   * Chacunes des composantes de chaque intensitÃ© sont
+   * additionnÃ©es une Ã  une.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0
    * sont prises en compte.
    */
   CEnergy operator+(const CEnergy& I) const
@@ -89,9 +89,9 @@ public:
     return CEnergy;
   }
   /**
-   * Opérateur de quotient par un scalaire. Chacune des composantes
-   * de l'intensité est divisée upar un même scalaire.
-   * Seules les intensités supérieures à 0 sont prises
+   * OpÃ©rateur de quotient par un scalaire. Chacune des composantes
+   * de l'intensitÃ© est divisÃ©e upar un mÃªme scalaire.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises
    * en compte.
    */
   CEnergy operator/(const float& K) const
@@ -103,9 +103,9 @@ public:
     return CEnergy;
   }
   /**
-   * Opérateur de produit par un scalaire. Chacune des composantes
-   * de l'intensité est multipliée upar un même scalaire.
-   * Seules les intensités supérieures à 0 sont prises
+   * OpÃ©rateur de produit par un scalaire. Chacune des composantes
+   * de l'intensitÃ© est multipliÃ©e upar un mÃªme scalaire.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises
    * en compte.
    */
   CEnergy operator*(const float& K) const
@@ -118,10 +118,10 @@ public:
   }
 
   /**
-   * Opérateur de produit combinatoire d'intensités lumineuses.
-   * Chacunes des composantes de chaque intensité sont
-   * multipliées une à une.
-   * Seules les intensités supérieures à 0 sont prises
+   * OpÃ©rateur de produit combinatoire d'intensitÃ©s lumineuses.
+   * Chacunes des composantes de chaque intensitÃ© sont
+   * multipliÃ©es une Ã  une.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises
    * en compte.
    */
   CEnergy operator*(const CEnergy& I) const
@@ -144,7 +144,7 @@ public:
   }
 
   /**
-   * Opérateur d'égalité.
+   * OpÃ©rateur d'Ã©galitÃ©.
    */
   bool operator==(const CEnergy& I) const
   {
@@ -154,12 +154,12 @@ public:
     return true;
   }
   /**
-   * Opérateur d'addition d'intensité lumineuses.
-   * Chacunes des composantes de chaque intensité sont
-   * additionnées une à une.
-   * Cette fonction <B>modifie</B> l'opérande de gauche
+   * OpÃ©rateur d'addition d'intensitÃ© lumineuses.
+   * Chacunes des composantes de chaque intensitÃ© sont
+   * additionnÃ©es une Ã  une.
+   * Cette fonction <B>modifie</B> l'opÃ©rande de gauche
    * par affectation.
-   * Seules les intensités supérieures à 0 sont prises en compte.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises en compte.
    */
   CEnergy& operator+=(const CEnergy& I){
     for (int i=0;i<COMPOSANTES;i++)
@@ -173,10 +173,10 @@ public:
     return *this;
   }
   /**
-   * Opérateur de quotient par un scalaire. Chacune des composantes
-   * de l'intensité est divisée upar un même scalaire.
-   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
-   * Seules les intensités supérieures à 0 sont prises en
+   * OpÃ©rateur de quotient par un scalaire. Chacune des composantes
+   * de l'intensitÃ© est divisÃ©e upar un mÃªme scalaire.
+   * Cette fonction <B>modifie</B> l'opÃ©rande de gauche par affectation.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises en
    * compte.
    */
   CEnergy& operator/=(const float& K){
@@ -185,10 +185,10 @@ public:
     return *this;
   }
   /**
-   * Opérateur de produit par un scalaire. Chacune des composantes
-   * de l'intensité est multipliée upar un même scalaire.
-   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
-   * Seules les intensités supérieures à 0 sont prises en
+   * OpÃ©rateur de produit par un scalaire. Chacune des composantes
+   * de l'intensitÃ© est multipliÃ©e upar un mÃªme scalaire.
+   * Cette fonction <B>modifie</B> l'opÃ©rande de gauche par affectation.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises en
    * compte.
    */
   CEnergy& operator*=(const float& K){
@@ -197,11 +197,11 @@ public:
     return *this;
   }
   /**
-   * Opérateur de produit combinatoire d'intensités lumineuses.
-   * Chacunes des composantes de chaque intensité sont
-   * multipliées une à une.
-   * Cette fonction <B>modifie</B> l'opérande de gauche par affectation.
-   * Seules les intensités supérieures à 0 sont prises
+   * OpÃ©rateur de produit combinatoire d'intensitÃ©s lumineuses.
+   * Chacunes des composantes de chaque intensitÃ© sont
+   * multipliÃ©es une Ã  une.
+   * Cette fonction <B>modifie</B> l'opÃ©rande de gauche par affectation.
+   * Seules les intensitÃ©s supÃ©rieures Ã  0 sont prises
    * en compte.
    */
   CEnergy& operator*=(const CEnergy& I){
@@ -211,7 +211,7 @@ public:
   }
 
   /**
-   * Opérateur d'allocation.
+   * OpÃ©rateur d'allocation.
    */
   CEnergy& operator=(const CEnergy& I) {
     for (int i=0;i<COMPOSANTES;i++)
@@ -219,11 +219,11 @@ public:
     return *this;
   };
 
-  const float* getColors() const {
+  const float* GetColors() const {
     return color;
   };
 
-  void getColor(float &r, float &g, float &b) const {
+  void GetColor(float &r, float &g, float &b) const {
     r = color[RED];
     g = color[GREEN];
     b = color[BLUE];
@@ -240,24 +240,30 @@ public:
            );
   }
 
-  void randomize( float min, float max )
-  {
-    float range  = max - min;
-    color[RED]   = (rand()/(float)RAND_MAX) * range + min;
-    color[GREEN] = (rand()/(float)RAND_MAX) * range + min;
-    color[BLUE]  = (rand()/(float)RAND_MAX) * range + min;
-  }
+	//-----------------------------------------------------------------------------------------------------------------
+	//
+	//-----------------------------------------------------------------------------------------------------------------
+	void randomize( float min, float max )
+	{
+		float range  = max - min;
+		color[RED]   = (rand()/(float)RAND_MAX) * range + min;
+		color[GREEN] = (rand()/(float)RAND_MAX) * range + min;
+		color[BLUE]  = (rand()/(float)RAND_MAX) * range + min;
+	}
 
-  float max() const
-  {
-    if (color[RED]>color[GREEN]){
-      if (color[RED]>color[BLUE])
-        return(color[RED]);
-    }else
-      if (color[GREEN]>color[BLUE])
-        return(color[GREEN]);
-    return(color[BLUE]);
-  }
+	//-----------------------------------------------------------------------------------------------------------------
+	//
+	//-----------------------------------------------------------------------------------------------------------------
+	float max() const
+	{
+		if (color[RED]>color[GREEN]){
+			if (color[RED]>color[BLUE])
+				return(color[RED]);
+		}else
+			if (color[GREEN]>color[BLUE])
+				return(color[GREEN]);
+		return(color[BLUE]);
+	}
 };//class CEnergy
 
 #endif

@@ -1,21 +1,23 @@
 #ifndef FIELDTHREAD_HPP
 #define FIELDTHREAD_HPP
 
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
+#ifdef MULTITHREADS
 
-#if !wxUSE_THREADS
-    #error "This class requires thread support!"
-#endif
+#	ifndef WX_PRECOMP
+#		include "wx/wx.h"
+#	endif
 
-#include <wx/thread.h>
-#include <list>
+#	if !wxUSE_THREADS
+#		error "This class requires thread support!"
+#	endif
+
+#	include <wx/thread.h>
+#	include <list>
 
 using namespace std;
 
-#include "globalField.hpp"
-#include "../flames/abstractFires.hpp"
+#	include "globalField.hpp"
+#	include "../flames/abstractFires.hpp"
 
 class FieldFiresThread;
 class IFireSource;
@@ -96,13 +98,16 @@ class GlobalFieldThread: public FieldThread
 {
 public:
   GlobalFieldThread(GlobalField *globalField, FieldThreadsScheduler* const scheduler);
-  virtual ~GlobalFieldThread(){};
+  virtual ~GlobalFieldThread(){}
 
   virtual ExitCode Entry();
+
   /** Implémentée mais elle n'est a priori jamais appelée, car cette méthode est seulement appelée *
    * dans le constructeur du solveur global, pour identifier les solveurs locaux. */
-  Field3D *getSolver() const { cerr << "error GlobalFieldThread::getSolver()" << endl; return NULL; };
-  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes) {} ;
+  Field3D *getSolver() const { assert(false); return NULL; }
+
+  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes) {}
+
 private:
   GlobalField *m_field;
 };
@@ -115,13 +120,20 @@ public:
 
   virtual ExitCode Entry();
   Field3D *getSolver() const { return m_field; };
-  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes){
-    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
-	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
+
+  void drawFlames(bool displayFlame, bool displayParticles, u_char displayFlamesBoundingVolumes)
+  {
+  	list<IFireSource*> &lFires = m_field->getFireSourcesList();
+  	ForEachIter(flamesIterator, list<IFireSource*>, lFires)
+  	{
       (*flamesIterator)->drawFlame (displayFlame, displayParticles, displayFlamesBoundingVolumes);
+  	}
   }
+
 private:
   Field3D *m_field;
 };
+
+#endif // MULTITHREADS
 
 #endif

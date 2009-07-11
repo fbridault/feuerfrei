@@ -3,8 +3,8 @@
 #include <math.h>
 #include <engine/Utility/GraphicsFn.hpp>
 
-FakeField3D::FakeField3D (const CPoint& position, float dim, const CPoint& scale, float timeStep, float buoyancy) :
-		Field3D(position, 1, 1, 1, dim, scale, timeStep, buoyancy)
+FakeField3D::FakeField3D (CTransform& a_rTransform, float dim, float timeStep, float buoyancy) :
+		Field3D(a_rTransform, 1, 1, 1, dim, timeStep, buoyancy)
 {
 	m_forceCoef = 3.0f;
 	m_coef = m_dt * m_dt * m_forceCoef;
@@ -114,7 +114,7 @@ void FakeField3D::addExternalForces(const CPoint& position, bool move)
 		strength.x = force.x > 0.0f ? .2f : -.2f;
 		strength.y = force.y > 0.0f ? .2f : -.2f;
 		strength.z = force.z > 0.0f ? .2f : -.2f;
-		setPosition(m_position + position);
+		m_rTransform.Move(position);
 	}
 	else
 	{

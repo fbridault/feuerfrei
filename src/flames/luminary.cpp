@@ -16,84 +16,114 @@
 #include "realFires.hpp"
 #include "wick.hpp"
 
-Luminary::Luminary (const LuminaryConfig& a_rConfig,
-										vector <Field3D *> &a_vpFields,
-										vector <IFireSource *> &a_vpFireSources,
-										CScene& a_rScene,
-										CharCPtrC a_szFilename,
-										const CShader& a_rShadowMapShader,
-										const CRenderTarget& a_rShadowRenderTarget)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+CLuminary::CLuminary (const LuminaryConfig& a_rConfig,
+					vector <Field3D *> &a_vpFields,
+					vector <IFireSource *> &a_vpFireSources,
+					CSpatialGraph &a_rGraph,
+					CScene& a_rScene,
+					CharCPtrC a_szFilename,
+					const CShader& a_rShadowMapShader,
+					const CRenderTarget& a_rShadowRenderTarget)
 {
 	string mtlName;
 	Field3D *pField;
 	IFireSource *pFireSource;
-	CPoint& rScale = a_rConfig.fields[0].scale;
 
-	/* On importe tous les objets contenus dans le fichier OBJ dont le nom commence par LAMP_NAME */
-	if (UObjImporter::getMTLFileNameFromOBJ(string(a_szFilename), mtlName))
+	/* Import all objects in OBJ file whose name begins with LAMP_NAME */
+	if (UObjImporter::GetMTLFileNameFromOBJ(string(a_szFilename), mtlName))
 		UObjImporter::importMTL(a_rScene, mtlName);
 
-	m_hasLuminary = UObjImporter::import(a_rScene, string(a_szFilename), m_luminary, LAMP_NAME);
+	// Create a transform node for the luminary
+	m_pTransform = new CTransform(a_rConfig.position, a_rConfig.fields[0].scale);
+	a_rGraph.AddTransform(m_pTransform);
+	m_hasLuminary = UObjImporter::import<CObject>(a_rScene, string(a_szFilename), NULL, m_pTransform, LAMP_NAME);
 
-	m_position = a_rConfig.position;
 	if (a_rConfig.fires[0].type != CANDLESSET)
 	{
-		pField = initField( a_rConfig.fields[0], m_position );
+		// Create a transform node for the field
+		CTransform* pFieldTransform = new CTransform();
+
+		// Parent luminary transform to field transform
+		m_pTransform->AddChild(pFieldTransform);
+
+		pField = initField( a_rConfig.fields[0], *pFieldTransform );
 		assert(pField != NULL);
-		pFireSource = initFire(a_rConfig.fires[0], a_szFilename, *pField, a_rScene, a_rShadowMapShader, a_rShadowRenderTarget);
+		pFireSource = initFire(	a_rConfig.fires[0], a_szFilename, *pField, *pFieldTransform, a_rScene,
+								a_rShadowMapShader, a_rShadowRenderTarget);
+
+		pField->addFireSource( pFireSource );
+
+		CTransform& rFireTransform = pFireSource->GrabTransform();
+		CPoint pt(.0f,.0f,.0f);
+		pFieldTransform->SetPosition( (pt-rFireTransform.GetLocalPosition()) * a_rConfig.fields[0].scale );
+
+		// Parent luminary transform to field transform
+		pFieldTransform->AddChild(&rFireTransform);
 	}
 	else
 	{
-		vector<CWick *> objList;
-		int i=0;
+		// TODO
+		assert(false);
+		// Create a transform node for the luminary
+		/*CTransform* m_pTransform = new CTransform();
+		assert(m_pTransform != NULL);
+		a_rGraph.AddTransform(m_pTransform);
+		UObjImporter::import<CWick>(a_rScene, string(a_szFilename), NULL, m_pTransform, WICK_NAME_PREFIX);
 
-		UObjImporter::import(a_rScene, string(a_szFilename), objList, WICK_NAME_PREFIX);
-
-		for (vector < CWick *>::iterator objListIterator = objList.begin ();
-		     objListIterator != objList.end (); objListIterator++, i++)
+		ForEachIter(itObject, CTransform::CObjectsList, rTransform.GetObjects())
 		{
-			pField = initField( a_rConfig.fields[0], m_position);
+			// Create a transform node for the field
+			CTransform* pFieldTransform = new CTransform();
+			a_rGraph.addTransform(pFieldTransform);
+
+			// Parent luminary transform to field transform
+			m_pTransform->AddChild(pFieldTransform);
+
+			pField = initField( a_rConfig.fields[0], *pFieldTransform);
 			assert(pField != NULL);
-			pFireSource = new Candle (	a_rConfig.fires[0], *pField, a_rScene, .125f, NULL,
-																	a_rShadowMapShader, a_rShadowRenderTarget, *objListIterator);
+			pFireSource = new Candle (	a_rConfig.fires[0], *pField, a_rGraph, a_rScene, .125f, NULL,
+										a_rShadowMapShader, a_rShadowRenderTarget, *itWick);
 
 			pFireSource->setInnerForce(a_rConfig.fires[0].innerForce);
 			pFireSource->setFDF(a_rConfig.fires[0].fdf);
 			pFireSource->setPerturbateMode(a_rConfig.fires[0].flickering);
-		}
+
+			pField->addFireSource( pFireSource );
+
+			CTransform const& rFireTransform = pFireSource->GetTransform();
+			CPoint pt(.0f,.0f,.0f);
+			pFieldTransform->SetPosition(  (pt-rFireTransform.GetPosition()) * a_rConfig.fields[0].scale );
+		}*/
 	}
 
-	pField->addFireSource( pFireSource );
-	pField->setPosition( m_position - pFireSource->GetPosition() * rScale );
-
 	/* Add field and fire in vectors */
-	m_fields.push_back( pField );
+	m_vpFields.push_back( pField );
 	a_vpFields.push_back( pField );
-	m_fireSources.push_back( pFireSource );
+	m_vpFireSources.push_back( pFireSource );
 	a_vpFireSources.push_back( pFireSource );
 	a_rScene.addSource( pFireSource );
-
-	if (m_hasLuminary)
-		for (vector < CObject* >::iterator luminaryIterator = m_luminary.begin ();
-		     luminaryIterator  != m_luminary.end (); luminaryIterator++)
-		{
-			a_rScene.addObject(*luminaryIterator);
-			(*luminaryIterator)->SetPosition(m_position);
-			(*luminaryIterator)->SetScale(rScale);
-		}
 }
 
-Luminary::~Luminary ()
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+CLuminary::~CLuminary ()
 {
 	/* On efface pas le luminaire, il appartient à la scène */
 }
 
-#define ARGS position, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\
-	fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy
+#define ARGS a_rTransform, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\
+	fieldConfig.dim, fieldConfig.timeStep, fieldConfig.buoyancy
 #define ARGS_SLV ARGS, fieldConfig.vorticityConfinement
 #define ARGS_GC ARGS_SLV, fieldConfig.omegaDiff, fieldConfig.omegaProj, fieldConfig.epsilon
 
-Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& position)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+Field3D* CLuminary::initField(const SolverConfig& fieldConfig, CTransform& a_rTransform)
 {
 	switch (fieldConfig.type)
 	{
@@ -110,7 +140,7 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 		case SIMPLE_FIELD :
 			return (new RealField3D(ARGS));
 		case FAKE_FIELD :
-			return (new FakeField3D(position, fieldConfig.dim, fieldConfig.scale, fieldConfig.timeStep, fieldConfig.buoyancy));
+			return (new FakeField3D(a_rTransform, fieldConfig.dim, fieldConfig.timeStep, fieldConfig.buoyancy));
 		case LOD_FIELD :
 			return (new LODField3D(ARGS_GC));
 		case LOD_HYBRID_FIELD :
@@ -122,33 +152,39 @@ Field3D* Luminary::initField(const SolverConfig& fieldConfig, const CPoint& posi
 	}
 }
 
-
-IFireSource* Luminary::initFire(	const FlameConfig& a_rFlameConfig,
-															CharCPtrC a_szFilename,
-															Field3D& a_rField,
-															CScene& a_rScene,
-															const CShader& a_rShadowMapShader,
-															const CRenderTarget& a_rShadowRenderTarget)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+IFireSource* CLuminary::initFire(const FlameConfig& a_rFlameConfig,
+								CharCPtrC a_szFilename,
+								Field3D& a_rField,
+								CTransform &a_rLuminaryTransform,
+								CScene& a_rScene,
+								const CShader& a_rShadowMapShader,
+								const CRenderTarget& a_rShadowRenderTarget)
 {
 	IFireSource *fire;
 	switch (a_rFlameConfig.type)
 	{
 		case CANDLE :
-			fire = new Candle (a_rFlameConfig,a_rField, a_rScene, .125f, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new Candle (	a_rFlameConfig, a_rField, a_rLuminaryTransform, a_rScene, .125f, a_szFilename,
+								a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case FIRMALAMPE :
-			fire = new Firmalampe(a_rFlameConfig, a_rField, a_rScene, a_szFilename, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new Firmalampe(	a_rFlameConfig, a_rField, a_rLuminaryTransform, a_rScene, a_szFilename,
+									a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		case TORCH :
-			fire = new CTorch(a_rFlameConfig, a_rField, a_rScene, a_szFilename, ("textures/torch6.png"),
-												a_rShadowMapShader, a_rShadowRenderTarget, 0.03f, 0.04f);
+			fire = new CTorch(	a_rFlameConfig, a_rField, a_rLuminaryTransform, a_rScene, a_szFilename,
+								("textures/torch6.png"), a_rShadowMapShader, a_rShadowRenderTarget, 0.03f, 0.04f);
 			break;
 		case CAMPFIRE :
-			fire = new CCampFire(a_rFlameConfig, a_rField, a_rScene, a_szFilename, ("textures/torch4.png"),
-														a_rShadowMapShader, a_rShadowRenderTarget, 0.05f, 0.02f);
+			fire = new CCampFire(	a_rFlameConfig, a_rField, a_rLuminaryTransform, a_rScene, a_szFilename,
+									("textures/torch4.png"), a_rShadowMapShader, a_rShadowRenderTarget, 0.05f, 0.02f);
 			break;
 		case CANDLESTICK :
-			fire = new CandleStick (a_rFlameConfig, a_rField, a_rScene, "scenes/bougie.obj", .125f, a_rShadowMapShader, a_rShadowRenderTarget);
+			fire = new CandleStick (a_rFlameConfig, a_rField, a_rLuminaryTransform, a_rScene, "scenes/bougie.obj",
+									.125f, a_rShadowMapShader, a_rShadowRenderTarget);
 			break;
 		default :
 			cerr << "Unknown flame type : " << (int)a_rFlameConfig.type << endl;

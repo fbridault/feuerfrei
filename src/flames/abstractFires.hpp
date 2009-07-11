@@ -30,19 +30,73 @@ class IES;
 extern uint g_count;
 #endif
 
+//*********************************************************************************************************************
+// Bounding volume type used for display
+//*********************************************************************************************************************
+struct _NDisplayBoundingVolume
+{
+	enum EValue
+	{
+		eNone,
+		eSphere,
+		eImpostor,
+
+		_NbValues
+	};
+};
+DeclareNumerable(_NDisplayBoundingVolume, NDisplayBoundingVolume);
+
+
+/*********************************************************************************************************************/
+/**		Class CDrawState	          			  	 																 */
+/*********************************************************************************************************************/
+class CRenderFlameState : public ITSingleton<CRenderFlameState>
+{
+	friend class ITSingleton<CRenderFlameState>;
+
+private:
+	/**
+	 * Constructeur par défaut.
+	 */
+	CRenderFlameState() :
+		m_bDisplay(true),
+		m_bDisplayParticle(false),
+		m_nBoundingVolume(NDisplayBoundingVolume::eNone)
+	{}
+
+public:
+
+	bool GetDisplay() const { return m_bDisplay; };
+	void SetDisplay(bool a_bDisplay) { m_bDisplay = a_bDisplay; }
+
+	bool GetDisplayParticle() const { return m_bDisplayParticle; };
+	void SetDisplayParticle(bool a_bDisplayParticle) { m_bDisplayParticle = a_bDisplayParticle; }
+
+	NDisplayBoundingVolume const& GetDisplayBoundingVolume() const { return m_nBoundingVolume; };
+	void SetDisplayBoundingVolume(NDisplayBoundingVolume const& a_nBoundingVolume) { m_nBoundingVolume = a_nBoundingVolume; }
+
+private:
+
+	/** Affiche ou non la flamme */
+	bool m_bDisplay;
+	/** Affiche ou non les particules des squelettes */
+	bool m_bDisplayParticle;
+	/** Volume englobant à afficher: aucun, sphère, ou boîte */
+	NDisplayBoundingVolume m_nBoundingVolume;
+};
 
 /**********************************************************************************************************************/
-/************************************ DEFINITION DE L'INTERFACE CFLAMELIGHT ************************************/
+/************************************* DEFINITION DE L'INTERFACE CFLAMELIGHT ******************************************/
 /**********************************************************************************************************************/
 class CFlameLight : public COmniLight
 {
 public:
 	CFlameLight(const CPoint &a_rPosition,
-							const CEnergy &a_rEnergy,
-							GLuint a_uiDepthMapSize,
-							const CShader& a_rGenShadowCubeMapShader,
-							const CRenderTarget& a_rShadowRenderTarget,
-							const string& a_rIESFileName) :
+				const CEnergy &a_rEnergy,
+				GLuint a_uiDepthMapSize,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget,
+				const string& a_rIESFileName) :
 		COmniLight(a_rPosition, a_rEnergy, a_uiDepthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 	{
 		m_pIesFile = new IES(a_rIESFileName.c_str());
@@ -52,13 +106,17 @@ public:
 	virtual ~CFlameLight()
 	{
 		delete m_pIesFile;
-	};
+	}
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Specific methods
+//---------------------------------------------------------------------------------------------------------------------
 
 	/** Modifie le coefficient pondérateur de l'intensité. */
-	virtual void SetIntensity(float coef)
+	void SetIntensity(float coef)
 	{
 		m_lightEnergy *= coef;
-	};
+	}
 
 	const float getLazimut() const
 	{
@@ -106,7 +164,7 @@ private:
 
 
 /**********************************************************************************************************************/
-/************************************* DEFINITION DE L'INTERFACE IFIRESOURCE ************************************/
+/************************************* DEFINITION DE L'INTERFACE IFIRESOURCE ******************************************/
 /**********************************************************************************************************************/
 
 /** La classe IFireSource désigne un objet qui produit du feu. Il se compose d'un luminaire (classe Object), de
@@ -130,83 +188,39 @@ public:
 	 * @param scene CPointeur sur la scène.
 	 * @param texname Nom du fichier contenant le luminaire.
 	 */
-	IFireSource(	const FlameConfig& a_rFlameConfig,
-							Field3D& a_rField,
-							uint a_uiNbFlames,
-							CharCPtrC a_szTexname,
-							const CShader& a_rGenShadowCubeMapShader,
-							const CRenderTarget& a_rShadowRenderTarget);
+	IFireSource(const FlameConfig& a_rFlameConfig,
+				Field3D& a_rField,
+				uint a_uiNbFlames,
+				CharCPtrC a_szTexname,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget);
 
 	/** Destructeur */
 	virtual ~IFireSource ();
 
+//---------------------------------------------------------------------------------------------------------------------
+//  Inherited methods
+//---------------------------------------------------------------------------------------------------------------------
+
+	/** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
+	 * build() avec le placage de texture. La flamme d'une IRealFlame est définie dans le repère du solveur,
+	 * donc seule une translation correspondant à la position du solveur est effectuée.
+	 *
+	 */
+	virtual void Render() const;
+
+	/** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante
+	 * et teste ensuite la visibilité de celle-ci. */
+	virtual void ComputeVisibility(const CCamera &view);
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Virtual methods
+//---------------------------------------------------------------------------------------------------------------------
+
 	/** Ajuste le niveau de détail de la NURBS.
 	 * @param value Valeur comprise entre 0 et LOD_VALUES.
 	 */
-	virtual void setLOD(u_char value)
-	{
-		switch (value)
-		{
-			case 5:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(4);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				break;
-			case 4:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(3);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				break;
-			case 3:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(2);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				break;
-			case 2:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(2);
-					m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				break;
-			case 1:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(1);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(true);
-				}
-				break;
-			case 0:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(1);
-					m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
-					m_flames[i]->setFlatFlame(true);
-				}
-				break;
-			default:
-				cerr << "Bad NURBS LOD parameter" << endl;
-		}
-	};
-
-	/** Retourne la position absolue dans le repère du monde.
-	 * @return Position absolue dans le repère du monde.
-	 */
-	CPoint const& getPosition () const
-	{
-		return m_rField.getPosition();
-	}
+	virtual void setLOD(u_char value);
 
 	/** Fonction chargée de construire les flammes composant la source de feu. Elle se charge également
 	 * de déterminer la position de la source de lumière.
@@ -216,68 +230,21 @@ public:
 	/** Dessine la mèche de la flamme. Les mèches des IRealFlame sont définies en (0,0,0), une translation
 	 * est donc effectuée pour tenir compte du placement du feu dans le monde.
 	 */
-	virtual void drawWick(bool displayBoxes) const
+	virtual void drawWickBoxes() const
 	{
-		CPoint const& rPt = getPosition();
-		CPoint const& rScale = m_rField.getScale();
-		glPushMatrix();
-		glTranslatef (rPt.x,rPt.y, rPt.z);
-		glScalef (rScale.x, rScale.y, rScale.z);
+		CTransform const& rTransform = m_rField.GetTransform();
+		rTransform.Push();
 		for (uint i = 0; i < m_nbFlames; i++)
-			m_flames[i]->drawWick(displayBoxes);
-		glPopMatrix();
+			m_flames[i]->drawWickBoxes();
+		rTransform.Pop();
 	}
 
-	/** Fonction appelée par la fonction de dessin OpenGL. Elle dessine la NURBS définie par la fonction
-	 * build() avec le placage de texture. La flamme d'une IRealFlame est définie dans le repère du solveur,
-	 * donc seule une translation correspondant à la position du solveur est effectuée.
-	 *
-	 * @param display affiche ou non la flamme
-	 * @param displayParticle affiche ou non les particules des squelettes
-	 * @param boundingVolume Optionel, volume englobant à afficher: 0 aucun, 1 sphère, 2 boîte
-	 */
-	virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
-	{
-#ifdef COUNT_NURBS_POLYGONS
-		g_count=0;
-#endif
-		switch (boundingVolume)
-		{
-			case BOUNDING_SPHERE :
-				drawBoundingSphere();
-				break;
-			case IMPOSTOR :
-				drawImpostor();
-				break;
-			default :
-				if (m_visibility)
-				{
-					CPoint const& rPt = getPosition();
-					CPoint const& rScale = m_rField.getScale();
-					glPushMatrix();
-					glTranslatef (rPt.x,rPt.y, rPt.z);
-					glScalef (rScale.x, rScale.y, rScale.z);
-					for (uint i = 0; i < m_nbFlames; i++)
-						m_flames[i]->drawFlame(display, displayParticle);
-					glPopMatrix();
-					// Trace une sphère indiquant le centre
-// 	  	    glPushMatrix();
-// 	  	    glTranslatef (m_centreSP.x, m_centreSP.y, m_centreSP.z);
-// 	  	    CUGraphicsFn::SolidSphere (.05, 10, 10);
-// 	  	    glPopMatrix();
-				}
-				break;
-		}
-#ifdef COUNT_NURBS_POLYGONS
-		cerr << g_count << endl;
-#endif
-	}
 
 	/** Dessin de la sphère englobante. */
 	virtual void drawBoundingSphere() const
 	{
 		if (m_visibility) m_boundingSphere.draw();
-	};
+	}
 
 	/** Dessin d'un imposteur pour le rendu. */
 	virtual void drawImpostor() const;
@@ -297,7 +264,7 @@ public:
 	virtual void setInnerForce(float value)
 	{
 		m_innerForce=value;
-	};
+	}
 
 	/** Affectation de la FDF.
 	 * @param value FDF.
@@ -305,7 +272,7 @@ public:
 	virtual void setFDF(int value)
 	{
 		m_fdf=value;
-	};
+	}
 
 	/** Affectation de la méthode de perturbation.
 	 * @param value Perturbation.
@@ -313,13 +280,7 @@ public:
 	virtual void setPerturbateMode(char value)
 	{
 		m_perturbate=value;
-	};
-
-	/** Modifie le type de flickering sur les flammes. */
-	char getPerturbateMode() const
-	{
-		return m_perturbate;
-	};
+	}
 
 	/** Affectation de la durée de vie des squelettes guides.
 	 * @param value Durée de vie en itérations.
@@ -328,7 +289,7 @@ public:
 	{
 		for (uint i = 0; i < m_nbFlames; i++)
 			m_flames[i]->setLeadLifeSpan(value);
-	};
+	}
 
 	/** Affectation de la durée de vie des squelettes périphériques.
 	 * @param value Durée de vie en itérations.
@@ -337,7 +298,7 @@ public:
 	{
 		for (uint i = 0; i < m_nbFlames; i++)
 			m_flames[i]->setPeriLifeSpan(value);
-	};
+	}
 
 	/** Active ou désactive l'affichage texturé sur la flamme. */
 	virtual void setSmoothShading (bool state)
@@ -349,14 +310,35 @@ public:
 	/** Fonction permettant de récupérer le centre de la flamme dans le repère local. */
 	virtual CPoint getCenter() const
 	{
-		return m_center;
+		return m_oCenter;
 	};
 
 	/** Fonction permettant de récupérer l'orientation principale de la flamme. */
 	virtual CVector getMainDirection() const
 	{
-		return m_direction;
-	};
+		return m_oDirection;
+	}
+
+	virtual bool operator<(const IFireSource& other) const;
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Specific methods
+//---------------------------------------------------------------------------------------------------------------------
+
+	/** Modifie le type de flickering sur les flammes. */
+	char getPerturbateMode() const
+	{
+		return m_perturbate;
+	}
+
+	/** Retourne la position absolue dans le repère du monde.
+	 * @return Position absolue dans le repère du monde.
+	 */
+	CPoint getFieldPosition () const
+	{
+		CTransform const& rTransform = m_rField.GetTransform();
+		return rTransform.GetLocalPosition();
+	}
 
 	/** Fonction recalculant le centre et la direction de la flamme, en vue de
 	 * l'éclairage. Appelée à chaque pas de simulation. */
@@ -365,16 +347,12 @@ public:
 	/** Construction de la sphère englobante de l'objet. */
 	void buildBoundingSphere ();
 
-	/** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante
-	 * et teste ensuite la visibilité de celle-ci. */
-	virtual void computeVisibility(const CCamera &view, bool forceSpheresBuild=false);
-
 	/** Test si la flamme est visible ou non. Le calcul de visibilité proprement
 	 * dit se fait à l'aide de la fonction computeVisibility. */
 	bool isVisible()
 	{
 		return m_visibility;
-	};
+	}
 
 	/** Récupération de la distance par rapport à la caméra. */
 	float getDistanceFromCamera()
@@ -385,15 +363,13 @@ public:
 	const GLfloat* getGlowWeights(uint index) const
 	{
 		return m_glowWeights[index];
-	};
+	}
 	GLfloat getGlowDivide(uint index) const
 	{
 		return m_glowDivide[index];
-	};
+	}
 
 	void computeGlowWeights(uint index, float sigma);
-
-	virtual bool operator<(const IFireSource& other) const;
 
 	/** Opérateur de comparaison des flammes basées sur leur distance par rapport
 	 * à la caméra. On est obligé de définir cet opérateur car on utilise des
@@ -438,10 +414,10 @@ protected:
 	int m_fdf;
 
 	/** Centre de la flamme, recalculé à chaque itération dans build() */
-	CPoint m_center;
+	CPoint m_oCenter;
 
 	/** Direction principale de la flamme, recalculée à chaque itération dans build() */
-	CVector m_direction;
+	CVector m_oDirection;
 
 	/** Sauvegardes du niveau de détail précédent, permet de déterminer s'il y a un changement. */
 	int m_fluidsLODSave, m_nurbsLODSave;
@@ -480,64 +456,7 @@ public:
 	virtual void build();
 	virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
 
-	virtual void setLOD(u_char value)
-	{
-		u_char tolerance=4;
-		switch (value)
-		{
-			case 5:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(4);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-					tolerance = 4;
-				}
-				break;
-			case 4:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(3);
-					m_flames[i]->setSkeletonsLOD(FULL_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-					tolerance = 3;
-				}
-				break;
-			case 3:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(2);
-					m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				tolerance = 2;
-				break;
-			case 2:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(1);
-					m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
-					m_flames[i]->setFlatFlame(false);
-				}
-				tolerance = 1;
-				break;
-			case 1:
-			case 0:
-				for (uint i = 0; i < m_nbFlames; i++)
-				{
-					m_flames[i]->setSamplingTolerance(1);
-					m_flames[i]->setSkeletonsLOD(HALF_SKELETON);
-					m_flames[i]->setFlatFlame(true);
-				}
-				tolerance = 1;
-				break;
-			default:
-				cerr << "Bad NURBS LOD parameter" << endl;
-		}
-		for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-		        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-			(*flamesIterator)->setSamplingTolerance(tolerance);
-	};
+	virtual void setLOD(u_char value);
 //   virtual void drawImpostor () const;
 
 	/** Ajoute une flamme détachée à la source.
@@ -559,7 +478,7 @@ public:
 	/** Active ou désactive l'affichage texturé sur la flamme. */
 	virtual void setSmoothShading (bool state);
 
-	virtual void computeVisibility(const CCamera &view, bool forceSpheresBuild=false);
+	virtual void ComputeVisibility(const CCamera &view);
 
 	void computeIntensityPositionAndDirection(void);
 private:

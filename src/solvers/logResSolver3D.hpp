@@ -30,8 +30,9 @@ public:
    * @param omegaProj Paramètre omega pour la projection.
    * @param epsilon Tolérance d'erreur pour GCSSOR.
    */
-  LogResSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
-		  float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon, uint nbTimeSteps);
+  LogResSolver3D (	CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
+					float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon,
+					uint nbTimeSteps);
   /** Destructeur. */
   virtual ~LogResSolver3D ();
 

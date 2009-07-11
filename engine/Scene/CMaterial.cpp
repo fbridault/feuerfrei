@@ -39,6 +39,6 @@ CMaterial::CMaterial ( 	CScene const& a_rScene,
 
 const bool CMaterial::isTransparent() const
 {
-	if (m_rScene.getTexture(m_diffuseTexture)->hasAlpha()) cerr << m_name << " is transparent" << endl;
-	return (m_rScene.getTexture(m_diffuseTexture)->hasAlpha());
+	if (m_rScene.GetTexture(m_diffuseTexture).hasAlpha()) cerr << m_name << " is transparent" << endl;
+	return (m_rScene.GetTexture(m_diffuseTexture).hasAlpha());
 }

@@ -7,11 +7,11 @@
 
 using namespace std;
 
-/** La classe texture peut être utilisée pour sous-classer différents types de textures, comme des textures
- * bitmaps à partir d'un fichier image, ou des textures de profondeur.
- * Lors du texturage, il suffit d'appeler la fonction glBindTexture() avec comme paramètre
- * ITexture::getTexture().
- * A noter que cette classe peut facilement être réutilisée pour une autre application.
+/** La classe texture peut ï¿½tre utilisï¿½e pour sous-classer diffï¿½rents types de textures, comme des textures
+ * bitmaps ï¿½ partir d'un fichier image, ou des textures de profondeur.
+ * Lors du texturage, il suffit d'appeler la fonction glBindTexture() avec comme paramï¿½tre
+ * ITexture::GetTexture().
+ * A noter que cette classe peut facilement ï¿½tre rï¿½utilisï¿½e pour une autre application.
  *
  * @author	Flavien Bridault
  */
@@ -19,16 +19,16 @@ class ITexture
 {
 protected:
 	ITexture(): m_type(GL_TEXTURE_2D) {};
-	/** Constructeur protégé uniquement à destination des sous-classes */
+	/** Constructeur protï¿½gï¿½ uniquement ï¿½ destination des sous-classes */
 	ITexture(GLenum type);
 
 public:
 	virtual ~ITexture();
 
-	/** Donne l'identifiant de la texture à utiliser avec glBindTexture().
+	/** Donne l'identifiant de la texture ï¿½ utiliser avec glBindTexture().
 	 * @return Identifiant de la texture.
 	 */
-	const GLuint getTexture() const
+	const GLuint GetTexture() const
 	{
 		return m_texName;
 	};
@@ -36,7 +36,7 @@ public:
 	/** Donne le type de la texture.
 	 * @return Type de la texture.
 	 */
-	const GLuint getTextureType() const
+	const GLuint GetTextureType() const
 	{
 		return m_type;
 	};
@@ -49,7 +49,7 @@ public:
 	};
 
 	/** Active la texture pour l'objet courant avec glBindTexture().
-	 * @param unité de texture
+	 * @param unitï¿½ de texture
 	 */
 	const void bind(uint uiTexUnit) const
 	{
@@ -89,21 +89,21 @@ protected:
 class CBitmapTexture : public ITexture
 {
 public:
-	/** Construit une texture RGB de type 2D à partir d'un fichier image.
-	 * @param filename Nom du fichier image à charger.
+	/** Construit une texture RGB de type 2D ï¿½ partir d'un fichier image.
+	 * @param filename Nom du fichier image ï¿½ charger.
 	 */
 	CBitmapTexture(CharCPtrC a_szFilename);
 
-	/** Construit une texture RGB à partir d'un fichier image.
-	 * @param filename Nom du fichier image à charger.
+	/** Construit une texture RGB ï¿½ partir d'un fichier image.
+	 * @param filename Nom du fichier image ï¿½ charger.
 	 * @param type Type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
 	 */
 	CBitmapTexture(CharCPtrC a_szFilename, GLenum type);
 
-	/** Construit une texture RGBA de type 2D à partir d'un fichier image.
-	 * @param filename Nom du fichier image à charger.
-	 * @param wrap_s Paramètre de répétition de la texture dans la direction s {GL_WRAP,GL_REPEAT}.
-	 * @param wrap_t Paramètre de répétition de la texture dans la direction t {GL_WRAP,GL_REPEAT}.
+	/** Construit une texture RGBA de type 2D ï¿½ partir d'un fichier image.
+	 * @param filename Nom du fichier image ï¿½ charger.
+	 * @param wrap_s Paramï¿½tre de rï¿½pï¿½tition de la texture dans la direction s {GL_WRAP,GL_REPEAT}.
+	 * @param wrap_t Paramï¿½tre de rï¿½pï¿½tition de la texture dans la direction t {GL_WRAP,GL_REPEAT}.
 	 */
 	CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t);
 
@@ -114,7 +114,7 @@ public:
 		return m_hasAlpha;
 	};
 
-	CharCPtrC getName() const
+	CharCPtrC GetName() const
 	{
 		return m_szFilename;
 	};
@@ -139,7 +139,7 @@ private:
 	 * @param   type  Type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
 	 * @param  width  Largeur de la texture.
 	 * @param height  Hauteur de la texture.
-	 * @param format  Format de la texture (à revoir).
+	 * @param format  Format de la texture (ï¿½ revoir).
 	 */
 	CRenderTexture(GLenum type, GLenum filter, uint width, uint height, char format);
 
@@ -164,7 +164,7 @@ public:
 	* @param           width  Largeur de la texture.
 	* @param          height  Hauteur de la texture.
 	* @param depthComparison  Indique que la texture est une shadow map ou non
-	* (c.à.d., si elle retourne un résultat de comparaison ou une profondeur)
+	* (c.ï¿½.d., si elle retourne un rï¿½sultat de comparaison ou une profondeur)
 	*/
 	CDepthTexture(GLenum type, uint width, uint height, GLenum filter, bool depthComparison);
 
@@ -192,14 +192,14 @@ private:
 	*/
 	CCubeTexture(uint width, uint height);
 public:
-	/** Constructeur d'une cubemap à partir de six fichiers images.
+	/** Constructeur d'une cubemap ï¿½ partir de six fichiers images.
 	* @param filenames  Tableau comprenant les nom des six fichiers images.
 	*/
 	CCubeTexture(const string filenames[6]);
 
 	virtual ~CCubeTexture(){};
 
-	/** Liste des targets pour la création des textures de CubeMap */
+	/** Liste des tarGets pour la crï¿½ation des textures de CubeMap */
 	static const GLenum s_cubeMapTarget[6];
 };
 
@@ -210,11 +210,11 @@ public:
 class CTexture3D : public ITexture
 {
 public:
-	/** Constructeur d'une cubemap à partir de six fichiers images.
+	/** Constructeur d'une cubemap ï¿½ partir de six fichiers images.
 	* @param filenames  Tableau comprenant les nom des six fichiers images.
 	*/
-	/** Construit une texture 3D en GL_LUMINANCE à partir d'un tableau de réels, de la largeur
-	* et de la hauteur de la texture. Utilisé seulement pour construire la texture des
+	/** Construit une texture 3D en GL_LUMINANCE ï¿½ partir d'un tableau de rï¿½els, de la largeur
+	* et de la hauteur de la texture. Utilisï¿½ seulement pour construire la texture des
 	* solides photom<E9>triques.
 	* @param x Largeur de la texture
 	* @param y Hauteur de la texture

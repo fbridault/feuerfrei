@@ -28,8 +28,8 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Solver2D (const CPoint& position, uint n_x, uint n_y, float dim, float timeStep, float buoyancy,
-	    float vorticityConfinement);
+  Solver2D (CTransform& a_rTransform, uint n_x, uint n_y, float dim, float timeStep, float buoyancy,
+			float vorticityConfinement);
   /** Destructeur */
   virtual ~Solver2D ();
 

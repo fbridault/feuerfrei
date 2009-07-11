@@ -1,9 +1,9 @@
 #include "benchsolver3D.hpp"
 
-BenchSolver3D::BenchSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+BenchSolver3D::BenchSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
 			      float buoyancy, float vorticityConfinement, uint nbTimeSteps, float omegaDiff, float omegaProj,
 			      float epsilon) :
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
+  Solver3D (a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement),
   GCSSORSolver3D(omegaDiff, omegaProj, epsilon)
 {
   m_save = new float[m_nbVoxels];

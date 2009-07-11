@@ -3,10 +3,10 @@
 
 #define GRID_INCREMENT 2
 
-LODSolver3D::LODSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+LODSolver3D::LODSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
 				      float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
 				      float omegaProj, float epsilon) :
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
+  Solver3D (a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement),
   GCSSORSolver3D (omegaDiff, omegaProj, epsilon)
 {
   /* Attention n_x, n_y et n_z doivent être impairs */
@@ -258,19 +258,19 @@ void LODSolver3D::displayBase (){
   glEnd ();
 }
 
-LODField3D::LODField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+LODField3D::LODField3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
 			float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon) :
-  Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy),
-  m_fakeField(position, dim, scale, timeStep, buoyancy),
-  m_solver(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement, omegaDiff, omegaProj, epsilon)
+  Field3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy),
+  m_fakeField(a_rTransform, dim, timeStep, buoyancy),
+  m_solver(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement, omegaDiff, omegaProj, epsilon)
 {
   m_currentField = &m_solver;
   m_fieldToSwitch = &m_solver;
 }
 
-LODSmoothField::LODSmoothField (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep,
+LODSmoothField::LODSmoothField (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep,
 				float buoyancy, float vorticityConfinement, float omegaDiff, float omegaProj, float epsilon) :
-  LODField3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement, omegaDiff, omegaProj, epsilon)
+  LODField3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement, omegaDiff, omegaProj, epsilon)
 {
   m_switch = 0;
 }

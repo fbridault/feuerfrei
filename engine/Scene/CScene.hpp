@@ -9,11 +9,13 @@ class CMaterial;
 #include "Light.hpp"
 #include "CCamera.hpp"
 #include "Texture.hpp"
+#include "CDrawState.hpp"
 
 #include <vector>
 #include <list>
 
-#include "../Utility/ISingleton.hpp"
+
+
 
 /**
  * Classe repr&eacute;sentant une sc&egrave;ne g&eacute;om&eacute;trique.
@@ -31,15 +33,12 @@ private:
 	/**
 	 * Constructeur par défaut.
 	 */
-	CScene() {};
+	CScene();
+
 	/** Destructeur par d&eacute;faut. */
 	~CScene();
 
 public:
-	/** Initialisation de la scène
-	 * @param fileName Nom du fichier OBJ.
-	 */
-	void init(const string& fileName);
 
 	/** Crée les VBOs - A n'appeler qu'une fois que tous les objets
 	 * ont été ajouté à la scène, soit via le constructeur, soit via la méthode
@@ -57,7 +56,26 @@ public:
 	 */
 	void addObject(CObject* const a_pObj)
 	{
-		m_objectsArray.push_back(a_pObj);
+		assert(a_pObj != NULL);
+		m_vpObjects.push_back(a_pObj);
+	};
+
+	/** Remove an object from the scene.
+	 * @param newObj Pointeur vers l'objet &agrave; ajouter.
+	 */
+	void removeObject(CObject* const a_pObj)
+	{
+		assert(a_pObj != NULL);
+		ForEachIter(itObject, CObjectsVector, m_vpObjects)
+		{
+			if(a_pObj == *itObject)
+			{
+				m_vpObjects.erase(itObject);
+				return;
+			}
+		}
+		// Object not found
+		assert(false);
 	};
 
 	/** Ajoute un matériau dans la scène.
@@ -65,7 +83,8 @@ public:
 	 */
 	void addMaterial(CMaterial *a_pMaterial)
 	{
-		m_materialArray.push_back(a_pMaterial);
+		assert(a_pMaterial != NULL);
+		m_vpMaterials.push_back(a_pMaterial);
 	};
 
 	/** Ajoute une texture dans la scène.
@@ -74,95 +93,110 @@ public:
 	 */
 	GLuint addTexture(CBitmapTexture * const a_pTexture)
 	{
-		m_texturesArray.push_back(a_pTexture);
-		return m_texturesArray.size()-1;
+		assert(a_pTexture != NULL);
+		m_vpTextures.push_back(a_pTexture);
+		return m_vpTextures.size()-1;
 	};
 
 	/** Ajoute une source lumineuse à la scène.
 	 * @param newSource pointeur vers la source lumineuse à ajouter.
 	 */
-	void addSource(ILight* const newSource)
+	void addSource(ILight* const a_rSource)
 	{
-		m_lightSourcesArray.push_back(newSource);
+		assert(a_rSource != NULL);
+		m_vpLights.push_back(a_rSource);
 	};
 
 	/** Lecture du nombre de points contenus dans la scène.
 	 * @return Nombre de points.
 	 */
-	uint getVertexCount();
+	uint GetVertexCount();
 
 	/** Lecture du nombre de polygones contenus dans la scène.
 	 * @return Nombre de polygones.
 	 */
-	uint getPolygonsCount();
+	uint GetPolygonsCount();
 
 	/** Lecture du nombre d'objets contenus dans la scène.
 	 * @return Nombre d'objets.
 	 */
-	uint getCObjectsCount() const
+	uint GetObjectsCount() const
 	{
-		return m_objectsArray.size();
+		return m_vpObjects.size();
 	};
 
 	/** Lecture du nombre de sources lumineuses contenus dans la scène.
 	 * @return Nombre de sources lumineuses.
 	 */
-	uint getSourcesCount() const
+	uint GetSourcesCount() const
 	{
-		return m_lightSourcesArray.size();
+		return m_vpLights.size();
 	};
 
-	float getArea()
+	/*float GetArea()
 	{
 		float area=0.0f;
-		for (vector < CObject * >::iterator objectsArrayIterator = m_objectsArray.begin ();
-		     objectsArrayIterator != m_objectsArray.end ();
-		     objectsArrayIterator++)
-			area += (*objectsArrayIterator)->getArea();
+		ForEachIterC(it, CObjectsVector, m_vpObjects)
+		{
+			area += (*it)->GetArea();
+		}
 		return area;
-	}
+	}*/
 
 	/** Lecture d'un polygone spécifique contenu dans la scène.
 	 * @param index Indice du polygone à obtenir.
 	 * @return Un pointeur vers le polygone recherché.
 	 */
-	CObject* getCObject(const int index) const
+	ISceneItem const& GetObject(const int index) const
 	{
-		return (m_objectsArray[index]);
+		assert( m_vpObjects[index] != NULL );
+		return (*m_vpObjects[index]);
 	};
 
 	/** Lecture d'une source lumineuse spécifique contenue dans la scène.
 	 * @param index Indice de la source à obtenir.
 	 * @return Un pointeur vers la source recherchée.
 	 */
-	ILight* getSource(const int index) const
+	ILight const& GetSource(const int index) const
 	{
-		return (m_lightSourcesArray[index]);
+		assert( m_vpLights[index] != NULL );
+		return (*m_vpLights[index]);
+	};
+	/** Lecture d'une source lumineuse spécifique contenue dans la scène.
+	 * @param index Indice de la source à obtenir.
+	 * @return Un pointeur vers la source recherchée.
+	 */
+	ILight& GetSource(const int index)
+	{
+		assert( m_vpLights[index] != NULL );
+		return (*m_vpLights[index]);
 	};
 
 	/** Lecture d'un matériau spécifique contenue dans la scène.
 	 * @param index Indice du matériau à obtenir.
 	 * @return Un pointeur vers le matériau recherché.
 	 */
-	CMaterial* getMaterial(const int index) const
+	CMaterial const& GetMaterial(const int index) const
 	{
-		return (m_materialArray[index]);
+		assert( m_vpMaterials[index] != NULL );
+		return (*m_vpMaterials[index]);
 	};
 
 	/** Lecture d'une texture spécifique contenue dans la scène.
 	 * @param index Indice de la texture à obtenir.
 	 * @return Un pointeur vers la texture recherchée.
 	 */
-	CBitmapTexture* getTexture(const int index) const
+	CBitmapTexture const& GetTexture(const int index) const
 	{
-		return (m_texturesArray[index]);
+		assert( m_vpTextures[index] != NULL );
+		return (*m_vpTextures[index]);
 	};
 
 	/** Donne l'indice d'un matériau dans la liste des matériaux de la scène.
 	 * @param name Nom du matériau.
 	 * @return Index du matériau.
 	 */
-	int getMaterialIndexByName(const string& name);
+	int GetMaterialIndexByName(const string& name);
 
 	/** Donne l'indice d'une texture dans la liste des textures de la scène.
 	 * @param name Nom du fichier de la texture.
@@ -170,160 +204,46 @@ public:
 	 */
 	int searchTextureIndexByName(CharCPtrC name);
 
-	/** Change l'affichage des sphères englobantes. */
-	void setBoundingSphereMode(bool mode)
+	void selectItem(uint a_uiSelectedItem)
 	{
-		m_boundingSpheresMode = mode;
-	};
+		assert ( a_uiSelectedItem < m_vpObjects.size()+m_vpLights.size() );
 
-	void computeVisibility(const CCamera &view);
-
-	/** Dessin des objets texturés */
-	void drawSceneTEX(void) const
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		for (vector<CObject*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
-		     objectsArrayIterator != m_objectsArray.end();
-		     objectsArrayIterator++)
-			(*objectsArrayIterator)->draw(TEXTURED,true, m_boundingSpheresMode);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	};
-
-	/** Dessin des objets non texturés */
-	void drawSceneWTEX() const
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		for (vector<CObject*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
-		     objectsArrayIterator != m_objectsArray.end();
-		     objectsArrayIterator++)
-			(*objectsArrayIterator)->draw(FLAT,false, m_boundingSpheresMode);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	};
-
-	/** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
-	void drawSceneWT() const
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		for (vector < CObject * >::const_iterator objectsArrayIterator = m_objectsArray.begin ();
-		     objectsArrayIterator != m_objectsArray.end ();
-		     objectsArrayIterator++)
-			(*objectsArrayIterator)->draw (AMBIENT,false, m_boundingSpheresMode);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	};
-
-	/** Dessin de tous les objets de la scène */
-	void drawScene () const
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		for (vector<CObject*>::const_iterator objectsArrayIterator = m_objectsArray.begin();
-		     objectsArrayIterator != m_objectsArray.end();
-		     objectsArrayIterator++)
-			(*objectsArrayIterator)->draw(ALL,true, m_boundingSpheresMode);
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	};
-
-	/** Dessin de tous les objets de la scène en enlevant les textures si nécessaire */
-	void drawSceneForSelection() const
-	{
-		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-		glEnableClientState(GL_NORMAL_ARRAY);
-		glEnableClientState(GL_VERTEX_ARRAY);
-
-		for (vector < CObject * >::const_iterator objectsArrayIterator = m_objectsArray.begin ();
-		     objectsArrayIterator != m_objectsArray.end ();
-		     objectsArrayIterator++)
-			(*objectsArrayIterator)->DrawForSelection ();
-
-		glDisableClientState(GL_VERTEX_ARRAY);
-		glDisableClientState(GL_NORMAL_ARRAY);
-		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0 );
-		glBindBuffer(GL_ARRAY_BUFFER, 0 );
-	};
-
-	void getBoundingBox(CPoint& a_rMin, CPoint& a_rMax)
-	{
-		a_rMin = m_min;
-		a_rMax = m_max;
-	}
-
-	void selectItem(uint selectedItem)
-	{
-		assert ( selectedItem < m_objectsArray.size()+m_lightSourcesArray.size() );
-		if (selectedItem < m_objectsArray.size())
-			m_selectedItem = m_objectsArray[selectedItem];
+		if (a_uiSelectedItem < m_vpObjects.size())
+			m_pSelectedItem = m_vpObjects[a_uiSelectedItem];
 		else
-			m_selectedItem = m_lightSourcesArray[selectedItem-m_objectsArray.size()];
-		m_selectedItem->Select();
+			m_pSelectedItem = m_vpLights[a_uiSelectedItem-m_vpObjects.size()];
+		m_pSelectedItem->Select();
 	}
 
 	void deselectItem()
 	{
-		m_selectedItem->Deselect();
-		m_selectedItem = NULL;
+		m_pSelectedItem->Deselect();
+		m_pSelectedItem = NULL;
 	}
 
-	void toggleItem(uint selectedItem)
+	void toggleItem(uint a_uiSelectedItem)
 	{
-		assert ( selectedItem < m_objectsArray.size()+m_lightSourcesArray.size() );
-		if (selectedItem >= m_objectsArray.size())
-			m_lightSourcesArray[selectedItem-m_objectsArray.size()]->toggle();
+		assert ( a_uiSelectedItem < m_vpObjects.size()+m_vpLights.size() );
+
+		if (a_uiSelectedItem >= m_vpObjects.size())
+			m_vpLights[a_uiSelectedItem-m_vpObjects.size()]->toggle();
 	}
 
 	void moveSelectedItem(float x, float y, float z, float oldX, float oldY);
 
 private:
-	vector<CObject*>        m_objectsArray; /** Liste des objets de la scene ne projetant pas d'ombres. */
-	vector<CMaterial*>      m_materialArray; /** Liste des matériaux.*/
-	vector<CBitmapTexture*> m_texturesArray; /** Liste des textures.*/
-	vector<ILight*>        m_lightSourcesArray; /** Liste des sources de lumière. */
 
-	/** Mode d'affichage */
-	uint m_boundingSpheresMode;
+	typedef vector<CObject*> CObjectsVector;
+	typedef vector<CMaterial*> CMaterialsVector;
+	typedef vector<CBitmapTexture*> CTexturesVector;
+	typedef vector<ILight*> CLightsVector;
 
-	/** Englobant */
-	CPoint m_min, m_max;
+	CObjectsVector		m_vpObjects; 		/** Liste des objets de la scène. */
+	CMaterialsVector 	m_vpMaterials; 		/** Liste des matériaux.*/
+	CTexturesVector		m_vpTextures; 		/** Liste des textures.*/
+	CLightsVector    	m_vpLights; 		/** Liste des sources de lumière. */
 
-	float m_initialNbPhotons;
-
-	ISceneItem *m_selectedItem;
+	ISceneItem *m_pSelectedItem;
 
 public:
 	/** Compteur permettant d'affecter un nom unique */

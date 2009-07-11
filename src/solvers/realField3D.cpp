@@ -6,9 +6,9 @@ RealField3D::RealField3D ()
 {
 }
 
-RealField3D::RealField3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
-			  float timeStep, float buoyancy) :
-  Field3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy)
+RealField3D::RealField3D (	CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
+							float timeStep, float buoyancy) :
+  Field3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy)
 {
   m_u        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
   m_v        = (float*)_mm_malloc( m_nbVoxels*sizeof(float),16);
@@ -108,7 +108,7 @@ void RealField3D::addExternalForces(const CPoint& position, bool move)
   if(move){
     force = position;
     strength.x = strength.y = strength.z = 1;
-    setPosition(m_position + position);
+	m_rTransform.Move(position);
   }else{
     force = position;
     strength = position * .1f;
@@ -132,8 +132,8 @@ void RealField3D::addExternalForces(const CPoint& position, bool move)
 	  m_wSrc[IX(i, j, k)] += strength.z*j/(float)m_nbVoxelsY;
 }
 
-void RealField3D::addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
-				  const CPoint& TRStrength, const CPoint& BRStrength)
+void RealField3D::addForcesOnFace(	unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+									const CPoint& TRStrength, const CPoint& BRStrength)
 {
   switch(face){
   case LEFT_FACE : ;

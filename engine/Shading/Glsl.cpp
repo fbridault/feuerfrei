@@ -13,12 +13,15 @@ using namespace std;
 
 static CharCPtr s_szDirectory = NULL;
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CShader::CShader(const string& vpname, const string& fpname, const string& macros)
 {
   assert(!vpname.empty());
   assert(!fpname.empty());
 
-  m_program = glCreateProgram();
+  m_uiProgram = glCreateProgram();
 
   m_vertexShader.load(vpname,macros);
   m_fragmentShader.load(fpname,macros);
@@ -27,26 +30,35 @@ CShader::CShader(const string& vpname, const string& fpname, const string& macro
   AttachShader(m_fragmentShader);
 
   Link();
-};
+}
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CShader::CShader(const string& fpname, const string& macros)
 {
   assert(!fpname.empty());
 
-  m_program = glCreateProgram();
+  m_uiProgram = glCreateProgram();
 
   m_fragmentShader.load(fpname,macros);
 
   AttachShader(m_fragmentShader);
 
   Link();
-};
+}
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CShader::SetShadersDirectory(CharCPtrC a_szDirectory)
 {
 	s_szDirectory = a_szDirectory;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void IShaderProgram::load(const string& fileNames, const string& macros ) const
 {
   GLint infologLength;
@@ -75,9 +87,9 @@ void IShaderProgram::load(const string& fileNames, const string& macros ) const
   for (vector<string>::const_iterator fileNamesIterator = vFileNames.begin ();
        fileNamesIterator != vFileNames.end (); fileNamesIterator++, i++)
   {
-    getFileContents(*fileNamesIterator,s[i]);
+    GetFileContents(*fileNamesIterator,s[i]);
     if (!macros.empty())
-      addMacros(macros,s[i]);
+      AddMacros(macros,s[i]);
     source[i] = s[i].c_str();
   }
   glShaderSource(m_shader, vFileNames.size(), source, NULL);
@@ -101,7 +113,10 @@ void IShaderProgram::load(const string& fileNames, const string& macros ) const
   }
 }
 
-void IShaderProgram::addMacros(const string& macros, string& source) const
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void IShaderProgram::AddMacros(const string& macros, string& source) const
 {
   vector<string> vMacros;
 
@@ -114,7 +129,10 @@ void IShaderProgram::addMacros(const string& macros, string& source) const
     source.insert(0,*vMacrosIterator);
 }
 
-void IShaderProgram::getFileContents(const string& fileName, string& source) const
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void IShaderProgram::GetFileContents(const string& fileName, string& source) const
 {
   string buffer;
 
@@ -130,11 +148,14 @@ void IShaderProgram::getFileContents(const string& fileName, string& source) con
   input.close();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void IShaderProgram::splitStringInStringsArray(const string& names, vector<string>& splitNames,
     const string& prefix, const string& suffix) const
 {
   bool find = true;
-  uint start=0,index=0;
+  StrSize start=0,index=0;
 
   while (find)
   {

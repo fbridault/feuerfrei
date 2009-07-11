@@ -26,13 +26,14 @@ public:
 	 * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
 	 */
 	Candle(	const FlameConfig& a_rFlameConfig,
-					Field3D& a_rField,
-					CScene& a_rScene,
-					float a_fRayon,
-					CharCPtrC a_szWickFileName,
-					const CShader& a_rGenShadowCubeMapShader,
-					const CRenderTarget& a_rShadowRenderTarget,
-					CWick *a_pWick=NULL);
+			Field3D& a_rField,
+			CTransform &a_rLuminaryTransform,
+			CScene& a_rScene,
+			float a_fRayon,
+			CharCPtrC a_szWickFileName,
+			const CShader& a_rGenShadowCubeMapShader,
+			const CRenderTarget& a_rShadowRenderTarget,
+			CWick *a_pWick=NULL);
 	/** Destructeur */
 	virtual ~Candle(){};
 };
@@ -51,12 +52,13 @@ public:
 	 * @param scene CPointeur sur la scène.
 	 * @param wickFileName nom du fichier contenant la mèche
 	 */
-	Firmalampe(const FlameConfig& a_rFlameConfig,
-							Field3D& a_rField,
-							CScene& a_rScene,
-							CharCPtrC a_szWickFileName,
-							const CShader& a_rGenShadowCubeMapShader,
-							const CRenderTarget& a_rShadowRenderTarget);
+	Firmalampe(	const FlameConfig& a_rFlameConfig,
+				Field3D& a_rField,
+				CTransform &a_rLuminaryTransform,
+				CScene& a_rScene,
+				CharCPtrC a_szWickFileName,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget);
 	/** Destructeur */
 	virtual ~Firmalampe(){};
 };
@@ -72,41 +74,57 @@ public:
 	 * @param torchName nom du fichier contenant le luminaire.
 	 */
 	CTFire(	const FlameConfig& a_rFlameConfig,
-					Field3D& a_rField,
-					CScene& a_rScene,
-					CharCPtrC a_szTorchName,
-					CharCPtrC a_rTextureName,
-					const CShader& a_rGenShadowCubeMapShader,
-					const CRenderTarget& a_rShadowRenderTarget,
-					float a_fWidth,
-					float a_fDetachedWidth) :
-			IDetachableFireSource (a_rFlameConfig, a_rField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+			Field3D& a_rField,
+			CTransform &a_rLuminaryTransform,
+			CScene& a_rScene,
+			CharCPtrC a_szTorchName,
+			CharCPtrC a_rTextureName,
+			const CShader& a_rGenShadowCubeMapShader,
+			const CRenderTarget& a_rShadowRenderTarget,
+			float a_fWidth,
+			float a_fDetachedWidth) :
+		IDetachableFireSource (a_rFlameConfig, a_rField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 	{
-		vector<CWick *> objList;
-
-		bool bStatus = UObjImporter::import(a_rScene, a_szTorchName, objList, WICK_NAME_PREFIX);
+		bool bStatus = UObjImporter::import<CWick>(a_rScene, a_szTorchName, NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
 		assert(bStatus == true);
 
-		m_nbFlames = objList.size();
+		m_nbFlames = a_rLuminaryTransform.GetNumObjects();
+		assert(m_nbFlames > 0);
 		m_flames = new IRealFlame* [m_nbFlames];
 
-		CPoint rPosition = GrabPosition();
-		/* Calcul de la position et recentrage des mèches */
-		for (vector <CWick *>::iterator objListIterator = objList.begin ();
-		        objListIterator != objList.end (); objListIterator++)
+		CTransform& rTransform = GrabTransform();
+		CPoint oPosition = rTransform.GetLocalPosition();
+
+		// Grab list of imported wicks
+		CTransform::CObjectsList& rlWicks = a_rLuminaryTransform.GrabObjects();
+
+		// Compute position
+		ForEachIter(itObject, CTransform::CObjectsList, rlWicks)
 		{
-			(*objListIterator)->buildBoundingBox();
-			rPosition += (*objListIterator)->getCenter();
+			// We know that we have only wicks
+			CWick* pWick = dynamic_cast<CWick *>(*itObject);
+			oPosition += pWick->GetCenter();
 		}
-		rPosition = CPoint(0.5f,0.0f,0.5f) - rPosition/m_nbFlames;
-		for (vector <CWick *>::iterator objListIterator = objList.begin ();
-		        objListIterator != objList.end (); objListIterator++)
-			(*objListIterator)->HardTranslate(rPosition);
+
+		// Center wicks
+		oPosition = CPoint(0.5f,0.0f,0.5f) - oPosition/m_nbFlames;
+		ForEachIter(itObject, CTransform::CObjectsList, rlWicks)
+		{
+			// We know that we have only wicks
+			CWick* pWick = dynamic_cast<CWick *>(*itObject);
+			pWick->HardTranslate(oPosition);
+		}
+
+		// Set new position in the transform
+		rTransform.SetPosition(oPosition);
 
 		int i=0;
-		for (vector <CWick *>::iterator objListIterator = objList.begin ();
-		        objListIterator != objList.end (); objListIterator++, i++)
-			m_flames[i] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (*objListIterator), a_fWidth, a_fDetachedWidth, this);
+		ForEachIterC(itObject, CTransform::CObjectsList, rlWicks)
+		{
+			m_flames[i++] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (CWick *)(*itObject),
+											a_fWidth, a_fDetachedWidth, this);
+		}
+		a_rLuminaryTransform.AddChild(this);
 	}
 
 	/** Destructeur */
@@ -115,11 +133,11 @@ public:
 	/** Dessine la mèche de la flamme. Les mèches des IRealFlame sont définies en (0,0,0), une translation
 	 * est donc effectuée pour tenir compte du placement du feu dans le monde.
 	 */
-	virtual void drawWick(bool displayBoxes) const
+	virtual void drawWickBoxes() const
 	{
 		if (t_bDrawWick)
 		{
-			IDetachableFireSource::drawWick(displayBoxes);
+			IDetachableFireSource::drawWickBoxes();
 		}
 	}
 };
@@ -160,30 +178,28 @@ public:
 	 * @param rayon Rayon de la flamme.
 	 */
 	CandleStick(const FlameConfig& a_rFlameConfig,
-							Field3D& a_rField,
-							CScene& a_rScene,
-							CharCPtrC a_szFilename,
-							float a_fRayon,
-							const CShader& a_rGenShadowCubeMapShader,
-							const CRenderTarget& a_rShadowRenderTarget);
+				Field3D& a_rField,
+				CTransform &a_rFieldTransform,
+				CScene& a_rScene,
+				CharCPtrC a_szFilename,
+				float a_fRayon,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget);
 
 	/** Destructeur */
 	virtual ~CandleStick();
 
 	virtual void build();
 
-	virtual void drawWick(bool displayBoxes) const
+	virtual void drawWickBoxes(bool displayBoxes) const
 	{
-		CPoint const& rPos = getPosition();
-		CPoint const& rScale = m_rField.getScale();
-		glPushMatrix();
-		glTranslatef (rPos.x,rPos.y,rPos.z);
-		glScalef (rScale.x, rScale.y, rScale.z);
+		CTransform const& rTransform = m_rField.GetTransform();
+		rTransform.Push();
 		for (uint i = 0; i < m_nbFlames; i++)
-			m_flames[i]->drawWick(displayBoxes);
+			m_flames[i]->drawWickBoxes();
 		for (uint i = 0; i < m_nbCloneFlames; i++)
-			m_cloneFlames[i]->drawWick(displayBoxes);
-		glPopMatrix();
+			m_cloneFlames[i]->drawWickBoxes();
+		rTransform.Pop();
 	}
 
 	virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const
@@ -199,16 +215,13 @@ public:
 			default :
 				if (m_visibility)
 				{
-					CPoint const& rPos = getPosition();
-					CPoint const& rScale = m_rField.getScale();
-					glPushMatrix();
-					glTranslatef (rPos.x,rPos.y,rPos.z);
-					glScalef (rScale.x, rScale.y, rScale.z);
+					CTransform const& rTransform = m_rField.GetTransform();
+					rTransform.Push();
 					for (uint i = 0; i < m_nbFlames; i++)
 						m_flames[i]->drawFlame(display, displayParticle);
 					for (uint i = 0; i < m_nbCloneFlames; i++)
 						m_cloneFlames[i]->drawFlame(display, displayParticle);
-					glPopMatrix();
+					rTransform.Pop();
 				}
 		}
 	}

@@ -43,7 +43,7 @@ public:
 
 	/** Lecture d'un indice dans le maillage.
 	 * @return Indice. */
-	uint getIndex(uint i) const
+	uint GetIndex(uint i) const
 	{
 		assert( i < m_indexArray.size()) ;
 		return m_indexArray[i];
@@ -59,21 +59,21 @@ public:
 
 	/** Lecture du nombre de polygones contenus dans le maillage.
 	 * @return Nombre de polygones. */
-	uint getIndexesCount () const
+	uint GetIndexesCount () const
 	{
 		return (m_indexArray.size());
 	};
 
 	/** Lecture du nombre de polygones contenus dans le maillage.
 	 * @return Nombre de polygones. */
-	uint getPolygonsCount () const
+	uint GetPolygonsCount () const
 	{
 		return (m_indexArray.size() / 3);
 	};
 
 	/** Lecture de l'index du matériau utilisé par le maillage.
 	 * @return Index du matériau dans la liste de matériau contenu dans la scène. */
-	uint getMaterialIndex () const
+	uint GetMaterialIndex () const
 	{
 		return (m_uiMaterial);
 	};
@@ -84,13 +84,13 @@ public:
 		m_attributes = attr;
 	};
 	/** Récupérer les attributs de l'objet. */
-	uint getAttributes () const
+	uint GetAttributes () const
 	{
 		return m_attributes;
 	};
 
 	/** Construction du Vertex Buffer CObject du maillage, ici le tableau d'indice. */
-	void buildVBO() const;
+	void BuildVBO() const;
 
 	/** Fonction de dessin de l'objet avec utilisation des VBOs.
 	 * @param drawCode
@@ -101,9 +101,7 @@ public:
 	 * @param tex false si l'objet texturé doit être affiché sans sa texture
 	 * @param lastMaterialIndex indice du dernier matériau appliqué, utilisé en entrée et en sortie.
 	 */
-	void draw(char drawCode, bool tex, uint& lastMaterialIndex) const;
-
-	void drawForSelection () const;
+	void Render() const;
 
 	const bool isTransparent () const;
 
@@ -118,7 +116,7 @@ public:
 	/** Calcule la visibilité de l'objet
 	 * @param view Référence sur la caméra
 	 */
-	void computeVisibility(const CCamera &view);
+	bool computeVisibility(const CCamera &view);
 
 	/** Construction des sphères englobantes de l'objet. A appeler après l'import de la scène. */
 	void buildBoundingSphere (CRefTable& refTable);
@@ -137,10 +135,10 @@ public:
 		return m_boundingSphere.GetCentre();
 	}
 
-	float getArea() const;
+	float GetArea() const;
 
-	void getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const;
-	void getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVector& normal) const;
+	void GetTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const;
+	void GetTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVector& normal) const;
 
 	CVector generateRandomRayHemisphere(uint iTriangle) const;
 

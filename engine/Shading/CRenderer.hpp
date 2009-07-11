@@ -14,11 +14,11 @@ class CForwardRenderer : public IRenderer
 {
 public: // ---------------------------------------------------
 
-  CForwardRenderer(CScene& a_rScene);             // Default Constructor, ctl is a pointer to OpenGL controller necessary for scene drawing.
+  CForwardRenderer(CScene& a_rScene);             // Default Constructor
   virtual ~CForwardRenderer(){};
 
-  void drawDirect(const ILight& src) const;   // Drawing method for direct lighting.
-  void drawBrdf() const;                                		// Drawing method for brdf factor.
+  void drawDirect(const ILight& src, CRenderList const& a_rRenderList) const;    // Drawing method for direct lighting.
+  void drawBrdf(CRenderList const& a_rRenderList) const;                         // Drawing method for brdf factor.
 };
 
 
@@ -30,13 +30,13 @@ class CDeferredRenderer : public IRenderer
 {
 public: // ---------------------------------------------------
 
-  CDeferredRenderer(CScene&a_rScene, uint width, uint height, const CCamera& camera); // Default Constructor, ctl is a pointer to OpenGL controller necessary for scene drawing.
+  CDeferredRenderer(CScene&a_rScene, uint width, uint height, const CCamera& camera); // Default Constructor
   virtual ~CDeferredRenderer();
 
-  void drawDirect(const ILight& src) const;                     // Drawing method for direct lighting.
-  void drawBrdf() const;                                        // Drawing method for brdf factor.
+  void drawDirect(const ILight& src, CRenderList const& a_rRenderList) const;    // Drawing method for direct lighting.
+  void drawBrdf(CRenderList const& a_rRenderList) const;                         // Drawing method for brdf factor.
 
-  void genGBuffer() const;                                      // Generate GBuffer
+  void genGBuffer(CRenderList const& a_rRenderList) const;                       // Generate GBuffer
 
   void drawColorsTex(uint width, uint height) const;
   void drawNormalsTex(uint width, uint height) const;
@@ -54,9 +54,9 @@ private:
   void destroyGBuffer();
 
 private:
-  CShader *m_gBufferShader;                                 // GBuffer
-  CRenderTarget *m_gBufferTargets;
-  const CCamera& m_camera;
+  CShader *m_pGBufferShader;                                 // GBuffer
+  CRenderTarget *m_pGBufferTargets;
+  const CCamera& m_rCamera;
 };
 
 #endif // CRENDERER_H

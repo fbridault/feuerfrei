@@ -4,6 +4,7 @@
 class GLFlameCanvas;
 class DepthPeelingEngine;
 class CRenderTarget;
+class CRenderList;
 
 #include "flames.hpp"
 #include <engine/Scene/CScene.hpp>
@@ -36,8 +37,8 @@ public:
 	 * @param boundingVolume Le cas échéant, volume englobant à afficher à la place des flammes.
 	 * (le paramètre displayFlames doit tout de même être à <i>true</i> pour les visualiser)
 	 */
-	void makePeels(GLFlameCanvas* const glBuffer, const CScene* const scene);
-	void render(GLFlameCanvas* const glBuffer);
+	void makePeels(CRenderList const& a_rRenderList);
+	void render(CRenderList const& a_rRenderList);
 	void renderFS();
 
 	void addLayer()

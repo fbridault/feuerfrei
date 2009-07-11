@@ -8,146 +8,160 @@
 /****************************************** DEFINITION DE LA CLASSE LUMINARY ****************************************/
 /**********************************************************************************************************************/
 
-/** La classe Luminary
- *
+/** The CLuminary class keeps track of association between fires and fields.
+ * It is not a renderable object and thus it doesn't belongs to a spatial graph.
+ * However it knows the main transform of a fire graph and is thus used to move it.
  * @author	Flavien Bridault
  */
-class Luminary
+class CLuminary
 {
 public:
 	/** Constructeur d'une source de flammes. La position de la source est donnée dans le repère du solveur.
-	 * @param config Configuration du luminaire.
-	 * @param fields Vecteur contenant les solveurs de la scène.
-	 * @param fireSources Vecteur contenant les feux de la scène.
-	 * @param scene CPointeur sur la scène.
-	 * @param filename Nom du fichier contenant le luminaire.
+	 * @param a_rConfig Configuration du luminaire.
+	 * @param a_vpFields Vecteur contenant les solveurs de la scène.
+	 * @param a_vpFireSources Vecteur contenant les feux de la scène.
+	 * @param a_rScene CPointeur sur la scène.
+	 * @param a_szFilename Nom du fichier contenant le luminaire.
 	 */
-	Luminary (const LuminaryConfig& a_rConfig,
-						vector <Field3D *> &a_vpFields,
-						vector <IFireSource *> &a_vpFireSources,
-						CScene& a_rScene,
-						CharCPtrC a_szFilename,
-						const CShader& a_rGenShadowCubeMapShader,
-						const CRenderTarget& a_rShadowRenderTarget);
+	CLuminary (	const LuminaryConfig& a_rConfig,
+				vector <Field3D *> &a_vpFields,
+				vector <IFireSource *> &a_vpFireSources,
+				CSpatialGraph &a_rGraph,
+				CScene& a_rScene,
+				CharCPtrC a_szFilename,
+				const CShader& a_rGenShadowCubeMapShader,
+				const CRenderTarget& a_rShadowRenderTarget);
 
 	/** Destructeur */
-	virtual ~Luminary ();
-
-	Field3D* initField(const SolverConfig& fieldConfig, const CPoint& position);
-	IFireSource* initFire(	const FlameConfig& a_rFlameConfig,
-											CharCPtrC a_szFilename,
-											Field3D& a_rField,
-											CScene& a_rScene,
-											const CShader& a_rShadowMapShader,
-											const CRenderTarget& a_rShadowRenderTarget);
-
-	/** Ajuste le niveau de détail de la NURBS.
-	 * @param value valeur comprise entre 1 et LOD_VALUES.
-	 */
-	virtual void setLOD(u_char value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setLOD(value);
-	};
-
-	/** Affectation du coefficient multiplicateur de la FDF.
-	 * @param value Coefficient.
-	 */
-	virtual void setInnerForce(float value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setInnerForce(value);
-	};
-
-	/** Affectation de la FDF.
-	 * @param value FDF.
-	 */
-	virtual void setFDF(int value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setFDF(value);
-	};
-
-	/** Affectation de la méthode de perturbation.
-	 * @param value Perturbation.
-	 */
-	virtual void setPerturbateMode(char value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setPerturbateMode(value);
-	};
-
-	/** Affectation de la durée de vie des squelettes guides.
-	 * @param value Durée de vie en itérations.
-	 */
-	virtual void setLeadLifeSpan(uint value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setLeadLifeSpan(value);
-	};
-
-	/** Affectation de la durée de vie des squelettes périphériques.
-	 * @param value Durée de vie en itérations.
-	 */
-	virtual void setPeriLifeSpan(uint value)
-	{
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-		     fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->setPeriLifeSpan(value);
-	};
-
-	virtual void setBuoyancy(float value)
-	{
-		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
-		     fieldIterator != m_fields.end (); fieldIterator++)
-			(*fieldIterator)->setBuoyancy(value);
-	}
-
-	virtual void setVorticity(float value)
-	{
-		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
-		     fieldIterator != m_fields.end (); fieldIterator++)
-			(*fieldIterator)->setVorticity(value);
-	}
+	virtual ~CLuminary ();
 
 	/** Déplace le luminaire.
 	 * @param forces Déplacement en (x,y,z).
 	 */
 	virtual void Move(const CPoint& a_rPosition)
 	{
-		CVector diff = a_rPosition - m_position;
-		for (list < Field3D* >::iterator fieldIterator = m_fields.begin ();
-			fieldIterator != m_fields.end (); fieldIterator++)
-			(*fieldIterator)->move(diff);
+		assert(m_pTransform != NULL);
+		CVector diff = a_rPosition - m_pTransform->GetLocalPosition();
 
-		for (list < IFireSource* >::iterator fireIterator = m_fireSources.begin ();
-			fireIterator != m_fireSources.end (); fireIterator++)
-			(*fireIterator)->Move(diff);
+		/* Notify fields of movement so that it can add forces */
+		ForEachIter(itField, CFieldList, m_vpFields)
+		{
+			(*itField)->move(diff);
+		}
 
-		for (vector < CObject* >::const_iterator luminaryIterator = m_luminary.begin ();
-			luminaryIterator  != m_luminary.end (); luminaryIterator++)
-			(*luminaryIterator)->SetPosition(a_rPosition);
-		m_position = a_rPosition;
+		m_pTransform->SetPosition(a_rPosition);
+	}
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Specific methods
+//---------------------------------------------------------------------------------------------------------------------
+
+	static Field3D* initField(const SolverConfig& fieldConfig, CTransform& a_rTransform);
+	static IFireSource* initFire(	const FlameConfig& a_rFlameConfig,
+							CharCPtrC a_szFilename,
+							Field3D& a_rField,
+							CTransform &a_rLuminaryTransform,
+							CScene& a_rScene,
+							const CShader& a_rShadowMapShader,
+							const CRenderTarget& a_rShadowRenderTarget);
+
+	/** Ajuste le niveau de détail de la NURBS.
+	 * @param value valeur comprise entre 1 et LOD_VALUES.
+	 */
+	void setLOD(u_char value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setLOD(value);
+		}
+	}
+
+	/** Affectation du coefficient multiplicateur de la FDF.
+	 * @param value Coefficient.
+	 */
+	void setInnerForce(float value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setInnerForce(value);
+		}
+	}
+
+	/** Affectation de la FDF.
+	 * @param value FDF.
+	 */
+	void setFDF(int value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setFDF(value);
+		}
+	}
+
+	/** Affectation de la méthode de perturbation.
+	 * @param value Perturbation.
+	 */
+	void setPerturbateMode(char value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setPerturbateMode(value);
+		}
+	}
+
+	/** Affectation de la durée de vie des squelettes guides.
+	 * @param value Durée de vie en itérations.
+	 */
+	void setLeadLifeSpan(uint value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setLeadLifeSpan(value);
+		}
+	}
+
+	/** Affectation de la durée de vie des squelettes périphériques.
+	 * @param value Durée de vie en itérations.
+	 */
+	void setPeriLifeSpan(uint value)
+	{
+		ForEachIter(itFire, CFireSourceList, m_vpFireSources)
+		{
+			(*itFire)->setPeriLifeSpan(value);
+		}
+	}
+
+	void setBuoyancy(float value)
+	{
+		ForEachIter(itField, CFieldList, m_vpFields)
+		{
+			(*itField)->setBuoyancy(value);
+		}
+	}
+
+	void setVorticity(float value)
+	{
+		ForEachIter(itField, CFieldList, m_vpFields)
+		{
+			(*itField)->setVorticity(value);
+		}
 	}
 
 protected:
-	/** Luminaire */
-	vector <CObject *> m_luminary;
-	/** Luminaire */
-	list <IFireSource *> m_fireSources;
-	/** Luminaire */
-	list <Field3D *> m_fields;
+
+	/** Fires */
+	typedef list <IFireSource *> CFireSourceList;
+	CFireSourceList m_vpFireSources;
+
+	/** Fields */
+	typedef list <Field3D *> CFieldList;
+	CFieldList m_vpFields;
 
 	/** Il se peut que le luminaire ne soit pas un objet physique, dans ce cas ce booléen est à false */
 	bool m_hasLuminary;
 
-	/** Position du luminaire. */
-	CPoint m_position;
+	/** Référence vers le noeud de transformation */
+	CTransform *m_pTransform;
 };
 
 

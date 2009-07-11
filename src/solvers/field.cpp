@@ -1,10 +1,12 @@
 #include "field.hpp"
 
-Field::Field()
+CTransform st_oTransform;
+
+Field::Field() : m_rTransform(st_oTransform)
 {
 }
 
-Field::Field (const CPoint& position, float timeStep, float buoyancy) : m_position(position)
+Field::Field (CTransform& a_rTransform, float timeStep, float buoyancy) : m_rTransform(a_rTransform)
 {
   m_dt = timeStep;
 

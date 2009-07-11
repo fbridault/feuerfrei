@@ -8,8 +8,8 @@ Field3D::Field3D ()
 {
 }
 
-Field3D::Field3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale, float timeStep, float buoyancy) :
-  Field(position, timeStep, buoyancy)
+Field3D::Field3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim, float timeStep, float buoyancy) :
+  Field(a_rTransform, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;
@@ -48,7 +48,6 @@ Field3D::Field3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float di
   buildDLBase ();
 
   m_nbMaxDiv = 1;
-  m_scale = scale;
 }
 
 Field3D::~Field3D ()

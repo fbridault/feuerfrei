@@ -270,7 +270,7 @@ public:
 	* Puis je calcule la hauteur depend de la projection de V2
 	* Sur V1 (produit scalaire).
 	*/
-	static float getTriangleArea(const CPoint &P1,const CPoint &P2,const CPoint &P3);
+	static float GetTriangleArea(const CPoint &P1,const CPoint &P2,const CPoint &P3);
 
 	// creates a random point on the triangle P1, P2, P3 => this
 	void setRandomPointInTriangle(const CPoint &P1, const CPoint &P2, const CPoint &P3);

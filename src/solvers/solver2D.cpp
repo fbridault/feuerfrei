@@ -7,9 +7,9 @@ Solver2D::Solver2D ()
 {
 }
 
-Solver2D::Solver2D (const CPoint& position, uint n_x, uint n_y,float dim, float timeStep, float buoyancy,
-		    float vorticityConfinement) :
-  Field(position, timeStep, buoyancy)
+Solver2D::Solver2D (CTransform& a_rTransform, uint n_x, uint n_y,float dim, float timeStep, float buoyancy,
+					float vorticityConfinement) :
+  Field(a_rTransform, timeStep, buoyancy)
 {
   m_nbVoxelsX = n_x;
   m_nbVoxelsY = n_y;

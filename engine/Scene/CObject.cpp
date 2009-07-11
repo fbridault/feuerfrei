@@ -6,247 +6,217 @@
 
 #include <values.h>
 
-/**************************************************************************************************/
-/**														 DEFINITION DE L'INTERFACE ISCENEITEM												*/
-/**************************************************************************************************/
+/*********************************************************************************************************************/
+/**		Interface ISceneItem            	 														   			 */
+/*********************************************************************************************************************/
 
-ISceneItem::ISceneItem(CPoint const& a_rPosition) :
-	m_oPosition(a_rPosition), m_oScale(1.f,1.f,1.f), m_bSelected(false)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+ISceneItem::ISceneItem(NRenderType const& a_nRenderType) :
+	m_bSelected(false),
+	m_bVisible(true),
+	m_nRenderType(a_nRenderType)
 {
 	m_uiGlName = CScene::glNameCounter++;
 }
 
-/**************************************************************************************************/
-/**														 DEFINITION DE LA CLASSE OBJECT 											 	    			*/
-/**************************************************************************************************/
+/*********************************************************************************************************************/
+/**		Class CObject          					  	 													   			 */
+/*********************************************************************************************************************/
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-CObject::CObject(CScene& a_rScene) :
-	ISceneItem(CPoint(0,0,0)),
+//---------------------------------------------------------------------------------------------------------------------
+CObject::CObject(CScene& a_rScene, CTransform& a_rTransform) :
+	ISceneItem(NRenderType::eNormal),
 	m_bBuilt(false),
 	m_rScene(a_rScene),
-	m_attributes(0)
+	m_rTransform(a_rTransform),
+	m_attributes(0),
+	m_oBBMin(FLT_MAX, FLT_MAX, FLT_MAX),
+ 	m_oBBMax(-FLT_MAX, -FLT_MAX, -FLT_MAX)
 {
 	glGenBuffers(1, &m_bufferID);
+	m_rTransform.AddChild(this);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 CObject::~CObject ()
 {
 	m_vertexArray.clear();
 
-	for (vector <CMesh* >::iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		delete (*meshesListIterator);
+	ForEachIter(itMesh, CMeshesVector, m_meshesList)
+	{
+		delete (*itMesh);
+	}
 	m_meshesList.clear ();
 	glDeleteBuffers(1, &m_bufferID);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::buildBoundingBox ()
-{
-	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
-	/* Création de la bounding box */
-
-	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
-	     vertexIterator != m_vertexArray.end (); vertexIterator++)
-	{
-		/* Calcul du max */
-		if ( vertexIterator->x > ptMax.x)
-			ptMax.x = vertexIterator->x;
-		if ( vertexIterator->y > ptMax.y)
-			ptMax.y = vertexIterator->y;
-		if ( vertexIterator->z > ptMax.z)
-			ptMax.z = vertexIterator->z;
-		/* Calcul du min */
-		if ( vertexIterator->x < ptMin.x)
-			ptMin.x = vertexIterator->x;
-		if ( vertexIterator->y < ptMin.y)
-			ptMin.y = vertexIterator->y;
-		if ( vertexIterator->z < ptMin.z)
-			ptMin.z = vertexIterator->z;
-	}
-	m_max = ptMax;
-	m_min = ptMin;
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::HardScale (float scaleFactor)
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::HardScale (float a_fScaleFactor)
 {
 	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
 	     vertexIterator != m_vertexArray.end (); vertexIterator++)
 	{
-		vertexIterator->x = vertexIterator->x * scaleFactor;
-		vertexIterator->y = vertexIterator->y * scaleFactor;
-		vertexIterator->z = vertexIterator->z * scaleFactor;
+		vertexIterator->x = vertexIterator->x * a_fScaleFactor;
+		vertexIterator->y = vertexIterator->y * a_fScaleFactor;
+		vertexIterator->z = vertexIterator->z * a_fScaleFactor;
 	}
-	m_max = m_max * scaleFactor;
-	m_min = m_min * scaleFactor;
+	m_oBBMax = m_oBBMax * a_fScaleFactor;
+	m_oBBMin = m_oBBMin * a_fScaleFactor;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::HardTranslate (const CPoint& offset)
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::HardTranslate (const CPoint& a_rOffset)
 {
 	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
 	     vertexIterator != m_vertexArray.end (); vertexIterator++)
 	{
-		vertexIterator->x = vertexIterator->x + offset.x;
-		vertexIterator->y = vertexIterator->y + offset.y;
-		vertexIterator->z = vertexIterator->z + offset.z;
+		vertexIterator->x = vertexIterator->x + a_rOffset.x;
+		vertexIterator->y = vertexIterator->y + a_rOffset.y;
+		vertexIterator->z = vertexIterator->z + a_rOffset.z;
 	}
-	m_max = m_max + offset;
-	m_min = m_min + offset;
+	m_oBBMax = m_oBBMax + a_rOffset;
+	m_oBBMin = m_oBBMin + a_rOffset;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::buildBoundingSpheres ()
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::BuildBoundingSpheres ()
 {
-	CRefTable refTable(getVertexArraySize());
+	CRefTable refTable(GetVertexArraySize());
 
-	for (vector <CMesh* >::iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		(*meshesListIterator)->buildBoundingSphere(refTable);
+	ForEachIter(itMesh, CMeshesVector, m_meshesList)
+	{
+		(*itMesh)->buildBoundingSphere(refTable);
+	}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void CObject::drawBoundingSpheres ()
 {
-	m_rScene.getMaterial(0)->apply();
-	for (vector <CMesh* >::iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		(*meshesListIterator)->drawBoundingSphere();
+	m_rScene.GetMaterial(0).apply();
+	ForEachIterC(itMesh, CMeshesVector, m_meshesList)
+	{
+		(*itMesh)->drawBoundingSphere();
+	}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::computeVisibility(const CCamera &view)
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::ComputeVisibility(const CCamera &a_rView)
 {
-	for (vector <CMesh* >::iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		(*meshesListIterator)->computeVisibility(view);
+	bool bVisible = false;
+
+	// TODO: Put Meshes in scene graph/render list !!!
+	ForEachIter(itMesh, CMeshesVector, m_meshesList)
+	{
+		bVisible |= (*itMesh)->computeVisibility(a_rView);
+	}
+	SetVisibility(bVisible);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-uint CObject::getPolygonsCount () const
+//---------------------------------------------------------------------------------------------------------------------
+uint CObject::GetPolygonsCount () const
 {
 	uint count=0;
-	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		count += (*meshesListIterator)->getPolygonsCount();
+	ForEachIterC(itMesh, CMeshesVector, m_meshesList)
+	{
+		count += (*itMesh)->GetPolygonsCount();
+	}
 	return count;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::buildVBO()
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::BuildVBO()
 {
 	assert(m_bBuilt == false);
 
 	/* Détermination du type de données décrites à partir des maillages */
-	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		if ( (*meshesListIterator)->getAttributes() > m_attributes)
-			m_attributes = (*meshesListIterator)->getAttributes();
+	ForEachIterC(itMesh, CMeshesVector, m_meshesList)
+	{
+		if((*itMesh)->GetAttributes() > m_attributes)
+			m_attributes = (*itMesh)->GetAttributes();
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_bufferID);
 	glBufferData(GL_ARRAY_BUFFER, m_vertexArray.size()*sizeof(Vertex), &m_vertexArray[0], GL_STATIC_DRAW);
 
-	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		(*meshesListIterator)->buildVBO();
+	ForEachIterC(itMesh, CMeshesVector, m_meshesList)
+	{
+		(*itMesh)->BuildVBO();
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0 );
 	m_bBuilt = true;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::draw (char drawCode, bool tex, bool boundingSpheres) const
+//---------------------------------------------------------------------------------------------------------------------
+void CObject::Render () const
 {
 	assert(m_bBuilt == true);
 
-	/* On initialise le dernier matériau au premier de la liste, le matériau par défaut */
-	uint lastMaterialIndex=0;
+	CDrawState &rDrawState = CDrawState::GetInstance();
+	NShadingType const& nShadingType = rDrawState.GetShadingType();
+	NDrawType const& nDrawType = rDrawState.GetDrawType();
 
-	if (boundingSpheres)
+	if (nDrawType == NDrawType::eBoundingSphere)
 	{
-		m_rScene.getMaterial(0)->apply();
-		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-		     meshesListIterator != m_meshesList.end ();
-		     meshesListIterator++)
-			(*meshesListIterator)->drawBoundingSphere();
+		m_rScene.GetMaterial(0).apply();
+		ForEachIterC(itMesh, CMeshesVector, m_meshesList)
+		{
+			(*itMesh)->drawBoundingSphere();
+		}
 	}
 	else
 	{
-		if (drawCode == AMBIENT)
+		if (nDrawType == NDrawType::eSelection)
+		{
+			glPushName(GetItemName());
+			assert(nShadingType == NShadingType::eAmbient);
+		}
+
+		if (nShadingType == NShadingType::eAmbient)
+		{
 			/* Dessiner avec le matériau par défaut (pour tester les zones d'ombres par exemple) */
-			m_rScene.getMaterial(0)->apply();
+			m_rScene.GetMaterial(0).apply();
+		}
 
-		CPoint const& rPosition = GetPosition();
-		CPoint const& rScale = GetScale();
-		glPushMatrix();
-		glTranslatef(rPosition.x,rPosition.y, rPosition.z);
-		glScalef(rScale.x, rScale.y, rScale.z);
 		/* Parcours de la liste des meshes */
-		for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-		     meshesListIterator != m_meshesList.end ();
-		     meshesListIterator++)
-			(*meshesListIterator)->draw(drawCode, tex, lastMaterialIndex);
-		glPopMatrix();
-
-		if (drawCode != AMBIENT)
+		ForEachIterC(ItMesh, CMeshesVector, m_meshesList)
+		{
+			(*ItMesh)->Render();
+		}
+		uint uiLastMaterialIndex = rDrawState.GetLastMaterialIndex();
+		if (nShadingType != NShadingType::eAmbient)
 			/* On désactive l'unité de texture le cas échéant */
-			if (m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+			if (m_rScene.GetMaterial(uiLastMaterialIndex).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
 			{
 				glDisable(GL_TEXTURE_2D);
 			}
+
+		if (nDrawType == NDrawType::eSelection)
+		{
+			glPopName();
+		}
 	}
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------------------------------------
-void CObject::DrawForSelection () const
-{
-	m_rScene.getMaterial(0)->apply();
-
-	CPoint const& rPosition = GetPosition();
-	CPoint const& rScale = GetScale();
-	glPushMatrix();
-	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
-	glScalef(rScale.x, rScale.y, rScale.z);
-	glPushName(GetItemName());
-	/* Parcours de la liste des meshes */
-	for (vector <CMesh* >::const_iterator meshesListIterator = m_meshesList.begin ();
-	     meshesListIterator != m_meshesList.end ();
-	     meshesListIterator++)
-		(*meshesListIterator)->drawForSelection();
-	glPopName();
-	glPopMatrix();
-}
 

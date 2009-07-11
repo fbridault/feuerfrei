@@ -14,7 +14,7 @@ extern uint g_objectCount;
 //
 //---------------------------------------------------------------------------------------------------------------------
 CMesh::CMesh (CScene& a_rScene, uint a_uiMaterial, CObject& a_rParent) :
-		m_rScene(a_rScene), m_rParent(a_rParent), m_uiMaterial(a_uiMaterial), m_attributes(0), m_visibility(true)
+		m_rScene(a_rScene), m_rParent(a_rParent), m_uiMaterial(a_uiMaterial), m_attributes(0)
 {
 	glGenBuffers(1, &m_bufferID);
 }
@@ -31,7 +31,7 @@ CMesh::~CMesh ()
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CMesh::buildVBO() const
+void CMesh::BuildVBO() const
 {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexArray.size()*sizeof(GLuint), &m_indexArray[0], GL_STATIC_DRAW);
@@ -56,7 +56,7 @@ void CMesh::buildBoundingSphere (CRefTable& refTable)
 		/* Take each point only once. */
 		if ( !refTable.findRef( m_indexArray[i] ) )
 		{
-			v = m_rParent.getVertex(m_indexArray[i]);
+			v = m_rParent.GetVertex(m_indexArray[i]);
 			refTable.addRef( m_indexArray[i] );
 			oCenter = (oCenter*n + CPoint(v.x, v.y, v.z)) / (float)(n+1);
 			n++;
@@ -70,7 +70,7 @@ void CMesh::buildBoundingSphere (CRefTable& refTable)
 	     indexIterator != m_indexArray.end ();  indexIterator++)
 	{
 		CPoint p;
-		v=m_rParent.getVertex(*indexIterator);
+		v=m_rParent.GetVertex(*indexIterator);
 		p=CPoint(v.x, v.y, v.z);
 		dist=p.squaredDistanceFrom(rCenter);
 		if ( dist > rRadius)
@@ -91,56 +91,57 @@ void CMesh::drawBoundingSphere()
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CMesh::computeVisibility(const CCamera &view)
+bool CMesh::computeVisibility(const CCamera &view)
 {
-	m_visibility = m_boundingSphere.isVisible(view);
+	return m_boundingSphere.isVisible(view);
 	//if(m_visibility) g_objectCount++;
-	return;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CMesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
+void CMesh::Render() const
 {
-	if (!m_visibility)
-		return;
+	CDrawState &rDrawState = CDrawState::GetInstance();
+	NShadingFilter const& nShadingFilter = rDrawState.GetShadingFilter();
+	NShadingType const& nShadingType = rDrawState.GetShadingType();
+	uint a_uiLastMaterialIndex = rDrawState.GetLastMaterialIndex();
 
-	if (drawCode == TEXTURED)
+	if (nShadingFilter == NShadingFilter::eTextured)
 	{
 		/* Ne dessiner que si il y a une texture */
-		if (!m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
+		if (!m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
 			return;
 	}
 	else
-		if (drawCode == FLAT)
+		if (nShadingFilter == NShadingFilter::eFlat)
 		{
 			/* Ne dessiner que si il n'y a pas de texture */
-			if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
+			if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
 				return;
 		}
 
-	if (drawCode != AMBIENT)
-		if ( m_uiMaterial != lastMaterialIndex)
+	if (nShadingType != NShadingType::eAmbient)
+		if ( m_uiMaterial != a_uiLastMaterialIndex)
 		{
-			if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture() && tex)
+			if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
 			{
 				/* Inutile de réactiver l'unité de texture si le matériau précédent en avait une */
-				if (!m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture())
+				if (!m_rScene.GetMaterial(a_uiLastMaterialIndex).hasDiffuseTexture())
 				{
 					glActiveTexture(GL_TEXTURE0+OBJECT_TEX_UNIT);
 					glEnable(GL_TEXTURE_2D);
 					glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				}
-				m_rScene.getMaterial(m_uiMaterial)->getDiffuseTexture()->bind();
+				m_rScene.GetMaterial(m_uiMaterial).GetDiffuseTexture().bind();
 			}
 			else
-				if (m_rScene.getMaterial(lastMaterialIndex)->hasDiffuseTexture() && tex)
+				if (m_rScene.GetMaterial(a_uiLastMaterialIndex).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
 				{
 					/* Pas de texture pour le matériau courant, on désactive l'unité de texture car le matériau précédent en avait une */
 					glDisable(GL_TEXTURE_2D);
 				}
-			m_rScene.getMaterial(m_uiMaterial)->apply();
+			m_rScene.GetMaterial(m_uiMaterial).apply();
 		}
 
 	m_rParent.bindVBO();
@@ -148,32 +149,16 @@ void CMesh::draw (char drawCode, bool tex, uint &lastMaterialIndex) const
 
 	glDrawElements(GL_TRIANGLES, m_indexArray.size(), GL_UNSIGNED_INT, 0);
 
-	lastMaterialIndex = m_uiMaterial;
+	rDrawState.SetLastMaterialIndex(m_uiMaterial);
 }
-
-
-//---------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------
-void CMesh::drawForSelection () const
-{
-	if (!m_visibility)
-		return;
-
-	m_rParent.bindVBO();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferID);
-
-	glDrawElements(GL_TRIANGLES, m_indexArray.size(), GL_UNSIGNED_INT, 0);
-}
-
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
 const bool CMesh::isTransparent () const
 {
-	if (m_rScene.getMaterial(m_uiMaterial)->hasDiffuseTexture())
-		if ( m_rScene.getMaterial(m_uiMaterial)->isTransparent())
+	if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
+		if ( m_rScene.GetMaterial(m_uiMaterial).isTransparent())
 			return true;
 	return false;
 }
@@ -181,20 +166,20 @@ const bool CMesh::isTransparent () const
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-float CMesh::getArea() const
+float CMesh::GetArea() const
 {
 	float area=0.0f;
 
 	for (uint i = 0; i < m_indexArray.size(); i+=3)
 	{
-		Vertex V1 = m_rParent.getVertex(m_indexArray[i]);
-		Vertex V2 = m_rParent.getVertex(m_indexArray[i+1]);
-		Vertex V3 = m_rParent.getVertex(m_indexArray[i+2]);
+		Vertex V1 = m_rParent.GetVertex(m_indexArray[i]);
+		Vertex V2 = m_rParent.GetVertex(m_indexArray[i+1]);
+		Vertex V3 = m_rParent.GetVertex(m_indexArray[i+2]);
 		CPoint P1(V1.x,V1.y,V1.z);
 		CPoint P2(V2.x,V2.y,V2.z);
 		CPoint P3(V3.x,V3.y,V3.z);
 
-		area += CPoint::getTriangleArea(P1,P2,P3);
+		area += CPoint::GetTriangleArea(P1,P2,P3);
 	}
 	return area;
 }
@@ -202,11 +187,11 @@ float CMesh::getArea() const
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const
+void CMesh::GetTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) const
 {
-	Vertex V1 = m_rParent.getVertex(m_indexArray[iTriangle*3]);
-	Vertex V2 = m_rParent.getVertex(m_indexArray[iTriangle*3+1]);
-	Vertex V3 = m_rParent.getVertex(m_indexArray[iTriangle*3+2]);
+	Vertex V1 = m_rParent.GetVertex(m_indexArray[iTriangle*3]);
+	Vertex V2 = m_rParent.GetVertex(m_indexArray[iTriangle*3+1]);
+	Vertex V3 = m_rParent.GetVertex(m_indexArray[iTriangle*3+2]);
 
 	P1.x=V1.x;
 	P1.y=V1.y;
@@ -217,20 +202,22 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3) cons
 	P3.x=V3.x;
 	P3.y=V3.y;
 	P3.z=V3.z;
+
 	/** Prise en compte de la translation */
-	P1 += m_rParent.GetPosition();
-	P2 += m_rParent.GetPosition();
-	P3 += m_rParent.GetPosition();
+	CTransform const& rTransform = m_rParent.GetTransform();
+	P1 += rTransform.GetLocalPosition();
+	P2 += rTransform.GetLocalPosition();
+	P3 += rTransform.GetLocalPosition();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVector& normal) const
+void CMesh::GetTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVector& normal) const
 {
-	Vertex V1 = m_rParent.getVertex(m_indexArray[iTriangle*3]);
-	Vertex V2 = m_rParent.getVertex(m_indexArray[iTriangle*3+1]);
-	Vertex V3 = m_rParent.getVertex(m_indexArray[iTriangle*3+2]);
+	Vertex V1 = m_rParent.GetVertex(m_indexArray[iTriangle*3]);
+	Vertex V2 = m_rParent.GetVertex(m_indexArray[iTriangle*3+1]);
+	Vertex V3 = m_rParent.GetVertex(m_indexArray[iTriangle*3+2]);
 	CVector N(V1.nx,V1.ny,V1.nz);
 
 	P1.x=V1.x;
@@ -243,9 +230,10 @@ void CMesh::getTriangle(uint iTriangle, CPoint &P1, CPoint &P2, CPoint &P3, CVec
 	P3.y=V3.y;
 	P3.z=V3.z;
 	/** Prise en compte de la translation */
-	P1 += m_rParent.GetPosition();
-	P2 += m_rParent.GetPosition();
-	P3 += m_rParent.GetPosition();
+	CTransform const& rTransform = m_rParent.GetTransform();
+	P1 += rTransform.GetLocalPosition();
+	P2 += rTransform.GetLocalPosition();
+	P3 += rTransform.GetLocalPosition();
 
 	normal = CVector(P2-P1)^CVector(P3-P1);
 	normal.normalize();
@@ -265,7 +253,7 @@ CVector CMesh::generateRandomRayHemisphere(uint iTriangle) const
 	CVector rayDir,dir,normal;
 	CVector iAxis,jAxis;
 
-	getTriangle(iTriangle,P1,P2,P3,normal);
+	GetTriangle(iTriangle,P1,P2,P3,normal);
 
 	r1 = rand()/(float)RAND_MAX;
 	r2 = rand()/(float)RAND_MAX;
@@ -276,7 +264,7 @@ CVector CMesh::generateRandomRayHemisphere(uint iTriangle) const
 	dir.y = sin ( 2*M_PI*r1 ) * gamma;
 	dir.z = r2;
 
-	jAxis=(normal^normal.getMinCoord()).normalize();
+	jAxis=(normal^normal.GetMinCoord()).normalize();
 	iAxis=( jAxis^normal).normalize();
 
 	rayDir.x = iAxis.x*dir.x + jAxis.x*dir.y + normal.x*dir.z;

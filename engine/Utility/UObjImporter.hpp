@@ -11,6 +11,7 @@ class CRefTable;
 #include "../Common.hpp"
 #include "../Scene/CScene.hpp"
 #include "../Scene/CMaterial.hpp"
+#include "../Scene/CSpatialGraph.hpp"
 #include "../Utility/CRefTable.hpp"
 #include "string.h"
 
@@ -34,24 +35,38 @@ public:
 	 * commençant portant ce nom, sinon tous les objets contenu dans le fichier sont importés.
 	 *
 	 * @param fileName nom du fichier OBJ &agrave; importer.
-	 * @param objectsList Liste d'objets dans laquelle importer le fichier.
-	 * @param wicksList Optionnel, liste de mèches dans laquelle importer le fichier.
-	 * @param prefix Préfixe servant de filtre pour les noms des objets.
+	 * @param a_rvpObjects Liste d'objets dans laquelle importer le fichier.
+	 * @param a_szPrefix Préfixe servant de filtre pour les noms des objets.
 	 *
 	 * @return false si l'import a échoué.
 	 */
 
 	template<class t_Object>
-	static bool import(CScene& a_rScene, const string& sceneName, vector <t_Object*> &objectsList, const char* prefix=NULL)
+	static bool import(	CScene& a_rScene,
+						const string& a_rSceneName,
+						CSpatialGraph* const a_pSpatialGraph=NULL,
+						CTransform* const a_pTransform=NULL,
+						const char* a_szPrefix=NULL)
 	{
-		bool skip = false;
-		bool objectsAttributesSet=false;
-		bool lookForSpecificObjects = (prefix != NULL);
-		uint prefixlen=0;
+		bool bSkip = false;
+		bool bObjectsAttributesSet=false;
+		bool bImportSpecificObjects = (a_szPrefix != NULL);
+		bool bAttachTransform = (a_pTransform != NULL);
+		if(bAttachTransform)
+		{
+			assert(a_pSpatialGraph == NULL);
+		}
+		else
+		{
+			assert(a_pSpatialGraph != NULL);
+		}
+
 		/* Indique qu'un maillage ou un objet a été créé, utile pour ajouter les informations géométriques une fois */
-		/* qu'elles sont toutes lues car les objets sont crées auparavant. */
-		bool meshCreated=false, objectCreated=false;
-		bool firstMesh = false;
+		/* qu'elles sont toutes lues car les objets sont créés auparavant. */
+		bool bMeshCreated=false, bObjectCreated=false;
+		bool bFirstMesh = false;
+
+		uint a_szPrefixlen=0;
 		char lettre,dump;
 		string buffer;
 		uint coord_textures = 0, normales = 0;
@@ -61,7 +76,7 @@ public:
 		int vindices[4], nindices[4], tindices[4];
 		uint i=0,j=0;
 		float x, y, z;
-		string fileName=sceneName;
+		string fileName=a_rSceneName;
 
 		/** On lit la ligne en une seule fois pour la parser ensuite */
 		std::string ligne;
@@ -73,20 +88,23 @@ public:
 		/** Table utilisée pour noter les références des vertex lors du regroupement */
 		CRefTable *refTable=NULL;
 
+		typedef vector <CPoint> CPointVector;
+		typedef vector <CVector> CVectorVector;
+		typedef vector <GLuint> CUIntVector;
 
-		vector < CPoint >worldPointsVector;
+		CPointVector worldPointsVector;
 		/** Liste des normales de l'objet */
-		vector < CVector >normalsVector, worldNormalsVector;
+		CVectorVector normalsVector, worldNormalsVector;
 		/** Liste des coordonnées de textures de l'objet */
-		vector < CPoint  >texCoordsVector, worldTexCoordsVector;
+		CPointVector texCoordsVector, worldTexCoordsVector;
 		/** Liste des indices des normales des facettes */
-		vector < GLuint >normalsIndexVector;
+		CUIntVector normalsIndexVector;
 		/** Liste des indices des coordonnées de textures des facettes */
-		vector < GLuint >texCoordsIndexVector;
+		CUIntVector texCoordsIndexVector;
 
 
-		if (lookForSpecificObjects) prefixlen = strlen(prefix);
-		getSceneAbsolutePath(fileName);
+		if (bImportSpecificObjects) a_szPrefixlen = strlen(a_szPrefix);
+		GetSceneAbsolutePath(fileName);
 
 		ifstream objFile(fileName.c_str(), ios::in);
 		if (!objFile.is_open ())
@@ -109,40 +127,61 @@ public:
 					/* Définition d'un nouvel objet. */
 					/* Un nouveau matériau est appliqué, nous devons donc créer un nouveau CMesh. */
 					/* Cependant, on commence d'abord par valider les données du CMesh précédent. */
-					if (meshCreated)
+					if (bMeshCreated)
 					{
 						/* On valide les données du dernier CMesh. */
-						nbObjectGroupVertex+=setUVsAndNormals(*currentMesh, *currentObject, *refTable,
-						                                       normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);
+						nbObjectGroupVertex+=setUVsAndNormals(	*currentMesh, *currentObject, *refTable,
+																normalsVector, normalsIndexVector,
+																texCoordsVector, texCoordsIndexVector);
 						normalsIndexVector.clear();
 						texCoordsIndexVector.clear();
-						meshCreated = false;
+						bMeshCreated = false;
 					}
 
 					objFile >> buffer;
 
-					if (lookForSpecificObjects)
+					if (bImportSpecificObjects)
 					{
 						/* On recherche un objet en particulier. */
-						if (!buffer.compare(0,prefixlen,prefix))
+						if (!buffer.compare(0,a_szPrefixlen,a_szPrefix))
 						{
 							/* Objet trouvé ! */
-							currentObject = new t_Object(a_rScene);
-							objectsList.push_back(currentObject);
-							objectCreated = true;
-							firstMesh = true;
-							skip = false;
+							CTransform *pTransform = NULL;
+							if(bAttachTransform)
+							{
+								pTransform = a_pTransform;
+							}
+							else
+							{
+								pTransform = new CTransform();
+								a_pSpatialGraph->AddTransform(pTransform);
+							}
+							currentObject = new t_Object(a_rScene, *pTransform);
+							a_rScene.addObject(currentObject);
+							bObjectCreated = true;
+							bFirstMesh = true;
+							bSkip = false;
 						}
 						else
-							skip = true;
+							bSkip = true;
 					}
 					else
 					{
 						/* Sinon on prend tous les objets dans le fichier. */
-						currentObject = new t_Object(a_rScene);
-						objectsList.push_back(currentObject);
-						objectCreated = true;
-						firstMesh = true;
+						CTransform *pTransform = NULL;
+						if(bAttachTransform)
+						{
+							pTransform = a_pTransform;
+						}
+						else
+						{
+							pTransform = new CTransform();
+							a_pSpatialGraph->AddTransform(pTransform);
+						}
+						currentObject = new t_Object(a_rScene, *pTransform);
+						a_rScene.addObject(currentObject);
+						bObjectCreated = true;
+						bFirstMesh = true;
 					}
 
 					normalsVector.clear();
@@ -155,61 +194,71 @@ public:
 
 				case 'g':
 					// Si on cherche des objets spécifiques on ne traite pas les groupes.
-					assert(lookForSpecificObjects == false);
+					assert(bImportSpecificObjects == false);
 					/* Définition d'un nouvel objet faisant parti d'un groupe. */
 					/* Un nouveau matériau est appliqué, nous devons donc créer un nouveau CMesh. */
 					/* Cependant, on commence d'abord par valider les données du CMesh précédent. */
-					if (meshCreated)
+					if (bMeshCreated)
 					{
 						/* On valide les données du dernier CMesh. */
-						nbObjectGroupVertex+=setUVsAndNormals(*currentMesh, *currentObject, *refTable,
-																											normalsVector, normalsIndexVector,
-																											texCoordsVector, texCoordsIndexVector);
+						nbObjectGroupVertex+=setUVsAndNormals(	*currentMesh, *currentObject, *refTable,
+																normalsVector, normalsIndexVector,
+																texCoordsVector, texCoordsIndexVector);
 						normalsIndexVector.clear();
 						texCoordsIndexVector.clear();
-						meshCreated = false;
+						bMeshCreated = false;
 					}
 					objFile >> buffer;
 
-					if (!objectCreated)
+					if (!bObjectCreated)
 					{
 						/* On prend tous les objets dans le fichier. */
-						currentObject = new t_Object(a_rScene);
-						objectsList.push_back(currentObject);
-						objectCreated = true;
-						firstMesh = true;
+						CTransform *pTransform = NULL;
+						if(bAttachTransform)
+						{
+							pTransform = a_pTransform;
+						}
+						else
+						{
+							pTransform = new CTransform();
+							a_pSpatialGraph->AddTransform(pTransform);
+						}
+						currentObject = new t_Object(a_rScene, *pTransform);
+						a_rScene.addObject(currentObject);
+						bObjectCreated = true;
+						bFirstMesh = true;
 					}
 					break;
 				case 'u':
 					/* Un nouveau matériau est appliqué, nous devons donc créer un nouveau CMesh. */
 					/* Cependant, on commence d'abord par valider les données du CMesh précédent. */
-					if (meshCreated)
+					if (bMeshCreated)
 					{
 						/* On valide les données du dernier CMesh. */
 						setUVsAndNormals(*currentMesh, *currentObject, *refTable,
 						                 normalsVector, normalsIndexVector, texCoordsVector, texCoordsIndexVector);
 						normalsIndexVector.clear();
 						texCoordsIndexVector.clear();
-						firstMesh = false;
+						bFirstMesh = false;
 					}
 
 					/* Création du nouveau mesh. */
 					objFile >> buffer >> buffer;
-					if (!skip)
+					if (!bSkip)
 					{
-						matIndex = a_rScene.getMaterialIndexByName(buffer);
+						matIndex = a_rScene.GetMaterialIndexByName(buffer);
 						assert(currentObject != NULL);
 						currentMesh = new CMesh(a_rScene, matIndex, *currentObject);
-						currentObject->addMesh(currentMesh);
-						meshCreated = true;
-						objectsAttributesSet = false;
+						currentObject->AddMesh(currentMesh);
+						bMeshCreated = true;
+						bObjectsAttributesSet = false;
 					}
 					break;
 				case 'm':
 					/* Définition des matériaux */
 					objFile >> buffer >> buffer;
 					/* La définition des matériaux est évitée si l'on importe qu'un seul objet. */
-					if (!lookForSpecificObjects)
+					if (!bImportSpecificObjects)
 						importMTL (a_rScene, buffer);
 					break;
 				case 'v':
@@ -220,21 +269,21 @@ public:
 							break;
 						case ' ':
 							objFile >> currentVertex.x >> currentVertex.y >> currentVertex.z;
-							if (!skip)
+							if (!bSkip)
 								currentObject->addVertex(currentVertex);
 							worldPointsVector.push_back(CPoint(x,y,z));
 							nbVertex++;
 							break;
 						case 'n':
 							objFile >> x >> y >> z;
-							if (!skip)
+							if (!bSkip)
 								normalsVector.push_back(CVector(x, y, z));
 							worldNormalsVector.push_back(CVector(x, y, z));
 							nbNormals++;
 							break;
 						case 't':
 							objFile >> x >> y;
-							if (!skip)
+							if (!bSkip)
 								/* On inverse la coordonnée y */
 								texCoordsVector.push_back(CPoint(x, -y, 0));
 							worldTexCoordsVector.push_back(CPoint(x, -y, 0));
@@ -243,20 +292,20 @@ public:
 					}
 					break;
 				case 'f':
-					if (skip)
+					if (bSkip)
 					{
 						getline(objFile,buffer);
 						break;
 					}
 					/** Pour prendre en compte les fichiers véreux ou usemtl n'est pas écrit */
-					if (!meshCreated && !skip)
+					if (!bMeshCreated && !bSkip)
 					{
-						matIndex = a_rScene.getMaterialIndexByName("default");
+						matIndex = a_rScene.GetMaterialIndexByName("default");
 						assert(currentObject != NULL);
 						currentMesh = new CMesh(a_rScene, matIndex, *currentObject);
-						currentObject->addMesh(currentMesh);
-						meshCreated = true;
-						objectsAttributesSet = false;
+						currentObject->AddMesh(currentMesh);
+						bMeshCreated = true;
+						bObjectsAttributesSet = false;
 					}
 
 					getline(objFile, ligne);
@@ -265,20 +314,20 @@ public:
 					/** On regarde si les attributs de l'objet ont été affectés ou non */
 					/** Ceci est en pratique réalisé sur la première face puisqu'on ne */
 					/** peut pas le déterminer avant */
-					if (!objectsAttributesSet)
+					if (!bObjectsAttributesSet)
 					{
 						i=j=0;
-						objectsAttributesSet = true;
+						bObjectsAttributesSet = true;
 
-						getObjectAttributesSet(ligne,normales,coord_textures);
+						GetObjectAttributesSet(ligne,normales,coord_textures);
 
 						currentMesh->setAttributes(coord_textures + normales);
-						if (firstMesh)
+						if (bFirstMesh)
 						{
 							/* On initialise la table de réf */
 							if (refTable)
 								delete refTable;
-							refTable = new CRefTable(currentObject->getVertexArraySize());
+							refTable = new CRefTable(currentObject->GetVertexArraySize());
 						}
 					}
 
@@ -378,21 +427,21 @@ public:
 			}
 		}
 		objFile.close ();
-		if (meshCreated)
+		if (bMeshCreated)
 		{
 			/* On valide les données du dernier CMesh. */
-			nbObjectGroupVertex+=setUVsAndNormals(*currentMesh,
-																								*currentObject,
-																								*refTable,
-																								normalsVector,
-																								normalsIndexVector,
-																								texCoordsVector,
-																								texCoordsIndexVector);
+			nbObjectGroupVertex+=setUVsAndNormals(	*currentMesh,
+													*currentObject,
+													*refTable,
+													normalsVector,
+													normalsIndexVector,
+													texCoordsVector,
+													texCoordsIndexVector);
 			normalsIndexVector.clear();
 			texCoordsIndexVector.clear();
 		}
 
-		return (objectsList.size() > 0);
+		return (currentObject != NULL);
 	}
 	/** Lit un fichier OBJ pass&eacute; en param&egrave;tre et cherche le nom du fichier MTL.
 	 *
@@ -401,7 +450,7 @@ public:
 	 *
 	 * @return true si trouve un fichier MTL
 	 */
-	static bool getMTLFileNameFromOBJ(const string& fileName, string& mtlName);
+	static bool GetMTLFileNameFromOBJ(const string& fileName, string& mtlName);
 
 	/** Lit un fichier MTL pass&eacute; en param&egrave;tres et importe les matériaux qu'il contient
 	 * dans la scène.
@@ -415,10 +464,10 @@ private:
 	/** Fonctions retournant le chemin absolu d'un fichier par rapport au chemin courant.
 	 * @param fileName Nom du fichier à traiter.
 	 */
-	static void getSceneAbsolutePath(string& sceneName);
+	static void GetSceneAbsolutePath(string& a_rSceneName);
 
 	/** Détermine les attributs fixés pour un objet pendant l'import */
-	static void getObjectAttributesSet(const string& str, uint& normals, uint& texCoords);
+	static void GetObjectAttributesSet(const string& str, uint& normals, uint& texCoords);
 
 	/** Fusion des trois tableaux en un seul tableau.
 	 * Le format OBJ gère trois tableaux d'indices, alors qu'en OpenGL il n'y a qu'un seul tableau d'indice.

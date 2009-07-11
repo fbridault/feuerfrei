@@ -35,12 +35,12 @@ public:
    * est simplement gardé pour des raisons de compatibilité, il est en effet ignoré
    * puisque la mèche n'est pas découpée.
    */
-  virtual void drawWick(bool displayBoxes) const
+  virtual void drawWickBoxes() const
   {
     CPoint diffPos = m_position;// - m_source->getPosition();
     glPushMatrix();
     glTranslatef(diffPos.x, diffPos.y, diffPos.z);
-    m_source->drawWick(displayBoxes);
+    m_source->drawWickBoxes();
     glPopMatrix();
   };
 
@@ -100,7 +100,7 @@ public:
   virtual void drawFlame(bool display, bool displayParticle) const{
     glPushMatrix();
     glTranslatef (m_position.x, m_position.y, m_position.z);
-    if( display) drawCPointFlame();
+    if( display) drawPointFlame();
     glPopMatrix();
   };
 };

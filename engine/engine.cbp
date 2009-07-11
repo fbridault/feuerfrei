@@ -29,7 +29,8 @@
 				<Option createDefFile="1" />
 				<Option createStaticLib="1" />
 				<Compiler>
-					<Add option="-march=athlon-xp" />
+					<Add option="-march=nocona" />
+					<Add option="-fexpensive-optimizations" />
 					<Add option="-O2" />
 				</Compiler>
 				<Linker>
@@ -43,7 +44,9 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-fPIC" />
 			<Add option="-DGL_GLEXT_PROTOTYPES" />
+			<Add option="-DILUT_USE_OPENGL" />
 			<Add directory="/usr/include/IL" />
 		</Compiler>
 		<Unit filename="Common.hpp" />
@@ -59,6 +62,7 @@
 		<Unit filename="Scene/CBoundingSphere.hpp" />
 		<Unit filename="Scene/CCamera.cpp" />
 		<Unit filename="Scene/CCamera.hpp" />
+		<Unit filename="Scene/CDrawState.hpp" />
 		<Unit filename="Scene/CMaterial.cpp" />
 		<Unit filename="Scene/CMaterial.hpp" />
 		<Unit filename="Scene/CMesh.cpp" />
@@ -67,6 +71,10 @@
 		<Unit filename="Scene/CObject.hpp" />
 		<Unit filename="Scene/CScene.cpp" />
 		<Unit filename="Scene/CScene.hpp" />
+		<Unit filename="Scene/CSpatialGraph.cpp" />
+		<Unit filename="Scene/CSpatialGraph.hpp" />
+		<Unit filename="Scene/CTransform.cpp" />
+		<Unit filename="Scene/CTransform.hpp" />
 		<Unit filename="Scene/Light.cpp" />
 		<Unit filename="Scene/Light.hpp" />
 		<Unit filename="Scene/Texture.cpp" />
@@ -91,7 +99,9 @@
 		<Unit filename="Utility/GraphicsFn.cpp" />
 		<Unit filename="Utility/GraphicsFn.hpp" />
 		<Unit filename="Utility/ISingleton.hpp" />
+		<Unit filename="Utility/Macros.hpp" />
 		<Unit filename="Utility/Numerable.hpp" />
+		<Unit filename="Utility/SmartPtr.hpp" />
 		<Unit filename="Utility/UObjImporter.cpp" />
 		<Unit filename="Utility/UObjImporter.hpp" />
 		<Extensions>

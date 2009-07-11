@@ -21,11 +21,12 @@ typedef unsigned int uint;
 // TEMP
 extern GLfloat g_modelViewMatrix[16];
 
-#define rThis *this
-
 typedef char * CharPtr;
 typedef char const * CharCPtr;
 typedef char * const CharPtrC;
 typedef char const * const CharCPtrC;
+typedef size_t StrSize;
+
+#include "Utility/Macros.hpp"
 
 #endif

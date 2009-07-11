@@ -6,13 +6,21 @@
 #include "../Utility/GraphicsFn.hpp"
 #include "CCamera.hpp"
 #include "CScene.hpp"
+#include "CRenderList.hpp"
 #include "../Shading/CRenderTarget.hpp"
 
 
-ILight* LightFactory::getInstance(	const char *type,
-																GLuint depthMapSize,
-																const CShader& a_rGenShadowCubeMapShader,
-																const CRenderTarget& a_rShadowRenderTarget)
+/*********************************************************************************************************************/
+/**		Class ULightFactory          			  	 													   			 */
+/*********************************************************************************************************************/
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+ILight* ULightFactory::GetInstance(	const char *type,
+									GLuint depthMapSize,
+									const CShader& a_rGenShadowCubeMapShader,
+									const CRenderTarget& a_rShadowRenderTarget)
 {
 	CPoint p, i;
 	CVector d;
@@ -20,7 +28,7 @@ ILight* LightFactory::getInstance(	const char *type,
 	p.randomize(-0.4, 0.4);
 	p.y = (p.y)/2.0;
 
-// TODO: Replace strcmp
+	// TODO: Replace strcmp
 	if (!strcmp(type,"spot"))
 	{
 		i.randomize( 0.01, 0.3);
@@ -31,7 +39,7 @@ ILight* LightFactory::getInstance(	const char *type,
 		if (!strcmp(type,"omni"))
 		{
 			i.randomize( 0.01, 0.2);
-			return new COmniLight(p,CEnergy(i.x,i.y,i.z),depthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget);
+			return new COmniLight(p,CEnergy(i.x,i.y,i.z), depthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget);
 		}
 		else
 		{
@@ -40,9 +48,12 @@ ILight* LightFactory::getInstance(	const char *type,
 		}
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
-	ISceneItem(P),
+	ISceneItem(NRenderType::eFx),
+	m_oTransform(P),
 	m_shadowRenderTarget(shadowRenderTarget)
 {
 	m_lightEnergy = I;
@@ -51,13 +62,15 @@ ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const C
 	m_lightModelViewMatrix = new GLfloat[16];
 
 	m_enabled = true;
-};
+}
 
-
-void ILight::draw() const
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void ILight::Render() const
 {
-	CPoint const& rPosition = GetPosition();
-	CPoint const& rScale = GetScale();
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rScale = m_oTransform.GetScale();
 	glPushMatrix();
 	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
 	glScalef(rScale.x, rScale.y, rScale.z);
@@ -70,10 +83,13 @@ void ILight::draw() const
 }
 
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void ILight::DrawForSelection() const
 {
-	CPoint const& rPosition = GetPosition();
-	CPoint const& rScale = GetScale();
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rScale = m_oTransform.GetScale();
 	glPushMatrix();
 	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
 	glScalef(rScale.x, rScale.y, rScale.z);
@@ -83,34 +99,41 @@ void ILight::DrawForSelection() const
 	glPopMatrix();
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void ILight::preRendering(bool shadows) const
 {
 	m_shadowRenderTarget.bindTexture();
 	assert(m_shader != NULL);
 
-	CPoint position = GetPosition() * g_modelViewMatrix;
+	CPoint position = m_oTransform.GetWorldPosition() * g_modelViewMatrix;
+	CShaderState& rShaderState = CShaderState::GetInstance();
 
-	m_shader->Enable();
-	m_shader->SetUniform3f("u_lightCentre", position.x,position.y,position.z);
-	m_shader->SetUniform3f("u_intensity",   m_lightEnergy[0], m_lightEnergy[1] ,m_lightEnergy[2]);
-	m_shader->SetUniform1i("u_shadowMap", SHADOW_MAP_TEX_UNIT);
+	rShaderState.Enable(*m_shader);
+	rShaderState.SetUniform3f("u_lightCentre", position.x,position.y,position.z);
+	rShaderState.SetUniform3f("u_intensity",   m_lightEnergy[0], m_lightEnergy[1] ,m_lightEnergy[2]);
+	rShaderState.SetUniform1i("u_shadowMap", SHADOW_MAP_TEX_UNIT);
 	if (shadows)
-		m_shader->SetUniform1i("u_shadowsEnabled",1);
+		rShaderState.SetUniform1i("u_shadowsEnabled",1);
 	else
-		m_shader->SetUniform1i("u_shadowsEnabled",0);
+		rShaderState.SetUniform1i("u_shadowsEnabled",0);
 
 	if (m_shader == m_deferredShader)
 	{
-		m_deferredShader->SetUniform1i("u_normalsTex", 1);
-		m_deferredShader->SetUniform1i("u_positionsTex", 2);
+		rShaderState.SetUniform1i("u_normalsTex", 1);
+		rShaderState.SetUniform1i("u_positionsTex", 2);
 	}
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void ILight::postRendering(bool shadows) const
 {
-	m_shader->Disable();
+	CShaderState& rShaderState = CShaderState::GetInstance();
+	rShaderState.Disable();
+
 	if (shadows)
 	{
 		glActiveTexture(GL_TEXTURE0+SHADOW_MAP_TEX_UNIT);               // Reset shadow map texture coordinates
@@ -120,28 +143,37 @@ void ILight::postRendering(bool shadows) const
 	}
 }
 
-/***************************************************************************************************/
-/******************************************* OMNILIGHT *******************************************/
-/***************************************************************************************************/
+
+/*********************************************************************************************************************/
+/**		Class COmniLight	          			  	 													   			 */
+/*********************************************************************************************************************/
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 COmniLight::COmniLight(const CPoint &P, const CEnergy &I, GLuint depthMapSize,
                        const CShader& genShadowCubeMapShader, const CRenderTarget& shadowRenderTarget) :
 		ILight(P,I,depthMapSize,shadowRenderTarget),
 		m_genShadowCubeMapShader(genShadowCubeMapShader)
 {
 	/** Création du light volume : sphère */
-	m_radius = sqrt(4.0/getEnergy().max());
+	m_radius = sqrt(4.0/GetEnergy().max());
 	m_volumeDL = glGenLists(1);
 	glNewList(m_volumeDL, GL_COMPILE);
 	UGraphicsFn::SolidSphere(m_radius,10,10);
 	glEndList();
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 COmniLight::~COmniLight ()
 {
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void COmniLight::chooseForwardShader (const CShader* spotShader, const CShader* omniShader)
 {
 	assert(omniShader != NULL);
@@ -149,7 +181,9 @@ void COmniLight::chooseForwardShader (const CShader* spotShader, const CShader* 
 	m_shader = m_forwardShader = omniShader;
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void COmniLight::chooseDeferredShader(const CShader* spotShader, const CShader* omniShader)
 {
 	assert(omniShader != NULL);
@@ -157,8 +191,10 @@ void COmniLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 	m_deferredShader = omniShader;
 }
 
-
-void COmniLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void COmniLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
 {
 	glPushAttrib(GL_VIEWPORT_BIT);
 	glViewport (0, 0, m_depthMapW, m_depthMapW);
@@ -170,44 +206,50 @@ void COmniLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 
 	glMatrixMode(GL_MODELVIEW);
 
-	m_shadowRenderTarget.bindTarget();
+	m_shadowRenderTarget.BindTarget();
 	m_shadowRenderTarget.bindChannel(0);
 
-	CPoint const& rPosition = GetPosition();
-	m_genShadowCubeMapShader.Enable();
-	m_genShadowCubeMapShader.SetUniform3f("u_lightCentre", rPosition.x,rPosition.y,rPosition.z);
+	CShaderState& rShaderState = CShaderState::GetInstance();
+	rShaderState.Enable(m_genShadowCubeMapShader);
+
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	rShaderState.SetUniform3f("u_lightCentre", rPosition.x,rPosition.y,rPosition.z);
+
+	CDrawState &rDrawState = CDrawState::GetInstance();
+	rDrawState.SetShadingFilter(NShadingFilter::eAll);
+	rDrawState.SetShadingType(NShadingType::eAmbient);
 
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector( 1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0)); // Il faut "inverser" les textures en y à cause du repère
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
 	m_shadowRenderTarget.bindChannel(1);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector(-1.0, 0.0, 0.0), CVector( 0.0, -1.0, 0.0));
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
 	m_shadowRenderTarget.bindChannel(2);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector( 0.0, 1.0, 0.0), CVector( 0.0, 0.0, 1.0));
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
 	m_shadowRenderTarget.bindChannel(3);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector( 0.0,-1.0, 0.0), CVector( 0.0, 0.0, -1.0));
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
 	m_shadowRenderTarget.bindChannel(4);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector( 0.0, 0.0, 1.0), CVector( 0.0, -1.0, 0.0));
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
 	m_shadowRenderTarget.bindChannel(5);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 	camera.setFromViewPoint(rPosition,CVector( 0.0, 0.0,-1.0), CVector( 0.0, -1.0, 0.0));
-	scene.drawSceneWT();
+	a_rRenderList.Render();
 
-	m_genShadowCubeMapShader.Disable();
-	m_shadowRenderTarget.bindDefaultTarget();
+	rShaderState.Disable();
+	CRenderTarget::BindDefaultTarget();
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -217,41 +259,48 @@ void COmniLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 	glMatrixMode(GL_MODELVIEW);
 	camera.setView();
 
-	glActiveTexture(GL_TEXTURE0+SHADOW_MAP_TEX_UNIT);  // On utilise la matrice de texture comme matrice de transformation des coordonnées
-	glMatrixMode(GL_TEXTURE);               // des points dans le repère de la lumière
+	glActiveTexture(GL_TEXTURE0+SHADOW_MAP_TEX_UNIT);  	// On utilise la matrice de texture comme matrice de transformation des coordonnées
+	glMatrixMode(GL_TEXTURE);               			// des points dans le repère de la lumière
 	glPushMatrix();
 	glLoadIdentity();
-	glMultMatrixf(invModelViewMatrix);      // Et enfin on applique la matrice inverse de transformation de la caméra
+	glMultMatrixf(invModelViewMatrix);     				// Et enfin on applique la matrice inverse de transformation de la caméra
 
 	glMatrixMode(GL_MODELVIEW);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void COmniLight::preRendering(bool shadows) const
 {
-	GLfloat offset=2.0f;
-	GLfloat filter[6][3] = { {offset, 0.0, 0.0}, {-offset, 0.0, 0.0}, {0.0, offset, 0.0}, {0.0, -offset, 0.0},
-		{0.0, 0.0, offset}, {0.0, 0.0, -offset}
+	GLfloat offset=2.f;
+	GLfloat filter[6][3] = { {offset, 0.f, 0.f}, {-offset, 0.f, 0.f}, {0.f, offset, 0.f}, {0.f, -offset, 0.f},
+		{0.f, 0.f, offset}, {0.f, 0.f, -offset}
 	};
-	CPoint const& rPosition = GetPosition();
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
 
 	ILight::preRendering(shadows);
-	m_shader->SetUniform1f( "u_mapSize",1.0/(float)m_depthMapW);
-	m_shader->SetUniform3fv("u_vFilter", &filter[0][0], 6);
-	m_shader->SetUniform3f( "u_worldLightCentre", rPosition.x,rPosition.y,rPosition.z);
+
+	CShaderState const& rShaderState = CShaderState::GetInstance();
+	rShaderState.SetUniform1f( "u_mapSize", 1.f/(float)m_depthMapW);
+	rShaderState.SetUniform3fv("u_vFilter", &filter[0][0], 6);
+	rShaderState.SetUniform3f( "u_worldLightCentre", rPosition.x,rPosition.y,rPosition.z);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void COmniLight::renderLightVolume(const CCamera& camera) const
 {
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
-	bool in=false;
-	CPoint const& rPosition = GetPosition();
-	CVector vecToLight = CPoint(0,0,0)-camera.getPosition() - rPosition;
+	bool bIn = false;
+
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CVector vecToLight = CPoint(0,0,0) - camera.GetPosition() - rPosition;
 	if ( vecToLight.norm() < m_radius )
 	{
 		glCullFace(GL_FRONT);
-		in = true;
+		bIn = true;
 	}
 
 	glPushMatrix();
@@ -259,10 +308,12 @@ void COmniLight::renderLightVolume(const CCamera& camera) const
 	glCallList(m_volumeDL);
 	glPopMatrix();
 
-	if (in) glCullFace(GL_BACK);
+	if (bIn) glCullFace(GL_BACK);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CVector COmniLight::generateRandomRay() const
 {
 	CVector rayDir;
@@ -281,12 +332,16 @@ CVector COmniLight::generateRandomRay() const
 }
 
 
-/***************************************************************************************************/
-/******************************************* SPOTLIGHT *******************************************/
-/***************************************************************************************************/
+/*********************************************************************************************************************/
+/**		Class CSpotLight	          			  	 													   			 */
+/*********************************************************************************************************************/
+
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CSpotLight::CSpotLight (const CPoint & P, const CVector& direction, const CEnergy & I, float angle,
                         GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
-		ILight(P,I,depthMapSize,shadowRenderTarget)
+	ILight(P,I,depthMapSize,shadowRenderTarget)
 {
 	GLuint slices=10;
 	m_direction = direction;
@@ -295,11 +350,11 @@ CSpotLight::CSpotLight (const CPoint & P, const CVector& direction, const CEnerg
 	m_angle  = angle*DEG_TO_RAD/2.0;
 	m_cutoff = cos(m_angle);
 
-	m_jAxis=(m_direction^m_direction.getMinCoord()).normalize();
+	m_jAxis=(m_direction^m_direction.GetMinCoord()).normalize();
 	m_iAxis=(m_jAxis^m_direction).normalize();
 
 	/** Création du light volume : cône */
-	m_height = sqrt(10.0/getEnergy().max());
+	m_height = sqrt(10.0/GetEnergy().max());
 
 	m_base = tanf(m_angle) * m_height;
 	m_volumeDL = glGenLists(1);
@@ -312,7 +367,9 @@ CSpotLight::CSpotLight (const CPoint & P, const CVector& direction, const CEnerg
 	glEndList();
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CSpotLight::chooseForwardShader( const CShader* spotShader, const CShader* omniShader)
 {
 	assert(spotShader != NULL);
@@ -320,7 +377,9 @@ void CSpotLight::chooseForwardShader( const CShader* spotShader, const CShader* 
 	m_shader = m_forwardShader = spotShader;
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CSpotLight::chooseDeferredShader(const CShader* spotShader, const CShader* omniShader)
 {
 	assert(spotShader != NULL);
@@ -328,11 +387,13 @@ void CSpotLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 	m_deferredShader = spotShader;
 }
 
-
-void CSpotLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invModelViewMatrix)
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void CSpotLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
 {
 	CVector up(0,0,1);
-	CPoint const& rPosition = GetPosition();
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
 
 	// Check if dir and up vectors are colinear for glutLookAt openGL call
 	// We compute the trapezoid area = norm of the cross product */
@@ -354,10 +415,14 @@ void CSpotLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 	glPushAttrib(GL_VIEWPORT_BIT);
 	glViewport (0, 0, m_depthMapW, m_depthMapH);
 
-	m_shadowRenderTarget.bindTarget();
+	CDrawState &rDrawState = CDrawState::GetInstance();
+	rDrawState.SetShadingFilter(NShadingFilter::eAll);
+	rDrawState.SetShadingType(NShadingType::eAmbient);
+
+	m_shadowRenderTarget.BindTarget();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	scene.drawSceneWT();
-	m_shadowRenderTarget.bindDefaultTarget();
+	a_rRenderList.Render();
+	CRenderTarget::BindDefaultTarget();
 
 	glPopAttrib();
 
@@ -380,19 +445,25 @@ void CSpotLight::castShadows(CCamera &camera, const CScene& scene, GLfloat *invM
 	glMatrixMode(GL_MODELVIEW);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CSpotLight::preRendering(bool shadows) const
 {
 	ILight::preRendering(shadows);
 	assert(m_shader != NULL);
 
 	CVector direction = m_direction * g_modelViewMatrix;
-	m_shader->SetUniform3f("u_spotDirection", direction.x, direction.y, direction.z);
-	m_shader->SetUniform1f("u_spotCutoff", m_cutoff);
-	m_shader->SetUniform2f("u_texmapscale",1.0/(float)m_depthMapW,1.0/(float)m_depthMapH);
+
+	CShaderState const& rShaderState = CShaderState::GetInstance();
+	rShaderState.SetUniform3f("u_spotDirection", direction.x, direction.y, direction.z);
+	rShaderState.SetUniform1f("u_spotCutoff", m_cutoff);
+	rShaderState.SetUniform2f("u_texmapscale",1.0/(float)m_depthMapW,1.0/(float)m_depthMapH);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void CSpotLight::renderLightVolume(const CCamera& camera) const
 {
 	/** Chercher rotation de la direction initiale du cône en Z, vers m_direction. */
@@ -400,10 +471,10 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	float angle = acos(dir * m_direction);  // m_direction est déjà normalisé
 	bool in=false;
 	CVector axeRot = dir ^ m_direction;
-	CPoint const& rPosition = GetPosition();
+	CPoint const& rPosition = m_oTransform.GetWorldPosition();
 
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
-	CVector vecToLight = CPoint(0,0,0)-camera.getPosition() - rPosition;
+	CVector vecToLight = CPoint(0,0,0)-camera.GetPosition() - rPosition;
 	vecToLight.normalize();
 
 	if ( (vecToLight * m_direction) > m_cutoff)
@@ -422,7 +493,9 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	if (in) glCullFace(GL_BACK);
 }
 
-
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 CVector CSpotLight::generateRandomRay() const
 {
 	CVector dir,rayDir;

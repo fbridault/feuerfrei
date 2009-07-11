@@ -1,8 +1,8 @@
 #include "GSSolver2D.hpp"
 
-GSSolver2D::GSSolver2D (const CPoint& position, uint n_x, uint n_y, float dim, float timeStep,
+GSSolver2D::GSSolver2D (CTransform& a_rTransform, uint n_x, uint n_y, float dim, float timeStep,
 			float buoyancy, float vorticityConfinement) :
-  Solver2D(position, n_x, n_y, dim, timeStep, buoyancy, vorticityConfinement)
+  Solver2D(a_rTransform, n_x, n_y, dim, timeStep, buoyancy, vorticityConfinement)
 {
 }
 

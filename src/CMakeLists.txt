@@ -1,76 +1,64 @@
-#Change PROJECT_NAME to the name of your project
-PROJECT(REAL-TIME_FLAMES)
-
-#include some macros from another file...  
-INCLUDE (${CMAKE_ROOT}/Modules/FindPNG.cmake)
-INCLUDE (${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
-INCLUDE (${CMAKE_ROOT}/Modules/FindwxWidgets.cmake)
-INCLUDE (${CMAKE_ROOT}/Modules/FindMFC.cmake)
-
 #permettre les calculs SSE
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
+
+include_directories(../)
 
 # Look for OpenGL
-FIND_PACKAGE(${Package} OpenGL)
-IF(OPENGL_FOUND)
-  FIND_FILE (HAVE_GLEXT GL/glext.h)
-  IF(HAVE_GLEXT)
-    ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
-    MESSAGE(STATUS "Found OpenGL")
-  ENDIF(HAVE_GLEXT)
+find_package(${Package} OpenGL)
+if(OPENGL_FOUND)
+  find_file (HAVE_GLEXT GL/glext.h)
+  if(HAVE_GLEXT)
+    add_definitions(-DGL_GLEXT_PROTOTYPES)
+    message(STATUS "Found OpenGL")
+  endif(HAVE_GLEXT)
   
-  INCLUDE(${OPENGL_INCLUDE_DIR})
-ENDIF(OPENGL_FOUND)
+  include(${OPENGL_INCLUDE_DIR})
+endif(OPENGL_FOUND)
 
 # Look for wxWidgets
-SET(wxWidgets_USE_LIBS base core gl net)
-FIND_PACKAGE(wxWidgets)
-IF(wxWidgets_FOUND)
-  MESSAGE(STATUS "Found a valid installation of wxWindows")
-  INCLUDE(${wxWidgets_USE_FILE})
-ENDIF(wxWidgets_FOUND)
+set(wxWidgets_USE_LIBS base core gl net)
+find_package(wxWidgets)
+if(wxWidgets_FOUND)
+  message(STATUS "Found a valid installation of wxWindows")
+  include(${wxWidgets_USE_FILE})
+endif(wxWidgets_FOUND)
 
-IF(CMAKE_BUILD_TYPE STREQUAL Debug)
-  MESSAGE(STATUS "Building a debug binary")
+if(CMAKE_BUILD_TYPE STREQUAL Debug)
+  message(STATUS "Building a debug binary")
   # Hack pour virer le strip si il existe
-  LIST(REMOVE_ITEM wxWidgets_LIBRARIES -s)
-  ADD_DEFINITIONS(-Wall)
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Debug)
+  list(REMOVE_ITEM wxWidgets_LIBRARIES -s)
+  add_definitions(-Wall)
+endif(CMAKE_BUILD_TYPE STREQUAL Debug)
 
-IF(CMAKE_BUILD_TYPE STREQUAL Profiling)
-  MESSAGE(STATUS "Building a profiling binary")
+if(CMAKE_BUILD_TYPE STREQUAL Profiling)
+  message(STATUS "Building a profiling binary")
   # Hack pour virer le strip si il existe
-  LIST(REMOVE_ITEM wxWidgets_LIBRARIES -s)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -Wall")
-  SET(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -pg")
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Profiling)
+  list(REMOVE_ITEM wxWidgets_LIBRARIES -s)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg -Wall")
+  set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -pg")
+endif(CMAKE_BUILD_TYPE STREQUAL Profiling)
 
-IF(CMAKE_BUILD_TYPE STREQUAL Release)
-  MESSAGE(STATUS "Building an optimized binary")
-ENDIF(CMAKE_BUILD_TYPE STREQUAL Release)
+if(CMAKE_BUILD_TYPE STREQUAL Release)
+  message(STATUS "Building an optimized binary")
+endif(CMAKE_BUILD_TYPE STREQUAL Release)
 
 # Source all directories
-AUX_SOURCE_DIRECTORY(flames FLAMES_SRCS)
-AUX_SOURCE_DIRECTORY(interface INTERFACE_SRCS)
-AUX_SOURCE_DIRECTORY(scene SCENE_SRCS)
-AUX_SOURCE_DIRECTORY(shaders SHADERS_SRCS)
-SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp solvers/globalField.cpp solvers/fieldThread.cpp)
-SET(INTERFACE_SRCS interface/GLFlameCanvas.cpp interface/luminaryDialog.cpp interface/flamesFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/shadowsDialog.cpp)
+aux_source_directory(flames FLAMES_SRCS)
+set(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver3D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp solvers/globalField.cpp solvers/fieldThread.cpp)
+set(INTERFACE_SRCS interface/GLFlameCanvas.cpp interface/luminaryDialog.cpp interface/flamesFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/shadowsDialog.cpp)
 
-SET(RTFLAMES_SRCS flames.cpp ${FLAMES_SRCS} ${INTERFACE_SRCS} ${SCENE_SRCS} ${SHADERS_SRCS} ${SOLVERS_SRCS})
+set(RTFLAMES_SRCS flames.cpp ${FLAMES_SRCS} ${INTERFACE_SRCS} ${SOLVERS_SRCS})
 
-SET(FLAMESEXE "rtflames")
-ADD_EXECUTABLE(${FLAMESEXE} ${RTFLAMES_SRCS}) 
-TARGET_LINK_LIBRARIES(${FLAMESEXE} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES})
-SET_TARGET_PROPERTIES(${FLAMESEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -DRTFLAMES_BUILD -DMULTITHREADS")
+set(FLAMESEXE "rtflames")
+add_executable(${FLAMESEXE} ${RTFLAMES_SRCS}) 
+target_link_libraries(${FLAMESEXE} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES} engine)
+set_target_properties(${FLAMESEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -DRTFLAMES_BUILD")
 
-SET(INTERFACE_SRCS interface/GLFluidsCanvas.cpp interface/fluidsFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/solverDialog.cpp)
-SET(SCENE_SRCS scene/camera.cpp scene/graphicsFn.cpp)
+set(INTERFACE_SRCS interface/GLFluidsCanvas.cpp interface/fluidsFrame.cpp interface/mainPanels.cpp interface/numTextCtrl.cpp interface/solverDialog.cpp)
+set(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver2D.cpp solvers/solver3D.cpp solvers/GSSolver2D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp  solvers/benchsolver3D.cpp solvers/logResAvgSolver3D.cpp solvers/logResAvgTimeSolver3D.cpp solvers/logResSolver3D.cpp solvers/compResAvgSolver3D.cpp solvers/CGSSORSolver2D.cpp)
+set(RTFLUIDS_SRCS fluids.cpp ${INTERFACE_SRCS} ${SCENE_SRCS} ${SOLVERS_SRCS})
 
-SET(SOLVERS_SRCS solvers/field.cpp solvers/field3D.cpp solvers/realField3D.cpp solvers/fakeField3D.cpp solvers/LODField3D.cpp solvers/solver.cpp solvers/solver2D.cpp solvers/solver3D.cpp solvers/GSSolver2D.cpp solvers/GSSolver3D.cpp solvers/GCSSORSolver3D.cpp solvers/GCSSORSolver3D-SSE.cpp solvers/HybridSolver3D.cpp  solvers/benchsolver3D.cpp solvers/logResAvgSolver3D.cpp solvers/logResAvgTimeSolver3D.cpp solvers/logResSolver3D.cpp solvers/compResAvgSolver3D.cpp solvers/CGSSORSolver2D.cpp)
-SET(RTFLUIDS_SRCS fluids.cpp ${INTERFACE_SRCS} ${SCENE_SRCS} ${SOLVERS_SRCS})
-
-SET(FLUIDSEXE "rtfluids")
-ADD_EXECUTABLE(${FLUIDSEXE} ${RTFLUIDS_SRCS}) 
-TARGET_LINK_LIBRARIES(${FLUIDSEXE} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES})
-SET_TARGET_PROPERTIES(${FLUIDSEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -DRTFLUIDS_BUILD")
+set(FLUIDSEXE "rtfluids")
+#add_executable(${FLUIDSEXE} ${RTFLUIDS_SRCS}) 
+#target_link_libraries(${FLUIDSEXE} ${wxWidgets_LIBRARIES} ${OPENGL_LIBRARIES} engine)
+#set_target_properties(${FLUIDSEXE} PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS} -DRTFLUIDS_BUILD")

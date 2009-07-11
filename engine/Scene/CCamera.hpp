@@ -45,7 +45,7 @@ DeclareNumerable(_NMouseButton, NMouseButton);
  * et du mouvement void OnMouseMotion (wxMouseEvent& event)<br>
  * Pour l'utiliser, il suffit de déclarer un objet de type CCamera. Dans la fonction de dessin de la scène, il
  * ne reste alors plus qu'à appeler la fonction publique setView() avant de tracer l'objet à visualiser.
- * Cette classe peut donc être utilisée ainsi avec une application wxWidgets quelconque.
+ * Cette classe peut donc être utilisée ainsi avec une application wxWidGets quelconque.
  *
  * @author	Flavien Bridault
  */
@@ -67,10 +67,7 @@ public:
 	void init(	CPoint const& a_rPosition, CVector const& a_rUp, CVector const& a_rView,
 						int w, int h, float clipping_value, CScene& a_rScene);
 
-	// void addCenterX(float value){ centerx+=value; eyex+=value;
-//       recalculer_matrice_initiale (); };
-//   void addCenterZ(float value){ centerz+=value; eyez+=value;
-//       recalculer_matrice_initiale ();};
+
 	/** Calcul de la rotation de la caméra
 	 * @param x position finale de la souris en x
 	 * @param y position finale de la souris en y
@@ -101,7 +98,7 @@ public:
 	 */
 	void setFromViewPoint(const CPoint& pos, const CPoint& dir)
 	{
-		//    CPoint target = src->center+src->dir;
+		//    CPoint tarGet = src->center+src->dir;
 //
 //    // Check if dir and up vectors are colinear for glutLookAt openGL call
 //    // We compute the trapezoid area = norm of the cross product */
@@ -185,29 +182,29 @@ public:
 
 	void computeFrustrum();
 
-	const float* getFrustum(uint side) const
+	const float* GetFrustum(uint side) const
 	{
 		return m_frustum[side];
 	};
 
-	uint getWidth() const
+	uint GetWidth() const
 	{
 		return m_viewPort[2];
 	};
-	uint getHeight() const
+	uint GetHeight() const
 	{
 		return m_viewPort[3];
 	};
 
-	CPoint const& getPosition() const
+	CPoint const& GetPosition() const
 	{
 		return m_position;
 	};
-	CVector const& getUpVector() const
+	CVector const& GetUpVector() const
 	{
 		return m_up;
 	};
-	CVector const& getViewVector() const
+	CVector const& GetViewVector() const
 	{
 		return m_view;
 	};
@@ -216,9 +213,9 @@ public:
 //  void displayStringOnScreen(const string &time, uint x ,uint y);
 
 	/* Récupère les coordonnées à l'écran d'un point */
-	void getScreenCoordinates(const CPoint& objPos, CPoint& screenPos) const;
+	void GetScreenCoordinates(const CPoint& objPos, CPoint& screenPos) const;
 	/* Récupère les coordonnées d'une sphère sur l'écran */
-	void getSphereCoordinates(const CPoint& objPos, float radius, CPoint& centerScreenPos, CPoint& periScreenPos ) const;
+	void GetSphereCoordinates(const CPoint& objPos, float radius, CPoint& centerScreenPos, CPoint& periScreenPos ) const;
 
 private:
 	/** Position de la scène. La caméra reste toujours centrée en (0,0,0) */

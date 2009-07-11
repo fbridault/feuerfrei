@@ -17,10 +17,10 @@ GCSSORSolver3D::GCSSORSolver3D (float omegaDiff, float omegaProj, float epsilon)
   m_epsilon = epsilon;
 }
 
-GCSSORSolver3D::GCSSORSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
-				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
-				float omegaProj, float epsilon) :
-  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement)
+GCSSORSolver3D::GCSSORSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
+								float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
+								float omegaProj, float epsilon) :
+  Solver3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement)
 {
   m_r=new float[m_nbVoxels];
   m_z=new float[m_nbVoxels];

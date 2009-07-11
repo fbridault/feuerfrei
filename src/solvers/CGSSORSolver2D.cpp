@@ -1,9 +1,9 @@
 #include "CGSSORSolver2D.hpp"
 
-CGSSORSolver2D::CGSSORSolver2D (const CPoint& position, uint n_x, uint n_y, float dim, float timeStep,
+CGSSORSolver2D::CGSSORSolver2D (CTransform& a_rTransform, uint n_x, uint n_y, float dim, float timeStep,
 				float buoyancy, float vorticityConfinement, float omegaDiff,
 				float omegaProj, float epsilon) :
-  Solver2D(position, n_x, n_y, dim, timeStep, buoyancy, vorticityConfinement)
+  Solver2D(a_rTransform, n_x, n_y, dim, timeStep, buoyancy, vorticityConfinement)
 {
   m_r=new float[m_nbVoxels];
   m_z=new float[m_nbVoxels];

@@ -35,7 +35,7 @@ public:
 	/** Constructeur de mèche.
 	 * @param scene CPointeur sur la scène.
 	 */
-	CWick(CScene& a_rScene) : CObject(a_rScene) {};
+	CWick(CScene& a_rScene, CTransform& rTransform) : CObject(a_rScene, rTransform) {};
 
 	virtual ~CWick();
 
@@ -57,11 +57,9 @@ public:
 	/** Affiche la mèche
 	 * @param displayBoxes Affiche ou non le partitionnement de la mèche.
 	 */
-	virtual void drawWick(bool displayBoxes) const
+	virtual void drawWickBoxes() const
 	{
-		draw(ALL,true);
-		if (displayBoxes)
-			glCallList(m_boxesDisplayList);
+		glCallList(m_boxesDisplayList);
 	};
 
 	bool checkPointsInVoxel(const CPoint& h, uint i, uint j, uint k)

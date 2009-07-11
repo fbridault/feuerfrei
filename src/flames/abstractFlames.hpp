@@ -298,12 +298,12 @@ public:
 	/** Dessine la mèche de la flamme.
 	 * @param displayBoxes Affiche ou non le partitionnement de la mèche.
 	 */
-	virtual void drawWick(bool displayBoxes) const = 0;
+	virtual void drawWickBoxes() const = 0;
 
 	/** Dessine une flamme ponctuelle. La différence avec drawLineFlame() est que la texture est translatée
 	 * pour rester en face de l'observateur.
 	 */
-	virtual void drawCPointFlame() const;
+	virtual void drawPointFlame() const;
 
 	/** Retourne la direction de la base de la flamme vers la derniere particule
 	 * pour orienter le solide photométrique.
@@ -391,9 +391,11 @@ public:
 		}
 	};
 
-	virtual void drawWick(bool displayBoxes) const
+	/** Display wick boxes
+	 */
+	virtual void drawWickBoxes() const
 	{
-		m_wick->drawWick(displayBoxes);
+		m_wick->drawWickBoxes();
 	};
 
 	/** Affiche les particules de tous les squelettes composants la flamme. */

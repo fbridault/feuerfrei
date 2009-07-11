@@ -1,8 +1,8 @@
 #include "GSSolver3D.hpp"
 
-GSSolver3D::GSSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+GSSolver3D::GSSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
 			float timeStep, float buoyancy, float vorticityConfinement) :
-  Solver3D(position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement)
+  Solver3D(a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement)
 {
   m_res=new float[m_nbVoxels];
   fill_n(m_res, m_nbVoxels, 0.0f);

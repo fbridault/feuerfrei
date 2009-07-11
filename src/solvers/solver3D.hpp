@@ -28,8 +28,8 @@ public:
    * @param timeStep Pas de temps utilisé pour la simulation.
    * @param buoyancy Intensité de la force de flottabilité dans le solveur.
    */
-  Solver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
-	    float timeStep, float buoyancy, float vorticityConfinement);
+  Solver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
+			float timeStep, float buoyancy, float vorticityConfinement);
   /** Destructeur */
   virtual ~Solver3D ();
 
@@ -41,8 +41,8 @@ public:
    */
   void addExternalForces(const CPoint& position, bool move);
 
-  void addForcesOnFace(unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
-		       const CPoint& TRStrength, const CPoint& BRStrength);
+  void addForcesOnFace(	unsigned char face, const CPoint& BLStrength, const CPoint& TLStrength,
+						const CPoint& TRStrength, const CPoint& BRStrength);
 protected:
   /** Traitement de valeurs aux bords du solveur.
    * @param b 1 pour composante u, 2 pour composante v, 3 pour composante w.

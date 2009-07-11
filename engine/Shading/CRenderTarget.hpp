@@ -41,7 +41,7 @@ public:
 	virtual ~CRenderTarget();
 
 	/** Active la cible pour le rendu */
-	void bindTarget() const
+	void BindTarget() const
 	{
 		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, m_uiFrameBuffer );
 		if (m_bDepthRenderBuffer)
@@ -74,6 +74,7 @@ public:
 	void bindChannel(uint i) const
 	{
 #ifdef DEBUG
+		int n;
 		glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS_EXT, &n);
 		assert( i < (uint)n);
 #endif
@@ -81,11 +82,10 @@ public:
 	}
 
 	/** Active le framebuffer par défaut, c'est à dire directement vers le back buffer. */
-	void bindDefaultTarget() const
+	static void BindDefaultTarget()
 	{
 		glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
-		if (m_bDepthRenderBuffer)
-			glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
+		glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, 0 );
 	}
 
 private:

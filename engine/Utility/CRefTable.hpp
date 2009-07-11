@@ -55,7 +55,7 @@ public:
 		return !m_dupRefs[i].empty();
 	}
 
-	const list<int>& getDupRefs(uint i)
+	const list<int>& GetDupRefs(uint i)
 	{
 		assert( i < m_dupRefs.size());
 		return m_dupRefs[i];

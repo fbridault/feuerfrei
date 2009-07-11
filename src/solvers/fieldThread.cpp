@@ -3,6 +3,8 @@
 #include "solver3D.hpp"
 #include "../flames/abstractFires.hpp"
 
+#ifdef MULTITHREADS
+
 FieldThreadsScheduler::FieldThreadsScheduler()
   : wxThread(wxTHREAD_JOINABLE)
 {
@@ -110,17 +112,19 @@ void *FieldFiresThread::Entry()
     AskExecAuthorization();
 
     /* Ajouter les forces externes des FDFs */
-    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
-	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
+  	list<IFireSource*> &lFires = m_field->getFireSourcesList();
+  	ForEachIter(flamesIterator, list<IFireSource*>, lFires)
+  	{
       (*flamesIterator)->addForces ();
-
+  	}
     m_field->iterate ();
 
     /* Il faut protéger l'accès aux flammes lors de la construction */
     Lock();
-    for (list < IFireSource* >::iterator flamesIterator = m_field->getFireSourcesList()->begin ();
-	 flamesIterator != m_field->getFireSourcesList()->end (); flamesIterator++)
+  	ForEachIter(flamesIterator, list<IFireSource*>, lFires)
+  	{
       (*flamesIterator)->build();
+  	}
     Unlock();
 
     /* Nettoyer les sources de forces externes */
@@ -136,3 +140,5 @@ void *FieldFiresThread::Entry()
   }
   return (void *)NULL;
 }
+
+#endif // MULTITHREADS

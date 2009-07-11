@@ -4,8 +4,8 @@
 #include "shadowsDialog.hpp"
 #include "GLFlameCanvas.hpp"
 
-// Déclarations de la table des événements
-// Sorte de relation qui lit des identifiants d'événements aux fonctions
+// DÃ©clarations de la table des Ã©vÃ©nements
+// Sorte de relation qui lit des identifiants d'Ã©vÃ©nements aux fonctions
 BEGIN_EVENT_TABLE(FlamesFrame, wxFrame)
 	EVT_SIZE(FlamesFrame::OnSize)
 	EVT_RADIOBOX(IDRB_Lighting, FlamesFrame::OnSelectLighting)
@@ -48,6 +48,9 @@ END_EVENT_TABLE();
 
 /**************************************** FlamesFrame Class methods **************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize& size, const wxString& configFileName)
 		: wxFrame((wxFrame *)NULL, -1, title, pos, size)
 {
@@ -63,11 +66,11 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 		_("Pixel-lighting"),
 		_("Photometric Solid")
 	};
-	/*********************************** Création des contrôles *************************************************/
-	// Création d'un bouton. Ce bouton est associé à l'identifiant
-	// événement ID_Bt_Click, en consultant, la table des événements
-	// on en déduit que c'est la fonction OnClickButton qui sera
-	// appelée lors d'un click sur ce bouton
+	/*********************************** CrÃ©ation des contrÃ´les *************************************************/
+	// CrÃ©ation d'un bouton. Ce bouton est associÃ© Ã  l'identifiant
+	// Ã©vÃ©nement ID_Bt_Click, en consultant, la table des Ã©vÃ©nements
+	// on en dÃ©duit que c'est la fonction OnClickButton qui sera
+	// appelÃ©e lors d'un click sur ce bouton
 	m_glBuffer = new GLFlameCanvas( this, wxID_ANY, wxPoint(0,0), wxSize(320,240), attributelist, wxSUNKEN_BORDER);
 	m_glBuffer->SetExtraStyle(wxWS_EX_PROCESS_IDLE);
 
@@ -108,6 +111,9 @@ FlamesFrame::FlamesFrame(const wxString& title, const wxPoint& pos, const wxSize
 	SetStatusText( _("FPS will be here...") );
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::SetToolTips()
 {
 	m_blendedSolidCheckBox->SetToolTip(_("Click to see the values of the photometric solid mapped on the scene"));
@@ -115,12 +121,15 @@ void FlamesFrame::SetToolTips()
 	m_depthPeelingSlider->SetToolTip(_("Change the number of layers used in the depth peeling process"));
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::DoLayout()
 {
 	wxStaticBoxSizer *lightingSizer, *globalSizer,*multiSizer, *luminariesSizer, *solversSizer, *flamesSizer, *gammaSizer;
 	wxBoxSizer *bottomSizer, *rightSizer, *lightingBottomSizer, *multiTopSizer, *multiBottomSizer, *globalTopSizer;
 
-	/* Réglages globaux */
+	/* RÃ©glages globaux */
 	globalTopSizer = new wxBoxSizer(wxHORIZONTAL);
 	globalTopSizer->Add(m_buttonRun, 0, 0, 0);
 	globalTopSizer->Add(m_buttonRestart, 0, 0, 0);
@@ -129,7 +138,7 @@ void FlamesFrame::DoLayout()
 	globalSizer->Add(globalTopSizer, 0, 0, 0);
 	globalSizer->Add(m_saveImagesCheckBox, 0, 0, 0);
 
-	/* Réglages du glow et du depth peeling */
+	/* RÃ©glages du glow et du depth peeling */
 	multiTopSizer = new wxBoxSizer(wxHORIZONTAL);
 	multiTopSizer->Add(m_glowEnabledCheckBox, 0, 0, 0);
 	multiTopSizer->Add(m_glow1Slider, 1, wxEXPAND, 0);
@@ -143,7 +152,7 @@ void FlamesFrame::DoLayout()
 	multiSizer->Add(multiTopSizer, 0, wxEXPAND, 0);
 	multiSizer->Add(multiBottomSizer, 0, wxEXPAND, 0);
 
-	/* Réglages de l'éclairage */
+	/* RÃ©glages de l'Ã©clairage */
 	lightingBottomSizer = new wxBoxSizer(wxHORIZONTAL);
 	lightingBottomSizer->Add(m_blendedSolidCheckBox, 1, 0, 0);
 	lightingBottomSizer->Add(m_shadowsEnabledCheckBox, 1, 0, 0);
@@ -152,7 +161,7 @@ void FlamesFrame::DoLayout()
 	lightingSizer->Add(m_lightingRadioBox, 0, wxEXPAND, 0);
 	lightingSizer->Add(lightingBottomSizer, 1, 0, 0);
 
-	/* Réglages de la correction Gamma */
+	/* RÃ©glages de la correction Gamma */
 	gammaSizer = new wxStaticBoxSizer(wxVERTICAL, this, _("Gamma correction"));
 	gammaSizer->Add(m_gammaCheckBox, 0, wxEXPAND, 0);
 	gammaSizer->Add(m_gammaSlider, 0, wxEXPAND, 0);
@@ -189,9 +198,12 @@ void FlamesFrame::DoLayout()
 	SetSizerAndFit(m_mainSizer);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::CreateMenuBar()
 {
-	/* Création des menus */
+	/* CrÃ©ation des menus */
 	m_menuFile = new wxMenu;
 
 	m_menuFile->Append( IDM_LoadParam, _("&Load simulation file...") );
@@ -234,6 +246,9 @@ void FlamesFrame::CreateMenuBar()
 	SetMenuBar( m_menuBar );
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnSize(wxSizeEvent& event)
 {
 	// this is also necessary to update the context on some platforms
@@ -241,6 +256,9 @@ void FlamesFrame::OnSize(wxSizeEvent& event)
 	Layout();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::InitGLBuffer()
 {
 	m_glBuffer->Init(&m_currentConfig);
@@ -253,6 +271,9 @@ void FlamesFrame::InitGLBuffer()
 	Layout();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::InitLuminariesPanels()
 {
 	wxString tabName;
@@ -269,6 +290,9 @@ void FlamesFrame::InitLuminariesPanels()
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::InitSolversPanels()
 {
 	wxString tabName;
@@ -292,6 +316,9 @@ void FlamesFrame::InitSolversPanels()
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::InitFlamesPanels()
 {
 	wxString tabName;
@@ -306,6 +333,9 @@ void FlamesFrame::InitFlamesPanels()
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnClose(wxCloseEvent& event)
 {
 #ifdef MULTITHREADS
@@ -324,7 +354,9 @@ void FlamesFrame::OnClose(wxCloseEvent& event)
 	Destroy();
 }
 
-// Fonction qui est exécutée lors du click sur le bouton.
+//---------------------------------------------------------------------------------------------------------------------
+// Fonction qui est exÃ©cutÃ©e lors du click sur le bouton.
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnClickButtonRun(wxCommandEvent& event)
 {
 	if (m_glBuffer->IsRunning())
@@ -339,17 +371,25 @@ void FlamesFrame::OnClickButtonRun(wxCommandEvent& event)
 	}
 }
 
-// Fonction qui est exécutée lors du click sur le bouton.
+//---------------------------------------------------------------------------------------------------------------------
+// Fonction qui est exÃ©cutÃ©e lors du click sur le bouton.
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnClickButtonRestart(wxCommandEvent& event)
 {
 	m_glBuffer->Restart();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckBS(wxCommandEvent& event)
 {
 	m_currentConfig.BPSEnabled = 1-m_currentConfig.BPSEnabled;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnSelectLighting(wxCommandEvent& event)
 {
 	m_currentConfig.lightingMode = event.GetSelection();
@@ -365,17 +405,26 @@ void FlamesFrame::OnSelectLighting(wxCommandEvent& event)
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckShadows(wxCommandEvent& event)
 {
 	m_currentConfig.shadowsEnabled = !m_currentConfig.shadowsEnabled;
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckGlow(wxCommandEvent& event)
 {
 	m_currentConfig.glowEnabled = !m_currentConfig.glowEnabled;
 	m_menuDisplayFlames->Enable(IDM_GlowOnly,m_currentConfig.glowEnabled);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckGamma(wxCommandEvent& event)
 {
 	m_glBuffer->setGammaCorrectionState( event.IsChecked() );
@@ -385,6 +434,9 @@ void FlamesFrame::OnCheckGamma(wxCommandEvent& event)
 		m_gammaSlider->Disable();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 {
 	m_currentConfig.depthPeelingEnabled = !m_currentConfig.depthPeelingEnabled;
@@ -394,6 +446,9 @@ void FlamesFrame::OnCheckDepthPeeling(wxCommandEvent& event)
 		m_depthPeelingSlider->Disable();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnScrollGlow(wxScrollEvent& event)
 {
 	switch (event.GetId())
@@ -407,23 +462,35 @@ void FlamesFrame::OnScrollGlow(wxScrollEvent& event)
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnScrollDP(wxScrollEvent& event)
 {
 	m_glBuffer->setNbDepthPeelingLayers(m_depthPeelingSlider->GetValue() );
 	m_currentConfig.nbDepthPeelingLayers = m_depthPeelingSlider->GetValue();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnScrollGamma(wxScrollEvent& event)
 {
 	m_currentConfig.gammaCorrection = m_gammaSlider->GetValue()/100.0f;
 	m_glBuffer->setGammaCorrection( m_currentConfig.gammaCorrection );
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnCheckSaveImages(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleSaveImages();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 {
 	wxString filename;
@@ -436,7 +503,7 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 		m_glBuffer->setRunningState(false);
 		filename = fileDialog.GetPath();
 
-		/* Récupération le chemin absolu vers la scène */
+		/* RÃ©cupÃ©ration le chemin absolu vers la scÃ¨ne */
 		filename.Replace(wxGetCwd(),_(""),false);
 		/* Suppression du premier slash */
 		filename=filename.Mid(1);
@@ -449,6 +516,9 @@ void FlamesFrame::OnOpenSceneMenu(wxCommandEvent& event)
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 {
 	wxString filename;
@@ -464,7 +534,7 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 		{
 			m_glBuffer->setRunningState(false);
 			Disable();
-			/* Récupération le chemin absolu vers la scène */
+			/* RÃ©cupÃ©ration le chemin absolu vers la scÃ¨ne */
 			filename.Replace(wxGetCwd(),_(""),false);
 			/* Suppression du premier slash */
 			filename=filename.Mid(1);
@@ -497,6 +567,9 @@ void FlamesFrame::OnLoadParamMenu(wxCommandEvent& event)
 /****************** METHODES DE CHARGEMENT DES PARAMETRES DE LA SIMULATION ************************/
 /**************************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
 	double tmp;
@@ -532,6 +605,9 @@ void FlamesFrame::LoadSolverSettings(wxString& groupName, SolverConfig& solverCo
 	solverConfig.nbMaxIter = m_config->Read(groupName + _("nbMaxIter"), 100);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
 {
 	double tmp;
@@ -558,6 +634,9 @@ void FlamesFrame::LoadFireSettings(wxString& groupName, FlameConfig& fireConfig)
 	fireConfig.IESFileName = m_config->Read(groupName + _("IESFileName"), _("IES/test.ies"));
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::LoadSettings (void)
 {
 	wxString groupName;
@@ -662,6 +741,9 @@ void FlamesFrame::LoadSettings (void)
 /****************** METHODES DE SAUVEGARDE DES PARAMETRES DE LA SIMULATION ************************/
 /**************************************************************************************************/
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverConfig)
 {
 //   solverConfig.buoyancy = ;
@@ -687,6 +769,9 @@ void FlamesFrame::SaveSolverSettings(wxString& groupName, SolverConfig& solverCo
 	m_config->Write(groupName + _("nbMaxIter"),(int)solverConfig.nbMaxIter);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::SaveFireSettings(wxString& groupName, FlameConfig& fireConfig)
 {
 	m_config->Write(groupName + _("Type"), (int )fireConfig.type);
@@ -700,6 +785,9 @@ void FlamesFrame::SaveFireSettings(wxString& groupName, FlameConfig& fireConfig)
 	m_config->Write(groupName + _("IESFileName"),fireConfig.IESFileName);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 {
 	wxString groupName;
@@ -776,6 +864,9 @@ void FlamesFrame::OnSaveSettingsMenu(wxCommandEvent& event)
 		             _("Save settings"), wxOK | wxICON_INFORMATION, this);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 {
 
@@ -787,7 +878,7 @@ void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 	if (fileDialog.ShowModal() == wxID_OK)
 	{
 		filename = fileDialog.GetPath();
-		/* Récupération le chemin absolu vers la scène */
+		/* RÃ©cupÃ©ration le chemin absolu vers la scÃ¨ne */
 		filename.Replace(wxGetCwd(),_(""),false);
 		/* Suppression du premier slash */
 		filename=filename.Mid(1);
@@ -802,86 +893,131 @@ void FlamesFrame::OnSaveSettingsAsMenu(wxCommandEvent& event)
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnQuitMenu(wxCommandEvent& WXUNUSED(event))
 {
 	Close(TRUE);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnAboutMenu(wxCommandEvent& WXUNUSED(event))
 {
 	wxMessageBox(_("Real-time simulation of flames\nOasis Team"),
 	             _("About flames"), wxOK | wxICON_INFORMATION, this);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnGlowOnlyMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleGlowOnlyDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnBDSMenu(wxCommandEvent& event)
 {
 	m_glBuffer->setBoundingSphereMode(event.IsChecked());
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnGridMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleGridDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnBaseMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleBaseDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnVelocityMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleVelocityDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnParticlesMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleParticlesDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnWickBoxesMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleWickBoxesDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnHideMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleFlamesDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnShadowVolumesMenu(wxCommandEvent& event)
 {
 	m_glBuffer->ToggleShadowVolumesDisplay();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnShadowVolumesSettingsMenu(wxCommandEvent& event)
 {
 	ShadowsDialog shadowsDialog(GetParent(),-1,_("Shadows settings"),&m_currentConfig,m_glBuffer);
 	shadowsDialog.ShowModal();
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnFBDSMenu(wxCommandEvent& event)
 {
 	m_menuDisplayFlames->Check(IDM_Shaded,false);
 	m_menuDisplayFlames->Check(IDM_Wired,false);
 	m_menuDisplayFlames->Check(IDM_FBDB,false);
 	m_menuDisplayFlames->Check(IDM_FBDS,true);
-	m_glBuffer->setBoundingVolumesDisplay(BOUNDING_SPHERE);
+	m_glBuffer->setBoundingVolumesDisplay(NDisplayBoundingVolume::eSphere);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnFBDBMenu(wxCommandEvent& event)
 {
 	m_menuDisplayFlames->Check(IDM_Shaded,false);
 	m_menuDisplayFlames->Check(IDM_Wired,false);
 	m_menuDisplayFlames->Check(IDM_FBDB,true);
 	m_menuDisplayFlames->Check(IDM_FBDS,false);
-	m_glBuffer->setBoundingVolumesDisplay(IMPOSTOR);
+	m_glBuffer->setBoundingVolumesDisplay(NDisplayBoundingVolume::eImpostor);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnWiredMenu(wxCommandEvent& event)
 {
 	m_menuDisplayFlames->Check(IDM_Shaded,false);
@@ -889,9 +1025,12 @@ void FlamesFrame::OnWiredMenu(wxCommandEvent& event)
 	m_menuDisplayFlames->Check(IDM_FBDS,false);
 	m_menuDisplayFlames->Check(IDM_FBDB,false);
 	m_glBuffer->setSmoothShading(false);
-	m_glBuffer->setBoundingVolumesDisplay(NO_BOUNDING_VOLUME);
+	m_glBuffer->setBoundingVolumesDisplay(NDisplayBoundingVolume::eNone);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 {
 	m_menuDisplayFlames->Check(IDM_Shaded,true);
@@ -899,9 +1038,12 @@ void FlamesFrame::OnShadedMenu(wxCommandEvent& event)
 	m_menuDisplayFlames->Check(IDM_FBDS,false);
 	m_menuDisplayFlames->Check(IDM_FBDB,false);
 	m_glBuffer->setSmoothShading(true);
-	m_glBuffer->setBoundingVolumesDisplay(false);
+	m_glBuffer->setBoundingVolumesDisplay(NDisplayBoundingVolume::eNone);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnSettingsMenu(wxCommandEvent& event)
 {
 	m_glBuffer->setRunningState(false);
@@ -916,6 +1058,9 @@ void FlamesFrame::OnSettingsMenu(wxCommandEvent& event)
 	m_glBuffer->setRunningState(true);
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
 {
 	wxString choices[] = {_("800x600"),_("960x720"),_("1024x768"),_("1152x864"),_("1280x1024")};
@@ -938,6 +1083,9 @@ void FlamesFrame::OnResolutionMenu(wxCommandEvent& event)
 	}
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
 void FlamesFrame::SetFPS(int fps, int rps, uint width, uint height)
 {
 	wxString s;

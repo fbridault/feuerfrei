@@ -7,11 +7,8 @@ uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton
 {
 	CPoint bounds[2], barycentre;
 
-	/* Création du VBO */
-	buildVBO();
-
 	/* La bounding box est délimitée par les points ptMax[flameConfig.skeletonsNumber] et ptMin[0] */
-	getBoundingBox (bounds[1], bounds[0]);
+	GetBoundingBox (bounds[1], bounds[0]);
 
 	m_boxesDisplayList=glGenLists(1);
 	glNewList (m_boxesDisplayList, GL_COMPILE);
@@ -59,16 +56,13 @@ uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton
 
 uint CWick::buildFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton * >& leadSkeletons, Field3D& a_rField )
 {
-	/* Création du VBO */
-	buildVBO();
-
 	/*****************************************************************************/
 	/* Création des points qui vont servir d'origines pour les squelettes guides */
 	/*****************************************************************************/
 
 	/* Récupération de la bounding box */
 	CPoint bounds[flameConfig.skeletonsNumber + 1];
-	getBoundingBox (bounds[flameConfig.skeletonsNumber], bounds[0]);
+	GetBoundingBox (bounds[flameConfig.skeletonsNumber], bounds[0]);
 
 	CPoint midDist = (bounds[flameConfig.skeletonsNumber] - bounds[0]) / (flameConfig.skeletonsNumber);
 	CPoint cellSpan = bounds[flameConfig.skeletonsNumber] - bounds[0];

@@ -1,14 +1,16 @@
 #include "realFires.hpp"
 
 #include <engine/Utility/GraphicsFn.hpp>
+#include <engine/Scene/CTransform.hpp>
 
 #include "../solvers/fakeField3D.hpp"
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 Candle::Candle (const FlameConfig& a_rFlameConfig,
 				Field3D& a_rField,
+				CTransform &a_rLuminaryTransform,
 				CScene& a_rScene,
 				float a_fRayon,
 				CharCPtrC a_szWickFileName,
@@ -26,39 +28,47 @@ Candle::Candle (const FlameConfig& a_rFlameConfig,
 	{
 		vector<CWick *> objList;
 
-		UObjImporter::import(a_rScene, string(a_szWickFileName), objList, WICK_NAME_PREFIX);
+		bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
 
-		assert (objList.size() > 0);
+		assert(bStatus);
 
-		CWick* pWick = *objList.begin();
-		/* Calcul de la position et recentrage de la mèche */
-		pWick->buildBoundingBox();
+		CWick* pWick = (CWick *)(*a_rLuminaryTransform.GrabObjects().begin());
 
-		CPoint& rPosition = GrabPosition();
-		rPosition = CPoint(0.5f,0.0f,0.5f) - pWick->getCenter();
-		pWick->HardTranslate(rPosition);
+		/* Recentrage de la mèche */
+		CTransform& rTransform = GrabTransform();
+		CPoint oPosition = rTransform.GetLocalPosition();
+		oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
+		pWick->HardTranslate(oPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, pWick);
+		a_rLuminaryTransform.AddChild(this);
+
+		// Set new position in the transform
+		rTransform.SetPosition(oPosition);
 	}
 	else
 	{
 		assert (a_pWick != NULL);
 
-		/* Calcul de la position et recentrage de la mèche */
-		a_pWick->buildBoundingBox();
-
-		CPoint& rPosition = GrabPosition();
-		rPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->getCenter();
-		a_pWick->HardTranslate(rPosition);
+		/* Recentrage de la mèche */
+		CTransform& rTransform = GrabTransform();
+		CPoint oPosition = rTransform.GetLocalPosition();
+		oPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->GetCenter();
+		a_pWick->HardTranslate(oPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, a_pWick);
+		a_rLuminaryTransform.AddChild(this);
+
+		// Set new position in the transform
+		rTransform.SetPosition(oPosition);
 	}
 }
 
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 						Field3D& a_rField,
+						CTransform &a_rLuminaryTransform,
 						CScene& a_rScene,
 						CharCPtrC a_szWickFileName,
 						const CShader& a_rGenShadowCubeMapShader,
@@ -73,39 +83,49 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 	vector<CWick *> objList;
 
 	assert(a_szWickFileName != NULL);
-	UObjImporter::import(a_rScene, string(a_szWickFileName), objList, WICK_NAME_PREFIX);
 
-	assert(objList.size() > 0);
+	bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
 
-	CPoint& rPosition = GrabPosition();
-	/* Calcul de la position et recentrage de la mèche */
-	(*objList.begin())->buildBoundingBox();
-	rPosition = CPoint(0.5f,0.0f,0.5f) - (*objList.begin())->getCenter();
-	(*objList.begin())->HardTranslate(rPosition);
+	assert(bStatus);
+	CWick* pWick = (CWick *)(*a_rLuminaryTransform.GrabObjects().begin());
 
-	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (*objList.begin()), 0.03f, 0.01f);
+	CTransform& rTransform = GrabTransform();
+	CPoint oPosition = rTransform.GetLocalPosition();
+	/* Recentrage de la mèche */
+	oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
+	pWick->HardTranslate(oPosition);
+
+	// Set new position in the transform
+	rTransform.SetPosition(oPosition);
+
+	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, pWick, 0.03f, 0.01f);
+	a_rLuminaryTransform.AddChild(this);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 CandleStick::CandleStick (	const FlameConfig& a_rFlameConfig,
-													Field3D& a_rField,
-													CScene& a_rScene,
-													CharCPtrC a_szFilename,
-													float a_fRayon,
-													const CShader& a_rGenShadowCubeMapShader,
-													const CRenderTarget& a_rShadowRenderTarget):
-		IFireSource (a_rFlameConfig,
-								a_rField,
-								1,
-								("textures/bougie2.png"),
-								a_rGenShadowCubeMapShader,
-								a_rShadowRenderTarget)
+							Field3D& a_rField,
+							CTransform &a_rLuminaryTransform,
+							CScene& a_rScene,
+							CharCPtrC a_szFilename,
+							float a_fRayon,
+							const CShader& a_rGenShadowCubeMapShader,
+							const CRenderTarget& a_rShadowRenderTarget):
+		IFireSource (	a_rFlameConfig,
+						a_rField,
+						1,
+						("textures/bougie2.png"),
+						a_rGenShadowCubeMapShader,
+						a_rShadowRenderTarget)
 {
-	vector<CWick *> objList;
+	assert(false);
+/*	vector<CWick *> objList;
 
-	UObjImporter::import(a_rScene, string(a_szFilename), objList, WICK_NAME_PREFIX);
+	CTransform *pTransform = new CTransform();
+	a_rGraph.addTransform(pTransform);
+	UObjImporter::import(a_rScene, string(a_szFilename), objList, a_rGraph, pTransform, WICK_NAME_PREFIX);
 
 	if (objList.size() > 0)
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, (*objList.begin()));
@@ -125,19 +145,19 @@ CandleStick::CandleStick (	const FlameConfig& a_rFlameConfig,
 	m_cloneFlames[9]  = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-1.0f,0.0f,0.0f));
 	m_cloneFlames[10] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(0.1f,0.0f,1.1f));
 	m_cloneFlames[11] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-0.14f,0.0f,-1.0f));
-	m_cloneFlames[12]  = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(1.0f,0.0f,1.0f));
-	m_cloneFlames[13]  = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-.9f,0.0f,1.3f));
+	m_cloneFlames[12] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(1.0f,0.0f,1.0f));
+	m_cloneFlames[13] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-.9f,0.0f,1.3f));
 	m_cloneFlames[14] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(1.0f,0.0f,-1.0f));
 	m_cloneFlames[15] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-1.0f,0.0f,-1.0f));
-	m_cloneFlames[16]  = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(1.33f,0.0f,0.0f));
-	m_cloneFlames[17]  = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-1.5f,0.0f,0.0f));
+	m_cloneFlames[16] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(1.33f,0.0f,0.0f));
+	m_cloneFlames[17] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(-1.5f,0.0f,0.0f));
 	m_cloneFlames[18] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,1.4f));
-	m_cloneFlames[19] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,-1.5f));
+	m_cloneFlames[19] = new CloneCPointFlame(a_rFlameConfig, (CPointFlame *) m_flames[0], CPoint(0.0f,0.0f,-1.5f));*/
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 CandleStick::~CandleStick()
 {
 	for (uint i = 0; i < m_nbCloneFlames; i++)
@@ -145,9 +165,9 @@ CandleStick::~CandleStick()
 	delete[]m_cloneFlames;
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void CandleStick::build()
 {
 	CPoint averagePos, tmp;
@@ -164,14 +184,16 @@ void CandleStick::build()
 		m_cloneFlames[i]->build();
 	}
 
+	CTransform &rTransform = GrabTransform();
+
 	averagePos = averagePos/(m_nbFlames+m_nbCloneFlames);
-	averagePos += getPosition();
-	SetPosition(averagePos);
+	averagePos += rTransform.GetLocalPosition();
+	rTransform.SetPosition(averagePos);
 }
 
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 //
-//---------------------------------------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 void CandleStick::toggleSmoothShading(bool state)
 {
 	IFireSource::setSmoothShading(state);

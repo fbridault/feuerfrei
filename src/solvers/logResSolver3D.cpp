@@ -1,9 +1,9 @@
 #include "logResSolver3D.hpp"
 
-LogResSolver3D::LogResSolver3D (const CPoint& position, uint n_x, uint n_y, uint n_z, float dim, const CPoint& scale,
+LogResSolver3D::LogResSolver3D (CTransform& a_rTransform, uint n_x, uint n_y, uint n_z, float dim,
 				float timeStep, float buoyancy, float vorticityConfinement, float omegaDiff,
 				float omegaProj, float epsilon, uint nbTimeSteps) :
-  Solver3D (position, n_x, n_y, n_z, dim, scale, timeStep, buoyancy, vorticityConfinement),
+  Solver3D (a_rTransform, n_x, n_y, n_z, dim, timeStep, buoyancy, vorticityConfinement),
   BenchSolver3D (nbTimeSteps, omegaDiff, omegaProj, epsilon)
 {
   m_fileDiff[0].open ("logs/GSsolverDiff.u.log", ios::out | ios::trunc);

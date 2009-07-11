@@ -42,14 +42,14 @@ public:
 
 	void enableGamma()
 	{
-		m_renderTarget->bindTarget();
+		m_renderTarget->BindTarget();
 		/* Effacement de la texture */
 		glClear(GL_COLOR_BUFFER_BIT);
 	};
 
 	void disableGamma()
 	{
-		m_renderTarget->bindDefaultTarget();
+		CRenderTarget::BindDefaultTarget();
 		glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -65,10 +65,11 @@ public:
 		glActiveTexture(GL_TEXTURE0_ARB);
 		glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
-		m_oShader.Enable();
-		m_oShader.SetUniform1f("gamma", m_gamma);
+		CShaderState& rShaderState = CShaderState::GetInstance();
+		rShaderState.Enable(m_oShader);
+		rShaderState.SetUniform1f("gamma", m_gamma);
 		m_renderTarget->drawTextureOnScreen(m_width,m_height, 0);
-		m_oShader.Disable();
+		rShaderState.Disable();
 
 		glDisable(GL_TEXTURE_RECTANGLE_ARB);
 		glMatrixMode(GL_PROJECTION);

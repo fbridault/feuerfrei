@@ -39,6 +39,7 @@ void CSpatialGraph::AddTransform(CTransform* const a_spTransform)
 	CTransform::CObjectsList const& lpObjects = a_spTransform->GetObjects();
 
 	//assert(lpObjects.empty() == false);
+	// TODO: calcul faux puisqu'on ne passe pas que par cette méthode pour remplir le graphe !!!!
 	ForEachIterC(itObject, CTransform::CObjectsList, lpObjects)
 	{
 		(*itObject)->GetBoundingBox(objMax, objMin);
@@ -121,19 +122,6 @@ bool CSpatialGraph::IsUpdateVisibilityNeeded() const
 	CVisibilityState const& rVisibilityState = CVisibilityState::GetInstance();
 	return rVisibilityState.IsUpdateVisibilityNeeded(m_uiVisibilityStateIndex);
 }
-
-//---------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------
-//void CSpatialGraph::AppendSpatialGraph(CSpatialGraph const& a_rGraph, CTransform& a_rTransform)
-//{
-//	ForEachIterC(itTransform, CTransformsList, a_rGraph.m_lpTransforms)
-//	{
-//		CTransform *pTransform = new CTransform(**itTransform);
-//		m_lpTransforms.push_back(pTransform);
-//	}
-//	a_rTransform.AddChild(*a_rGraph.m_lpTransforms.begin());
-//}
 
 //---------------------------------------------------------------------------------------------------------------------
 //

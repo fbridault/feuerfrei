@@ -26,7 +26,6 @@ public:
 	 */
 	void AddTransform(CTransform* const a_pTransform);
 
-
 	/** Retrieve bounding box */
 	void GetBoundingBox(CPoint& a_rMin, CPoint& a_rMax)
 	{
@@ -43,9 +42,6 @@ public:
 	{
 		return m_oRootTransform;
 	}
-
-	/** Append another spatial graph to the current one */
-	//void AppendSpatialGraph(CSpatialGraph const& a_rGraph, CTransform& a_rTransform);
 
 	/** Remove all tranforms and objects */
 	void Clear();

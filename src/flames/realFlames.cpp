@@ -139,9 +139,9 @@ void CLineFlame::computeVTexCoords()
 
 	/* Si la flamme a un parent, c'est une flamme détachable, on fait varier la texcoord V dans le temps */
 	if (m_parentFire)
-		m_vTexInit = (m_vTexInit >= 0.85f) ? 0.0f : m_vTexInit + 0.15f;
+		m_vTexInit = (m_vTexInit >= 0.0f) ? 1.0f : m_vTexInit - 0.15f;
 	else
-		m_vTexInit = 0.0;
+		m_vTexInit = 1.0;
 	if (m_lodSkel == FULL_SKELETON)
 		vinc = 1.0f / (float)(m_vsize-1);
 	else
@@ -151,7 +151,7 @@ void CLineFlame::computeVTexCoords()
 	for (i = 0; i < m_vsize; i++)
 	{
 		m_texTmp[i] = vtmp;
-		vtmp += vinc;
+		vtmp -= vinc;
 	}
 }
 

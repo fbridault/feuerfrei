@@ -20,6 +20,7 @@ public:
 	CTransform(CPoint const& a_rPosition);
 	CTransform(CPoint const& a_rPosition, CPoint const& a_rScale);
 	CTransform(CTransform const& a_rTransform);
+	CTransform(CMatrix const& a_rMatrix);
 
 	~CTransform() {};
 
@@ -67,8 +68,7 @@ public:
 //		m_oScale = a_rScale;
 	}
 
-	void Render();
-
+	/** Accumulate children of this transform into the given rendering list */
 	void Accumulate(IRenderList& a_rRenderList) const;
 
 	void Push() const

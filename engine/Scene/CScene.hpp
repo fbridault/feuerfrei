@@ -147,7 +147,7 @@ public:
 	 * @param index Indice du polygone à obtenir.
 	 * @return Un pointeur vers le polygone recherché.
 	 */
-	ISceneItem const& GetObject(const int index) const
+	ISceneItem const& GetObject(int index) const
 	{
 		assert( m_vpObjects[index] != NULL );
 		return (*m_vpObjects[index]);
@@ -157,7 +157,7 @@ public:
 	 * @param index Indice de la source à obtenir.
 	 * @return Un pointeur vers la source recherchée.
 	 */
-	ILight const& GetSource(const int index) const
+	ILight const& GetSource(int index) const
 	{
 		assert( m_vpLights[index] != NULL );
 		return (*m_vpLights[index]);
@@ -166,7 +166,7 @@ public:
 	 * @param index Indice de la source à obtenir.
 	 * @return Un pointeur vers la source recherchée.
 	 */
-	ILight& GetSource(const int index)
+	ILight& GetSource(int index)
 	{
 		assert( m_vpLights[index] != NULL );
 		return (*m_vpLights[index]);
@@ -176,7 +176,7 @@ public:
 	 * @param index Indice du matériau à obtenir.
 	 * @return Un pointeur vers le matériau recherché.
 	 */
-	CMaterial const& GetMaterial(const int index) const
+	CMaterial const& GetMaterial(int index) const
 	{
 		assert( m_vpMaterials[index] != NULL );
 		return (*m_vpMaterials[index]);
@@ -186,7 +186,7 @@ public:
 	 * @param index Indice de la texture à obtenir.
 	 * @return Un pointeur vers la texture recherchée.
 	 */
-	CBitmapTexture const& GetTexture(const int index) const
+	CBitmapTexture const& GetTexture(int index) const
 	{
 		assert( m_vpTextures[index] != NULL );
 		return (*m_vpTextures[index]);

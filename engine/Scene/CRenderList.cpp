@@ -37,9 +37,9 @@ void IRenderList::CheckAndAddItem(ISceneItem& a_rSceneItem)
 		// At the moment, rely on OpenGL push/pop matrix
 		GLfloat f44Matrix[16];
 		glGetFloatv (GL_MODELVIEW_MATRIX, f44Matrix);
+		CMatrix oMatrix(f44Matrix);
 
-		m_lTransforms.push_back(CTransform(	CPoint(f44Matrix[12], f44Matrix[13], f44Matrix[14]),
-											CPoint(1.f, 1.f, 1.f)));
+		m_lTransforms.push_back(CTransform(oMatrix));
 	}
 }
 

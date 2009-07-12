@@ -1,36 +1,83 @@
 #if !defined(SMARTPTR_H)
 #define SMARTPTR_H
 
+template<class t_Class> class CSmartPtr;
 
+class CSmartPtrRefCounter
+{
+	template<class t_Class> friend class CSmartPtr;
+
+private:
+
+	CSmartPtrRefCounter() : m_uiRefCount(1) {}
+
+	void Increase() {  m_uiRefCount++; }
+	bool Decrease() {  assert(m_uiRefCount > 0); m_uiRefCount--; return (m_uiRefCount > 0); }
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Attributes
+//---------------------------------------------------------------------------------------------------------------------
+
+private:
+
+	uint m_uiRefCount;
+};
 
 template<class t_Class>
-class SmartPtr
+class CSmartPtr
 {
 	typedef t_Class CType;
 
 public:
 
-	SmartPtr() : m_pObject(NULL), m_uiRefCount(0) {}
-	~SmartPtr()
+	CSmartPtr() : m_pObject(NULL), m_pRefCounter(NULL) {}
+
+	CSmartPtr(CType* a_pObject) : m_pObject(a_pObject)
 	{
-		// Ensure no one still references the pointer
-		assert(m_pObject == NULL);
-		assert(m_uiRefCount == 0);
+		// Allocate a new ref counter
+		m_pRefCounter = new CSmartPtrRefCounter();
 	}
 
-	SmartPtr& operator=(CType const* a_pObject)
+	~CSmartPtr()
 	{
-		if(a_pObject == NULL)
+		if(m_pRefCounter != NULL)
 		{
-			m_uiRefCount--;
-			if(m_uiRefCount == 0)
+			if(m_pRefCounter->Decrease() == false)
 			{
 				delete m_pObject;
+				delete m_pRefCounter;
+			}
+		}
+	}
+
+	CSmartPtr& operator=(CSmartPtr const* a_spObject)
+	{
+		if(a_spObject == NULL)
+		{
+			// If we do have a pointer
+			if(m_pRefCounter != NULL)
+			{
+				// Decrease the ref counter and test if we are the last
+				if(m_pRefCounter->Decrease() == false)
+				{
+					delete m_pObject;
+					delete m_pRefCounter;
+					m_pObject = NULL;
+					m_pRefCounter = NULL;
+				}
 			}
 		}
 		else
 		{
-			m_pObject = a_pObject;
+			// Set new pointed object
+			m_pObject = a_spObject.m_pObject;
+
+			// If we do have a pointer, decrease ref counter before setting the new one
+			if(m_pRefCounter != NULL)
+			{
+				m_pRefCounter->Decrease();
+			}
+			m_pRefCounter = a_spObject.m_pRefCounter;
 		}
 		return rThis;
 	}
@@ -42,7 +89,7 @@ public:
 private:
 
 	CType* m_pObject;
-	uint m_uiRefCount;
+	CSmartPtrRefCounter* m_pRefCounter;
 };
 
 #endif //

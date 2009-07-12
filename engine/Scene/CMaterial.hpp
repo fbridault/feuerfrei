@@ -41,7 +41,7 @@ public:
 	/** Retourne le nom du matériau.
 	 * @return Nom du matériau.
 	 */
-	const string& GetName() const
+	string const& GetName() const
 	{
 		return m_name;
 	};
@@ -49,7 +49,7 @@ public:
 	/* Lecture de la composante spéculaire.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& GetSpecularCoefficients() const
+	CEnergy const& GetSpecularCoefficients() const
 	{
 		return (m_Ks);
 	};
@@ -57,7 +57,7 @@ public:
 	/** Lecture de la composante diffuse.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& GetDiffuseCoefficients() const
+	CEnergy const& GetDiffuseCoefficients() const
 	{
 		return (m_Kd);
 	};
@@ -65,7 +65,7 @@ public:
 	/** Lecture de la composante ambiante.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& GetAmbientCoefficients() const
+	CEnergy const& GetAmbientCoefficients() const
 	{
 		return (m_Ka);
 	};
@@ -83,25 +83,25 @@ public:
 	/** Indique si le matériau possède une texture.
 	 * @return True si le matériau a une texture.
 	 */
-	const bool hasDiffuseTexture() const
+	bool hasDiffuseTexture() const
 	{
-		return (m_diffuseTexture!=-1);
+		return (m_iDiffuseTexture!=-1);
 	};
 
 	/** Retourne un pointeur sur la texture du matériau.
 	 * @return Pointeur sur la texture
 	 */
-	const ITexture& GetDiffuseTexture() const
+	ITexture const& GetDiffuseTexture() const
 	{
-		return m_rScene.GetTexture(m_diffuseTexture);
+		return m_rScene.GetTexture(m_iDiffuseTexture);
 	};
 
 	/** Lecture de la composante diffuse.
 	 * @return Une variable de type CEnergy.
 	 */
-	const CEnergy& GetDiffuseReflectivity() const
+	CEnergy const& GetDiffuseReflectivity() const
 	{
-		if (m_diffuseTexture > -1)
+		if (m_iDiffuseTexture > -1)
 			return m_KDiffuseTexture;
 		else
 			return m_Kd;
@@ -110,7 +110,7 @@ public:
 	/** Indique si le matériau possède une texture.
 	 * @return True si le matériau a une texture.
 	 */
-	const bool isTransparent() const;
+	bool isTransparent() const;
 
 private:
 	CScene const& m_rScene; /** Pointeur vers la scène, utilisé pour récupérer les textures. */
@@ -121,7 +121,7 @@ private:
 	CEnergy m_Ka;                 /** Composante de réflexion ambiante. */
 	CEnergy m_KDiffuseTexture;    /** Composante moyenne de réflexion diffuse de la texture. */
 
-	int m_diffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
+	int m_iDiffuseTexture;  /** Indice de la texture diffuse dans la scène. -1 si le matériau n'est pas texturé. */
 };
 
 #endif

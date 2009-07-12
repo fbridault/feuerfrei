@@ -158,7 +158,7 @@ protected:
 	 * @param pt point à affecter dans le tableau
 	 * @param v valeur de la coordonnée de texture t
 	 */
-	void setCtrlCPoint (CPoint const& a_rPoint, GLfloat u)
+	void SetCtrlPoint (CPoint const& a_rPoint, GLfloat u)
 	{
 		*m_ctrlPoints++ =a_rPoint.x;
 		*m_ctrlPoints++ = a_rPoint.y;

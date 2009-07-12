@@ -285,8 +285,8 @@ public:
 							objFile >> x >> y;
 							if (!bSkip)
 								/* On inverse la coordonnée y */
-								texCoordsVector.push_back(CPoint(x, -y, 0));
-							worldTexCoordsVector.push_back(CPoint(x, -y, 0));
+								texCoordsVector.push_back(CPoint(x, y, 0));
+							worldTexCoordsVector.push_back(CPoint(x, y, 0));
 							nbTexCoords++;
 							break;
 					}

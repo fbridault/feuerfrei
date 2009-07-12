@@ -18,7 +18,7 @@ using namespace std;
 class ITexture
 {
 protected:
-	ITexture(): m_type(GL_TEXTURE_2D) {};
+	ITexture(): m_eType(GL_TEXTURE_2D) {};
 	/** Constructeur prot�g� uniquement � destination des sous-classes */
 	ITexture(GLenum type);
 
@@ -30,7 +30,7 @@ public:
 	 */
 	const GLuint GetTexture() const
 	{
-		return m_texName;
+		return m_uiTexId;
 	};
 
 	/** Donne le type de la texture.
@@ -38,14 +38,14 @@ public:
 	 */
 	const GLuint GetTextureType() const
 	{
-		return m_type;
+		return m_eType;
 	};
 
 	/** Active la texture pour l'objet courant avec glBindTexture().
 	 */
 	const void bind() const
 	{
-		glBindTexture(m_type, m_texName);
+		glBindTexture(m_eType, m_uiTexId);
 	};
 
 	/** Active la texture pour l'objet courant avec glBindTexture().
@@ -54,12 +54,12 @@ public:
 	const void bind(uint uiTexUnit) const
 	{
 		glActiveTexture(GL_TEXTURE0+uiTexUnit);
-		glBindTexture(m_type, m_texName);
+		glBindTexture(m_eType, m_uiTexId);
 	};
 
 	void drawOnScreen(uint width, uint height) const
 	{
-		glBindTexture(m_type, m_texName);
+		glBindTexture(m_eType, m_uiTexId);
 		glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		glBegin(GL_QUADS);
 
@@ -77,10 +77,10 @@ public:
 
 protected:
 	/** Identifiant OpenGL de la texture */
-	GLuint m_texName;
+	GLuint m_uiTexId;
 
 	/** Type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB, ... */
-	GLenum m_type;
+	GLenum m_eType;
 };
 
 /************************************************************************************/
@@ -92,20 +92,20 @@ public:
 	/** Construit une texture RGB de type 2D � partir d'un fichier image.
 	 * @param filename Nom du fichier image � charger.
 	 */
-	CBitmapTexture(CharCPtrC a_szFilename);
+	CBitmapTexture(string const& a_strFilename);
 
 	/** Construit une texture RGB � partir d'un fichier image.
 	 * @param filename Nom du fichier image � charger.
 	 * @param type Type de la texture parmi GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE_ARB,...
 	 */
-	CBitmapTexture(CharCPtrC a_szFilename, GLenum type);
+	CBitmapTexture(string const& a_strFilename, GLenum type);
 
 	/** Construit une texture RGBA de type 2D � partir d'un fichier image.
 	 * @param filename Nom du fichier image � charger.
 	 * @param wrap_s Param�tre de r�p�tition de la texture dans la direction s {GL_WRAP,GL_REPEAT}.
 	 * @param wrap_t Param�tre de r�p�tition de la texture dans la direction t {GL_WRAP,GL_REPEAT}.
 	 */
-	CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t);
+	CBitmapTexture(string const& a_strFilename, GLint wrap_s, GLint wrap_t);
 
 	virtual ~CBitmapTexture();
 
@@ -114,16 +114,16 @@ public:
 		return m_hasAlpha;
 	};
 
-	CharCPtrC GetName() const
+	string const& GetName() const
 	{
-		return m_szFilename;
+		return m_strFilename;
 	};
 
 private:
-	void load(CharCPtrC a_szFilename);
+	void load(string const& a_strFilename);
 
 private:
-	CharCPtr m_szFilename;
+	string m_strFilename;
 	bool m_hasAlpha;
 };
 

@@ -62,7 +62,7 @@ public:
 		glPushMatrix();
 		glLoadIdentity();
 
-		glActiveTexture(GL_TEXTURE0_ARB);
+		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_RECTANGLE_ARB);
 
 		CShaderState& rShaderState = CShaderState::GetInstance();

@@ -72,7 +72,7 @@
 				<Option object_output="./" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="params/candle.ini " />
+				<Option parameters="params/occuliste.ini" />
 				<Compiler>
 					<Add directory="/home/flavien/recherche/git/flames/src/.." />
 					<Add directory="/usr/lib/wx/include/gtk2-unicode-release-2.8" />
@@ -226,7 +226,6 @@
 			<envvars />
 			<code_completion />
 			<debugger />
-			<lib_finder disable_auto="1" />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

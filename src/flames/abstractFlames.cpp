@@ -155,7 +155,7 @@ void INurbsFlame::drawLineFlame () const
 	}
 	else
 	{
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glActiveTextureARB(GL_TEXTURE0);
 		glEnable (GL_TEXTURE_2D);
 		glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 		m_rTexture.bind();
@@ -238,7 +238,7 @@ void IFixedFlame::drawPointFlame () const
 
 		angle4 = (angle2 < PI / 2.0f) ? -angle : angle;
 
-		glActiveTextureARB(GL_TEXTURE0_ARB);
+		glActiveTextureARB(GL_TEXTURE0);
 		glEnable (GL_TEXTURE_2D);
 		/****************************************************************************************/
 		/* Affichage de la flamme */
@@ -293,11 +293,11 @@ void IRealFlame::computeVTexCoords()
 	uint i;
 
 	vinc = 1.0f / (float)(m_vsize-1);
-	vtmp = 0.0;
+	vtmp = 1.0f;
 	for (i = 0; i < m_vsize; i++)
 	{
 		m_texTmp[i] = vtmp;
-		vtmp += vinc;
+		vtmp -= vinc;
 	}
 }
 
@@ -388,19 +388,19 @@ bool IRealFlame::build()
 			}
 			/* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == 0)
 				{
 					pt = CPoint::pointBetween(	m_periSkeletons[i]->getLeadSkeleton ().getParticle(0),
 					                           m_periSkeletons[i]->getParticle(0));
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 				}
 
 			for (j = 0; j < m_periSkeletons[i]->getSize() - 1; j++)
 			{
-				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
+				SetCtrlPoint (m_periSkeletons[i]->getParticle(j), utex);
 				/* On regarde s'il ne faut pas ajouter un point */
 				for (l = 0; l < nb_pts_supp; l++)
 				{
@@ -408,21 +408,21 @@ bool IRealFlame::build()
 					{
 						/* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
 						pt = CPoint::pointBetween(m_periSkeletons[i]->getParticle(j), m_periSkeletons[i]->getParticle(j + 1));
-						setCtrlCPoint (pt, utex);
+						SetCtrlPoint (pt, utex);
 					}
 				}
 			}
 
-			setCtrlCPoint (m_periSkeletons[i]->getLastParticle(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLastParticle(), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize())
 				{
 					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot(), m_periSkeletons[i]-> getLastParticle());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 				}
 
-			setCtrlCPoint (m_periSkeletons[i]->getRoot(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getRoot(), utex);
 
 			bool prec = false;
 
@@ -431,7 +431,7 @@ bool IRealFlame::build()
 				{
 					pt = CPoint::pointBetween(m_periSkeletons[i]->getRoot(),
 					                          m_periSkeletons[i]->getLeadSkeleton().getRoot());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
 
@@ -444,22 +444,22 @@ bool IRealFlame::build()
 						pt = m_periSkeletons[i]-> getRoot();
 					}
 					pt = CPoint::pointBetween (pt, m_periSkeletons[i]->getLeadSkeleton().getRoot());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot (), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot (), utex);
 		}
 		else
 		{
 			/* Cas sans problème */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 			for (j = 0; j < m_periSkeletons[i]->getSize(); j++)
 			{
-				setCtrlCPoint (m_periSkeletons[i]->getParticle (j), utex);
+				SetCtrlPoint (m_periSkeletons[i]->getParticle (j), utex);
 			}
-			setCtrlCPoint (m_periSkeletons[i]->getRoot(), utex);
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getRoot(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton ().getRoot(), utex);
 		}
 		m_texTmp = m_texTmpSave;
 		utex += m_utexInc;

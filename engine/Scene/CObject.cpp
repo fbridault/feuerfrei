@@ -204,13 +204,6 @@ void CObject::Render () const
 		{
 			(*ItMesh)->Render();
 		}
-		uint uiLastMaterialIndex = rDrawState.GetLastMaterialIndex();
-		if (nShadingType != NShadingType::eAmbient)
-			/* On désactive l'unité de texture le cas échéant */
-			if (m_rScene.GetMaterial(uiLastMaterialIndex).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
-			{
-				glDisable(GL_TEXTURE_2D);
-			}
 
 		if (nDrawType == NDrawType::eSelection)
 		{

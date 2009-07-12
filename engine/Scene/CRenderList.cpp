@@ -70,6 +70,13 @@ void CRenderList::Render() const
 
 	if(m_nRenderType == NRenderType::eNormal)
 	{
+		GLint iTex2DEnable;
+		glGetIntegerv(GL_TEXTURE_2D, &iTex2DEnable);
+		if(iTex2DEnable == GL_TRUE)
+		{
+			glDisable(GL_TEXTURE_2D);
+		}
+
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);

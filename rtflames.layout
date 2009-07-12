@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="rtflames" />
-	<File name="engine/Init.cpp" open="1" top="0" tabpos="7">
+	<File name="engine/Init.cpp" open="0" top="0" tabpos="8">
 		<Cursor position="325" topLine="0" />
 	</File>
 	<File name="engine/Maths/CMatrix.cpp" open="0" top="0" tabpos="10">
@@ -25,29 +25,35 @@
 	<File name="engine/Scene/CCamera.hpp" open="0" top="0" tabpos="14">
 		<Cursor position="361" topLine="21" />
 	</File>
-	<File name="engine/Scene/CMaterial.cpp" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+	<File name="engine/Scene/CMaterial.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="776" topLine="1" />
 	</File>
-	<File name="engine/Scene/CMaterial.hpp" open="1" top="0" tabpos="0">
-		<Cursor position="0" topLine="0" />
+	<File name="engine/Scene/CMaterial.hpp" open="1" top="0" tabpos="17">
+		<Cursor position="2413" topLine="70" />
 	</File>
-	<File name="engine/Scene/CMesh.cpp" open="1" top="0" tabpos="6">
-		<Cursor position="3957" topLine="66" />
+	<File name="engine/Scene/CMesh.cpp" open="1" top="0" tabpos="18">
+		<Cursor position="4934" topLine="111" />
 	</File>
 	<File name="engine/Scene/CMesh.hpp" open="0" top="0" tabpos="10">
 		<Cursor position="3210" topLine="90" />
 	</File>
-	<File name="engine/Scene/CObject.cpp" open="1" top="0" tabpos="13">
-		<Cursor position="6463" topLine="175" />
+	<File name="engine/Scene/CObject.cpp" open="1" top="0" tabpos="15">
+		<Cursor position="5821" topLine="133" />
 	</File>
-	<File name="engine/Scene/CObject.hpp" open="1" top="0" tabpos="3">
-		<Cursor position="777" topLine="18" />
+	<File name="engine/Scene/CObject.hpp" open="1" top="0" tabpos="4">
+		<Cursor position="8472" topLine="287" />
 	</File>
-	<File name="engine/Scene/CRenderList.cpp" open="1" top="0" tabpos="2">
-		<Cursor position="2379" topLine="39" />
+	<File name="engine/Scene/CRenderList.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="2379" topLine="0" />
 	</File>
-	<File name="engine/Scene/CRenderList.hpp" open="1" top="0" tabpos="5">
+	<File name="engine/Scene/CRenderList.hpp" open="1" top="0" tabpos="6">
 		<Cursor position="823" topLine="33" />
+	</File>
+	<File name="engine/Scene/CScene.cpp" open="1" top="0" tabpos="22">
+		<Cursor position="0" topLine="107" />
+	</File>
+	<File name="engine/Scene/CScene.hpp" open="1" top="0" tabpos="0">
+		<Cursor position="5249" topLine="184" />
 	</File>
 	<File name="engine/Scene/CSpatialGraph.cpp" open="0" top="0" tabpos="2">
 		<Cursor position="4410" topLine="79" />
@@ -61,31 +67,34 @@
 	<File name="engine/Scene/CTransform.hpp" open="0" top="0" tabpos="3">
 		<Cursor position="1051" topLine="27" />
 	</File>
-	<File name="engine/Scene/Light.cpp" open="1" top="0" tabpos="14">
-		<Cursor position="17412" topLine="416" />
+	<File name="engine/Scene/Light.cpp" open="0" top="0" tabpos="14">
+		<Cursor position="4838" topLine="118" />
 	</File>
 	<File name="engine/Scene/Light.hpp" open="0" top="0" tabpos="4">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="engine/Scene/Texture.hpp" open="0" top="0" tabpos="30">
-		<Cursor position="1700" topLine="39" />
+	<File name="engine/Scene/Texture.cpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
+	</File>
+	<File name="engine/Scene/Texture.hpp" open="1" top="0" tabpos="19">
+		<Cursor position="1359" topLine="35" />
 	</File>
 	<File name="engine/Shading/CGammaFX.cpp" open="0" top="0" tabpos="9">
 		<Cursor position="315" topLine="0" />
 	</File>
 	<File name="engine/Shading/CGammaFX.hpp" open="1" top="0" tabpos="12">
-		<Cursor position="1719" topLine="47" />
+		<Cursor position="1515" topLine="44" />
 	</File>
-	<File name="engine/Shading/CRenderTarget.cpp" open="0" top="0" tabpos="33">
+	<File name="engine/Shading/CRenderTarget.cpp" open="1" top="0" tabpos="33">
 		<Cursor position="6120" topLine="156" />
 	</File>
 	<File name="engine/Shading/CRenderTarget.hpp" open="0" top="0" tabpos="12">
 		<Cursor position="2220" topLine="43" />
 	</File>
-	<File name="engine/Shading/CRenderer.cpp" open="1" top="0" tabpos="0">
-		<Cursor position="5965" topLine="0" />
+	<File name="engine/Shading/CRenderer.cpp" open="1" top="0" tabpos="21">
+		<Cursor position="7927" topLine="201" />
 	</File>
-	<File name="engine/Shading/CRenderer.hpp" open="0" top="0" tabpos="0">
+	<File name="engine/Shading/CRenderer.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="1634" topLine="0" />
 	</File>
 	<File name="engine/Shading/Glsl.cpp" open="1" top="0" tabpos="0">
@@ -112,35 +121,35 @@
 	<File name="engine/Utility/Numerable.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="1470" topLine="48" />
 	</File>
-	<File name="engine/Utility/UObjImporter.cpp" open="0" top="0" tabpos="17">
-		<Cursor position="0" topLine="252" />
+	<File name="engine/Utility/UObjImporter.cpp" open="1" top="0" tabpos="23">
+		<Cursor position="3750" topLine="157" />
 	</File>
-	<File name="engine/Utility/UObjImporter.hpp" open="0" top="0" tabpos="0">
-		<Cursor position="6929" topLine="204" />
+	<File name="engine/Utility/UObjImporter.hpp" open="0" top="0" tabpos="24">
+		<Cursor position="8877" topLine="255" />
 	</File>
-	<File name="src/flames/DPengine.cpp" open="1" top="0" tabpos="6">
+	<File name="src/flames/DPengine.cpp" open="1" top="0" tabpos="7">
 		<Cursor position="24" topLine="133" />
 	</File>
-	<File name="src/flames/DPengine.hpp" open="1" top="0" tabpos="0">
+	<File name="src/flames/DPengine.hpp" open="1" top="0" tabpos="1">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="src/flames/abstractFires.cpp" open="1" top="1" tabpos="8">
-		<Cursor position="2446" topLine="104" />
+	<File name="src/flames/abstractFires.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="2446" topLine="693" />
 	</File>
 	<File name="src/flames/abstractFires.hpp" open="1" top="0" tabpos="11">
 		<Cursor position="469" topLine="0" />
 	</File>
-	<File name="src/flames/abstractFlames.cpp" open="0" top="0" tabpos="0">
-		<Cursor position="5651" topLine="95" />
+	<File name="src/flames/abstractFlames.cpp" open="1" top="1" tabpos="20">
+		<Cursor position="9297" topLine="220" />
 	</File>
-	<File name="src/flames/abstractFlames.hpp" open="0" top="0" tabpos="18">
+	<File name="src/flames/abstractFlames.hpp" open="1" top="0" tabpos="18">
 		<Cursor position="0" topLine="240" />
 	</File>
 	<File name="src/flames/glowengine.cpp" open="1" top="0" tabpos="10">
-		<Cursor position="2016" topLine="45" />
+		<Cursor position="2016" topLine="93" />
 	</File>
-	<File name="src/flames/glowengine.hpp" open="1" top="0" tabpos="13">
-		<Cursor position="2663" topLine="94" />
+	<File name="src/flames/glowengine.hpp" open="0" top="0" tabpos="13">
+		<Cursor position="2663" topLine="92" />
 	</File>
 	<File name="src/flames/luminary.cpp" open="0" top="0" tabpos="16">
 		<Cursor position="2306" topLine="39" />
@@ -154,7 +163,7 @@
 	<File name="src/flames/realFires.hpp" open="0" top="0" tabpos="21">
 		<Cursor position="2722" topLine="64" />
 	</File>
-	<File name="src/flames/realFlames.cpp" open="0" top="0" tabpos="24">
+	<File name="src/flames/realFlames.cpp" open="1" top="0" tabpos="24">
 		<Cursor position="0" topLine="422" />
 	</File>
 	<File name="src/flames/realFlames.hpp" open="0" top="0" tabpos="23">
@@ -163,13 +172,13 @@
 	<File name="src/flames/skeleton.cpp" open="0" top="0" tabpos="26">
 		<Cursor position="1330" topLine="11" />
 	</File>
-	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="0" tabpos="4">
+	<File name="src/interface/GLFlameCanvas.cpp" open="1" top="0" tabpos="5">
 		<Cursor position="20610" topLine="602" />
 	</File>
 	<File name="src/interface/GLFlameCanvas.hpp" open="1" top="0" tabpos="9">
-		<Cursor position="9416" topLine="306" />
+		<Cursor position="9416" topLine="290" />
 	</File>
-	<File name="src/interface/flamesFrame.cpp" open="1" top="0" tabpos="1">
+	<File name="src/interface/flamesFrame.cpp" open="1" top="0" tabpos="2">
 		<Cursor position="43876" topLine="1009" />
 	</File>
 	<File name="src/solvers/GCSSORSolver3D.cpp" open="0" top="0" tabpos="3">
@@ -177,6 +186,9 @@
 	</File>
 	<File name="src/solvers/fakeField3D.cpp" open="0" top="0" tabpos="23">
 		<Cursor position="3537" topLine="96" />
+	</File>
+	<File name="src/solvers/field.hpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
 	</File>
 	<File name="src/solvers/realField3D.cpp" open="0" top="0" tabpos="22">
 		<Cursor position="2826" topLine="90" />

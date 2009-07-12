@@ -11,10 +11,10 @@ using namespace std;
 //---------------------------------------------------------------------------------------------------------------------
 ITexture::ITexture(GLenum type)
 {
-	m_type = type;
+	m_eType = type;
 
-	glGenTextures(1, &m_texName);
-	glBindTexture(m_type, m_texName);
+	glGenTextures(1, &m_uiTexId);
+	glBindTexture(m_eType, m_uiTexId);
 	/** Les paramètres des textures sont ensuite déterminées dans le constructeur de la sous-classe */
 }
 
@@ -23,7 +23,7 @@ ITexture::ITexture(GLenum type)
 //---------------------------------------------------------------------------------------------------------------------
 ITexture::~ITexture()
 {
-	glDeleteTextures(1, &m_texName);
+	glDeleteTextures(1, &m_uiTexId);
 }
 
 /************************************************************************************/
@@ -33,41 +33,41 @@ ITexture::~ITexture()
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename) :
+CBitmapTexture::CBitmapTexture(string const& a_strFilename) :
 		ITexture(GL_TEXTURE_2D)
 {
-	load(a_szFilename);
-	cout << "Loading scene texture : " << a_szFilename << "......" << endl;
+	load(a_strFilename);
+	cout << "Loading scene texture : " << a_strFilename << "......" << endl;
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLenum type) :
+CBitmapTexture::CBitmapTexture(string const& a_strFilename, GLenum type) :
 		ITexture(type)
 {
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_S,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_T,GL_CLAMP);
 
-	cout << "Loading scene texture : " << a_szFilename << "......" << endl;
-	load(a_szFilename);
-	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+	cout << "Loading scene texture : " << a_strFilename << "......" << endl;
+	load(a_strFilename);
+	glTexParameteri(m_eType,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(m_eType,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-CBitmapTexture::CBitmapTexture(CharCPtrC a_szFilename, GLint wrap_s, GLint wrap_t) :
+CBitmapTexture::CBitmapTexture(string const& a_strFilename, GLint wrap_s, GLint wrap_t) :
 		ITexture(GL_TEXTURE_2D)
 {
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,wrap_s);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,wrap_t);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_S,wrap_s);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_T,wrap_t);
 
-	cout << "Loading texture : " << a_szFilename << "......" << endl;
-	load(a_szFilename);
-	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
+	cout << "Loading texture : " << a_strFilename << "......" << endl;
+	load(a_strFilename);
+	glTexParameteri(m_eType,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(m_eType,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ CBitmapTexture::~CBitmapTexture()
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CBitmapTexture::load(CharCPtrC a_szFilename)
+void CBitmapTexture::load(string const& a_strFilename)
 {
 	uint w,h;
 
@@ -91,18 +91,18 @@ void CBitmapTexture::load(CharCPtrC a_szFilename)
 	ilGenImages(1, &ImgId); // Generate an image name to use.
 	ilBindImage(ImgId); // Bind this image name
 
-	if ( !ilLoadImage((char *)a_szFilename) )
-		cerr << "Error loading texture " << a_szFilename << endl;
+	if ( !ilLoadImage((char *)a_strFilename.c_str()) )
+		cerr << "Error loading texture " << a_strFilename << endl;
 
 	w=ilGetInteger(IL_IMAGE_WIDTH);
 	h=ilGetInteger(IL_IMAGE_HEIGHT);
 
-	if (m_type == GL_TEXTURE_2D && (!isPowerOfTwo(w) || !isPowerOfTwo(h)))
-		cerr << "(WW) Bitmap texture " << a_szFilename << " size is not a power of 2" << endl;
+	if (m_eType == GL_TEXTURE_2D && (!isPowerOfTwo(w) || !isPowerOfTwo(h)))
+		cerr << "(WW) Bitmap texture " << a_strFilename << " size is not a power of 2" << endl;
 
-	m_texName = ilutGLBindMipmaps();
+	m_uiTexId = ilutGLBindMipmaps();
 
-	m_szFilename = a_szFilename;
+	m_strFilename = a_strFilename;
 	m_hasAlpha = false;
 
 	ilDeleteImages(1, &ImgId);
@@ -118,22 +118,22 @@ void CBitmapTexture::load(CharCPtrC a_szFilename)
 CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint height, char format) :
 		ITexture(type)
 {
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
-	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_S,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_T,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_MAG_FILTER,filter);
+	glTexParameteri(m_eType,GL_TEXTURE_MIN_FILTER,filter);
 
 	switch (format)
 	{
 		case 0 :
-			glTexImage2D(m_type, 0, GL_RGB16F_ARB, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(m_eType, 0, GL_RGB16F_ARB, width, height, 0, GL_RGB, GL_FLOAT, NULL);
 			break;
 		case 1 :
-			glTexImage2D(m_type, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+			glTexImage2D(m_eType, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 			break;
-//    case 0 : glTexImage2D(m_type, 0, GL_RGB32F_ARB, width, height, 0, GL_RGBA, GL_FLOAT, NULL); break;
-//    case 1 : glTexImage2D(m_type, 0, GL_FLOAT_RG16_NV, width, height, 0, GL_FLOAT_RG16_NV, GL_UNSIGNED_BYTE, NULL); break;
-//    case 2 : glTexImage2D(m_type, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); break;
+//    case 0 : glTexImage2D(m_eType, 0, GL_RGB32F_ARB, width, height, 0, GL_RGBA, GL_FLOAT, NULL); break;
+//    case 1 : glTexImage2D(m_eType, 0, GL_FLOAT_RG16_NV, width, height, 0, GL_FLOAT_RG16_NV, GL_UNSIGNED_BYTE, NULL); break;
+//    case 2 : glTexImage2D(m_eType, 0, GL_RGB10_A2, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); break;
 	}
 }
 
@@ -143,12 +143,12 @@ CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint heig
 CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint height) :
 		ITexture(type)
 {
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_S,GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_T,GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER,filter);
-	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER,filter);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_S,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_T,GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_MAG_FILTER,filter);
+	glTexParameteri(m_eType,GL_TEXTURE_MIN_FILTER,filter);
 
-	glTexImage2D(m_type, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(m_eType, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 }
 
 /************************************************************************************/
@@ -161,16 +161,16 @@ CRenderTexture::CRenderTexture(GLenum type, GLenum filter, uint width, uint heig
 CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter, bool depthComparison) :
 		ITexture( type)
 {
-	glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, filter);
-	glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, filter);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(m_eType, GL_TEXTURE_MAG_FILTER, filter);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_T, GL_CLAMP);
 	if (depthComparison)
 	{
-		glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-		glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glTexParameteri(m_eType,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+		glTexParameteri(m_eType,GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	}
-	glTexImage2D( m_type, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D( m_eType, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -179,15 +179,15 @@ CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter
 CDepthTexture::CDepthTexture(GLenum type, uint width, uint height, GLenum filter, GLenum func) :
 		ITexture( type)
 {
-	glTexParameteri(m_type,GL_TEXTURE_MIN_FILTER, filter);
-	glTexParameteri(m_type,GL_TEXTURE_MAG_FILTER, filter);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(m_type,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-	glTexParameteri(m_type,GL_TEXTURE_COMPARE_FUNC, func);
-//   glTexParameteri(m_type, GL_DEPTH_TEXTURE_MODE_ARB, GL_ALPHA);
+	glTexParameteri(m_eType,GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(m_eType,GL_TEXTURE_MAG_FILTER, filter);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(m_eType,GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+	glTexParameteri(m_eType,GL_TEXTURE_COMPARE_FUNC, func);
+//   glTexParameteri(m_eType, GL_DEPTH_TEXTURE_MODE_ARB, GL_ALPHA);
 
-	glTexImage2D(m_type, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(m_eType, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 }
 
 /************************************************************************************/
@@ -210,11 +210,11 @@ const GLenum CCubeTexture::s_cubeMapTarget[6] =
 CCubeTexture::CCubeTexture(uint width, uint height) :
 		ITexture(GL_TEXTURE_CUBE_MAP)
 {
-	glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(m_eType, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
 	for (int i = 0; i < 6; i++)
 //    glTexImage2D( s_cubeMapTarget[i], 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
@@ -229,11 +229,11 @@ CCubeTexture::CCubeTexture(uint width, uint height) :
 CCubeTexture::CCubeTexture(const string filenames[6]) :
 	ITexture(GL_TEXTURE_CUBE_MAP)
 {
-	glTexParameteri(m_type, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(m_type, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameteri(m_type, GL_TEXTURE_WRAP_R, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(m_eType, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameteri(m_eType, GL_TEXTURE_WRAP_R, GL_CLAMP);
 
 	glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
 	glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);

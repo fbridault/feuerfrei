@@ -81,7 +81,7 @@ void UObjImporter::importMTL(CScene& a_rScene, const string& fileName)
 	char lettre, lettre2;
 	string buffer;
 	string texturePath;
-	int nouvelle_texture = -1;
+	int uiNewTexture = -1;
 	string name_nouvelle_matiere;
 	bool newMat=false;
 
@@ -162,8 +162,8 @@ void UObjImporter::importMTL(CScene& a_rScene, const string& fileName)
 				/* On ajoute donc d'abord le matériau précédemment trouvé */
 				if (newMat)
 				{
-					a_rScene.addMaterial(new CMaterial (a_rScene, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
-					nouvelle_texture = -1;
+					a_rScene.addMaterial(new CMaterial (a_rScene, name_nouvelle_matiere, Ka, Kd, Ks, shini, uiNewTexture)); //,alpha);
+					uiNewTexture = -1;
 					newMat=false;
 				}
 				Ks[0] = Ks[1] = Ks[2] = Kd[0] = Kd[1] = Kd[2] = Ka[0] = Ka[1] = Ka[2] = 0.0;
@@ -181,9 +181,10 @@ void UObjImporter::importMTL(CScene& a_rScene, const string& fileName)
 				texturePath.append(m_currentDir);
 				texturePath.append(buffer);
 
-				if ( (nouvelle_texture = a_rScene.searchTextureIndexByName(texturePath.c_str())) == -1)
+				uiNewTexture = a_rScene.searchTextureIndexByName(texturePath);
+				if (uiNewTexture == -1)
 				{
-					nouvelle_texture = a_rScene.addTexture(new CBitmapTexture (texturePath.c_str()));
+					uiNewTexture = a_rScene.addTexture(new CBitmapTexture (texturePath));
 				}
 				break;
 			default:
@@ -194,8 +195,8 @@ void UObjImporter::importMTL(CScene& a_rScene, const string& fileName)
 	/* On ajoute enfin le dernier matériau trouvé */
 	if (newMat)
 	{
-		a_rScene.addMaterial(new CMaterial (a_rScene, name_nouvelle_matiere, Ka, Kd, Ks, shini, nouvelle_texture)); //,alpha);
-		nouvelle_texture = -1;
+		a_rScene.addMaterial(new CMaterial (a_rScene, name_nouvelle_matiere, Ka, Kd, Ks, shini, uiNewTexture)); //,alpha);
+		uiNewTexture = -1;
 		newMat=false;
 	}
 	matFile.close();

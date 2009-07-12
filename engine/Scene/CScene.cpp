@@ -82,33 +82,32 @@ uint CScene::GetVertexCount()
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-int CScene::GetMaterialIndexByName(const string& name)
+int CScene::GetMaterialIndexByName(const string& a_strName)
 {
 	int index=0;
 
 	ForEachIterC(itMaterial, CMaterialsVector, m_vpMaterials)
 	{
-		if ( !(*itMaterial)->GetName().compare (name) )
+		if ( !(*itMaterial)->GetName().compare (a_strName) )
 		{
 			return index;
 		}
-
 		index++;
 	}
-	cerr << "Error loading unknown material " << name << endl;
+	cerr << "Error loading unknown material " << a_strName << endl;
 	return GetMaterialIndexByName("default");
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-int CScene::searchTextureIndexByName(CharCPtrC name)
+int CScene::searchTextureIndexByName(string const& a_strName)
 {
 	int index=0;
 
 	ForEachIterC(itTexture, CTexturesVector, m_vpTextures)
 	{
-		if ( !strcmp((*itTexture)->GetName(), name) )
+		if ( !a_strName.compare((*itTexture)->GetName()) )
 		{
 			return index;
 		}

@@ -107,41 +107,54 @@ void CMesh::Render() const
 	NShadingType const& nShadingType = rDrawState.GetShadingType();
 	uint a_uiLastMaterialIndex = rDrawState.GetLastMaterialIndex();
 
+	CMaterial const& rMaterial = m_rScene.GetMaterial(m_uiMaterial);
+
 	if (nShadingFilter == NShadingFilter::eTextured)
 	{
 		/* Ne dessiner que si il y a une texture */
-		if (!m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
+		if (!rMaterial.hasDiffuseTexture())
 			return;
 	}
 	else
 		if (nShadingFilter == NShadingFilter::eFlat)
 		{
 			/* Ne dessiner que si il n'y a pas de texture */
-			if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
+			if (rMaterial.hasDiffuseTexture())
 				return;
 		}
 
 	if (nShadingType != NShadingType::eAmbient)
 		if ( m_uiMaterial != a_uiLastMaterialIndex)
 		{
-			if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
+			CMaterial const& rLastMaterial = m_rScene.GetMaterial(a_uiLastMaterialIndex);
+
+			if ( rMaterial.hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
 			{
 				/* Inutile de réactiver l'unité de texture si le matériau précédent en avait une */
-				if (!m_rScene.GetMaterial(a_uiLastMaterialIndex).hasDiffuseTexture())
+				/* TODO : state cache !!! */
+
+				GLint iTex2DEnable;
+				glGetIntegerv(GL_TEXTURE_2D, &iTex2DEnable);
+				if(iTex2DEnable == GL_FALSE)
 				{
-					glActiveTexture(GL_TEXTURE0+OBJECT_TEX_UNIT);
+//				}
+//				if (!rLastMaterial.hasDiffuseTexture())
+//				{
 					glEnable(GL_TEXTURE_2D);
+					glActiveTexture(GL_TEXTURE0+OBJECT_TEX_UNIT);
 					glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE, GL_MODULATE);
 				}
-				m_rScene.GetMaterial(m_uiMaterial).GetDiffuseTexture().bind();
+
+				ITexture const& rTexture = rMaterial.GetDiffuseTexture();
+				rTexture.bind();
 			}
 			else
-				if (m_rScene.GetMaterial(a_uiLastMaterialIndex).hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
+				if ( rLastMaterial.hasDiffuseTexture() && nShadingType == NShadingType::eNormal)
 				{
 					/* Pas de texture pour le matériau courant, on désactive l'unité de texture car le matériau précédent en avait une */
 					glDisable(GL_TEXTURE_2D);
 				}
-			m_rScene.GetMaterial(m_uiMaterial).apply();
+			rMaterial.apply();
 		}
 
 	m_rParent.bindVBO();

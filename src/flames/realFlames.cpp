@@ -235,7 +235,7 @@ bool CLineFlame::buildFlat ()
 
 			for (j = 0; j < m_leadSkeletons[i]->getSize () - 1; j++)
 			{
-				setCtrlCPoint (m_leadSkeletons[i]->getParticle (j), utex);
+				SetCtrlPoint (m_leadSkeletons[i]->getParticle (j), utex);
 				/* On regarde s'il ne faut pas ajouter un point */
 				for (l = 0; l < nb_pts_supp; l++)
 				{
@@ -243,18 +243,18 @@ bool CLineFlame::buildFlat ()
 					{
 						/* On peut référencer j+1 puisque m_maxDistancesIndexes[l] != j si j == m_leadSkeletons[i]->getSize()-1 */
 						pt = CPoint::pointBetween(m_leadSkeletons[i]->getParticle (j), m_leadSkeletons[i]->getParticle (j + 1));
-						setCtrlCPoint (pt, utex);
+						SetCtrlPoint (pt, utex);
 					}
 				}
 			}
-			setCtrlCPoint (m_leadSkeletons[i]->getLastParticle (), utex);
+			SetCtrlPoint (m_leadSkeletons[i]->getLastParticle (), utex);
 
 			bool prec = false;
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == (int)m_leadSkeletons[i]->getSize ()-1)
 				{
 					pt = CPoint::pointBetween(m_leadSkeletons[i]->getRoot (), m_leadSkeletons[i]-> getLastParticle ());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
 
@@ -267,10 +267,10 @@ bool CLineFlame::buildFlat ()
 						pt = m_leadSkeletons[i]-> getRoot ();
 					}
 					pt = CPoint::pointBetween (pt, m_leadSkeletons[i]->getLastParticle ());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
-			setCtrlCPoint (m_leadSkeletons[i]->getRoot (), utex);
+			SetCtrlPoint (m_leadSkeletons[i]->getRoot (), utex);
 		}
 		else
 		{
@@ -278,9 +278,9 @@ bool CLineFlame::buildFlat ()
 			/* Remplissage des points de contrôle */
 			for (j = 0; j < m_leadSkeletons[i]->getSize (); j++)
 			{
-				setCtrlCPoint (m_leadSkeletons[i]->getParticle (j), utex);
+				SetCtrlPoint (m_leadSkeletons[i]->getParticle (j), utex);
 			}
-			setCtrlCPoint (m_leadSkeletons[i]->getRoot (), utex);
+			SetCtrlPoint (m_leadSkeletons[i]->getRoot (), utex);
 		}
 		m_texTmp = m_texTmpSave;
 		utex += m_utexInc;
@@ -544,14 +544,14 @@ bool CDetachedFlame::build()
 			}
 			/* Les particules les plus écartées sont maintenant connues, on peut passer à l'affichage */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == 0)
 				{
 					pt = CPoint::pointBetween(	m_periSkeletons[i]->getLeadSkeleton().getParticle(0),
 												m_periSkeletons[i]->getParticle(0));
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 				}
 
 			for (j = 0; j < m_periSkeletons[i]->getSize () - 1; j++)
@@ -564,22 +564,22 @@ bool CDetachedFlame::build()
 						/* On peut référencer j+1 puisque normalement, m_maxDistancesIndexes[l] != j si j == m_periSkeletons[i]->getSize()-1 */
 						pt = CPoint::pointBetween(	m_periSkeletons[i]->getParticle(j),
 													m_periSkeletons[i]->getParticle(j + 1));
-						setCtrlCPoint (pt, utex);
+						SetCtrlPoint (pt, utex);
 					}
 				}
-				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
+				SetCtrlPoint (m_periSkeletons[i]->getParticle(j), utex);
 			}
 
 			bool prec = false;
 
-			setCtrlCPoint (m_periSkeletons[i]->getLastParticle(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLastParticle(), utex);
 
 			for (l = 0; l < nb_pts_supp; l++)
 				if (m_maxDistancesIndexes[l] == (int)m_periSkeletons[i]->getSize())
 				{
 					pt = CPoint::pointBetween(m_periSkeletons[i]->getLastParticle(),
 					                          m_periSkeletons[i]->getLeadSkeleton().getLastParticle());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
 
@@ -592,21 +592,21 @@ bool CDetachedFlame::build()
 						pt = m_periSkeletons[i]->getLastParticle();
 					}
 					pt = CPoint::pointBetween (pt, m_periSkeletons[i]->getLeadSkeleton().getLastParticle());
-					setCtrlCPoint (pt, utex);
+					SetCtrlPoint (pt, utex);
 					prec = true;
 				}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
 		}
 		else
 		{
 			/* Cas sans problème */
 			/* Remplissage des points de contrôle */
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getParticle(0), utex);
 			for (j = 0; j < m_periSkeletons[i]->getSize (); j++)
 			{
-				setCtrlCPoint (m_periSkeletons[i]->getParticle(j), utex);
+				SetCtrlPoint (m_periSkeletons[i]->getParticle(j), utex);
 			}
-			setCtrlCPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
+			SetCtrlPoint (m_periSkeletons[i]->getLeadSkeleton().getLastParticle(), utex);
 		}
 		m_texTmp = m_texTmpSave;
 		utex += m_utexInc;

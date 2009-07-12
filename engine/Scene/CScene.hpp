@@ -196,13 +196,13 @@ public:
 	 * @param name Nom du matériau.
 	 * @return Index du matériau.
 	 */
-	int GetMaterialIndexByName(const string& name);
+	int GetMaterialIndexByName(const string& a_strName);
 
 	/** Donne l'indice d'une texture dans la liste des textures de la scène.
 	 * @param name Nom du fichier de la texture.
 	 * @return Index de la texture, -1 si elle n'existe pas
 	 */
-	int searchTextureIndexByName(CharCPtrC name);
+	int searchTextureIndexByName(const string& a_strName);
 
 	void selectItem(uint a_uiSelectedItem)
 	{

@@ -24,6 +24,7 @@ struct _NRenderType
 		eNormal,
 		eTransparent,
 		eFx,
+		eImmediate,
 
 		_NbValues
 	};
@@ -40,7 +41,7 @@ protected:
 
 public:
 
-	~ISceneItem(){};
+	virtual ~ISceneItem() {};
 
 	/** Select/Unselect */
 	void Select()
@@ -73,7 +74,6 @@ public:
 //  Virtuals
 //---------------------------------------------------------------------------------------------------------------------
 
-// TODO Nécessaire ??
 	/** Donne l'englobant de l'objet.
 	 * @param max Retourne le coin supérieur de l'englobant.
 	 * @param min Retourne le coin inférieur de l'englobant.

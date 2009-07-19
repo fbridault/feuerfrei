@@ -43,9 +43,10 @@ uint CWick::buildPointFDF (FlameConfig const& flameConfig, vector< CLeadSkeleton
 	for (vector < Vertex >::iterator vertexIterator = m_vertexArray.begin ();
 	        vertexIterator != m_vertexArray.end (); vertexIterator++)
 	{
-		barycentre.x += (*vertexIterator).x;
-		barycentre.y += (*vertexIterator).y;
-		barycentre.z += (*vertexIterator).z;
+		Vertex& rVertex = (*vertexIterator);
+		barycentre.x += rVertex.x;
+		barycentre.y += rVertex.y;
+		barycentre.z += rVertex.z;
 	}
 	barycentre = barycentre / (float)m_vertexArray.size();
 

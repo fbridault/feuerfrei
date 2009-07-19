@@ -376,18 +376,18 @@ bool CLineFlame::buildFlat ()
 /************************************** IMPLEMENTATION DE LA CLASSE POINTFLAME ****************************************/
 /**********************************************************************************************************************/
 
-CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D& a_rField, float rayon, CWick *wick):
-		IRealFlame ( flameConfig.skeletonsNumber, 3, a_rTex)
+CPointFlame::CPointFlame (	const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D& a_rField,
+							float a_fRayon, CWick *a_pWick):
+	IRealFlame ( flameConfig.skeletonsNumber, 3, a_rTex)
 {
-	uint i;
 	float angle;
 
-	assert(rayon > 0.0f);
-	assert(wick != NULL);
+	assert(a_fRayon > 0.0f);
+	assert(a_pWick != NULL);
 
 	m_nbLeadSkeletons = 1;
 
-	m_wick = wick;
+	m_wick = a_pWick;
 	m_wick->buildPointFDF(flameConfig, m_leadSkeletons, a_rField);
 
 	/* On créé les squelettes en cercle */
@@ -396,9 +396,9 @@ CPointFlame::CPointFlame (const FlameConfig& flameConfig, ITexture const& a_rTex
 	assert(m_leadSkeletons[0] != NULL);
 	CPoint const& pt = m_leadSkeletons[0]->getRoot();
 
-	for (i = 0; i < m_nbSkeletons; i++)
+	for (uint i = 0; i < m_nbSkeletons; i++)
 	{
-		CPoint oRoot(cos (angle) * rayon + pt.x, pt.y, sin (angle) * rayon + pt.z);
+		CPoint oRoot(cos (angle) * a_fRayon + pt.x, pt.y, sin (angle) * a_fRayon + pt.z);
 		m_periSkeletons[i] =
 			new CPeriSkeleton(a_rField, oRoot,	CPoint(1.0f,.75f,1.0f), *m_leadSkeletons[0], flameConfig.periLifeSpan);
 		angle += 2.0f * PI / m_nbSkeletons;

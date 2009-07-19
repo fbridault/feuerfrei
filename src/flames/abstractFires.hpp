@@ -88,19 +88,22 @@ private:
 /**********************************************************************************************************************/
 /************************************* DEFINITION DE L'INTERFACE CFLAMELIGHT ******************************************/
 /**********************************************************************************************************************/
-class CFlameLight : public COmniLight
+class CFlameLight : public ISceneItem
 {
 public:
-	CFlameLight(const CPoint &a_rPosition,
+	CFlameLight(CTransform& a_rTransform,
 				const CEnergy &a_rEnergy,
 				GLuint a_uiDepthMapSize,
 				const CShader& a_rGenShadowCubeMapShader,
 				const CRenderTarget& a_rShadowRenderTarget,
 				const string& a_rIESFileName) :
-		COmniLight(a_rPosition, a_rEnergy, a_uiDepthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+		ISceneItem(NRenderType::eFx)
 	{
 		m_pIesFile = new IES(a_rIESFileName.c_str());
-		setEnergy(CEnergy(1.0,0.5,0.0));
+		m_pLight = new COmniLight(a_rTransform, a_rEnergy, a_uiDepthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget);
+		m_pLight->setEnergy(CEnergy(1.0,0.5,0.0));
+		CTransform& rFieldTransform = a_rTransform.GrabParent();
+		rFieldTransform.AddChild(this);
 	}
 
 	virtual ~CFlameLight()
@@ -115,51 +118,35 @@ public:
 	/** Modifie le coefficient pondérateur de l'intensité. */
 	void SetIntensity(float coef)
 	{
-		m_lightEnergy *= coef;
+		CEnergy& rEnergy = m_pLight->GrabEnergy();
+		rEnergy *= coef;
 	}
 
-	const float getLazimut() const
-	{
-		return m_pIesFile->getLazimut();
-	};
+	COmniLight const& GetLight() const { assert(m_pLight != NULL); return *m_pLight; }
+	COmniLight& GrabLight() { assert(m_pLight != NULL); return *m_pLight; }
 
-	const float getLzenith() const
-	{
-		return m_pIesFile->getLzenith();
-	};
+	float getLazimut() const { return m_pIesFile->getLazimut(); }
+	float getLzenith() const { return m_pIesFile->getLzenith(); }
+	float getLazimutTEX() const { return m_pIesFile->getLazimutTEX(); }
+	float getLzenithTEX() const { return m_pIesFile->getLzenithTEX();	}
 
-	const float getLazimutTEX() const
-	{
-		return m_pIesFile->getLazimutTEX();
-	};
-
-	const float getLzenithTEX() const
-	{
-		return m_pIesFile->getLzenithTEX();
-	};
-
-	/** Retourne le nombre de valeurs en zénithal. */
-	const uint getIESZenithSize() const
-	{
-		return m_pIesFile->getNbzenith();
-	};
-
-	/** Retourne le nombre de valeurs en azimuthal. */
-	const uint getIESAzimuthSize() const
-	{
-		return m_pIesFile->getNbazimut();
-	};
+	/** Retourne le nombre de valeurs en zénithal/azimuthal. */
+	uint getIESZenithSize() const	{ return m_pIesFile->getNbzenith();	}
+	uint getIESAzimuthSize() const { return m_pIesFile->getNbazimut();}
 
 	/** Supprime le fichier IES courant et en utilise un autre. */
-	void useNewIESFile(const string& a_rIESFileName)
+	void useNewIESFile(string const& a_rIESFileName)
 	{
 		delete m_pIesFile;
 		m_pIesFile = new IES(a_rIESFileName.c_str());
-	};
+	}
+
 
 private:
 	/** Fichier IES utilisé pour le solide photométrique de la source. */
-	IES *m_pIesFile;
+	IES* m_pIesFile;
+
+	COmniLight* m_pLight;
 };
 
 
@@ -188,7 +175,8 @@ public:
 	 * @param scene CPointeur sur la scène.
 	 * @param texname Nom du fichier contenant le luminaire.
 	 */
-	IFireSource(const FlameConfig& a_rFlameConfig,
+	IFireSource(CTransform& a_rTransform,
+				const FlameConfig& a_rFlameConfig,
 				Field3D& a_rField,
 				uint a_uiNbFlames,
 				CharCPtrC a_szTexname,
@@ -212,6 +200,14 @@ public:
 	/** Calcul de la visibilité de la source. La méthode crée d'abord une sphère englobante
 	 * et teste ensuite la visibilité de celle-ci. */
 	virtual void ComputeVisibility(const CCamera &view);
+
+	/** Donne l'englobant de l'objet.
+	 * @param max Retourne le coin supérieur de l'englobant.
+	 * @param min Retourne le coin inférieur de l'englobant.
+	 */
+	virtual void GetBoundingBox(CPoint& a_rMax, CPoint& a_rMin) const {}
+
+	virtual void Move(CVector const& a_rDir) {}
 
 //---------------------------------------------------------------------------------------------------------------------
 //  Virtual methods
@@ -445,12 +441,13 @@ public:
 	 * @param scene CPointeur sur la scène.
 	 * @param texname Nom du fichier image de la texture.
 	 */
-	IDetachableFireSource (const FlameConfig& a_rFlameConfig,
-												Field3D& a_rField,
-												uint a_uiNbFlames,
-												CharCPtrC a_szTexname,
-												const CShader& a_rGenShadowCubeMapShader,
-												const CRenderTarget& a_rShadowRenderTarget);
+	IDetachableFireSource (	CTransform& a_rTransform,
+							const FlameConfig& a_rFlameConfig,
+							Field3D& a_rField,
+							uint a_uiNbFlames,
+							CharCPtrC a_szTexname,
+							const CShader& a_rGenShadowCubeMapShader,
+							const CRenderTarget& a_rShadowRenderTarget);
 	virtual ~IDetachableFireSource();
 
 	virtual void build();

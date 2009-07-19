@@ -49,6 +49,10 @@ CTransform::CTransform(CMatrix const& a_rMatrix) :
 {
 }
 
+CTransform::~CTransform()
+{
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
@@ -94,4 +98,23 @@ void CTransform::Accumulate(IRenderList& a_rRenderList) const
 		a_rRenderList.CheckAndAddItem(*pItem);
 	}
 	Pop();
+}
+
+void CTransform::Clear()
+{
+	ForEachIter(it, CTransformsList, m_lpTransforms)
+	{
+		CTransform *pTransform = *it;
+		pTransform->Clear();
+		delete pTransform;
+	}
+	m_lpTransforms.clear();
+	m_lpObjects.clear();
+	// On ne delete pas les objets pour l'instant, la scène s'en occupe
+//	ForEachIter(it, CObjectsList, m_lpObjects)
+//	{
+//		ISceneItem *pItem = *it;
+//		it = m_lpObjects.erase(it);
+//		delete pItem;
+//	}
 }

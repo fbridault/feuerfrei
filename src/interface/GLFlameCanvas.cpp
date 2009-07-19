@@ -768,8 +768,9 @@ void GLFlameCanvas::drawScene()
 	        firesIterator != m_fires.end (); firesIterator++)
 	{
 		IFireSource* pFireSource = *firesIterator;
+		ILight const& rLight = pFireSource->GetLight();
 
-		if ( !pFireSource->isEnabled() ) continue;
+		if ( !rLight.IsEnabled() ) continue;
 
 		//if (m_displayShadows)
 		/** Construction de la shadowMap */
@@ -784,7 +785,7 @@ void GLFlameCanvas::drawScene()
 			glDepthFunc(GL_LEQUAL);
 		}
 
-		m_pForwardRenderer->drawDirect(*pFireSource, m_oSceneRenderList);
+		m_pForwardRenderer->drawDirect(rLight, m_oSceneRenderList);
 
 		if (additiveBlending)
 		{
@@ -832,7 +833,7 @@ void GLFlameCanvas::drawScene()
 	        fieldsIterator != m_fields.end (); fieldsIterator++)
 	{
 		CTransform const& rTransform = (*fieldsIterator)->GetTransform();
-		CPoint const& rPosition =  rTransform.GetLocalPosition ();
+		CPoint const& rPosition =  rTransform.GetWorldPosition ();
 		CPoint const& rScale = rTransform.GetScale ();
 
 		glPushMatrix ();

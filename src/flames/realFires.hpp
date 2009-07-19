@@ -27,7 +27,7 @@ public:
 	 */
 	Candle(	const FlameConfig& a_rFlameConfig,
 			Field3D& a_rField,
-			CTransform &a_rLuminaryTransform,
+			CTransform &a_rTransform,
 			CScene& a_rScene,
 			float a_fRayon,
 			CharCPtrC a_szWickFileName,
@@ -54,7 +54,7 @@ public:
 	 */
 	Firmalampe(	const FlameConfig& a_rFlameConfig,
 				Field3D& a_rField,
-				CTransform &a_rLuminaryTransform,
+				CTransform &a_rTransform,
 				CScene& a_rScene,
 				CharCPtrC a_szWickFileName,
 				const CShader& a_rGenShadowCubeMapShader,
@@ -75,7 +75,7 @@ public:
 	 */
 	CTFire(	const FlameConfig& a_rFlameConfig,
 			Field3D& a_rField,
-			CTransform &a_rLuminaryTransform,
+			CTransform &a_rTransform,
 			CScene& a_rScene,
 			CharCPtrC a_szTorchName,
 			CharCPtrC a_rTextureName,
@@ -83,20 +83,21 @@ public:
 			const CRenderTarget& a_rShadowRenderTarget,
 			float a_fWidth,
 			float a_fDetachedWidth) :
-		IDetachableFireSource (a_rFlameConfig, a_rField, 0, a_rTextureName, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+		IDetachableFireSource (	a_rTransform, a_rFlameConfig, a_rField, 0, a_rTextureName,
+								a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 	{
-		bool bStatus = UObjImporter::import<CWick>(a_rScene, a_szTorchName, NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
+		CTransform& rLuminaryTransform = a_rTransform.GrabParent().GrabParent();
+		bool bStatus = UObjImporter::import<CWick>(a_rScene, a_szTorchName, NULL, &rLuminaryTransform, WICK_NAME_PREFIX);
 		assert(bStatus == true);
 
-		m_nbFlames = a_rLuminaryTransform.GetNumObjects();
+		m_nbFlames = rLuminaryTransform.GetNumObjects();
 		assert(m_nbFlames > 0);
 		m_flames = new IRealFlame* [m_nbFlames];
 
-		CTransform& rTransform = GrabTransform();
-		CPoint oPosition = rTransform.GetLocalPosition();
+		CPoint oPosition = a_rTransform.GetLocalPosition();
 
 		// Grab list of imported wicks
-		CTransform::CObjectsList& rlWicks = a_rLuminaryTransform.GrabObjects();
+		CTransform::CObjectsList& rlWicks = rLuminaryTransform.GrabObjects();
 
 		// Compute position
 		ForEachIter(itObject, CTransform::CObjectsList, rlWicks)
@@ -116,7 +117,7 @@ public:
 		}
 
 		// Set new position in the transform
-		rTransform.SetPosition(oPosition);
+		a_rTransform.SetPosition(oPosition);
 
 		int i=0;
 		ForEachIterC(itObject, CTransform::CObjectsList, rlWicks)
@@ -124,7 +125,6 @@ public:
 			m_flames[i++] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, (CWick *)(*itObject),
 											a_fWidth, a_fDetachedWidth, this);
 		}
-		a_rLuminaryTransform.AddChild(this);
 	}
 
 	/** Destructeur */
@@ -179,7 +179,7 @@ public:
 	 */
 	CandleStick(const FlameConfig& a_rFlameConfig,
 				Field3D& a_rField,
-				CTransform &a_rFieldTransform,
+				CTransform &a_rTransform,
 				CScene& a_rScene,
 				CharCPtrC a_szFilename,
 				float a_fRayon,

@@ -20,20 +20,6 @@ class CRenderList;
 
 using namespace std;
 
-
-/*********************************************************************************************************************/
-/**		Class ULightFactory          			  	 													   			 */
-/*********************************************************************************************************************/
-class ULightFactory
-{
-private:
-	ULightFactory();
-	~ULightFactory();
-public:
-	static ILight* GetInstance(const char *type, GLuint depthMapSize, const CShader& genShadowCubeMapShader,
-	                           const CRenderTarget& shadowRenderTarget);
-};
-
 /**
  * Classe de base repr&eacute;sentant une source lumineuse.
  * Une source lumineuse peut &ecirc;tre de cinq types diff&eacute;rents (pointLight, areaLight, etc.) et
@@ -52,7 +38,7 @@ protected:
 	 * @param P position de la source.
 	 * @param I intensit&eacute; lumineuse de la source.
 	 */
-	ILight (const CPoint & P, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget);
+	ILight (CTransform& a_rTransform, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget);
 
 public:
 
@@ -118,6 +104,13 @@ public:
 	/**
 	 * Lecture de l'intensit&eacute; lumineuse de la source.
 	 */
+	CEnergy& GrabEnergy ()
+	{
+		return m_lightEnergy;
+	};
+	/**
+	 * Lecture de l'intensit&eacute; lumineuse de la source.
+	 */
 	void setEnergy (const CEnergy& a_rEnergy)
 	{
 		m_lightEnergy = a_rEnergy;
@@ -130,12 +123,12 @@ public:
 	}
 	void toggle()
 	{
-		m_enabled = !m_enabled;
+		m_bEnabled = !m_bEnabled;
 	};
 
-	bool isEnabled()
+	bool IsEnabled() const
 	{
-		return m_enabled;
+		return m_bEnabled;
 	};
 
 	void toggleShader()
@@ -148,11 +141,11 @@ public:
 
 	CTransform const& GetTransform() const
 	{
-		return m_oTransform;
+		return m_rTransform;
 	}
 	CTransform& GrabTransform()
 	{
-		return m_oTransform;
+		return m_rTransform;
 	}
 
 protected:
@@ -162,9 +155,9 @@ protected:
 //---------------------------------------------------------------------------------------------------------------------
 
 	CEnergy m_lightEnergy;
-	CTransform m_oTransform;
+	CTransform& m_rTransform;
 
-	bool m_enabled;
+	bool m_bEnabled;
 	GLfloat *m_lightProjectionMatrix, *m_lightModelViewMatrix;
 	GLuint m_depthMapW, m_depthMapH;
 
@@ -180,7 +173,7 @@ protected:
 class COmniLight : public ILight
 {
 public:
-	COmniLight (const CPoint& P, const CEnergy& I, GLuint depthMapSize, const CShader& genShadowCubeMapShader,
+	COmniLight (CTransform& a_rTransform, const CEnergy& I, GLuint depthMapSize, const CShader& genShadowCubeMapShader,
 				const CRenderTarget& shadowRenderTarget);
 	/** Destructeur par d&eacute;faut. */
 	virtual ~COmniLight ();
@@ -220,7 +213,7 @@ public:
 	 * @param P position de la source.
 	 * @param I intensit&eacute; lumineuse de la source.
 	 */
-	CSpotLight (const CPoint & P, const CVector& direction, const CEnergy & I, float cutoff,
+	CSpotLight (CTransform& a_rTransform, const CVector& direction, const CEnergy & I, float cutoff,
 				GLuint depthMapSize, const CRenderTarget& shadowRenderTarget);
 
 	/**

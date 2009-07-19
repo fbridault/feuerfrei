@@ -70,7 +70,9 @@ public:
 		{
 			if(a_pObj == *itObject)
 			{
+				CObject *pObject = *itObject;
 				m_vpObjects.erase(itObject);
+				delete pObject;
 				return;
 			}
 		}

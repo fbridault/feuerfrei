@@ -171,7 +171,7 @@ public:
 	 * @param wick Optionnel, objet représentant la mèche. Si NULL, un cylindre simple est utilisé.
 	 */
 	CPointFlame ( const FlameConfig& flameConfig, ITexture const& a_rTex, Field3D& a_rField,
-	              float rayon, CWick *wick);
+	              float a_fRayon, CWick *a_pWick);
 
 	/** Destructeur*/
 	virtual ~CPointFlame();

@@ -10,14 +10,15 @@
 //---------------------------------------------------------------------------------------------------------------------
 Candle::Candle (const FlameConfig& a_rFlameConfig,
 				Field3D& a_rField,
-				CTransform &a_rLuminaryTransform,
+				CTransform &a_rTransform,
 				CScene& a_rScene,
 				float a_fRayon,
 				CharCPtrC a_szWickFileName,
 				const CShader& a_rGenShadowCubeMapShader,
 				const CRenderTarget& a_rShadowRenderTarget,
 				CWick *a_pWick):
-	IFireSource (	a_rFlameConfig,
+	IFireSource (	a_rTransform,
+					a_rFlameConfig,
 					a_rField,
 					1,
 					("textures/bougie2.png"),
@@ -26,39 +27,32 @@ Candle::Candle (const FlameConfig& a_rFlameConfig,
 {
 	if (a_szWickFileName != NULL)
 	{
-		vector<CWick *> objList;
+		CTransform& rLuminaryTransform = a_rTransform.GrabParent().GrabParent();
+		bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &rLuminaryTransform, WICK_NAME_PREFIX);
+		assert(bStatus == true);
 
-		bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
-
-		assert(bStatus);
-
-		CWick* pWick = (CWick *)(*a_rLuminaryTransform.GrabObjects().begin());
+		CWick* pWick = dynamic_cast<CWick *>(*rLuminaryTransform.GrabObjects().begin());
+		assert (pWick != NULL);
 
 		/* Recentrage de la mèche */
-		CTransform& rTransform = GrabTransform();
-		CPoint oPosition = rTransform.GetLocalPosition();
-		oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
+		CPoint oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
 		pWick->HardTranslate(oPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, pWick);
-		a_rLuminaryTransform.AddChild(this);
 
 		// Set new position in the transform
-		rTransform.SetPosition(oPosition);
+		a_rTransform.SetPosition(oPosition);
 	}
 	else
 	{
 		assert (a_pWick != NULL);
 
 		/* Recentrage de la mèche */
-		CTransform& rTransform = GrabTransform();
-		CPoint oPosition = rTransform.GetLocalPosition();
-		oPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->GetCenter();
+		CPoint oPosition = CPoint(0.5f,0.0f,0.5f) - a_pWick->GetCenter();
 		a_pWick->HardTranslate(oPosition);
 		m_flames[0] = new CPointFlame(a_rFlameConfig, m_oTexture, a_rField, a_fRayon, a_pWick);
-		a_rLuminaryTransform.AddChild(this);
 
 		// Set new position in the transform
-		rTransform.SetPosition(oPosition);
+		a_rTransform.SetPosition(oPosition);
 	}
 }
 
@@ -68,12 +62,13 @@ Candle::Candle (const FlameConfig& a_rFlameConfig,
 //---------------------------------------------------------------------------------------------------------------------
 Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 						Field3D& a_rField,
-						CTransform &a_rLuminaryTransform,
+						CTransform &a_rTransform,
 						CScene& a_rScene,
 						CharCPtrC a_szWickFileName,
 						const CShader& a_rGenShadowCubeMapShader,
 						const CRenderTarget& a_rShadowRenderTarget) :
-	IFireSource (	a_rFlameConfig,
+	IFireSource (	a_rTransform,
+					a_rFlameConfig,
 					a_rField,
 					1,
 					("textures/firmalampe.png"),
@@ -84,22 +79,20 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 
 	assert(a_szWickFileName != NULL);
 
-	bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &a_rLuminaryTransform, WICK_NAME_PREFIX);
+	CTransform& rLuminaryTransform = a_rTransform.GrabParent().GrabParent();
+	bool bStatus = UObjImporter::import<CWick>(a_rScene, string(a_szWickFileName), NULL, &rLuminaryTransform, WICK_NAME_PREFIX);
 
 	assert(bStatus);
-	CWick* pWick = (CWick *)(*a_rLuminaryTransform.GrabObjects().begin());
+	CWick* pWick = (CWick *)(*rLuminaryTransform.GrabObjects().begin());
 
-	CTransform& rTransform = GrabTransform();
-	CPoint oPosition = rTransform.GetLocalPosition();
 	/* Recentrage de la mèche */
-	oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
+	CPoint oPosition = CPoint(0.5f,0.0f,0.5f) - pWick->GetCenter();
 	pWick->HardTranslate(oPosition);
 
 	// Set new position in the transform
-	rTransform.SetPosition(oPosition);
+	a_rTransform.SetPosition(oPosition);
 
 	m_flames[0] = new CLineFlame( a_rFlameConfig, m_oTexture, a_rField, pWick, 0.03f, 0.01f);
-	a_rLuminaryTransform.AddChild(this);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -107,13 +100,14 @@ Firmalampe::Firmalampe(	const FlameConfig& a_rFlameConfig,
 //---------------------------------------------------------------------------------------------------------------------
 CandleStick::CandleStick (	const FlameConfig& a_rFlameConfig,
 							Field3D& a_rField,
-							CTransform &a_rLuminaryTransform,
+							CTransform &a_rTransform,
 							CScene& a_rScene,
 							CharCPtrC a_szFilename,
 							float a_fRayon,
 							const CShader& a_rGenShadowCubeMapShader,
 							const CRenderTarget& a_rShadowRenderTarget):
-		IFireSource (	a_rFlameConfig,
+		IFireSource (	a_rTransform,
+						a_rFlameConfig,
 						a_rField,
 						1,
 						("textures/bougie2.png"),
@@ -170,25 +164,25 @@ CandleStick::~CandleStick()
 //---------------------------------------------------------------------------------------------------------------------
 void CandleStick::build()
 {
-	CPoint averagePos, tmp;
-
-	for (uint i = 0; i < m_nbFlames; i++)
-	{
-		averagePos +=  m_flames[i]->getCenter ();
-		m_flames[i]->build();
-	}
-
-	for (uint i = 0; i < m_nbCloneFlames; i++)
-	{
-		averagePos += m_cloneFlames[i]->getCenter ();
-		m_cloneFlames[i]->build();
-	}
-
-	CTransform &rTransform = GrabTransform();
-
-	averagePos = averagePos/(m_nbFlames+m_nbCloneFlames);
-	averagePos += rTransform.GetLocalPosition();
-	rTransform.SetPosition(averagePos);
+//	CPoint averagePos, tmp;
+//
+//	for (uint i = 0; i < m_nbFlames; i++)
+//	{
+//		averagePos +=  m_flames[i]->getCenter ();
+//		m_flames[i]->build();
+//	}
+//
+//	for (uint i = 0; i < m_nbCloneFlames; i++)
+//	{
+//		averagePos += m_cloneFlames[i]->getCenter ();
+//		m_cloneFlames[i]->build();
+//	}
+//
+//	CTransform &rTransform = GrabTransform();
+//
+//	averagePos = averagePos/(m_nbFlames+m_nbCloneFlames);
+//	averagePos += rTransform.GetLocalPosition();
+//	rTransform.SetPosition(averagePos);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

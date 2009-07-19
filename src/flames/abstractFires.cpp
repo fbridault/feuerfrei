@@ -12,13 +12,14 @@
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-IFireSource::IFireSource(	const FlameConfig& a_rFlameConfig,
+IFireSource::IFireSource(	CTransform& a_rTransform,
+							const FlameConfig& a_rFlameConfig,
 							Field3D& a_rField,
 							uint a_uiNbFlames,
 							CharCPtrC a_szTexname,
 							const CShader& a_rGenShadowCubeMapShader,
 							const CRenderTarget& a_rShadowRenderTarget) :
-	CFlameLight(CPoint(0.0f,0.0f,0.0f),
+	CFlameLight(a_rTransform,
 				CEnergy(1.0,1.0,1.0),
 				512,
 				a_rGenShadowCubeMapShader,
@@ -126,14 +127,11 @@ void IFireSource::build()
 		averageVec += m_flames[i]->getMainDirection ();
 	}
 
-	CTransform const& rFieldTransform = m_rField.GetTransform();
-
-	averagePos *= rFieldTransform.GetScale();
 	m_oCenter = averagePos/m_nbFlames;
-	averagePos = m_oCenter + rFieldTransform.GetLocalPosition();
 
-	CTransform& rLightTransform = GrabTransform();
-	rLightTransform.SetPosition(averagePos);
+	ILight& rLight = GrabLight();
+	CTransform& rLightTransform = rLight.GrabTransform();
+	rLightTransform.SetPosition(m_oCenter);
 
 	m_oDirection = averageVec/m_nbFlames;
 }
@@ -433,13 +431,14 @@ void IFireSource::setLOD(u_char value)
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-IDetachableFireSource::IDetachableFireSource(const FlameConfig& a_rFlameConfig,
-																						Field3D& a_rField,
-																						uint a_uiNbFlames,
-																						CharCPtrC a_szTexname,
-																						const CShader& a_rGenShadowCubeMapShader,
-																						const CRenderTarget& a_rShadowRenderTarget) :
-		IFireSource (a_rFlameConfig, a_rField, a_uiNbFlames, a_szTexname, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
+IDetachableFireSource::IDetachableFireSource(	CTransform& a_rTransform,
+												const FlameConfig& a_rFlameConfig,
+												Field3D& a_rField,
+												uint a_uiNbFlames,
+												CharCPtrC a_szTexname,
+												const CShader& a_rGenShadowCubeMapShader,
+												const CRenderTarget& a_rShadowRenderTarget) :
+	IFireSource (a_rTransform, a_rFlameConfig, a_rField, a_uiNbFlames, a_szTexname, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 {
 	computeGlowWeights(0,1.8f);
 	computeGlowWeights(1,2.2f);
@@ -500,7 +499,6 @@ void IDetachableFireSource::build()
 {
 	CPoint averagePos, tmp;
 	CVector averageVec;
-	CDetachedFlame* flame;
 
 	if (!m_visibility) return;
 
@@ -516,7 +514,8 @@ void IDetachableFireSource::build()
 	m_oCenter = averagePos/m_nbFlames;
 	averagePos = m_oCenter + rFieldTransform.GetLocalPosition();
 
-	CTransform &rTransform = GrabTransform();
+	ILight& rLight = GrabLight();
+	CTransform& rTransform = rLight.GrabTransform();
 	rTransform.SetPosition(averagePos);
 
 	m_oDirection = averageVec/m_nbFlames;
@@ -527,7 +526,7 @@ void IDetachableFireSource::build()
 	{
 		if (!(*flamesIterator)->build())
 		{
-			flame = *flamesIterator;
+			CDetachedFlame* flame = *flamesIterator;
 			flamesIterator = m_detachedFlamesList.erase(flamesIterator);
 			delete flame;
 		}

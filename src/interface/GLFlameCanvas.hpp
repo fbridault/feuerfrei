@@ -139,25 +139,30 @@ public:
 
 		CVisibilityState &rVisibilityState = CVisibilityState::GetInstance();
 		rVisibilityState.TriggerUpdateVisibility();
-	};
+	}
+
 	void addPermanentExternalForcesToField(int selectedField, CPoint &pt)
 	{
 		if (selectedField >= 0) m_fields[selectedField]->addPermanentExternalForces(pt);
 		else m_globalField->addPermanentExternalForces(pt);
-	};
+	}
+
 	void setFieldBuoyancy(int index, float value)
 	{
 		if (index >= 0) m_fields[index]->setBuoyancy(value);
 		else m_globalField->setBuoyancy(value);
-	};
+	}
+
 	void setFlameForces(int index, float value)
 	{
 		m_fires[index]->setInnerForce(value);
-	};
+	}
+
 	void setFlameIntensity(int index, float value)
 	{
 		m_fires[index]->SetIntensity(value);
-	};
+	}
+
 	void setFlameLOD(int index, u_char value)
 	{
 		m_fires[index]->setLOD(value);
@@ -167,28 +172,34 @@ public:
 	{
 		if (index >= 0) m_luminaries[index]->setBuoyancy(value);
 		else m_globalField->setBuoyancy(value);
-	};
+	}
+
 	void setLuminaryVorticity(int index, float value)
 	{
 		if (index >= 0) m_luminaries[index]->setVorticity(value);
 		else m_globalField->setVorticity(value);
-	};
+	}
+
 	void setLuminaryForces(int index, float value)
 	{
 		m_luminaries[index]->setInnerForce(value);
-	};
+	}
+
 	void setLuminaryLOD(int index, u_char value)
 	{
 		m_luminaries[index]->setLOD(value);
-	};
+	}
+
 	void setLuminaryFDF(int index, int value)
 	{
 		m_luminaries[index]->setFDF(value);
-	};
+	}
+
 	void setLuminaryPerturbateMode(int index, char value)
 	{
 		m_luminaries[index]->setPerturbateMode(value);
-	};
+	}
+
 	void setLuminaryLeadLifeSpan(int index, uint value)
 	{
 		m_luminaries[index]->setLeadLifeSpan(value);
@@ -196,12 +207,13 @@ public:
 	void setLuminaryPeriLifeSpan(int index, uint value)
 	{
 		m_luminaries[index]->setPeriLifeSpan(value);
-	};
+	}
 
 	void setNbDepthPeelingLayers(uint value)
 	{
 		m_depthPeelingEngine->setNbLayers(value);
-	};
+	}
+
 	void RegeneratePhotometricSolids(uint flameIndex, wxString IESFileName);
 
 	//-----------------------------------------------------------------------------------------------------------------

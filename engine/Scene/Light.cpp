@@ -9,51 +9,12 @@
 #include "CRenderList.hpp"
 #include "../Shading/CRenderTarget.hpp"
 
-
-/*********************************************************************************************************************/
-/**		Class ULightFactory          			  	 													   			 */
-/*********************************************************************************************************************/
-
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-ILight* ULightFactory::GetInstance(	const char *type,
-									GLuint depthMapSize,
-									const CShader& a_rGenShadowCubeMapShader,
-									const CRenderTarget& a_rShadowRenderTarget)
-{
-	CPoint p, i;
-	CVector d;
-
-	p.randomize(-0.4, 0.4);
-	p.y = (p.y)/2.0;
-
-	// TODO: Replace strcmp
-	if (!strcmp(type,"spot"))
-	{
-		i.randomize( 0.01, 0.3);
-		d.randomize(-1.0, 1.0);
-		return new CSpotLight(p,d,CEnergy(i.x,i.y,i.z),0.9, depthMapSize, a_rShadowRenderTarget);
-	}
-	else
-		if (!strcmp(type,"omni"))
-		{
-			i.randomize( 0.01, 0.2);
-			return new COmniLight(p,CEnergy(i.x,i.y,i.z), depthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget);
-		}
-		else
-		{
-			cerr << "(EE) Cannot create light, bad type" << endl;
-			return NULL;
-		}
-}
-
-//---------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------
-ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
-	ISceneItem(NRenderType::eFx),
-	m_oTransform(P),
+ILight::ILight (CTransform& a_rTransform, const CEnergy & I, GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
+	ISceneItem(NRenderType::eImmediate),
+	m_rTransform(a_rTransform),
 	m_shadowRenderTarget(shadowRenderTarget)
 {
 	m_lightEnergy = I;
@@ -61,7 +22,9 @@ ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const C
 	m_lightProjectionMatrix = new GLfloat[16];
 	m_lightModelViewMatrix = new GLfloat[16];
 
-	m_enabled = true;
+	m_bEnabled = true;
+
+	m_rTransform.AddChild(this);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -69,8 +32,8 @@ ILight::ILight (const CPoint& P, const CEnergy & I, GLuint depthMapSize, const C
 //---------------------------------------------------------------------------------------------------------------------
 void ILight::Render() const
 {
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
-	CPoint const& rScale = m_oTransform.GetScale();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
+	CPoint const& rScale = m_rTransform.GetScale();
 	glPushMatrix();
 	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
 	glScalef(rScale.x, rScale.y, rScale.z);
@@ -88,8 +51,8 @@ void ILight::Render() const
 //---------------------------------------------------------------------------------------------------------------------
 void ILight::DrawForSelection() const
 {
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
-	CPoint const& rScale = m_oTransform.GetScale();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
+	CPoint const& rScale = m_rTransform.GetScale();
 	glPushMatrix();
 	glTranslatef(rPosition.x,rPosition.y, rPosition.z);
 	glScalef(rScale.x, rScale.y, rScale.z);
@@ -107,7 +70,7 @@ void ILight::preRendering(bool shadows) const
 	m_shadowRenderTarget.bindTexture();
 	assert(m_shader != NULL);
 
-	CPoint position = m_oTransform.GetWorldPosition() * g_modelViewMatrix;
+	CPoint position = m_rTransform.GetWorldPosition() * g_modelViewMatrix;
 	CShaderState& rShaderState = CShaderState::GetInstance();
 
 	rShaderState.Enable(*m_shader);
@@ -151,9 +114,9 @@ void ILight::postRendering(bool shadows) const
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-COmniLight::COmniLight(const CPoint &P, const CEnergy &I, GLuint depthMapSize,
+COmniLight::COmniLight(CTransform& a_rTransform, const CEnergy &I, GLuint depthMapSize,
                        const CShader& genShadowCubeMapShader, const CRenderTarget& shadowRenderTarget) :
-		ILight(P,I,depthMapSize,shadowRenderTarget),
+		ILight(a_rTransform,I,depthMapSize,shadowRenderTarget),
 		m_genShadowCubeMapShader(genShadowCubeMapShader)
 {
 	/** Création du light volume : sphère */
@@ -212,7 +175,7 @@ void COmniLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, 
 	CShaderState& rShaderState = CShaderState::GetInstance();
 	rShaderState.Enable(m_genShadowCubeMapShader);
 
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
 	rShaderState.SetUniform3f("u_lightCentre", rPosition.x,rPosition.y,rPosition.z);
 
 	CDrawState &rDrawState = CDrawState::GetInstance();
@@ -277,7 +240,7 @@ void COmniLight::preRendering(bool shadows) const
 	GLfloat filter[6][3] = { {offset, 0.f, 0.f}, {-offset, 0.f, 0.f}, {0.f, offset, 0.f}, {0.f, -offset, 0.f},
 		{0.f, 0.f, offset}, {0.f, 0.f, -offset}
 	};
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
 
 	ILight::preRendering(shadows);
 
@@ -295,7 +258,7 @@ void COmniLight::renderLightVolume(const CCamera& camera) const
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
 	bool bIn = false;
 
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
 	CVector vecToLight = CPoint(0,0,0) - camera.GetPosition() - rPosition;
 	if ( vecToLight.norm() < m_radius )
 	{
@@ -339,9 +302,9 @@ CVector COmniLight::generateRandomRay() const
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-CSpotLight::CSpotLight (const CPoint & P, const CVector& direction, const CEnergy & I, float angle,
+CSpotLight::CSpotLight (CTransform& a_rTransform, const CVector& direction, const CEnergy & I, float angle,
                         GLuint depthMapSize, const CRenderTarget& shadowRenderTarget) :
-	ILight(P,I,depthMapSize,shadowRenderTarget)
+	ILight(a_rTransform, I,depthMapSize,shadowRenderTarget)
 {
 	GLuint slices=10;
 	m_direction = direction;
@@ -393,7 +356,7 @@ void CSpotLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 void CSpotLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
 {
 	CVector up(0,0,1);
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
 
 	// Check if dir and up vectors are colinear for glutLookAt openGL call
 	// We compute the trapezoid area = norm of the cross product */
@@ -471,7 +434,7 @@ void CSpotLight::renderLightVolume(const CCamera& camera) const
 	float angle = acos(dir * m_direction);  // m_direction est déjà normalisé
 	bool in=false;
 	CVector axeRot = dir ^ m_direction;
-	CPoint const& rPosition = m_oTransform.GetWorldPosition();
+	CPoint const& rPosition = m_rTransform.GetWorldPosition();
 
 	/** Détermine si l'on est à l'intérieur ou à l'extérieur du volume */
 	CVector vecToLight = CPoint(0,0,0)-camera.GetPosition() - rPosition;

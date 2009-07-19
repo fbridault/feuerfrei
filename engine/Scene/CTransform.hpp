@@ -22,7 +22,7 @@ public:
 	CTransform(CTransform const& a_rTransform);
 	CTransform(CMatrix const& a_rMatrix);
 
-	~CTransform() {};
+	~CTransform();
 
 	/** Get item position */
 	CPoint GetLocalPosition () const
@@ -114,6 +114,19 @@ public:
 		m_lpTransforms.push_back(a_pTransform);
 		a_pTransform->AddParent(this);
 	}
+
+	CTransform& GrabParent()
+	{
+		assert(m_pParentTransform != NULL);
+		return *m_pParentTransform;
+	}
+	CTransform const& GetParent() const
+	{
+		assert(m_pParentTransform != NULL);
+		return *m_pParentTransform;
+	}
+
+	void Clear();
 
 private:
 

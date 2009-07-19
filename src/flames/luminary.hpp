@@ -56,15 +56,6 @@ public:
 //  Specific methods
 //---------------------------------------------------------------------------------------------------------------------
 
-	static Field3D* initField(const SolverConfig& fieldConfig, CTransform& a_rTransform);
-	static IFireSource* initFire(	const FlameConfig& a_rFlameConfig,
-							CharCPtrC a_szFilename,
-							Field3D& a_rField,
-							CTransform &a_rLuminaryTransform,
-							CScene& a_rScene,
-							const CShader& a_rShadowMapShader,
-							const CRenderTarget& a_rShadowRenderTarget);
-
 	/** Ajuste le niveau de détail de la NURBS.
 	 * @param value valeur comprise entre 1 et LOD_VALUES.
 	 */
@@ -147,7 +138,20 @@ public:
 		}
 	}
 
-protected:
+private :
+
+	static Field3D* CreateField(const SolverConfig& fieldConfig, CTransform& a_rTransform);
+	static IFireSource* CreateFire(	const FlameConfig& a_rFlameConfig,
+									CharCPtrC a_szFilename,
+									Field3D& a_rField,
+									CTransform &a_rTransform,
+									CScene& a_rScene,
+									const CShader& a_rShadowMapShader,
+									const CRenderTarget& a_rShadowRenderTarget);
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Attributes
+//---------------------------------------------------------------------------------------------------------------------
 
 	/** Fires */
 	typedef list <IFireSource *> CFireSourceList;

@@ -128,5 +128,5 @@ bool CSpatialGraph::IsUpdateVisibilityNeeded() const
 //---------------------------------------------------------------------------------------------------------------------
 void CSpatialGraph::Clear()
 {
-//	m_oRootTransform.Clear();
+	m_oRootTransform.Clear();
 }

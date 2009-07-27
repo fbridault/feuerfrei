@@ -442,27 +442,15 @@ public:
 							const CRenderTarget& a_rShadowRenderTarget);
 	virtual ~IDetachableFireSource();
 
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Inherited methods
+//---------------------------------------------------------------------------------------------------------------------
+
 	virtual void build();
-	virtual void drawFlame(bool display, bool displayParticle, u_char boundingVolume=0) const;
+	virtual void Render() const;
 
 	virtual void setLOD(u_char value);
-//   virtual void drawImpostor () const;
-
-	/** Ajoute une flamme détachée à la source.
-	 * @param detachedFlame CPointeur sur la nouvelle flamme détachée à ajouter.
-	 */
-	virtual void addDetachedFlame(CDetachedFlame* detachedFlame)
-	{
-		m_detachedFlamesList.push_back(detachedFlame);
-	}
-
-	/** Supprime une flamme détachée à la source.
-	 * @param detachedFlame CPointeur sur la flamme détachée à enlever.
-	 */
-	virtual void removeDetachedFlame(CDetachedFlame* detachedFlame)
-	{
-		m_detachedFlamesList.remove(detachedFlame);
-	}
 
 	/** Active ou désactive l'affichage texturé sur la flamme. */
 	virtual void setSmoothShading (bool state);
@@ -470,12 +458,34 @@ public:
 	virtual void ComputeVisibility(const CCamera &view);
 
 	void computeIntensityPositionAndDirection(void);
+
+//---------------------------------------------------------------------------------------------------------------------
+//  Specific methods
+//---------------------------------------------------------------------------------------------------------------------
+
+	/** Ajoute une flamme détachée à la source.
+	 * @param detachedFlame CPointeur sur la nouvelle flamme détachée à ajouter.
+	 */
+	virtual void addDetachedFlame(CDetachedFlame* detachedFlame)
+	{
+		m_lpDetachedFlamesList.push_back(detachedFlame);
+	}
+
+	/** Supprime une flamme détachée à la source.
+	 * @param detachedFlame CPointeur sur la flamme détachée à enlever.
+	 */
+	virtual void removeDetachedFlame(CDetachedFlame* detachedFlame)
+	{
+		m_lpDetachedFlamesList.remove(detachedFlame);
+	}
+
 private:
 	/** Construit la bounding box utilisée pour l'affichage */
 	virtual void buildBoundingBox ();
 
 	/** Liste des flammes détachées */
-	list<CDetachedFlame *> m_detachedFlamesList;
+	typedef list<CDetachedFlame *> CDetachedFlameList;
+	CDetachedFlameList m_lpDetachedFlamesList;
 	CPoint m_BBmin, m_BBmax;
 };
 

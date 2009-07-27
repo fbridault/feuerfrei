@@ -142,7 +142,7 @@
 	<File name="src/flames/abstractFires.cpp" open="1" top="0" tabpos="30">
 		<Cursor position="14187" topLine="411" />
 	</File>
-	<File name="src/flames/abstractFires.hpp" open="1" top="0" tabpos="29">
+	<File name="src/flames/abstractFires.hpp" open="1" top="1" tabpos="29">
 		<Cursor position="2987" topLine="79" />
 	</File>
 	<File name="src/flames/abstractFlames.cpp" open="1" top="0" tabpos="12">
@@ -187,8 +187,8 @@
 	<File name="src/interface/flamesFrame.cpp" open="0" top="0" tabpos="4">
 		<Cursor position="37999" topLine="787" />
 	</File>
-	<File name="src/solvers/GCSSORSolver3D.cpp" open="1" top="1" tabpos="3">
-		<Cursor position="18805" topLine="603" />
+	<File name="src/solvers/GCSSORSolver3D.cpp" open="0" top="0" tabpos="3">
+		<Cursor position="18703" topLine="600" />
 	</File>
 	<File name="src/solvers/LODField3D.hpp" open="1" top="0" tabpos="0">
 		<Cursor position="0" topLine="0" />
@@ -202,13 +202,16 @@
 	<File name="src/solvers/field3D.cpp" open="1" top="0" tabpos="0">
 		<Cursor position="0" topLine="0" />
 	</File>
-	<File name="src/solvers/realField3D.cpp" open="1" top="0" tabpos="22">
-		<Cursor position="2826" topLine="90" />
+	<File name="src/solvers/realField3D.cpp" open="0" top="0" tabpos="22">
+		<Cursor position="2755" topLine="81" />
 	</File>
 	<File name="src/solvers/realField3D.hpp" open="0" top="0" tabpos="0">
 		<Cursor position="3668" topLine="72" />
 	</File>
-	<File name="src/solvers/solver3D.cpp" open="0" top="0" tabpos="24">
+	<File name="src/solvers/solver3D.cpp" open="1" top="0" tabpos="24">
 		<Cursor position="7539" topLine="229" />
+	</File>
+	<File name="src/solvers/solver3D.hpp" open="1" top="0" tabpos="0">
+		<Cursor position="0" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

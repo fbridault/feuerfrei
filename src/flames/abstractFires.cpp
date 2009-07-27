@@ -451,42 +451,61 @@ IDetachableFireSource::IDetachableFireSource(	CTransform& a_rTransform,
 //---------------------------------------------------------------------------------------------------------------------
 IDetachableFireSource::~IDetachableFireSource()
 {
-	for (list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
-	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	for (list < CDetachedFlame* >::iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+	        flamesIterator != m_lpDetachedFlamesList.end();  flamesIterator++)
 		delete (*flamesIterator);
-	m_detachedFlamesList.clear ();
+	m_lpDetachedFlamesList.clear ();
 }
-
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void IDetachableFireSource::drawFlame(bool display, bool displayParticle, u_char boundingVolume) const
+void IDetachableFireSource::Render() const
 {
 #ifdef COUNT_NURBS_POLYGONS
 	g_count=0;
 #endif
-	switch (boundingVolume)
+	// Get current flame rendering style
+	CRenderFlameState const& rRenderState = CRenderFlameState::GetInstance();
+	NDisplayBoundingVolume const& nBoundingVolume = rRenderState.GetDisplayBoundingVolume();
+
+	CGlowState& rGlowState = CGlowState::GetInstance();
+	if(rGlowState.IsEnabled() == true)
 	{
-		case 1 :
+		CShaderState& rShaderState = CShaderState::GetInstance();
+		uint const uiIndex = rGlowState.GetPassNumber();
+
+		GLfloat const fDivide = getGlowDivide(uiIndex);
+		GLfloat const* pfWeights = getGlowWeights(uiIndex);
+		rShaderState.SetUniform1f("divide", fDivide);
+		rShaderState.SetUniform1fv("weights", pfWeights, FILTER_SIZE);
+	}
+
+	switch (nBoundingVolume)
+	{
+		case NDisplayBoundingVolume::eSphere :
 			drawBoundingSphere();
 			break;
-		case 2 :
+		case NDisplayBoundingVolume::eImpostor :
 			drawImpostor();
 			break;
-		default :
+		case NDisplayBoundingVolume::eNone :
 			if (m_visibility)
 			{
-				CTransform const& rTransform = m_rField.GetTransform();
-				rTransform.Push();
+				bool const bDisplay = rRenderState.GetDisplay();
+				bool const bDisplayParticle = rRenderState.GetDisplayParticle();
+				ForEachUInt (i, m_nbFlames)
+				{
+					m_flames[i]->drawFlame(bDisplay, bDisplayParticle);
+				}
 
-				for (uint i = 0; i < m_nbFlames; i++)
-					m_flames[i]->drawFlame(display, displayParticle);
-				for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-				        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
-					(*flamesIterator)->drawFlame(display, displayParticle);
-
-				rTransform.Pop();
+				ForEachIterC (it, CDetachedFlameList, m_lpDetachedFlamesList)
+				{
+					(*it)->drawFlame(bDisplay, bDisplayParticle);
+				}
 			}
+			break;
+		default :
+			assert(false);
 			break;
 	}
 #ifdef COUNT_NURBS_POLYGONS
@@ -523,13 +542,13 @@ void IDetachableFireSource::build()
 	m_oDirection = averageVec/m_nbFlames;
 
 	/* Destruction des flammes détachées en fin de vie */
-	list < CDetachedFlame* >::iterator flamesIterator = m_detachedFlamesList.begin ();
-	while ( flamesIterator != m_detachedFlamesList.end())
+	list < CDetachedFlame* >::iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+	while ( flamesIterator != m_lpDetachedFlamesList.end())
 	{
 		if (!(*flamesIterator)->build())
 		{
 			CDetachedFlame* flame = *flamesIterator;
-			flamesIterator = m_detachedFlamesList.erase(flamesIterator);
+			flamesIterator = m_lpDetachedFlamesList.erase(flamesIterator);
 			delete flame;
 		}
 		else
@@ -545,9 +564,9 @@ void IDetachableFireSource::build()
 	k = t*t;
 
 	/* Calcul de la bounding sphere pour les flammes détachées */
-//   if( m_detachedFlamesList.size () )
-//     for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-// 	 flamesIterator != m_detachedFlamesList.end();  flamesIterator++){
+//   if( m_lpDetachedFlamesList.size () )
+//     for (list < CDetachedFlame* >::const_iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+// 	 flamesIterator != m_lpDetachedFlamesList.end();  flamesIterator++){
 //       pt = (*flamesIterator)->getTop();
 //       if(pt.x > ptMax.x)
 // 	ptMax.x = pt.x;
@@ -620,8 +639,8 @@ void IDetachableFireSource::build()
 void IDetachableFireSource::setSmoothShading (bool state)
 {
 	IFireSource::setSmoothShading(state);
-	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-	        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+	        flamesIterator != m_lpDetachedFlamesList.end();  flamesIterator++)
 		(*flamesIterator)->setSmoothShading(state);
 }
 
@@ -765,9 +784,9 @@ void IDetachableFireSource::buildBoundingBox ()
 	CPoint ptMax(-FLT_MAX, -FLT_MAX, -FLT_MAX), ptMin(FLT_MAX, FLT_MAX, FLT_MAX);
 	CPoint pt;
 
-	if ( m_detachedFlamesList.size () )
-		for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-		        flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	if ( m_lpDetachedFlamesList.size () )
+		for (list < CDetachedFlame* >::const_iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+		        flamesIterator != m_lpDetachedFlamesList.end();  flamesIterator++)
 		{
 			pt = (*flamesIterator)->getTop();
 			if (pt.x > ptMax.x)
@@ -860,7 +879,7 @@ void IDetachableFireSource::setLOD(u_char value)
 		default:
 			cerr << "Bad NURBS LOD parameter" << endl;
 	}
-	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_detachedFlamesList.begin ();
-			flamesIterator != m_detachedFlamesList.end();  flamesIterator++)
+	for (list < CDetachedFlame* >::const_iterator flamesIterator = m_lpDetachedFlamesList.begin ();
+			flamesIterator != m_lpDetachedFlamesList.end();  flamesIterator++)
 		(*flamesIterator)->setSamplingTolerance(tolerance);
 }

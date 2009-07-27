@@ -170,6 +170,7 @@ public:
   {
   	// Fake field and solver transforms are the same
   	m_fakeField.move(forces);
+  	m_solver.move(forces);
   }
 
   void addTemporaryExternalForces(const CPoint& forces)

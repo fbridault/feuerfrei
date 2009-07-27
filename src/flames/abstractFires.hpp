@@ -88,7 +88,7 @@ private:
 /**********************************************************************************************************************/
 /************************************* DEFINITION DE L'INTERFACE CFLAMELIGHT ******************************************/
 /**********************************************************************************************************************/
-class CFlameLight : public ISceneItem
+class CFlameLight : public COmniLight
 {
 public:
 	CFlameLight(CTransform& a_rTransform,
@@ -97,13 +97,10 @@ public:
 				const CShader& a_rGenShadowCubeMapShader,
 				const CRenderTarget& a_rShadowRenderTarget,
 				const string& a_rIESFileName) :
-		ISceneItem(NRenderType::eFx)
+		COmniLight(a_rTransform, a_rEnergy, a_uiDepthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget)
 	{
 		m_pIesFile = new IES(a_rIESFileName.c_str());
-		m_pLight = new COmniLight(a_rTransform, a_rEnergy, a_uiDepthMapSize, a_rGenShadowCubeMapShader, a_rShadowRenderTarget);
-		m_pLight->setEnergy(CEnergy(1.0,0.5,0.0));
-		CTransform& rFieldTransform = a_rTransform.GrabParent();
-		rFieldTransform.AddChild(this);
+		setEnergy(CEnergy(1.0,0.5,0.0));
 	}
 
 	virtual ~CFlameLight()
@@ -118,12 +115,9 @@ public:
 	/** Modifie le coefficient pondérateur de l'intensité. */
 	void SetIntensity(float coef)
 	{
-		CEnergy& rEnergy = m_pLight->GrabEnergy();
+		CEnergy& rEnergy = GrabEnergy();
 		rEnergy *= coef;
 	}
-
-	COmniLight const& GetLight() const { assert(m_pLight != NULL); return *m_pLight; }
-	COmniLight& GrabLight() { assert(m_pLight != NULL); return *m_pLight; }
 
 	float getLazimut() const { return m_pIesFile->getLazimut(); }
 	float getLzenith() const { return m_pIesFile->getLzenith(); }
@@ -145,8 +139,6 @@ public:
 private:
 	/** Fichier IES utilisé pour le solide photométrique de la source. */
 	IES* m_pIesFile;
-
-	COmniLight* m_pLight;
 };
 
 
@@ -164,7 +156,7 @@ private:
  *
  * @author	Flavien Bridault
  */
-class IFireSource : public CFlameLight
+class IFireSource : public ISceneItem
 {
 public:
 	/** Constructeur d'une source de flammes. La position de la source est donnée dans le repère du solveur.
@@ -356,14 +348,11 @@ public:
 		return m_dist;
 	};
 
-	const GLfloat* getGlowWeights(uint index) const
-	{
-		return m_glowWeights[index];
-	}
-	GLfloat getGlowDivide(uint index) const
-	{
-		return m_glowDivide[index];
-	}
+	const GLfloat* getGlowWeights(uint index) const { return m_glowWeights[index]; }
+	GLfloat getGlowDivide(uint index) const { return m_glowDivide[index]; }
+
+	CFlameLight const& GetLight() const { assert(m_pLight != NULL); return *m_pLight; }
+	CFlameLight& GrabLight() { assert(m_pLight != NULL); return *m_pLight; }
 
 	void computeGlowWeights(uint index, float sigma);
 
@@ -376,6 +365,9 @@ public:
 	}
 
 protected:
+
+	/** Pointeur vers la lumière */
+	CFlameLight* m_pLight;
 
 	/** Nombre de flammes */
 	uint m_nbFlames;

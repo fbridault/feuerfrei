@@ -108,7 +108,6 @@ void RealField3D::addExternalForces(const CPoint& position, bool move)
   if(move){
     force = position;
     strength.x = strength.y = strength.z = 1;
-	m_rTransform.Move(position);
   }else{
     force = position;
     strength = position * .1f;

@@ -160,7 +160,8 @@ public:
 
 	void setFlameIntensity(int index, float value)
 	{
-		m_fires[index]->SetIntensity(value);
+		CFlameLight& rLight = m_fires[index]->GrabLight();
+		rLight.SetIntensity(value);
 	}
 
 	void setFlameLOD(int index, u_char value)

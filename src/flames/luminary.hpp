@@ -38,19 +38,7 @@ public:
 	/** Déplace le luminaire.
 	 * @param forces Déplacement en (x,y,z).
 	 */
-	virtual void Move(const CPoint& a_rPosition)
-	{
-		assert(m_pTransform != NULL);
-		CVector diff = a_rPosition - m_pTransform->GetLocalPosition();
-
-		/* Notify fields of movement so that it can add forces */
-		ForEachIter(itField, CFieldList, m_vpFields)
-		{
-			(*itField)->move(diff);
-		}
-
-		m_pTransform->SetPosition(a_rPosition);
-	}
+	virtual void Move(const CPoint& a_rPosition);
 
 //---------------------------------------------------------------------------------------------------------------------
 //  Specific methods

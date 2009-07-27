@@ -404,7 +404,6 @@ void Solver3D::addExternalForces(const CPoint& position, bool move)
 	{
 		force = position;
 		strength.x = strength.y = strength.z = .1f * m_forceCoef;
-		m_rTransform.Move(position);
 	}
 	else
 	{

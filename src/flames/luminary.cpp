@@ -116,6 +116,23 @@ CLuminary::~CLuminary ()
 {
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//
+//---------------------------------------------------------------------------------------------------------------------
+void CLuminary::Move(const CPoint& a_rPosition)
+{
+	assert(m_pTransform != NULL);
+	CVector diff = a_rPosition - m_pTransform->GetLocalPosition();
+
+	/* Notify fields of movement so that it can add forces */
+	ForEachIter(itField, CFieldList, m_vpFields)
+	{
+		(*itField)->move(diff);
+	}
+
+	m_pTransform->SetPosition(a_rPosition);
+}
+
 #define ARGS a_rTransform, fieldConfig.resx, fieldConfig.resy, fieldConfig.resz,\
 	fieldConfig.dim, fieldConfig.timeStep, fieldConfig.buoyancy
 #define ARGS_SLV ARGS, fieldConfig.vorticityConfinement

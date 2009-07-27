@@ -19,15 +19,14 @@ IFireSource::IFireSource(	CTransform& a_rTransform,
 							CharCPtrC a_szTexname,
 							const CShader& a_rGenShadowCubeMapShader,
 							const CRenderTarget& a_rShadowRenderTarget) :
-	CFlameLight(a_rTransform,
-				CEnergy(1.0,1.0,1.0),
-				512,
-				a_rGenShadowCubeMapShader,
-				a_rShadowRenderTarget,
-				string(a_rFlameConfig.IESFileName.fn_str())),
+
+	ISceneItem(NRenderType::eFx),
 	m_rField(a_rField),
 	m_oTexture(a_szTexname, GL_REPEAT, GL_REPEAT)
 {
+	m_pLight = new CFlameLight(	a_rTransform, CEnergy(1.0,1.0,1.0), 512, a_rGenShadowCubeMapShader,
+								a_rShadowRenderTarget, string(a_rFlameConfig.IESFileName.fn_str())),
+
 	m_nbFlames=a_uiNbFlames;
 	/* Si le tableau n'est pas initialisé par le constructeur d'une sous-classe, on le fait ici */
 	if (m_nbFlames) m_flames = new IRealFlame* [m_nbFlames];
@@ -42,6 +41,9 @@ IFireSource::IFireSource(	CTransform& a_rTransform,
 
 	computeGlowWeights(0,3.0f);
 	computeGlowWeights(1,10.0f);
+
+	CTransform& rFieldTransform = a_rTransform.GrabParent();
+	rFieldTransform.AddChild(this);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -155,7 +157,7 @@ void IFireSource::computeIntensityPositionAndDirection()
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
 	fIntensity = sqrt(fIntensity);
 
-	SetIntensity(fIntensity);
+	m_pLight->SetIntensity(fIntensity);
 	// l'axe de rotation est dans le plan x0z perpendiculaire aux coordonnées
 	// de o projeté perpendiculairement dans ce plan
 //   m_axeRotation.set(-o.z,0.0,o.x);
@@ -640,7 +642,7 @@ void IDetachableFireSource::computeIntensityPositionAndDirection()
 	/* Fonction de smoothing pour éviter d'avoir trop de fluctuation */
 	fIntensity = sqrt(fIntensity)*2.0f;
 
-	SetIntensity(fIntensity);
+	m_pLight->SetIntensity(fIntensity);
 }
 
 //---------------------------------------------------------------------------------------------------------------------

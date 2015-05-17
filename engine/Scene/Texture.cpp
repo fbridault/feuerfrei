@@ -100,7 +100,7 @@ void CBitmapTexture::load(string const& a_strFilename)
 	if (m_eType == GL_TEXTURE_2D && (!isPowerOfTwo(w) || !isPowerOfTwo(h)))
 		cerr << "(WW) Bitmap texture " << a_strFilename << " size is not a power of 2" << endl;
 
-	m_uiTexId = ilutGLBindMipmaps();
+	//m_uiTexId = ilutGLBindMipmaps();
 
 	m_strFilename = a_strFilename;
 	m_hasAlpha = false;

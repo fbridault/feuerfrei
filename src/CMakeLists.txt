@@ -4,7 +4,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
 include_directories(../)
 
 # Look for OpenGL
-find_package(${Package} OpenGL)
+find_package(${Package} OpenGL REQUIRED)
 if(OPENGL_FOUND)
   find_file (HAVE_GLEXT GL/glext.h)
   if(HAVE_GLEXT)
@@ -12,15 +12,19 @@ if(OPENGL_FOUND)
     message(STATUS "Found OpenGL")
   endif(HAVE_GLEXT)
   
-  include(${OPENGL_INCLUDE_DIR})
+  include_directories(${OPENGL_INCLUDE_DIR})
 endif(OPENGL_FOUND)
 
 # Look for wxWidgets
 set(wxWidgets_USE_LIBS base core gl net)
-find_package(wxWidgets)
+
+#include_directories(/usr/include/wx-2.8/)
+
+find_package(wxWidgets REQUIRED)
 if(wxWidgets_FOUND)
   message(STATUS "Found a valid installation of wxWindows")
   include(${wxWidgets_USE_FILE})
+
 endif(wxWidgets_FOUND)
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)

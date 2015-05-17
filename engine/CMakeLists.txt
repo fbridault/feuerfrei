@@ -6,7 +6,7 @@ add_subdirectory(Samples)
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
 
 # Look for OpenGL
-find_package(${PACKAGE} OpenGL)
+find_package(${PACKAGE} OpenGL REQUIRED)
 if(OPENGL_FOUND)
   find_file (HAVE_GLEXT GL/glext.h)
   if(HAVE_GLEXT)
@@ -14,10 +14,10 @@ if(OPENGL_FOUND)
     message(STATUS "Found OpenGL")
   endif(HAVE_GLEXT)
   
-  include(${OPENGL_INCLUDE_DIR})
+  include_directories(${OPENGL_INCLUDE_DIR})
 endif(OPENGL_FOUND)
 
-find_package(${PACKAGE} DevIL)
+find_package(${PACKAGE} DevIL REQUIRED)
 if(IL_FOUND)
   include_directories(${IL_INCLUDE_DIR})
   add_definitions(-DILUT_USE_OPENGL)
@@ -59,4 +59,5 @@ set(ENGINE_SRCS ${MATHS_SRCS} ${PHYSICS_SRCS} ${SCENE_SRCS} ${SHADING_SRCS} ${UT
 
 set(ENGINELIB "engine")
 add_library(${ENGINELIB} SHARED ${ENGINE_SRCS}) 
-target_link_libraries(${ENGINELIB} ${OPENGL_LIBRARIES} ${IL_LIBRARY} ${ILU_LIBRARY} ${ILUT_LIBRARY})
+target_link_libraries(${ENGINELIB} PUBLIC ${OPENGL_LIBRARIES} ${IL_LIBRARIES} ${ILU_LIBRARIES} ${ILUT_LIBRARIES})
+

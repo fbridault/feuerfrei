@@ -17,8 +17,8 @@ struct _NMouseButtonState
 {
 	enum EValue
 	{
-		eButtonUp,
-		eButtonDown,
+		eUp,
+		eDown,
 
 		_NbValues
 	};
@@ -29,10 +29,10 @@ struct _NMouseButton
 {
 	enum EValue
 	{
-		eButtonNone,
-		eButtonLeft,
-		eButtonMiddle,
-		eButtonRight,
+		eNone,
+		eLeft,
+		eMiddle,
+		eRight,
 
 		_NbValues
 	};
@@ -65,7 +65,7 @@ private:
 
 public:
 	void init(	CPoint const& a_rPosition, CVector const& a_rUp, CVector const& a_rView,
-						int w, int h, float clipping_value, CScene& a_rScene);
+				int w, int h, float clipping_value, CScene& a_rScene);
 
 
 	/** Calcul de la rotation de la caméra

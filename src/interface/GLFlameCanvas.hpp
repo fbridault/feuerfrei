@@ -69,15 +69,15 @@ public:
 
 	bool IsRunning(void)
 	{
-		return m_run;
+		return m_bRun;
 	};
 	/** Lance/arrête l'animation */
 	void setRunningState(bool run)
 	{
-		m_run=run;
+		m_bRun=run;
 #ifdef MULTITHREADS
-		if (!m_run) PauseThreads();
-		if (m_run) ResumeThreads();
+		if (!m_bRun) PauseThreads();
+		if (m_bRun) ResumeThreads();
 #endif
 	};
 
@@ -275,12 +275,12 @@ private:
 	FlameAppConfig *m_currentConfig;
 	/********* Variables relatives au contrôle de l'affichage **************/
 	/* true si la simulation est en cours, 0 sinon */
-	bool m_run, m_saveImages;
+	bool m_bRun, m_saveImages;
 	bool m_displayVelocity, m_displayBase, m_displayGrid, m_displayWickBoxes;
 	bool m_drawShadowVolumes, m_glowOnly, m_gammaCorrection, m_fullscreen;
 	u_char m_displayFlamesBoundingVolumes;
 	/** true si l'application est correctement initialisée, false sinon */
-	bool m_init;
+	bool m_bInit;
 
 	/********* Variables relatives à la fenêtre d'affichage ****************/
 	uint m_width, m_height;
@@ -328,12 +328,11 @@ private:
 	CSpatialGraph m_oSceneGraph;
 	CRenderList m_oSceneRenderList, m_oFlamesRenderList;
 
-
 	CGammaFX *m_gammaEngine;
 	wxStopWatch *m_swatch;
 
 	float *m_intensities;
-	bool m_visibility;
+	bool m_bVisibility;
 
 	const static int m_nbIterFlickering = 20;
 	DECLARE_EVENT_TABLE()

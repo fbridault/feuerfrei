@@ -103,7 +103,7 @@ public:
 	 */
 	void Render() const;
 
-	const bool isTransparent () const;
+	bool isTransparent () const;
 
 	/** Ajout d'un index de point dans le tableau d'indices.
 	 * @param i indice à ajouter.

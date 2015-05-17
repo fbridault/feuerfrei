@@ -1,5 +1,7 @@
 project(Engine)
 
+add_subdirectory(Samples)
+
 #permettre les calculs SSE
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse -mfpmath=sse -Wall")
 

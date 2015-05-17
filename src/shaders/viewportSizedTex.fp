@@ -5,5 +5,5 @@ uniform sampler2DRect text;
 
 void main()
 {
-  gl_FragColor=texture2DRect(text, vec2(gl_FragCoord.x,gl_FragCoord.y));
+  gl_FragColor = texture2DRect(text, vec2(gl_FragCoord.x,gl_FragCoord.y));
 }

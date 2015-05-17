@@ -60,27 +60,9 @@ class FlamesApp : public wxApp
 	/** Méthode d'initialisation de l'application
 	 */
 	virtual bool OnInit();
-
-	/** Détermine si les shaders Cg sont déjà compilés
-	 * @return false si les shaders sont compilés
-	 */
-	bool areShadersCompiled();
 };
 
 IMPLEMENT_APP(FlamesApp)
-
-bool FlamesApp::areShadersCompiled()
-{
-	if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowX.o"))))
-		if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vertGlowY.o"))))
-			if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("fragGlow.o"))))
-				if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("SVExtrude.o"))))
-					if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("vpSPTEX.o"))))
-						if (wxFile::Exists(wxString::Format(_("%s%s"),SHADERS_OBJECTS_PATH, _("gamma.o"))))
-							return false;
-	cerr << "Cg shaders are not compiled yet, that will be done during this run." << endl;
-	return true;
-}
 
 bool FlamesApp::OnInit()
 {
@@ -101,16 +83,14 @@ bool FlamesApp::OnInit()
 
 	if ( !wxFile::Exists(configFileName) )
 	{
-		cerr << "File " << configFileName.fn_str() << " doesn't exist." << endl << "Exiting..." << endl;
+		cerr << "File " << configFileName << " doesn't exist." << endl << "Exiting..." << endl;
 		return false;
 	}
 
 	initEngine();
-	// Plus utilisé, était nécessaire avec Cg, ne l'est plus avec GLSL
-	//  recompileShaders = areShadersCompiled();
 
 	/* Teste s'il est nécessaire de recompiler les shaders */
-	FlamesFrame *frame = new FlamesFrame( 	_("Real-time Animation of small Flames - ")+configFileName,
+	FlamesFrame *frame = new FlamesFrame( 	_("Real-time Animation of small Flames - ") + configFileName,
 	                                       wxDefaultPosition,
 	                                       wxDefaultSize,
 	                                       configFileName );

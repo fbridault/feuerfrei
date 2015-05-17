@@ -168,7 +168,7 @@ void CMesh::Render() const
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-const bool CMesh::isTransparent () const
+bool CMesh::isTransparent () const
 {
 	if (m_rScene.GetMaterial(m_uiMaterial).hasDiffuseTexture())
 		if ( m_rScene.GetMaterial(m_uiMaterial).isTransparent())
@@ -181,7 +181,7 @@ const bool CMesh::isTransparent () const
 //---------------------------------------------------------------------------------------------------------------------
 float CMesh::GetArea() const
 {
-	float area=0.0f;
+	float fArea=0.0f;
 
 	for (uint i = 0; i < m_indexArray.size(); i+=3)
 	{
@@ -192,9 +192,9 @@ float CMesh::GetArea() const
 		CPoint P2(V2.x,V2.y,V2.z);
 		CPoint P3(V3.x,V3.y,V3.z);
 
-		area += CPoint::GetTriangleArea(P1,P2,P3);
+		fArea += CPoint::GetTriangleArea(P1,P2,P3);
 	}
-	return area;
+	return fArea;
 }
 
 //---------------------------------------------------------------------------------------------------------------------

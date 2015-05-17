@@ -98,22 +98,22 @@ void CLeadSkeleton::addForces (int fdf, float innerForce, char perturbate)
 
 void CLeadSkeleton::addParticle(CPoint const& a_rParticle)
 {
-	if (m_headIndex >= NB_PARTICLES_MAX-1)
+	if (m_iHeadIndex >= NB_PARTICLES_MAX-1)
 	{
 		puts("(EE) Too many particles in CLeadSkeleton::addParticle() !!!");
 		return;
 	}
-	m_headIndex++;
+	m_iHeadIndex++;
 
-	m_queue[m_headIndex] = a_rParticle;
-	m_queue[m_headIndex].birth(m_lifeSpan);
+	m_queue[m_iHeadIndex] = a_rParticle;
+	m_queue[m_iHeadIndex].birth(m_lifeSpan);
 }
 
 CFreeLeadSkeleton* CLeadSkeleton::split (uint a_uiSplitHeight)
 {
 	CFreeLeadSkeleton *skel = new CFreeLeadSkeleton(rThis, a_uiSplitHeight);
 
-	m_headIndex = a_uiSplitHeight;
+	m_iHeadIndex = a_uiSplitHeight;
 
 	return( skel );
 }
@@ -141,7 +141,7 @@ CFreePeriSkeleton* CFreeLeadSkeleton::dup(const CPoint& offset)
 		copy->m_queue[i].m_lifespan += m_queue[i].m_lifespan;
 	}
 
-	copy->m_headIndex = m_headIndex;
+	copy->m_iHeadIndex = m_iHeadIndex;
 	copy->m_selfVelocity = m_selfVelocity;
 	return copy;
 }

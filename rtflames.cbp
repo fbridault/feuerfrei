@@ -1,231 +1,361 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_project_file>
-	<FileVersion major="1" minor="6" />
-	<Project>
-		<Option title="rtflames" />
-		<Option makefile_is_custom="1" />
-		<Option compiler="gcc" />
-		<Build>
-			<Target title="all">
-				<Option type="4" />
-				<Option compiler="gcc" />
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; all' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-			<Target title="rebuild_cache">
-				<Option type="4" />
-				<Option compiler="gcc" />
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; rebuild_cache' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-			<Target title="engine">
-				<Option output="/home/flavien/recherche/git/flames/engine/libengine.so" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="/home/flavien/recherche/git/flames/engine" />
-				<Option object_output="./" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add directory="/usr/include/IL" />
-				</Compiler>
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; engine' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-			<Target title="engine/fast">
-				<Option output="/home/flavien/recherche/git/flames/engine/libengine.so" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="/home/flavien/recherche/git/flames/engine" />
-				<Option object_output="./" />
-				<Option type="3" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add directory="/usr/include/IL" />
-				</Compiler>
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; engine/fast' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-			<Target title="rtflames">
-				<Option output="/home/flavien/recherche/git/flames/src/rtflames" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="/home/flavien/recherche/git/flames" />
-				<Option object_output="./" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option parameters="params/torch.ini" />
-				<Compiler>
-					<Add directory="/home/flavien/recherche/git/flames/src/.." />
-					<Add directory="/usr/lib/wx/include/gtk2-unicode-release-2.8" />
-					<Add directory="/usr/include/wx-2.8" />
-				</Compiler>
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; rtflames' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-			<Target title="rtflames/fast">
-				<Option output="/home/flavien/recherche/git/flames/src/rtflames" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="/home/flavien/recherche/git/flames/src" />
-				<Option object_output="./" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Compiler>
-					<Add directory="/home/flavien/recherche/git/flames/src/.." />
-					<Add directory="/usr/lib/wx/include/gtk2-unicode-release-2.8" />
-					<Add directory="/usr/include/wx-2.8" />
-				</Compiler>
-				<MakeCommands>
-					<Build command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; rtflames/fast' />
-					<CompileFile command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; &quot;$file&quot;' />
-					<Clean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean' />
-					<DistClean command='/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean' />
-					<AskRebuildNeeded command="$make -q -f $makefile $target" />
-					<SilentBuild command="$make -s -f $makefile $target" />
-				</MakeCommands>
-			</Target>
-		</Build>
-		<Unit filename="engine/Init.cpp" />
-		<Unit filename="engine/Init.hpp" />
-		<Unit filename="engine/Maths/CMatrix.cpp" />
-		<Unit filename="engine/Maths/CMatrix.hpp" />
-		<Unit filename="engine/Maths/CPoint.cpp" />
-		<Unit filename="engine/Maths/CPoint.hpp" />
-		<Unit filename="engine/Maths/UMatrixFn.cpp" />
-		<Unit filename="engine/Maths/UMatrixFn.hpp" />
-		<Unit filename="engine/Scene/CCamera.cpp" />
-		<Unit filename="engine/Scene/CCamera.hpp" />
-		<Unit filename="engine/Scene/CMaterial.cpp" />
-		<Unit filename="engine/Scene/CMaterial.hpp" />
-		<Unit filename="engine/Scene/CMesh.cpp" />
-		<Unit filename="engine/Scene/CMesh.hpp" />
-		<Unit filename="engine/Scene/CObject.cpp" />
-		<Unit filename="engine/Scene/CObject.hpp" />
-		<Unit filename="engine/Scene/CRenderList.cpp" />
-		<Unit filename="engine/Scene/CRenderList.hpp" />
-		<Unit filename="engine/Scene/CScene.cpp" />
-		<Unit filename="engine/Scene/CScene.hpp" />
-		<Unit filename="engine/Scene/CSpatialGraph.cpp" />
-		<Unit filename="engine/Scene/CSpatialGraph.hpp" />
-		<Unit filename="engine/Scene/CTransform.cpp" />
-		<Unit filename="engine/Scene/CTransform.hpp" />
-		<Unit filename="engine/Scene/Light.cpp" />
-		<Unit filename="engine/Scene/Light.hpp" />
-		<Unit filename="engine/Scene/Texture.cpp" />
-		<Unit filename="engine/Scene/Texture.hpp" />
-		<Unit filename="engine/Shading/CGammaFX.cpp" />
-		<Unit filename="engine/Shading/CGammaFX.hpp" />
-		<Unit filename="engine/Shading/CRenderTarget.cpp" />
-		<Unit filename="engine/Shading/CRenderTarget.hpp" />
-		<Unit filename="engine/Shading/CRenderer.cpp" />
-		<Unit filename="engine/Shading/CRenderer.hpp" />
-		<Unit filename="engine/Shading/Glsl.cpp" />
-		<Unit filename="engine/Shading/Glsl.hpp" />
-		<Unit filename="engine/Shading/IRenderer.cpp" />
-		<Unit filename="engine/Shading/IRenderer.hpp" />
-		<Unit filename="engine/Utility/CRefTable.hpp" />
-		<Unit filename="engine/Utility/GraphicsFn.cpp" />
-		<Unit filename="engine/Utility/GraphicsFn.hpp" />
-		<Unit filename="engine/Utility/ISingleton.hpp" />
-		<Unit filename="engine/Utility/Macros.hpp" />
-		<Unit filename="engine/Utility/Numerable.hpp" />
-		<Unit filename="engine/Utility/SmartPtr.hpp" />
-		<Unit filename="engine/Utility/UObjImporter.cpp" />
-		<Unit filename="engine/Utility/UObjImporter.hpp" />
-		<Unit filename="src/flames.cpp" />
-		<Unit filename="src/flames/DPengine.cpp" />
-		<Unit filename="src/flames/DPengine.hpp" />
-		<Unit filename="src/flames/abstractFires.cpp" />
-		<Unit filename="src/flames/abstractFires.hpp" />
-		<Unit filename="src/flames/abstractFlames.cpp" />
-		<Unit filename="src/flames/abstractFlames.hpp" />
-		<Unit filename="src/flames/cloneFlames.cpp" />
-		<Unit filename="src/flames/cloneFlames.hpp" />
-		<Unit filename="src/flames/glowengine.cpp" />
-		<Unit filename="src/flames/glowengine.hpp" />
-		<Unit filename="src/flames/ies.cpp" />
-		<Unit filename="src/flames/ies.hpp" />
-		<Unit filename="src/flames/leadSkeleton.cpp" />
-		<Unit filename="src/flames/leadSkeleton.hpp" />
-		<Unit filename="src/flames/luminary.cpp" />
-		<Unit filename="src/flames/luminary.hpp" />
-		<Unit filename="src/flames/noise.cpp" />
-		<Unit filename="src/flames/noise.hpp" />
-		<Unit filename="src/flames/periSkeleton.cpp" />
-		<Unit filename="src/flames/periSkeleton.hpp" />
-		<Unit filename="src/flames/realFires.cpp" />
-		<Unit filename="src/flames/realFires.hpp" />
-		<Unit filename="src/flames/realFlames.cpp" />
-		<Unit filename="src/flames/realFlames.hpp" />
-		<Unit filename="src/flames/skeleton.cpp" />
-		<Unit filename="src/flames/skeleton.hpp" />
-		<Unit filename="src/flames/wick.cpp" />
-		<Unit filename="src/flames/wick.hpp" />
-		<Unit filename="src/interface/GLFlameCanvas.cpp" />
-		<Unit filename="src/interface/GLFlameCanvas.hpp" />
-		<Unit filename="src/interface/flamesFrame.cpp" />
-		<Unit filename="src/interface/flamesFrame.hpp" />
-		<Unit filename="src/interface/luminaryDialog.cpp" />
-		<Unit filename="src/interface/luminaryDialog.hpp" />
-		<Unit filename="src/interface/mainPanels.cpp" />
-		<Unit filename="src/interface/mainPanels.hpp" />
-		<Unit filename="src/interface/numTextCtrl.cpp" />
-		<Unit filename="src/interface/numTextCtrl.hpp" />
-		<Unit filename="src/interface/shadowsDialog.cpp" />
-		<Unit filename="src/interface/shadowsDialog.hpp" />
-		<Unit filename="src/solvers/GCSSORSolver3D-SSE.cpp" />
-		<Unit filename="src/solvers/GCSSORSolver3D-SSE.hpp" />
-		<Unit filename="src/solvers/GCSSORSolver3D.cpp" />
-		<Unit filename="src/solvers/GCSSORSolver3D.hpp" />
-		<Unit filename="src/solvers/GSSolver3D.cpp" />
-		<Unit filename="src/solvers/GSSolver3D.hpp" />
-		<Unit filename="src/solvers/HybridSolver3D.cpp" />
-		<Unit filename="src/solvers/HybridSolver3D.hpp" />
-		<Unit filename="src/solvers/LODField3D.cpp" />
-		<Unit filename="src/solvers/LODField3D.hpp" />
-		<Unit filename="src/solvers/fakeField3D.cpp" />
-		<Unit filename="src/solvers/fakeField3D.hpp" />
-		<Unit filename="src/solvers/field.cpp" />
-		<Unit filename="src/solvers/field.hpp" />
-		<Unit filename="src/solvers/field3D.cpp" />
-		<Unit filename="src/solvers/field3D.hpp" />
-		<Unit filename="src/solvers/fieldThread.cpp" />
-		<Unit filename="src/solvers/fieldThread.hpp" />
-		<Unit filename="src/solvers/globalField.cpp" />
-		<Unit filename="src/solvers/globalField.hpp" />
-		<Unit filename="src/solvers/realField3D.cpp" />
-		<Unit filename="src/solvers/realField3D.hpp" />
-		<Unit filename="src/solvers/solver.cpp" />
-		<Unit filename="src/solvers/solver.hpp" />
-		<Unit filename="src/solvers/solver3D.cpp" />
-		<Unit filename="src/solvers/solver3D.hpp" />
-		<Extensions>
-			<envvars />
-			<code_completion />
-			<debugger />
-		</Extensions>
-	</Project>
+   <FileVersion major="1" minor="6" />
+   <Project>
+      <Option title="rtflames" />
+      <Option makefile_is_custom="1" />
+      <Option compiler="gcc" />
+      <Build>
+      <Target title="all">
+         <Option working_dir="/home/flavien/recherche/git/flames" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; all" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rebuild_cache">
+         <Option working_dir="/home/flavien/recherche/git/flames" />
+         <Option type="4" />
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; rebuild_cache" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="engine">
+         <Option output="/home/flavien/recherche/git/flames/engine/libengine.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/engine" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/usr/include/IL" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; engine" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="engine/fast">
+         <Option output="/home/flavien/recherche/git/flames/engine/libengine.so" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/engine" />
+         <Option object_output="./" />
+         <Option type="3" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/usr/include/IL" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; engine/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="glutSample">
+         <Option output="/home/flavien/recherche/git/flames/engine/Samples/glutSample" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/engine/Samples" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/flavien/recherche/git/flames/engine/Samples/../.." />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; glutSample" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="glutSample/fast">
+         <Option output="/home/flavien/recherche/git/flames/engine/Samples/glutSample" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/engine/Samples" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/flavien/recherche/git/flames/engine/Samples/../.." />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; glutSample/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/engine/Samples/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rtflames">
+         <Option output="/home/flavien/recherche/git/flames/src/rtflames" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/src" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/flavien/recherche/git/flames/src/.." />
+            <Add directory="/usr/lib/wx/include/gtk2-unicode-release-2.8" />
+            <Add directory="/usr/include/wx-2.8" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; rtflames" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      <Target title="rtflames/fast">
+         <Option output="/home/flavien/recherche/git/flames/src/rtflames" prefix_auto="0" extension_auto="0" />
+         <Option working_dir="/home/flavien/recherche/git/flames/src" />
+         <Option object_output="./" />
+         <Option type="1" />
+         <Option compiler="gcc" />
+         <Compiler>
+            <Add directory="/home/flavien/recherche/git/flames/src/.." />
+            <Add directory="/usr/lib/wx/include/gtk2-unicode-release-2.8" />
+            <Add directory="/usr/include/wx-2.8" />
+         </Compiler>
+         <MakeCommands>
+            <Build command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; rtflames/fast" />
+            <CompileFile command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; &quot;$file&quot;" />
+            <Clean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean" />
+            <DistClean command="/usr/bin/make -f &quot;/home/flavien/recherche/git/flames/src/Makefile&quot; clean" />
+         </MakeCommands>
+      </Target>
+      </Build>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Init.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/CMatrix.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/CPoint.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/UMatrixFn.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Samples/glutSample.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CCamera.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CMaterial.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CMesh.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CObject.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CRenderList.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CScene.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CSpatialGraph.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CTransform.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/Light.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/Texture.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CGammaFX.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CRenderTarget.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CRenderer.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/Glsl.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/IRenderer.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/GraphicsFn.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/UObjImporter.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/DPengine.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/abstractFires.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/abstractFlames.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/cloneFlames.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/glowengine.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/ies.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/leadSkeleton.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/luminary.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/noise.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/periSkeleton.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/realFires.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/realFlames.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/skeleton.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/wick.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/flamesFrame.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/luminaryDialog.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/mainPanels.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/numTextCtrl.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/shadowsDialog.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GSSolver3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/LODField3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/fakeField3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/field.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/field3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/fieldThread.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/globalField.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/realField3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/solver.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/solver3D.cpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Init.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/CMatrix.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/CPoint.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Maths/UMatrixFn.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CCamera.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CMaterial.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CMesh.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CObject.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CRenderList.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CScene.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CSpatialGraph.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/CTransform.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/Light.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Scene/Texture.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CGammaFX.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CRenderTarget.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/CRenderer.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/Glsl.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Shading/IRenderer.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/CRefTable.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/GraphicsFn.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/ISingleton.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/Macros.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/Numerable.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/SmartPtr.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/engine/Utility/UObjImporter.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/DPengine.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/abstractFires.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/abstractFlames.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/cloneFlames.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/glowengine.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/ies.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/leadSkeleton.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/luminary.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/noise.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/periSkeleton.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/realFires.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/realFlames.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/skeleton.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/flames/wick.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/GLFlameCanvas.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/flamesFrame.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/luminaryDialog.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/mainPanels.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/numTextCtrl.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/interface/shadowsDialog.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D-SSE.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GCSSORSolver3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/GSSolver3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/HybridSolver3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/LODField3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/fakeField3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/field.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/field3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/fieldThread.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/globalField.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/realField3D.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/solver.hpp">
+      </Unit>
+      <Unit filename="/home/flavien/recherche/git/flames/src/solvers/solver3D.hpp">
+      </Unit>
+   </Project>
 </CodeBlocks_project_file>

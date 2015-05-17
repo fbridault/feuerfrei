@@ -10,7 +10,7 @@ GLfloat g_modelViewMatrix[16];
 CCamera::CCamera () :
 	m_pScene(NULL)
 {
-	m_buttonPressed = NMouseButton::eButtonNone;
+	m_buttonPressed = NMouseButton::eNone;
 	m_move = false;
 	m_currentRotationX = 0;
 	m_mouseSensitivity = 800;
@@ -110,7 +110,7 @@ void CCamera::OnMouseClick (NMouseButton a_nButton, NMouseButtonState a_nState, 
 	m_beginMouseX = x;
 	m_beginMouseY = y;
 
-	if (a_nState == NMouseButtonState::eButtonDown)
+	if (a_nState == NMouseButtonState::eDown)
 		m_move = true;
 	else
 		m_move = false;
@@ -120,13 +120,13 @@ void CCamera::OnMouseMotion (int x, int y)
 {
 	if (m_move)
 	{
-		if (m_buttonPressed == NMouseButton::eButtonRight)
+		if (m_buttonPressed == NMouseButton::eRight)
 		{
 			computeView(x,y);
 			glGetFloatv (GL_MODELVIEW_MATRIX, g_modelViewMatrix);
 		}
 		else
-			if (m_buttonPressed == NMouseButton::eButtonMiddle)
+			if (m_buttonPressed == NMouseButton::eMiddle)
 			{
 				moveOnSides( (x - m_beginMouseX)  / (m_mouseSensitivity) );
 				moveUpOrDown( (m_beginMouseY - y) / (m_mouseSensitivity) );

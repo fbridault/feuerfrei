@@ -25,7 +25,7 @@ using namespace std;
  * Une source lumineuse peut &ecirc;tre de cinq types diff&eacute;rents (pointLight, areaLight, etc.) et
  * chaque type poss&egrave;de ses attributs propres pour d&eacute;finir compl&egrave;tement une source.
  *
- * @author	Christophe Cassagnab&egrave;re modifi&eacute; par Flavien Bridault
+ * @author	Flavien Bridault
  * @version	%I%, %G%
  * @since	1.0
  * @see Material, CEnergy
@@ -79,7 +79,7 @@ public:
 	virtual void chooseDeferredShader(const CShader* spotShader, const CShader* omniShader) = 0;
 
 	/** Rendu à partir du point de vue de la source. */
-	virtual void castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix) = 0;
+	virtual void CastShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix) = 0;
 
 	virtual void renderLightVolume(const CCamera& camera) const = 0;
 
@@ -131,7 +131,7 @@ public:
 		return m_bEnabled;
 	};
 
-	void toggleShader()
+	void ToggleShader()
 	{
 		if (m_shader == m_forwardShader)
 			m_shader = m_deferredShader;
@@ -187,7 +187,7 @@ public:
 	virtual void chooseDeferredShader(const CShader* spotShader, const CShader* omniShader);
 
 	/** Rendu à partir du point de vue de la source. */
-	virtual void castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix);
+	virtual void CastShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix);
 
 	virtual void renderLightVolume(const CCamera& camera) const;
 
@@ -231,7 +231,7 @@ public:
 	virtual void chooseDeferredShader(const CShader* spotShader, const CShader* omniShader);
 
 	/** Rendu à partir du point de vue de la source. */
-	virtual void castShadows(CCamera& camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix);
+	virtual void CastShadows(CCamera& camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix);
 
 	virtual void renderLightVolume(const CCamera& camera) const;
 

@@ -57,7 +57,7 @@ public:
 	 */
 	CParticle const& getLastParticle() const
 	{
-		return m_queue[m_headIndex];
+		return m_queue[m_iHeadIndex];
 	};
 
 	/** Donne l'élément à l'indice passé en paramètre.
@@ -76,7 +76,7 @@ public:
 	 */
 	CParticle const& getMiddleParticle() const
 	{
-		return m_queue[m_headIndex/2];
+		return m_queue[m_iHeadIndex/2];
 	};
 
 	/** Donne la taille du squelette, sans tenir compte éventuellement de
@@ -86,7 +86,7 @@ public:
 	 */
 	virtual uint getInternalSize() const
 	{
-		return m_headIndex+1;
+		return m_iHeadIndex+1;
 	};
 
 	/** Donne la taille du squelette, sans tenir compte éventuellement de
@@ -96,7 +96,7 @@ public:
 	 */
 	virtual uint getSize() const
 	{
-		return m_headIndex+1;
+		return m_iHeadIndex+1;
 	};
 
 	/** Donne l'élément en tête de file.
@@ -114,7 +114,7 @@ public:
 	 */
 	virtual bool isDead() const
 	{
-		return (m_headIndex < 0);
+		return (m_iHeadIndex < 0);
 	};
 
 	/** Dessine le squelette à l'écran. */
@@ -178,7 +178,7 @@ protected:
 	Field3D& m_rField;
 
 	/** Indice de la tête de la file. */
-	int m_headIndex;
+	int m_iHeadIndex;
 
 	/** File de particules. */
 	CParticle *m_queue;
@@ -234,7 +234,7 @@ public:
 
 	virtual uint getSize() const
 	{
-		return ( (m_lod) ? (m_headIndex / 2)+1 : m_headIndex+1);
+		return ( (m_lod) ? (m_iHeadIndex / 2)+1 : m_iHeadIndex+1);
 	};
 
 	/** Déplacement de l'origine du squelette. */

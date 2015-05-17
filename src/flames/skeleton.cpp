@@ -15,24 +15,22 @@ IFreeSkeleton::IFreeSkeleton(uint a_uiSize, Field3D& a_rField) :
 	m_rField(a_rField)
 {
 	m_queue = new CParticle[a_uiSize];
-	m_headIndex = -1;
+	m_iHeadIndex = -1;
 }
 
 IFreeSkeleton::IFreeSkeleton(IFreeSkeleton const& a_rSrc, uint a_uiSplitHeight) :
 	m_rField(a_rSrc.m_rField)
 {
-	uint i;
-;
 	m_queue = new CParticle[a_uiSplitHeight+1];
 
 	/* Recopie des particules en fonction de la hauteur de coupe */
-	for ( i=0; i <= a_uiSplitHeight; i++)
+	for (uint i=0; i <= a_uiSplitHeight; i++)
 	{
 		m_queue[i] = a_rSrc.m_queue[i];
 		/* Extension de la durée de vie !! */
 		m_queue[i].m_lifespan +=LIFE_EXTEND;
 	}
-	m_headIndex = a_uiSplitHeight;
+	m_iHeadIndex = a_uiSplitHeight;
 	m_selfVelocity = a_rSrc.m_selfVelocity;
 }
 
@@ -43,13 +41,11 @@ IFreeSkeleton::~IFreeSkeleton()
 
 void IFreeSkeleton::removeParticle(uint n)
 {
-	int i;
-
-	for ( i=n; i<m_headIndex ; i++)
+	for (int i=n; i<m_iHeadIndex ; i++)
 		m_queue[i] = m_queue[i+1];
 
-	m_headIndex--;
-	assert(m_headIndex>=0);
+	m_iHeadIndex--;
+	assert(m_iHeadIndex>=0);
 }
 
 void IFreeSkeleton::swap(uint i, uint j)
@@ -62,11 +58,8 @@ void IFreeSkeleton::swap(uint i, uint j)
 
 void IFreeSkeleton::move ()
 {
-	uint i;
-
-	/* Déplacement des particules */
 	/* Boucle de parcours : du haut vers le bas */
-	for (i = 0; i < getInternalSize (); i++)
+	for (uint i = 0; i < getInternalSize (); i++)
 	{
 		CParticle& tmp = grabParticle (i);
 

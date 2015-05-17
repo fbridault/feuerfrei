@@ -32,14 +32,14 @@ public:
 
 	~CTNumerable() {};
 
-	CTNumerable<t_object>& operator=(CTNumerable<t_object> const& a_rSource)
+	CTNumerable<CType>& operator=(CTNumerable<CType> const& a_rSource)
 	{
 		assert(a_rSource.m_eVal < CType::_NbValues);
 		m_eVal = a_rSource.m_eVal;
 		return *this;
 	}
 
-	CTNumerable<t_object>& operator=(uint a_uiSource)
+	CTNumerable<CType>& operator=(uint a_uiSource)
 	{
 		assert(a_uiSource <	CType::_NbValues);
 		m_eVal = a_uiSource;
@@ -52,7 +52,7 @@ public:
 		return m_eVal == a_rSource;
 	}
 
-	bool operator==(CTNumerable<t_object> const& a_nSource) const
+	bool operator==(CTNumerable<CType> const& a_nSource) const
 	{
 		assert(a_nSource.m_eVal < CType::_NbValues);
 		return m_eVal == a_nSource.m_eVal;
@@ -63,7 +63,7 @@ public:
 		return !(rThis == a_rSource);
 	}
 
-	bool operator!=(CTNumerable<t_object> const& a_nSource) const
+	bool operator!=(CTNumerable<CType> const& a_nSource) const
 	{
 		return !(rThis == a_nSource);
 	}

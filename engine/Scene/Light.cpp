@@ -157,7 +157,7 @@ void COmniLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void COmniLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
+void COmniLight::CastShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
 {
 	glPushAttrib(GL_VIEWPORT_BIT);
 	glViewport (0, 0, m_depthMapW, m_depthMapW);
@@ -353,7 +353,7 @@ void CSpotLight::chooseDeferredShader(const CShader* spotShader, const CShader* 
 //---------------------------------------------------------------------------------------------------------------------
 //
 //---------------------------------------------------------------------------------------------------------------------
-void CSpotLight::castShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
+void CSpotLight::CastShadows(CCamera &camera, CRenderList const& a_rRenderList, GLfloat *invModelViewMatrix)
 {
 	CVector up(0,0,1);
 	CPoint const& rPosition = m_rTransform.GetWorldPosition();

@@ -40,8 +40,8 @@ void DepthPeelingEngine::generateTex()
 
 	m_renderTarget[0]->addTarget("color rect rgba nearest",0,m_nbLayers/2);
 
-	m_renderTarget[0]->addTarget("depth rect shadow nearest greater",1);
-	m_renderTarget[1]->addTarget("depth rect shadow nearest greater",1);
+	m_renderTarget[0]->addTarget("depth rect shadow nearest greater", 1);
+	m_renderTarget[1]->addTarget("depth rect shadow nearest greater", 1);
 
 	m_sceneDepthRenderTarget = new CRenderTarget("depth shadow rect nearest less",m_width, m_height, 2);
 

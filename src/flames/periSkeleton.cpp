@@ -27,7 +27,7 @@ CFreePeriSkeleton* CPeriSkeleton::split (uint a_uiSplitHeight, CFreeLeadSkeleton
 {
 	CFreePeriSkeleton *skel = new CFreePeriSkeleton(rThis, a_rLeadSkeleton, a_uiSplitHeight);
 
-	m_headIndex = a_uiSplitHeight;
+	m_iHeadIndex = a_uiSplitHeight;
 
 	assert(skel != NULL);
 	return( skel );
@@ -46,15 +46,15 @@ void CPeriSkeleton::addForces ()
 
 void CPeriSkeleton::addParticle(CPoint const& a_rParticle)
 {
-	if (m_headIndex >= NB_PARTICLES_MAX-1)
+	if (m_iHeadIndex >= NB_PARTICLES_MAX-1)
 	{
 		puts("(EE) Too many particles in CPeriSkeleton::addParticle() !!!");
 		return;
 	}
-	m_headIndex++;
+	m_iHeadIndex++;
 
-	m_queue[m_headIndex] = a_rParticle;
-	m_queue[m_headIndex].birth(m_lifeSpan);
+	m_queue[m_iHeadIndex] = a_rParticle;
+	m_queue[m_iHeadIndex].birth(m_lifeSpan);
 }
 
 bool CPeriSkeleton::moveParticle (CParticle& a_rParticle)

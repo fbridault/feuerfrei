@@ -7,8 +7,8 @@
 
 using namespace std;
 
-/** La classe texture peut �tre utilis�e pour sous-classer diff�rents types de textures, comme des textures
- * bitmaps � partir d'un fichier image, ou des textures de profondeur.
+/** La classe texture peut être utilisée pour sous-classer différents types de textures, comme des textures
+ * bitmaps à partir d'un fichier image, ou des textures de profondeur.
  * Lors du texturage, il suffit d'appeler la fonction glBindTexture() avec comme param�tre
  * ITexture::GetTexture().
  * A noter que cette classe peut facilement �tre r�utilis�e pour une autre application.
@@ -28,7 +28,7 @@ public:
 	/** Donne l'identifiant de la texture � utiliser avec glBindTexture().
 	 * @return Identifiant de la texture.
 	 */
-	const GLuint GetTexture() const
+	GLuint GetTexture() const
 	{
 		return m_uiTexId;
 	};
@@ -36,14 +36,13 @@ public:
 	/** Donne le type de la texture.
 	 * @return Type de la texture.
 	 */
-	const GLuint GetTextureType() const
+	GLuint GetTextureType() const
 	{
 		return m_eType;
 	};
 
-	/** Active la texture pour l'objet courant avec glBindTexture().
-	 */
-	const void bind() const
+	/** Active la texture pour l'objet courant avec glBindTexture(). */
+	void bind() const
 	{
 		glBindTexture(m_eType, m_uiTexId);
 	};
@@ -51,7 +50,7 @@ public:
 	/** Active la texture pour l'objet courant avec glBindTexture().
 	 * @param unit� de texture
 	 */
-	const void bind(uint uiTexUnit) const
+	void bind(uint uiTexUnit) const
 	{
 		glActiveTexture(GL_TEXTURE0+uiTexUnit);
 		glBindTexture(m_eType, m_uiTexId);
@@ -109,7 +108,7 @@ public:
 
 	virtual ~CBitmapTexture();
 
-	const bool hasAlpha() const
+	bool hasAlpha() const
 	{
 		return m_hasAlpha;
 	};

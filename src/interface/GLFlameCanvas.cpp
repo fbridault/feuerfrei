@@ -25,8 +25,8 @@ GLFlameCanvas::GLFlameCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	m_oSceneRenderList(NRenderType::eNormal),
 	m_oFlamesRenderList(NRenderType::eFx)
 {
-	m_init = false;
-	m_run = false;
+	m_bInit = false;
+	m_bRun = false;
 	m_pixels = new u_char[size.GetWidth()*size.GetHeight()*3];
 	m_framesCount = 0;
 	/* Pour éviter de faire un calcul pour ajouter des 0... */
@@ -57,7 +57,7 @@ GLFlameCanvas::~GLFlameCanvas()
 void GLFlameCanvas::InitUISettings(void)
 {
 	/* Pour l'affichage */
-	m_run = true;
+	m_bRun = true;
 	m_saveImages = false;
 	m_glowOnly = false;
  	m_displayBase = m_displayVelocity = m_displayGrid = m_displayWickBoxes = m_fullscreen = false;
@@ -236,7 +236,7 @@ void GLFlameCanvas::Init (FlameAppConfig *config)
 
 	InitScene();
 
-	m_init = true;
+	m_bInit = true;
 
 	cout << "Initialization over" << endl;
 }
@@ -273,7 +273,7 @@ void GLFlameCanvas::ResumeThreads()
 //---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::DeleteThreads()
 {
-	m_init = false;
+	m_bInit = false;
 	/* On sort les threads de leur pause si nécessaire, car sinon il serait impossible de les arrêter ! */
 	if ( !IsRunning() ) setRunningState(true);
 
@@ -305,8 +305,8 @@ void GLFlameCanvas::DeleteThreads()
 //---------------------------------------------------------------------------------------------------------------------
 void GLFlameCanvas::Restart (void)
 {
-	m_run = false;
-	m_init = false;
+	m_bRun = false;
+	m_bInit = false;
 	Disable();
 #ifdef MULTITHREADS
 	DeleteThreads();
@@ -323,8 +323,8 @@ void GLFlameCanvas::Restart (void)
 
 	m_swatch->Start();
 
-	m_run = true;
-	m_init = true;
+	m_bRun = true;
+	m_bInit = true;
 	cout << "Initialization over" << endl;
 	Enable();
 }
@@ -382,8 +382,8 @@ void GLFlameCanvas::ReloadFieldsAndFires (void)
 	InitThreads();
 #endif
 	m_swatch->Start();
-	m_run = true;
-	m_init = true;
+	m_bRun = true;
+	m_bInit = true;
 	cout << "Initialization over" << endl;
 	Enable();
 }
@@ -438,21 +438,24 @@ void GLFlameCanvas::DestroyScene(void)
 void GLFlameCanvas::OnIdle(wxIdleEvent& event)
 {
 #ifndef MULTITHREADS
-	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-	        firesIterator != m_fires.end (); firesIterator++)
-		(*firesIterator)->addForces ();
+	if(m_bRun)
+	{
+		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+				firesIterator != m_fires.end (); firesIterator++)
+			(*firesIterator)->addForces ();
 
-	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	        fieldsIterator != m_fields.end (); fieldsIterator++)
-		(*fieldsIterator)->iterate ();
+		for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+				fieldsIterator != m_fields.end (); fieldsIterator++)
+			(*fieldsIterator)->iterate ();
 
-	for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
-	        firesIterator != m_fires.end (); firesIterator++)
-		(*firesIterator)->build();
+		for (vector < IFireSource* >::iterator firesIterator = m_fires.begin ();
+				firesIterator != m_fires.end (); firesIterator++)
+			(*firesIterator)->build();
 
-	for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
-	        fieldsIterator != m_fields.end (); fieldsIterator++)
-		(*fieldsIterator)->cleanSources ();
+		for (vector < Field3D* >::iterator fieldsIterator = m_fields.begin ();
+				fieldsIterator != m_fields.end (); fieldsIterator++)
+			(*fieldsIterator)->cleanSources ();
+	}
 #endif
 	/* Force à redessiner */
 	this->Refresh();
@@ -476,22 +479,22 @@ void GLFlameCanvas::OnMouseClick(wxMouseEvent& event)
 	switch (event.GetButton())
 	{
 		case wxMOUSE_BTN_LEFT :
-			nButton = NMouseButton::eButtonLeft;
+			nButton = NMouseButton::eLeft;
 			break;
 		case wxMOUSE_BTN_MIDDLE :
-			nButton = NMouseButton::eButtonMiddle;
+			nButton = NMouseButton::eMiddle;
 			break;
 		case wxMOUSE_BTN_RIGHT :
-			nButton = NMouseButton::eButtonRight;
+			nButton = NMouseButton::eRight;
 			break;
 	}
 	if (event.ButtonDown())
 	{
-		nButtonState = NMouseButtonState::eButtonDown;
+		nButtonState = NMouseButtonState::eDown;
 	}
 	else
 	{
-		nButtonState = NMouseButtonState::eButtonUp;
+		nButtonState = NMouseButtonState::eUp;
 	}
 	m_pCamera->OnMouseClick(nButton, nButtonState, event.GetX(), event.GetY());
 }
@@ -540,7 +543,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 				(*fieldsIterator)->increaseRes ();
 			break;
 		case WXK_SPACE :
-			setRunningState(!m_run);
+			setRunningState(!m_bRun);
 			//m_nurbsTest = 1;
 			break;
 		case 'R' :
@@ -576,7 +579,7 @@ void GLFlameCanvas::OnKeyPressed(wxKeyEvent& event)
 
 void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 {
-	if (!m_init)
+	if (!m_bInit)
 		return;
 
 	wxPaintDC dc(this);
@@ -594,9 +597,9 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 		m_oSceneRenderList.Accumulate(m_oSceneGraph);
 	}
 
-	if (m_run)
+	if (m_bRun)
 	{
-		m_visibility = false;
+		m_bVisibility = false;
 
 		// Get display flame state
 		CRenderFlameState const &rRenderState = CRenderFlameState::GetInstance();
@@ -608,7 +611,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 			        firesIterator != m_fires.end (); firesIterator++)
 				if ((*firesIterator)->isVisible())
 				{
-					m_visibility = true;
+					m_bVisibility = true;
 					break;
 				}
 		}
@@ -619,7 +622,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	bool const bDisplayParticles = rRenderState.GetDisplayParticle();
 
 	if (!m_nurbsTest)
-		if (m_visibility || bDisplayParticles)
+		if (m_bVisibility || bDisplayParticles)
 		{
 			if (m_currentConfig->glowEnabled )
 			{
@@ -642,14 +645,14 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 
 					/* Dessin de la scène dans le depth buffer sans les textures pour avoir les occlusions sur les flammes */
 					glClear(GL_DEPTH_BUFFER_BIT);
-//					glDrawBuffer(GL_NONE);
-//					glReadBuffer(GL_NONE);
+					glDrawBuffer(GL_NONE);
+					glReadBuffer(GL_NONE);
 					CDrawState &rDrawState = CDrawState::GetInstance();
 					rDrawState.SetShadingFilter(NShadingFilter::eAll);
 					rDrawState.SetShadingType(NShadingType::eAmbient);
 					m_oSceneRenderList.Render();
-//					glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
-//					glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
+					glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT);
+					glReadBuffer(GL_COLOR_ATTACHMENT0_EXT);
 
 					glClear(GL_COLOR_BUFFER_BIT);
 					glEnable(GL_BLEND);
@@ -675,7 +678,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 	drawScene();
 
 	/********************* DESSINS DES FLAMMES SANS GLOW **********************************/
-	if ((m_visibility || bDisplayParticles) && !m_currentConfig->glowEnabled )
+	if ((m_bVisibility || bDisplayParticles) && !m_currentConfig->glowEnabled )
 	{
 		if (m_currentConfig->depthPeelingEnabled)
 			m_depthPeelingEngine->render(m_oFlamesRenderList);
@@ -695,7 +698,7 @@ void GLFlameCanvas::OnPaint (wxPaintEvent& event)
 					glCallList(m_flamesDisplayList);
 	}
 
-	if ((m_visibility || bDisplayParticles) && m_currentConfig->glowEnabled )
+	if ((m_bVisibility || bDisplayParticles) && m_currentConfig->glowEnabled )
 	{
 		CRenderFlameState &rRenderState = CRenderFlameState::GetInstance();
 		rRenderState.SetDisplayBoundingVolume(NDisplayBoundingVolume::eImpostor);
